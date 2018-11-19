@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Feature;
 use App\Key;
+use App\Script;
 use App\Server;
 use App\ServerFeature;
 use Illuminate\Http\Request;
@@ -47,15 +48,31 @@ class ServerController extends Controller
     public function one(){
         $server = Server::where('_id',request('id'))->first();
         $server_features = ServerFeature::where('server_id',$server->_id)->get();
+        $scripts = Script::where('features','server')->get();
         return view('server.one',[
             "stats" => $server->run("df -h"),
             "server" => $server,
-            "server_features" => $server_features
+            "server_features" => $server_features,
+            "scripts" => $scripts
         ]);
     }
 
     public function run(){
         $output = Server::where('_id',\request('server_id'))->first()->run(\request('command'));
+        return [
+            "result" => 200,
+            "data" => $output
+        ];
+    }
+
+    public function runScript(){
+        $script = Script::where('_id',\request('script_id'))->first();
+        $inputs = explode(',',$script->inputs);
+        $params = "";
+        foreach ($inputs as $input){
+            $params = " " . \request(explode(':',$input)[0]);
+        }
+        $output = Server::where('_id',\request('server_id'))->first()->runScript($script, $params);
         return [
             "result" => 200,
             "data" => $output

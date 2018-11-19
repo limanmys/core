@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+    <script>
+        var server_id = "{{$server->_id}}";
+        var params = [];
+        var script_id = "";
+    </script>
     <button class="btn btn-success" onclick="location.href = '/sunucular/';">Geri Don</button>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">
         Düzenle
@@ -8,10 +13,17 @@
 
     <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#commandModal">
         Komut Çalıştır
-    </button><br><br>
+    </button>
+    @isset($scripts)
+        @foreach($scripts as $script)
+            <button class="btn-primary btn" onclick="generateModal('{{$script->inputs}}','{{$script->name}}','{{$script->_id}}')">{{$script->name}}</button>
+        @endforeach
+    @endisset
+    <br><br>
     <button type="button" class="btn btn-secondary btn-lg" data-toggle="modal" data-target="#addService">
         Servisleri Düzenle
-    </button><br><br>
+    </button>
+    <br><br>
     <h3>{{$server->name}}</h3><br>
 
     <pre>
@@ -37,7 +49,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-danger" onclick="deleteServer('{{$server->id}}')">Sunucu Sil</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteServer()">Sunucu Sil</button>
                 </div>
             </div>
         </div>
@@ -62,7 +74,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-warning" onclick="runCommand('{{$server->id}}')">Çalıştır</button>
+                    <button type="button" class="btn btn-warning" onclick="runCommand()">Çalıştır</button>
                 </div>
             </div>
         </div>
@@ -104,19 +116,41 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-warning" onclick="runCommand('{{$server->id}}')">Çalıştır</button>
+                    <button type="button" class="btn btn-warning" onclick="runCommand()">Çalıştır</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="customScripts" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="exampleModalLabel">Servisleri Düzenle</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group" id="customScriptInputs">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-warning" onclick="runCustomScript()">Çalıştır</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
         $("#commandOutput").fadeOut();
-        function deleteServer(id) {
+        function deleteServer() {
             $.ajax({
                 url : "{{ route('server_remove') }}",
                 type : "POST",
                 data :{
-                    id : id
+                    id : server_id
                 },
                 success : function (data) {
                     if(data["result"] === 200){
@@ -127,18 +161,67 @@
                 }
             });
         }
-        function runCommand(id) {
+        function runCommand() {
             var command = $("#run_command").val();
             $.ajax({
                 url : "{{ route('server_run') }}",
                 type : "POST",
                 data :{
-                    server_id : id,
+                    server_id : server_id,
                     command : command
                 },
                 success : function (data) {
                     if(data["result"] === 200){
                         $("#commandOutput").fadeIn().html(data["data"]);
+                    }else{
+                        alert("Hata");
+                    }
+                }
+            });
+        }
+        
+        function generateModal(raw_inputs,title,id) {
+            script_id = id;
+            $("#customScriptInputs").html("");
+            var inputs = raw_inputs.split(',');
+            $("#customScripts .modal-title").html(title);
+            inputs.forEach(function (input) {
+                var current = input.split(':');
+                var newInput = document.createElement("input");
+                switch (current[1]) {
+                    case "number":
+                    case "ip_address":
+                        newInput.type="number";
+                        break;
+                    case "string":
+                    default:
+                        newInput.type="text";
+                        break;
+                }
+                newInput.name = "custom_" + current[0];
+                params.push(current[0]);
+                $(newInput).addClass("form-control");
+                $("#customScriptInputs").append("<h3>" + current[0] +"</h3>");
+                document.getElementById('customScriptInputs').appendChild(newInput);
+            });
+            $('#customScripts').modal('show');
+        }
+        
+        function runCustomScript() {
+            //setup params
+            var data = {};
+            params.forEach(function (param) {
+                data[param] = $("input[name='custom_" + param + "']").val();
+            });
+            data["server_id"] = server_id;
+            data["script_id"] = script_id;
+            $.ajax({
+                url : "{{ route('script_run') }}",
+                type : "POST",
+                data :data,
+                success : function (data) {
+                    if(data["result"] === 200){
+                        console.log(data["data"]);
                     }else{
                         alert("Hata");
                     }

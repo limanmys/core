@@ -15,16 +15,13 @@
         <thead>
         <tr>
             <th scope="col">Betik Adı</th>
-            <th scope="col"></th>
+            {{--<th scope="col"></th>--}}
         </tr>
         </thead>
         <tbody>
         @foreach ($scripts as $script)
             <tr class="highlight" onclick="window.location.href = '{{route('script_one',$script->_id)}}'">
                 <td>{{$script->name}}</td>
-                <td>
-                    <button class="btn btn-primary">Düzenle</button>
-                </td>
             </tr>
         @endforeach
         </tbody>
