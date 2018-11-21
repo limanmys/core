@@ -24,12 +24,12 @@ Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/', 'HomeController@index')->name('home');
     Route::get('/sunucular', 'ServerController@index')->name('servers');
-    Route::group(['middleware' => ['parameters:server_id','server']], function () {
+    Route::group(['middleware' => ['server']], function () {
         Route::get('/sunucular/{server_id}', 'ServerController@one')->name('server_one');
         Route::post('/sunucu/ekle' , 'ServerController@add')->name('server_add')->middleware('parameters:username,password,ip_address,port');
-        Route::post('/sunucu/sil', 'ServerController@remove')->name('server_remove')->middleware('');
+        Route::post('/sunucu/sil', 'ServerController@remove')->name('server_remove')->middleware('parameters:server_id');
         Route::post('/sunucu/calistir', 'ServerController@run')->name('server_run');
-        Route::post('/sunucu/kontrol', 'ServerController@check')->name('server_check');
+        Route::post('/sunucu/kontrol', 'ServerController@check')->name('server_check')->middleware('parameters:feature,server_id');
     });
     Route::get('/anahtarlar','SshController@index')->name('keys');
     Route::post('/anahtar/ekle','SshController@add')->name('key_add');
@@ -47,4 +47,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/l/{feature}/{city}/{server}', 'FeatureController@server')->name('feature_server');
 
     Route::get('/ayarlar', 'SettingsController@index')->name('settings');
+
+
 });
+Route::get('/ldap','LdapController@getUsers');

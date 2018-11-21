@@ -9,7 +9,8 @@
         "fideloper/proxy": "^4.0",
         "jenssegers/mongodb": "^3.4",
         "laravel/framework": "5.7.*",
-        "laravel/tinker": "^1.0"
+        "laravel/tinker": "^1.0",
+      "ext-ldap": "*"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
