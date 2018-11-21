@@ -9,6 +9,7 @@
         <div class="card w-auto">
             <div class="card-body">
                 <h4 class="card-title">Gerekli Parametreler</h4>
+                <h6>Kullanıcıya input olarak gösterilecek parametreler, parametre adları <b>aynı yazıldığı gibi</b> arayüzde gösterilecektir.</h6>
                 <div class="form-inline">
                     <table>
                         <tr>
@@ -58,8 +59,8 @@
                             </td>
                             <td style="margin:10px;">
                                 <select class="form-control" name="inputs" id="inputType">
-                                    <option value="string">Metin</option>
-                                    <option value="number">Sayı</option>
+                                    <option value="string" style="background-color: blue">Metin</option>
+                                    <option value="number" style="background-color: pink">Sayı</option>
                                     <option value="ip">Ip Adresi</option>
                                 </select>
                             </td>
@@ -135,9 +136,17 @@
 
     <script>
         function addInput() {
-            var name = $("#inputName").val();
-            var type = $("#inputType").val();
-            $(".inputs").append("<span class='input_list'>\"" + name + '\":' + type + "</span>");
+            var name = $("#inputName");
+            var type = $("#inputType");
+            if(name.val() === ""){
+                return;
+            }
+            $(".inputs").append("<span onclick=\"removeInput('" + name.val() + "')\" class='input_list inputs_" + name.val() + "'>" + name.val() + "</span>");
+            name.val("");
+        }
+        
+        function removeInput(target) {
+            $(".inputs_" + target).remove();
         }
     </script>
 @endsection

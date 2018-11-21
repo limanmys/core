@@ -46,13 +46,10 @@ class ServerController extends Controller
     }
 
     public function one(){
-        $server = Server::where('_id',request('id'))->first();
-        $server_features = ServerFeature::where('server_id',$server->_id)->get();
         $scripts = Script::where('features','server')->get();
         return view('server.one',[
-            "stats" => $server->run("df -h"),
-            "server" => $server,
-            "server_features" => $server_features,
+            "stats" => \request('server')->run("df -h"),
+            "server" => \request('server'),
             "scripts" => $scripts
         ]);
     }
@@ -70,11 +67,27 @@ class ServerController extends Controller
         $inputs = explode(',',$script->inputs);
         $params = "";
         foreach ($inputs as $input){
-            $params = " " . \request(explode(':',$input)[0]);
+            $params = $params. " " . \request(explode(':',$input)[0]);
         }
         $output = Server::where('_id',\request('server_id'))->first()->runScript($script, $params);
         return [
             "result" => 200,
+            "data" => $output
+        ];
+    }
+
+    public function check(){
+        $feature = Feature::where('name','like',request('feature'))->first();
+        $output = Server::where('_id',\request('server_id'))->first()->isRunning($feature->service);
+        if($output == "active\n"){
+            $result = 200;
+        }else if($output === "inactive\n"){
+            $result = 202;
+        }else{
+            $result = 201;
+        }
+        return [
+            "result" => $result,
             "data" => $output
         ];
     }

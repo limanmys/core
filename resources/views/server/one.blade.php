@@ -14,18 +14,23 @@
     <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#commandModal">
         Komut Çalıştır
     </button>
+    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addService">
+        Servisleri Düzenle
+    </button>
     @isset($scripts)
         @foreach($scripts as $script)
             <button class="btn-primary btn" onclick="generateModal('{{$script->inputs}}','{{$script->name}}','{{$script->_id}}')">{{$script->name}}</button>
         @endforeach
     @endisset
     <br><br>
-    <button type="button" class="btn btn-secondary btn-lg" data-toggle="modal" data-target="#addService">
-        Servisleri Düzenle
-    </button>
+    <h1>{{$server->name}}</h1>
+    <h4>Servis Durumları</h4>
+        @foreach($server->features as $feature)
+            <button type="button" class="btn btn-info btn-lg" style="cursor:default;" id="status_{{$feature}}">
+                {{strtoupper($feature)}}
+            </button>
+        @endforeach
     <br><br>
-    <h3>{{$server->name}}</h3><br>
-
     <pre>
         @isset($stats)
             {{$stats}}
@@ -33,7 +38,7 @@
     </pre>
 
     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">
-        Sunucu Sil
+        Sunucuyu Sil
     </button>
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -64,8 +69,14 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" onclick="document.getElementById('run_command').disabled = !this.checked;" id="commandResponsibility">
+                        <label class="form-check-label" for="defaultCheck1">
+                            Özel komut çalıştırma sorumluluğunu kabul ediyorum.
+                        </label>
+                    </div><br>
                     <div class="form-group">
-                        <textarea class="form-control" id="run_command" rows="3"></textarea>
+                        <textarea class="form-control" id="run_command" rows="3" disabled></textarea>
                     </div>
                     <div class="form-group">
                         <textarea class="form-control" id="commandOutput" rows="3" readonly></textarea>
@@ -103,11 +114,11 @@
                                 <th scope="row">{{$loop->index + 1}}</th>
                                 <td>{{$feature->name}}</td>
                                 <td>
-                                    @if($server_features->where('_id',$feature->_id)->count() > 0)
-                                        <button type="button" class="btn btn-danger">Devre Dışı Bırak</button>
-                                    @else
-                                        <button type="button" class="btn btn-success">Servisi Ekle</button>
-                                    @endif
+                                    {{--@if($server_features->where('_id',$feature->_id)->count() > 0)--}}
+                                        {{--<button type="button" class="btn btn-danger">Devre Dışı Bırak</button>--}}
+                                    {{--@else--}}
+                                        {{--<button type="button" class="btn btn-success">Servisi Ekle</button>--}}
+                                    {{--@endif--}}
                                 </td>
                             </tr>
                     @endforeach
@@ -135,10 +146,13 @@
                     <div class="form-group" id="customScriptInputs">
 
                     </div>
+                    <div class="collapse" id="customScriptOutput">
+
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-warning" onclick="runCustomScript()">Çalıştır</button>
+                    <button type="button" id="cs_cancel" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="button" id="cs_submit" class="btn btn-warning" onclick="runCustomScript()">Çalıştır</button>
                 </div>
             </div>
         </div>
@@ -162,6 +176,9 @@
             });
         }
         function runCommand() {
+            if($("#commandResponsibility").is(':checked') === false){
+                return;
+            }
             var command = $("#run_command").val();
             $.ajax({
                 url : "{{ route('server_run') }}",
@@ -179,32 +196,59 @@
                 }
             });
         }
-        
+
         function generateModal(raw_inputs,title,id) {
             script_id = id;
             $("#customScriptInputs").html("");
+            $('#customScriptOutput').html("");
             var inputs = raw_inputs.split(',');
             $("#customScripts .modal-title").html(title);
-            inputs.forEach(function (input) {
-                var current = input.split(':');
-                var newInput = document.createElement("input");
-                switch (current[1]) {
-                    case "number":
-                    case "ip_address":
-                        newInput.type="number";
-                        break;
-                    case "string":
-                    default:
-                        newInput.type="text";
-                        break;
-                }
-                newInput.name = "custom_" + current[0];
-                params.push(current[0]);
-                $(newInput).addClass("form-control");
-                $("#customScriptInputs").append("<h3>" + current[0] +"</h3>");
-                document.getElementById('customScriptInputs').appendChild(newInput);
-            });
+            if (inputs[0] !== ""){
+                inputs.forEach(function (input) {
+                    var current = input.split(':');
+                    var newInput = document.createElement("input");
+                    switch (current[1]) {
+                        case "number":
+                        case "ip_address":
+                            newInput.type="number";
+                            break;
+                        case "string":
+                        default:
+                            newInput.type="text";
+                            break;
+                    }
+                    newInput.name = "custom_" + current[0];
+                    params.push(current[0]);
+                    $(newInput).addClass("form-control");
+                    $("#customScriptInputs").append("<h3>" + current[0] +"</h3>");
+                    document.getElementById('customScriptInputs').appendChild(newInput);
+                });
+            }else{
+                runCustomScript();
+            }
             $('#customScripts').modal('show');
+        }
+
+
+        function checkStatus(feature) {
+            var element = $("#status_" + feature);
+            $.ajax({
+                    url : "{{ route('server_check') }}",
+                    type : "POST",
+                    data : {
+                        feature : feature,
+                        server_id : '{{$server->_id}}'
+                    },
+                    success : function (data) {
+                        if(data["result"] === 200){
+                            element.removeClass('btn-info').removeClass('btn-danger').addClass('btn-success');
+                        }else if(data["result"] === 201){
+                            element.removeClass('btn-success').removeClass('btn-info').addClass('btn-danger');
+                        }else{
+                            element.removeClass('btn-success').removeClass('btn-info').addClass('btn-secondary');
+                        }
+                    }
+            });
         }
         
         function runCustomScript() {
@@ -221,12 +265,20 @@
                 data :data,
                 success : function (data) {
                     if(data["result"] === 200){
-                        console.log(data["data"]);
+                        $('#customScriptOutput').html(data["data"]).collapse();
+                        $("#cs_cancel").fadeOut();
+                        $("#cs_submit").fadeOut();
+                        // console.log(data["data"]);
                     }else{
                         alert("Hata");
                     }
                 }
             });
         }
+        @foreach($server->features as $feature)
+            setInterval(function () {
+                checkStatus('{{$feature}}');
+            }, 5000);
+        @endforeach
     </script>
 @endsection
