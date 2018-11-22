@@ -6,8 +6,7 @@
             <div class="col-9">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
-                        <p class="card-text">{{$output}}</p>
+
                     </div>
                 </div>
             </div>

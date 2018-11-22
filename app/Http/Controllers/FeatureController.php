@@ -41,11 +41,10 @@ class FeatureController extends Controller
         $feature = Feature::where('name',\request('feature'))->first();
         $server = Server::where('_id',\request('server'))->first();
         $scripts = Script::where('features','like',\request('feature'))->get();
-        $script = Script::where('_id',"5bf67021fdce2771a86cba43")->first();
+        $script = Script::where('_id',"5bf69cc7fdce27729a1080c2")->first();
         $output = $server->runScript($script,"");
         $output = str_replace("\n","",$output);
         $json = json_decode($output,true);
-        dd($output);
         return view('feature.server',[
             "feature" => $feature,
             "server" => $server,
