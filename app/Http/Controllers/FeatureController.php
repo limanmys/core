@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Feature;
 use App\Script;
 use App\Server;
-use Illuminate\Http\Request;
 
 class FeatureController extends Controller
 {
@@ -16,9 +15,18 @@ class FeatureController extends Controller
         if(!Feature::where('name',\request('feature'))->exists()){
             return redirect(route('home'));
         }
-        $cities = "54,81,06";
+        $servers = Server::where('features','like',\request('feature'))->get();
+        $cities = "";
+        foreach ($servers as $server){
+            if($cities == "")
+                $cities = $cities . $server->city;
+            else{
+                $cities = $cities . "," .$server->city;
+            }
+        }
         return view('feature.index',[
-            "cities" => $cities
+            "cities" => $cities,
+            "name" => request('feature')
         ]);
     }
 

@@ -24,9 +24,9 @@ Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/', 'HomeController@index')->name('home');
     Route::get('/sunucular', 'ServerController@index')->name('servers');
+    Route::post('/sunucu/ekle' , 'ServerController@add')->name('server_add')->middleware('parameters:username,password,ip_address,port');
     Route::group(['middleware' => ['server']], function () {
         Route::get('/sunucular/{server_id}', 'ServerController@one')->name('server_one');
-        Route::post('/sunucu/ekle' , 'ServerController@add')->name('server_add')->middleware('parameters:username,password,ip_address,port');
         Route::post('/sunucu/sil', 'ServerController@remove')->name('server_remove')->middleware('parameters:server_id');
         Route::post('/sunucu/calistir', 'ServerController@run')->name('server_run');
         Route::post('/sunucu/kontrol', 'ServerController@check')->name('server_check')->middleware('parameters:feature,server_id');
@@ -48,6 +48,8 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/ayarlar', 'SettingsController@index')->name('settings');
 
-
+    Route::get('/eklentiler' , 'ExtensionsController@index')->name('extensions');
 });
-Route::get('/ldap','LdapController@getUsers');
+Route::get('/ldap/users','LdapController@getUsers');
+Route::get('/ldap/groups','LdapController@getGroups');
+Route::get('/ldap/computers','LdapController@getComputers');

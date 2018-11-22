@@ -1,10 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h2>SSH Anahtarları</h2>
+    </div>
     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
         Anahtar Ekle
     </button><br><br>
-    <h1 class="h2">Anahtarlar</h1>
     <table class="table">
         <thead>
         <tr>

@@ -10,42 +10,25 @@
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
 
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h2>Kullanıcılar</h2>
+    </div>
     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#userAdd">
-
         Kullanıcı Ekle
-
     </button><br><br>
-
-    <h1 class="h2">Kullanıcılar</h1>
-
     <table id="mainTable" class="table">
-
         <thead>
-
         <tr>
-
             <th scope="col">Kullanıcı Adı</th>
-
             <th scope="col">Email</th>
-
             <th scope="col"></th>
-
         </tr>
-
         </thead>
-
         <tbody data-toggle="modal" data-target="#new">
-
         @foreach ($users as $user)
-
             <tr class="highlight">
-
                 <td>{{$user->name}}</td>
-
                 <td>{{$user->email}}</td>
-
-
-
             </tr>
 
         @endforeach

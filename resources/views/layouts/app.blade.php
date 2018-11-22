@@ -79,6 +79,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link text-white" href="{{route('extensions')}}">
+                                <i class="fas fa-anchor"></i>
+                                <span>{{ __("Eklentiler") }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-white" href="{{route('settings')}}">
                                 <i class="fas fa-anchor"></i>
                                 <span>{{ __("Sistem Ayarları") }}</span>

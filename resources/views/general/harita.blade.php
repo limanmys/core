@@ -264,10 +264,6 @@
         function svgturkiyeharitasi() {
             const element = document.querySelector('#svg-turkiye-haritasi');
             const info = document.querySelector('.il-isimleri');
-            var sehirler = "{{$cities}}".split(",");
-            sehirler.forEach(function (sehir) {
-                $("g [data-plakakodu='" + sehir + "'] path").addClass('hasServer');
-            })
 
             element.addEventListener(
                 'mouseover',
@@ -316,12 +312,13 @@
             );
         }
         svgturkiyeharitasi();
+        var sehirler = "{{$cities}}".split(",");
+        sehirler.forEach(function (sehir) {
+            var sehir_adi = $("*[data-plakakodu='" + sehir + "']").attr('id');
+            $("#" + sehir_adi + " path").css('fill','grey');
+        });
     </script>
     <style>
-
-        .hasServer{
-            fill: grey;
-        }
 
         .svg-turkiye-haritasi {
             max-width: 1140px;

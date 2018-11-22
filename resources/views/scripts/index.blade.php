@@ -4,13 +4,15 @@
     <script src="{{asset('js/file_upload/jquery.ui.widget.js')}}"></script>
     <script src="{{asset('js/file_upload/jquery.iframe-transport.js')}}"></script>
     <script src="{{asset('js/file_upload/jquery.fileupload.js')}}"></script>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Betikler</h1>
+    </div>
     <button type="button" class="btn btn-success" onclick="window.location.href = '{{route('script_add')}}'">
         Betik Oluştur
     </button>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#scriptUpload">
         Betik Yükle
     </button><br><br>
-    <h1 class="h2">Betikler</h1>
     <table class="table">
         <thead>
         <tr>
