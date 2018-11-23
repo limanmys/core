@@ -14,9 +14,9 @@
         </tr>
         </thead>
         <tbody>
-        @foreach($features as $feature)
-            <tr class="highlight" onclick="extensionModal('{{$feature->name}}','{{$feature->publisher}}','{{$feature->support}}','{{$feature->status}}')">
-                <td>{{$feature->name}}</td>
+        @foreach($extensions as $extension)
+            <tr class="highlight" onclick="location.href = '{{route('extension_one',$extension->_id)}}'">
+                <td>{{$extension->name}}</td>
             </tr>
         @endforeach
         </tbody>

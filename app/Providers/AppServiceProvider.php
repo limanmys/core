@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Feature;
+use App\Extension;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,8 +15,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $features = Feature::where('status', 0)->get();
-        View::share('features', $features);
+        $extensions = Extension::where('status', 0)->get();
+        View::share('extensions', $extensions);
     }
 
     /**

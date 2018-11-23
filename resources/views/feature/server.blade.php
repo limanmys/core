@@ -6,7 +6,7 @@
             <div class="col-9">
                 <div class="card">
                     <div class="card-body">
-
+                        @include('extensions.'. strtolower($feature->name) . '.index')
                     </div>
                 </div>
             </div>

@@ -31,6 +31,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/sunucu/calistir', 'ServerController@run')->name('server_run');
         Route::post('/sunucu/kontrol', 'ServerController@check')->name('server_check')->middleware('parameters:feature,server_id');
     });
+
     Route::get('/anahtarlar','SshController@index')->name('keys');
     Route::post('/anahtar/ekle','SshController@add')->name('key_add');
 
@@ -49,6 +50,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/ayarlar', 'SettingsController@index')->name('settings');
 
     Route::get('/eklentiler' , 'ExtensionsController@index')->name('extensions');
+    Route::get('/eklentiler/{id}','ExtensionsController@one')->name('extension_one');
 });
 Route::get('/ldap/users','LdapController@getUsers');
 Route::get('/ldap/groups','LdapController@getGroups');

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Feature;
+use App\Extension;
 use App\Key;
 use App\Script;
 use App\Server;
@@ -77,7 +77,7 @@ class ServerController extends Controller
     }
 
     public function check(){
-        $feature = Feature::where('name','like',request('feature'))->first();
+        $feature = Extension::where('name','like',request('feature'))->first();
         $output = Server::where('_id',\request('server_id'))->first()->isRunning($feature->service);
         if($output == "active\n"){
             $result = 200;

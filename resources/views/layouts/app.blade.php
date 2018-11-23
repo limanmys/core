@@ -51,11 +51,11 @@
                                 <span>{{ __("Sunucular") }}</span>
                             </a>
                         </li>
-                        @foreach($features as $feature)
+                        @foreach($extensions as $extension)
                             <li class="nav-item">
-                                <a class="nav-link text-white" href="/l/{{$feature->name}}">
+                                <a class="nav-link text-white" href="/l/{{$extension->name}}">
                                     <i class="fas fa-anchor"></i>
-                                    <span>{{$feature->name}}</span>
+                                    <span>{{$extension->name}}</span>
                                 </a>
                             </li>
                         @endforeach

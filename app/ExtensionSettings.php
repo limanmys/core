@@ -4,8 +4,9 @@ namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
-class Feature extends Eloquent
+class ExtensionSettings extends Eloquent
 {
-    protected $collection = 'features';
+    protected $collection = 'feature_settings';
     protected $connection = 'mongodb';
+
 }

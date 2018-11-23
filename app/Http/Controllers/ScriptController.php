@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Feature;
+use App\Extension;
 use App\Script;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -17,7 +17,7 @@ class ScriptController extends Controller
     }
 
     public function add(){
-        $features = Feature::all();
+        $features = Extension::all();
         return view("scripts.add",[
             "features" => $features
         ]);

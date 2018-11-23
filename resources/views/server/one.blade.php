@@ -109,10 +109,10 @@
                         </tr>
                         </thead>
                         <tbody>
-                    @foreach($features as $feature)
+                    @foreach($extensions as $extension)
                             <tr>
                                 <th scope="row">{{$loop->index + 1}}</th>
-                                <td>{{$feature->name}}</td>
+                                <td>{{$extension->name}}</td>
                                 <td>
                                     {{--@if($server_features->where('_id',$feature->_id)->count() > 0)--}}
                                         {{--<button type="button" class="btn btn-danger">Devre Dışı Bırak</button>--}}
