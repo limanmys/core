@@ -17,26 +17,26 @@
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/fa.min.css') }}">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 </head>
 <body>
+@auth
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
 
-<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">{{ __("Liman Sistem Yönetimi") }}</a>
-    <button class="w3-button w3-teal w3-xlarge" onclick="clickme()">☰</button>
-    @auth
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">{{ __("Liman Sistem Yönetimi") }}</a>
+
         <input class="form-control form-control-dark w-100" type="text" placeholder="{{ __("Arama") }}" aria-label="{{ __("Arama") }}">
         <ul class="navbar-nav px-3">
             <li class="nav-item text-nowrap">
                 <a class="nav-link text-white" href="#">{{ __("Çıkış Yap") }}</a>
             </li>
         </ul>
-    @endauth
-</nav>
-<div class="container-fluid">
-    <div class="row">
-        @auth
-            <nav class="col-md-2 d-none d-md-block bg-dark sidebar" style="width: 350px;" id="mySidenav">
+
+    </nav>
+@endauth
+    <div class="container-fluid">
+        <div class="row">
+            @auth
+            <nav class="col-md-2 d-none d-md-block bg-dark sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -93,45 +93,21 @@
                     </ul>
                 </div>
             </nav>
-        @endauth
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-            <br>
-            @yield('content')
-        </main>
+            @endauth
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                <br>
+                @yield('content')
+            </main>
+        </div>
     </div>
-</div>
-@auth
-    <script>
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $(document).ready(function () {
-            $(document).click(function (event) {
-                var clickover = $(event.target);
-                var _opened = $(".navbar-collapse").hasClass("navbar-collapse in");
-                if (_opened === true && !clickover.hasClass("navbar-toggle")) {
-                    $("button.navbar-toggle").click();
+    @auth
+        <script>
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-        });
-        function clickme(){
-            navSize = document.getElementById("mySidenav").style.width;
-            console.log(navSize);
-            if(navSize=="350px")
-                return close();
-
-            return open();
-        }
-        function open() {
-            document.getElementById("mySidenav").style.width = "350px";
-        }
-        function close() {
-            document.getElementById("mySidenav").style.width = "40px";
-            document.body.style.backgroundColor = "white";
-        }
-    </script>
-@endauth
+        </script>
+    @endauth
 </body>
 </html>
