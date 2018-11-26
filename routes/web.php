@@ -22,14 +22,19 @@
 Auth::routes();
 
 Route::group(['middleware' => ['auth']], function () {
+
     Route::get('/', 'HomeController@index')->name('home');
     Route::get('/sunucular', 'ServerController@index')->name('servers');
     Route::post('/sunucu/ekle' , 'ServerController@add')->name('server_add')->middleware('parameters:username,password,ip_address,port');
+
     Route::group(['middleware' => ['server']], function () {
+
+        Route::get('/l/{feature}/{city}/{server_id}', 'ExtensionsController@generatePage')->name('feature_server')->middleware('script_parameters');
         Route::get('/sunucular/{server_id}', 'ServerController@one')->name('server_one');
         Route::post('/sunucu/sil', 'ServerController@remove')->name('server_remove')->middleware('parameters:server_id');
         Route::post('/sunucu/calistir', 'ServerController@run')->name('server_run');
         Route::post('/sunucu/kontrol', 'ServerController@check')->name('server_check')->middleware('parameters:feature,server_id');
+
     });
 
     Route::get('/anahtarlar','SshController@index')->name('keys');
@@ -43,15 +48,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/betik/calistir', 'ServerController@runScript')->name('script_run');
     Route::post('/betik/yukle', 'ScriptController@upload')->name('script_upload');
 
-    Route::get('/l/{feature}', 'FeatureController@index')->name('feature');
-    Route::get('/l/{feature}/{city}', 'FeatureController@city')->name('feature_city');
-    Route::get('/l/{feature}/{city}/{server}', 'FeatureController@server')->name('feature_server');
+    Route::get('/l/{feature}', 'ExtensionsController@index')->name('feature');
+    Route::get('/l/{feature}/{city}', 'ExtensionsController@city')->name('feature_city');
 
     Route::get('/ayarlar', 'SettingsController@index')->name('settings');
 
-    Route::get('/eklentiler' , 'ExtensionsController@index')->name('extensions');
+    Route::get('/eklentiler' , 'ExtensionsController@settings')->name('extensions_settings');
     Route::get('/eklentiler/{id}','ExtensionsController@one')->name('extension_one');
 });
-Route::get('/ldap/users','LdapController@getUsers');
-Route::get('/ldap/groups','LdapController@getGroups');
-Route::get('/ldap/computers','LdapController@getComputers');

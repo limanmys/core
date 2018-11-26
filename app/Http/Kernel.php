@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\Parameters;
+use App\Http\Middleware\ScriptParameters;
 use App\Http\Middleware\Server;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -60,6 +61,7 @@ class Kernel extends HttpKernel
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'parameters' => Parameters::class,
         'server' => Server::class,
+        'script_parameters' => ScriptParameters::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,

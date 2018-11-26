@@ -56,6 +56,9 @@ class Script extends Eloquent
                 case 12:
                     $script->company = $rows[$i];
                     break;
+                case 13:
+                    $script->unique_code = $rows[$i];
+                    break;
             }
         }
         $script->save();

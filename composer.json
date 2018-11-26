@@ -6,14 +6,16 @@
     "type": "project",
     "require": {
         "php": "^7.1.3",
+        "ext-json": "*",
+        "ext-ldap": "*",
+        "barryvdh/laravel-ide-helper": "^2.5",
         "fideloper/proxy": "^4.0",
         "jenssegers/mongodb": "^3.4",
         "laravel/framework": "5.7.*",
-        "laravel/tinker": "^1.0",
-      "ext-ldap": "*",
-      "ext-json": "*"
+        "laravel/tinker": "^1.0"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.2",
         "beyondcode/laravel-dump-server": "^1.0",
         "filp/whoops": "^2.0",
         "fzaninotto/faker": "^1.4",

@@ -73,7 +73,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="{{route('extensions')}}">
+                            <a class="nav-link text-white" href="{{route('extensions_settings')}}">
                                 <i class="fas fa-anchor"></i>
                                 <span>{{ __("Eklentiler") }}</span>
                             </a>

@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-3">
             <div class="list-group">
-                <a href="#" class="list-group-item list-group-item-action" onclick="$(this).addClass('active')">Dapibus ac facilisis in</a>
+                @each('extensions.__system__.dropdown',$files,'file')
             </div>
         </div>
         <div class="col-9">
@@ -16,22 +16,10 @@
             </div>
         </div>
     </div>
-    <div class="form-group">
-        <ul>
-            @foreach($files as $file)
-                @if(!is_array($file))
-                    <li>{{$file}}</li>
-                @else
-                    <ul>
-                    @foreach($file as $i)
-                            @if(!is_array($i))
-                                <li>{{$i}}</li>
-                            @endif
 
-                    @endforeach
-                    </ul>
-                @endif
-            @endforeach
-        </ul>
-    </div>
+    <script>
+        function details() {
+            $('.list-group-item').removeClass('active');$("#" + id).addClass('active')
+        }
+    </script>
 @endsection

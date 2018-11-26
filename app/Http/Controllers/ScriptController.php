@@ -36,7 +36,7 @@ class ScriptController extends Controller
         $contents = Storage::get('scripts/' . $script->_id);
         //Dirty way, but works well.
         $contents = explode("\n", $contents);
-        $contents = array_slice($contents,13);
+        $contents = array_slice($contents,14);
         $contents = implode("\n",$contents);
         return view("scripts.one",[
             "script" => $script,
