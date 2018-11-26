@@ -35,10 +35,11 @@
             var data = {
                 server_id : server_id,
                 extension_name : extension,
+                url : url
             };
             data = data.concat(inputs);
             $.ajax({
-                url : url,
+                url : '{{route('extension_api')}}',
                 type : "POST",
                 data :data,
                 success : function (data) {

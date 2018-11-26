@@ -81,7 +81,7 @@ class ExtensionsController extends Controller
     public function generatePage(){
         foreach (\request('scripts') as $script){
             foreach (str_split($script->inputs,',') as $input){
-                
+                dd($input);
             }
         }
     }
