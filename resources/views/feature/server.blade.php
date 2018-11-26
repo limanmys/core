@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-    <h2>{{$server->name}} Sunucusunda <b>{{$feature->name}}</b> Yönetimi</h2>
+    <h2>{{request('server')->name}} Sunucusunda <b>{{$extension->name}}</b> Yönetimi</h2>
         <div class="row">
             <div class="col-9">
                 <div class="card">
-                    <div class="card-body">
-                        @include('extensions.'. strtolower($feature->name) . '.index')
+                    <div class="card-body mainArea">
+                            YÜKLENİYOR...
                     </div>
                 </div>
             </div>
@@ -27,6 +27,24 @@
                 </div>
             </div>
         </div>
-    <div class="card-group">
-    </div>
+    <script>
+        var server_id = "{{request('server')->name}}";
+        var extension = "{{$extension->name}}";
+        function request(url,...inputs) {
+            var args = Array.prototype.slice.call(arguments, 0);
+            var data = {
+                server_id : server_id,
+                extension_name : extension,
+            };
+            data = data.concat(inputs);
+            $.ajax({
+                url : url,
+                type : "POST",
+                data :data,
+                success : function (data) {
+                    $(".mainArea").html(data);
+                }
+            });
+        }
+    </script>
 @endsection

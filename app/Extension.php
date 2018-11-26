@@ -6,6 +6,6 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
 class Extension extends Eloquent
 {
-    protected $collection = 'features';
+    protected $collection = 'extensions';
     protected $connection = 'mongodb';
 }

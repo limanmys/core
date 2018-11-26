@@ -70,28 +70,20 @@ class ExtensionsController extends Controller
     }
 
     public function server(){
-        $feature = Extension::where('name',\request('feature'))->first();
-        $server = Server::where('_id',\request('server'))->first();
-        $scripts = Script::where('features','like',\request('feature'))->get();
-        $script = $scripts->where('unique_code',$feature->views["index"])->first();
-        $output = $server->runScript($script,"");
-        $output = str_replace("\n","",$output);
-        try{
-            $json = json_decode($output,true);
-        }
-        catch (JsonException $e) {
-            return view('general.error',$e->getMessage());
-        }
+        $extension = Extension::where('name',\request('feature'))->first();
+        $scripts = Script::where('extensions','like',\request('feature'))->get();
             return view('feature.server',[
-            "feature" => $feature,
-            "server" => $server,
+            "extension" => $extension,
             "scripts" => $scripts,
-            "data" => $json
         ]);
     }
 
     public function generatePage(){
-
+        foreach (\request('scripts') as $script){
+            foreach (str_split($script->inputs,',') as $input){
+                
+            }
+        }
     }
 
     public function route(){

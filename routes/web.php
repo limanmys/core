@@ -29,12 +29,12 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::group(['middleware' => ['server']], function () {
 
-        Route::get('/l/{feature}/{city}/{server_id}', 'ExtensionsController@generatePage')->name('feature_server')->middleware('script_parameters');
+        Route::get('/l/{feature}/{city}/{server_id}', 'ExtensionsController@server')->name('feature_server');
         Route::get('/sunucular/{server_id}', 'ServerController@one')->name('server_one');
         Route::post('/sunucu/sil', 'ServerController@remove')->name('server_remove')->middleware('parameters:server_id');
         Route::post('/sunucu/calistir', 'ServerController@run')->name('server_run');
         Route::post('/sunucu/kontrol', 'ServerController@check')->name('server_check')->middleware('parameters:feature,server_id');
-
+        Route::post('/extension/{extension_id}/','ServerController@generatePage')->name('extension_api')->middleware('script_parameters');
     });
 
     Route::get('/anahtarlar','SshController@index')->name('keys');

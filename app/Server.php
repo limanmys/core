@@ -32,7 +32,7 @@ class Server extends Eloquent
         shell_exec($copy_file_query);
         shell_exec('sudo chmod +x /tmp/' . $script->_id);
         $query = ($script->root == 1)? 'sudo ' : '';
-        $query = $query . substr($script->language,1) . ' /tmp/' .$script->_id . " run".$parameters;
+        $query = $query . substr($script->language,1) . ' /tmp/' .$script->_id . " run ".$parameters;
         $query = $query = "ssh -p " . $this->port . " " . $key->username . "@" . $this->ip_address . " -i ../keys/" .
             Auth::id() . " " . $query . " 2>&1";
         $output = shell_exec($query);
