@@ -27,10 +27,11 @@ class SshController extends Controller
         $key = new Key($data);
         $key->user_id = Auth::id();
         $key->save();
-        Key::init(request('username'),request('password'),
+        $output = Key::init(request('username'),request('password'),
             $server->ip_address,$server->port,Auth::id());
         return [
-            "result" => 200
+            "result" => 200,
+            "log" => $output
         ];
     }
 }
