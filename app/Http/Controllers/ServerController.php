@@ -25,7 +25,7 @@ class ServerController extends Controller
         $server->user_id = Auth::id();
         $server->extensions = [];
         $server->save();
-        Key::init(request('username'), request('password'), request('ip_address'),
+        $output = Key::init(request('username'), request('password'), request('ip_address'),
             request('port'),Auth::id());
         $key = new Key($data);
         $key->server_id = $server->id;
@@ -33,7 +33,8 @@ class ServerController extends Controller
         $key->save();
         return [
             "result" => 200,
-            "id" => $server->id
+            "id" => $server->id,
+            "output" => $output
         ];
     }
 
@@ -131,5 +132,20 @@ class ServerController extends Controller
             "result" => 200,
             "data" => $output
         ];
+    }
+
+    public function isAlive(){
+        $output = shell_exec("echo exit | telnet " . \request('ip') ." " . \request('port'));
+        if (strpos($output,"Connected to " . \request('ip')) == false){
+            return [
+                "result" => 201,
+                "data" => $output
+            ];
+        }else{
+            return [
+                "result" => 200,
+                "data" => $output
+            ];
+        }
     }
 }

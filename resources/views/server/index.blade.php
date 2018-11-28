@@ -72,9 +72,9 @@
 
                     port: port,
 
-                }, function (data, status) {
-
-                    if (data == "true") {
+                }, function (data) {
+                    console.log(data.result);
+                    if (data.result === 200) {
 
                         id_error.textContent = "";
 
