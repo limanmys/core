@@ -22,8 +22,9 @@ class Key extends Eloquent
         //Trust target server
         shell_exec("ssh-keyscan -p " . $server_port . " -H ". $server_address . " >> ~/.ssh/known_hosts");
         //Send Keys to target
-        shell_exec("sshpass -p '" . $password . "' ssh-copy-id -i " . __DIR__ . "/../keys/" . $account_name ." " . $username
+        $output = shell_exec("sshpass -p '" . $password . "' ssh-copy-id -i " . __DIR__ . "/../keys/" . $account_name ." " . $username
             ."@" . $server_address ." 2>&1 -p " . $server_port);
-        return;
+
+        return $output;
     }
 }

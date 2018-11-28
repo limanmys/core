@@ -26,7 +26,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/', 'HomeController@index')->name('home');
     Route::get('/sunucular', 'ServerController@index')->name('servers');
     Route::post('/sunucu/ekle' , 'ServerController@add')->name('server_add')->middleware('parameters:username,password,ip_address,port');
-
+    Route::post('/api/status', 'ServerController@isAlive')->middleware('parameters:ip,port');
     Route::group(['middleware' => ['server']], function () {
 
         Route::get('/l/{feature}/{city}/{server_id}', 'ExtensionsController@server')->name('feature_server');
