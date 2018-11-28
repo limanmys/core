@@ -12,7 +12,6 @@ class Server extends Eloquent
     protected $fillable = ['name', 'ip_address' ,'port' ,'city'];
     private $key = null;
     public function run($command){
-
         $key = Key::where([
             'server_id' => $this->id,
             'user_id' => Auth::id()
@@ -39,6 +38,22 @@ class Server extends Eloquent
         return $output;
     }
 
+    public function systemScript($name,$parameters){
+        $key = Key::where([
+            'server_id' => $this->id,
+            'user_id' => Auth::id()
+        ])->first();
+        $name = $name . ".lmn";
+        $copy_file_query = 'scp -P ' . $this->port . " -i ../keys/" . Auth::id() .' ' . storage_path('app/system_scripts/' . $name) .' ' . $key->username .'@' . $this->ip_address . ':/tmp/';
+        shell_exec($copy_file_query);
+        shell_exec('sudo chmod +x /tmp/' . $name);
+        $query = 'sudo /usr/bin/env python3 /tmp/' .$name . " run ".$parameters;
+        $query = $query = "ssh -p " . $this->port . " " . $key->username . "@" . $this->ip_address . " -i ../keys/" .
+            Auth::id() . " " . $query . " 2>&1" . (($name == "network.lmn") ? " > /dev/null 2>/dev/null &" : "");
+        $output = shell_exec($query);
+        return $output;
+    }
+
     public function isRunning($service_name){
         $key = Key::where([
             'server_id' => $this->id,
@@ -57,10 +72,6 @@ class Server extends Eloquent
             return false;
         }
         return true;
-    }
-
-    private function changeHostname(){
-
     }
 
     public function sshPortEnabled(){

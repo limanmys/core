@@ -6,6 +6,9 @@
         var params = [];
         var script_id = "";
     </script>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{$server->name}}</h1>
+    </div>
     <button class="btn btn-success" onclick="location.href = '/sunucular/';">Geri Don</button>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">
         Düzenle
@@ -17,17 +20,22 @@
     <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addService">
         Servisleri Düzenle
     </button>
+    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#changeNetwork">
+        Network
+    </button>
+    <button type="button" class="btn btn-primary" data-toggle="modal" onclick="getHostname()">
+        Hostname
+    </button>
     @isset($scripts)
         @foreach($scripts as $script)
             <button class="btn-primary btn" onclick="generateModal('{{$script->inputs}}','{{$script->name}}','{{$script->_id}}')">{{$script->name}}</button>
         @endforeach
     @endisset
     <br><br>
-    <h1>{{$server->name}}</h1>
     <h4>Servis Durumları</h4>
-        @foreach($server->features as $feature)
-            <button type="button" class="btn btn-info btn-lg" style="cursor:default;" id="status_{{$feature}}">
-                {{strtoupper($feature)}}
+        @foreach($services as $service)
+            <button type="button" class="btn btn-info btn-lg" style="cursor:default;" id="status_{{$service}}">
+                {{strtoupper($service)}}
             </button>
         @endforeach
     <br><br>
@@ -157,6 +165,71 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="changeHostname" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="exampleModalLabel">Hostname Değiştir</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5>Aktif hostname : </h5>
+                    <h4 id="currentHostname"></h4><br>
+                    <input id="new_hostname" type="text" class="form-control" placeholder="Yeni Hostname"
+                           data-validation="required" data-validation-error-msg="Girilmesi Zorunlu Alan">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cs_cancel" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="button" id="cs_submit" class="btn btn-warning" onclick="changeHostname()">Değiştir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="changeNetwork" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="exampleModalLabel">Hostname Değiştir</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <h3>İp Adresi</h3>
+                        <input id="new_ip" type="text" class="form-control"
+                               placeholder="İp Adresi">
+                    </div>
+                    <div class="form-group">
+                        <h3>Cidr Adresi</h3>
+                        <input id="new_cidr" type="text" class="form-control"
+                               placeholder="Cidr Adresi">
+                    </div>
+                    <div class="form-group">
+                        <h3>Gateway</h3>
+                        <input id="new_gateway" type="text" class="form-control"
+                               placeholder="Gateway">
+                    </div>
+                    <div class="form-group">
+                        <h3>Interface</h3>
+                        <input id="new_interface" type="text" class="form-control"
+                               placeholder="Interface">
+                    </div>
+                    <div class="form-group">
+                        <h3>SSH Parolası</h3>
+                        <input id="new_password" type="text" class="form-control"
+                               placeholder="SSH Parolası">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cs_cancel" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="button" id="cs_submit" class="btn btn-warning" onclick="changeNetwork()">Değiştir</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         $("#commandOutput").fadeOut();
         function deleteServer() {
@@ -164,7 +237,7 @@
                 url : "{{ route('server_remove') }}",
                 type : "POST",
                 data :{
-                    id : server_id
+                    server_id : server_id
                 },
                 success : function (data) {
                     if(data["result"] === 200){
@@ -190,6 +263,44 @@
                 success : function (data) {
                     if(data["result"] === 200){
                         $("#commandOutput").fadeIn().html(data["data"]);
+                    }else{
+                        alert("Hata");
+                    }
+                }
+            });
+        }
+        
+        function getHostname() {
+            var command = "cat /etc/hostname";
+            $.ajax({
+                url : "{{ route('server_run') }}",
+                type : "POST",
+                data :{
+                    server_id : server_id,
+                    command : command
+                },
+                success : function (data) {
+                    if(data["result"] === 200){
+                        $("#currentHostname").html(data["data"]);
+                    }else{
+                        alert("Hata");
+                    }
+                }
+            });
+            $('#changeHostname').modal('show');
+        }
+
+        function changeHostname() {
+            $.ajax({
+                url : "{{ route('server_hostname') }}",
+                type : "POST",
+                data :{
+                    server_id : server_id,
+                    hostname : $("#new_hostname").val()
+                },
+                success : function (data) {
+                    if(data["result"] === 200){
+                        getHostname();
                     }else{
                         alert("Hata");
                     }
@@ -275,7 +386,30 @@
                 }
             });
         }
-        @foreach($server->features as $feature)
+        
+        function changeNetwork() {
+            //ip,cidr,gateway,interface,password
+            $.ajax({
+                url : "{{ route('server_network') }}",
+                type : "POST",
+                data :{
+                    server_id : server_id,
+                    ip : $("#new_ip").val(),
+                    cidr : $("#new_cidr").val(),
+                    gateway : $("#new_gateway").val(),
+                    interface : $("#new_interface").val(),
+                    password : $("#new_password").val(),
+                },
+                success : function (data) {
+                    if(data["result"] === 200){
+                        location.reload();
+                    }else{
+                        alert("Hata");
+                    }
+                }
+            });
+        }
+        @foreach($server->extensions as $feature)
             setInterval(function () {
                 checkStatus('{{$feature}}');
             }, 5000);
