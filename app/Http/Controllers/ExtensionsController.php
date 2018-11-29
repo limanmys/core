@@ -47,7 +47,7 @@ class ExtensionsController extends Controller
         if(!Extension::where('name',\request('feature'))->exists()){
             return redirect(route('home'));
         }
-        $servers = Server::where('features','like',\request('feature'))->get();
+        $servers = Server::where('extensions','like',\request('feature'))->get();
         $cities = "";
         foreach ($servers as $server){
             if($cities == "")
@@ -63,18 +63,27 @@ class ExtensionsController extends Controller
     }
 
     public function city(){
-        $servers = Server::where('city',\request('city'))->where('features','like',\request('feature'))->get();
+        $servers = Server::where('city',\request('city'))->where('extensions','like',\request('feature'))->get();
         return view('feature.city',[
             "servers" => $servers
         ]);
     }
 
     public function server(){
-        $extension = Extension::where('name',\request('feature'))->first();
-        $scripts = Script::where('extensions','like',\request('feature'))->get();
-            return view('feature.server',[
+        $extension = Extension::where('name',\request('extension'))->first();
+        $scripts = Script::where('extensions','like',\request('extension'))->get();
+        $server = \request('server');
+        $outputs = [];
+        foreach ($extension->views["index"] as $unique_code){
+            $script = $scripts->where('unique_code', $unique_code)->first();
+            $output = $server->runScript($script,'');
+            $output = str_replace('\n','',$output);
+            $outputs[$unique_code] = json_decode($output,true);
+        }
+        return view('feature.server',[
             "extension" => $extension,
             "scripts" => $scripts,
+            "data" => $outputs
         ]);
     }
 
