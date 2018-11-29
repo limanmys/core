@@ -299,13 +299,14 @@
         }
         function addAll(){
             var command=document.getElementById("editor");
-            data["command"]=command.textContent;
+            data["code"]=command.textContent;
             if( 'name' in data){
-                $.post("" ,{
+                $.post({{route('script_create')}} ,{
                     data:data
                 },function (data,status) {
                     if(data["result"] === 200){
                         //window.location.replace("{{route('users')}}" + "/" + data["id"]);
+                        console.log(data);
                     }else{
                         alert("Hata!");
                     }
