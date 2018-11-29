@@ -4,9 +4,8 @@
 
 @section('content')
 
-    <link href="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/theme-default.min.css"
-          rel="stylesheet" type="text/css"/>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
+    <link href="js/form-validator/theme-default.min.css" rel="stylesheet" type="text/css"/>
+    <script src="js/form-validator/jquery.form-validator.min.js"></script>
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Sunucular</h1>
     </div>
@@ -129,6 +128,7 @@
             var name = $("#add_name").val();
             var ip = $("#add_ip").val();
             var port = $("#add_port").val();
+            var city_value = $("#city").val();
             var username = $("#add_username").val();
             var password = $("#add_password").val();
             $("#add_dhcp").prop("checked") ? features = features + "1" : 0;
@@ -139,6 +139,7 @@
                 ip_address: ip,
                 port: port,
                 username: username,
+                city:city_value,
                 password: password,
             }, function (data, status) {
                 if (data["result"] === 200) {

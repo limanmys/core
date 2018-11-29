@@ -14,7 +14,7 @@
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
 
     <!-- Styles -->
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/fa.min.css') }}">
 
@@ -29,8 +29,8 @@
             position: fixed;
             z-index: 1000;
             display: block;
-            -webkit-transition: margin 2s;
-            transition: margin 2s;
+            -webkit-transition: margin 0.7s;
+            transition: margin 0.7s;
             flex:1;
         }
         #navbar-toggle {

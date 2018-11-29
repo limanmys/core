@@ -1,13 +1,13 @@
 <select class="form-control" id="city"name="Sehir">
-    <option value="1">Adana</option>
-    <option value="2">Adıyaman</option>
-    <option value="3">Afyonkarahisar</option>
-    <option value="4">Ağrı</option>
-    <option value="5">Amasya</option>
-    <option value="6">Ankara</option>
-    <option value="7">Antalya</option>
-    <option value="8">Artvin</option>
-    <option value="9">Aydın</option>
+    <option value="01">Adana</option>
+    <option value="02">Adıyaman</option>
+    <option value="03">Afyonkarahisar</option>
+    <option value="04">Ağrı</option>
+    <option value="05">Amasya</option>
+    <option value="06">Ankara</option>
+    <option value="07">Antalya</option>
+    <option value="08">Artvin</option>
+    <option value="09">Aydın</option>
     <option value="10">Balıkesir</option>
     <option value="11">Bilecik</option>
     <option value="12">Bingöl</option>

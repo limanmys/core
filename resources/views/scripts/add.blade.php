@@ -8,18 +8,27 @@
             right: 0;
             bottom: 0;
             left: 0;
+            font-size: 15px;
+        }
+        .alert{
+            display: none;
         }
     </style>
     <script>
         var data=[];
+        var check=true;
+        var check1=true;
+        var check2=true;
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
-    <!-- Styles -->
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-    <link href="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/theme-default.min.css"
-          rel="stylesheet" type="text/css" />
+
+    <link href="../js/form-validator/theme-default.min.css" rel="stylesheet" type="text/css"/>
+    <script src="../js/src/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/src/mode-javascript.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/form-validator/jquery.form-validator.min.js"></script>
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Betik Oluşturma</h1>
+    </div>
     <button class="btn btn-success" onclick="history.back();">Geri Don</button>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#settingsModal">
         Ayarlar
@@ -47,6 +56,10 @@
                             <td style="margin:10px;">
                                 <button class="btn btn-primary" onclick="addInput()">Ekle</button>
                             </td>
+                            <div class="alert alert-danger alert-dismissable" id="alert3">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                Aynı parametre girilemez!
+                            </div>
                         </tr>
                     </table>
 
@@ -57,7 +70,7 @@
                 </div>
             </div>
         </div>
-        <div class="card w-auto" style="width: 18rem; height: 20rem;">
+        <div class="card w-auto" style="width: 18rem;  height: 18rem;">
             <div class="card-body">
                 <div class="form-group">
                     <label for="exampleFormControlTextarea1">Kodu buraya yazınız</label>
@@ -96,9 +109,17 @@
                 </div>
             </div>
         </div>
+        <div class="card w-auto" style="width: 18rem;">
+            <div class="card-body">
+                <div class="form-group">
+                    <h3>Sorumluluk Reddi</h3>
+                    Bu dosyayı kaydetmenin sorumluluğunu üstleniyorum.<br><br>
         <button onclick="addAll()" class="btn btn-primary w-auto">
             Ekle
         </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -126,7 +147,7 @@
                         </div>
                         <div class="form-group">
                             <h3>Versiyon</h3>
-                            <input id="username" type="text" class="form-control" placeholder="Betik Versiyonu" value="1" data-validation="custom"  data-validation-regexp="^[0-9]" data-validation-error-msg="Versiyon sayı olmalı.">
+                            <input id="version" type="text" class="form-control" placeholder="Betik Versiyonu" value="1" data-validation="custom"  data-validation-regexp="^[0-9]" data-validation-error-msg="Versiyon sayı olmalı.">
                         </div>
                         <div class="form-group">
                             <h3>Açıklama</h3>
@@ -148,6 +169,15 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
                         <button type="button" class="btn btn-success" onclick="add()">Kaydet</button>
                     </div>
+                    <div class="alert alert-danger alert-dismissable" id="alert1">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        Alanların doğru doldurulması gerekiyor!
+                    </div>
+                    <div class="alert alert-success alert-dismissable" id="alert2">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        Doğru! Yönlendiriliyor.
+                    </div>
+
                 </form>
             </div>
         </div>
@@ -157,6 +187,7 @@
         $.validate({
             addValidClassOnAll : true
         });
+
         $('#inputType').on('change', function() {
             if(this.value=="string"){
                 $(this).css("backgroundColor", "#5cb85c");
@@ -195,12 +226,14 @@
             var name = $("#inputName").val();
             var type = $("#inputType").val();
             data["NeededParameter"]=$("#inputName").val()+":"+$("#inputType").val();
-
             var value2=data["parameterName"] +":"+data["inputType"];
+            console.log(data["NeededParameter"].includes(name).size);
 
             var r= $('<button class="btn btn-success" onclick="sil(this)" id="">value2</button>');
             r.id=name;
             r.text(name);
+            r.css("margin","8px");
+            r.css("display","inline-block");
             if(type=="string"){
                 r.css("backgroundColor", "#5cb85c");
                 r.css("color", "white");}
@@ -219,6 +252,8 @@
             var r= $('<button class="btn btn-success" onclick="sil(this)" id=""></button>');
             r.id=name;
             r.text(name);
+            r.css("margin","8px");
+            r.css("display","inline-block");
             if(type=="string"){
                 r.css("backgroundColor", "#5cb85c");
                 r.css("color", "white");}
@@ -237,9 +272,29 @@
             data["description"]=$("#description").val();
             data["email"]=$("#email").val();
             data["type"]=$( "#betiktype" ).val();
-            if(data["name"]!="" && data["feature"]!="" && data["version"]!="" && data["description"]!="" && data["email"]!="" && data["type"]!="" ){
-                $("#settingsModal").modal('hide');
-                $(".modal-backdrop").remove();
+            $('#name').validate(function(valid, elem) {
+               check=valid;
+            });
+            $('#version').validate(function(valid, elem) {
+               check1=valid;
+            });
+            $('#email').validate(function(valid, elem) {
+              check2=valid;
+            });
+            if(check&& check1&& check2){
+                $('#alert1').hide();
+                $('#alert2').show();
+                setTimeout(function() {
+                    console.log("geldim");
+                    $('#settingsModal').modal('hide');
+                    $(".modal-backdrop").remove();
+                }, 1000);
+
+            }
+            else
+            {
+                $('#alert2').hide();
+                $('#alert1').show();
             }
         }
         function addAll(){
@@ -264,6 +319,7 @@
             $(id).remove();
         }
     </script>
+
     <script>
         var editor = ace.edit("editor");
         editor.session.setMode("ace/mode/python");
