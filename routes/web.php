@@ -27,6 +27,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/betikler', 'ScriptController@index')->name('scripts');
     Route::get('/betik/ekle', 'ScriptController@add')->name('script_add');
+    Route::post('/betik/ekle', 'ScriptController@create')->name('script_create');
     Route::get('/betik/{id}' , 'ScriptController@one')->name('script_one');
     Route::post('/betik/calistir', 'ServerController@runScript')->name('script_run');
     Route::post('/betik/yukle', 'ScriptController@upload')->name('script_upload');
