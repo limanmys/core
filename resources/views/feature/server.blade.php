@@ -6,7 +6,7 @@
             <div class="col-9">
                 <div class="card">
                     <div class="card-body mainArea">
-                            YÜKLENİYOR...
+                            @include('extensions.' . strtolower($extension->name) . '.index')
                     </div>
                 </div>
             </div>
@@ -30,20 +30,26 @@
     <script>
         var server_id = "{{request('server')->name}}";
         var extension = "{{$extension->name}}";
-        function request(url,...inputs) {
+        function request(url,next,...inputs) {
             var args = Array.prototype.slice.call(arguments, 0);
             var data = {
                 server_id : server_id,
                 extension_name : extension,
                 url : url
             };
-            data = data.concat(inputs);
+            inputs.forEach(function (input) {
+                var key = input.split(':')[0];
+                var data = input.split(':')[1];
+                data = $.merge(data,{key : data});
+            });
+            console.log(data);
+            return;
             $.ajax({
-                url : '{{route('extension_api')}}',
+                url : '{{route('extension_api',$extension->name)}}',
                 type : "POST",
                 data :data,
                 success : function (data) {
-                    $(".mainArea").html(data);
+                    next(data);
                 }
             });
         }

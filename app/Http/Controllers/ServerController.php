@@ -148,4 +148,14 @@ class ServerController extends Controller
             ];
         }
     }
+
+    public function service(){
+        $server = \request('server');
+        $service = Extension::where('name','like',\request('extension'))->first()->service;
+        $output = $server->run("sudo systemctl " . \request('action') . ' ' . $service);
+        return[
+            "result" => 200,
+            "data" => $output
+        ];
+    }
 }

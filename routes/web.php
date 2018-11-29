@@ -1,24 +1,5 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-//Route::get('/', function () {
-//	if(Auth::check() == false){
-//    	return redirect('/login');
-//    }else{
-//    	return view('welcome');
-//    }
-//});
-
 Auth::routes();
 
 Route::group(['middleware' => ['auth']], function () {
@@ -28,14 +9,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/sunucu/ekle' , 'ServerController@add')->name('server_add')->middleware('parameters:username,password,ip_address,port');
     Route::post('/api/status', 'ServerController@isAlive')->middleware('parameters:ip,port');
     Route::group(['middleware' => ['server']], function () {
-
-        Route::get('/l/{feature}/{city}/{server_id}', 'ExtensionsController@server')->name('feature_server');
+        Route::get('/l/{extension}/{city}/{server_id}', 'ExtensionsController@server')->name('feature_server');
         Route::get('/sunucular/{server_id}', 'ServerController@one')->name('server_one');
         Route::post('/sunucu/sil', 'ServerController@remove')->name('server_remove')->middleware('parameters:server_id');
         Route::post('/sunucu/calistir', 'ServerController@run')->name('server_run');
         Route::post('/sunucu/kontrol', 'ServerController@check')->name('server_check')->middleware('parameters:feature,server_id');
         Route::post('/sunucu/network', 'ServerController@network')->name('server_network')->middleware('parameters:ip,cidr,gateway,interface,password');
         Route::post('/sunucu/hostname', 'ServerController@hostname')->name('server_hostname')->middleware('parameters:hostname');
+        Route::post('/sunucu/servis', 'ServerController@service')->name('server_service')->middleware('parameters:extension,action');
         Route::post('/extension/{extension_id}/','ServerController@generatePage')->name('extension_api')->middleware('script_parameters');
     });
 

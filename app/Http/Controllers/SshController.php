@@ -13,7 +13,7 @@ class SshController extends Controller
         $keys = Key::where('user_id',Auth::id())->get();
         $servers = Server::all();
         foreach ($keys as $key){
-            $key->server_name = $servers->where('_id',$key->server_id)->get('name');
+            $key->server_name = $servers->where('_id',$key->server_id)->first()->name;
         }
         return view('keys.index',[
             "keys" => $keys,
