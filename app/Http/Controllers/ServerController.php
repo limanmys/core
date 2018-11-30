@@ -164,7 +164,7 @@ class ServerController extends Controller
         $script = Script::where('unique_code',$extension->setup)->first();
         $server = \request('server');
         $output = $server->runScript($script,\request('domain') . " " . \request('interface'));
-        if($server->isRunning($extension->service)){
+        if($server->isRunning($extension->service) == "active\n"){
             $server->extensions = array_merge($server->extensions, [\request('extension')]);
             $server->save();
             return [
