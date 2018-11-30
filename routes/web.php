@@ -17,6 +17,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/sunucu/network', 'ServerController@network')->name('server_network')->middleware('parameters:ip,cidr,gateway,interface,password');
         Route::post('/sunucu/hostname', 'ServerController@hostname')->name('server_hostname')->middleware('parameters:hostname');
         Route::post('/sunucu/servis', 'ServerController@service')->name('server_service')->middleware('parameters:extension,action');
+        Route::post('/sunucu/eklenti', 'ServerController@enableExtension')->name('server_extension');
         Route::post('/extension/{extension_id}/','ServerController@generatePage')->name('extension_api')->middleware('script_parameters');
     });
 

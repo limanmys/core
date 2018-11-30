@@ -106,40 +106,26 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Servisleri Düzenle</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">DNS Kurulumu</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col"></th>
-                            <th scope="col">Adı</th>
-                            <th scope="col">Durumu</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                    @foreach($extensions as $extension)
-                            <tr>
-                                <th scope="row">{{$loop->index + 1}}</th>
-                                <td>{{$extension->name}}</td>
-                                <td>
-                                    {{--@if($server_features->where('_id',$feature->_id)->count() > 0)--}}
-                                        {{--<button type="button" class="btn btn-danger">Devre Dışı Bırak</button>--}}
-                                    {{--@else--}}
-                                        {{--<button type="button" class="btn btn-success">Servisi Ekle</button>--}}
-                                    {{--@endif--}}
-                                </td>
-                            </tr>
-                    @endforeach
-                        </tbody>
-                    </table>
+                    <div class="form-group">
+                        <h5>Domain Adı</h5>
+                        <input id="dns_domain" type="text" class="form-control"
+                               placeholder="Domain Adı">
+                    </div>
+                    <div class="form-group">
+                        <h5>Interface</h5>
+                        <input id="dns_interface" type="text" class="form-control"
+                               placeholder="Interface">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-warning" onclick="runCommand()">Çalıştır</button>
+                    <button type="button" class="btn btn-warning" onclick="installService()">Kur</button>
                 </div>
             </div>
         </div>
@@ -195,7 +181,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="modal-title" id="exampleModalLabel">Hostname Değiştir</h2>
+                    <h2 class="modal-title" id="exampleModalLabel">Network Değiştir</h2>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -457,6 +443,30 @@
                 },
 
             },function (data,status) {
+                if(data["result"] === 200){
+                    // window.location.replace("{{route('servers')}}" + "/" + data["id"]);
+                }else{
+                    alert("Hata!");
+                }
+            });
+        }
+
+        function installService(service) {
+            var dns_domain = $("#dns_domain").val();
+            var interface = $("#dns_interface").val();
+            $.ajax({
+                url : "{{ route('server_extension') }}",
+                type : "POST",
+                data: {
+                    server_id : server_id,
+                    extension : 'dns',
+                    domain : dns_domain,
+                    interface : interface
+                },
+
+            },function (data,status) {
+                console.log(data);
+                return;
                 if(data["result"] === 200){
                     // window.location.replace("{{route('servers')}}" + "/" + data["id"]);
                 }else{

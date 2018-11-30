@@ -158,4 +158,25 @@ class ServerController extends Controller
             "data" => $output
         ];
     }
+
+    public function enableExtension(){
+        $extension = Extension::where('name','like',\request('extension'))->first();
+        $script = Script::where('unique_code',$extension->setup)->first();
+        $server = \request('server');
+        $output = $server->runScript($script,\request('domain') . " " . \request('interface'));
+        if($server->isRunning($extension->service)){
+            $server->extensions = array_merge($server->extensions, [\request('extension')]);
+            $server->save();
+            return [
+                "result" => 200,
+                "data" => $output
+            ];
+        }else{
+            return [
+                "result" => 201,
+                "data" => $output
+            ];
+        }
+
+    }
 }
