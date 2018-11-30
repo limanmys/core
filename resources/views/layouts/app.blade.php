@@ -11,6 +11,7 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/jquery-3.3.1.min.js') }}"></script>
+    <script src="{{asset('js/popper.min.js')}}"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
 
     <!-- Styles -->
@@ -29,8 +30,6 @@
             position: fixed;
             z-index: 1000;
             display: block;
-            -webkit-transition: margin 2s;
-            transition: margin 2s;
             flex:1;
         }
         #navbar-toggle {
@@ -51,12 +50,10 @@
             padding: 0;
         }
         .sidebar-nav li a {
-            padding-left: 20px;
             font-size: 16px;
             text-decoration: none;
             color: #FFF;
             float: left;
-            text-decoration: none;
             width: 100%;
             height: 50px;
             line-height: 15px;
@@ -89,42 +86,40 @@
         <div class="row">
             @auth
                 <div class="sidebar">
-
                     <ul class="sidebar-nav">
-
                         <li>
-                            <a href="{{route('home')}}">Ana Sayfa <i class="fa fa-home menu-icon fa-2x" aria-hidden="true"></i></a>
+                            <a href="{{route('home')}}">Ana Sayfa<i data-toggle="tooltip" data-placement="bottom" title="Ana Sayfa" class="fa fa-home menu-icon" aria-hidden="true"></i></a>
                         </li>
                         <li>
-                            <a href="{{route('servers')}}">Sunucular<i class="fa fa-download menu-icon fa-2x" aria-hidden="true"></i></a>
+                            <a href="{{route('servers')}}">Sunucular<i data-toggle="tooltip" data-placement="bottom" title="Sunucular" class="fa fa-download menu-icon" aria-hidden="true"></i></a>
                         </li>
                         @foreach($extensions as $extension)
-                        <li>
-                            <a href="/l/{{$extension->name}}">{{$extension->name}}<i class="fa fa-cog menu-icon fa-2x" aria-hidden="true"></i></a>
-                        </li>
+                            <li>
+                                <a href="/l/{{$extension->name}}">{{$extension->name}}<i data-toggle="tooltip" data-placement="bottom" title="{{$extension->name}}" class="fa fa-cog menu-icon" aria-hidden="true"></i></a>
+                            </li>
                         @endforeach
                         <li>
-                            <a href="{{route('scripts')}}">Betikler<i class="fa fa-sign-out menu-icon fa-2x" aria-hidden="true"></i>
+                            <a href="{{route('scripts')}}">Betikler<i data-toggle="tooltip" data-placement="bottom" title="Betikler" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('keys')}}">SSH Anahtarları<i class="fa fa-sign-out menu-icon fa-2x" aria-hidden="true"></i>
+                            <a href="{{route('keys')}}">SSH Anahtarları<i data-toggle="tooltip" data-placement="bottom" title="SSH Anahtarları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('extensions_settings')}}">Eklentiler<i class="fa fa-sign-out menu-icon fa-2x" aria-hidden="true"></i>
+                            <a href="{{route('extensions_settings')}}">Eklentiler<i data-toggle="tooltip" data-placement="bottom" title="Eklentiler" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('users')}}">Liman Kullanıcıları<i class="fa fa-sign-out menu-icon fa-2x" aria-hidden="true"></i>
+                            <a href="{{route('users')}}">Liman Kullanıcıları<i data-toggle="tooltip" data-placement="bottom" title="Liman Kullanıcıları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('settings')}}">Sistem Ayarları<i class="fa fa-sign-out menu-icon fa-2x" aria-hidden="true"></i>
+                            <a href="{{route('settings')}}">Sistem Ayarları<i data-toggle="tooltip" data-placement="bottom" title="Sistem Ayarları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a id="navbar-toggle"><i class="fa fa-bars menu-icon fa-2x" aria-hidden="true"></i></a>
+                            <a onclick="navbar(true);" class="text-right"><i class="fa fa-bars menu-icon" aria-hidden="true"></i></a>
                         </li>
                     </ul>
                 </div>
@@ -142,24 +137,31 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            function clickme(){
-                $(this).toggleClass('active');
-                $('.sidebar').animate({width: 'toggle'}, 200);
-
-            }
-            var state = "expanded";
-            $('#navbar-toggle').click(function() {
-                if (state == "expanded") {
-                    $('.sidebar').css('margin-left', '-250px');
-                    state = "minimized";
-                } else {
-                    if (state == "minimized") {
-                        $('.sidebar').css('margin-left', '0px');
-                        state = "expanded";
-                    }
-                }
-            })
         </script>
     @endauth
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    });
+
+    function navbar(flag) {
+        if (localStorage.getItem("state") === "expanded") {
+            if(!flag){
+                $('.sidebar').css('margin-left', '0px');
+            }else{
+                $('.sidebar').css('margin-left', '-270px');
+                localStorage.setItem("state", "minimized");
+            }
+        } else{
+            if(!flag){
+                $('.sidebar').css('margin-left', '-270px');
+            }else{
+                $('.sidebar').css('margin-left', '0px');
+                localStorage.setItem("state", "expanded");
+            }
+        }
+    }
+    navbar(false);
+</script>
 </body>
 </html>

@@ -122,6 +122,9 @@
                         <input id="dns_interface" type="text" class="form-control"
                                placeholder="Interface">
                     </div>
+                    <div class="collapse" id="installServiceOutput">
+
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
@@ -465,12 +468,10 @@
                 },
 
             },function (data,status) {
-                console.log(data);
-                return;
                 if(data["result"] === 200){
-                    // window.location.replace("{{route('servers')}}" + "/" + data["id"]);
+                    location.reload();
                 }else{
-                    alert("Hata!");
+                    $('#installServiceOutput').html(data["data"]).collapse();
                 }
             });
         }
