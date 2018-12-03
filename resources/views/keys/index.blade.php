@@ -5,17 +5,17 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h2>SSH Anahtarları</h2>
+        <h2>{{ __("SSH Anahtarları") }}</h2>
     </div>
     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
-        Anahtar Ekle
+        {{ __("Anahtar Ekle") }}
     </button><br><br>
     <table class="table">
         <thead>
         <tr>
-            <th scope="col">Anahtar Adı</th>
-            <th scope="col">Kullanıcı</th>
-            <th scope="col">Sunucu</th>
+            <th scope="col">{{ __("Anahtar Adı") }}</th>
+            <th scope="col">{{ __("Kullanıcı") }}</th>
+            <th scope="col">{{ __("Sunucu") }}</th>
         </tr>
         </thead>
         <tbody data-toggle="modal" data-target="#duzenle">
@@ -73,7 +73,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title" id="exampleModalLabel">Anahtar Ekle</h1>
+                    <h1 class="modal-title" id="exampleModalLabel">{{ __("Anahtar Ekle") }}</h1>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -81,11 +81,11 @@
                 <form>
                     <div class="modal-body">
                         <div class="form-group">
-                            <h3>Adı</h3>
-                            <input id="add_name" type="text" class="form-control" placeholder="Anahtar kısa adı" data-validation="length" data-validation-length="min4" data-validation-error-msg="4 karakterden az olmaz.">
+                            <h3>{{ __("Adı") }}</h3>
+                            <input id="add_name" type="text" class="form-control" placeholder="{{ __("Anahtar Kısa Adı") }}" data-validation="length" data-validation-length="min4" data-validation-error-msg="4 karakterden az olmaz.">
                         </div>
                         <div class="form-group">
-                            <h3>Sunucu</h3>
+                            <h3>{{ __("Sunucu") }}</h3>
                             <select class="form-control" id="add_server">
                                 @foreach ($servers as $server)
                                     <option value="{{$server->id}}">{{$server->name}}</option>
@@ -93,20 +93,20 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <h3>Kullanıcı Adı</h3>
-                            <input id="add_username" type="text" class="form-control" placeholder="Anahtar Kullanıcı Adı" data-validation="required" data-validation-error-msg="Girilmesi Zorunlu Alan">
+                            <h3>{{ __("Kullanıcı Adı") }}</h3>
+                            <input id="add_username" type="text" class="form-control" placeholder="{{ __("Anahtar Kullanıcı Adı") }}" data-validation="required" data-validation-error-msg="Girilmesi Zorunlu Alan">
                         </div>
                         <div class="form-group">
-                            <h3>Parola</h3>
-                            <input id="add_password" data-validation-error-msg="Girilmesi zorunlu alan." placeholder="Parola" data-validation="required"  name="password" type="password" class="form-control">
+                            <h3>{{ __("Parola") }}</h3>
+                            <input id="add_password" data-validation-error-msg="Girilmesi zorunlu alan." placeholder="{{ __("Parola") }}" data-validation="required"  name="password" type="password" class="form-control">
                         </div>
                         <div>
-                            <input type="checkbox" onclick="myFunction()">Show Password
+                            <input type="checkbox" onclick="myFunction()">{{ __("Şifreyi Göster") }}
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                        <button type="button" class="btn btn-success" onclick="add()">Ekle</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __("İptal") }}</button>
+                        <button type="button" class="btn btn-success" onclick="add()">{{ __("Ekle") }}</button>
                     </div>
                 </form>
             </div>
@@ -116,7 +116,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Anahtar Düzenle</h2>
+                    <h2>{{ __("Anahtar Düzenle") }}</h2>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -124,11 +124,11 @@
                 <form>
                     <div class="modal-body">
                         <div class="form-group">
-                            <h3>Adı</h3>
-                            <input id="change_name" type="text" class="form-control" placeholder="Anahtar kısa adı" data-validation="length" data-validation-length="min4" data-validation-error-msg="4 karakterden az olmaz.">
+                            <h3>{{ __("Adı") }}</h3>
+                            <input id="change_name" type="text" class="form-control" placeholder="{{ __("Anahtar Kısa Adı") }}" data-validation="length" data-validation-length="min4" data-validation-error-msg="4 karakterden az olmaz.">
                         </div>
                         <div class="form-group">
-                            <h3>Sunucu</h3>
+                            <h3>{{ __("Sunucu") }}</h3>
                             <select class="form-control" id="change_server">
                                 @foreach ($servers as $server)
                                     <option value="{{$server->id}}">{{$server->name}}</option>
@@ -136,21 +136,21 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <h3>Kullanıcı Adı</h3>
-                            <input id="change_username" type="text" class="form-control" placeholder="Anahtar Kullanıcı Adı" data-validation="required" data-validation-error-msg="Girilmesi Zorunlu Alan">
+                            <h3>{{ __("Kullanıcı Adı") }}</h3>
+                            <input id="change_username" type="text" class="form-control" placeholder="{{ __("Anahtar Kullanıcı Adı") }}" data-validation="required" data-validation-error-msg="Girilmesi Zorunlu Alan">
                         </div>
                         <div class="form-group">
-                            <h3>Parola</h3>
-                            <input  id="change_pass" data-validation-error-msg="Girilmesi zorunlu alan." placeholder="Parola" data-validation="required"  name="password" type="password" class="form-control">
+                            <h3>{{ __("Parola") }}</h3>
+                            <input  id="change_pass" data-validation-error-msg="Girilmesi zorunlu alan." placeholder="{{ __("Parola") }}" data-validation="required"  name="password" type="password" class="form-control">
                         </div>
                         <div>
-                            <input type="checkbox" onclick="myFunction()">Show Password
+                            <input type="checkbox" onclick="myFunction()">{{ __("Şifreyi Göster") }}
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                        <button type="button" class="btn btn-success" onclick="degistir()">Düzenle</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __("İptal") }}</button>
+                        <button type="button" class="btn btn-success" onclick="degistir()">{{ __("Düzenle") }}</button>
                     </div>
                 </form>
             </div>

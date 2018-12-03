@@ -83,11 +83,14 @@ class ExtensionsController extends Controller
         return view('feature.server',[
             "extension" => $extension,
             "scripts" => $scripts,
-            "data" => $outputs
+            "data" => $outputs,
+            "view" => "index"
         ]);
     }
 
     public function route(){
+        $extension = Extension::where('name',\request('extension'))->first();
+        $scripts = Script::where('extensions','like',\request('extension'))->get();
         $outputs = [];
         foreach (\request('scripts') as $script){
             $parameters = '';
@@ -98,20 +101,25 @@ class ExtensionsController extends Controller
             $output = str_replace('\n','',$output);
             $outputs[$script->unique_code] = json_decode($output,true);
         }
-        return view('extensions.' . strtolower(\request('extension')) . '.' . \request('url'),[
-            "result" => 200,
-            "data" => $outputs,
-        ]);
-    }
-
-    public function route2(){
-        if(!file_exists(resource_path('views') . DIRECTORY_SEPARATOR . 'extensions' . DIRECTORY_SEPARATOR .
-         request('feature') . DIRECTORY_SEPARATOR . request('route') )){
-            return view('general.error',[
-               'Route bulunamadı!'
+        $view = (\request()->ajax()) ? 'extensions.' . strtolower(\request('extension')) . '.' . \request('url')
+            : 'feature.server';
+        if(view()->exists($view)){
+            return view($view,[
+                "result" => 200,
+                "data" => $outputs,
+                "view" => \request('url'),
+                "extension" => $extension,
+                "scripts" => $scripts,
             ]);
+        }else{
+            return [
+                "result" => 200,
+                "data" => $outputs,
+                "view" => \request('url'),
+                "extension" => $extension,
+                "scripts" => $scripts,
+            ];
         }
-        echo "yey";
     }
 
 }

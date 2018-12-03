@@ -13,22 +13,22 @@
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">{{$server->name}}</h1>
     </div>
-    <button class="btn btn-success" onclick="location.href = '/sunucular/';">Geri Don</button>
+    <button class="btn btn-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">
-        Düzenle
+        {{__("Düzenle")}}
     </button>
 
     <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#commandModal">
-        Komut Çalıştır
+        {{__("Komut Çalıştır")}}
     </button>
     <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addService">
-        Servisleri Düzenle
+        {{__("Servisleri Düzenle")}}
     </button>
     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#changeNetwork">
-        Network
+        {{__("Network")}}
     </button>
     <button type="button" class="btn btn-primary" data-toggle="modal" onclick="getHostname()">
-        Hostname
+        {{__("Hostname")}}
     </button>
     @isset($scripts)
         @foreach($scripts as $script)
@@ -36,7 +36,7 @@
         @endforeach
     @endisset
     <br><br>
-    <h4>Servis Durumları</h4>
+    <h4>{{__("Servis Durumları")}}</h4>
         @foreach($services as $service)
             <button type="button" class="btn btn-info btn-lg" style="cursor:default;" id="status_{{$service}}">
                 {{strtoupper($service)}}
@@ -50,23 +50,23 @@
     </pre>
 
     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">
-        Sunucuyu Sil
+        {{__("Sunucuyu Sil")}}
     </button>
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Sunucu Sil</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">{{__("Sunucuyu Sil")}}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h2><b>{{$server->name }}</b></h2> isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.
+                    <h2><b>{{$server->name }}</b></h2>{{__("isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.")}}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-danger" onclick="deleteServer()">Sunucu Sil</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__("İptal")}}</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteServer()">{{__("Sunucuyu Sil")}}</button>
                 </div>
             </div>
         </div>
@@ -84,7 +84,7 @@
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" onclick="document.getElementById('run_command').disabled = !this.checked;" id="commandResponsibility">
                         <label class="form-check-label" for="defaultCheck1">
-                            Özel komut çalıştırma sorumluluğunu kabul ediyorum.
+                            {{__("Özel komut çalıştırma sorumluluğunu kabul ediyorum.")}}
                         </label>
                     </div><br>
                     <div class="form-group">
@@ -478,7 +478,7 @@
         @foreach($server->extensions as $feature)
             setInterval(function () {
                 checkStatus('{{$feature}}');
-            }, 5000);
+            }, 3000);
         @endforeach
     </script>
 @endsection
