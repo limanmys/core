@@ -2,6 +2,8 @@
 
 Auth::routes();
 
+Route::get('/locale','UserController@setLocale')->name('set_locale');
+
 Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/', 'HomeController@index')->name('home');
@@ -19,7 +21,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/sunucu/hostname', 'ServerController@hostname')->name('server_hostname')->middleware('parameters:hostname');
         Route::post('/sunucu/servis', 'ServerController@service')->name('server_service')->middleware('parameters:extension,action');
         Route::post('/sunucu/eklenti', 'ServerController@enableExtension')->name('server_extension');
-        Route::post('/extension/{extension_id}/','ExtensionsController@handleRequest')->name('extension_api')->middleware('script_parameters');
+        Route::post('/extension/{extension_id}/','ExtensionsController@route')->name('extension_api')->middleware('script_parameters');
     });
 
     Route::get('/anahtarlar','SshController@index')->name('keys');

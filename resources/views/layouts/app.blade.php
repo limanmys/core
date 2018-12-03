@@ -3,7 +3,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -68,54 +67,64 @@
     </style>
 </head>
 <body>
-@auth
-    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
 
-        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">{{ __("Liman Sistem Yönetimi") }}</a>
-        <input class="form-control form-control-dark w-100" type="text" placeholder="{{ __("Arama") }}" aria-label="{{ __("Arama") }}">
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="/">{{ __("Liman Sistem Yönetimi") }}</a>
+        @auth
+        <input class="form-control form-control-dark w-80" type="text" placeholder="{{ __("Arama") }}" aria-label="{{ __("Arama") }}">
+        @endauth
         <ul class="navbar-nav px-3">
             <li class="nav-item text-nowrap">
-                <a class="nav-link text-white" href="#">{{ __("Çıkış Yap") }}</a>
+                @if (Session::get('locale') == "tr")
+                    <a class="nav-link text-white" onclick="language('en')">EN</a>
+                @else
+                    <a class="nav-link text-white" onclick="language('tr')">TR</a>
+                @endif
+
             </li>
         </ul>
-
+        @auth
+        <ul class="navbar-nav px-3">
+            <li class="nav-item text-nowrap">
+                <a class="nav-link text-white" href="#">{{Auth::user()->name}}</a>
+            </li>
+        </ul>
+        @endauth
     </nav>
-@endauth
-
     <div class="container-fluid">
         <div class="row">
             @auth
                 <div class="sidebar">
                     <ul class="sidebar-nav">
                         <li>
-                            <a href="{{route('home')}}">Ana Sayfa<i data-toggle="tooltip" data-placement="bottom" title="Ana Sayfa" class="fa fa-home menu-icon" aria-hidden="true"></i></a>
+                            <a href="{{route('home')}}">{{ __("Ana Sayfa") }}<i data-toggle="tooltip" data-placement="bottom" title="Ana Sayfa" class="fa fa-home menu-icon" aria-hidden="true"></i></a>
                         </li>
                         <li>
-                            <a href="{{route('servers')}}">Sunucular<i data-toggle="tooltip" data-placement="bottom" title="Sunucular" class="fa fa-download menu-icon" aria-hidden="true"></i></a>
+                            <a href="{{route('servers')}}">{{ __("Sunucular") }}<i data-toggle="tooltip" data-placement="bottom" title="Sunucular" class="fa fa-download menu-icon" aria-hidden="true"></i></a>
                         </li>
                         @foreach($extensions as $extension)
                             <li>
-                                <a href="/l/{{$extension->name}}">{{$extension->name}}<i data-toggle="tooltip" data-placement="bottom" title="{{$extension->name}}" class="fa fa-cog menu-icon" aria-hidden="true"></i></a>
+                                <a href="/l/{{$extension->name}}">{{ __($extension->name) }}<i data-toggle="tooltip" data-placement="bottom" title="{{$extension->name}}" class="fa fa-cog menu-icon" aria-hidden="true"></i></a>
                             </li>
                         @endforeach
                         <li>
-                            <a href="{{route('scripts')}}">Betikler<i data-toggle="tooltip" data-placement="bottom" title="Betikler" class="fa fa-cog menu-icon" aria-hidden="true"></i>
+                            <a href="{{route('scripts')}}">{{ __("Betikler") }}<i data-toggle="tooltip" data-placement="bottom" title="Betikler" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('keys')}}">SSH Anahtarları<i data-toggle="tooltip" data-placement="bottom" title="SSH Anahtarları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
+                            <a href="{{route('keys')}}">{{ __("SSH Anahtarları") }}<i data-toggle="tooltip" data-placement="bottom" title="SSH Anahtarları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('extensions_settings')}}">Eklentiler<i data-toggle="tooltip" data-placement="bottom" title="Eklentiler" class="fa fa-cog menu-icon" aria-hidden="true"></i>
+                            <a href="{{route('extensions_settings')}}">{{ __("Eklentiler") }}<i data-toggle="tooltip" data-placement="bottom" title="Eklentiler" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('users')}}">Liman Kullanıcıları<i data-toggle="tooltip" data-placement="bottom" title="Liman Kullanıcıları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
+                            <a href="{{route('users')}}">{{ __("Liman Kullanıcıları") }}<i data-toggle="tooltip" data-placement="bottom" title="Liman Kullanıcıları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('settings')}}">Sistem Ayarları<i data-toggle="tooltip" data-placement="bottom" title="Sistem Ayarları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
+                            <a href="{{route('settings')}}">{{ __("Sistem Ayarları") }}<i data-toggle="tooltip" data-placement="bottom" title="Sistem Ayarları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
@@ -165,6 +174,14 @@
             }
         }
     }
+    function language(locale){
+        $.get("{{route('set_locale')}}", {
+            locale: locale,
+        }, function (data, status) {
+            location.reload();
+        });
+    }
+
     navbar(false);
 </script>
 </body>

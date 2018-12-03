@@ -21,5 +21,7 @@
         function details() {
             $('.list-group-item').removeClass('active');$("#" + id).addClass('active')
         }
+
+
     </script>
 @endsection
