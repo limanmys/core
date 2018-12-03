@@ -30,22 +30,19 @@
             </div>
         </div>
     <script>
-        var server_id = "{{request('server')->name}}";
+        var server_id = "{{request('server')->_id}}";
         var extension = "{{$extension->name}}";
+        var history = [];
         function request(url,next,...inputs) {
-            var args = Array.prototype.slice.call(arguments, 0);
             var data = {
                 server_id : server_id,
-                extension_name : extension,
+                extension : extension,
                 url : url
             };
             inputs.forEach(function (input) {
                 var key = input.split(':')[0];
-                var data = input.split(':')[1];
-                data = $.merge(data,{key : data});
+                data[key] = input.split(':')[1];
             });
-            console.log(data);
-            return;
             $.ajax({
                 url : '{{route('extension_api',$extension->name)}}',
                 type : "POST",
@@ -54,6 +51,14 @@
                     next(data);
                 }
             });
+        }
+        
+        function redirect(path,...inputs) {
+            var params = "";
+            inputs.forEach(function (input) {
+                params = params + "&" + input.split(':')[0] + "=" + input.split(':')[1];
+            });
+            location.href = location.href + '/' + path + params;
         }
     </script>
 @endsection

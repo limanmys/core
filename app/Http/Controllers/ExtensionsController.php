@@ -87,21 +87,31 @@ class ExtensionsController extends Controller
         ]);
     }
 
-    public function generatePage(){
+    public function route(){
+        $outputs = [];
         foreach (\request('scripts') as $script){
-            foreach (str_split($script->inputs,',') as $input){
-                dd($input);
+            $parameters = '';
+            foreach (explode(',' , $script->inputs) as $input){
+                $parameters = $parameters . " " .\request(explode(':', $input)[0]);
             }
+            $output = \request('server')->runScript($script,$parameters);
+            $output = str_replace('\n','',$output);
+            $outputs[$script->unique_code] = json_decode($output,true);
         }
+        return view('extensions.' . strtolower(\request('extension')) . '.' . \request('url'),[
+            "result" => 200,
+            "data" => $outputs,
+        ]);
     }
 
-    public function route(){
+    public function route2(){
         if(!file_exists(resource_path('views') . DIRECTORY_SEPARATOR . 'extensions' . DIRECTORY_SEPARATOR .
          request('feature') . DIRECTORY_SEPARATOR . request('route') )){
             return view('general.error',[
                'Route bulunamadı!'
             ]);
         }
-        //TODO
+        echo "yey";
     }
+
 }

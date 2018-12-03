@@ -141,22 +141,26 @@
     @endauth
 <script>
     $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
+        $('[data-toggle="tooltip"]').tooltip();
     });
 
     function navbar(flag) {
         if (localStorage.getItem("state") === "expanded") {
             if(!flag){
                 $('.sidebar').css('margin-left', '0px');
+                $('main').removeClass('col-lg-11').addClass('col-lg-10');
             }else{
                 $('.sidebar').css('margin-left', '-270px');
+                $('main').removeClass('col-lg-10').addClass('col-lg-11');
                 localStorage.setItem("state", "minimized");
             }
         } else{
             if(!flag){
                 $('.sidebar').css('margin-left', '-270px');
+                $('main').removeClass('col-lg-10').addClass('col-lg-11');
             }else{
                 $('.sidebar').css('margin-left', '0px');
+                $('main').removeClass('col-lg-11').addClass('col-lg-10');
                 localStorage.setItem("state", "expanded");
             }
         }
