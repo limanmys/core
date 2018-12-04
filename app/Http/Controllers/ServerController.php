@@ -6,18 +6,22 @@ use App\Extension;
 use App\Key;
 use App\Script;
 use App\Server;
-use App\ServerFeature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ServerController extends Controller
 {
     public function index(){
+        $all_servers = Server::all();
+        $permissions = request('permissions');
+        $servers = [];
+        foreach ($permissions->servers as $server_id) {
+            array_push($servers,$all_servers->where('_id',$server_id)->first());
+        }
         return view('server.index',[
-            "servers" => Server::all()
+            "servers" => $servers
         ]);
     }
-
 
     public function add(Request $request){
         $data = $request->all();
@@ -47,7 +51,7 @@ class ServerController extends Controller
     }
 
     public function one(){
-        $scripts = Script::where('features','server')->get();
+        $scripts = Script::where('extensions','server')->get();
         $server = \request('server');
         $services = $server->extensions;
         for ($i = 0 ; $i < count($services); $i++){
@@ -87,8 +91,8 @@ class ServerController extends Controller
     }
 
     public function check(){
-        $feature = Extension::where('name','like',request('feature'))->first();
-        $output = Server::where('_id',\request('server_id'))->first()->isRunning($feature->service);
+        $extension = Extension::where('name','like',request('extension'))->first();
+        $output = Server::where('_id',\request('server_id'))->first()->isRunning($extension->service);
         if($output == "active\n"){
             $result = 200;
         }else if($output === "inactive\n"){

@@ -1,7 +1,7 @@
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addZone">
+    Zone Ekle
+</button>
 @if(is_array($data["dns_zone_add"]))
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addZone">
-        Zone Ekle
-    </button>
     @foreach($data["dns_zone_add"] as $zone)
         <div class="card">
             <div class="card-title">

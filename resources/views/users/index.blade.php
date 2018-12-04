@@ -2,13 +2,7 @@
 
 @section('content')
 
-    <link href="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/theme-default.min.css"
-          rel="stylesheet" type="text/css" />
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
-
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h2>Kullanıcılar</h2>
     </div>
     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#userAdd">
@@ -57,7 +51,7 @@
                                 <input id="change_pass" data-validation-error-msg="Girilmesi zorunlu alan." placeholder="Parola" data-validation="required"  name="password" type="password" class="form-control">
                             </div>
                             <div>
-                                <input type="checkbox" onclick="myFunction()">Show Password
+                                <input type="checkbox" onclick="this()">Show Password
                             </div>
                         </td>
                     </div>
@@ -104,11 +98,11 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <h3>Kullanıcı Adı</h3>
-                            <input id="add_name" type="text" class="form-control" placeholder="Kullanıcı adı" data-validation="length" data-validation-length="min4" data-validation-error-msg="Kullanıcı adı en az 4 harfli olmalı.">
+                            <input id="add_name" type="text" class="form-control" placeholder="Kullanıcı adı" required pattern="^.{0,150}$">
                         </div>
                         <div class="form-group">
                             <h3>Email Adresi</h3>
-                            <input id="add_email" type="text" class="form-control" placeholder="Email Adresi"  data-validation="email" data-validation-error-msg="Geçerli bir e-mail address girin.">
+                            <input name="email" type="text" class="form-control" placeholder="Email Adresi" required>
                         </div>
                         <div class="form-group">
                             <h3>Parola</h3>
@@ -120,7 +114,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                        <button type="button" class="btn btn-success" onclick="add()">Ekle</button>
+                        <button type="submit" class="btn btn-success">Ekle</button>
                     </div>
                 </form>
             </div>
@@ -130,18 +124,12 @@
     </div>
 
     <script>
-        $.validate({
-            addValidClassOnAll : true
-        });
-
+        
         function update(){
-            var name = $("#change_name").val();
-            var mail = $("#change_email").val();
-            var pass = $("#change_pass").val();
             $.post("" ,{
-                name : name,
-                mail : mail,
-                pass:pass,
+                name : $("#change_name").val(),
+                mail : $("#change_email").val(),
+                pass:$("#change_pass").val(),
             },function (data,status) {
                 if(data["result"] === 200){
                     location.reload();
@@ -149,6 +137,10 @@
                     alert("Hata!");
                 }
             });
+        }
+
+        function deneme(form){
+            console.log(form);
         }
 
         function deletion(){
@@ -167,20 +159,17 @@
                 }
             });
         }
-        function add() {
+        function execute(flag) {
             var name = $("#add_name").val();
             var email = $("#add_email").val();
             var parola = $("#add_parola").val();
-            $("#add_dhcp").prop("checked") ? features = features + "1" : 0;
-            $("#add_dns").prop("checked") ? features = features + "2" : 0;
-            $("#add_ldap").prop("checked") ? features = features + "3" : 0;
-            $.post("{{route('server_add')}}" ,{
+            $.post("",{
                 name : name,
                 email : email,
                 parola : parola,
             },function (data,status) {
                 if(data["result"] === 200){
-                    //window.location.replace("{{route('users')}}" + "/" + data["id"]);
+                    location.reload();
                 }else{
                     alert("Hata!");
                 }
@@ -188,7 +177,7 @@
         }
         function myFunction() {
             var x = document.getElementById("change_pass");
-            var y=document.getElementById("add_parola");
+            var y = document.getElementById("add_parola");
             if (x.type === "password") {
                 x.type = "text";
             } else {

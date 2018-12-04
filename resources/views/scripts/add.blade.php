@@ -118,9 +118,9 @@
                         </div>
                         <div class="form-group">
                             <h3>Özellik</h3>
-                            <select class="form-control" id="feature">
-                                @foreach ($features as $feature)
-                                    <option value="{{$feature->_id}}">{{$feature->name}}</option>
+                            <select class="form-control" id="extension">
+                                @foreach ($extensions as $extension)
+                                    <option value="{{$extension->_id}}">{{$extension->name}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -232,12 +232,12 @@
         }
         function add(){
             data["name"]=$("#name").val();
-            data["feature"]=$( "#feature option:selected" ).text();
+            data["extension"]=$( "#extension option:selected" ).text();
             data["version"]=$("#version").val();
             data["description"]=$("#description").val();
             data["email"]=$("#email").val();
             data["type"]=$( "#betiktype" ).val();
-            if(data["name"]!="" && data["feature"]!="" && data["version"]!="" && data["description"]!="" && data["email"]!="" && data["type"]!="" ){
+            if(data["name"]!="" && data["extension"]!="" && data["version"]!="" && data["description"]!="" && data["email"]!="" && data["type"]!="" ){
                 $("#settingsModal").modal('hide');
                 $(".modal-backdrop").remove();
             }

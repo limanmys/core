@@ -44,8 +44,8 @@
         </div>
     </div>
     <script>
-        function extensionModal(feature, publisher, email, status) {
-            $(".modal-title").html(feature + " eklentisi");
+        function extensionModal(extension, publisher, email, status) {
+            $(".modal-title").html(extension + " eklentisi");
             $("#creator").html("Yapımcı : " + publisher);
             if(status === "0" || status === "2"){
                 $("#disableButton").attr("disabled","disabled");

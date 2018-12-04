@@ -45,5 +45,8 @@
   "Sunucuyu Sil" : "Remove Server",
   "isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır." : "are you sure to remove this server? This operation can not be undone.",
   "Başlamak için lütfen bir şehir seçin." : "Please select a city to begin with.",
-  "Önerilen Betikler" : "Suggessted Scripts"
+  "Önerilen Betikler" : "Suggessted Scripts",
+  "Yetki Dağılımı" : "Authority Distribution",
+  "Liman'ı Kullanmak için hiçbir yetkiniz bulunmamaktadır" : "You have no rights to use",
+  "Bu sunucuya erişmek için yetkiniz bulunmamaktadır" : "You are not authorized to access this server"
 }

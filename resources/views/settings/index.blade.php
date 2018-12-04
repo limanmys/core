@@ -9,10 +9,10 @@
 
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <a class="nav-link active" href="#">Active</a>
+            <a class="nav-link active" href="#">{{__("Kullanıcılar")}}</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
+        <a class="nav-link" href="#">{{__("Ayarlar")}}</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="#">Link</a>

@@ -106,7 +106,7 @@
                         </div>
                         <div class="form-group">
                             <h3>Özellik</h3>
-                            <select class="form-control" id="feature">
+                            <select class="form-control" id="extension">
                                 @foreach ($extensions as $extension)
                                     <option value="{{$extension->_id}}">{{$extension->name}}</option>
                                 @endforeach
