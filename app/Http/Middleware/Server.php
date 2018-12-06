@@ -50,15 +50,13 @@ class Server
             }
             //Check if SSH key is valid or even exist for user.
             if($server->integrity() == false){
-                $message = __("Sunucuya erişmek için izniniz yok.");
+                $message = __("SSH: Sunucuya erişmek için izniniz yok.");
                 if($request->ajax()){
                     return response([
                         "message" => $message
                     ],401);
                 }
-                return response()->view('general.error',[
-                    "message" => $message
-                ]);
+                return redirect(route('keys'));
             }
             //Now that everything is checked, add server variable to request to easy access and prevent more database queries.
             $request->request->add(['server' => $server]);

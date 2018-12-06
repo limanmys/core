@@ -364,13 +364,13 @@
         }
 
 
-        function checkStatus(feature) {
-            var element = $("#status_" + feature);
+        function checkStatus(extension) {
+            var element = $("#status_" + extension);
             $.ajax({
                     url : "{{ route('server_check') }}",
                     type : "POST",
                     data : {
-                        feature : feature,
+                        extension : extension,
                         server_id : '{{$server->_id}}'
                     },
                     success : function (data) {
@@ -475,9 +475,9 @@
                 }
             });
         }
-        @foreach($server->extensions as $feature)
+        @foreach($server->extensions as $extension)
             setInterval(function () {
-                checkStatus('{{$feature}}');
+                checkStatus('{{$extension}}');
             }, 3000);
         @endforeach
     </script>

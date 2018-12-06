@@ -17,9 +17,9 @@ class ScriptController extends Controller
     }
 
     public function add(){
-        $features = Extension::all();
+        $extensions = Extension::all();
         return view("scripts.add",[
-            "features" => $features
+            "extensions" => $extensions
         ]);
     }
 
@@ -32,7 +32,7 @@ class ScriptController extends Controller
     }
 
     public function one(){
-        $script = Script::where('_id',\request('id'))->first();
+        $script = Script::where('_id',\request('script_id'))->first();
         $contents = Storage::get('scripts/' . $script->_id);
         //Dirty way, but works well.
         $contents = explode("\n", $contents);
@@ -48,7 +48,7 @@ class ScriptController extends Controller
         $script = new Script();
         $script = Script::fillValues($script,\request('language'),\request('encoding'),\request('root'),\request('name'),
         \request('description'),\request('version'),\request('extensions'),\request('inputs'),\request('outputs')
-    ,\request('type'),\request('authors'),\request('support_email'),\request('company'),\request('unique_code'),\request('code'));
+    ,\request('type'),\Auth::user()->name,\request('support_email'),\request('company'),\request('unique_code'),\request('code'));
         $script->save();
         return [
             "result" => 200,

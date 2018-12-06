@@ -79,5 +79,9 @@
   "Bu alan 4 karakterden az olamaz": "This field cannot be less than 4 characters",
   "Versiyon Sayı Olmalı": "Version should be number",
   "Geçerli bir e-mail address girin": "Enter a valid e-mail address",
-  "Kuruluş": "Company"
+  "Kuruluş": "Company",
+  "Yetki Dağılımı" : "Authority Distribution",
+  "Liman'ı Kullanmak için hiçbir yetkiniz bulunmamaktadır" : "You have no rights to use",
+  "Bu sunucuya erişmek için yetkiniz bulunmamaktadır" : "You are not authorized to access this server",
+  "Kullanıcı Ekle" : "Add User"
 }
