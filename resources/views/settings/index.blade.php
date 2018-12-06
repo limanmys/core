@@ -42,7 +42,18 @@
                     </table>
             </div>
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#deneme">
+                            {{__("Testing")}}
+                        </button>
+                @include('__system__.modal',[
+                    "id"=>"deneme",
+                    "title" => "Merhaba Ertan",
+                    "url" => "/user/add",
+                    "inputs" => [
+                        "Kullanıcı Adı" => "username:text",
+                        "İp Adresi" => "ip_address:number"
+                    ]
+                ])
             </div>
             <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
 
@@ -85,6 +96,7 @@
 
             <script>
                 function addUser(form){
+                    console.log(this);
                     var data = new FormData(form);
                     console.log(data.get('username'));
                     return false;
