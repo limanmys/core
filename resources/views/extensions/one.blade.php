@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-3">
             <div class="list-group">
-                @each('extensions.__system__.dropdown',$files,'file')
+                @each('__system__.dropdown',$files,'file')
             </div>
         </div>
         <div class="col-9">
@@ -21,7 +21,5 @@
         function details() {
             $('.list-group-item').removeClass('active');$("#" + id).addClass('active')
         }
-
-
     </script>
 @endsection
