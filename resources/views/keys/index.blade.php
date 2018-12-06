@@ -1,22 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
-    <link href="js/form-validator/theme-default.min.css" rel="stylesheet" type="text/css"/>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="js/form-validator/jquery.form-validator.min.js"></script>
-
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h2>SSH Anahtarları</h2>
+        <h2>{{ __("SSH Anahtarları") }}</h2>
     </div>
     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
-        Anahtar Ekle
+        {{ __("Anahtar Ekle") }}
     </button><br><br>
     <table class="table">
         <thead>
         <tr>
-            <th scope="col">Anahtar Adı</th>
-            <th scope="col">Kullanıcı</th>
-            <th scope="col">Sunucu</th>
+            <th scope="col">{{ __("Anahtar Adı") }}</th>
+            <th scope="col">{{ __("Kullanıcı") }}</th>
+            <th scope="col">{{ __("Sunucu") }}</th>
         </tr>
         </thead>
         <tbody data-toggle="modal" data-target="#duzenle">
@@ -30,40 +26,26 @@
         </tbody>
     </table>
     <script>
-        function add() {
-            var name = $("#add_name").val();
-            var username = $("#add_username").val();
-            var password = $("#add_password").val();
-            var server_id = $("#add_server").val();
-            $.post("{{route('key_add')}}" ,{
-                name : name,
-                username : username,
-                password : password,
-                server_id : server_id
-            },function (data,status) {
-                if(data["result"] === 200){
-                    location.reload();
-                }else{
-                    alert("Hata!");
-                }
-            });
-        }
-        function degistir() {
+        function add(event,flag) {
+            event.preventDefault();
+            var x = $("#form").serializeArray();
+            dataObj = {};
+            $.each(x, function(i, field){
 
-            var name = $("#change_name").val();
-            var username = $("#change_username").val();
-            var password = $("#change_password").val();
-            var server_id = $("#change_server").val();
-            $.post("" ,{
-                name : name,
-                username : username,
-                password : password,
-                server_id : server_id
+                dataObj[field.name] = field.value;
+            });
+            var route=flag=='add' ? "{{route('key_add')}}" :'';
+            $.post(route,{
+                name : dataObj['name'],
+                username : dataObj['username'],
+                password : dataObj['password'],
+                server_id : dataObj['server']
             },function (data,status) {
                 if(data["result"] === 200){
                     location.reload();
                 }else{
                     alert("Hata!");
+
                 }
             });
         }
@@ -74,40 +56,40 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title" id="exampleModalLabel">Anahtar Ekle</h1>
+                    <h1 class="modal-title" id="exampleModalLabel">{{ __("Anahtar Ekle") }}</h1>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form>
+                <form id="form"onsubmit="add(event,'add')">
                     <div class="modal-body">
                         <div class="form-group">
-                            <h3>Adı</h3>
-                            <input id="add_name" type="text" class="form-control" placeholder="Anahtar kısa adı" data-validation="length" data-validation-length="min4" data-validation-error-msg="4 karakterden az olmaz.">
+                            <h3>{{ __("Adı") }}</h3>
+                            <input id="add_name" name="name" type="text" class="form-control" placeholder="{{ __("Anahtar Kısa Adı") }}" value="" required minlength="4">
                         </div>
                         <div class="form-group">
-                            <h3>Sunucu</h3>
-                            <select class="form-control" id="add_server">
+                            <h3>{{ __("Sunucu") }}</h3>
+                            <select class="form-control" id="add_server" name="server">
                                 @foreach ($servers as $server)
                                     <option value="{{$server->id}}">{{$server->name}}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
-                            <h3>Kullanıcı Adı</h3>
-                            <input id="add_username" type="text" class="form-control" placeholder="Anahtar Kullanıcı Adı" data-validation="required" data-validation-error-msg="Girilmesi Zorunlu Alan">
+                            <h3>{{ __("Kullanıcı Adı") }}</h3>
+                            <input id="add_username" name="username" type="text" value=""class="form-control" placeholder="{{ __("Anahtar Kullanıcı Adı") }}" required>
                         </div>
                         <div class="form-group">
-                            <h3>Parola</h3>
-                            <input id="add_password" data-validation-error-msg="Girilmesi zorunlu alan." placeholder="Parola" data-validation="required"  name="password" type="password" class="form-control">
+                            <h3>{{ __("Parola") }}</h3>
+                            <input id="add_password"  placeholder="{{ __("Parola") }}"  value="" name="password" type="password" type="password" required>
                         </div>
                         <div>
-                            <input type="checkbox" onclick="myFunction()">Show Password
+                            <input type="checkbox" onclick="myFunction()">{{ __("Şifreyi Göster") }}
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                        <button type="button" class="btn btn-success" onclick="add()">Ekle</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __("İptal") }}</button>
+                        <button class="btn btn-success" type="submit">{{ __("Ekle") }}</button>
                     </div>
                 </form>
             </div>
@@ -117,64 +99,52 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Anahtar Düzenle</h2>
+                    <h2>{{ __("Anahtar Düzenle") }}</h2>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form>
+                <form id="form" onsubmit="add(event,'update')">
                     <div class="modal-body">
                         <div class="form-group">
-                            <h3>Adı</h3>
-                            <input id="change_name" type="text" class="form-control" placeholder="Anahtar kısa adı" data-validation="length" data-validation-length="min4" data-validation-error-msg="4 karakterden az olmaz.">
+                            <h3>{{ __("Adı") }}</h3>
+                            <input id="change_name" name="name" type="text" class="form-control" placeholder="{{ __("Anahtar Kısa Adı") }}" required minlength="4">
                         </div>
                         <div class="form-group">
-                            <h3>Sunucu</h3>
-                            <select class="form-control" id="change_server">
+                            <h3>{{ __("Sunucu") }}</h3>
+                            <select class="form-control" id="change_server" name="server">
                                 @foreach ($servers as $server)
                                     <option value="{{$server->id}}">{{$server->name}}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
-                            <h3>Kullanıcı Adı</h3>
-                            <input id="change_username" type="text" class="form-control" placeholder="Anahtar Kullanıcı Adı" data-validation="required" data-validation-error-msg="Girilmesi Zorunlu Alan">
+                            <h3>{{ __("Kullanıcı Adı") }}</h3>
+                            <input id="change_username" name="username" type="text" class="form-control" placeholder="{{ __("Anahtar Kullanıcı Adı") }}" required>
                         </div>
                         <div class="form-group">
-                            <h3>Parola</h3>
-                            <input  id="change_pass" data-validation-error-msg="Girilmesi zorunlu alan." placeholder="Parola" data-validation="required"  name="password" type="password" class="form-control">
+                            <h3>{{ __("Parola") }}</h3>
+                            <input  id="change_pass" name="password" type="password" type="password" placeholder="{{ __("Parola") }}" required>
                         </div>
                         <div>
-                            <input type="checkbox" onclick="myFunction()">Show Password
+                            <input type="checkbox" onclick="myFunction()">{{ __("Şifreyi Göster") }}
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                        <button type="button" class="btn btn-success" onclick="degistir()">Düzenle</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __("İptal") }}</button>
+                        <button type="submit" class="btn btn-success" >{{ __("Düzenle") }}</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
     <script>
-        $.validate({
-            addValidClassOnAll : true,
-            modules: 'security'
-        });
         function myFunction() {
             var x = document.getElementById("add_password");
             var y=document.getElementById("change_pass");
-            if (x.type === "password") {
-                x.type = "text";
-            } else {
-                x.type = "password";
-            }
-            if (y.type === "password") {
-                y.type = "text";
-            } else {
-                y.type = "password";
-            }
+            x.type=="password"?x.type="text":x.type="password";
+            y.type=="password"?y.type="text":y.type="password";
         }
     </script>
 @endsection

@@ -75,6 +75,7 @@ class Server extends Eloquent
     }
 
     public function sshPortEnabled(){
+        $query = "echo exit | telnet " . $this->ip_address ." " . $this->port;
         $output = shell_exec("echo exit | telnet " . $this->ip_address ." " . $this->port);
         if (strpos($output,"Connected to " . $this->ip_address)){
             return true;

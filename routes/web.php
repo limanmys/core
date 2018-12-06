@@ -2,6 +2,8 @@
 
 Auth::routes();
 
+Route::get('/locale','UserController@setLocale')->name('set_locale');
+
 Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/', 'HomeController@index')->name('home');
@@ -10,6 +12,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/api/status', 'ServerController@isAlive')->middleware('parameters:ip,port');
     Route::group(['middleware' => ['server']], function () {
         Route::get('/l/{extension}/{city}/{server_id}', 'ExtensionsController@server')->name('feature_server');
+        Route::get('/l/{extension}/{city}/{server_id}/{unique_code}','ExtensionsController@route')->middleware('script_parameters');
         Route::get('/sunucular/{server_id}', 'ServerController@one')->name('server_one');
         Route::post('/sunucu/sil', 'ServerController@remove')->name('server_remove')->middleware('parameters:server_id');
         Route::post('/sunucu/calistir', 'ServerController@run')->name('server_run');
@@ -17,7 +20,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/sunucu/network', 'ServerController@network')->name('server_network')->middleware('parameters:ip,cidr,gateway,interface,password');
         Route::post('/sunucu/hostname', 'ServerController@hostname')->name('server_hostname')->middleware('parameters:hostname');
         Route::post('/sunucu/servis', 'ServerController@service')->name('server_service')->middleware('parameters:extension,action');
-        Route::post('/extension/{extension_id}/','ServerController@generatePage')->name('extension_api')->middleware('script_parameters');
+        Route::post('/sunucu/eklenti', 'ServerController@enableExtension')->name('server_extension');
+        Route::post('/extension/{extension_id}/','ExtensionsController@route')->name('extension_api')->middleware('script_parameters');
     });
 
     Route::get('/anahtarlar','SshController@index')->name('keys');

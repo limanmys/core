@@ -7,18 +7,18 @@
     <link href="js/form-validator/theme-default.min.css" rel="stylesheet" type="text/css"/>
     <script src="js/form-validator/jquery.form-validator.min.js"></script>
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Sunucular</h1>
+        <h1 class="h2">{{__("Sunucular")}}</h1>
     </div>
     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
-        Server Ekle
+        {{__("Server Ekle")}}
     </button><br><br>
 
     <table class="table">
         <thead>
         <tr>
-            <th scope="col">Sunucu Adı</th>
-            <th scope="col">İp Adresi</th>
-            <th scope="col">Port</th>
+            <th scope="col">{{__("Sunucu Adı")}}</th>
+            <th scope="col">{{__("İp Adresi")}}</th>
+            <th scope="col">{{__("Port")}}</th>
         </tr>
         </thead>
         <tbody>
@@ -52,7 +52,7 @@
                     ip: ip,
                     port: port,
                 }, function (data, status) {
-                    if (data == "true") {
+                    if (data === "true") {
                         id_error.textContent = "";
                         id_error_success.textContent = "Herşey Yolunda";
                         ip.textContent.style.color = 'green';
@@ -131,9 +131,7 @@
             var city_value = $("#city").val();
             var username = $("#add_username").val();
             var password = $("#add_password").val();
-            $("#add_dhcp").prop("checked") ? features = features + "1" : 0;
-            $("#add_dns").prop("checked") ? features = features + "2" : 0;
-            $("#add_ldap").prop("checked") ? features = features + "3" : 0;
+            var city = $("#city").val();
             $.post("{{route('server_add')}}", {
                 name: name,
                 ip_address: ip,
@@ -141,6 +139,7 @@
                 username: username,
                 city:city_value,
                 password: password,
+                city : city
             }, function (data, status) {
                 if (data["result"] === 200) {
                     $('#exampleModal').modal('hide');
