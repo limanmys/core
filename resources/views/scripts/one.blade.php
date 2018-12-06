@@ -21,10 +21,8 @@
         var check1=true;
         var check2=true;
     </script>
-    <link href="../js/form-validator/theme-default.min.css" rel="stylesheet" type="text/css"/>
     <script src="../js/src/ace.js" type="text/javascript" charset="utf-8"></script>
     <script src="../js/src/mode-javascript.js" type="text/javascript" charset="utf-8"></script>
-    <script src="../js/form-validator/jquery.form-validator.min.js"></script>
     <button class="btn btn-success" onclick="history.back();">Geri Don</button>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#settingsModal">
         Ayarlar
@@ -215,10 +213,11 @@
         function addInput() {
             var name = $("#inputName").val();
             var type = $("#inputType").val();
-            data["NeededParameter"]=$("#inputName").val()+":"+$("#inputType").val();
-
-            var value2=data["parameterName"] +":"+data["inputType"];
-
+            if(data["inputs"])
+                data["inputs"]=data["NeededParameter"]+","+$("#inputName").val()+":"+$("#inputType").val();
+            else
+                data["inputs"]=$("#inputName").val()+":"+$("#inputType").val();
+            console.log(data["inputs"]);
             var r= $('<button class="btn btn-success" onclick="sil(this)" id="">value2</button>');
             r.id=name;
             r.text(name);
@@ -238,7 +237,10 @@
         function addResultParameters(){
             var name= $("#ResultParameterName").val();
             var type = $("#inputTypeResult").val();
-            data["ResultParameter"]=$("#ResultParameterName").val()+":"+$("#inputTypeResult").val();
+            if(data["outputs"])
+                data["outputs"]=data["outputs"]+","+$("#ResultParameterName").val()+":"+$("#inputTypeResult").val();
+            else
+                data["outputs"]=$("#ResultParameterName").val()+":"+$("#inputTypeResult").val();
             var r= $('<button class="btn btn-success" onclick="sil(this)" id=""></button>');
             r.id=name;
             r.text(name);
