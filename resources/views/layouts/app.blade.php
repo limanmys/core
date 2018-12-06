@@ -8,14 +8,12 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/jquery-3.3.1.min.js') }}"></script>
-    <script src="{{asset('js/popper.min.js')}}"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
 
     <!-- Styles -->
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/main.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/fa.min.css') }}" rel="stylesheet">
-
+    
     <style>
         .sidebar {
             color: #FFF;
@@ -95,32 +93,32 @@
                 <div class="sidebar">
                     <ul class="sidebar-nav">
                         <li>
-                            <a href="{{route('home')}}">{{ __("Ana Sayfa") }}<i data-toggle="tooltip" data-placement="bottom" title="Ana Sayfa" class="fa fa-home menu-icon" aria-hidden="true"></i></a>
+                            <a href="{{route('home')}}">{{ __("Ana Sayfa") }}<i data-placement="bottom" title="Ana Sayfa" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i></a>
                         </li>
                         @p_server
                             <li>
-                                <a href="{{route('servers')}}">{{ __("Sunucular") }}<i data-toggle="tooltip" data-placement="bottom" title="Sunucular" class="fa fa-download menu-icon" aria-hidden="true"></i></a>
+                                <a href="{{route('servers')}}">{{ __("Sunucular") }}<i data-toggle="tooltip" data-placement="bottom" title="Sunucular" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i></a>
                             </li>
                         @endp_server
                         @foreach($extensions as $extension)
                             <li>
-                                <a href="/l/{{$extension->name}}">{{ __($extension->name) }}<i data-toggle="tooltip" data-placement="bottom" title="{{$extension->name}}" class="fa fa-cog menu-icon" aria-hidden="true"></i></a>
+                                <a href="/l/{{$extension->name}}">{{ __($extension->name) }}<i data-toggle="tooltip" data-placement="bottom" title="{{$extension->name}}" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i></a>
                             </li>
                         @endforeach
                         <li>
-                            <a href="{{route('scripts')}}">{{ __("Betikler") }}<i data-toggle="tooltip" data-placement="bottom" title="Betikler" class="fa fa-cog menu-icon" aria-hidden="true"></i>
+                            <a href="{{route('scripts')}}">{{ __("Betikler") }}<i data-toggle="tooltip" data-placement="bottom" title="Betikler" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('keys')}}">{{ __("SSH Anahtarları") }}<i data-toggle="tooltip" data-placement="bottom" title="SSH Anahtarları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
+                            <a href="{{route('keys')}}">{{ __("SSH Anahtarları") }}<i data-toggle="tooltip" data-placement="bottom" title="SSH Anahtarları" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('extensions_settings')}}">{{ __("Eklentiler") }}<i data-toggle="tooltip" data-placement="bottom" title="Eklentiler" class="fa fa-cog menu-icon" aria-hidden="true"></i>
+                            <a href="{{route('extensions_settings')}}">{{ __("Eklentiler") }}<i data-toggle="tooltip" data-placement="bottom" title="Eklentiler" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('settings')}}">{{ __("Sistem Ayarları") }}<i data-toggle="tooltip" data-placement="bottom" title="Sistem Ayarları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
+                            <a href="{{route('settings')}}">{{ __("Sistem Ayarları") }}<i data-toggle="tooltip" data-placement="bottom" title="Sistem Ayarları" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
@@ -144,7 +142,6 @@
                 });
             @endauth
             $(function () {
-                $('[data-toggle="tooltip"]').tooltip();
                 $('form').attr('target','#');
             });
 

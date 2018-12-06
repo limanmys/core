@@ -14,13 +14,22 @@
             <form onsubmit="return @isset($function){{$function}}(this)@endisset">
                 <div class="modal-body">
                     @if(isset($inputs) && is_array($inputs))
-                        @foreach ($inputs as $name => $type)
-                            <input type="{{$type}}" name="{{$name}}" placeholder="{{$name}}" class="form-control" required><br>
+                        @foreach ($inputs as $name => $input)
+                        <h5>{{$name}}</h5>
+                        @if(is_array($input))
+                            <select name="{{$name}}" class="form-control" required>
+                                @foreach ($input as $key => $value)
+                                    <option value="{{$value}}">{{$key}}</option>
+                                @endforeach    
+                            </select>
+                        @else
+                            <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{$name}}" class="form-control" required><br>
+                        @endif
                         @endforeach
                     @endisset
                 </div>
                 <div class="modal-footer">
-                <button type="button" class="btn btn-success">@isset($submit_text){{__($submit_text)}}@endisset</button>
+                <button type="submit" class="btn btn-success">@isset($submit_text){{__($submit_text)}}@endisset</button>
                 </div>
             </form>
         </div>
