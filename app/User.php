@@ -28,4 +28,13 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function permissions(){
+        $permissions = Permission::where('user_id',$this->_id)->first();
+        return $permissions;
+    }
+
+    public function isAdmin(){
+        return ($this->status == 1) ? true : false;
+    }
 }

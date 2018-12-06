@@ -14,7 +14,7 @@ class ExtensionsController extends Controller
     }
 
     public function one(){
-        $extension = Extension::where('_id',\request('id'))->first();
+        $extension = Extension::where('_id',\request('extension_id'))->first();
         $files = $this->tree(resource_path('views' . DIRECTORY_SEPARATOR .'extensions' . DIRECTORY_SEPARATOR . strtolower($extension->name)));
         return view('extensions.one',[
             "extension" => $extension,
@@ -44,10 +44,10 @@ class ExtensionsController extends Controller
     }
 
     public function index(){
-        if(!Extension::where('name',\request('feature'))->exists()){
+        if(!Extension::where('name',\request('extension'))->exists()){
             return redirect(route('home'));
         }
-        $servers = Server::where('extensions','like',\request('feature'))->get();
+        $servers = Server::where('extensions','like',\request('extension'))->get();
         $cities = "";
         foreach ($servers as $server){
             if($cities == "")
@@ -58,12 +58,12 @@ class ExtensionsController extends Controller
         }
         return view('feature.index',[
             "cities" => $cities,
-            "name" => request('feature')
+            "name" => request('extension')
         ]);
     }
 
     public function city(){
-        $servers = Server::where('city',\request('city'))->where('extensions','like',\request('feature'))->get();
+        $servers = Server::where('city',\request('city'))->where('extensions','like',\request('extension'))->get();
         return view('feature.city',[
             "servers" => $servers
         ]);

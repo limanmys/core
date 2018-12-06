@@ -3,8 +3,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ __("Liman Sistem Yönetimi") }}</title>
 
@@ -52,28 +50,26 @@
                         <li>
                             <a href="{{route('home')}}">{{ __("Ana Sayfa") }}<i data-toggle="tooltip" data-placement="bottom" title="Ana Sayfa" class="fa fa-home menu-icon" aria-hidden="true"></i></a>
                         </li>
+                        @p_server
                         <li>
                             <a href="{{route('servers')}}">{{ __("Sunucular") }}<i data-toggle="tooltip" data-placement="bottom" title="Sunucular" class="fa fa-download menu-icon" aria-hidden="true"></i></a>
                         </li>
+                        @endp_server
                         @foreach($extensions as $extension)
                             <li>
-                                <a href="/l/{{$extension->name}}">{{ __($extension->name) }}<i data-toggle="tooltip" data-placement="bottom" title="{{$extension->name}}" class="fa fa-server menu-icon" aria-hidden="true"></i></a>
+                                <a href="/l/{{$extension->name}}">{{ __($extension->name) }}<i data-toggle="tooltip" data-placement="bottom" title="{{$extension->name}}" class="fa fa-cog menu-icon" aria-hidden="true"></i></a>
                             </li>
                         @endforeach
                         <li>
-                            <a href="{{route('scripts')}}">{{ __("Betikler") }}<i data-toggle="tooltip" data-placement="bottom" title="Betikler" class="fa fa-code menu-icon" aria-hidden="true"></i>
+                            <a href="{{route('scripts')}}">{{ __("Betikler") }}<i data-toggle="tooltip" data-placement="bottom" title="Betikler" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('keys')}}">{{ __("SSH Anahtarları") }}<i data-toggle="tooltip" data-placement="bottom" title="SSH Anahtarları" class="fa fa-key menu-icon" aria-hidden="true"></i>
+                            <a href="{{route('keys')}}">{{ __("SSH Anahtarları") }}<i data-toggle="tooltip" data-placement="bottom" title="SSH Anahtarları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('extensions_settings')}}">{{ __("Eklentiler") }}<i data-toggle="tooltip" data-placement="bottom" title="Eklentiler" class="fa fa-plus menu-icon" aria-hidden="true"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{route('users')}}">{{ __("Liman Kullanıcıları") }}<i data-toggle="tooltip" data-placement="bottom" title="Liman Kullanıcıları" class="fa fa-user menu-icon" aria-hidden="true"></i>
+                            <a href="{{route('extensions_settings')}}">{{ __("Eklentiler") }}<i data-toggle="tooltip" data-placement="bottom" title="Eklentiler" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
                         <li>
@@ -99,11 +95,10 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-        </script>
     @endauth
-<script>
     $(function () {
         $('[data-toggle="tooltip"]').tooltip();
+        $('form').attr('target','#');
     });
 
     function navbar(flag) {
