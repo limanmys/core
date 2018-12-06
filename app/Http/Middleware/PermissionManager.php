@@ -21,9 +21,11 @@ class PermissionManager
         if($permissions == null && Auth::user()->isAdmin() == false){
             abort(403,__("Liman'ı Kullanmak için hiçbir yetkiniz bulunmamaktadır."));
         }
+        $request->request->add(['permissions' => $permissions]);
         if(Auth::user()->isAdmin()){
             return $next($request);    
         }
+        
         $controller = explode('\\',$request->route()->getAction('controller'));
         $controller = $controller[count($controller) -1 ];
         
@@ -69,9 +71,9 @@ class PermissionManager
         }else if($request->has('extension_id')){
             $extension_id = $request->get('extension_id');
         }else if($request->route('extension') != null){
-            $extension_id = Extension::where('name',$request->route('extension'))->first()->_id;
+            $extension_id = Extension::where('name','like',$request->route('extension'))->first()->_id;
         }else if($request->has('extension')){
-            $extension_id = Extension::where('name',$request->get('extension'))->first()->_id;
+            $extension_id = Extension::where('name','like',$request->get('extension'))->first()->_id;
         }
         if($extension_id != null){
             if($permissions->extensions == null || is_array($permissions->extensions) == false){
@@ -85,7 +87,7 @@ class PermissionManager
                 ]);
             }
         }
-        $request->request->add(['permissions' => $permissions]);
+        
         return $next($request);
     }
 }

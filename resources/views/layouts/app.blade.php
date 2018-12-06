@@ -3,8 +3,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ __("Liman Sistem Yönetimi") }}</title>
 
@@ -15,8 +13,8 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/fa.min.css') }}">
+    <link href="{{ asset('css/main.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/fa.min.css') }}" rel="stylesheet">
 
     <style>
         .sidebar {
@@ -99,9 +97,11 @@
                         <li>
                             <a href="{{route('home')}}">{{ __("Ana Sayfa") }}<i data-toggle="tooltip" data-placement="bottom" title="Ana Sayfa" class="fa fa-home menu-icon" aria-hidden="true"></i></a>
                         </li>
-                        <li>
-                            <a href="{{route('servers')}}">{{ __("Sunucular") }}<i data-toggle="tooltip" data-placement="bottom" title="Sunucular" class="fa fa-download menu-icon" aria-hidden="true"></i></a>
-                        </li>
+                        @p_server
+                            <li>
+                                <a href="{{route('servers')}}">{{ __("Sunucular") }}<i data-toggle="tooltip" data-placement="bottom" title="Sunucular" class="fa fa-download menu-icon" aria-hidden="true"></i></a>
+                            </li>
+                        @endp_server
                         @foreach($extensions as $extension)
                             <li>
                                 <a href="/l/{{$extension->name}}">{{ __($extension->name) }}<i data-toggle="tooltip" data-placement="bottom" title="{{$extension->name}}" class="fa fa-cog menu-icon" aria-hidden="true"></i></a>
@@ -120,10 +120,6 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('users')}}">{{ __("Liman Kullanıcıları") }}<i data-toggle="tooltip" data-placement="bottom" title="Liman Kullanıcıları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
-                            </a>
-                        </li>
-                        <li>
                             <a href="{{route('settings')}}">{{ __("Sistem Ayarları") }}<i data-toggle="tooltip" data-placement="bottom" title="Sistem Ayarları" class="fa fa-cog menu-icon" aria-hidden="true"></i>
                             </a>
                         </li>
@@ -139,50 +135,48 @@
             </main>
         </div>
     </div>
-    @auth
         <script>
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
+            @auth
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+            @endauth
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+                $('form').attr('target','#');
             });
+
+            function navbar(flag) {
+                if (localStorage.getItem("state") === "expanded") {
+                    if(!flag){
+                        $('.sidebar').css('margin-left', '0px');
+                        $('main').removeClass('col-lg-11').addClass('col-lg-10');
+                    }else{
+                        $('.sidebar').css('margin-left', '-270px');
+                        $('main').removeClass('col-lg-10').addClass('col-lg-11');
+                        localStorage.setItem("state", "minimized");
+                    }
+                } else{
+                    if(!flag){
+                        $('.sidebar').css('margin-left', '-270px');
+                        $('main').removeClass('col-lg-10').addClass('col-lg-11');
+                    }else{
+                        $('.sidebar').css('margin-left', '0px');
+                        $('main').removeClass('col-lg-11').addClass('col-lg-10');
+                        localStorage.setItem("state", "expanded");
+                    }
+                }
+            }
+            function language(locale){
+                $.get("{{route('set_locale')}}", {
+                    locale: locale,
+                }, function (data, status) {
+                    location.reload();
+                });
+            }
+            navbar(false);
         </script>
-    @endauth
-<script>
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-    });
-
-    function navbar(flag) {
-        if (localStorage.getItem("state") === "expanded") {
-            if(!flag){
-                $('.sidebar').css('margin-left', '0px');
-                $('main').removeClass('col-lg-11').addClass('col-lg-10');
-            }else{
-                $('.sidebar').css('margin-left', '-270px');
-                $('main').removeClass('col-lg-10').addClass('col-lg-11');
-                localStorage.setItem("state", "minimized");
-            }
-        } else{
-            if(!flag){
-                $('.sidebar').css('margin-left', '-270px');
-                $('main').removeClass('col-lg-10').addClass('col-lg-11');
-            }else{
-                $('.sidebar').css('margin-left', '0px');
-                $('main').removeClass('col-lg-11').addClass('col-lg-10');
-                localStorage.setItem("state", "expanded");
-            }
-        }
-    }
-    function language(locale){
-        $.get("{{route('set_locale')}}", {
-            locale: locale,
-        }, function (data, status) {
-            location.reload();
-        });
-    }
-
-    navbar(false);
-</script>
 </body>
 </html>
