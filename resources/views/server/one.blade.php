@@ -1,40 +1,34 @@
 @extends('layouts.app')
 
 @section('content')
-    <style>
-        .service_change{
-            display: none;
-        }
-    </style>
     <script>
         var server_id = "{{$server->_id}}";
         var params = [];
         var script_id = "";
     </script>
-
-    <link href="js/form-validator/theme-default.min.css" rel="stylesheet" type="text/css"/>
-
-    <script src="../js/form-validator/jquery.form-validator.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/theme-default.min.css"
+          rel="stylesheet" type="text/css" />
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">{{$server->name}}</h1>
     </div>
-    <button class="btn btn-success" onclick="location.href = '/sunucular/';">Geri Don</button>
+    <button class="btn btn-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">
-        Düzenle
+        {{__("Düzenle")}}
     </button>
 
     <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#commandModal">
-        Komut Çalıştır
+        {{__("Komut Çalıştır")}}
     </button>
     <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addService">
-        Servisleri Düzenle
+        {{__("Servisleri Düzenle")}}
     </button>
     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#changeNetwork">
-        Network
+        {{__("Network")}}
     </button>
     <button type="button" class="btn btn-primary" data-toggle="modal" onclick="getHostname()">
-        Hostname
+        {{__("Hostname")}}
     </button>
     @isset($scripts)
         @foreach($scripts as $script)
@@ -42,9 +36,9 @@
         @endforeach
     @endisset
     <br><br>
-    <h4>Servis Durumları</h4>
+    <h4>{{__("Servis Durumları")}}</h4>
         @foreach($services as $service)
-            <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#status"style="cursor:default;" id="status_{{$service}}">
+            <button type="button" class="btn btn-info btn-lg" style="cursor:default;" id="status_{{$service}}">
                 {{strtoupper($service)}}
             </button>
         @endforeach
@@ -56,46 +50,23 @@
     </pre>
 
     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">
-        Sunucuyu Sil
+        {{__("Sunucuyu Sil")}}
     </button>
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Sunucu Sil</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">{{__("Sunucuyu Sil")}}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h2><b>{{$server->name }}</b></h2> isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.
+                    <h2><b>{{$server->name }}</b></h2>{{__("isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.")}}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-danger" onclick="deleteServer()">Sunucu Sil</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Servis Durumunu Seç</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-
-                    <div class="form-group">
-                                <ul><button type="button"  class="btn btn-warning" data-dismiss="modal" onclick="serverDisabled(this.id)" id={{$service}}>Servis Devre Dışı Bırak</button></ul>
-                                <ul><button type="button" class="btn btn-primary" data-dismiss="modal" onclick="serverRun(this.id)" id={{$service}}>Servisi Çalıştır</button></ul>
-                        <ul><button type="button" class="btn btn-success" data-dismiss="modal" onclick="serverStop(this.id)" id={{$service}}>Servisi Durdur</button></ul>
-                </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__("İptal")}}</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteServer()">{{__("Sunucuyu Sil")}}</button>
                 </div>
             </div>
         </div>
@@ -113,7 +84,7 @@
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" onclick="document.getElementById('run_command').disabled = !this.checked;" id="commandResponsibility">
                         <label class="form-check-label" for="defaultCheck1">
-                            Özel komut çalıştırma sorumluluğunu kabul ediyorum.
+                            {{__("Özel komut çalıştırma sorumluluğunu kabul ediyorum.")}}
                         </label>
                     </div><br>
                     <div class="form-group">
@@ -135,53 +106,29 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Servisleri Düzenle</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">DNS Kurulumu</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <select id="inputType">
-                        @foreach($extensions as $extension)
-                        <option value={{$loop->index + 1}}>{{$extension->name}}</option>
-                        @endforeach
-                    </select>
-                    <div class="service_change">
-                    <div class="pr-service d1">
-                        <label for="hostname"><b>DNS Hostname</b></label>
-                        <input type="text" placeholder="Input Hostname For DNS option" name="dns" required><br/>
-                        <label for="deneme"><b>Deneme</b></label>
-                        <input type="text" placeholder="Input Deneme For DNS option" name="dns" required>
+                    <div class="form-group">
+                        <h5>Domain Adı</h5>
+                        <input id="dns_domain" type="text" class="form-control"
+                               placeholder="Domain Adı">
                     </div>
-                    <div class="pr-service d2">
-                        <label for="hostname"><b>DHCP Hostname:</b></label>
-                        <input type="text" placeholder="Input For DHCP option" name="dns" required><br/>
-                        <label for="deneme"><b>Deneme</b></label>
-                        <input type="text" placeholder="Input Deneme For DHCP option" name="dns" required>
+                    <div class="form-group">
+                        <h5>Interface</h5>
+                        <input id="dns_interface" type="text" class="form-control"
+                               placeholder="Interface">
                     </div>
-                    <div class="pr-service d3">
-                        <label for="hostname"><b>Hostname</b></label>
-                        <input type="text" placeholder="Input For Kullanıcılar option" name="kullanıcılar" required><br/>
-                        <label for="deneme"><b>Deneme</b></label>
-                        <input type="text" placeholder="Input Deneme For Kullanıcılar option" name="dns" required>
-                    </div>
-                    <div class="pr-service d4">
-                        <label for="hostname"><b>Hostname</b></label>
-                        <input type="text" placeholder="Input For Gruplar option" name="gruplar" required><br/>
-                        <label for="deneme"><b>Deneme</b></label>
-                        <input type="text" placeholder="Input Deneme For Gruplar option" name="dns" required>
-                    </div>
-                    <div class="pr-service d5">
-                        <label for="hostname"><b>Hostname</b></label>
-                        <input type="text" placeholder="Input For Bilgisayarlar option" name="bilgisayarlar" required><br/>
-                        <label for="deneme"><b>Deneme</b></label>
-                        <input type="text" placeholder="Input Deneme For Bilgisayarlar option" name="dns" required>
-                    </div>
+                    <div class="collapse" id="installServiceOutput">
+
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-warning" onclick="runCommand()">Çalıştır</button>
+                    <button type="button" class="btn btn-warning" onclick="installService()">Kur</button>
                 </div>
             </div>
         </div>
@@ -237,7 +184,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="modal-title" id="exampleModalLabel">Hostname Değiştir</h2>
+                    <h2 class="modal-title" id="exampleModalLabel">Network Değiştir</h2>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -297,10 +244,6 @@
                     <div class="form-group">
                         <h3>Bağlantı Portu</h3>
                         <input id="add_port" type="text" class="form-control" placeholder="Bağlantı Portu" value="22">
-                    </div>
-                    <div class="form-group">
-                        <h3>Şehirler</h3>
-                        @include("server.cities")
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -493,15 +436,13 @@
             var name = $("#add_name").val();
             var ip = $("#add_ip").val();
             var port = $("#add_port").val();
-            var city_value = $("#city").val();
             $.ajax({
                 url : "{{ route('server_run') }}",
                 type : "POST",
                 data: {
                     name:name,
                     ip:ip,
-                    port:port,
-                    city:city_value
+                    port:port
                 },
 
             },function (data,status) {
@@ -512,77 +453,32 @@
                 }
             });
         }
-        function serverDisabled(eventId){
 
-            console.log(eventId);
+        function installService(service) {
+            var dns_domain = $("#dns_domain").val();
+            var interface = $("#dns_interface").val();
             $.ajax({
-                url : "{{ route('server_service') }}",
+                url : "{{ route('server_extension') }}",
                 type : "POST",
                 data: {
-                    extensions:eventId,
-                    action:"disable",
-                    server_id:server_id
-
+                    server_id : server_id,
+                    extension : 'dns',
+                    domain : dns_domain,
+                    interface : interface
                 },
 
             },function (data,status) {
                 if(data["result"] === 200){
-                    console.log("geldim");
-                    // window.location.replace("{{route('servers')}}" + "/" + data["id"]);
+                    location.reload();
                 }else{
-                    alert("Hata!");
+                    $('#installServiceOutput').html(data["data"]).collapse();
                 }
             });
         }
-        function serverRun(eventId){
-            console.log(eventId);
-            $.ajax({
-                url : "{{ route('server_service') }}",
-                type : "POST",
-                data: {
-                    extensions:eventId,
-                    action:"start",
-                    server_id:server_id
-                },
-
-            },function (data,status) {
-                if(data["result"] === 200){
-                    console.log("dsa");
-                    // window.location.replace("{{route('servers')}}" + "/" + data["id"]);
-                }else{
-                    alert("Hata!");
-                }
-            });
-        }
-        function serverStop(eventId){
-
-            $.ajax({
-                url : "{{ route('server_service') }}",
-                type : "POST",
-                data: {
-                    extensions:eventId,
-                    action:"stop",
-                    server_id:server_id
-                },
-
-            },function (data,status) {
-                if(data["result"] === 200){
-                    // window.location.replace("{{route('servers')}}" + "/" + data["id"]);
-                }else{
-                    alert("Hata!");
-                }
-            });
-        }
-        $('#inputType').on('change', function() {
-            $('.pr-service').hide();
-            $('.service_change').show();
-                $('.d'+$(this).val()).show();
-
-        });
         @foreach($server->extensions as $feature)
             setInterval(function () {
                 checkStatus('{{$feature}}');
-            }, 5000);
+            }, 3000);
         @endforeach
     </script>
 @endsection

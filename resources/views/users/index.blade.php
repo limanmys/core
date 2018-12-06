@@ -1,12 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
-    <link href="js/form-validator/theme-default.min.css" rel="stylesheet" type="text/css"/>
-
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="js/form-validator/jquery.form-validator.min.js"></script>
-
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h2>Kullanıcılar</h2>
     </div>
@@ -40,20 +34,20 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form>
+                <form onsubmit="add(event,'update')">
                     <div class="modal-body">
                         <td>
                             <div class="form-group">
                                 <h3>Kullanıcı Adı</h3>
-                                <input id="change_name" type="text" class="form-control" placeholder="Kullanıcı adı" data-validation="length" data-validation-length="min4" data-validation-error-msg="Kullanıcı adı en az 4 harfli olmalı." >
+                                <input id="change_name" type="text" name="kullanici_adi" class="form-control" placeholder="Kullanıcı adı" value="" required minlength="3">
                             </div>
                             <div class="form-group">
                                 <h3>Email Adresi</h3>
-                                <input id="change_email" type="text" class="form-control" placeholder="Email Adresi"  data-validation="email" data-validation-error-msg="Geçerli bir e-mail address girin.">
+                                <input id="change_email" type="text" name="email" class="form-control" placeholder="Ex: example@example.com"  value=""required pattern="[a-zA-Z0-9_\.\+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-\.]+">
                             </div>
                             <div class="form-group">
                                 <h3>Parola</h3>
-                                <input id="change_pass" data-validation-error-msg="Girilmesi zorunlu alan." placeholder="Parola" data-validation="required"  name="password" type="password" class="form-control">
+                                <input id="change_pass"  placeholder="Parola"  name="password" type="password" value="" class="form-control" required>
                             </div>
                             <div>
                                 <input type="checkbox" onclick="myFunction()">Show Password
@@ -61,10 +55,10 @@
                         </td>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-danger" id="button1" data-dismiss="modal" data-toggle="modal" data-target="#check" onclick="deletion()">Hesabı Kapat</button>
+                        <button class="btn btn-danger" id="button1" data-dismiss="modal" data-toggle="modal" data-target="#check" onclick="deletion(this)">Hesabı Kapat</button>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Çıkış</button>
-                        <button  class="btn btn-primary" onclick="update()">Düzenle</button>
+                        <button  class="btn btn-primary" type="submit" value="Düzenle">Düzenle</button>
                     </div>
                 </form>
             </div>
@@ -85,7 +79,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-danger" onclick="deletion()">Sunucu Sil</button>
+                    <button type="button" class="btn btn-danger" onclick="deletion(this)">Kullanıcıyı Sil</button>
                 </div>
             </div>
         </div>
@@ -99,19 +93,19 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form>
+                <form onsubmit="add(event,'add')">
                     <div class="modal-body">
                         <div class="form-group">
                             <h3>Kullanıcı Adı</h3>
-                            <input id="add_name" type="text" class="form-control" placeholder="Kullanıcı adı" data-validation="length" data-validation-length="min4" data-validation-error-msg="Kullanıcı adı en az 4 harfli olmalı.">
+                            <input id="add_name" type="text" class="form-control" name="kullanici_adi" placeholder="Kullanıcı adı" required minlength="3">
                         </div>
                         <div class="form-group">
                             <h3>Email Adresi</h3>
-                            <input id="add_email" type="text" class="form-control" placeholder="Email Adresi"  data-validation="email" data-validation-error-msg="Geçerli bir e-mail address girin.">
+                            <input id="add_email" type="text" class="form-control" name="email" placeholder="Email Adresi"  required pattern="[a-zA-Z0-9_\.\+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-\.]+">
                         </div>
                         <div class="form-group">
                             <h3>Parola</h3>
-                            <input id="add_parola" type="password" class="form-control" placeholder="Parola" data-validation="length" data-validation-length="min4" data-validation-error-msg="Parola en az 4 haneli olmalı.">
+                            <input id="add_parola" type="password" name="password" class="form-control" placeholder="Parola" required>
                         </div>
                         <div>
                             <input type="checkbox" onclick="myFunction()">Show Password
@@ -119,7 +113,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                        <button type="button" class="btn btn-success" onclick="add()">Ekle</button>
+                        <button type="button" class="btn btn-success" type="submit">Ekle</button>
                     </div>
                 </form>
             </div>
@@ -129,18 +123,13 @@
     </div>
 
     <script>
-        $.validate({
-            addValidClassOnAll : true
-        });
+        function deletion(event){
 
-        function update(){
-            var name = $("#change_name").val();
-            var mail = $("#change_email").val();
-            var pass = $("#change_pass").val();
+            $('tr.selected').removeClass('selected');
+            // add selected class to current row
+            $(this).closest('tr').addClass('selected');
             $.post("" ,{
-                name : name,
-                mail : mail,
-                pass:pass,
+
             },function (data,status) {
                 if(data["result"] === 200){
                     location.reload();
@@ -149,36 +138,18 @@
                 }
             });
         }
-
-        function deletion(){
-            var name = $("#change_name").val();
-            var mail = $("#change_email").val();
-            var pass = $("#change_pass").val();
-            $.post("" ,{
-                name : name,
-                mail : mail,
-                pass:pass,
-            },function (data,status) {
-                if(data["result"] === 200){
-                    location.reload();
-                }else{
-                    alert("Hata!");
-                }
-            });
-        }
-        function add() {
-            var name = $("#add_name").val();
-            var email = $("#add_email").val();
-            var parola = $("#add_parola").val();
+        function add(event) {
+            event.preventDefault();
             $("#add_dhcp").prop("checked") ? features = features + "1" : 0;
             $("#add_dns").prop("checked") ? features = features + "2" : 0;
             $("#add_ldap").prop("checked") ? features = features + "3" : 0;
-            $.post("{{route('server_add')}}" ,{
-                name : name,
-                email : email,
-                parola : parola,
+            $.post("event=='add' ? {{route('server_add')}}:{{route('server_add')}}" ,{
+                name : jQuery('input[name="kullanici_adi"]').val(),
+                email : jQuery('input[name="email"]').val(),
+                parola : jQuery('input[name="password"]').val(),
             },function (data,status) {
                 if(data["result"] === 200){
+                    location.reload();
                     //window.location.replace("{{route('users')}}" + "/" + data["id"]);
                 }else{
                     alert("Hata!");

@@ -3,11 +3,11 @@
 @section('content')
     <h1>
         @isset($message)
-            {{$message}}
+            {{__($message)}}
         @endisset
     </h1>
     <h3>
-        3 Saniye içinde geri yönlendirileceksiniz...
+        {{__("3 Saniye içinde geri yönlendirileceksiniz...")}}
     </h3>
     <script>
         setTimeout(function () {

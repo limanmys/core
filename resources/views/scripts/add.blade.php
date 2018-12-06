@@ -13,6 +13,12 @@
         .alert{
             display: none;
         }
+        .column {
+            float: left;
+            width: 50%;
+            padding: 10px;
+            height: 500px; /* Should be removed. Only for demonstration */
+        }
     </style>
     <script>
         var data=[];
@@ -27,34 +33,34 @@
     <script src="../js/form-validator/jquery.form-validator.min.js"></script>
 
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Betik Oluşturma</h1>
+        <h1 class="h2">{{ __("Betik Oluşturma") }}</h1>
     </div>
-    <button class="btn btn-success" onclick="history.back();">Geri Don</button>
+    <button class="btn btn-success" onclick="history.back();">{{ __("Geri dön") }}</button>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#settingsModal">
-        Ayarlar
+        {{ __("Ayarlar") }}
     </button><br><br>
     <div class="cards">
         <div class="card w-auto">
             <div class="card-body">
-                <h4 class="card-title">Gerekli Parametreler</h4>
-                <h6>Kullanıcıya input olarak gösterilecek parametreler, parametre adları <b>aynı yazıldığı gibi</b> arayüzde gösterilecektir.</h6>
+                <h4 class="card-title">{{ __("Gerekli Parametreler") }}</h4>
+                <h6>{{ __("Kullanıcıya input olarak gösterilecek parametreler, parametre adları") }} <b>{{ __("aynı yazıldığı gibi") }}</b> {{ __("arayüzde gösterilecektir") }}.</h6>
                 <div class="form-inline">
                     <table>
                         <tr>
                             <td style="margin:10px;">
                                 <div class="form-group">
-                                    <input id="inputName" type="text" class="form-control" placeholder="Parametre Adı" data-validation="length" data-validation-length="min0">
+                                    <input id="inputName" type="text" class="form-control" placeholder="{{ __("Parametre Adı") }}" data-validation="length" data-validation-length="min0">
                                 </div>
                             </td>
                             <td style="margin:10px;">
                                 <select class="form-control" name="inputs" style="color:white;background-color:#5cb85c;" id="inputType">
-                                    <option value="string" style="color:white;background-color:#5cb85c;">Metin</option>
-                                    <option value="number" style="color:white;background-color:#428bca;">Sayı</option>
-                                    <option value="ip" style="color:white;background-color:#f0ad4e;">Ip Adresi</option>
+                                    <option value="string" style="color:white;background-color:#5cb85c;">{{ __("Metin") }}</option>
+                                    <option value="number" style="color:white;background-color:#428bca;">{{ __("Sayı") }}</option>
+                                    <option value="ip" style="color:white;background-color:#f0ad4e;">{{ __("İp Adresi") }}</option>
                                 </select>
                             </td>
                             <td style="margin:10px;">
-                                <button class="btn btn-primary" onclick="addInput()">Ekle</button>
+                                <button class="btn btn-primary" onclick="addInput()">{{ __("Ekle") }}</button>
                             </td>
                             <div class="alert alert-danger alert-dismissable" id="alert3">
                                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -73,31 +79,31 @@
         <div class="card w-auto" style="width: 18rem;  height: 18rem;">
             <div class="card-body">
                 <div class="form-group">
-                    <label for="exampleFormControlTextarea1">Kodu buraya yazınız</label>
+                    <label for="exampleFormControlTextarea1">{{ __("Kodu buraya yazınız") }}</label>
                     <div id="editor"></div>
                 </div>
             </div>
         </div>
         <div class="card w-auto">
             <div class="card-body">
-                <h5 class="card-title">Sonuç Parametreleri</h5>
+                <h5 class="card-title">{{ __("Sonuç Parametreleri") }}</h5>
                 <div class="form-inline">
                     <table>
                         <tr>
                             <td style="margin:10px;">
                                 <div class="form-group">
-                                    <input id="ResultParameterName" type="text" class="form-control" placeholder="Parametre Adı" data-validation="length" data-validation-length="min0">
+                                    <input id="ResultParameterName" type="text" class="form-control" placeholder="{{ __("Parametre Adı") }}" data-validation="length" data-validation-length="min0">
                                 </div>
                             </td>
                             <td style="margin:10px;">
                                 <select class="form-control" name="inputs" id="inputTypeResult" style="color:white;background-color:#5cb85c;">
-                                    <option value="string" style="color:white;background-color:#5cb85c;">Metin</option>
-                                    <option value="number" style="color:white;background-color:#428bca;">Sayı</option>
-                                    <option value="ip" style="color:white;background-color:#f0ad4e;">Ip Adresi</option>
+                                    <option value="string" style="color:white;background-color:#5cb85c;">{{ __("Metin") }}</option>
+                                    <option value="number" style="color:white;background-color:#428bca;">{{ __("Sayı") }}</option>
+                                    <option value="ip" style="color:white;background-color:#f0ad4e;">{{ __("İp Adresi") }}</option>
                                 </select>
                             </td>
                             <td style="margin:10px;">
-                                <button class="btn btn-primary" onclick="addResultParameters()">Ekle</button>
+                                <button class="btn btn-primary" onclick="addResultParameters()">{{ __("Ekle") }}</button>
                             </td>
                         </tr>
                     </table>
@@ -112,10 +118,10 @@
         <div class="card w-auto" style="width: 18rem;">
             <div class="card-body">
                 <div class="form-group">
-                    <h3>Sorumluluk Reddi</h3>
-                    Bu dosyayı kaydetmenin sorumluluğunu üstleniyorum.<br><br>
+                    <h3>{{ __("Sorumluluk Reddi") }}</h3>
+                    {{ __("Bu dosyayı kaydetmenin sorumluluğunu üstleniyorum") }}.<br><br>
         <button onclick="addAll()" class="btn btn-primary w-auto">
-            Ekle
+            {{ __("Ekle") }}
         </button>
                 </div>
             </div>
@@ -126,56 +132,70 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title" id="exampleModalLabel">Betik Ayarları</h1>
+                    <h1 class="modal-title" id="exampleModalLabel">{{ __("Betik Ayarları") }}</h1>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <form>
                     <div class="modal-body">
+                        <div class="column">
                         <div class="form-group">
-                            <h3>Adı</h3>
-                            <input id="name" type="text" class="form-control" placeholder="Betik kısa adı" data-validation="length" data-validation-length="min4">
+                            <h3>{{ __("Adı") }}</h3>
+                            <input id="name" type="text" class="form-control" placeholder="{{ __("Betik kısa adı") }}" required>
                         </div>
                         <div class="form-group">
-                            <h3>Özellik</h3>
+                            <h3>{{ __("Özellik") }}</h3>
                             <select class="form-control" id="feature">
                                 @foreach ($features as $feature)
                                     <option value="{{$feature->_id}}">{{$feature->name}}</option>
                                 @endforeach
                             </select>
                         </div>
+                            <div class="form-group">
+                                <h3>{{ __("Versiyon") }}</h3>
+                                <input id="version" type="text" class="form-control" placeholder="{{ __("Betik Versiyonu") }}" value="1" data-validation="custom"  data-validation-regexp="^[0-9]" data-validation-error-msg="{{ __("Versiyon Sayı Olmalı") }}.">
+                            </div>
+                            <div class="form-group">
+                                <h5>{{ __("Language") }}</h5>
+                                <input id="code_language" type="text" class="form-control"
+                                       placeholder="{{ __("Language") }}">
+                            </div>
+                            <div class="form-group">
+                                <h5>{{ __("Kuruluş") }}</h5>
+                                <input id="company" type="text" class="form-control" placeholder="{{ __("Kuruluş") }}" data-validation="required" data-validation-error-msg="Bu alan girilmesi zorunludur.">
+                            </div>
+                        </div>
+                        <div class="column">
+
                         <div class="form-group">
-                            <h3>Versiyon</h3>
-                            <input id="version" type="text" class="form-control" placeholder="Betik Versiyonu" value="1" data-validation="custom"  data-validation-regexp="^[0-9]" data-validation-error-msg="Versiyon sayı olmalı.">
+                            <h3>{{ __("Açıklama") }}</h3>
+                            <input id="description" type="text" class="form-control" placeholder="{{ __("Anahtar Kullanıcı Adı") }}">
                         </div>
                         <div class="form-group">
-                            <h3>Açıklama</h3>
-                            <input id="description" type="text" class="form-control" placeholder="Anahtar Kullanıcı Adı">
+                            <h3>{{ __("Mail Adresi") }}</h3>
+                            <input id="email" type="email" class="form-control"  placeholder="{{ __("Destek Verilecek ") }}{{ __("Mail Adresi") }}" data-validation="email" data-validation-error-msg="{{ __("Geçerli bir e-mail address girin") }}.">
                         </div>
                         <div class="form-group">
-                            <h3>Mail Adresi</h3>
-                            <input id="email" type="email" class="form-control"  placeholder="Destek verilecek Email Adresi" data-validation="email" data-validation-error-msg="Geçerli bir e-mail address girin.">
-                        </div>
-                        <div class="form-group">
-                            <h3>Betik Türü</h3>
+                            <h3>{{ __("Betik Türü") }}</h3>
                             <select class="form-control" name="inputs" id="betiktype">
-                                <option value="query">Sorgulama</option>
-                                <option value="query">Çalıştırma</option>
+                                <option value="query">{{ __("Sorgulama") }}</option>
+                                <option value="query">{{ __("Çalıştırma") }}</option>
                             </select>
+                        </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                        <button type="button" class="btn btn-success" onclick="add()">Kaydet</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __("İptal") }}</button>
+                        <button type="button" class="btn btn-success" onclick="add()">{{ __("Kaydet") }}</button>
                     </div>
                     <div class="alert alert-danger alert-dismissable" id="alert1">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        Alanların doğru doldurulması gerekiyor!
+                        {{ __("Alanların doğru doldurulması gerekiyor!") }}
                     </div>
                     <div class="alert alert-success alert-dismissable" id="alert2">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        Doğru! Yönlendiriliyor.
+                        {{ __("Doğru Yönlendiriliyor") }}.
                     </div>
 
                 </form>
@@ -225,11 +245,13 @@
         function addInput() {
             var name = $("#inputName").val();
             var type = $("#inputType").val();
-            data["NeededParameter"]=$("#inputName").val()+":"+$("#inputType").val();
-            var value2=data["parameterName"] +":"+data["inputType"];
-            console.log(data["NeededParameter"].includes(name).size);
-
-            var r= $('<button class="btn btn-success" onclick="sil(this)" id="">value2</button>');
+            if(data["inputs"]) {
+                data["inputs"] = data["inputs"] + "," + $("#inputName").val() + ":" + $("#inputType").val();
+                //console.log(data["inputs"].substr(0, data["inputs"].indexOf(':')));
+            }
+            else
+                data["inputs"]=$("#inputName").val()+":"+$("#inputType").val();
+            var r= $('<button class="btn btn-success" onclick="sil(this)" id=""></button>');
             r.id=name;
             r.text(name);
             r.css("margin","8px");
@@ -248,7 +270,10 @@
         function addResultParameters(){
             var name= $("#ResultParameterName").val();
             var type = $("#inputTypeResult").val();
-            data["ResultParameter"]=$("#ResultParameterName").val()+":"+$("#inputTypeResult").val();
+            if(data["outputs"])
+                data["outputs"]=data["outputs"]+","+$("#ResultParameterName").val()+":"+$("#inputTypeResult").val();
+            else
+                data["outputs"]=$("#ResultParameterName").val()+":"+$("#inputTypeResult").val();
             var r= $('<button class="btn btn-success" onclick="sil(this)" id=""></button>');
             r.id=name;
             r.text(name);
@@ -272,6 +297,12 @@
             data["description"]=$("#description").val();
             data["email"]=$("#email").val();
             data["type"]=$( "#betiktype" ).val();
+            editor.session.setMode("ace/mode/$( \"#code_language\" ).val()");
+            if($( "#code_language" ).val()=="python3")
+                data["language"]="!/usr/bin/env/"+$( "#code_language" ).val();
+            else
+                data["language"]=$( "#code_language" ).val();
+            data["company"]=$( "#company" ).val();
             $('#name').validate(function(valid, elem) {
                check=valid;
             });
@@ -300,8 +331,10 @@
         function addAll(){
             var command=document.getElementById("editor");
             data["code"]=command.textContent;
+            console.log(data["inputs"]);
+            console.log(data["outputs"]);
             if( 'name' in data){
-                $.post({{route('script_create')}} ,{
+                $.post("{{route('script_create')}}" ,{
                     data:data
                 },function (data,status) {
                     if(data["result"] === 200){
@@ -323,6 +356,6 @@
 
     <script>
         var editor = ace.edit("editor");
-        editor.session.setMode("ace/mode/python");
+
     </script>
 @endsection

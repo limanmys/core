@@ -30,8 +30,9 @@ class Script extends Eloquent
     }
 
     public static function fillValues($script, ... $parameters){
+        $parameters = $parameters[0];
         for($i = 0 ; $i <= 13;$i++){
-            $parameters[$i] = str_replace("#","",$parameters[$i]);
+            $parameters[$i] = str_replace("# ","",$parameters[$i]);
             switch ($i){
                 case 0:
                     $script->language = $parameters[$i];
