@@ -12,55 +12,8 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/main.css') }}" rel="stylesheet">
-    
-    <style>
-        .sidebar {
-            color: #FFF;
-            background: #2b2b2d;
-            width: 320px;
-            max-width: 400px;
-            height: 100%;
-            float: left;
-            position: fixed;
-            z-index: 1000;
-            display: block;
-            flex:1;
-        }
-        #navbar-toggle {
-            cursor: pointer;
-        }
-        #toggleView {
-            margin-left: 44px;
-        }
-        .menu-icon {
-            float: right;
-        }
-        .sidebar-nav {
-            display: block;
-            float: left;
-            width: 100%;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        .sidebar-nav li a {
-            font-size: 16px;
-            text-decoration: none;
-            color: #FFF;
-            float: left;
-            width: 100%;
-            height: 50px;
-            line-height: 15px;
-            padding: 20px;
-            vertical-align: center;
-        }
-        .sidebar-nav li a:hover {
-            background:#121213;
-            -webkit-transition: background 0.1s;
-            transition: background 0.1s;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
 </head>
 <body>
 
@@ -133,6 +86,7 @@
             </main>
         </div>
     </div>
+    @auth
         <script>
             @auth
                 $.ajaxSetup({
@@ -144,36 +98,42 @@
             $(function () {
                 $('form').attr('target','#');
             });
+    @endauth
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+        $('form').attr('target','#');
+    });
 
-            function navbar(flag) {
-                if (localStorage.getItem("state") === "expanded") {
-                    if(!flag){
-                        $('.sidebar').css('margin-left', '0px');
-                        $('main').removeClass('col-lg-11').addClass('col-lg-10');
-                    }else{
-                        $('.sidebar').css('margin-left', '-270px');
-                        $('main').removeClass('col-lg-10').addClass('col-lg-11');
-                        localStorage.setItem("state", "minimized");
-                    }
-                } else{
-                    if(!flag){
-                        $('.sidebar').css('margin-left', '-270px');
-                        $('main').removeClass('col-lg-10').addClass('col-lg-11');
-                    }else{
-                        $('.sidebar').css('margin-left', '0px');
-                        $('main').removeClass('col-lg-11').addClass('col-lg-10');
-                        localStorage.setItem("state", "expanded");
-                    }
-                }
+    function navbar(flag) {
+        if (localStorage.getItem("state") === "expanded") {
+            if(!flag){
+                $('.sidebar').css('margin-left', '0px');
+                $('main').removeClass('col-lg-11').addClass('col-lg-10');
+            }else{
+                $('.sidebar').css('margin-left', '-270px');
+                $('main').removeClass('col-lg-10').addClass('col-lg-11');
+                localStorage.setItem("state", "minimized");
             }
-            function language(locale){
-                $.get("{{route('set_locale')}}", {
-                    locale: locale,
-                }, function (data, status) {
-                    location.reload();
-                });
+        } else{
+            if(!flag){
+                $('.sidebar').css('margin-left', '-270px');
+                $('main').removeClass('col-lg-10').addClass('col-lg-11');
+            }else{
+                $('.sidebar').css('margin-left', '0px');
+                $('main').removeClass('col-lg-11').addClass('col-lg-10');
+                localStorage.setItem("state", "expanded");
             }
-            navbar(false);
-        </script>
+        }
+    }
+    function language(locale){
+        $.get("{{route('set_locale')}}", {
+            locale: locale,
+        }, function (data, status) {
+            location.reload();
+        });
+    }
+
+    navbar(false);
+</script>
 </body>
 </html>

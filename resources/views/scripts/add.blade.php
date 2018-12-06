@@ -1,25 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-    <style type="text/css" media="screen">
-        #editor {
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-        }
-    </style>
     <script>
         var data=[];
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
+    <script src="../js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/ace/mode-python.js" type="text/javascript" charset="utf-8"></script>
     <!-- Styles -->
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-    <link href="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/theme-default.min.css"
-          rel="stylesheet" type="text/css" />
+
     <button class="btn btn-success" onclick="history.back();">Geri Don</button>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#settingsModal">
         Ayarlar
@@ -96,9 +86,18 @@
                 </div>
             </div>
         </div>
-        <button onclick="addAll()" class="btn btn-primary w-auto">
-            Ekle
-        </button>
+        <div class="card w-auto" style="width: 18rem;">
+            <div class="card-body">
+                <div class="form-group">
+                    <h3>Sorumluluk Reddi</h3>
+                    Bu dosyayı kaydetmenin sorumluluğunu üstleniyorum.<br><br>
+                    <button onclick="addAll()"  class="btn btn-primary">
+                        Ekle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 
     <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -112,13 +111,15 @@
                 </div>
                 <form>
                     <div class="modal-body">
+                        <div class="column">
                         <div class="form-group">
                             <h3>Adı</h3>
-                            <input id="name" type="text" class="form-control" placeholder="Betik kısa adı" data-validation="length" data-validation-length="min4">
+                            <input id="name" type="text" class="form-control" placeholder="Betik kısa adı" >
                         </div>
+
                         <div class="form-group">
                             <h3>Özellik</h3>
-                            <select class="form-control" id="extension">
+                            <select class="form-control" id="feature">
                                 @foreach ($extensions as $extension)
                                     <option value="{{$extension->_id}}">{{$extension->name}}</option>
                                 @endforeach
@@ -126,15 +127,17 @@
                         </div>
                         <div class="form-group">
                             <h3>Versiyon</h3>
-                            <input id="username" type="text" class="form-control" placeholder="Betik Versiyonu" value="1" data-validation="custom"  data-validation-regexp="^[0-9]" data-validation-error-msg="Versiyon sayı olmalı.">
+                            <input id="username" type="text" class="form-control" placeholder="Betik Versiyonu" value="1">
                         </div>
+                        </div>
+                        <div class="column">
                         <div class="form-group">
                             <h3>Açıklama</h3>
                             <input id="description" type="text" class="form-control" placeholder="Anahtar Kullanıcı Adı">
                         </div>
                         <div class="form-group">
                             <h3>Mail Adresi</h3>
-                            <input id="email" type="email" class="form-control"  placeholder="Destek verilecek Email Adresi" data-validation="email" data-validation-error-msg="Geçerli bir e-mail address girin.">
+                            <input id="email" type="email" class="form-control"  placeholder="Destek verilecek Email Adresi">
                         </div>
                         <div class="form-group">
                             <h3>Betik Türü</h3>
@@ -142,6 +145,7 @@
                                 <option value="query">Sorgulama</option>
                                 <option value="query">Çalıştırma</option>
                             </select>
+                        </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -154,9 +158,7 @@
     </div>
 
     <script>
-        $.validate({
-            addValidClassOnAll : true
-        });
+
         $('#inputType').on('change', function() {
             if(this.value=="string"){
                 $(this).css("backgroundColor", "#5cb85c");
@@ -194,13 +196,14 @@
         function addInput() {
             var name = $("#inputName").val();
             var type = $("#inputType").val();
-            data["NeededParameter"]=$("#inputName").val()+":"+$("#inputType").val();
-
-            var value2=data["parameterName"] +":"+data["inputType"];
-
+            if(data["inputs"])
+                data["inputs"]=data["inputs"]+","+$("#inputName").val()+":"+$("#inputType").val();
+            else
+                data["inputs"]=$("#inputName").val()+":"+$("#inputType").val();
             var r= $('<button class="btn btn-success" onclick="sil(this)" id="">value2</button>');
             r.id=name;
             r.text(name);
+            r.css("margin","10px");
             if(type=="string"){
                 r.css("backgroundColor", "#5cb85c");
                 r.css("color", "white");}
@@ -215,10 +218,14 @@
         function addResultParameters(){
             var name= $("#ResultParameterName").val();
             var type = $("#inputTypeResult").val();
-            data["ResultParameter"]=$("#ResultParameterName").val()+":"+$("#inputTypeResult").val();
+            if(data["outputs"])
+                data["outputs"]=data["outputs"]+","+$("#ResultParameterName").val()+":"+$("#inputTypeResult").val();
+            else
+                data["outputs"]=$("#ResultParameterName").val()+":"+$("#inputTypeResult").val();
             var r= $('<button class="btn btn-success" onclick="sil(this)" id=""></button>');
             r.id=name;
             r.text(name);
+            r.css("margin","10px");
             if(type=="string"){
                 r.css("backgroundColor", "#5cb85c");
                 r.css("color", "white");}
@@ -232,12 +239,12 @@
         }
         function add(){
             data["name"]=$("#name").val();
-            data["extension"]=$( "#extension option:selected" ).text();
+            data["feature"]=$( "#feature option:selected" ).text();
             data["version"]=$("#version").val();
             data["description"]=$("#description").val();
             data["email"]=$("#email").val();
             data["type"]=$( "#betiktype" ).val();
-            if(data["name"]!="" && data["extension"]!="" && data["version"]!="" && data["description"]!="" && data["email"]!="" && data["type"]!="" ){
+            if(data["name"]!="" && data["feature"]!="" && data["version"]!="" && data["description"]!="" && data["email"]!="" && data["type"]!="" ){
                 $("#settingsModal").modal('hide');
                 $(".modal-backdrop").remove();
             }
@@ -246,7 +253,7 @@
             var command=document.getElementById("editor");
             data["code"]=command.textContent;
             if( 'name' in data){
-                $.post({{route('script_create')}} ,{
+                $.post("{{route('script_create')}}" ,{
                     data:data
                 },function (data,status) {
                     if(data["result"] === 200){
