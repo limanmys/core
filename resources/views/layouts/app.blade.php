@@ -3,15 +3,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __("Liman Sistem Yönetimi") }}</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/jquery-3.3.1.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+
+    <script src="{{asset('js/liman.js')}}"></script>
+    <script src="{{ asset('js/bootstrap-native-v4.min.js') }}"></script>
 
     <!-- Styles -->
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
 </head>
@@ -24,12 +26,13 @@
         @endauth
         <ul class="navbar-nav px-3">
             <li class="nav-item text-nowrap">
-                @if (Session::get('locale') == "tr")
-                    <a class="nav-link text-white" onclick="language('en')">EN</a>
-                @else
-                    <a class="nav-link text-white" onclick="language('tr')">TR</a>
-                @endif
-
+                <form action="#" onsubmit="return request('/locale',this)">
+                    @if (Session::get('locale') == "en")
+                        <a class="nav-link text-white" onclick="language('tr')">TR</a>
+                    @else
+                        <a class="nav-link text-white" onclick="language('en')">EN</a>
+                    @endif
+                </form>
             </li>
         </ul>
         @auth
@@ -46,94 +49,39 @@
                 <div class="sidebar">
                     <ul class="sidebar-nav">
                         <li>
-                            <a href="{{route('home')}}">{{ __("Ana Sayfa") }}<i data-placement="bottom" title="Ana Sayfa" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i></a>
+                            <a href="{{route('home')}}">{{ __("Ana Sayfa") }}</a>
                         </li>
-                        @p_server
-                            <li>
-                                <a href="{{route('servers')}}">{{ __("Sunucular") }}<i data-toggle="tooltip" data-placement="bottom" title="Sunucular" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i></a>
-                            </li>
-                        @endp_server
+                        <li>
+                            <a href="{{route('servers')}}">{{ __("Sunucular") }}</a>
+                        </li>
                         @foreach($extensions as $extension)
                             <li>
-                                <a href="/l/{{$extension->name}}">{{ __($extension->name) }}<i data-toggle="tooltip" data-placement="bottom" title="{{$extension->name}}" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i></a>
+                                <a href="/l/{{$extension->name}}">{{ __($extension->name) }}</a>
                             </li>
                         @endforeach
                         <li>
-                            <a href="{{route('scripts')}}">{{ __("Betikler") }}<i data-toggle="tooltip" data-placement="bottom" title="Betikler" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i>
-                            </a>
+                            <a href="{{route('scripts')}}">{{ __("Betikler") }}</a>
                         </li>
                         <li>
-                            <a href="{{route('keys')}}">{{ __("SSH Anahtarları") }}<i data-toggle="tooltip" data-placement="bottom" title="SSH Anahtarları" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i>
-                            </a>
+                            <a href="{{route('keys')}}">{{ __("SSH Anahtarları") }}</a>
                         </li>
                         <li>
-                            <a href="{{route('extensions_settings')}}">{{ __("Eklentiler") }}<i data-toggle="tooltip" data-placement="bottom" title="Eklentiler" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i>
-                            </a>
+                            <a href="{{route('extensions_settings')}}">{{ __("Eklentiler") }}</a>
                         </li>
                         <li>
-                            <a href="{{route('settings')}}">{{ __("Sistem Ayarları") }}<i data-toggle="tooltip" data-placement="bottom" title="Sistem Ayarları" class="glyphicon glyphicon-asterisk" aria-hidden="true"></i>
-                            </a>
+                            <a href="{{route('settings')}}">{{ __("Sistem Ayarları") }}</a>
                         </li>
                         <li>
-                            <a onclick="navbar(true);" class="text-right"><i class="fa fa-bars menu-icon" aria-hidden="true"></i></a>
+                            <a onclick="navbar(true);" class="text-right"></a>
                         </li>
                     </ul>
                 </div>
             @endauth
-            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            <main role="main" class="col-md-9 ml-md-5 col-lg-10 px-4">
                 <br>
                 @yield('content')
             </main>
         </div>
     </div>
-    @auth
-        <script>
-            @auth
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                });
-            @endauth
-            $(function () {
-                $('form').attr('target','#');
-            });
-    @endauth
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-        $('form').attr('target','#');
-    });
-
-    function navbar(flag) {
-        if (localStorage.getItem("state") === "expanded") {
-            if(!flag){
-                $('.sidebar').css('margin-left', '0px');
-                $('main').removeClass('col-lg-11').addClass('col-lg-10');
-            }else{
-                $('.sidebar').css('margin-left', '-270px');
-                $('main').removeClass('col-lg-10').addClass('col-lg-11');
-                localStorage.setItem("state", "minimized");
-            }
-        } else{
-            if(!flag){
-                $('.sidebar').css('margin-left', '-270px');
-                $('main').removeClass('col-lg-10').addClass('col-lg-11');
-            }else{
-                $('.sidebar').css('margin-left', '0px');
-                $('main').removeClass('col-lg-11').addClass('col-lg-10');
-                localStorage.setItem("state", "expanded");
-            }
-        }
-    }
-    function language(locale){
-        $.get("{{route('set_locale')}}", {
-            locale: locale,
-        }, function (data, status) {
-            location.reload();
-        });
-    }
-
-    navbar(false);
-</script>
 </body>
 </html>

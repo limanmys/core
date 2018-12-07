@@ -4,8 +4,6 @@
     <script>
         var data=[];
     </script>
-    <script src="../js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="../js/ace/mode-python.js" type="text/javascript" charset="utf-8"></script>
     <!-- Styles -->
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
