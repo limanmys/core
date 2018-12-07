@@ -45,7 +45,7 @@ class PermissionManager
                 ]);
             }
         }
-
+        
         $script_id = null;
         if($request->route('script_id') != null){
             $script_id = $request->route('script_id');

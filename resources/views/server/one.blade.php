@@ -6,36 +6,37 @@
         var params = [];
         var script_id = "";
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
-    <link href="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/theme-default.min.css"
-          rel="stylesheet" type="text/css" />
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">{{$server->name}}</h1>
-    </div>
+    
+    @include('title',[
+        "title" => $server->name       
+    ])
     <button class="btn btn-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">
-        {{__("Düzenle")}}
-    </button>
 
-    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#commandModal">
-        {{__("Komut Çalıştır")}}
-    </button>
-    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addService">
-        {{__("Servisleri Düzenle")}}
-    </button>
-    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#changeNetwork">
-        {{__("Network")}}
-    </button>
-    <button type="button" class="btn btn-primary" data-toggle="modal" onclick="getHostname()">
-        {{__("Hostname")}}
-    </button>
-    @isset($scripts)
-        @foreach($scripts as $script)
-            <button class="btn-primary btn" onclick="generateModal('{{$script->inputs}}','{{$script->name}}','{{$script->_id}}')">{{$script->name}}</button>
-        @endforeach
-    @endisset
-    <br><br>
+    @include('modal-button',[
+        "class" => "btn-primary",
+        "target_id" => "editModal",
+        "text" => "Düzenle"
+    ]) 
+    @include('modal-button',[
+        "class" => "btn-warning",
+        "target_id" => "commandModal",
+        "text" => "Komut Çalıştır"
+    ])    
+    @include('modal-button',[
+        "class" => "btn-secondary",
+        "target_id" => "addService",
+        "text" => "Servis Ekle"
+    ])
+    @include('modal-button',[
+        "class" => "btn-info",
+        "target_id" => "changeNetwork",
+        "text" => "Network"
+    ])
+    @include('modal-button',[
+        "class" => "btn-primary",
+        "target_id" => "changeHostname",
+        "text" => "Hostname"
+    ])<br><br>
     <h4>{{__("Servis Durumları")}}</h4>
         @foreach($services as $service)
             <button type="button" class="btn btn-info btn-lg" style="cursor:default;" id="status_{{$service}}">
@@ -48,34 +49,25 @@
             {{$stats}}
         @endisset
     </pre>
+    
+    @include('modal-button',[
+        "class" => "btn-danger",
+        "target_id" => "deleteModal",
+            "text" => "Sunucuyu Sil"
+    ])
 
-    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">
-        {{__("Sunucuyu Sil")}}
-    </button>
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">{{__("Sunucuyu Sil")}}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h2><b>{{$server->name }}</b></h2>{{__("isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.")}}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__("İptal")}}</button>
-                    <button type="button" class="btn btn-danger" onclick="deleteServer()">{{__("Sunucuyu Sil")}}</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('modal',[
+        "id"=>"deleteModal",
+        "title" => $server->name,
+        "url" => route('server_remove'),
+        "text" => "isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+        "submit_text" => "Sunucuyu Sil"
+    ])
     <div class="modal fade" id="commandModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Komut Çalıştır</h5>
+                    <h5 class="modal-title" id="exampleModalLabel"></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -102,6 +94,7 @@
             </div>
         </div>
     </div>
+    
     <div class="modal fade" id="addService" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -254,44 +247,6 @@
         </div>
     </div>
     <script>
-        $("#commandOutput").fadeOut();
-        function deleteServer() {
-            $.ajax({
-                url : "{{ route('server_remove') }}",
-                type : "POST",
-                data :{
-                    server_id : server_id
-                },
-                success : function (data) {
-                    if(data["result"] === 200){
-                        window.location.replace("{{route('servers')}}");
-                    }else{
-                        alert("Hata");
-                    }
-                }
-            });
-        }
-        function runCommand() {
-            if($("#commandResponsibility").is(':checked') === false){
-                return;
-            }
-            var command = $("#run_command").val();
-            $.ajax({
-                url : "{{ route('server_run') }}",
-                type : "POST",
-                data :{
-                    server_id : server_id,
-                    command : command
-                },
-                success : function (data) {
-                    if(data["result"] === 200){
-                        $("#commandOutput").fadeIn().html(data["data"]);
-                    }else{
-                        alert("Hata");
-                    }
-                }
-            });
-        }
         
         function getHostname() {
             var command = "cat /etc/hostname";

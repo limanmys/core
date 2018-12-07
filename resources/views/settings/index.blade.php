@@ -52,12 +52,6 @@
                     "inputs" => [
                         "Kullanıcı Adı" => "username:text",
                         "İp Adresi" => "ip_address:number",
-                        "Ertan" => "ssh_password:password",
-                        "Script Tipi" => [
-                            "deneme" => "mert",
-                            "qweqwe" => "qwe"
-                        ],
-                        "Dosya" => "file:file",
                     ],
                     "submit_text" => "Ekle"
                 ])

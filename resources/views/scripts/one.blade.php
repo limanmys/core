@@ -21,8 +21,6 @@
         var check1=true;
         var check2=true;
     </script>
-    <script src="../js/src/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="../js/src/mode-javascript.js" type="text/javascript" charset="utf-8"></script>
     <button class="btn btn-success" onclick="history.back();">Geri Don</button>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#settingsModal">
         Ayarlar
