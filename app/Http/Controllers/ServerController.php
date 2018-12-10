@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\Auth;
 
 class ServerController extends Controller
 {
+    public static $protected = true;
+    
     public function index(){
         $all_servers = Server::all();
         $permissions = request('permissions');
         $servers = [];
-        foreach ($permissions->servers as $server_id) {
+        foreach ($permissions->server as $server_id) {
             array_push($servers,$all_servers->where('_id',$server_id)->first());
         }
         return view('server.index',[
@@ -35,9 +37,9 @@ class ServerController extends Controller
         $key->server_id = $server->id;
         $key->user_id = Auth::id();
         $permissions = $request->get('permissions');
-        $user_servers = $permissions->servers;
+        $user_servers = $permissions->server;
         array_push($user_servers,$server->_id);
-        $permissions->servers = $user_servers;
+        $permissions->server = $user_servers;
         $permissions->save();
         $key->save();
         return [
