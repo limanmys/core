@@ -1,8 +1,8 @@
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addZone">
     Zone Ekle
 </button>
-@if(is_array($data["dns_zone_add"]))
-    @foreach($data["dns_zone_add"] as $zone)
+@if(is_array($data["dns_generate"]))
+    @foreach($data["dns_generate"] as $zone)
         <div class="card">
             <div class="card-title">
                 <span onclick="redirect('zone_details','alan_adi:{{$zone["name"]}}')">{{$zone["name"]}}</span>
