@@ -25,6 +25,17 @@
         @endforeach
         </tbody>
     </table>
+    @include('modal',[
+                  "id"=>"userAdd",
+                  "title" => __("Kullanıcı Ekle"),
+                  "url" => "/user/add",
+                  "inputs" => [
+                      __("Kullanıcı Adı") => "kullanici_adi:text",
+                      __("Email Adresi") => "email:text",
+                      __("Parola") => "password:password"
+                  ],
+                  "submit_text" => "Ekle"
+              ])
     <div class="modal fade" id="new" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -48,9 +59,6 @@
                             <div class="form-group">
                                 <h3>Parola</h3>
                                 <input id="change_pass"  placeholder="Parola"  name="password" type="password" value="" class="form-control" required>
-                            </div>
-                            <div>
-                                <input type="checkbox" onclick="myFunction()">Show Password
                             </div>
                         </td>
                     </div>
@@ -84,44 +92,6 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="userAdd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title" id="exampleModalLabel">Kullanıcı Ekle</h1>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form onsubmit="add(event,'add')">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <h3>Kullanıcı Adı</h3>
-                            <input id="add_name" type="text" class="form-control" name="kullanici_adi" placeholder="Kullanıcı adı" required minlength="3">
-                        </div>
-                        <div class="form-group">
-                            <h3>Email Adresi</h3>
-                            <input id="add_email" type="text" class="form-control" name="email" placeholder="Email Adresi"  required pattern="[a-zA-Z0-9_\.\+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-\.]+">
-                        </div>
-                        <div class="form-group">
-                            <h3>Parola</h3>
-                            <input id="add_parola" type="password" name="password" class="form-control" placeholder="Parola" required>
-                        </div>
-                        <div>
-                            <input type="checkbox" onclick="myFunction()">Show Password
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                        <button type="button" class="btn btn-success" type="submit">Ekle</button>
-                    </div>
-                </form>
-            </div>
-
-        </div>
-
-    </div>
-
     <script>
         function deletion(event){
 
@@ -140,13 +110,19 @@
         }
         function add(event) {
             event.preventDefault();
+            var x = $("#form").serializeArray();
+            dataObj = {};
+            $.each(x, function(i, field){
+
+                dataObj[field.name] = field.value;
+            });
             $("#add_dhcp").prop("checked") ? features = features + "1" : 0;
             $("#add_dns").prop("checked") ? features = features + "2" : 0;
             $("#add_ldap").prop("checked") ? features = features + "3" : 0;
             $.post("event=='add' ? {{route('server_add')}}:{{route('server_add')}}" ,{
-                name : jQuery('input[name="kullanici_adi"]').val(),
-                email : jQuery('input[name="email"]').val(),
-                parola : jQuery('input[name="password"]').val(),
+                name : dataObj['name'],
+                email : dataObj['email'],
+                parola : dataObj['password']
             },function (data,status) {
                 if(data["result"] === 200){
                     location.reload();
@@ -155,20 +131,6 @@
                     alert("Hata!");
                 }
             });
-        }
-        function myFunction() {
-            var x = document.getElementById("change_pass");
-            var y=document.getElementById("add_parola");
-            if (x.type === "password") {
-                x.type = "text";
-            } else {
-                x.type = "password";
-            }
-            if (y.type === "password") {
-                y.type = "text";
-            } else {
-                y.type = "password";
-            }
         }
     </script>
 @endsection
