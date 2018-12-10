@@ -34,6 +34,11 @@ class ServerController extends Controller
         $key = new Key($data);
         $key->server_id = $server->id;
         $key->user_id = Auth::id();
+        $permissions = $request->get('permissions');
+        $user_servers = $permissions->servers;
+        array_push($user_servers,$server->_id);
+        $permissions->servers = $user_servers;
+        $permissions->save();
         $key->save();
         return [
             "result" => 200,

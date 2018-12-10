@@ -18,7 +18,7 @@ class UserController extends Controller
             \Session::put('locale', request('locale'));
             return response('Alright',200);
         }else{
-            return response('Language not found',502);
+            return response('Language not found',404);
         }
     }
 }

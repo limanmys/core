@@ -2,7 +2,7 @@
 
 Auth::routes();
 
-Route::get('/locale','UserController@setLocale')->name('set_locale');
+Route::post('/locale','UserController@setLocale')->name('set_locale');
 
 Route::group(['middleware' => ['auth','permissions']], function () {
 
