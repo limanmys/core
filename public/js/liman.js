@@ -1,9 +1,9 @@
 function request(url,data,next) {
-    // var form = new FormData(data);
+    var form = new FormData(data);
     var r = new XMLHttpRequest();
     r.open("POST",url);
     r.setRequestHeader('X-CSRF-TOKEN', csrf);
-    r.send(data);
+    r.send(form);
     r.onload = function(response){
         next(response);
     }
