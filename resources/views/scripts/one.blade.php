@@ -296,6 +296,7 @@
                     data:data
                 },function (data,status) {
                     if(data["result"] === 200){
+                        //window.location.replace("{{route('users')}}" + "/" + data["id"]);
                     }else{
                         alert("Hata!");
                     }

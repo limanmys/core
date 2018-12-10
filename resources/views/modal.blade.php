@@ -11,23 +11,18 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            @if(isset($onsubmit))
-                <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return {{$onsubmit}}" target="#">
-            @else
-                <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return @isset($url)request('{{$url}}',this)@endisset" target="#">
-            @endif
+            <form onsubmit="return @isset($url)request('{{$url}}',this)@endisset" target="#">
                 <div class="modal-body">
                     @if(isset($inputs) && is_array($inputs))
                         @foreach ($inputs as $name => $input)
+                            <h5>{{__($name)}}</h5>
                             @if(is_array($input))
-                            <h5>{{__(explode(":",$name)[0])}}</h5>
-                                <select name="{{explode(":",$name)[1]}}" class="form-control" required>
+                                <select name="{{$name}}" class="form-control" required>
                                     @foreach ($input as $key => $value)
                                         <option value="{{$value}}">{{__($key)}}</option>
                                     @endforeach    
-                                </select><br>
+                                </select>
                             @else
-                            <h5>{{__($name)}}</h5>
                                 <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}" class="form-control" required><br>
                             @endif
                         @endforeach

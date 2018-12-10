@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
     @include('title',[
         "title" => "Sunucular"
     ])

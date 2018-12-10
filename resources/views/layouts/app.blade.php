@@ -79,13 +79,8 @@
                             <a href="{{route('settings')}}">{{ __("Sistem Ayarları") }}</a>
                         </li>
                         @endp
-                        @if(Auth::user()->isAdmin() == false)
                         <li>
-                            <a href="{{route('request_permission')}}">{{ __("Yetki Talebi") }}</a>
-                        </li>
-                        @endif
-                        <li>
-                            <a onclick="navbar(true);" class="text-right">Toggle</a>
+                            <a onclick="navbar(true);" class="text-right"></a>
                         </li>
                     </ul>
                 </div>

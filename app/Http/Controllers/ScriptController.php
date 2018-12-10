@@ -48,8 +48,8 @@ class ScriptController extends Controller
 
     public function create(){
         $script = new Script();
-        $script = Script::fillValues($script,"!/usr/bin/python3","-*- coding: utf-8 -*-","1",\request('name'),
-        \request('description'),\request('version'),\request('extensions'),\request('inputs'),""
+        $script = Script::fillValues($script,\request('language'),\request('encoding'),\request('root'),\request('name'),
+        \request('description'),\request('version'),\request('extensions'),\request('inputs'),\request('outputs')
     ,\request('type'),\Auth::user()->name,\request('support_email'),\request('company'),\request('unique_code'),\request('code'));
         $script->save();
         return [
