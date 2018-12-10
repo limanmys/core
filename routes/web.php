@@ -2,7 +2,7 @@
 
 Auth::routes();
 
-Route::post('/locale','UserController@setLocale')->name('set_locale');
+Route::post('/locale','HomeController@setLocale')->name('set_locale');
 
 Route::group(['middleware' => ['auth','permissions']], function () {
 
@@ -28,7 +28,7 @@ Route::group(['middleware' => ['auth','permissions']], function () {
     Route::get('/anahtarlar','SshController@index')->name('keys');
     Route::post('/anahtar/ekle','SshController@add')->name('key_add');
 
-    Route::get('/kullanicilar','UserController@index')->name('users');
+    Route::get('/kullanici/{user_id}','UserController@one')->name('user');
 
     Route::get('/betikler', 'ScriptController@index')->name('scripts');
     Route::get('/betik/ekle', 'ScriptController@add')->name('script_add');
@@ -44,4 +44,7 @@ Route::group(['middleware' => ['auth','permissions']], function () {
 
     Route::get('/eklentiler' , 'ExtensionController@settings')->name('extensions_settings');
     Route::get('/eklentiler/{extension_id}','ExtensionController@one')->name('extension_one');
+
+    Route::get('/talep','HomeController@all')->name('request_permission');
+    Route::post('/talep','HomeController@request')->name('request_send');
 });
