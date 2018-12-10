@@ -75,7 +75,10 @@ class Script extends Eloquent
                     $script->company = $parameters[$i];
                     break;
                 case 13:
-                        $script->unique_code = $parameters[$i];
+                    $script->unique_code = $parameters[$i];
+                    break;
+                case 14:
+                    $script->regex = $parameters[$i];
                     break;
             }
         }
