@@ -51,11 +51,9 @@
                         <li>
                             <a href="{{route('home')}}">{{ __("Ana Sayfa") }}</a>
                         </li>
-                        @p('server')
                         <li>
                             <a href="{{route('servers')}}">{{ __("Sunucular") }}</a>
                         </li>
-                        @endp
                         @foreach($extensions as $extension)
                             @p('extension',$extension->_id)
                             <li>
@@ -71,12 +69,16 @@
                         <li>
                             <a href="{{route('keys')}}">{{ __("SSH Anahtarları") }}</a>
                         </li>
+                        @p('extension_manager')
                         <li>
                             <a href="{{route('extensions_settings')}}">{{ __("Eklentiler") }}</a>
                         </li>
+                        @endp
+                        @p('settings')
                         <li>
                             <a href="{{route('settings')}}">{{ __("Sistem Ayarları") }}</a>
                         </li>
+                        @endp
                         <li>
                             <a onclick="navbar(true);" class="text-right"></a>
                         </li>
