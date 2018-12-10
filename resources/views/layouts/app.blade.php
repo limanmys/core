@@ -51,17 +51,23 @@
                         <li>
                             <a href="{{route('home')}}">{{ __("Ana Sayfa") }}</a>
                         </li>
+                        @p('server')
                         <li>
                             <a href="{{route('servers')}}">{{ __("Sunucular") }}</a>
                         </li>
+                        @endp
                         @foreach($extensions as $extension)
+                            @p('extension',$extension->_id)
                             <li>
-                                <a href="/l/{{$extension->name}}">{{ __($extension->name) }}</a>
+                                <a href="/l/{{$extension->_id}}">{{ __($extension->name) }}</a>
                             </li>
+                            @endp
                         @endforeach
+                        @p('script')
                         <li>
                             <a href="{{route('scripts')}}">{{ __("Betikler") }}</a>
                         </li>
+                        @endp
                         <li>
                             <a href="{{route('keys')}}">{{ __("SSH Anahtarları") }}</a>
                         </li>
