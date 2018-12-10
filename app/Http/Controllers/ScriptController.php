@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 
 class ScriptController extends Controller
 {
+    public static $protected = true;
+    
     public function index(){
         $scripts = Script::all();
         return view( "scripts.index",[

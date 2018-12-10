@@ -7,8 +7,10 @@ use App\Script;
 use App\Server;
 use Illuminate\Http\Request;
 use JsonException;
-class ExtensionsController extends Controller
+class ExtensionController extends Controller
 {
+    public static $protected = true;
+    
     public function settings(){
         return view('extensions.index');
     }
@@ -44,10 +46,10 @@ class ExtensionsController extends Controller
     }
 
     public function index(){
-        if(!Extension::where('name',\request('extension'))->exists()){
+        if(Extension::where('_id',request('extension_id'))->exists() == false){
             return redirect(route('home'));
         }
-        $servers = Server::where('extensions','like',\request('extension'))->get();
+        $servers = Server::where('extensions','like',\request('extension_id'))->get();
         $cities = "";
         foreach ($servers as $server){
             if($cities == "")
@@ -63,15 +65,15 @@ class ExtensionsController extends Controller
     }
 
     public function city(){
-        $servers = Server::where('city',\request('city'))->where('extensions','like',\request('extension'))->get();
+        $servers = Server::where('city',\request('city'))->where('extensions','like',\request('extension_id'))->get();
         return view('feature.city',[
             "servers" => $servers
         ]);
     }
 
     public function server(){
-        $extension = Extension::where('name',\request('extension'))->first();
-        $scripts = Script::where('extensions','like',\request('extension'))->get();
+        $extension = Extension::where('_id',\request('extension_id'))->first();
+        $scripts = Script::where('extensions','like',$extension->name)->get();
         $server = \request('server');
         $outputs = [];
         foreach ($extension->views["index"] as $unique_code){
@@ -89,8 +91,8 @@ class ExtensionsController extends Controller
     }
 
     public function route(){
-        $extension = Extension::where('name',\request('extension'))->first();
-        $scripts = Script::where('extensions','like',\request('extension'))->get();
+        $extension = Extension::where('name',\request('extension_id'))->first();
+        $scripts = Script::where('extensions','like',\request('extension_id'))->get();
         $outputs = [];
         foreach (\request('scripts') as $script){
             $parameters = '';
@@ -101,7 +103,7 @@ class ExtensionsController extends Controller
             $output = str_replace('\n','',$output);
             $outputs[$script->unique_code] = json_decode($output,true);
         }
-        $view = (\request()->ajax()) ? 'extensions.' . strtolower(\request('extension')) . '.' . \request('url')
+        $view = (\request()->ajax()) ? 'extensions.' . strtolower(\request('extension_id')) . '.' . \request('url')
             : 'feature.server';
         if(view()->exists($view)){
             return view($view,[

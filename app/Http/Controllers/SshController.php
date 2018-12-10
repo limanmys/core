@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 
 class SshController extends Controller
 {
+    public static $protected = true;
+    
     public function index(){
         $keys = Key::where('user_id',Auth::id())->get();
         $servers = Server::all();
