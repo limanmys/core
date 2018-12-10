@@ -99,7 +99,25 @@
         </div>
     </div>
     </div>
-
+    @include('modal',[
+                     "id"=>"settingsModal",
+                     "title" => __("Betik Ayarları"),
+                     "url" => "/user/add",
+                     "inputs" => [
+                         __("Adı") => "name:text",
+                         __("Özellik") => "ip:text",  /*   @foreach ($extensions as $extension)
+                                    <option value="{{$extension->_id}}">{{$extension->name}}</option>
+                                @endforeach*/
+                         __("Versiyon") => "versiyon:text",
+                         __("Açıklama") => "description:text",
+                         __("Mail Adresi") => "mail:text",
+                         __("Betik Türü") => [
+                            "Sorgulama"=>"0",
+                            "Çalıştırma"=>"1"
+                         ]
+                     ],
+                     "submit_text" => "Ekle"
+                 ])
     <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -160,38 +178,12 @@
     <script>
 
         $('#inputType').on('change', function() {
-            if(this.value=="string"){
-                $(this).css("backgroundColor", "#5cb85c");
+                $(this).css("backgroundColor", getRandomColor());
                 $(this).css("color", "white");
-            }
-            else if(this.value=="number"){
-                $(this).css("backgroundColor", "#428bca");
-                $(this).css("color", "white");
-            }
-            else if(this.value=="ip"){
-                $(this).css("backgroundColor", "#f0ad4e");
-                $(this).css("color", "white");
-            }
-            else{
-                $(this).css("backgroundColor", "white");
-            }
         });
         $('#inputTypeResult').on('change', function() {
-            if(this.value=="string"){
-                $(this).css("backgroundColor", "#5cb85c");
+                $(this).css("backgroundColor",getRandomColor());
                 $(this).css("color", "white");
-            }
-            else if(this.value=="number"){
-                $(this).css("backgroundColor", "#428bca");
-                $(this).css("color", "white");
-            }
-            else if(this.value=="ip"){
-                $(this).css("backgroundColor", "#f0ad4e");
-                $(this).css("color", "white");
-            }
-            else{
-                $(this).css("backgroundColor", "white");
-            }
         });
         function addInput() {
             var name = $("#inputName").val();
@@ -275,5 +267,14 @@
     <script>
         var editor = ace.edit("editor");
         editor.session.setMode("ace/mode/python");
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
     </script>
+
 @endsection

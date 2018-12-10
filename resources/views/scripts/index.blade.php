@@ -28,48 +28,20 @@
         @endforeach
         </tbody>
     </table>
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title" id="exampleModalLabel">Sunucu Ekle</h1>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <h3>Adı</h3>
-                            <input id="add_name" type="text" class="form-control" placeholder="Sunucu kısa adı" data-validation="length" data-validation-length="min0">
-                        </div>
-                        <div class="form-group">
-                            <h3>İp Adresi</h3>
-                            <input id="add_ip" type="text" class="form-control" placeholder="Sunucu Ipv4 Adresi"  data-validation="length" data-validation-length="min0">
-                        </div>
-                        <div class="form-group">
-                            <h3>Bağlantı Portu</h3>
-                            <input id="add_port" type="text" class="form-control" placeholder="Bağlantı Portu" value="22">
-                        </div>
-                        <div class="form-group">
-                            <h3>Anahtar Kullanıcı Adı</h3>
-                            <input id="add_username" type="text" class="form-control" placeholder="Anahtar Kullanıcı Adı">
-                        </div>
-                        <div class="form-group">
-                            <h3>Anahtar Parola</h3>
-                            <input id="add_password" type="password" class="form-control" placeholder="Anahtar Parola">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                        <button type="button" class="btn btn-success" onclick="add()">Ekle</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
+    @include('modal',[
+                  "id"=>"exampleModal",
+                  "title" => __("Sunucu Ekle"),
+                  "url" => "/user/add",
+                  "inputs" => [
+                      __("Adı") => "name:text",
+                      __("İp Adresi") => "ip:text",
+                      __("Parola") => "password:password",
+                      __("Bağlantı Portu") => "port:text",
+                      __("Anahtar Kullanıcı Adı") => "username:text",
+                      __("Anahtar Parola") => "anahtar_parola:password"
+                  ],
+                  "submit_text" => "Ekle"
+              ])
     <div class="modal fade" id="scriptUpload" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
