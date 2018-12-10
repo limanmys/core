@@ -24,7 +24,7 @@ class HomeController extends Controller
     public function index()
     {
         return view('index',[
-            "stats" => shell_exec("neofetch --stdout")
+            "stats" => shell_exec("screenfetch")
         ]);
     }
 }

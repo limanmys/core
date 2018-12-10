@@ -6,32 +6,37 @@
         var params = [];
         var script_id = "";
     </script>
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">{{$server->name}}</h1>
-    </div>
-    <button class="btn btn-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">
-        {{__("Düzenle")}}
-    </button>
 
-    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#commandModal">
-        {{__("Komut Çalıştır")}}
-    </button>
-    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addService">
-        {{__("Servisleri Düzenle")}}
-    </button>
-    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#changeNetwork">
-        {{__("Network")}}
-    </button>
-    <button type="button" class="btn btn-primary" data-toggle="modal" onclick="getHostname()">
-        {{__("Hostname")}}
-    </button>
-    @isset($scripts)
-        @foreach($scripts as $script)
-            <button class="btn-primary btn" onclick="generateModal('{{$script->inputs}}','{{$script->name}}','{{$script->_id}}')">{{$script->name}}</button>
-        @endforeach
-    @endisset
-    <br><br>
+    @include('title',[
+        "title" => $server->name
+    ])
+    <button class="btn btn-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
+
+    @include('modal-button',[
+        "class" => "btn-primary",
+        "target_id" => "editModal",
+        "text" => "Düzenle"
+    ])
+    @include('modal-button',[
+        "class" => "btn-warning",
+        "target_id" => "commandModal",
+        "text" => "Komut Çalıştır"
+    ])
+    @include('modal-button',[
+        "class" => "btn-secondary",
+        "target_id" => "addService",
+        "text" => "Servis Ekle"
+    ])
+    @include('modal-button',[
+        "class" => "btn-info",
+        "target_id" => "changeNetwork",
+        "text" => "Network"
+    ])
+    @include('modal-button',[
+        "class" => "btn-primary",
+        "target_id" => "changeHostname",
+        "text" => "Hostname"
+    ])<br><br>
     <h4>{{__("Servis Durumları")}}</h4>
         @foreach($services as $service)
             <button type="button" class="btn btn-info btn-lg" style="cursor:default;" id="status_{{$service}}">
@@ -45,6 +50,18 @@
         @endisset
     </pre>
 
+    @include('modal-button',[
+        "class" => "btn-danger",
+        "target_id" => "deleteModal",
+            "text" => "Sunucuyu Sil"
+    ])
+    @include('modal',[
+         "id"=>"deleteModal",
+         "title" => $server->name,
+         "url" => route('server_remove'),
+         "text" => "isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+         "submit_text" => "Sunucuyu Sil"
+     ])
 
     @include('modal',[
                        "id"=>"changeNetwork",
@@ -74,28 +91,6 @@
                   ])
 
 
-    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">
-        {{__("Sunucuyu Sil")}}
-    </button>
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">{{__("Sunucuyu Sil")}}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h2><b>{{$server->name }}</b></h2>{{__("isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.")}}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__("İptal")}}</button>
-                    <button type="button" class="btn btn-danger" onclick="deleteServer()">{{__("Sunucuyu Sil")}}</button>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="modal fade" id="commandModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -205,7 +200,79 @@
             </div>
         </div>
     </div>
-
+    <div class="modal fade" id="changeNetwork" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="exampleModalLabel">Network Değiştir</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <h3>İp Adresi</h3>
+                        <input id="new_ip" type="text" class="form-control"
+                               placeholder="İp Adresi">
+                    </div>
+                    <div class="form-group">
+                        <h3>Cidr Adresi</h3>
+                        <input id="new_cidr" type="text" class="form-control"
+                               placeholder="Cidr Adresi">
+                    </div>
+                    <div class="form-group">
+                        <h3>Gateway</h3>
+                        <input id="new_gateway" type="text" class="form-control"
+                               placeholder="Gateway">
+                    </div>
+                    <div class="form-group">
+                        <h3>Interface</h3>
+                        <input id="new_interface" type="text" class="form-control"
+                               placeholder="Interface">
+                    </div>
+                    <div class="form-group">
+                        <h3>SSH Parolası</h3>
+                        <input id="new_password" type="text" class="form-control"
+                               placeholder="SSH Parolası">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cs_cancel" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="button" id="cs_submit" class="btn btn-warning" onclick="changeNetwork()">Değiştir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel">Sunucu Düzenle</h1>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <h3>Adı</h3>
+                        <input id="add_name" type="text" class="form-control" placeholder="Sunucu kısa adı" data-validation="required" data-validation-error-msg="Girilmesi Zorunlu Alan">
+                    </div>
+                    <div class="form-group">
+                        <h3>İp Adresi</h3>
+                        <input id="add_ip" type="text" class="form-control" placeholder="Sunucu Ipv4 Adresi" data-validation-help="Örnek Ip:192.168.56.10" data-validation="custom"  data-validation-regexp="^(?=.*[^\.]$)((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.?){4}$" data-validation-error-msg="Geçerli Ip Adress Girin." >
+                    </div>
+                    <div class="form-group">
+                        <h3>Bağlantı Portu</h3>
+                        <input id="add_port" type="text" class="form-control" placeholder="Bağlantı Portu" value="22">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-success" onclick="edit()">Düzenle</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         $("#commandOutput").fadeOut();
         function deleteServer() {
@@ -363,7 +430,49 @@
             });
         }
         
+        function changeNetwork() {
+            //ip,cidr,gateway,interface,password
+            $.ajax({
+                url : "{{ route('server_network') }}",
+                type : "POST",
+                data :{
+                    server_id : server_id,
+                    ip : $("#new_ip").val(),
+                    cidr : $("#new_cidr").val(),
+                    gateway : $("#new_gateway").val(),
+                    interface : $("#new_interface").val(),
+                    password : $("#new_password").val(),
+                },
+                success : function (data) {
+                    if(data["result"] === 200){
+                        location.reload();
+                    }else{
+                        alert("Hata");
+                    }
+                }
+            });
+        }
+        function edit(){
+            var name = $("#add_name").val();
+            var ip = $("#add_ip").val();
+            var port = $("#add_port").val();
+            $.ajax({
+                url : "{{ route('server_run') }}",
+                type : "POST",
+                data: {
+                    name:name,
+                    ip:ip,
+                    port:port
+                },
 
+            },function (data,status) {
+                if(data["result"] === 200){
+                    // window.location.replace("{{route('servers')}}" + "/" + data["id"]);
+                }else{
+                    alert("Hata!");
+                }
+            });
+        }
 
         function installService(service) {
             var dns_domain = $("#dns_domain").val();
