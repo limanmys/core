@@ -25,7 +25,7 @@ class PermissionManager
             "server" => 1,
             "extension" => 1
         ];
-
+        
         foreach($validations as $target=>$type){
             if($this->verify($target,$type) == false){
                 return $this->response();
@@ -35,6 +35,7 @@ class PermissionManager
         if($this->verifyController() == false){
             return $this->response();
         }
+        
         return $next($request);
     }
 
@@ -96,11 +97,11 @@ class PermissionManager
 
     private function verifyController(){
         $controller = $this->controller();
-        $ignore_list = ["home"];
+        $ignore_list = ["home","ssh","server"];
         if($this->checkArray($controller) == false && in_array($controller,$ignore_list) == false){
             return false;
         }else{
             return true;
         }
-    }  
+    }
 }

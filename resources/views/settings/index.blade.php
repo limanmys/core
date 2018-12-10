@@ -32,7 +32,7 @@
                             </thead>
                             <tbody data-toggle="modal" data-target="#new">
                             @foreach ($users as $user)
-                                <tr class="highlight">
+                                <tr class="highlight" onclick="location.href = '{{route('user',$user->_id)}}'">
                                     <td>{{$user->name}}</td>
                                     <td>{{$user->email}}</td>
                                 </tr>
