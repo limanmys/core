@@ -3,6 +3,7 @@
 @section('content')
     <script>
         var data=[];
+        var color=["#5cb85c","#428bca","#f0ad4e"];
     </script>
     <!-- Styles -->
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
@@ -26,7 +27,7 @@
                                 </div>
                             </td>
                             <td style="margin:10px;">
-                                <select class="form-control" name="inputs" style="color:white;background-color:#5cb85c;" id="inputType">
+                                <select class="form-control" name="inputs" style="color:white;background-color:#5cb85c;" id="inputType" onchange="myInputs()">
                                     <option value="string" style="color:white;background-color:#5cb85c;">Metin</option>
                                     <option value="number" style="color:white;background-color:#428bca;">Sayı</option>
                                     <option value="ip" style="color:white;background-color:#f0ad4e;">Ip Adresi</option>
@@ -40,7 +41,7 @@
 
                 </div>
                 <br>
-                <div class="inputs">
+                <div class="inputs" id="inputs">
 
                 </div>
             </div>
@@ -49,8 +50,9 @@
             <div class="card-body">
                 <div class="form-group">
                     <label for="exampleFormControlTextarea1">Kodu buraya yazınız</label>
-                    <div id="editor"></div>
-                </div>
+                    <div>
+                    <textarea id="code"></textarea>
+                    </div>
             </div>
         </div>
         <div class="card w-auto">
@@ -65,7 +67,7 @@
                                 </div>
                             </td>
                             <td style="margin:10px;">
-                                <select class="form-control" name="inputs" id="inputTypeResult" style="color:white;background-color:#5cb85c;">
+                                <select class="form-control" name="inputs" id="inputTypeResult" style="color:white;background-color:#5cb85c;" onchange="myResults()">
                                     <option value="string" style="color:white;background-color:#5cb85c;">Metin</option>
                                     <option value="number" style="color:white;background-color:#428bca;">Sayı</option>
                                     <option value="ip" style="color:white;background-color:#f0ad4e;">Ip Adresi</option>
@@ -97,25 +99,7 @@
         </div>
     </div>
     </div>
-    @include('modal',[
-                     "id"=>"settingsModal",
-                     "title" => __("Betik Ayarları"),
-                     "url" => "/user/add",
-                     "inputs" => [
-                         __("Adı") => "name:text",
-                         __("Özellik") => "ip:text",  /*   @foreach ($extensions as $extension)
-                                    <option value="{{$extension->_id}}">{{$extension->name}}</option>
-                                @endforeach*/
-                         __("Versiyon") => "versiyon:text",
-                         __("Açıklama") => "description:text",
-                         __("Mail Adresi") => "mail:text",
-                         __("Betik Türü") => [
-                            "Sorgulama"=>"0",
-                            "Çalıştırma"=>"1"
-                         ]
-                     ],
-                     "submit_text" => "Ekle"
-                 ])
+
     <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -145,6 +129,13 @@
                             <h3>Versiyon</h3>
                             <input id="username" type="text" class="form-control" placeholder="Betik Versiyonu" value="1">
                         </div>
+                            <div class="form-group">
+                                <h3>Dil Seçimi</h3>
+                                <select class="form-control" name="inputs" id="languagetype">
+                                    <option value="query">Python</option>
+                                    <option value="query">Bash</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="column">
                         <div class="form-group">
@@ -174,62 +165,35 @@
     </div>
 
     <script>
-
-        $('#inputType').on('change', function() {
-                $(this).css("backgroundColor", getRandomColor());
-                $(this).css("color", "white");
-        });
-        $('#inputTypeResult').on('change', function() {
-                $(this).css("backgroundColor",getRandomColor());
-                $(this).css("color", "white");
-        });
+        function myInputs(){
+            var x = document.getElementById("inputType");
+            x.style.backgroundColor=color[x.selectedIndex];
+        }
+        function myResults() {
+            var x = document.getElementById("inputTypeResult");
+            x.style.backgroundColor=color[x.selectedIndex];
+        }
         function addInput() {
-            var name = $("#inputName").val();
-            var type = $("#inputType").val();
             if(data["inputs"])
-                data["inputs"]=data["inputs"]+","+$("#inputName").val()+":"+$("#inputType").val();
+                data["inputs"]=data["inputs"]+","+document.getElementById("inputName").value+":"+document.getElementById("inputType").value;
             else
-                data["inputs"]=$("#inputName").val()+":"+$("#inputType").val();
-            var r= $('<button class="btn btn-success" onclick="sil(this)" id="">value2</button>');
-            r.id=name;
-            r.text(name);
-            r.css("margin","10px");
-            if(type=="string"){
-                r.css("backgroundColor", "#5cb85c");
-                r.css("color", "white");}
-            else if(type=="number"){
-                r.css("backgroundColor", "#428bca");
-                r.css("color", "white");}
-            else if(type=="ip"){
-                r.css("backgroundColor", "#f0ad4e");
-                r.css("color", "white");}
-            $(".inputs").append(r);
+                data["inputs"]=document.getElementById("inputName").value+":"+document.getElementById("inputType").value;
+            var r= createButton(document.getElementById("inputName").value,document.getElementById("inputType").selectedIndex);
+            document.getElementById('inputs').appendChild(r);
         }
         function addResultParameters(){
             var name= $("#ResultParameterName").val();
             var type = $("#inputTypeResult").val();
             if(data["outputs"])
-                data["outputs"]=data["outputs"]+","+$("#ResultParameterName").val()+":"+$("#inputTypeResult").val();
+                data["outputs"]=data["outputs"]+","+document.getElementById("ResultParameterName").value+":"+document.getElementById("inputTypeResult").value;
             else
-                data["outputs"]=$("#ResultParameterName").val()+":"+$("#inputTypeResult").val();
-            var r= $('<button class="btn btn-success" onclick="sil(this)" id=""></button>');
-            r.id=name;
-            r.text(name);
-            r.css("margin","10px");
-            if(type=="string"){
-                r.css("backgroundColor", "#5cb85c");
-                r.css("color", "white");}
-            else if(type=="number"){
-                r.css("backgroundColor", "#428bca");
-                r.css("color", "white");}
-            else if(type=="ip"){
-                r.css("backgroundColor", "#f0ad4e");
-                r.css("color", "white");}
-            $(".Resultsinputs").append(r);
+                data["outputs"]=document.getElementById("ResultParameterName").value+":"+document.getElementById("inputTypeResult").value;
+            var r= createButton(document.getElementById("ResultParameterName").value,document.getElementById("inputTypeResult").selectedIndex);
+            document.getElementById('Resultsinputs').appendChild(r);
         }
         function add(){
             data["name"]=$("#name").val();
-            data["feature"]=$( "#feature option:selected" ).text();
+            data["extension"]=$( "#feature option:selected" ).text();
             data["version"]=$("#version").val();
             data["description"]=$("#description").val();
             data["email"]=$("#email").val();
@@ -240,8 +204,8 @@
             }
         }
         function addAll(){
-            var command=document.getElementById("editor");
-            data["code"]=command.textContent;
+            var command=document.getElementById("code");
+            data["code"]=command;
             if( 'name' in data){
                 $.post("{{route('script_create')}}" ,{
                     data:data
@@ -259,20 +223,20 @@
             }
         }
         function sil(id){
-            $(id).remove();
+            var elem = document.getElementById(id);
+            elem.parentNode.removeChild(elem);
+        }
+        function createButton(name,index){
+            var button=document.createElement("BUTTON");
+            button.id=name;
+            button.className="btn btn-success";
+            button.innerHTML=name;
+           // button.onclick=sil(this);
+            button.style.margin="10px";
+            button.style.backgroundColor=color[index];
+            return button;
         }
     </script>
-    <script>
-        var editor = ace.edit("editor");
-        editor.session.setMode("ace/mode/python");
-        function getRandomColor() {
-            var letters = '0123456789ABCDEF';
-            var color = '#';
-            for (var i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
-        }
-    </script>
+
 
 @endsection
