@@ -16,6 +16,7 @@ Route::group(['middleware' => ['auth','permissions']], function () {
         Route::get('/l/{extension_id}/{city}/{server_id}/{unique_code}','ExtensionController@route')->middleware('script_parameters');
         Route::get('/sunucular/{server_id}', 'ServerController@one')->name('server_one');
         Route::post('/sunucu/sil', 'ServerController@remove')->name('server_remove')->middleware('parameters:server_id');
+        Route::post('/sunucu/guncelle','ServerController@update')->name('server_update')->middleware('parameters:server_id,name');
         Route::post('/sunucu/calistir', 'ServerController@run')->name('server_run');
         Route::post('/sunucu/kontrol', 'ServerController@check')->name('server_check')->middleware('parameters:extension_id,server_id');
         Route::post('/sunucu/network', 'ServerController@network')->name('server_network')->middleware('parameters:ip,cidr,gateway,interface,password');
@@ -45,6 +46,8 @@ Route::group(['middleware' => ['auth','permissions']], function () {
     Route::get('/eklentiler' , 'ExtensionController@settings')->name('extensions_settings');
     Route::get('/eklentiler/{extension_id}','ExtensionController@one')->name('extension_one');
 
-    Route::get('/talep','HomeController@all')->name('request_permission');
+    Route::get('/taleplerim','HomeController@all')->name('request_permission');
     Route::post('/talep','HomeController@request')->name('request_send');
+    Route::get('/talepler','PermissionController@all')->name('request_list');
+    Route::get('/talep/{request_id}','PermissionController@one')->name('request_one');
 });

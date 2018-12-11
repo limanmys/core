@@ -14,7 +14,7 @@
             @if(isset($onsubmit))
                 <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return {{$onsubmit}}" target="#">
             @else
-                <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return @isset($url)request('{{$url}}',this)@endisset" target="#">
+                <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return @isset($url)request('{{$url}}',this,@isset($next){{$next}}@endisset)"@endisset target="#">
             @endif
                 <div class="modal-body">
                     @if(isset($inputs) && is_array($inputs))
@@ -27,8 +27,12 @@
                                     @endforeach    
                                 </select><br>
                             @else
-                            <h5>{{__($name)}}</h5>
-                                <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}" class="form-control" required><br>
+                                @if(explode(":", $input)[1] == "hidden")
+                                    <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}" class="form-control" required value="{{explode(":",$name)[1]}}">@if(explode(":", $input)[1] != "hidden")<br>@endif
+                                @else
+                                    <h5>{{__($name)}}</h5>
+                                    <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}" class="form-control" required>@if(explode(":", $input)[1] != "hidden")<br>@endif
+                                @endif
                             @endif
                         @endforeach
                     @endisset
@@ -37,7 +41,7 @@
                     @endisset
                 </div>
                 <div class="modal-footer">
-                <button type="submit" class="btn btn-success">@isset($submit_text){{__($submit_text)}}@endisset</button>
+                    <button type="submit" class="btn btn-success">@isset($submit_text){{__($submit_text)}}@endisset</button>
                 </div>
             </form>
         </div>
