@@ -83,5 +83,6 @@
   "Yetki Dağılımı" : "Authority Distribution",
   "Liman'ı Kullanmak için hiçbir yetkiniz bulunmamaktadır" : "You have no rights to use",
   "Bu sunucuya erişmek için yetkiniz bulunmamaktadır" : "You are not authorized to access this server",
-  "Kullanıcı Ekle" : "Add User"
+  "Kullanıcı Ekle" : "Add User",
+  "Yetki Talepleri" : "Authorization Requests"
 }

@@ -4,7 +4,6 @@
     @include('title',[
         "title" => "Sunucular"        
     ])
-
     @include('modal-button',[
         "class" => "btn-success",
         "target_id" => "add_server",
@@ -34,6 +33,7 @@
         "id"=>"add_server",
         "title" => "Sunucu Ekle",
         "url" => route('server_add'),
+        "next" => "redirect",
         "inputs" => [
             "Adı" => "name:text",
             "İp Adresi" => "ip_address:text",

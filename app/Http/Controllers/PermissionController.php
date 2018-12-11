@@ -17,10 +17,24 @@ class PermissionController extends Controller
         if(Auth::user()->isAdmin()){
             return true;
         }
-        //TODO
-        // $permissions = request('permissions');
-        // if($permissions->__get($type) == null || in_array($id,$permissions->__get($type)) == false){
-        //     return false;
-        // }
+    }
+
+    public function all(){
+        $requests = \App\Request::all();
+        $users = \App\User::all();
+        foreach($requests as $r){
+            $r->user_name = $users->where('_id',$r->user_id)->first()->name;
+        }
+        return view('permission.list',[
+            "requests" => $requests
+        ]);
+    }
+
+    public function one(){
+        $request = \App\Request::where('_id',request('request_id'))->first();
+        $request->user_name = \App\User::where('_id',$request->user_id)->first()->name;
+        return view('permission.one',[
+            "request" => $request
+        ]);
     }
 }

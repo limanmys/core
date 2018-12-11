@@ -26,19 +26,22 @@
         @endauth
         <ul class="navbar-nav px-3">
             <li class="nav-item text-nowrap">
-                <form action="#" onsubmit="return request('/locale',this)">
+                <form action="#" onsubmit="return request('/locale',this,reload)" style="cursor: pointer;">
                     @if (Session::get('locale') == "en")
-                        <a class="nav-link text-white" onclick="language('tr')">TR</a>
+                        <input type="hidden" name="locale" value="tr">
+                        <button class="btn btn-link text-white-">TR</button>
                     @else
-                        <a class="nav-link text-white" onclick="language('en')">EN</a>
+                        <input type="hidden" name="locale" value="en">
+                        <button class="btn btn-link text-white">EN</button>
                     @endif
+
                 </form>
             </li>
         </ul>
         @auth
         <ul class="navbar-nav px-3">
-            <li class="nav-item text-nowrap">
-                <a class="nav-link text-white" href="#">{{Auth::user()->name}}</a>
+            <li class="nav-item text-nowrap" style="cursor: pointer;">
+                <a class="nav-link text-white" onclick="return request('logout',null,reload)">{{Auth::user()->name}}</a>
             </li>
         </ul>
         @endauth
@@ -82,6 +85,10 @@
                         @if(Auth::user()->isAdmin() == false)
                         <li>
                             <a href="{{route('request_permission')}}">{{ __("Yetki Talebi") }}</a>
+                        </li>
+                        @else
+                        <li>
+                            <a href="{{route('request_list')}}">{{ __("Yetki Talepleri") }}</a>
                         </li>
                         @endif
                         <li>

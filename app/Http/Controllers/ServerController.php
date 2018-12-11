@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Extension;
 use App\Key;
 use App\Script;
+use App\Permission;
 use App\Server;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,16 +43,14 @@ class ServerController extends Controller
         $permissions->server = $user_servers;
         $permissions->save();
         $key->save();
-        return [
-            "result" => 200,
-            "id" => $server->id,
-            "output" => $output
-        ];
+        return response(route('server_one',$server->id),200);
     }
 
     public function remove(){
         Server::where('_id',\request('server_id'))->delete();
         Key::where('server_id', \request('server_id'))->delete();
+        $user_permissions = Permission::where('server','like',request('server_id'))->get();
+        dd($user_permissions);
         return [
             "result" => 200
         ];
@@ -69,6 +68,7 @@ class ServerController extends Controller
         }
         return view('server.one',[
             "stats" => \request('server')->run("df -h"),
+            "hostname" => request('server')->run("hostname"),
             "server" => \request('server'),
             "services" => $services,
             "scripts" => $scripts
@@ -188,6 +188,15 @@ class ServerController extends Controller
                 "data" => $output
             ];
         }
+    }
 
+    public function update(){
+        $output = request('server')->update([
+            "name" => request('name')
+        ]);
+        return [
+            "result" => 200,
+            "data" => $output
+        ];
     }
 }
