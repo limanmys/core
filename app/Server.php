@@ -11,6 +11,7 @@ class Server extends Eloquent
     protected $connection = 'mongodb';
     protected $fillable = ['name', 'ip_address' ,'port' ,'city'];
     private $key = null;
+    
     public function run($command){
         $key = Key::where([
             'server_id' => $this->id,

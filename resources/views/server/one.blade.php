@@ -10,17 +10,17 @@
 
     @include('modal-button',[
         "class" => "btn-primary",
-        "target_id" => "editModal",
+        "target_id" => "edit",
         "text" => "Düzenle"
     ]) 
     @include('modal-button',[
         "class" => "btn-warning",
-        "target_id" => "commandModal",
+        "target_id" => "command",
         "text" => "Komut Çalıştır"
     ])    
     @include('modal-button',[
         "class" => "btn-secondary",
-        "target_id" => "addService",
+        "target_id" => "install_extension",
         "text" => "Servis Ekle"
     ])
     @include('modal-button',[
@@ -48,12 +48,12 @@
     
     @include('modal-button',[
         "class" => "btn-danger",
-        "target_id" => "deleteModal",
+        "target_id" => "delete",
             "text" => "Sunucuyu Sil"
     ])
 
     @include('modal',[
-        "id"=>"deleteModal",
+        "id"=>"delete",
         "title" => $server->name,
         "url" => route('server_remove'),
         "text" => "isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
@@ -65,7 +65,7 @@
     ])
 
     @include('modal',[
-        "id"=>"editModal",
+        "id"=>"edit",
         "title" => "Sunucuyu Düzenle",
         "url" => route('server_update'),
         "next" => "reload",
@@ -104,98 +104,56 @@
         "submit_text" => "Değiştir"
     ])
 
-    <div class="modal fade" id="commandModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title">
-                        {{__("Komut Çalıştır")}}
-                    </h1>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" onclick="document.getElementById('run_command').disabled = !this.checked;" id="commandResponsibility">
-                        <label class="form-check-label">
-                            {{__("Özel komut çalıştırma sorumluluğunu kabul ediyorum.")}}
-                        </label>
-                    </div><br>
-                    <div class="form-group">
-                        <textarea class="form-control" id="run_command" rows="3" disabled></textarea>
-                    </div>
-                    <div class="form-group">
-                        <textarea class="form-control" id="commandOutput" rows="3" readonly hidden></textarea>
-                    </div>
+    @include('modal',[
+        "id"=>"install_extension",
+        "title" => "Servis Yükle",
+        "url" => route('server_extension'),
+        "next" => "reload",
+        "selects" => [
+            "DNS:5c0a170f7b57f19953126e37" => [
+                "Domain Adı" => "domain:text",
+                "Arayüz" => "interface:text",
+                "DNS:5c0a170f7b57f19953126e37" => "extension_id:hidden"
+            ],
+            "DHCP:5c0a1c5f7b57f19953126e38" => [
+                "Domain Adı" => "domain:text",
+                "Arayüz" => "interface:text",
+                "Subnet" => "subnet:text",
+                "DHCP:5c0a1c5f7b57f19953126e38" => "extension_id:hidden"
+            ]
+        ],
+        "inputs" => [
+            "Sunucu Id:$server->_id" => "server_id:hidden"
+        ],
+        "submit_text" => "Değiştir"
+    ])
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-warning" onclick="runCommand()">Çalıştır</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('modal',[
+        "id"=>"command",
+        "title" => "Özel Komut Çalıştır",
+        "url" => route('server_run'),
+        "next" => "commandDisplay",
+        "inputs" => [
+            "Sorumluluk Reddi" => "responsibility:checkbox",
+            "Kod Alanı" => "command:textarea",
+            "Sunucu Id:$server->_id" => "server_id:hidden"
+        ],
+        "output" => "command_output",
+        "submit_text" => "Çalıştır"
+    ])
     
-    <div class="modal fade" id="addService" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">DNS Kurulumu</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <h5>Domain Adı</h5>
-                        <input id="dns_domain" type="text" class="form-control"
-                               placeholder="Domain Adı">
-                    </div>
-                    <div class="form-group">
-                        <h5>Interface</h5>
-                        <input id="dns_interface" type="text" class="form-control"
-                               placeholder="Interface">
-                    </div>
-                    <div class="collapse" id="installServiceOutput">
-
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-warning" onclick="installService()">Kur</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
-        function checkStatus(extension) {
-            var element = $("#status_" + extension);
-            $.ajax({
-                    url : "{{ route('server_check') }}",
-                    type : "POST",
-                    data : {
-                        extension : extension,
-                        server_id : '{{$server->_id}}'
-                    },
-                    success : function (data) {
-                        if(data["result"] === 200){
-                            element.removeClass('btn-info').removeClass('btn-danger').addClass('btn-success');
-                        }else if(data["result"] === 201){
-                            element.removeClass('btn-success').removeClass('btn-info').addClass('btn-danger');
-                        }else{
-                            element.removeClass('btn-success').removeClass('btn-info').addClass('btn-secondary');
-                        }
-                    }
-            });
+        function commandDisplay(output){
+            var element = document.getElementById("command_output");
+            element.value = output;
+            element.removeAttribute('hidden');
         }
         
         @foreach($server->extensions as $extension)
             setInterval(function () {
-                checkStatus('{{$extension}}');
+                // checkStatus('{{$extension}}');
             }, 3000);
         @endforeach
+        
     </script>
 @endsection

@@ -4,9 +4,10 @@ function request(url,data,next) {
     var r = new XMLHttpRequest();
     r.open("POST",url);
     r.setRequestHeader('X-CSRF-TOKEN', csrf);
+    r.setRequestHeader("Accept","text/json");
     r.send(form);
     r.onreadystatechange = function(){
-        if(r.status == 200){
+        if(r.status == 200 && r.readyState == 4){
             return next(r.responseText);
         }
     }
@@ -25,6 +26,10 @@ function redirect(url){
 
 function debug(data){
     console.log(data);
+}
+
+function back(){
+    history.back();
 }
 
 function navbar(flag) {

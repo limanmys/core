@@ -11,33 +11,42 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            @if(isset($onsubmit))
+            <?php
+                $rand = bin2hex(random_bytes(10));
+            ?>
+            @isset($onsubmit)
                 <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return {{$onsubmit}}" target="#">
             @else
                 <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return @isset($url)request('{{$url}}',this,@isset($next){{$next}}@endisset)"@endisset target="#">
             @endif
                 <div class="modal-body">
-                    @if(isset($inputs) && is_array($inputs))
-                        @foreach ($inputs as $name => $input)
-                            @if(is_array($input))
-                            <h5>{{__(explode(":",$name)[0])}}</h5>
-                                <select name="{{explode(":",$name)[1]}}" class="form-control" required>
-                                    @foreach ($input as $key => $value)
-                                        <option value="{{$value}}">{{__($key)}}</option>
-                                    @endforeach    
-                                </select><br>
-                            @else
-                                @if(explode(":", $input)[1] == "hidden")
-                                    <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}" class="form-control" required value="{{explode(":",$name)[1]}}">@if(explode(":", $input)[1] != "hidden")<br>@endif
-                                @else
-                                    <h5>{{__($name)}}</h5>
-                                    <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}" class="form-control" required>@if(explode(":", $input)[1] != "hidden")<br>@endif
-                                @endif
-                            @endif
-                        @endforeach
+                    @if(isset($selects) && is_array($selects))
+                        <h5>{{__("Servis Seçimi")}}</h5>
+                        <select class="form-control" required onchange="cs_{{$id}}(this.value)">
+                            @foreach ($selects as $key => $select)
+                                <option value="{{explode(":",$key)[1]}}">{{__(explode(":",$key)[0])}}</option>
+                            @endforeach
+                            @foreach ($selects as $key => $select)
+                                @include('__system__.inputs',[
+                                        "inputs" => $select,
+                                        "disabled" => "true",
+                                        "id" => explode(":",$key)[1],
+                                        "random" => $id
+                                ])
+                            @endforeach
+                        </select><br>
+                    @endif
+                    @isset($inputs)
+                        @include('__system__.inputs',$inputs)
                     @endisset
-                    @if(isset($text))
+                    @isset($text)
                         {{__($text)}}
+                    @endisset
+                    @isset($output)
+                    <pre>
+                        <textarea class="form-control" id="{{$output}}" hidden readonly rows="10"></textarea>
+                        </pre>
+                        <br>
                     @endisset
                 </div>
                 <div class="modal-footer">
@@ -47,3 +56,18 @@
         </div>
     </div>
 </div>
+@isset($selects)
+    <script type="text/javascript">
+        function cs_{{$id}}(test){
+            Array.prototype.forEach.call(document.getElementsByClassName('install_extension'),function(element){
+                element.setAttribute('hidden',"true");
+                element.setAttribute('disabled',"true");
+            });
+            Array.prototype.forEach.call(document.getElementsByClassName(test),function(element){
+                element.removeAttribute('hidden');
+                element.removeAttribute('disabled');
+            });
+        }
+        cs_{{$id}}('{{explode(':',key($selects))[1]}}')
+    </script>
+@endisset
