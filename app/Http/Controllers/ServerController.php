@@ -54,10 +54,13 @@ class ServerController extends Controller
         Server::where('_id',\request('server_id'))->delete();
         Key::where('server_id', \request('server_id'))->delete();
         $user_permissions = Permission::where('server','like',request('server_id'))->get();
-        dd($user_permissions);
-        return [
-            "result" => 200
-        ];
+        foreach ($user_permissions as $permission) {
+            $servers = $permission->server;
+            unset($servers[array_search('server_id',$servers)]);
+            $permission->server = $servers;
+            $permission->save();    
+        }
+        return route('servers');
     }
 
     public function one(){
