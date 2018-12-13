@@ -99,6 +99,7 @@ class ExtensionController extends Controller
         $outputs = [];
         foreach (\request('scripts') as $script){
             $parameters = '';
+            dd($script);
             foreach (explode(',' , $script->inputs) as $input){
                 $parameters = $parameters . " " .\request(explode(':', $input)[0]);
             }

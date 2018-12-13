@@ -45,7 +45,7 @@
             {{$stats}}
         @endisset
     </pre>
-    
+
     @include('modal-button',[
         "class" => "btn-danger",
         "target_id" => "delete",
@@ -57,7 +57,7 @@
         "title" => $server->name,
         "url" => route('server_remove'),
         "text" => "isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-        "next" => "debug",
+        "next" => "redirect",
         "inputs" => [
             "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
@@ -82,7 +82,7 @@
         "url" => route('server_network'),
         "next" => "reload",
         "inputs" => [
-            "İp Adresi" => "ip_address:text",
+            "İp Adresi" => "ip:text",
             "Cidr Adresi" => "cidr:text",
             "Gateway" => "gateway:text",
             "Arayüz" => "interface:text",

@@ -14,6 +14,9 @@ class Script extends Eloquent
         $rows = explode("\n", $file);
         $script = new Script();
         $script = Script::fillValues($script,$rows);
+        if(Script::where('unique_code',$script->unique_code)->exists()){
+            return false;
+        };
         $script->save();
         return $script;
     }

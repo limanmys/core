@@ -3,8 +3,8 @@
     {{__("Zone Ekle")}}
   </button>
   <div class="dropdown-menu">
-    <button class="dropdown-item" data-toggle="modal" data-target="#add_forward_zone">Forward Zone Ekle</a>
-    <button class="dropdown-item" data-toggle="modal" data-target="#add_reverse_zone">Reverse Zone Ekle</a>
+    <button class="dropdown-item" data-toggle="modal" data-target="#add_forward_zone">Forward</button>
+    <button class="dropdown-item" data-toggle="modal" data-target="#add_reverse_zone">Reverse</button>
   </div>
 </div>
 
