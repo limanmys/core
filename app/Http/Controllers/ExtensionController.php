@@ -6,7 +6,7 @@ use App\Extension;
 use App\Script;
 use App\Server;
 use Illuminate\Http\Request;
-use JsonException;
+
 class ExtensionController extends Controller
 {
     public static $protected = true;
@@ -86,13 +86,14 @@ class ExtensionController extends Controller
             "extension" => $extension,
             "scripts" => $scripts,
             "data" => $outputs,
-            "view" => "index"
+            "view" => "index",
+            "server" => $server
         ]);
     }
 
     public function route(){
-        $extension = Extension::where('name',\request('extension_id'))->first();
-        $scripts = Script::where('extensions','like',\request('extension_id'))->get();
+        $extension = request('extension');
+        $scripts = Script::where('extensions','like','%' . $extension->name . '%')->get();
         $outputs = [];
         foreach (\request('scripts') as $script){
             $parameters = '';
@@ -103,8 +104,7 @@ class ExtensionController extends Controller
             $output = str_replace('\n','',$output);
             $outputs[$script->unique_code] = json_decode($output,true);
         }
-        $view = (\request()->ajax()) ? 'extensions.' . strtolower(\request('extension_id')) . '.' . \request('url')
-            : 'feature.server';
+        $view = (\request()->ajax()) ? 'extensions.' . strtolower(\request('extension_id')) . '.' . \request('url') : 'feature.server';
         if(view()->exists($view)){
             return view($view,[
                 "result" => 200,
