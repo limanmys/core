@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Extension;
 use App\Key;
 use App\Script;
+use App\Permission;
 use App\Server;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,11 +15,15 @@ class ServerController extends Controller
     public static $protected = true;
     
     public function index(){
-        $all_servers = Server::all();
         $permissions = request('permissions');
         $servers = [];
+        if($permissions->__get("server") == null){
+            return view('server.index');
+        }
         foreach ($permissions->server as $server_id) {
-            array_push($servers,$all_servers->where('_id',$server_id)->first());
+            if(Server::where('_id',$server_id)->exists()){
+                array_push($servers,Server::where('_id',$server_id)->first());    
+            }
         }
         return view('server.index',[
             "servers" => $servers
@@ -42,16 +47,14 @@ class ServerController extends Controller
         $permissions->server = $user_servers;
         $permissions->save();
         $key->save();
-        return [
-            "result" => 200,
-            "id" => $server->id,
-            "output" => $output
-        ];
+        return response(route('server_one',$server->id),200);
     }
 
     public function remove(){
         Server::where('_id',\request('server_id'))->delete();
         Key::where('server_id', \request('server_id'))->delete();
+        $user_permissions = Permission::where('server','like',request('server_id'))->get();
+        dd($user_permissions);
         return [
             "result" => 200
         ];
@@ -69,6 +72,7 @@ class ServerController extends Controller
         }
         return view('server.one',[
             "stats" => \request('server')->run("df -h"),
+            "hostname" => request('server')->run("hostname"),
             "server" => \request('server'),
             "services" => $services,
             "scripts" => $scripts
@@ -77,10 +81,7 @@ class ServerController extends Controller
 
     public function run(){
         $output = Server::where('_id',\request('server_id'))->first()->run(\request('command'));
-        return [
-            "result" => 200,
-            "data" => $output
-        ];
+        return $output;
     }
 
     public function runScript(){
@@ -171,7 +172,7 @@ class ServerController extends Controller
     }
 
     public function enableExtension(){
-        $extension = Extension::where('name','like',\request('extension'))->first();
+        $extension = Extension::where('_id',\request('extension_id'))->first();
         $script = Script::where('unique_code',$extension->setup)->first();
         $server = \request('server');
         $output = $server->runScript($script,\request('domain') . " " . \request('interface'));
@@ -188,6 +189,15 @@ class ServerController extends Controller
                 "data" => $output
             ];
         }
+    }
 
+    public function update(){
+        $output = request('server')->update([
+            "name" => request('name')
+        ]);
+        return [
+            "result" => 200,
+            "data" => $output
+        ];
     }
 }
