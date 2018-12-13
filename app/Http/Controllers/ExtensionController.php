@@ -18,9 +18,11 @@ class ExtensionController extends Controller
     public function one(){
         $extension = Extension::where('_id',\request('extension_id'))->first();
         $files = $this->tree(resource_path('views' . DIRECTORY_SEPARATOR .'extensions' . DIRECTORY_SEPARATOR . strtolower($extension->name)));
+        $scripts = Script::where('extensions','like',$extension->name)->get();
         return view('extensions.one',[
             "extension" => $extension,
-            "files" => $files
+            "files" => $files,
+            "scripts" => $scripts
         ]);
     }
 
