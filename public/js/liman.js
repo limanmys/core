@@ -14,8 +14,9 @@ function request(url,data,next) {
     return false;
 }
 
-function reload(){
+function reload(data){
     location.reload();
+    return;
 }
 
 function redirect(url){
