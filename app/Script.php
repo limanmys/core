@@ -22,19 +22,20 @@ class Script extends Eloquent
     }
 
     public static function createFile($script,...$parameters){
-        $script = $script->save();
+        $script->save();;
         $file = fopen(storage_path('app' . DIRECTORY_SEPARATOR . 'scripts' ) . DIRECTORY_SEPARATOR . $script->_id, 'w');
-        foreach ($parameters as $parameter){
-            fwrite($file,'#' . $parameter . '\n');
+        $user_inputs = array_slice($parameters[0],0,-1);
+        foreach ($user_inputs as $parameter){
+            fwrite($file,'#' . $parameter . PHP_EOL);
         }
-        fwrite($file,$parameters[count($parameters)]);
+        fwrite($file,$parameters[0][count($parameters[0]) -1]);
         fclose($file);
-        return Script::fillValues($script,$parameters);
+        return Script::fillValues($script,$user_inputs);
     }
 
     public static function fillValues($script, ... $parameters){
         $parameters = $parameters[0];
-        for($i = 0 ; $i <= 13;$i++){
+        for($i = 0 ; $i <= 12;$i++){
             $parameters[$i] = str_replace("# ","",$parameters[$i]);
             switch ($i){
                 case 0:
@@ -56,31 +57,27 @@ class Script extends Eloquent
                     $script->version = $parameters[$i];
                     break;
                 case 6:
-                    $rows[$i] = explode(',',$parameters[$i]);
                     $script->extensions = $parameters[$i];
                     break;
                 case 7:
                     $script->inputs = $parameters[$i];
                     break;
                 case 8:
-                    $script->outputs = $parameters[$i];
-                    break;
-                case 9:
                     $script->type = $parameters[$i];
                     break;
-                case 10:
+                case 9:
                     $script->authors = $parameters[$i];
                     break;
-                case 11:
+                case 10:
                     $script->support_email = $parameters[$i];
                     break;
-                case 12:
+                case 11:
                     $script->company = $parameters[$i];
                     break;
-                case 13:
+                case 12:
                     $script->unique_code = $parameters[$i];
                     break;
-                case 14:
+                case 13:
                     $script->regex = $parameters[$i];
                     break;
             }

@@ -54,8 +54,8 @@
     "id"=>"request",
     "title" => "Yetki İste",
     "url" => route('request_send'),
+    "next" => "reload",
     "inputs" => [
-        "Email" => "email:text",
         "Yetki Tipi:type" => [
             "Sunucu" => "server",
             "Betik" => "script",

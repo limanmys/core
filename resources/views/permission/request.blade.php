@@ -5,7 +5,7 @@
 @include('title',[
     "title" => "Yetki Talebi"
 ])
-<form onsubmit="return request('{{route('request_send')}}',this)">
+<form onsubmit="return request('{{route('request_send')}}',this,reload)">
     <div class="form-group">
       <label>{{__("İletişim Adresi")}}</label>
     <input name="email" type="email" class="form-control" value="{{Auth::user()->email}}" required>

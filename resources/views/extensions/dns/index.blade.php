@@ -12,10 +12,9 @@
     @foreach($data["dns_generate"] as $zone)
         <div class="card">
             <div class="card-title">
-                <span onclick="redirect('zone_details','alan_adi:{{$zone["name"]}}')">{{$zone["name"]}}</span>
+                <span onclick="route('zone_details?&alan_adi={{$zone["name"]}}')">{{$zone["name"]}}</span>
             </div>
             <div class="card-body">
-
             </div>
         </div>
     @endforeach
@@ -40,7 +39,7 @@
     "url" => route('extension_api',['add_reverse_zone']),
     "next" => "debug",
     "inputs" => [
-        "Zone Adı" => "alan_adi:text",
+        "Zone Adı" => "ters_alan_adi:text",
         "-:$server->_id" => "server_id:hidden",
         "-:$extension->_id" => "extension_id:hidden"
     ],

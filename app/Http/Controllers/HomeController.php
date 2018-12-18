@@ -52,7 +52,7 @@ class HomeController extends Controller
     public function request(){
         $req = new \App\Request();
         $req->user_id = \Auth::id();
-        $req->email = request('email');
+        $req->email = \Auth::user()->email;
         $req->note = request('note');
         $req->type = request('type');
         $req->speed = request('speed');

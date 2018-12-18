@@ -25,6 +25,7 @@ class ScriptParameters
         }
 
         $extension = \App\Extension::where('_id',$extension_id)->first();
+
         $url = null;
         if($request->route('unique_code') != null){
             $url = $request->route('unique_code');
