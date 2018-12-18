@@ -20,7 +20,7 @@
             </thead>
             <tbody>
             @foreach ($servers as $server)
-                <tr onclick="location.href = '/sunucular/{{$server->_id}}';" class="highlight">
+                <tr onclick="dummy('{{$server->_id}}')" class="highlight">
                     <td>{{$server->name}}</td>
                     <td>{{$server->ip_address}}</td>
                     <td>{{$server->port}}</td>
@@ -45,4 +45,13 @@
         ],
         "submit_text" => "Ekle"
     ])
+
+    <script>
+        function dummy(id){
+            let main = document.getElementsByTagName('main')[0];
+            main.innerHTML = document.getElementsByClassName('loading')[0].innerHTML;
+            document.getElementsByClassName('loading_message')[0].innerHTML = "Sunucuyla bağlantı kuruluyor";
+            location.href = '/sunucular/' + id ;
+        }
+    </script>
 @endsection
