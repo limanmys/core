@@ -5,6 +5,7 @@
 [role="main"] {
     padding-top: 58px; /* Space for fixed navbar */
     padding-left: 20px;
+    width: 100%;
 }
 
 .number{
