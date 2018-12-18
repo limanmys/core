@@ -99,7 +99,6 @@ class ExtensionController extends Controller
         $outputs = [];
         foreach (\request('scripts') as $script){
             $parameters = '';
-            dd($script);
             foreach (explode(',' , $script->inputs) as $input){
                 $parameters = $parameters . " " .\request(explode(':', $input)[0]);
             }
@@ -107,8 +106,9 @@ class ExtensionController extends Controller
             $output = str_replace('\n','',$output);
             $outputs[$script->unique_code] = json_decode($output,true);
         }
+
         $view = (\request()->ajax()) ? 'extensions.' . strtolower(\request('extension_id')) . '.' . \request('url') : 'feature.server';
-        if(view()->exists($view)){
+        if(\request()->ajax() == false){
             return view($view,[
                 "result" => 200,
                 "data" => $outputs,
@@ -117,14 +117,7 @@ class ExtensionController extends Controller
                 "scripts" => $scripts,
             ]);
         }else{
-            return [
-                "result" => 200,
-                "data" => $outputs,
-                "view" => \request('url'),
-                "extension" => $extension,
-                "scripts" => $scripts,
-            ];
+            return 200;
         }
     }
-
 }

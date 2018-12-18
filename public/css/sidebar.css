@@ -1,23 +1,9 @@
 .sidebar {
     color: #FFF;
     background: #2b2b2d;
-    width: 320px;
-    max-width: 400px;
     height: 100%;
     float: left;
     position: fixed;
-    z-index: 1000;
-    display: block;
-    flex:1;
-}
-#navbar-toggle {
-    cursor: pointer;
-}
-#toggleView {
-    margin-left: 44px;
-}
-.menu-icon {
-    float: right;
 }
 .sidebar-nav {
     display: block;
@@ -36,10 +22,11 @@
     height: 50px;
     line-height: 15px;
     padding: 20px;
-    vertical-align: center;
+    /*vertical-align: center;*/
 }
-.sidebar-nav li a:hover {
-    background:#121213;
-    -webkit-transition: background 0.1s;
-    transition: background 0.1s;
+.sidebar-nav li a:hover, .selected {
+    background: white;
+    color:black;
+    -webkit-transition: background 0.3s;
+    transition: background 0.3s;
 }

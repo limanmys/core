@@ -43,7 +43,7 @@ class ScriptController extends Controller
         $contents = Storage::get('scripts/' . $script->_id);
         //Dirty way, but works well.
         $contents = explode("\n", $contents);
-        $contents = array_slice($contents,14);
+        $contents = array_slice($contents,15);
         $contents = implode("\n",$contents);
         return view("scripts.one",[
             "script" => $script,
@@ -53,13 +53,9 @@ class ScriptController extends Controller
 
     public function create(){
         $script = new Script();
-        $script = Script::fillValues($script,"!/usr/bin/python3","-*- coding: utf-8 -*-","1",\request('name'),
-        \request('description'),\request('version'),\request('extensions'),\request('inputs'),""
-    ,\request('type'),\Auth::user()->name,\request('support_email'),\request('company'),\request('unique_code'),\request('code'));
+        $script = Script::createFile($script,["!/usr/bin/python3","-*- coding: utf-8 -*-",request('root'),\request('name'),
+        \request('description'),\request('version'),\request('extensions'),\request('inputs'),\request('type'),\Auth::user()->name,\request('support_email'),\request('company'),\request('unique_code'),\request('regex'),\request('code')]);
         $script->save();
-        return [
-            "result" => 200,
-            "script" => $script->_id
-        ];
+        return route('script_one',$script->_id);
     }
 }

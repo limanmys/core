@@ -1,28 +1,32 @@
 function request(url,data,next) {
-    if(data != null)
-        var form = new FormData(data);
-    var r = new XMLHttpRequest();
+    if(data instanceof FormData === false){
+        data = new FormData(data);
+    }
+    let r = new XMLHttpRequest();
     r.open("POST",url);
     r.setRequestHeader('X-CSRF-TOKEN', csrf);
     r.setRequestHeader("Accept","text/json");
-    r.send(form);
+    r.send(data);
     r.onreadystatechange = function(){
-        if(r.status == 200 && r.readyState == 4){
+        if(r.status === 200 && r.readyState === 4){
             return next(r.responseText);
         }
-    }
+    };
     return false;
 }
 
-function reload(data){
+function reload(){
     location.reload();
-    return;
 }
 
 function redirect(url){
     if(url === "")
         return;
     window.location.href = url;
+}
+
+function route(url){
+    window.location.href = window.location.href + "/" + url;
 }
 
 function debug(data){
@@ -34,23 +38,41 @@ function back(){
 }
 
 function navbar(flag) {
-    var sidebar = document.getElementsByClassName("sidebar")[0];
-    var main = document.getElementsByTagName('main')[0];
+    let sidebar = document.getElementsByClassName("sidebar")[0];
+    let main = document.getElementsByTagName('main')[0];
     if (localStorage.getItem("state") === "e") {
-        sidebar.style.marginLeft = "-270px";
-        main.classList.remove('ml-sm-auto');
-        main.classList.add('ml-md-5');
-        (flag) ? localStorage.setItem("state", "m") : null;
+        if(flag){
+            sidebar.style.width = "60px";
+            main.style.marginLeft = "70px";
+            toggle("hidden");
+            localStorage.setItem("state", "m");
+        }else{
+            sidebar.style.width = "230px";
+            main.style.marginLeft = "240px";
+            toggle("visible");
+        }
     }else{
-        sidebar.style.marginLeft = "0px";
-        main.classList.remove('ml-md-5');
-        main.classList.add('ml-sm-auto');
-        (flag) ? localStorage.setItem("state", "e") : null;
+        if(flag){
+            sidebar.style.width = "230px";
+            main.style.marginLeft = "240px";
+            toggle("visible");
+            localStorage.setItem("state", "e");
+        }else{
+            sidebar.style.width = "60px";
+            main.style.marginLeft = "70px";
+            toggle("hidden");
+        }
+    }
+
+    function toggle(target){
+        Array.prototype.forEach.call(document.querySelectorAll('.sidebar-name'), function (el) {
+            el.style.visibility = target;
+        });
     }
 }
 
 window.onload = function(){
     navbar(false);
-}
+};
 
-var csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');
+let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');
