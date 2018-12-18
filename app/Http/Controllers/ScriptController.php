@@ -27,6 +27,11 @@ class ScriptController extends Controller
 
     public function upload(){
         $script = Script::readFromFile(\request()->file('script'));
+        if($script == false){
+            return [
+                "result" => 201
+            ];
+        }
         Storage::putFileAs('scripts',\request()->file('script'),$script->_id);
         return [
             "result" => 200

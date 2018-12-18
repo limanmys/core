@@ -3,116 +3,146 @@
 Auth::routes();
 
 // Change the language
-Route::post('/locale','HomeController@setLocale')->name('set_locale');
 
-// Middleware group for both authentication and permissions of request.
-Route::group(['middleware' => ['auth','permissions']], function () {
-    
-    // Home Route
-    Route::get('/', 'HomeController@index')->name('home');
+Route::post('/locale', 'HomeController@setLocale')->name('set_locale');
 
-    // Servers Route
-    Route::get('/sunucular', 'ServerController@index')->name('servers');
+// Home Route
 
-    // Add Server Route
-    Route::post('/sunucu/ekle' , 'ServerController@add')->name('server_add')->middleware('parameters:username,password,ip_address,port');
+Route::get('/', 'HomeController@index')->name('home');
 
-    // Server Status Route (Telnet)
-    Route::post('/api/status', 'ServerController@isAlive')->middleware('parameters:ip,port');
+// Servers Route
 
-    // Middleware to convert server_id to server object.
-    Route::group(['middleware' => ['server']], function () {
+Route::get('/sunucular', 'ServerController@index')->name('servers');
 
-        // Extension' Server' Home Route
-        Route::get('/l/{extension_id}/{city}/{server_id}', 'ExtensionController@server')->name('extension_server');
+// Add Server Route
 
-        // Extension' Server' Any Route Handler
-        Route::get('/l/{extension_id}/{city}/{server_id}/{unique_code}','ExtensionController@route')->middleware('script_parameters');
+Route::post('/sunucu/ekle', 'ServerController@add')->name('server_add')->middleware('parameters:username,password,ip_address,port');
 
-        // Single Server Details Route
-        Route::get('/sunucular/{server_id}', 'ServerController@one')->name('server_one');
+// Server Status Route (Telnet)
 
-        // Remove Server Route
-        Route::post('/sunucu/sil', 'ServerController@remove')->name('server_remove')->middleware('parameters:server_id');
-        
-        // Server Update Route
-        Route::post('/sunucu/guncelle','ServerController@update')->name('server_update')->middleware('parameters:server_id,name');
+Route::post('/api/status', 'ServerController@isAlive')->middleware('parameters:ip,port');
 
-        // Server Command Route
-        Route::post('/sunucu/calistir', 'ServerController@run')->name('server_run');
+// Middleware to convert server_id to server object.
 
-        // Server' Service Status Route
-        Route::post('/sunucu/kontrol', 'ServerController@check')->name('server_check')->middleware('parameters:extension_id,server_id');
+Route::group(['middleware' => ['server']],function (){
 
-        // Server Network Update
-        Route::post('/sunucu/network', 'ServerController@network')->name('server_network')
-                ->middleware('parameters:ip,cidr,gateway,interface,password');
+    // Extension' Server' Home Route
 
-        // Server Hostname Update
-        Route::post('/sunucu/hostname', 'ServerController@hostname')->name('server_hostname')->middleware('parameters:hostname');
+    Route::get('/l/{extension_id}/{city}/{server_id}', 'ExtensionController@server')->name('extension_server');
 
-        // Server Service Run,Stop,Enable,Disable Route
-        Route::post('/sunucu/servis', 'ServerController@service')->name('server_service')->middleware('parameters:extension_id,action');
+    // Extension' Server' Any Route Handler
 
-        // Server Extension Installation Route
-        Route::post('/sunucu/eklenti', 'ServerController@enableExtension')->name('server_extension');
+    Route::get('/l/{extension_id}/{city}/{server_id}/{unique_code}', 'ExtensionController@route')->middleware('script_parameters');
 
+    // Single Server Details Route
+
+    Route::get('/sunucular/{server_id}', 'ServerController@one')->name('server_one');
+
+    // Remove Server Route
+
+    Route::post('/sunucu/sil', 'ServerController@remove')->name('server_remove')->middleware('parameters:server_id');
+
+    // Server Update Route
+
+    Route::post('/sunucu/guncelle', 'ServerController@update')->name('server_update')->middleware('parameters:server_id,name');
+
+    // Server Command Route
+
+    Route::post('/sunucu/calistir', 'ServerController@run')->name('server_run');
+
+    // Server' Service Status Route
+
+    Route::post('/sunucu/kontrol', 'ServerController@check')->name('server_check')->middleware('parameters:extension_id,server_id');
+
+    // Server Network Update
+
+    Route::post('/sunucu/network', 'ServerController@network')->name('server_network')->middleware('parameters:ip,cidr,gateway,interface,password');
+
+    // Server Hostname Update
+
+    Route::post('/sunucu/hostname', 'ServerController@hostname')->name('server_hostname')->middleware('parameters:hostname');
+
+    // Server Service Run,Stop,Enable,Disable Route
+
+    Route::post('/sunucu/servis', 'ServerController@service')->name('server_service')->middleware('parameters:extension_id,action');
+
+    // Server Extension Installation Route
+
+    Route::post('/sunucu/eklenti', 'ServerController@enableExtension')->name('server_extension');
     });
 
-    // SSH Key List Route
-    Route::get('/anahtarlar','SshController@index')->name('keys');
+// SSH Key List Route
 
-    // SSH Key Add Route
-    Route::post('/anahtar/ekle','SshController@add')->name('key_add');
+Route::get('/anahtarlar', 'SshController@index')->name('keys');
 
-    // User Details Route
-    Route::get('/kullanici/{user_id}','UserController@one')->name('user');
+// SSH Key Add Route
 
-    // Script List Route
-    Route::get('/betikler', 'ScriptController@index')->name('scripts');
+Route::post('/anahtar/ekle', 'SshController@add')->name('key_add');
 
-    // Script Add View Route
-    Route::get('/betik/ekle', 'ScriptController@add')->name('script_add');
+// User Details Route
 
-    // Script Add Route
-    Route::post('/betik/ekle', 'ScriptController@create')->name('script_create');
+Route::get('/kullanici/{user_id}', 'UserController@one')->name('user');
 
-    // Script Details Route
-    Route::get('/betik/{script_id}' , 'ScriptController@one')->name('script_one');
+// Script List Route
 
-    // Script Run Route
-    Route::post('/betik/calistir', 'ServerController@runScript')->name('script_run');
+Route::get('/betikler', 'ScriptController@index')->name('scripts');
 
-    // Script Upload Route
-    Route::post('/betik/yukle', 'ScriptController@upload')->name('script_upload');
+// Script Add View Route
 
-    // Extension Page (City Select) Route
-    Route::get('/l/{extension_id}', 'ExtensionController@index')->name('extension_id');
+Route::get('/betik/ekle', 'ScriptController@add')->name('script_add');
 
-    // Extension City Servers Route
-    Route::get('/l/{extension_id}/{city}', 'ExtensionController@city')->name('extension_city');
+// Script Add Route
 
-    // Settings Route
-    Route::get('/ayarlar', 'SettingsController@index')->name('settings');
+Route::post('/betik/ekle', 'ScriptController@create')->name('script_create');
 
-    // Extensions List Route
-    Route::get('/eklentiler' , 'ExtensionController@settings')->name('extensions_settings');
+// Script Details Route
 
-    // Extension Details Route
-    Route::get('/eklentiler/{extension_id}','ExtensionController@one')->name('extension_one');
+Route::get('/betik/{script_id}', 'ScriptController@one')->name('script_one');
 
-    // Extension Management Route
-    Route::post('/extension/{job}','ExtensionController@route')->name('extension_api')->middleware('script_parameters');
-    
-    // My Requests Route
-    Route::get('/taleplerim','HomeController@all')->name('request_permission');
+// Script Run Route
 
-    // Send Request Route
-    Route::post('/talep','HomeController@request')->name('request_send');
+Route::post('/betik/calistir', 'ServerController@runScript')->name('script_run');
 
-    // List All Requests Route
-    Route::get('/talepler','PermissionController@all')->name('request_list');
+// Script Upload Route
 
-    // Request Details Page
-    Route::get('/talep/{request_id}','PermissionController@one')->name('request_one');
-});
+Route::post('/betik/yukle', 'ScriptController@upload')->name('script_upload');
+
+// Extension Page (City Select) Route
+
+Route::get('/l/{extension_id}', 'ExtensionController@index')->name('extension_id');
+
+// Extension City Servers Route
+
+Route::get('/l/{extension_id}/{city}', 'ExtensionController@city')->name('extension_city');
+
+// Settings Route
+
+Route::get('/ayarlar', 'SettingsController@index')->name('settings');
+
+// Extensions List Route
+
+Route::get('/eklentiler', 'ExtensionController@settings')->name('extensions_settings');
+
+// Extension Details Route
+
+Route::get('/eklentiler/{extension_id}', 'ExtensionController@one')->name('extension_one');
+
+// Extension Management Route
+
+Route::post('/extension/{job}', 'ExtensionController@route')->name('extension_api')->middleware('script_parameters');
+
+// My Requests Route
+
+Route::get('/taleplerim', 'HomeController@all')->name('request_permission');
+
+// Send Request Route
+
+Route::post('/talep', 'HomeController@request')->name('request_send');
+
+// List All Requests Route
+
+Route::get('/talepler', 'PermissionController@all')->name('request_list');
+
+// Request Details Page
+
+Route::get('/talep/{request_id}', 'PermissionController@one')->name('request_one');

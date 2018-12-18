@@ -1,7 +1,22 @@
-@if(is_array($file))
-    @each('__system__.dropdown',$file,'file')
-@else
-    <a href="#" class="list-group-item list-group-item-action" onclick="details()">{{$file}}</a>
-@endif
+@foreach ($files as $key => $file)
+    @if(is_string($key))
+        <hr><li><div class="btn-group dropright">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{$key}}</button>
+            <ul class="dropdown-menu">
+                @foreach ($files[$key] as $key2 => $file)
+                 {{--  @if(is_array($files[$key][$key2]))
+                        @include('__system__.dropdown',$file)
+                    @else--}}
+                    <a onclick="details()">{{$files[$key][$key2]}}</a>
+        {{--  @endif--}}
+                 @endforeach
+             </ul>
+            </div>
+            </li>
+            @else
+        <hr><li> <a class="btn btn-default glyphicon glyphicon-hand-up" onclick="details()">{{$file}}</a></li>
+            @endif
+            @endforeach
+
 
 

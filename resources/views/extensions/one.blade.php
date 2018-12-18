@@ -5,28 +5,33 @@
         <h2>{{$extension->name}} Ayarları</h2>
     </div>
 
-    <div class="row">
+    <div class="row" >
         <div class="col-3">
-        <li class="dropdown">
+            <li class="dropdown">
             <a href="#" data-toggle="dropdown">Files<i class="icon-arrow"></i></a>
-            <ul class="dropdown-menu">
-                <li>@each('__system__.dropdown',$files,'file')</li>
-            </ul>
-        </li>
+                <ul class="dropdown-menu">
+                @include('__system__.dropdown',$files)
+                </ul>
+            </li>
         </div>
-        <div class="col-9">
+        <div class="col-9 " >
             <div class="form-group">
-                <div class="card">
-                    <buttton id="ekle"class="btn btn-success">ekle</buttton>
+                <div class="card hidden" id="scripts">
+                    @include('modal-button',[
+                 "class" => "btn-success",
+                 "target_id" => "ekle",
+                 "text" => "Betik Ekle"
+                ])
                     <table class="table">
                         <thead>
                         <tr>
                             <th scope="col">Script Adı</th>
                             <th scope="col">Script Description</th>
+                            <th scope="col">Betik Sil</th>
                         </tr>
                         </thead>
                         <tbody>
-                        @each('__system__.content',$scripts,'scripts')
+                            @include('__system__.content', ['scripts' => $scripts,'extension'=>$extension])
                         </tbody>
                     </table>
                 </div>
@@ -36,7 +41,8 @@
 
     <script>
         function details() {
-
+            var x = document.getElementById("scripts");
+            x.className = "card";
            //$('.list-group-item').removeClass('active');$("#" + id).addClass('active')
         }
     </script>
@@ -45,7 +51,22 @@
           "title" => "Betik Ekleme",
           "url" => route('server_update'),
           "next" => "reload",
+            "selects" => [
+            "Alan Ekle:5c0a170f7b57f19953126e37" => [
 
-          "submit_text" => "Düzenle"
+            ],
+            "Ters Alan Ekle:5c0a1c5f7b57f19953126e38" => [
+
+            ],
+             "Dns Detayları:5c0a1c5f7b57f19953126e38" => [
+
+            ],
+        ],
+        "inputs" => [
+            "Açıklama" => "aciklama:text",
+            "Extension Id:$extension->id" => "extension_id:hidden",
+            //"Script Id:$script->id" => "script_id:hidden",
+        ],
+          "submit_text" => "Ekle"
       ])
 @endsection
