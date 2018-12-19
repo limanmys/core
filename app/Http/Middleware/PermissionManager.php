@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
-use App\Extension;
 use Illuminate\Support\Facades\Log;
 
 class PermissionManager
@@ -12,14 +11,14 @@ class PermissionManager
     // Main Function of Middleware
     public function handle($request, Closure $next)
     {
-        Log::error(Auth::id() . " giris yapti.");
+
         // Ignore this middleware if user is not authenticated at all.
-        if(Auth::check() == false){
+        if(!\Auth::check()){
             return $next($request);
         }
 
         // Get User Permissions.
-        $permissions = Auth::user()->permissions();
+        $permissions = \Auth::user()->permissions();
 
         // If there's not any permission and user is not admin, throw error.
         if($permissions == null && Auth::user()->isAdmin() == false){
@@ -30,7 +29,7 @@ class PermissionManager
         $request->request->add(['permissions' => $permissions]);
 
         // If simply admin, allow request.
-        if(Auth::user()->isAdmin()){
+        if(\Auth::user()->isAdmin()){
             return $next($request);    
         }
 
@@ -40,7 +39,7 @@ class PermissionManager
             "server" => 1,
             "extension" => 1
         ];
-        
+
         // Loop through every validations
         foreach($validations as $target=>$type){
             if($this->verify($target,$type) == false){

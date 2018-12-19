@@ -22,11 +22,11 @@
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
     <span class="navbar-brand col-sm-3 col-md-2 mr-0" style="cursor: default"><span
                 style="line-height: 30px;">{{ __("Liman Sistem Yönetimi") }}</span><i
-                style="cursor: pointer;line-height: 30px;" onclick="navbar(true)"
-                class="float-right fas fa-bars"></i></span>
+                style="cursor: pointer;line-height: 30px;margin-left: 100px;" onclick="navbar(true)"
+                class="fas fa-bars"></i></span>
     @auth
         <input class="form-control form-control-dark w-80" type="text" placeholder="{{ __("Arama") }}"
-               aria-label="{{ __("Arama") }}">
+               aria-label="{{ __("Arama") }}" onkeyup="search();" id="search_input">
     @endauth
     <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
