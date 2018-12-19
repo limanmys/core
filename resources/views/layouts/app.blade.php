@@ -20,10 +20,11 @@
 </head>
 <body style="display: block">
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <span class="navbar-brand col-sm-3 col-md-2 mr-0" style="cursor: default"><span
-                style="line-height: 30px;">{{ __("Liman Sistem Yönetimi") }}</span><i
-                style="cursor: pointer;line-height: 30px;margin-left: 100px;" onclick="navbar(true)"
-                class="fas fa-bars"></i></span>
+    <span class="navbar-brand col-sm-3 col-md-2 mr-0" style="cursor: default">
+        @auth<i
+                style="cursor: pointer;line-height: 30px;margin-left: 7px;margin-right: 2px" onclick="navbar(true)"
+                class="fas fa-bars"></i>@endauth
+        <span style="line-height: 30px;">{{ __("Liman") }}</span></span>
     @auth
         <input class="form-control form-control-dark w-80" type="text" placeholder="{{ __("Arama") }}"
                aria-label="{{ __("Arama") }}" onkeyup="search();" id="search_input">
