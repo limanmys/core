@@ -1,13 +1,35 @@
 function request(url,data,next) {
+
+    let old;
+    let id = null;
+    if(data != null){
+        id = data.getAttribute('id');
+    }
     if(data instanceof FormData === false){
         data = new FormData(data);
     }
+
+    if(id != null){
+
+        // Grab the element.
+        let element = document.getElementById(id);
+
+        //
+        old = element.innerHTML;
+        loading(element,"Yukleniyor");
+    }
     let r = new XMLHttpRequest();
+
     r.open("POST",url);
     r.setRequestHeader('X-CSRF-TOKEN', csrf);
     r.setRequestHeader("Accept","text/json");
-    r.send(data);
+    setTimeout(function () {
+        r.send(data);
+    },1000);
     r.onreadystatechange = function(){
+        if(r.readyState === 4 && id != null){
+            document.getElementById(id).innerHTML = old;
+        }
         if(r.status === 200 && r.readyState === 4){
             return next(r.responseText);
         }
@@ -87,4 +109,12 @@ window.onload = function(){
     navbar(false);
 };
 
+function loading(target_element,message){
+    target_element.innerHTML = document.getElementsByClassName('loading')[0].innerHTML;
+    document.getElementsByClassName('loading_message')[0].innerHTML = message;
+}
+
+window.onbeforeunload = function(){
+  loading(document.getElementsByTagName('main')[0],'');
+};
 let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');

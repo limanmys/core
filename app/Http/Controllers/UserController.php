@@ -13,4 +13,9 @@ class UserController extends Controller
             "user" => $user
         ]);
     }
+
+    public function logout(){
+        \Auth::logout();
+        return 200;
+    }
 }

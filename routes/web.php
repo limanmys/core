@@ -1,6 +1,12 @@
 <?php
 
-Auth::routes();
+Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
+Route::post('login', 'Auth\LoginController@login');
+Route::post('/logout','UserController@logout')->name('logout');
+
+Route::get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
+Route::post('register', 'Auth\RegisterController@register');
+
 
 // Change the language
 Route::post('/locale', 'HomeController@setLocale')->name('set_locale');

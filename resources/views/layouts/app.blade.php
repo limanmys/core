@@ -30,6 +30,11 @@
                aria-label="{{ __("Arama") }}" onkeyup="search();" id="search_input">
     @endauth
     <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap text-white" style="cursor: pointer">
+            {{__("Bildirimler")}}
+        </li>
+    </ul>
+    <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
             <form action="#" onsubmit="return request('/locale',this,reload)" style="cursor: pointer;">
                 @if (Session::get('locale') == "en")
@@ -135,6 +140,20 @@
         </main>
     </div>
     @include('__system__.loading')
+    @include('modal',[
+        "id"=>"notifications",
+        "title" => "Sunucu Ekle",
+        "url" => route('server_add'),
+        "next" => "redirect",
+        "inputs" => [
+            "Adı" => "name:text",
+            "İp Adresi" => "ip_address:text",
+            "Bağlantı Portu" => "port:number",
+            "Anahtar Kullanıcı Adı" => "username:text",
+            "Anahtar Parola" => "password:password"
+        ],
+        "submit_text" => "Ekle"
+    ])
 </div>
 </body>
 </html>
