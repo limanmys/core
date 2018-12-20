@@ -1,13 +1,17 @@
 @foreach($scripts as $script)
-    <tr><td>{{$script->name}}</td>
+    <tr>
+        <td>{{$script->name}}</td>
         <td> {{$script->description}}</td>
+        <?php
+             $random=rand();
+        ?>
         <td> @include('modal-button',[
             "class" => "btn-danger",
-            "target_id" => "delete",
+            "target_id" => "delete".$random,
              "text" => "Betik Sil"
         ])
             @include('modal',[
-           "id"=>"delete",
+           "id"=> "delete".$random,
            "title" => $script->name,
            //"url" => route('server_remove'),
            "text" => "Bu Betik'i silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",

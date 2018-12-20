@@ -7,13 +7,23 @@
 
     <div class="row" >
         <div class="col-3">
-            <li class="dropdown">
-            <a href="#" data-toggle="dropdown">Files<i class="icon-arrow"></i></a>
-                <ul class="dropdown-menu">
-                @include('__system__.dropdown',$files)
-                </ul>
-            </li>
+            <div class="form-group">
+                <div class="card bg-info text-white">
+                    <div class="panel-group" id="accordion1">
+                          <div class="panel panel-default">
+                                 <div class="panel-heading">
+                                     <h4 class="panel-title">
+                                        <a style="text-decoration: none; color: white" data-toggle="collapse" data-parent="#accordion1" href="#collapseOne">Files<i class="arrow down"></i></a>
+                                    </h4>
+                                </div>
+                        <div id="collapseOne" class="panel-collapse collapse in">
+                    <div class="panel-body"> @include('__system__.dropdown',$files)</div>
+                </div>
+            </div>
+          </div>
         </div>
+       </div>
+      </div>
         <div class="col-9 " >
             <div class="form-group">
                 <div class="card hidden" id="scripts">
@@ -48,7 +58,6 @@
            //$('.list-group-item').removeClass('active');$("#" + id).addClass('active')
             console.log(view);
         }
-
     </script>
     @include('modal',[
           "id"=>"ekle",

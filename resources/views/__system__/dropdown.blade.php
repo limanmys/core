@@ -1,23 +1,26 @@
-@foreach ($files as $key => $file)
+@foreach ($files as $key => $files)
     @if(is_string($key))
         <hr>
-        <li>
-            <div class="btn-group dropright">
-                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{$key}}</button>
-            <ul class="dropdown-menu">
-                @foreach ($files[$key] as $key2 => $file)
-                   {{--@if(is_array($files[$key][$key2]))
-                        @include('__system__.dropdown',$files[$key])
-                    @else--}}
-                    <a onclick="details(this)">{{$files[$key][$key2]}}</a>
-        {{--@endif--}}
-                @endforeach
-            </ul>
+            <div class="panel-group" id="accordion2">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <i style="margin:5px; color:#DCDCDC;" class="fa fa-folder" aria-hidden="true"></i>
+                    <a id="deneme1"style="text-decoration: none; color: white" data-toggle="collapse" data-parent="#accordion2" href="#<?php echo $key; ?>">{{$key}}
+                    </a>
+                    <i class="arrow down"></i>
+                </h4>
             </div>
-        </li>
+            <div id="<?php echo $key;?>" class="panel-collapse collapse in">
+                <div class="panel-body"> @include('__system__.dropdown',$files)</div>
+            </div>
+        </div>
+        </div>
     @else
-        <hr><li> <a class="btn btn-default glyphicon glyphicon-hand-up" onclick="details(this)">{{$file}}</a></li>
-        @endif
+        <hr><i style="margin:5px; color: #DCDCDC;"class="fa fa-file" aria-hidden="true"></i>
+            <a class="btn btn-default glyphicon glyphicon-hand-up" onclick="details(this)">{{$files}}</a>
+
+    @endif
 @endforeach
 
 
