@@ -21,3 +21,9 @@ if(!function_exists('controller')){
         return $controller;
     }
 }
+
+if(!function_exists('notifications')){
+    function notifications(){
+        return \App\Notification::where('user_id',Auth::id())->get();
+    }
+}

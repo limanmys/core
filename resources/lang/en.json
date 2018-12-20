@@ -86,5 +86,7 @@
   "Kullanıcı Ekle" : "Add User",
   "Yetki Talepleri" : "Authorization Requests",
   "Sunucuları" : "Servers",
-  "Tüm Sunucular" : "All Servers"
+  "Tüm Sunucular" : "All Servers",
+  "Okunmamış :count mesajınız var." : "You have :count unread messages",
+  "Hiç okunmamış mesajınız yok" : "You have no unread messages"
 }

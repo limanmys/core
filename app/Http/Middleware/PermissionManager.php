@@ -109,6 +109,7 @@ class PermissionManager
                 return false;
             }
         }
+        // TODO add objects to request here.
         return true;
     }
 

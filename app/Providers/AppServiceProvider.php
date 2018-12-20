@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Extension;
+use App\Notification;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
@@ -20,11 +21,7 @@ class AppServiceProvider extends ServiceProvider
         $extensions = Extension::where('status', 0)->get();
         View::share('extensions', $extensions);
         Blade::if('p', function ($target,$id = null) {
-            if(Auth::user()->hasAccess($target,$id)){
-                return true;
-            }else{
-                return false;
-            }
+            return \Auth::user()->hasAccess($target,$id);
         });
     }
 

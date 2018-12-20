@@ -114,7 +114,12 @@ function loading(target_element,message){
     document.getElementsByClassName('loading_message')[0].innerHTML = message;
 }
 
+function showNotifications(){
+
+}
+
 window.onbeforeunload = function(){
   loading(document.getElementsByTagName('main')[0],'');
 };
+
 let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');
