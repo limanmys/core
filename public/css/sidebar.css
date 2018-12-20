@@ -24,9 +24,14 @@
     padding: 20px;
     /*vertical-align: center;*/
 }
-.sidebar-nav li a:hover, .selected {
+.sidebar-nav li a:hover {
     background: white;
     color:black;
     -webkit-transition: background 0.3s;
     transition: background 0.3s;
+}
+
+.nav-selected, .nav-selected i, .nav-selected span{
+    background: white;
+    color:black;
 }

@@ -57,13 +57,13 @@
             <div class="sidebar">
                 <ul class="sidebar-nav">
                     <li>
-                        <a href="{{route('home')}}" class="{{ Request::is(route('home')) ? 'selected' : '' }}">
+                        <a href="{{route('home')}}" class="{{ isCurrentPage('home') ? 'nav-selected' : ''}}">
                             <i class="fas fa-home"></i>&nbsp;
                             <span class="sidebar-name">{{ __("Ana Sayfa") }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{route('servers')}}">
+                        <a href="{{route('servers')}}" class="{{ isCurrentPage('server') ? 'nav-selected' : ''}}">
                             <i class="fas fa-server"></i>&nbsp;
                             <span class="sidebar-name">{{ __("Sunucular") }}</span>
                         </a>
@@ -71,7 +71,7 @@
                     @foreach($extensions as $extension)
                         @p('extension',$extension->_id)
                         <li>
-                            <a href="/l/{{$extension->_id}}">
+                            <a href="/l/{{$extension->_id}}" class="{{ isCurrentPage('extension',$extension->id) ? 'nav-selected' : ''}}">
                                 @if($extension->icon)
                                     <i class="fas fa-{{$extension->icon}}"></i>&nbsp;
                                 @else
@@ -84,21 +84,21 @@
                     @endforeach
                     @p('script')
                     <li>
-                        <a href="{{route('scripts')}}">
+                        <a href="{{route('scripts')}}" class="{{ isCurrentPage('script') ? 'nav-selected' : ''}}">
                             <i class="fas fa-subscript"></i>&nbsp;
                             <span class="sidebar-name">{{ __("Betikler") }}</span>
                         </a>
                     </li>
                     @endp
                     <li>
-                        <a href="{{route('keys')}}">
+                        <a href="{{route('keys')}}" class="{{ isCurrentPage('ssh') ? 'nav-selected' : ''}}">
                             <i class="fas fa-key"></i>&nbsp;
                             <span class="sidebar-name">{{ __("SSH Anahtarları") }}</span>
                         </a>
                     </li>
                     @p('extension_manager')
                     <li>
-                        <a href="{{route('extensions_settings')}}">
+                        <a href="{{route('extensions_settings')}}" class="{{ isCurrentPage('extension') ? 'nav-selected' : ''}}">
                             <i class="fas fa-plus"></i>&nbsp;
                             <span class="sidebar-name">{{ __("Eklentiler") }}</span>
                         </a>
@@ -106,7 +106,7 @@
                     @endp
                     @p('settings')
                     <li>
-                        <a href="{{route('settings')}}">
+                        <a href="{{route('settings')}}" class="{{ \Request::route()->getName() == 'settings' ? 'nav-selected' : ''}}">
                             <i class="fas fa-cog"></i>&nbsp;
                             <span class="sidebar-name">{{ __("Sistem Ayarları") }}</span>
                         </a>
@@ -114,14 +114,14 @@
                     @endp
                     @if(Auth::user()->isAdmin() == false)
                         <li>
-                            <a href="{{route('request_permission')}}">
+                            <a href="{{route('request_permission')}}" class="{{ \Request::route()->getName() == 'request_permission' ? 'nav-selected' : ''}}">
                                 <i class="fas fa-lock"></i>&nbsp;
                                 <span class="sidebar-name">{{ __("Yetki Talebi") }}</span>
                             </a>
                         </li>
                     @else
                         <li>
-                            <a href="{{route('request_list')}}">
+                            <a href="{{route('request_list')}}" class="{{ isCurrentPage('permission') ? 'nav-selected' : ''}}">
                                 <i class="fas fa-lock"></i>&nbsp;
                                 <span class="sidebar-name">{{ __("Yetki Talepleri") }}</span>
                             </a>

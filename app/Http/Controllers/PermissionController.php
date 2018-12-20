@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+
 class PermissionController extends Controller
 {
     public function grant(){
@@ -18,10 +20,9 @@ class PermissionController extends Controller
     }
 
     public function all(){
-        $requests = \App\Request::all();
-        $users = \App\User::all();
+        $requests = \App\LimanRequest::all();
         foreach($requests as $r){
-            $r->user_name = $users->where('_id',$r->user_id)->first()->name;
+            $r->user_name = User::find($r->user_id)->name;
         }
         return view('permission.list',[
             "requests" => $requests
@@ -29,7 +30,7 @@ class PermissionController extends Controller
     }
 
     public function one(){
-        $request = \App\Request::where('_id',request('request_id'))->first();
+        $request = \App\LimanRequest::where('_id',request('permission_id'))->first();
         $request->user_name = \App\User::where('_id',$request->user_id)->first()->name;
         return view('permission.one',[
             "request" => $request

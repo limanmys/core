@@ -136,7 +136,7 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
     Route::get('/taleplerim', 'HomeController@all')->name('request_permission');
 
-// Send Request Route
+// Send LimanRequest Route
 
     Route::post('/talep', 'HomeController@request')->name('request_send');
 
@@ -144,9 +144,9 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
     Route::get('/talepler', 'PermissionController@all')->name('request_list');
 
-// Request Details Page
+// LimanRequest Details Page
 
-    Route::get('/talep/{request_id}', 'PermissionController@one')->name('request_one');
+    Route::get('/talep/{permission_id}', 'PermissionController@one')->name('request_one');
 
 
 // Search Page
