@@ -8,12 +8,12 @@
     <div class="row" >
         <div class="col-3">
             <div class="form-group">
-                <div class="card bg-info text-white">
+                <div class="card bg-dark text-white">
                     <div class="panel-group" id="accordion1">
                           <div class="panel panel-default">
                                  <div class="panel-heading">
                                      <h4 class="panel-title">
-                                        <a style="text-decoration: none; color: white" data-toggle="collapse" data-parent="#accordion1" href="#collapseOne">Files<i class="arrow down"></i></a>
+                                        <a style="margin:10px;text-decoration: none; color: white" data-toggle="collapse" data-parent="#accordion1" href="#collapseOne">Files<i class="arrow down"></i></a>
                                     </h4>
                                 </div>
                         <div id="collapseOne" class="panel-collapse collapse in">
@@ -50,6 +50,7 @@
     </div>
 
     <script>
+        //Todo Take Current View
         view="";
         function details(event) {
             view=event.text;
