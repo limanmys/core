@@ -115,23 +115,42 @@ class ExtensionController extends Controller
         // Filters servers for permissions.
         $servers = Server::filterPermissions($servers);
 
+        // Get Extension Name
+        $extension = Extension::where('_id',request('extension_id'))->first();
+
         return view('feature.city', [
-            "servers" => $servers
+            "servers" => $servers,
+            "name" => $extension->name
         ]);
     }
 
     public function server()
     {
+        // Retrieve Extension from middleware. TODO retrieve extension from middleware.
         $extension = Extension::where('_id', \request('extension_id'))->first();
-        $scripts = Script::where('extensions', 'like', $extension->name)->get();
+
+        // Get extension scripts
+        $scripts = Script::extension($extension->name);
+
+        // Get server object from middleware.
         $server = \request('server');
         $outputs = [];
+
+        // Go through each required scripts and run each of them.
         foreach ($extension->views["index"] as $unique_code) {
+
+            // Get Script
             $script = $scripts->where('unique_code', $unique_code)->first();
+
+            // Run Script with no parameters.
             $output = $server->runScript($script, '');
+
+            // Decode output and set it into outputs array.
             $output = str_replace('\n', '', $output);
             $outputs[$unique_code] = json_decode($output, true);
         }
+
+        // Return all required parameters.
         return view('feature.server', [
             "extension" => $extension,
             "scripts" => $scripts,
@@ -143,9 +162,14 @@ class ExtensionController extends Controller
 
     public function route()
     {
+        // Get Extension from Middleware
         $extension = request('extension');
-        $scripts = Script::where('extensions', 'like', '%' . $extension->name . '%')->get();
+
+        // Get Scripts of extension.
+        $scripts = Script::extension($extension->name);
         $outputs = [];
+
+        // Go through each required scripts of page and run them with proper parameters.
         foreach (\request('scripts') as $script) {
             $parameters = '';
             foreach (explode(',', $script->inputs) as $input) {
