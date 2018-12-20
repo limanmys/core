@@ -19,7 +19,7 @@
             "Adı" => "name:text",
             "Açıklama" => "description:text",
             "Versiyon" => "version:number",
-            "Eklenti:extesions" => [
+            "Eklenti:extensions" => [
                 "Sunucu" => "server",
                 "DNS" => "dns"
             ],
@@ -29,10 +29,14 @@
                 "Ekleme" => "2:1",
                 "Silme" => "2:2"
             ],
-            "Destekleyen" => "authors:text",
+            "Root Yetkisi:root" => [
+                "Gerekli" => "1",
+                "Gereksiz" => "0"
+            ],
             "Destek Maili" => "support_email:email",
             "Kurum" => "company:text",
-            "Benzersiz Isim" => "unique_code:text"
+            "Benzersiz Isim" => "unique_code:text",
+            "Regex" => "regex:text"
         ],
         "submit_text" => "Kaydet"
     ])
@@ -60,12 +64,11 @@
     </div>
         <div class="form-group">
           <label class="h4">Betik Kodu</label>
-          <textarea id="code" class="form-control"rows="15"></textarea>
+          <textarea id="code" class="form-control" rows="15"></textarea>
         </div>
         <button class="btn btn-success" onclick="add()">Betiği Oluştur</button>
     <script>
         var inputs = [];
-        var formq = null;
         function settings(){
             document.querySelector('[aria-label="Close"]').click();
             return false;
@@ -94,7 +97,7 @@
             var form = new FormData(document.getElementById("settings_form"));
             form.append('inputs',inputs.join(','));
             form.append('code',document.getElementById('code').value);
-            request("{{route('script_create')}}",form);
+            request("{{route('script_create')}}",form,redirect);
         }
     </script>
 @endsection

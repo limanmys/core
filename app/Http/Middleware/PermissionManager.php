@@ -5,12 +5,14 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use App\Extension;
+use Illuminate\Support\Facades\Log;
 
 class PermissionManager
 {
     // Main Function of Middleware
     public function handle($request, Closure $next)
     {
+        Log::error(Auth::id() . " giris yapti.");
         // Ignore this middleware if user is not authenticated at all.
         if(Auth::check() == false){
             return $next($request);

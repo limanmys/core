@@ -129,7 +129,7 @@ Route::get('/eklentiler/{extension_id}', 'ExtensionController@one')->name('exten
 
 // Extension Management Route
 
-Route::post('/extension/{job}', 'ExtensionController@route')->name('extension_api')->middleware('script_parameters');
+Route::post('/extension/{unique_code}', 'ExtensionController@route')->name('extension_api')->middleware(['server','script_parameters']);
 
 // My Requests Route
 

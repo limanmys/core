@@ -69,6 +69,7 @@ body {
 [role="main"] {
     padding-top: 48px; /* Space for fixed navbar */
 }
+
 #inputs span{
     border:1px solid black;
     border-radius: 10px;
@@ -77,14 +78,11 @@ body {
     font-size: 20px;
 }
 .number{
-    background-color : #5cb85c;
+    background-color : blue;
 }
 .string{
-    background-color : #428bca;
+    background-color : pink;
 }
-/*
- * Navbar
- */
 
 .navbar-brand {
     padding-top: .75rem;
