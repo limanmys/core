@@ -1,9 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-
     @include('title',[
-        "title" => "Sunucular"
+        "title" => "Tüm Sunucular"
     ])
     @include('modal-button',[
         "class" => "btn-success",

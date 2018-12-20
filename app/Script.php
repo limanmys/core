@@ -84,4 +84,8 @@ class Script extends Eloquent
         }
         return $script;
     }
+
+    public static function extension($name){
+        return Script::where('extensions', 'like', '%' . $name . '%')->get();
+    }
 }

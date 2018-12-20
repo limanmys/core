@@ -7808,7 +7808,7 @@ namespace Illuminate\Support\Facades {
         }
         
         /**
-         * Return the Request instance.
+         * Return the LimanRequest instance.
          *
          * @return $this 
          * @static 
@@ -8322,7 +8322,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function initialize($query = array(), $request = array(), $attributes = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::initialize($query, $request, $attributes, $cookies, $files, $server, $content);
         }
         
@@ -8334,12 +8334,12 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function createFromGlobals()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::createFromGlobals();
         }
         
         /**
-         * Creates a Request based on a given URI and configuration.
+         * Creates a LimanRequest based on a given URI and configuration.
          * 
          * The information contained in the URI always take precedence
          * over the other information (server and parameters).
@@ -8356,14 +8356,14 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::create($uri, $method, $parameters, $cookies, $files, $server, $content);
         }
         
         /**
-         * Sets a callable able to create a Request instance.
+         * Sets a callable able to create a LimanRequest instance.
          * 
-         * This is mainly useful when you need to override the Request class
+         * This is mainly useful when you need to override the LimanRequest class
          * to keep BC with an existing system. It should not be used for any
          * other purpose.
          *
@@ -8372,7 +8372,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function setFactory($callable)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::setFactory($callable);
         }
         
@@ -8386,7 +8386,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function overrideGlobals()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::overrideGlobals();
         }
         
@@ -8396,13 +8396,13 @@ namespace Illuminate\Support\Facades {
          * You should only list the reverse proxies that you manage directly.
          *
          * @param array $proxies A list of trusted proxies
-         * @param int $trustedHeaderSet A bit field of Request::HEADER_*, to set which headers to trust from your proxies
+         * @param int $trustedHeaderSet A bit field of LimanRequest::HEADER_*, to set which headers to trust from your proxies
          * @throws \InvalidArgumentException When $trustedHeaderSet is invalid
          * @static 
          */ 
         public static function setTrustedProxies($proxies, $trustedHeaderSet)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::setTrustedProxies($proxies, $trustedHeaderSet);
         }
         
@@ -8414,19 +8414,19 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getTrustedProxies()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getTrustedProxies();
         }
         
         /**
          * Gets the set of trusted headers from trusted proxies.
          *
-         * @return int A bit field of Request::HEADER_* that defines which headers are trusted from your proxies
+         * @return int A bit field of LimanRequest::HEADER_* that defines which headers are trusted from your proxies
          * @static 
          */ 
         public static function getTrustedHeaderSet()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getTrustedHeaderSet();
         }
         
@@ -8440,7 +8440,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function setTrustedHosts($hostPatterns)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::setTrustedHosts($hostPatterns);
         }
         
@@ -8452,7 +8452,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getTrustedHosts()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getTrustedHosts();
         }
         
@@ -8463,12 +8463,12 @@ namespace Illuminate\Support\Facades {
          * have consistent escaping and unneeded delimiters are removed.
          *
          * @param string $qs Query string
-         * @return string A normalized query string for the Request
+         * @return string A normalized query string for the LimanRequest
          * @static 
          */ 
         public static function normalizeQueryString($qs)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::normalizeQueryString($qs);
         }
         
@@ -8487,7 +8487,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function enableHttpMethodParameterOverride()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::enableHttpMethodParameterOverride();
         }
         
@@ -8499,7 +8499,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getHttpMethodParameterOverride()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getHttpMethodParameterOverride();
         }
         
@@ -8512,7 +8512,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function hasPreviousSession()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::hasPreviousSession();
         }
         
@@ -8520,15 +8520,15 @@ namespace Illuminate\Support\Facades {
          * Whether the request contains a Session object.
          * 
          * This method does not give any information about the state of the session object,
-         * like whether the session is started or not. It is just a way to check if this Request
+         * like whether the session is started or not. It is just a way to check if this LimanRequest
          * is associated with a Session instance.
          *
-         * @return bool true when the Request contains a Session object, false otherwise
+         * @return bool true when the LimanRequest contains a Session object, false otherwise
          * @static 
          */ 
         public static function hasSession()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::hasSession();
         }
         
@@ -8540,7 +8540,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function setSession($session)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::setSession($session);
         }
         
@@ -8552,7 +8552,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function setSessionFactory($factory)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::setSessionFactory($factory);
         }
         
@@ -8571,7 +8571,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getClientIps()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getClientIps();
         }
         
@@ -8591,7 +8591,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getClientIp()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getClientIp();
         }
         
@@ -8603,7 +8603,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getScriptName()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getScriptName();
         }
         
@@ -8624,7 +8624,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getPathInfo()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getPathInfo();
         }
         
@@ -8643,7 +8643,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getBasePath()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getBasePath();
         }
         
@@ -8660,7 +8660,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getBaseUrl()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getBaseUrl();
         }
         
@@ -8672,7 +8672,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getScheme()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getScheme();
         }
         
@@ -8689,7 +8689,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getPort()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getPort();
         }
         
@@ -8701,7 +8701,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getUser()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getUser();
         }
         
@@ -8713,7 +8713,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getPassword()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getPassword();
         }
         
@@ -8725,7 +8725,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getUserInfo()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getUserInfo();
         }
         
@@ -8739,7 +8739,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getHttpHost()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getHttpHost();
         }
         
@@ -8751,7 +8751,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getRequestUri()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getRequestUri();
         }
         
@@ -8766,20 +8766,20 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getSchemeAndHttpHost()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getSchemeAndHttpHost();
         }
         
         /**
-         * Generates a normalized URI (URL) for the Request.
+         * Generates a normalized URI (URL) for the LimanRequest.
          *
-         * @return string A normalized URI (URL) for the Request
+         * @return string A normalized URI (URL) for the LimanRequest
          * @see getQueryString()
          * @static 
          */ 
         public static function getUri()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getUri();
         }
         
@@ -8792,12 +8792,12 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getUriForPath($path)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getUriForPath($path);
         }
         
         /**
-         * Returns the path as relative reference from the current Request path.
+         * Returns the path as relative reference from the current LimanRequest path.
          * 
          * Only the URIs path component (no schema, host etc.) is relevant and must be given.
          * Both paths must be absolute and not contain relative parts.
@@ -8817,22 +8817,22 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getRelativeUriForPath($path)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getRelativeUriForPath($path);
         }
         
         /**
-         * Generates the normalized query string for the Request.
+         * Generates the normalized query string for the LimanRequest.
          * 
          * It builds a normalized query string, where keys/value pairs are alphabetized
          * and have consistent escaping.
          *
-         * @return string|null A normalized query string for the Request
+         * @return string|null A normalized query string for the LimanRequest
          * @static 
          */ 
         public static function getQueryString()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getQueryString();
         }
         
@@ -8849,7 +8849,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function isSecure()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::isSecure();
         }
         
@@ -8867,7 +8867,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getHost()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getHost();
         }
         
@@ -8879,7 +8879,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function setMethod($method)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::setMethod($method);
         }
         
@@ -8900,7 +8900,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getMethod()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getMethod();
         }
         
@@ -8913,7 +8913,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getRealMethod()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getRealMethod();
         }
         
@@ -8926,7 +8926,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getMimeType($format)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getMimeType($format);
         }
         
@@ -8939,7 +8939,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getMimeTypes($format)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getMimeTypes($format);
         }
         
@@ -8952,7 +8952,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getFormat($mimeType)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getFormat($mimeType);
         }
         
@@ -8965,7 +8965,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function setFormat($format, $mimeTypes)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::setFormat($format, $mimeTypes);
         }
         
@@ -8984,7 +8984,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getRequestFormat($default = 'html')
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getRequestFormat($default);
         }
         
@@ -8996,7 +8996,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function setRequestFormat($format)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::setRequestFormat($format);
         }
         
@@ -9008,7 +9008,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getContentType()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getContentType();
         }
         
@@ -9020,7 +9020,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function setDefaultLocale($locale)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::setDefaultLocale($locale);
         }
         
@@ -9032,7 +9032,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getDefaultLocale()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getDefaultLocale();
         }
         
@@ -9044,7 +9044,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function setLocale($locale)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::setLocale($locale);
         }
         
@@ -9056,7 +9056,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getLocale()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getLocale();
         }
         
@@ -9069,7 +9069,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function isMethod($method)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::isMethod($method);
         }
         
@@ -9083,7 +9083,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function isMethodSafe()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::isMethodSafe();
         }
         
@@ -9095,7 +9095,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function isMethodIdempotent()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::isMethodIdempotent();
         }
         
@@ -9108,7 +9108,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function isMethodCacheable()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::isMethodCacheable();
         }
         
@@ -9126,7 +9126,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getProtocolVersion()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getProtocolVersion();
         }
         
@@ -9140,7 +9140,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getContent($asResource = false)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getContent($asResource);
         }
         
@@ -9152,7 +9152,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getETags()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getETags();
         }
         
@@ -9164,7 +9164,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function isNoCache()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::isNoCache();
         }
         
@@ -9177,7 +9177,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getPreferredLanguage($locales = null)
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getPreferredLanguage($locales);
         }
         
@@ -9189,7 +9189,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getLanguages()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getLanguages();
         }
         
@@ -9201,7 +9201,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getCharsets()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getCharsets();
         }
         
@@ -9213,7 +9213,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getEncodings()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getEncodings();
         }
         
@@ -9225,7 +9225,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getAcceptableContentTypes()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::getAcceptableContentTypes();
         }
         
@@ -9241,7 +9241,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function isXmlHttpRequest()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::isXmlHttpRequest();
         }
         
@@ -9256,7 +9256,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function isFromTrustedProxy()
         {
-            //Method inherited from \Symfony\Component\HttpFoundation\Request            
+            //Method inherited from \Symfony\Component\HttpFoundation\LimanRequest
             return \Illuminate\Http\Request::isFromTrustedProxy();
         }
         
