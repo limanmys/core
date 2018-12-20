@@ -40,11 +40,15 @@
     </div>
 
     <script>
-        function details() {
+        view="";
+        function details(event) {
+            view=event.text;
             var x = document.getElementById("scripts");
             x.className = "card";
            //$('.list-group-item').removeClass('active');$("#" + id).addClass('active')
+            console.log(view);
         }
+
     </script>
     @include('modal',[
           "id"=>"ekle",
