@@ -71,6 +71,18 @@ function navbar(flag) {
     }
 }
 
+function search(){
+    let search_input = document.getElementById('search_input');
+    if(search_input.value === ""){
+        return;
+    }
+    let data = new FormData();
+    data.append('text',search_input.value);
+    request('arama',data,function(response){
+        console.log(response);
+    });
+}
+
 window.onload = function(){
     navbar(false);
 };

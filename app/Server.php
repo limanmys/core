@@ -111,4 +111,30 @@ class Server extends Eloquent
             return $key;
         }
     }
+
+    public static function filterPermissions($raw_servers){
+        // Ignore permissions if user is admin.
+        if(\Auth::user()->isAdmin()){
+            return $raw_servers;
+        }
+
+        // Get permissions from middleware.
+        $permissions = request('permissions');
+
+        // Create new array for permitted servers
+        $servers = [];
+
+        // Loop through each server and add permitted ones in servers array.
+        foreach ($raw_servers as $server){
+            if(in_array($server->_id, $permissions->server)){
+                array_push($servers,$server);
+            }
+        }
+        return $servers;
+    }
+
+    public static function getAll($coloumns = []){
+        $servers = Server::all($coloumns);
+        return Server::filterPermissions($servers);
+    }
 }
