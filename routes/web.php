@@ -1,6 +1,12 @@
 <?php
 
-Auth::routes();
+Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
+Route::post('login', 'Auth\LoginController@login');
+Route::post('/logout','UserController@logout')->name('logout');
+
+Route::get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
+Route::post('register', 'Auth\RegisterController@register');
+
 
 // Change the language
 Route::post('/locale', 'HomeController@setLocale')->name('set_locale');
@@ -136,7 +142,7 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
     Route::get('/taleplerim', 'HomeController@all')->name('request_permission');
 
-// Send Request Route
+// Send LimanRequest Route
 
     Route::post('/talep', 'HomeController@request')->name('request_send');
 
@@ -144,9 +150,9 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
     Route::get('/talepler', 'PermissionController@all')->name('request_list');
 
-// Request Details Page
+// LimanRequest Details Page
 
-    Route::get('/talep/{request_id}', 'PermissionController@one')->name('request_one');
+    Route::get('/talep/{permission_id}', 'PermissionController@one')->name('request_one');
 
 
 // Search Page

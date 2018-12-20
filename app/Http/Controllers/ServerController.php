@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Extension;
 use App\Key;
+use App\Mail\BasicNotification;
+use App\Notification;
 use App\Script;
 use App\Permission;
 use App\Server;
@@ -33,7 +35,7 @@ class ServerController extends Controller
         $server->user_id = Auth::id();
         $server->extensions = [];
         $server->save();
-        $output = Key::init(request('username'), request('password'), request('ip_address'),
+        Key::init(request('username'), request('password'), request('ip_address'),
             request('port'), Auth::id());
         $key = new Key($data);
         $key->server_id = $server->id;
@@ -203,6 +205,9 @@ class ServerController extends Controller
 
     public function update()
     {
+        Notification::new("Testing","server_add",
+            "Server Adi Basariyla Guncellendi : " . \request('name'));
+
         $output = request('server')->update([
             "name" => request('name')
         ]);

@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">{{ __('Sunucular') }}</h1>
+        <h1 class="h2">{{$name}} {{ __('Sunucuları') }}</h1>
     </div>
     <button class="btn btn-success" onclick="history.back();">{{ __('Geri Dön') }}</button><br><br>
     <table class="table">

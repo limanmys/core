@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class HomeController extends Controller
 {
     /**
@@ -43,14 +41,14 @@ class HomeController extends Controller
     }
 
     public function all(){
-        $requests = \App\Request::where('user_id',\Auth::id())->get();
+        $requests = \App\LimanRequest::where('user_id',\Auth::id())->get();
         return view('permission.all',[
             "requests" => $requests
         ]);
     }
 
     public function request(){
-        $req = new \App\Request();
+        $req = new \App\LimanRequest();
         $req->user_id = \Auth::id();
         $req->email = \Auth::user()->email;
         $req->note = request('note');

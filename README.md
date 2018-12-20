@@ -19,7 +19,7 @@ sudo git clone https://github.com/mertcelen/liman.git /var/www/liman
 echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu xenial main" | sudo tee /etc/apt/sources.list.d/ondrej.list
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 4F4EA0AAE5267A6C
 sudo apt update
-sudo apt install php php-fpm composer php-mongodb php-ldap php-mbstring php-xml php-zıp
+sudo apt install php php-fpm composer php-mongodb php-ldap php-mbstring php-xml php-zip
 ```
 
 ##### Nginx Kurulumu
