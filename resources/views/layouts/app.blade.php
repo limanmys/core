@@ -1,3 +1,6 @@
+@auth
+    @php($notifications = notifications())
+@endauth
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -28,12 +31,35 @@
     @auth
         <input class="form-control form-control-dark w-80" type="text" placeholder="{{ __("Arama") }}"
                aria-label="{{ __("Arama") }}" onkeyup="search();" id="search_input">
-    @endauth
-    <ul class="navbar-nav px-3">
-        <li class="nav-item text-nowrap text-white" style="cursor: pointer">
-            {{__("Bildirimler")}}
-        </li>
+
+    <ul class="px-3 dropdown" style="list-style: none;margin-bottom:0px">
+        <span class="px-3 text-white" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;">
+            @if(count($notifications) > 0)
+                <i class="fas fa-bell"></i>
+            @else
+                <i class="far fa-bell"></i>
+            @endif
+            {{count($notifications)}}
+        </span>
+        <ul class="dropdown-menu shadow-lg border-dark" style="width: 300px;margin-left: -100px;">
+            @if(count($notifications))
+                <li class="header" style="margin:15px;">{{__("Okunmamış :count mesajınız var.",["count" => count($notifications)])}}</li>
+            @else
+                <li class="header" style="margin:15px;">{{__("Hiç okunmamış mesajınız yok")}}</li>
+            @endif
+
+            <li>
+                <ul class="menu" style="list-style: none">
+                    @foreach($notifications->take(5) as $notification)
+                        <li style="border:1px solid grey;border-radius: 5px;padding:10px;margin:20px;margin-left: -20px;">
+                            {{$notification->title}}
+                        </li>
+                    @endforeach
+                </ul>
+            </li>
+        </ul>
     </ul>
+    @endauth
     <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
             <form action="#" onsubmit="return request('/locale',this,reload)" style="cursor: pointer;">
