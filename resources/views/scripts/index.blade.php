@@ -2,7 +2,7 @@
 
 @section('content')
     @include('title',[
-        "title" => "Betikler"        
+        "title" => "Betikler"
     ])
     <button type="button" class="btn btn-success" onclick="window.location.href = '{{route('script_add')}}'">
         {{ __("Betik Oluştur") }}
@@ -38,5 +38,5 @@
         @endforeach
         </tbody>
     </table>
-     
+
 @endsection

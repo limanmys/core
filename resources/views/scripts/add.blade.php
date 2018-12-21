@@ -41,25 +41,26 @@
         "submit_text" => "Kaydet"
     ])
     <div class="form-row align-items-center">
-        <div class="col-auto">
-            <label class="h4">Input Adı</label>
-            <input id="i_name" class="form-control">
+        <div class="form-row">
+        <div class="col">
+
+            <input placeholder="Input Adı" id="i_name" class="form-control">
         </div>
-        <div class="col-auto">
-            <label class="h4">Türü</label>
+        <div class="col">
+
             <select id="i_type" class="form-control">
                 <option value="string">Yazı</option>
                 <option value="number">Sayı</option>
             </select>
         </div>
-        <div class="col-auto">
-            <label class="h4">&nbsp;</label>
-            <button class="btn btn-primary mb-2" onclick="addInput()">Ekle</button>
+        <div class="col">
+            <button class="btn btn-primary" onclick="addInput()">Ekle</button>
+        </div>
         </div>
     </div>
     <br>
     <div id="inputs">
-        
+
     </div>
         <div class="form-group">
           <label class="h4">Betik Kodu</label>
