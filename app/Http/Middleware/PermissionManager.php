@@ -116,7 +116,7 @@ class PermissionManager
     // Check if Controller is in ignored list.
     private function verifyController(){
         $controller = $this->controller();
-        $ignore_list = ["home","ssh","server"];
+        $ignore_list = ["home","ssh","server","notification"];
         if($this->checkArray($controller) == false && in_array($controller,$ignore_list) == false){
             return false;
         }else{

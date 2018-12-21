@@ -9,4 +9,6 @@
         {{$stats}}
     </pre>
 
+    <button onclick="checkNotifications()">Bildirimleri Al</button>
+
 @endsection
