@@ -20,8 +20,6 @@ class ServerController extends Controller
     {
         // Retrieve all servers.
         $servers = Server::getAll();
-        // Filters servers for permissions.
-//        $servers = Server::filterPermissions($servers);
 
         return view('server.index', [
             "servers" => $servers
@@ -205,8 +203,11 @@ class ServerController extends Controller
 
     public function update()
     {
-        Notification::new("Testing","server_add",
-            "Server Adi Basariyla Guncellendi : " . \request('name'));
+        Notification::new(
+            __("Server Adı Güncellemesi"),
+            "notify",
+            __(":old isimli sunucu adı :new olarak değiştirildi.",["old"=>request('server')->name,"new"=>request('name')])
+        );
 
         $output = request('server')->update([
             "name" => request('name')

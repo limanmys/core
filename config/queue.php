@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('QUEUE_CONNECTION', 'sync'),
+    'default' => env('QUEUE_CONNECTION', 'redis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -35,10 +35,10 @@ return [
         ],
 
         'database' => [
-            'driver' => 'database',
-            'table' => 'jobs',
-            'queue' => 'default',
-            'retry_after' => 90,
+            'driver' => 'mongodb',
+            'table'  => 'jobs',
+            'queue'  => 'default',
+            'expire' => 60,
         ],
 
         'beanstalkd' => [
@@ -79,8 +79,8 @@ return [
     */
 
     'failed' => [
-        'database' => env('DB_CONNECTION', 'mysql'),
-        'table' => 'failed_jobs',
+        'database' => 'mongodb',
+        'table'    => 'failed_jobs',
     ],
 
 ];

@@ -158,4 +158,8 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 // Search Page
 
     Route::post('/arama/','SearchController@index')->name('search');
+
+// Notifications List
+
+    Route::post('/bildirimler','NotificationController@check')->name('user_notifications');
 });

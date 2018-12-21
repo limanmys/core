@@ -31,32 +31,26 @@
     @auth
         <input class="form-control form-control-dark w-80" type="text" placeholder="{{ __("Arama") }}"
                aria-label="{{ __("Arama") }}" onkeyup="search();" id="search_input">
-
     <ul class="px-3 dropdown" style="list-style: none;margin-bottom:0px">
         <span class="px-3 text-white" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;">
             @if(count($notifications) > 0)
-                <i class="fas fa-bell"></i>
+                <i class="fas fa-bell bell"></i>
             @else
                 <i class="far fa-bell"></i>
             @endif
-            {{count($notifications)}}
         </span>
-        <ul class="dropdown-menu shadow-lg border-dark" style="width: 300px;margin-left: -100px;">
-            @if(count($notifications))
-                <li class="header" style="margin:15px;">{{__("Okunmamış :count mesajınız var.",["count" => count($notifications)])}}</li>
-            @else
-                <li class="header" style="margin:15px;">{{__("Hiç okunmamış mesajınız yok")}}</li>
+        <ul class="dropdown-menu shadow-lg border-dark" style="width: 400px;margin-left: -200px;">
+            <form>
+            @if(count($notifications) == 0)
+                <li class="header alert alert-success" style="margin:15px;">{{__("Hiç okunmamış mesajınız yok")}}</li>
             @endif
 
             <li>
-                <ul class="menu" style="list-style: none">
-                    @foreach($notifications->take(5) as $notification)
-                        <li style="border:1px solid grey;border-radius: 5px;padding:10px;margin:20px;margin-left: -20px;">
-                            {{$notification->title}}
-                        </li>
-                    @endforeach
+                <ul id="notificationArea" class="menu" style="list-style: none">
+                    @include('__system__.notifications',$notifications)
                 </ul>
             </li>
+            </form>
         </ul>
     </ul>
     @endauth
@@ -65,10 +59,10 @@
             <form action="#" onsubmit="return request('/locale',this,reload)" style="cursor: pointer;">
                 @if (Session::get('locale') == "en")
                     <input type="hidden" name="locale" value="tr">
-                    <button class="btn btn-link text-white-">TR</button>
+                    <button class="btn btn-link text-white-">English</button>
                 @else
                     <input type="hidden" name="locale" value="en">
-                    <button class="btn btn-link text-white">EN</button>
+                    <button class="btn btn-link text-white">Türkçe</button>
                 @endif
 
             </form>
@@ -88,13 +82,13 @@
             <div class="sidebar">
                 <ul class="sidebar-nav">
                     <li>
-                        <a href="{{route('home')}}" class="{{ isCurrentPage('home') ? 'nav-selected' : ''}}">
+                        <a href="{{route('home')}}">
                             <i class="fas fa-home"></i>&nbsp;
                             <span class="sidebar-name">{{ __("Ana Sayfa") }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{route('servers')}}" class="{{ isCurrentPage('server') ? 'nav-selected' : ''}}">
+                        <a href="{{route('servers')}}">
                             <i class="fas fa-server"></i>&nbsp;
                             <span class="sidebar-name">{{ __("Sunucular") }}</span>
                         </a>
@@ -102,7 +96,7 @@
                     @foreach($extensions as $extension)
                         @p('extension',$extension->_id)
                         <li>
-                            <a href="/l/{{$extension->_id}}" class="{{ isCurrentPage('extension',$extension->id) ? 'nav-selected' : ''}}">
+                            <a href="/l/{{$extension->_id}}">
                                 @if($extension->icon)
                                     <i class="fas fa-{{$extension->icon}}"></i>&nbsp;
                                 @else
@@ -115,21 +109,21 @@
                     @endforeach
                     @p('script')
                     <li>
-                        <a href="{{route('scripts')}}" class="{{ isCurrentPage('script') ? 'nav-selected' : ''}}">
+                        <a href="{{route('scripts')}}">
                             <i class="fas fa-subscript"></i>&nbsp;
                             <span class="sidebar-name">{{ __("Betikler") }}</span>
                         </a>
                     </li>
                     @endp
                     <li>
-                        <a href="{{route('keys')}}" class="{{ isCurrentPage('ssh') ? 'nav-selected' : ''}}">
+                        <a href="{{route('keys')}}">
                             <i class="fas fa-key"></i>&nbsp;
                             <span class="sidebar-name">{{ __("SSH Anahtarları") }}</span>
                         </a>
                     </li>
                     @p('extension_manager')
                     <li>
-                        <a href="{{route('extensions_settings')}}" class="{{ isCurrentPage('extension') ? 'nav-selected' : ''}}">
+                        <a href="{{route('extensions_settings')}}">
                             <i class="fas fa-plus"></i>&nbsp;
                             <span class="sidebar-name">{{ __("Eklentiler") }}</span>
                         </a>
@@ -137,7 +131,7 @@
                     @endp
                     @p('settings')
                     <li>
-                        <a href="{{route('settings')}}" class="{{ \Request::route()->getName() == 'settings' ? 'nav-selected' : ''}}">
+                        <a href="{{route('settings')}}">
                             <i class="fas fa-cog"></i>&nbsp;
                             <span class="sidebar-name">{{ __("Sistem Ayarları") }}</span>
                         </a>
@@ -145,14 +139,14 @@
                     @endp
                     @if(Auth::user()->isAdmin() == false)
                         <li>
-                            <a href="{{route('request_permission')}}" class="{{ \Request::route()->getName() == 'request_permission' ? 'nav-selected' : ''}}">
+                            <a href="{{route('request_permission')}}">
                                 <i class="fas fa-lock"></i>&nbsp;
                                 <span class="sidebar-name">{{ __("Yetki Talebi") }}</span>
                             </a>
                         </li>
                     @else
                         <li>
-                            <a href="{{route('request_list')}}" class="{{ isCurrentPage('permission') ? 'nav-selected' : ''}}">
+                            <a href="{{route('request_list')}}">
                                 <i class="fas fa-lock"></i>&nbsp;
                                 <span class="sidebar-name">{{ __("Yetki Talepleri") }}</span>
                             </a>
@@ -166,20 +160,17 @@
         </main>
     </div>
     @include('__system__.loading')
-    @include('modal',[
-        "id"=>"notifications",
-        "title" => "Sunucu Ekle",
-        "url" => route('server_add'),
-        "next" => "redirect",
-        "inputs" => [
-            "Adı" => "name:text",
-            "İp Adresi" => "ip_address:text",
-            "Bağlantı Portu" => "port:number",
-            "Anahtar Kullanıcı Adı" => "username:text",
-            "Anahtar Parola" => "password:password"
-        ],
-        "submit_text" => "Ekle"
-    ])
+</div>
+<div class="winter-is-coming">
+
+    <div class="snow snow--near"></div>
+    <div class="snow snow--near snow--alt"></div>
+
+    <div class="snow snow--mid"></div>
+    <div class="snow snow--mid snow--alt"></div>
+
+    <div class="snow snow--far"></div>
+    <div class="snow snow--far snow--alt"></div>
 </div>
 </body>
 </html>
