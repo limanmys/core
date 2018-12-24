@@ -16,6 +16,7 @@ class PermissionManager
         if(!\Auth::check()){
             return $next($request);
         }
+        $request->request->add(['user_id' => \Auth::id()]);
 
         // Get User Permissions.
         $permissions = \Auth::user()->permissions();
@@ -116,7 +117,7 @@ class PermissionManager
     // Check if Controller is in ignored list.
     private function verifyController(){
         $controller = $this->controller();
-        $ignore_list = ["home","ssh","server","notification"];
+        $ignore_list = ["home","ssh","server","notification","auth"];
         if($this->checkArray($controller) == false && in_array($controller,$ignore_list) == false){
             return false;
         }else{

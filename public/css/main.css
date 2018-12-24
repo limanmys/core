@@ -5,6 +5,7 @@
 [role="main"] {
     padding-top: 58px;
     padding-left: 20px;
+    margin-left: 70px;
     width: 100%;
     padding-right: 20px;
 }
@@ -78,35 +79,38 @@
 }
 
 .bell{
-    -webkit-animation: ring 10s .7s ease-in-out infinite;
+    -webkit-animation: ring 2s .5s ease-in-out infinite;
     -webkit-transform-origin: 50% 4px;
-    -moz-animation: ring 10s .7s ease-in-out infinite;
+    -moz-animation: ring 2s .5s ease-in-out infinite;
     -moz-transform-origin: 50% 4px;
-    animation: ring 4s .7s ease-in-out infinite;
+    animation: ring 2s .5s ease-in-out infinite;
     transform-origin: 50% 4px;
 }
 
 @-webkit-keyframes ring {
     0% { -webkit-transform: rotateZ(0); }
-    25% { -webkit-transform: rotateZ(30deg); }
-    50% { -webkit-transform: rotateZ(-28deg); }
-    75% { -webkit-transform: rotateZ(34deg); }
+    20% { -webkit-transform: rotateZ(30deg); }
+    40% { -webkit-transform: rotateZ(-30deg); }
+    60% { -webkit-transform: rotateZ(30deg); }
+    80% { -webkit-transform: rotateZ(-30deg); }
     100% { -webkit-transform: rotateZ(0); }
 }
 
 @-moz-keyframes ring {
     0% { -moz-transform: rotate(0); }
-    25% { -moz-transform: rotate(30deg); }
-    50% { -moz-transform: rotate(-28deg); }
-    75% { -moz-transform: rotate(34deg); }
+    20% { -moz-transform: rotate(30deg); }
+    40% { -moz-transform: rotate(-30deg); }
+    60% { -moz-transform: rotate(30deg); }
+    80% { -moz-transform: rotate(-30deg); }
     100% { -moz-transform: rotate(0); }
 }
 
 @keyframes ring {
     0% { transform: rotate(0); }
-    25% { transform: rotate(30deg); }
-    50% { transform: rotate(-28deg); }
-    75% { transform: rotate(34deg); }
+    20% { transform: rotate(30deg); }
+    40% { transform: rotate(-30deg); }
+    60% { transform: rotate(30deg); color: yellow;}
+    80% { transform: rotate(-30deg);}
     100% { transform: rotate(0); }
 }
 

@@ -33,12 +33,16 @@
         "target_id" => "change_hostname",
         "text" => "Hostname"
     ])<br><br>
+    @if(count($services) > 0)
     <h4>{{__("Servis Durumları")}}</h4>
         @foreach($services as $service)
             <button type="button" class="btn btn-info btn-lg" style="cursor:default;" id="status_{{$service}}">
                 {{strtoupper($service)}}
             </button>
         @endforeach
+    @else
+        <h4>{{__("Yüklü servis yok.")}}</h4>
+    @endif
     <br><br>
     <pre>
         @isset($stats)
@@ -108,7 +112,7 @@
         "id"=>"install_extension",
         "title" => "Servis Yükle",
         "url" => route('server_extension'),
-        "next" => "reload",
+        "next" => "alert",
         "selects" => [
             "DNS:5c0a170f7b57f19953126e37" => [
                 "Domain Adı" => "domain:text",
@@ -141,14 +145,14 @@
         "output" => "command_output",
         "submit_text" => "Çalıştır"
     ])
-    
+
     <script>
         function commandDisplay(output){
-            var element = document.getElementById("command_output");
+            let element = document.getElementById("command_output");
             element.value = output;
             element.removeAttribute('hidden');
         }
-        
+
         @foreach($server->extensions as $extension)
             setInterval(function () {
                 // checkStatus('{{$extension}}');
