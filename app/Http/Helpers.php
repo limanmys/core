@@ -9,6 +9,9 @@ if(!function_exists('respond')){
 
 if(!function_exists('notifications')){
     function notifications(){
-        return \App\Notification::where('user_id',\Auth::id())->orderBy('updated_at','desc')->take(5)->get();
+        return \App\Notification::where([
+            "user_id" => \Auth::id(),
+            "read" => false
+        ])->orderBy('updated_at','desc')->take(5)->get();
     }
 }

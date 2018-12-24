@@ -9,7 +9,7 @@ class Server extends Eloquent
 {
     protected $collection = 'servers';
     protected $connection = 'mongodb';
-    protected $fillable = ['name', 'ip_address' ,'port' ,'city'];
+    protected $fillable = ['name', 'ip_address' ,'port' ,'city','type'];
     private $key = null;
     
     public function run($command){
@@ -102,8 +102,15 @@ class Server extends Eloquent
         if($key == null){
             return false;
         }
+        // Trust server again just in case.
+        shell_exec("ssh-keyscan -p " . $this->port . " -H ". $this->ip_address . " >> ~/.ssh/known_hosts");
+
+        // Fix key file permissions again, just in case.
+        $query = "chmod 400 ../keys/" . Auth::id();
+        shell_exec($query);
         $query = "ssh -p " . $this->port . " " . $key->username . "@" . $this->ip_address . " -i ../keys/" .
             Auth::id() . " " . "whoami" . " 2>&1";
+
         $output = shell_exec($query);
         if($output != ($key->username . "\n")){
             return false;

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Extension;
+use App\Jobs\RunScript;
 use App\Key;
 use App\Mail\BasicNotification;
 use App\Notification;
@@ -30,11 +31,11 @@ class ServerController extends Controller
     {
         $data = $request->all();
         $server = new Server($data);
-        $server->user_id = Auth::id();
+        $server->user_id = request('user_id');
         $server->extensions = [];
         $server->save();
         Key::init(request('username'), request('password'), request('ip_address'),
-            request('port'), Auth::id());
+            request('port'), request('user_id'));
         $key = new Key($data);
         $key->server_id = $server->id;
         $key->user_id = Auth::id();
@@ -66,16 +67,12 @@ class ServerController extends Controller
         $scripts = Script::where('extensions', 'server')->get();
         $server = \request('server');
         $services = $server->extensions;
-        for ($i = 0; $i < count($services); $i++) {
-            if ($services[$i] == "kullanıcılar" || $services[$i] == "gruplar") {
-                unset($services[$i]);
-                array_push($services, 'ldap');
-            }
-        }
+        $available_services = Extension::all();
         return view('server.one', [
             "stats" => \request('server')->run("df -h"),
             "hostname" => request('server')->run("hostname"),
             "server" => \request('server'),
+            "available_services" => $available_services,
             "services" => $services,
             "scripts" => $scripts
         ]);
@@ -185,20 +182,17 @@ class ServerController extends Controller
         $extension = Extension::where('_id', \request('extension_id'))->first();
         $script = Script::where('unique_code', $extension->setup)->first();
         $server = \request('server');
-        $output = $server->runScript($script, \request('domain') . " " . \request('interface'));
-        if ($server->isRunning($extension->service) == "active\n") {
-            $server->extensions = array_merge($server->extensions, [\request('extension')]);
-            $server->save();
-            return [
-                "result" => 200,
-                "data" => $output
-            ];
-        } else {
-            return [
-                "result" => 201,
-                "data" => $output
-            ];
-        }
+        $notification = Notification::new(
+            __("Servis Yükleniyor."),
+            "onhold",
+            __(":server isimli sunucuda :new kuruluyor.",["server"=>request('server')->name,"new"=>$extension->name])
+        );
+        $job = new RunScript($script, $server,\request('domain') . " " . \request('interface'),\Auth::user(),$notification);
+        $this->dispatch($job);
+        return [
+            "target_id" => "install_extension",
+            "message" => __("Kurulum talebi başarıyla alındı. Gelişmeleri bildirim üzerinden takip edebilirsiniz.")
+        ];
     }
 
     public function update()

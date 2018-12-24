@@ -22,16 +22,16 @@
     <link rel="stylesheet" href="{{ asset('css/fa.min.css') }}">
 </head>
 <body style="display: block">
-<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0">
     <span class="navbar-brand col-sm-3 col-md-2 mr-0" style="cursor: default">
-        @auth<i
-                style="cursor: pointer;line-height: 30px;margin-left: 7px;margin-right: 2px" onclick="navbar(true)"
-                class="fas fa-bars"></i>@endauth
-        <span style="line-height: 30px;">{{ __("Liman") }}</span></span>
+        {{--@auth<i--}}
+                {{--style="cursor: pointer;line-height: 30px;margin-left: 7px;margin-right: 2px" onclick="navbar(true)"--}}
+                {{--class="fas fa-bars"></i>@endauth--}}
+        <span style="line-height: 30px;cursor:default;"><b>{{ __("Liman Sistem Yönetimi") }}</b></span></span>
     @auth
         <input class="form-control form-control-dark w-80" type="text" placeholder="{{ __("Arama") }}"
                aria-label="{{ __("Arama") }}" onkeyup="search();" id="search_input">
-    <ul class="px-3 dropdown" style="list-style: none;margin-bottom:0px">
+    <ul class="dropdown" style="list-style: none;margin-bottom:0px">
         <span class="px-3 text-white" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;">
             @if(count($notifications) > 0)
                 <i class="fas fa-bell bell"></i>
@@ -39,39 +39,33 @@
                 <i class="far fa-bell"></i>
             @endif
         </span>
-        <ul class="dropdown-menu shadow-lg border-dark" style="width: 400px;margin-left: -200px;">
-            <form>
-            @if(count($notifications) == 0)
-                <li class="header alert alert-success" style="margin:15px;">{{__("Hiç okunmamış mesajınız yok")}}</li>
-            @endif
-
-            <li>
-                <ul id="notificationArea" class="menu" style="list-style: none">
-                    @include('__system__.notifications',$notifications)
-                </ul>
-            </li>
-            </form>
+        <ul id="notificationDiv" class="dropdown-menu shadow-lg border-dark" style="width: 400px;margin-left: -200px;">
+            @include('__system__.notifications',$notifications)
         </ul>
     </ul>
     @endauth
-    <ul class="navbar-nav px-3">
+    <ul class="navbar-nav">
         <li class="nav-item text-nowrap">
-            <form action="#" onsubmit="return request('/locale',this,reload)" style="cursor: pointer;">
+            <form action="#" onsubmit="return request('{{route('set_locale')}}',this,reload)" style="cursor: pointer;">
                 @if (Session::get('locale') == "en")
                     <input type="hidden" name="locale" value="tr">
-                    <button class="btn btn-link text-white-">English</button>
+                    <button class="btn btn-link text-white-">
+                        <img src="https://lipis.github.io/flag-icon-css/flags/4x3/gb.svg" width="60px" height="20px">
+                    </button>
                 @else
                     <input type="hidden" name="locale" value="en">
-                    <button class="btn btn-link text-white">Türkçe</button>
+                    <button class="btn btn-link text-white">
+                        <img src="https://lipis.github.io/flag-icon-css/flags/4x3/tr.svg" alt="Ne Mutlu Türküm Diyene" width="70px" height="25px">
+                    </button>
                 @endif
 
             </form>
         </li>
     </ul>
     @auth
-        <ul class="navbar-nav px-3">
+        <ul class="navbar-nav px-2">
             <li class="nav-item text-nowrap" style="cursor: pointer;">
-                <a class="nav-link text-white" onclick="return request('logout',null,reload)">{{Auth::user()->name}}</a>
+                <a class="nav-link text-white" onclick="return request('{{route('logout')}}',null,reload)"><i class="fas fa-sign-out-alt"></i></a>
             </li>
         </ul>
     @endauth
@@ -79,18 +73,20 @@
 <div class="container-fluid">
     <div class="row">
         @auth
-            <div class="sidebar">
+            <div class="sidebar" onmouseover="navbar(true)" onmouseout="navbar(false)">
                 <ul class="sidebar-nav">
                     <li>
                         <a href="{{route('home')}}">
                             <i class="fas fa-home"></i>&nbsp;
-                            <span class="sidebar-name">{{ __("Ana Sayfa") }}</span>
+                            <span class="sidebar-name" style="visibility: hidden;">{{ __("Ana Sayfa") }}</span>
+                            <span class="badge badge-info badge-pill" id="home_notifications">2</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{route('servers')}}">
                             <i class="fas fa-server"></i>&nbsp;
-                            <span class="sidebar-name">{{ __("Sunucular") }}</span>
+                            <span class="sidebar-name" style="visibility: hidden;">{{ __("Sunucular") }}</span>
+                            <span class="badge badge-info badge-pill" id="server_notifications">4</span>
                         </a>
                     </li>
                     @foreach($extensions as $extension)
@@ -102,7 +98,8 @@
                                 @else
                                     <i class="fas fa-circle"></i>&nbsp;
                                 @endif
-                                <span class="sidebar-name">{{ __($extension->name) }}</span>
+                                <span class="sidebar-name" style="visibility: hidden;">{{ __($extension->name) }}</span>
+                                    <span class="badge badge-info badge-pill" id="{{strtolower($extension->name)}}_notifications">5</span>
                             </a>
                         </li>
                         @endp
@@ -111,21 +108,24 @@
                     <li>
                         <a href="{{route('scripts')}}">
                             <i class="fas fa-subscript"></i>&nbsp;
-                            <span class="sidebar-name">{{ __("Betikler") }}</span>
+                            <span class="sidebar-name" style="visibility: hidden;">{{ __("Betikler") }}</span>
+                            <span class="badge badge-info badge-pill" id="script_notifications">4</span>
                         </a>
                     </li>
                     @endp
                     <li>
                         <a href="{{route('keys')}}">
                             <i class="fas fa-key"></i>&nbsp;
-                            <span class="sidebar-name">{{ __("SSH Anahtarları") }}</span>
+                            <span class="sidebar-name" style="visibility: hidden;">{{ __("SSH Anahtarları") }}</span>
+                            <span class="badge badge-info badge-pill" id="key_notifications">3</span>
                         </a>
                     </li>
                     @p('extension_manager')
                     <li>
                         <a href="{{route('extensions_settings')}}">
                             <i class="fas fa-plus"></i>&nbsp;
-                            <span class="sidebar-name">{{ __("Eklentiler") }}</span>
+                            <span class="sidebar-name" style="visibility: hidden;">{{ __("Eklentiler") }}</span>
+                            <span class="badge badge-info badge-pill" id="extensions_notifications">2</span>
                         </a>
                     </li>
                     @endp
@@ -133,7 +133,8 @@
                     <li>
                         <a href="{{route('settings')}}">
                             <i class="fas fa-cog"></i>&nbsp;
-                            <span class="sidebar-name">{{ __("Sistem Ayarları") }}</span>
+                            <span class="sidebar-name" style="visibility: hidden;">{{ __("Sistem Ayarları") }}</span>
+                            <span class="badge badge-info badge-pill" id="settings_notifications">1</span>
                         </a>
                     </li>
                     @endp
@@ -141,14 +142,16 @@
                         <li>
                             <a href="{{route('request_permission')}}">
                                 <i class="fas fa-lock"></i>&nbsp;
-                                <span class="sidebar-name">{{ __("Yetki Talebi") }}</span>
+                                <span class="sidebar-name" style="visibility: hidden;">{{ __("Yetki Talebi") }}</span>
+                                <span class="badge badge-info badge-pill" id="request_notifications">2</span>
                             </a>
                         </li>
                     @else
                         <li>
                             <a href="{{route('request_list')}}">
                                 <i class="fas fa-lock"></i>&nbsp;
-                                <span class="sidebar-name">{{ __("Yetki Talepleri") }}</span>
+                                <span class="sidebar-name" style="visibility: hidden;">{{ __("Yetki Talepleri") }}</span>
+                                <span class="badge badge-info badge-pill" id="request_list_notifications">3</span>
                             </a>
                         </li>
                     @endif

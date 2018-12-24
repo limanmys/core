@@ -20,6 +20,8 @@
                 <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return @isset($url)request('{{$url}}',this,@isset($next){{$next}}@endisset)"@endisset target="#">
             @endif
                 <div class="modal-body">
+                    <div id="{{$id}}_alert" class="alert alert-primary" role="alert" hidden>
+                    </div>
                     @if(isset($selects) && is_array($selects))
                         <h5>{{__("Servis Seçimi")}}</h5>
                         <select class="form-control" required onchange="cs_{{$id}}(this.value)">
@@ -58,12 +60,12 @@
 </div>
 @isset($selects)
     <script type="text/javascript">
-        function cs_{{$id}}(test){
-            Array.prototype.forEach.call(document.getElementsByClassName('install_extension'),function(element){
+        function cs_{{$id}}(target){
+            Array.prototype.forEach.call(document.getElementsByClassName('{{$id}}'),function(element){
                 element.setAttribute('hidden',"true");
                 element.setAttribute('disabled',"true");
             });
-            Array.prototype.forEach.call(document.getElementsByClassName(test),function(element){
+            Array.prototype.forEach.call(document.getElementsByClassName(target),function(element){
                 element.removeAttribute('hidden');
                 element.removeAttribute('disabled');
             });

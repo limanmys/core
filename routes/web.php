@@ -2,7 +2,7 @@
 
 Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');
-Route::post('/logout','UserController@logout')->name('logout');
+Route::post('/logout','AuthController@logout')->name('logout');
 
 Route::get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
 Route::post('register', 'Auth\RegisterController@register');
@@ -162,4 +162,6 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 // Notifications List
 
     Route::post('/bildirimler','NotificationController@check')->name('user_notifications');
+
+    Route::post('/bildirim/oku','NotificationController@read')->name('notification_read');
 });

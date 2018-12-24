@@ -20,6 +20,7 @@ class Notification extends Eloquent
         $notification->server_id = $server_id;
         $notification->extension_id = $extension_id;
         $notification->level = $level;
+        $notification->read = false;
         $notification->save();
 
         // Before we return the notification, check if it's urgent. If so, send an email.

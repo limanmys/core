@@ -1,28 +1,11 @@
 function navbar(flag) {
     let sidebar = document.getElementsByClassName("sidebar")[0];
-    let main = document.getElementsByTagName('main')[0];
-    if (localStorage.getItem("state") === "e") {
-        if(flag){
-            sidebar.style.width = "60px";
-            main.style.marginLeft = "70px";
-            toggle("hidden");
-            localStorage.setItem("state", "m");
-        }else{
-            sidebar.style.width = "230px";
-            main.style.marginLeft = "240px";
-            toggle("visible");
-        }
+    if(flag){
+        sidebar.style.width = "230px";
+        toggle("visible");
     }else{
-        if(flag){
-            sidebar.style.width = "230px";
-            main.style.marginLeft = "240px";
-            toggle("visible");
-            localStorage.setItem("state", "e");
-        }else{
-            sidebar.style.width = "60px";
-            main.style.marginLeft = "70px";
-            toggle("hidden");
-        }
+        sidebar.style.width = "60px";
+        toggle("hidden");
     }
 
     function toggle(target){
@@ -35,16 +18,17 @@ function navbar(flag) {
 function request(url,data,next) {
 
     let old;
+
     let id = null;
-    if(data != null){
-        id = data.getAttribute('id');
-    }
+
     if(data instanceof FormData === false){
+        id = (data !== null && data.hasAttribute('id')) ? data.getAttribute('id') : null;
         data = new FormData(data);
+    }else{
+        id = (data.has('id')) ? data.get('id') : null;
     }
 
     if(id != null){
-
         // Grab the element.
         let element = document.getElementById(id);
 
@@ -53,7 +37,6 @@ function request(url,data,next) {
         loading(element,"Yukleniyor");
     }
     let r = new XMLHttpRequest();
-
     r.open("POST",url);
     r.setRequestHeader('X-CSRF-TOKEN', csrf);
     r.setRequestHeader("Accept","text/json");
@@ -110,13 +93,13 @@ function loading(target_element,message){
     document.getElementsByClassName('loading_message')[0].innerHTML = message;
 }
 
-function notification(){
+function background(){
     console.log('hello');
 }
 
 function checkNotifications(){
     request('/bildirimler',null,function(response){
-        document.getElementById("notificationArea").innerHTML = response;
+        document.getElementById("notificationDiv").innerHTML = response;
     });
 }
 
@@ -125,7 +108,24 @@ window.onbeforeunload = function(){
 };
 
 window.onload = function(){
-    navbar(false);
+    document.getElementById('notificationDiv').addEventListener('click',function(e){
+        e.stopPropagation();
+    });
+    setInterval(checkNotifications,3000);
 };
+
+function alert(data) {
+    let json = JSON.parse(data);
+    document.getElementById(json["targetid"] + "_alert").innerHTML = json["message"];
+    document.getElementById(json["targetid"] + "_alert").removeAttribute('hidden');
+}
+
+function dismissNotification(id){
+    let data = new FormData();
+    data.append('notification_id',id);
+    request('/bildirim/oku',data,function(){
+        checkNotifications();
+    });
+}
 
 let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');
