@@ -187,11 +187,13 @@ class ServerController extends Controller
             "onhold",
             __(":server isimli sunucuda :new kuruluyor.",["server"=>request('server')->name,"new"=>$extension->name])
         );
-        $job = new RunScript($script, $server,\request('domain') . " " . \request('interface'),\Auth::user(),$notification);
-        $this->dispatch($job);
+        $job = new RunScript($script, $server,\request('domain') . " "
+            . \request('interface'),\Auth::user(),$notification ,$extension);
+        dispatch($job);
         return [
             "target_id" => "install_extension",
-            "message" => __("Kurulum talebi başarıyla alındı. Gelişmeleri bildirim üzerinden takip edebilirsiniz.")
+            "message" => __("Kurulum talebi başarıyla alındı. Gelişmeleri bildirim üzerinden takip edebilirsiniz."),
+            "job" => $job
         ];
     }
 

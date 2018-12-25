@@ -22,7 +22,7 @@ class Server
                 return $this->response(__("Sunucu bulunamadı."));
             }
             //Check if ssh port is active on server.
-            if ($server->sshPortEnabled() == false) {
+            if ($server->isAlive() == false) {
                 return $this->response(__("Sunucuyla bağlantı kurulamadı."));
             }
             //Check if SSH key is valid or even exist for user.

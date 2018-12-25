@@ -11,25 +11,22 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class RunScript implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    protected $script,$server,$user, $parameters, $key, $notification;
+    protected $script,$server,$user, $parameters, $notification, $extension, $key;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(\App\Script $script,\App\Server $server, $parameters,\App\User $user, \App\Notification $notification)
+    public function __construct(\App\Script $script,\App\Server $server, $parameters,\App\User $user, \App\Notification $notification,\App\Extension $extension)
     {
         $this->user = $user;
         $this->server = $server;
+        $this->key = $server->key;
         $this->script = $script;
         $this->parameters = $parameters;
         $this->notification = $notification;
-        $key = \App\Key::where([
-            'server_id' => $this->server->_id,
-            'user_id' => $this->user->_id
-        ])->first();
-        $this->key = $key;
+        $this->extension = $extension;
     }
 
     /**
@@ -39,27 +36,42 @@ class RunScript implements ShouldQueue
      */
     public function handle()
     {
-
         $this->notification->type = "working";
+        $this->read = false;
         $this->notification->save();
-
         //Copy script to target.
-        $copy_file_query = 'scp -P ' . $this->server->port . " -i ../keys/" . $this->user->_id .' ' . storage_path('app/scripts/' . $this->script->_id) .' ' . $this->key->username .'@' . $this->server->ip_address . ':/tmp/';
+        $copy_file_query = 'scp -P ' . $this->server->port . " -i " . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id .' ' . storage_path('app/scripts/' . $this->script->_id) .' ' . $this->key->username .'@' . $this->server->ip_address . ':/tmp/';
         shell_exec($copy_file_query);
-        shell_exec('sudo chmod +x /tmp/' . $this->script->_id);
+        $permission_query = 'sudo chmod +x /tmp/' . $this->script->_id;
+        $query = "ssh -p " . $this->server->port . " " . $this->key->username . "@" . $this->server->ip_address
+        . " -i "  . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id . " " . $permission_query . " 2>&1";
+        shell_exec($query);
         $query = ($this->script->root == 1)? 'sudo ' : '';
         $query = $query . substr($this->script->language,1) . ' /tmp/' .$this->script->_id . " run ".$this->parameters;
-        $query = $query = "ssh -p " . $this->server->port . " " . $this->key->username . "@" . $this->server->ip_address . " -i ../keys/" .
-            $this->user->_id . " " . $query . " 2>&1";
-        $output = shell_exec($query);
-        $this->notification->log = $output;
-        if ($this->server->isRunning($this->extension->service) == "active\n") {
+        $query = "ssh -p " . $this->server->port . " " . $this->key->username . "@" . $this->server->ip_address
+            . " -i "  . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id . " " . $query . " 2>&1";
+        shell_exec($query);
+        $service_status = "sudo systemctl is-failed " . $this->extension->service;
+        $query = "ssh -p " . $this->server->port . " " . $this->key->username . "@" . $this->server->ip_address
+            . " -i "  . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id . " " . $service_status . " 2>&1";
+        $log = shell_exec($query);
+        echo $query;
+        if ($log == "active\n") {
             $this->server->extensions = array_merge($this->server->extensions, [\request('extension')]);
             $this->server->save();
             $this->notification->type = "success";
         }else{
             $this->notification->type = "error";
         }
+        $this->notification->save();
+    }
+
+    public function failed(){
+        $this->notification->type = "error";
+        $this->notification->title = "Hata Oluştu";
+        $this->notification->message = $this->server->name . " sunucusunda hata oluştu.";
+        $this->notification->log = $this->output;
+        $this->notification->query = $this->query;
         $this->notification->save();
     }
 }

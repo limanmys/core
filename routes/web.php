@@ -150,7 +150,7 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
     Route::get('/talepler', 'PermissionController@all')->name('request_list');
 
-// LimanRequest Details Page
+// LimanRequest Details Route
 
     Route::get('/talep/{permission_id}', 'PermissionController@one')->name('request_one');
 
@@ -162,6 +162,13 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 // Notifications List
 
     Route::post('/bildirimler','NotificationController@check')->name('user_notifications');
+// Notification Read Route
 
     Route::post('/bildirim/oku','NotificationController@read')->name('notification_read');
+
+//  Extension View Scripts
+
+    Route::post('/eklentiler/betikler', 'ExtensionController@getScriptsOfView')->name('extension_page_scripts');
+
+
 });

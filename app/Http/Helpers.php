@@ -2,7 +2,6 @@
 
 if(!function_exists('respond')){
     function respond($data){
-
         return response($data);
     }
 }
@@ -13,5 +12,17 @@ if(!function_exists('notifications')){
             "user_id" => \Auth::id(),
             "read" => false
         ])->orderBy('updated_at','desc')->take(5)->get();
+    }
+}
+
+if(!function_exists('log')){
+    function log($message){
+        Log::info(Auth::id() . ":" . $message);
+    }
+}
+
+if(!function_exists('server_log')){
+    function server_log($server_id, $message){
+        Log::info(Auth::id()  . ":" . $server_id . ":" . $message);
     }
 }

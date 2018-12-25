@@ -24,9 +24,6 @@
 <body style="display: block">
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0">
     <span class="navbar-brand col-sm-3 col-md-2 mr-0" style="cursor: default">
-        {{--@auth<i--}}
-                {{--style="cursor: pointer;line-height: 30px;margin-left: 7px;margin-right: 2px" onclick="navbar(true)"--}}
-                {{--class="fas fa-bars"></i>@endauth--}}
         <span style="line-height: 30px;cursor:default;"><b>{{ __("Liman Sistem Yönetimi") }}</b></span></span>
     @auth
         <input class="form-control form-control-dark w-80" type="text" placeholder="{{ __("Arama") }}"
@@ -50,12 +47,12 @@
                 @if (Session::get('locale') == "en")
                     <input type="hidden" name="locale" value="tr">
                     <button class="btn btn-link text-white-">
-                        <img src="https://lipis.github.io/flag-icon-css/flags/4x3/gb.svg" width="60px" height="20px">
+                        English
                     </button>
                 @else
                     <input type="hidden" name="locale" value="en">
                     <button class="btn btn-link text-white">
-                        <img src="https://lipis.github.io/flag-icon-css/flags/4x3/tr.svg" alt="Ne Mutlu Türküm Diyene" width="70px" height="25px">
+                        Türkçe
                     </button>
                 @endif
 
