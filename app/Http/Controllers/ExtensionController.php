@@ -29,7 +29,6 @@ class ExtensionController extends Controller
 
         // Retrieve scripts from database.
         $scripts = Script::where('extensions', 'like', $extension->name)->get();
-
         // Return view with required parameters.
         return view('extensions.one', [
             "extension" => $extension,
@@ -192,5 +191,39 @@ class ExtensionController extends Controller
         } else {
             return 200;
         }
+    }
+
+    public function getScriptsOfView(){
+        $extension = Extension::find(request('extension_id'));
+        if(array_key_exists(request('view'),$extension->views)){
+            $arr = $extension->views[request('view')];
+        }else{
+            $arr = [];
+        }
+        return $arr;
+    }
+
+    public function addScriptToView(){
+        $extension = Extension::find(request('extension_id'));
+        $temp = $extension->views;
+        if(array_key_exists(request('view'),$extension->views)){
+            array_push($temp[request('view')],request('unique_code'));
+        }else{
+            $temp[request('view')] = [request('unique_code')];
+        }
+        $extension->views = $temp;
+        $extension->save();
+        return response(__("Başarıyla Eklendi."),200);
+    }
+
+    public function removeScriptFromView(){
+        $extension = Extension::find(request('extension_id'));
+        $temp = $extension->views;
+        if(array_key_exists(request('view'),$extension->views)){
+            unset($temp[request('view')][array_search(request('unique_code'), $temp[request('view')])]);
+        }else{
+            return response(__("Sayfa Bulunamadı."),404);
+        }
+        return response(__("Başarıyla kaldırıldı."),200);
     }
 }

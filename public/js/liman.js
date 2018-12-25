@@ -116,8 +116,8 @@ window.onload = function(){
 
 function alert(data) {
     let json = JSON.parse(data);
-    document.getElementById(json["targetid"] + "_alert").innerHTML = json["message"];
-    document.getElementById(json["targetid"] + "_alert").removeAttribute('hidden');
+    document.getElementById(json["target_id"] + "_alert").innerHTML = json["message"];
+    document.getElementById(json["target_id"] + "_alert").removeAttribute('hidden');
 }
 
 function dismissNotification(id){

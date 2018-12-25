@@ -6,6 +6,7 @@
     float: left;
     position: fixed;
     width: 60px;
+    z-index: 300;
 }
 
 .sidebar-nav {
