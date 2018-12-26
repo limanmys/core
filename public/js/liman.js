@@ -14,7 +14,7 @@ function navbar(flag) {
         });
     }
 }
-
+let deneme;
 function request(url,data,next) {
 
     let old;
@@ -44,11 +44,24 @@ function request(url,data,next) {
         r.send(data);
     },300);
     r.onreadystatechange = function(){
-        if(r.readyState === 4 && id != null){
-            document.getElementById(id).innerHTML = old;
-        }
-        if(r.status === 200 && r.readyState === 4){
-            return next(r.responseText);
+        if(r.readyState === 4){
+            if(r.getResponseHeader("content-type") !== "application/json"){
+                return next(r.responseText);
+            }
+            let response = JSON.parse(r.responseText);
+            switch (r.status) {
+                case 200:
+                    return next(r.responseText);
+                case 300:
+                    return window.location = response["message"];
+                default:
+                    if(id != null){
+                        document.getElementById(id).innerHTML = old;
+                        if(r.status !== 200 || r.status !== 300){
+                            message(r.responseText);
+                        }
+                    }
+            }
         }
     };
     return false;
@@ -62,10 +75,6 @@ function redirect(url){
     if(url === "")
         return;
     window.location.href = url;
-}
-
-function route(url){
-    window.location.href = window.location.href + "/" + url;
 }
 
 function debug(data){
@@ -114,10 +123,16 @@ window.onload = function(){
     setInterval(checkNotifications,3000);
 };
 
-function alert(data) {
+function message(data) {
     let json = JSON.parse(data);
-    document.getElementById(json["target_id"] + "_alert").innerHTML = json["message"];
-    document.getElementById(json["target_id"] + "_alert").removeAttribute('hidden');
+    let modal = document.getElementsByClassName("modal show")[0];
+    if(!modal){
+        return;
+    }
+    let modal_id = modal.getAttribute("id");
+    console.log(modal_id);
+    document.getElementById(modal_id + "_alert").innerHTML = json["message"];
+    document.getElementById(modal_id + "_alert").removeAttribute('hidden');
 }
 
 function dismissNotification(id){

@@ -15,14 +15,17 @@ class Key extends Eloquent
         if (!is_dir(storage_path('keys'))) {
             shell_exec("mkdir -p " . storage_path('keys'));
         }
+
         //Generate key and put it into keys folder, dont regenerate!
         if(!file_exists(storage_path('keys')  . DIRECTORY_SEPARATOR . $account_name)){
             shell_exec("ssh-keygen -t rsa -f " . storage_path('keys')  . DIRECTORY_SEPARATOR . $account_name ." -q -P ''");
         }
+
         //Trust target server
         shell_exec("ssh-keyscan -p " . $server_port . " -H ". $server_address . " >> ~/.ssh/known_hosts");
+
         //Send Keys to target
-        return shell_exec("sshpass -p '" . $password . "' ssh-copy-id -i " . storage_path('keys')  . DIRECTORY_SEPARATOR . $account_name ." " . $username
+        shell_exec("sshpass -p '" . $password . "' ssh-copy-id -i " . storage_path('keys')  . DIRECTORY_SEPARATOR . $account_name ." " . $username
             ."@" . $server_address ." 2>&1 -p " . $server_port);
     }
 }
