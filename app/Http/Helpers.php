@@ -1,8 +1,10 @@
 <?php
 
 if(!function_exists('respond')){
-    function respond($data){
-        return response($data);
+    function respond($message, $status = 200){
+        return response([
+            "message" => __($message)
+        ],$status);
     }
 }
 

@@ -23,7 +23,7 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
 // Add Server Route
 
-    Route::post('/sunucu/ekle', 'ServerController@add')->name('server_add')->middleware('parameters:username,password,ip_address,port');
+    Route::post('/sunucu/ekle', 'Server\AddController@main')->name('server_add')->middleware('parameters:username,password,ip_address,port');
 
 // Server Status Route (Telnet)
 

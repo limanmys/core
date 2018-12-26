@@ -112,7 +112,7 @@
         "id"=>"install_extension",
         "title" => "Servis Yükle",
         "url" => route('server_extension'),
-        "next" => "alert",
+        "next" => "message",
         "selects" => [
             "DNS:5c0a170f7b57f19953126e37" => [
                 "Domain Adı" => "domain:text",

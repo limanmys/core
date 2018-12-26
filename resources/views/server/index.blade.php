@@ -35,7 +35,6 @@
         "id"=>"add_server",
         "title" => "Sunucu Ekle",
         "url" => route('server_add'),
-        "next" => "redirect",
         "selects" => [
             "Linux Sunucusu:linux" => [
                 "Linux:linux" => "type:hidden"

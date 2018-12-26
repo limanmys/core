@@ -5,13 +5,11 @@ namespace App\Http\Controllers;
 use App\Extension;
 use App\Jobs\RunScript;
 use App\Key;
-use App\Mail\BasicNotification;
 use App\Notification;
 use App\Script;
 use App\Permission;
 use App\Server;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Auth;
 
 class ServerController extends Controller
 {
@@ -25,27 +23,6 @@ class ServerController extends Controller
         return view('server.index', [
             "servers" => $servers
         ]);
-    }
-
-    public function add(Request $request)
-    {
-        $data = $request->all();
-        $server = new Server($data);
-        $server->user_id = request('user_id');
-        $server->extensions = [];
-        $server->save();
-        Key::init(request('username'), request('password'), request('ip_address'),
-            request('port'), request('user_id'));
-        $key = new Key($data);
-        $key->server_id = $server->id;
-        $key->user_id = Auth::id();
-        $permissions = $request->get('permissions');
-        $user_servers = $permissions->server;
-        array_push($user_servers, $server->_id);
-        $permissions->server = $user_servers;
-        $permissions->save();
-        $key->save();
-        return response(route('server_one', $server->id), 200);
     }
 
     public function remove()
@@ -64,24 +41,12 @@ class ServerController extends Controller
 
     public function one()
     {
-        $scripts = Script::where('extensions', 'server')->get();
-        $server = \request('server');
-        $services = $server->extensions;
-        $available_services = Extension::all();
-        return view('server.one', [
-            "stats" => \request('server')->run("df -h"),
-            "hostname" => request('server')->run("hostname"),
-            "server" => \request('server'),
-            "available_services" => $available_services,
-            "services" => $services,
-            "scripts" => $scripts
-        ]);
+
     }
 
     public function run()
     {
-        $output = Server::where('_id', \request('server_id'))->first()->run(\request('command'));
-        return $output;
+        return request('server')->run(\request('command'));
     }
 
     public function runScript()
@@ -190,11 +155,9 @@ class ServerController extends Controller
         $job = new RunScript($script, $server,\request('domain') . " "
             . \request('interface'),\Auth::user(),$notification ,$extension);
         dispatch($job);
-        return [
-            "target_id" => "install_extension",
-            "message" => __("Kurulum talebi başarıyla alındı. Gelişmeleri bildirim üzerinden takip edebilirsiniz."),
-            "job" => $job
-        ];
+        respond([
+            "message" => __("Kurulum talebi başarıyla alındı. Gelişmeleri bildirim üzerinden takip edebilirsiniz.")
+        ]);
     }
 
     public function update()

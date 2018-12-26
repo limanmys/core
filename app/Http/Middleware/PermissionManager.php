@@ -113,15 +113,11 @@ class PermissionManager
         // TODO add objects to request here.
         return true;
     }
-
+    // TODO make it work.
     // Check if Controller is in ignored list.
     private function verifyController(){
         $controller = $this->controller();
         $ignore_list = ["home","ssh","server","notification","auth"];
-        if($this->checkArray($controller) == false && in_array($controller,$ignore_list) == false){
-            return false;
-        }else{
-            return true;
-        }
+        return ($this->checkArray($controller)  || in_array($controller,$ignore_list));
     }
 }

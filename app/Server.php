@@ -9,7 +9,7 @@ class Server extends Eloquent
 {
     protected $collection = 'servers';
     protected $connection = 'mongodb';
-    protected $fillable = ['name', 'ip_address', 'port', 'city', 'type', 'control_port'];
+    protected $fillable = ['name', 'ip_address', 'city', 'type', 'control_port'];
     public $key;
 
     public function run($command)
@@ -18,19 +18,20 @@ class Server extends Eloquent
         return $this->runSSH($command);
     }
 
-    private function runSSH($query)
+    public function runSSH($query)
     {
         // Log Query
         server_log($this->_id, "command_" . $query);
         // Build Query
+
         $query = "ssh -p " . $this->port . " " . $this->key->username . "@" . $this->ip_address . " -i " . storage_path('keys') .
             DIRECTORY_SEPARATOR . Auth::id() . " " . $query . " 2>&1";
-        echo $query;
+
         // Execute and return outputs.
         return shell_exec($query);
     }
 
-    private function putFile($script)
+    public function putFile($script)
     {
         // First, copy file through scp.
         $query = 'scp -P ' . $this->port . " -i " . storage_path('keys') . DIRECTORY_SEPARATOR . Auth::id() .
@@ -91,7 +92,7 @@ class Server extends Eloquent
         return strpos($output, "Connected to " . $this->ip_address);
     }
 
-    private function sshAccessEnabled()
+    public function sshAccessEnabled()
     {
         $key = $this->sshKey();
         if (!$this->isAlive() || !$key) {
@@ -100,7 +101,7 @@ class Server extends Eloquent
         return true;
     }
 
-    private function sshKey()
+    public function sshKey()
     {
         $key = Key::where([
             'server_id' => $this->id,

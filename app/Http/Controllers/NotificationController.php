@@ -11,9 +11,12 @@ class NotificationController extends Controller
             "user_id" => \Auth::id(),
             "read" => false
         ])->orderBy('updated_at','desc')->take(5)->get();
-        return view('__system__.notifications',[
-            "notifications" => $notifications
-        ]);
+        return response()
+            ->view('__system__.notifications',
+                [
+                    "notifications" => $notifications
+                ])
+            ->header('Content-Type','html');
     }
 
     public function read(){

@@ -55,13 +55,16 @@ class RunScript implements ShouldQueue
         $query = "ssh -p " . $this->server->port . " " . $this->key->username . "@" . $this->server->ip_address
             . " -i "  . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id . " " . $service_status . " 2>&1";
         $log = shell_exec($query);
-        echo $query;
         if ($log == "active\n") {
             $this->server->extensions = array_merge($this->server->extensions, [\request('extension')]);
             $this->server->save();
             $this->notification->type = "success";
+            $this->notification->title = $this->extension->name . " kuruldu";
+            $this->notification->message = $this->extension->name . " servisi kurulumu başarıyla tamamlandı.";
         }else{
             $this->notification->type = "error";
+            $this->notification->title = $this->extension->name . " kurulamadı";
+            $this->notification->message = $this->extension->name . " servisi kurulumu başarısız.";
         }
         $this->notification->save();
     }
