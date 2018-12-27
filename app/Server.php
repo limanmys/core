@@ -107,6 +107,7 @@ class Server extends Eloquent
             'server_id' => $this->id,
             'user_id' => Auth::id()
         ])->first();
+
         if ($key == null) {
             return false;
         }
@@ -116,6 +117,7 @@ class Server extends Eloquent
         // Fix key file permissions again, just in case.
         $query = "chmod 400 " . storage_path('keys')  . DIRECTORY_SEPARATOR . Auth::id();
         shell_exec($query);
+
         $query = "ssh -p " . $this->port . " " . $key->username . "@" . $this->ip_address . " -i " . storage_path('keys') .
             DIRECTORY_SEPARATOR . Auth::id() . " " . "whoami" . " 2>&1";
 

@@ -22,7 +22,7 @@ class AddController extends Controller
         if(!$this->server->isAlive()){
             return respond("Sunucuyla bağlantı kurulamadı.",406);
         }
-
+        $this->server->save();
         // Run required function for specific type.
         switch ($this->server->type){
             case("linux"):
@@ -52,33 +52,35 @@ class AddController extends Controller
         Key::init(request('username'), request('password'), request('ip_address'),
             request('port'), request('user_id'));
 
-        // Validate Key Installation.
-        if(!$this->server->sshAccessEnabled()){
-            return respond("SSH Kullanıcı Parola Hatası",401);
-        }
+        $this->server->port = request('port');
 
-        // Generate Key
         $key = new Key(request()->all());
+
         $key->server_id = $this->server->id;
         $key->user_id = Auth::id();
 
-        $this->grantPermissions();
-
         $key->save();
 
-        return respond(route('server_one', $this->server->_id),300);
+        // Validate Key Installation.
+        if(!$this->server->sshAccessEnabled()){
+            $key->delete();
+            $this->server->delete();
+            return respond("SSH Kullanıcı Parola Hatası",401);
+        }
+
+        return $this->grantPermissions();
     }
 
     private function linux(){
-        $this->grantPermissions();
+        return $this->grantPermissions();
     }
 
     private function windows(){
-        $this->grantPermissions();
+        return $this->grantPermissions();
     }
 
     private function windows_powershell(){
-        $this->grantPermissions();
+        return $this->grantPermissions();
     }
 
     private function grantPermissions(){
@@ -92,5 +94,7 @@ class AddController extends Controller
         // Lastly, save all information.
         $permissions->save();
         $this->server->save();
+
+        return respond(route('server_one',$this->server->_id),300);
     }
 }

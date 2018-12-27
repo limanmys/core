@@ -15,17 +15,24 @@
             <tr>
                 <th scope="col">{{__("Sunucu Adı")}}</th>
                 <th scope="col">{{__("İp Adresi")}}</th>
-                <th scope="col">{{__("Port")}}</th>
+                <th scope="col">{{__("Sunucu Tipi")}}</th>
+                <th scope="col">{{__("Kontrol Portu")}}</th>
             </tr>
             </thead>
             <tbody>
             @foreach ($servers as $server)
-                <tr onclick="dummy('{{$server->_id}}')" class="highlight">
-                    <td>{{$server->name}}</td>
-                    <td>{{$server->ip_address}}</td>
-                    <td>{{$server->port}}</td>
+                <tr onclick="dummy('{{$server->_id}}')" class="highlight" oncontextmenu="rightClick(this)">
+                    <td id="name">{{$server->name}}</td>
+                    <td id="ip_address">{{$server->ip_address}}</td>
+                    <td id="type">{{$server->type}}</td>
+                    <td id="control_port">{{$server->control_port}}</td>
+                    <td id="server_id" hidden>{{$server->_id}}</td>
                 </tr>
             @endforeach
+            <div class="dropdown-menu dropdown-menu-sm" id="context-menu">
+                <a class="dropdown-item highlight" href="#">Düzenle</a>
+                <a class="dropdown-item highlight" href="#">Sil</a>
+            </div>
             </tbody>
         </table>
     @else
@@ -152,6 +159,11 @@
             main.innerHTML = document.getElementsByClassName('loading')[0].innerHTML;
             document.getElementsByClassName('loading_message')[0].innerHTML = "Sunucuyla bağlantı kuruluyor";
             location.href = '/sunucular/' + id;
+        }
+
+        function rightClick(event){
+            console.log(event);
+            return false;
         }
     </script>
 @endsection

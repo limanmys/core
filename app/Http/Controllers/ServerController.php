@@ -39,11 +39,6 @@ class ServerController extends Controller
         return route('servers');
     }
 
-    public function one()
-    {
-
-    }
-
     public function run()
     {
         return request('server')->run(\request('command'));
@@ -169,7 +164,8 @@ class ServerController extends Controller
         );
 
         $output = request('server')->update([
-            "name" => request('name')
+            "name" => request('name'),
+            "control_port" => request('control_port')
         ]);
         return [
             "result" => 200,
