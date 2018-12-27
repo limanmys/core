@@ -23,7 +23,7 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
 // Add Server Route
 
-    Route::post('/sunucu/ekle', 'Server\AddController@main')->name('server_add')->middleware('parameters:username,password,ip_address,port');
+    Route::post('/sunucu/ekle', 'Server\AddController@main')->name('server_add')->middleware('parameters:ip_address,control_port,type,city');
 
 // Server Status Route (Telnet)
 
@@ -43,7 +43,7 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
         // Single Server Details Route
 
-        Route::get('/sunucular/{server_id}', 'ServerController@one')->name('server_one');
+        Route::get('/sunucular/{server_id}', 'Server\OneController@main')->name('server_one');
 
         // Remove Server Route
 
@@ -51,7 +51,7 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
         // Server Update Route
 
-        Route::post('/sunucu/guncelle', 'ServerController@update')->name('server_update')->middleware('parameters:server_id,name');
+        Route::post('/sunucu/guncelle', 'ServerController@update')->name('server_update')->middleware('parameters:server_id,name,control_port');
 
         // Server Command Route
 

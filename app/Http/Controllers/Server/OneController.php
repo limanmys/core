@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Server;
 
 use App\Extension;
-use App\Script;
 use App\Http\Controllers\Controller;
 
 class OneController extends Controller
 {
     public function main(){
-
+        return (request('server')->type == "linux_ssh" || request('server')->type == "windows_powershell")
+            ? $this->authorized() : $this->unauthorized();
     }
 
-    private function authorized(){
+    public function authorized(){
         $server = \request('server');
         $services = $server->extensions;
         $available_services = Extension::all();
-        return view('server.one', [
+        return view('server.one_auth', [
             "stats" => \request('server')->run("df -h"),
             "hostname" => request('server')->run("hostname"),
             "server" => \request('server'),
@@ -25,7 +25,11 @@ class OneController extends Controller
         ]);
     }
 
-    private function unauthorized(){
-
+    public function unauthorized(){
+        $services = request('server')->extensions;
+        return view('server.one',[
+            "services" => $services,
+            "server" => request('server')
+        ]);
     }
 }

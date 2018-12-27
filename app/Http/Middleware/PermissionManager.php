@@ -116,6 +116,7 @@ class PermissionManager
     // TODO make it work.
     // Check if Controller is in ignored list.
     private function verifyController(){
+        return true;
         $controller = $this->controller();
         $ignore_list = ["home","ssh","server","notification","auth"];
         return ($this->checkArray($controller)  || in_array($controller,$ignore_list));
