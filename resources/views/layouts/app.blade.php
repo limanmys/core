@@ -40,7 +40,6 @@
             @include('__system__.notifications',$notifications)
         </ul>
     </ul>
-    @endauth
     <ul class="navbar-nav">
         <li class="nav-item text-nowrap">
             <form action="#" onsubmit="return request('{{route('set_locale')}}',this,reload)" style="cursor: pointer;">
@@ -59,7 +58,6 @@
             </form>
         </li>
     </ul>
-    @auth
         <ul class="navbar-nav px-2">
             <li class="nav-item text-nowrap" style="cursor: pointer;">
                 <a class="nav-link text-white" onclick="return request('{{route('logout')}}',null,reload)"><i class="fas fa-sign-out-alt"></i></a>

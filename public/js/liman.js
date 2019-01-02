@@ -45,22 +45,22 @@ function request(url,data,next) {
     },300);
     r.onreadystatechange = function(){
         if(r.readyState === 4){
+            if(id != null){
+                document.getElementById(id).innerHTML = old;
+                if(r.status !== 200 || r.status !== 300){
+                    message(r.responseText);
+                }
+            }
             if(r.getResponseHeader("content-type") !== "application/json"){
                 return next(r.responseText);
             }
             let response = JSON.parse(r.responseText);
+
             switch (r.status) {
                 case 200:
                     return next(r.responseText);
                 case 300:
                     return window.location = response["message"];
-                default:
-                    if(id != null){
-                        document.getElementById(id).innerHTML = old;
-                        if(r.status !== 200 || r.status !== 300){
-                            message(r.responseText);
-                        }
-                    }
             }
         }
     };
@@ -130,7 +130,6 @@ function message(data) {
         return;
     }
     let modal_id = modal.getAttribute("id");
-    console.log(modal_id);
     document.getElementById(modal_id + "_alert").innerHTML = json["message"];
     document.getElementById(modal_id + "_alert").removeAttribute('hidden');
 }

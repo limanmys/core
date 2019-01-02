@@ -150,6 +150,10 @@
     <script>
         function commandDisplay(output){
             let element = document.getElementById("command_output");
+            let modal = document.getElementsByClassName("modal show")[0];
+            let modal_id = modal.getAttribute("id");
+            document.getElementById(modal_id + "_alert").innerHTML = "Komut Çalıştırıldı.";
+            document.getElementById(modal_id + "_alert").removeAttribute('hidden');
             element.value = output;
             element.removeAttribute('hidden');
         }

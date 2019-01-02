@@ -41,7 +41,7 @@ class ServerController extends Controller
 
     public function run()
     {
-        return request('server')->run(\request('command'));
+        return respond(request('server')->run(\request('command')));
     }
 
     public function runScript()
@@ -150,9 +150,11 @@ class ServerController extends Controller
         $job = new RunScript($script, $server,\request('domain') . " "
             . \request('interface'),\Auth::user(),$notification ,$extension);
         dispatch($job);
-        respond([
-            "message" => __("Kurulum talebi başarıyla alındı. Gelişmeleri bildirim üzerinden takip edebilirsiniz.")
-        ]);
+        return respond("Kurulum talebi başarıyla alındı. Gelişmeleri bildirim üzerinden takip edebilirsiniz.");
+    }
+
+    public function enableInstalledExtension(){
+
     }
 
     public function update()
