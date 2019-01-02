@@ -83,7 +83,7 @@
             inputs.push(name + ":" + type);
             var new_span = document.createElement('span');
             new_span.appendChild(document.createTextNode(name));
-            new_span.setAttribute('class',(type == "string") ? 'string' : 'number');
+            new_span.setAttribute('class',(type === "string") ? 'string' : 'number');
             new_span.setAttribute("onclick","removeInput('" + name + "','" + type + "',this)");
             document.getElementById("inputs").appendChild(new_span);
         }
