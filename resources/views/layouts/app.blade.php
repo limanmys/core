@@ -74,14 +74,14 @@
                         <a href="{{route('home')}}">
                             <i class="fas fa-home"></i>&nbsp;
                             <span class="sidebar-name" style="visibility: hidden;">{{ __("Ana Sayfa") }}</span>
-                            <span class="badge badge-info badge-pill" id="home_notifications">2</span>
+                            <span class="badge badge-info badge-pill" id="home_notifications"></span>
                         </a>
                     </li>
                     <li>
                         <a href="{{route('servers')}}">
                             <i class="fas fa-server"></i>&nbsp;
                             <span class="sidebar-name" style="visibility: hidden;">{{ __("Sunucular") }}</span>
-                            <span class="badge badge-info badge-pill" id="server_notifications">4</span>
+                            <span class="badge badge-info badge-pill" id="server_notifications"></span>
                         </a>
                     </li>
                     @foreach($extensions as $extension)
@@ -94,7 +94,7 @@
                                     <i class="fas fa-circle"></i>&nbsp;
                                 @endif
                                 <span class="sidebar-name" style="visibility: hidden;">{{ __($extension->name) }}</span>
-                                    <span class="badge badge-info badge-pill" id="{{strtolower($extension->name)}}_notifications">5</span>
+                                    <span class="badge badge-info badge-pill" id="{{strtolower($extension->name)}}_notifications"></span>
                             </a>
                         </li>
                         @endp
@@ -104,7 +104,7 @@
                         <a href="{{route('scripts')}}">
                             <i class="fas fa-subscript"></i>&nbsp;
                             <span class="sidebar-name" style="visibility: hidden;">{{ __("Betikler") }}</span>
-                            <span class="badge badge-info badge-pill" id="script_notifications">4</span>
+                            <span class="badge badge-info badge-pill" id="script_notifications"></span>
                         </a>
                     </li>
                     @endp
@@ -112,7 +112,7 @@
                         <a href="{{route('keys')}}">
                             <i class="fas fa-key"></i>&nbsp;
                             <span class="sidebar-name" style="visibility: hidden;">{{ __("SSH Anahtarları") }}</span>
-                            <span class="badge badge-info badge-pill" id="key_notifications">3</span>
+                            <span class="badge badge-info badge-pill" id="key_notifications"></span>
                         </a>
                     </li>
                     @p('extension_manager')
@@ -120,7 +120,7 @@
                         <a href="{{route('extensions_settings')}}">
                             <i class="fas fa-plus"></i>&nbsp;
                             <span class="sidebar-name" style="visibility: hidden;">{{ __("Eklentiler") }}</span>
-                            <span class="badge badge-info badge-pill" id="extensions_notifications">2</span>
+                            <span class="badge badge-info badge-pill" id="extensions_notifications"></span>
                         </a>
                     </li>
                     @endp
@@ -129,7 +129,7 @@
                         <a href="{{route('settings')}}">
                             <i class="fas fa-cog"></i>&nbsp;
                             <span class="sidebar-name" style="visibility: hidden;">{{ __("Sistem Ayarları") }}</span>
-                            <span class="badge badge-info badge-pill" id="settings_notifications">1</span>
+                            <span class="badge badge-info badge-pill" id="settings_notifications"></span>
                         </a>
                     </li>
                     @endp
@@ -138,7 +138,7 @@
                             <a href="{{route('request_permission')}}">
                                 <i class="fas fa-lock"></i>&nbsp;
                                 <span class="sidebar-name" style="visibility: hidden;">{{ __("Yetki Talebi") }}</span>
-                                <span class="badge badge-info badge-pill" id="request_notifications">2</span>
+                                <span class="badge badge-info badge-pill" id="request_notifications"></span>
                             </a>
                         </li>
                     @else
@@ -146,7 +146,7 @@
                             <a href="{{route('request_list')}}">
                                 <i class="fas fa-lock"></i>&nbsp;
                                 <span class="sidebar-name" style="visibility: hidden;">{{ __("Yetki Talepleri") }}</span>
-                                <span class="badge badge-info badge-pill" id="request_list_notifications">3</span>
+                                <span class="badge badge-info badge-pill" id="request_list_notifications"></span>
                             </a>
                         </li>
                     @endif
