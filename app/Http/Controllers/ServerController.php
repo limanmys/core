@@ -66,6 +66,8 @@ class ServerController extends Controller
             return respond('btn-success');
         } else if ($output === "inactive\n") {
             return respond('btn-secondary');
+        } else{
+            return respond('btn-danger');
         }
     }
 
@@ -154,10 +156,6 @@ class ServerController extends Controller
             . \request('interface'),\Auth::user(),$notification ,$extension);
         dispatch($job);
         return respond("Kurulum talebi başarıyla alındı. Gelişmeleri bildirim üzerinden takip edebilirsiniz.");
-    }
-
-    public function enableInstalledExtension(){
-
     }
 
     public function update()

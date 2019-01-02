@@ -203,7 +203,7 @@
         "url" => route('server_upload'),
         "next" => "debug",
         "inputs" => [
-            "Yüklenecek Dosya(lar)" => "files:file",
+            "Yüklenecek Dosya(lar)" => "file:file",
             "Yol" => "path:text",
             "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
