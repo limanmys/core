@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Server;
 use App\Key;
 use App\Permission;
 use App\Server;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class MainController extends Controller
@@ -35,9 +34,19 @@ class MainController extends Controller
     }
 
     public function upload(){
-        request()->file('files')->move('/tmp/',request()->file('files')->getClientOriginalName());
-        server()->putFile('/tmp/' .request()->file('files')->getClientOriginalName(), \request('path'));
+        // Store file in /tmp directory.
+        request()->file('file')->move('/tmp/',request()->file('file')->getClientOriginalName());
 
-        return respond("Dosya başarıyla yüklendi.");
+        // Send file to the server.
+        server()->putFile('/tmp/' .request()->file('file')->getClientOriginalName(), \request('path'));
+
+        // Build query to check if file exists in server to validate.
+        $query = '[[ -f ' . request('path') .
+            request()->file('file')->getClientOriginalName()  . ' ]] && echo "1" || echo "0"';
+        $flag = server()->run($query);
+        if($flag == "1\n"){
+            return respond("Dosya başarıyla yüklendi.");
+        }
+        return respond('Dosya yüklenemedi.');
     }
 }

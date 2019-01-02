@@ -45,10 +45,6 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
         Route::get('/sunucular/{server_id}', 'Server\OneController@main')->name('server_one');
 
-        // Remove Server Route
-
-        Route::post('/sunucu/sil', 'Server\MainController@remove')->name('server_remove')->middleware('parameters:server_id');
-
         // Server Update Route
 
         Route::post('/sunucu/guncelle', 'ServerController@update')->name('server_update')->middleware('parameters:server_id,name,control_port,city');
@@ -77,8 +73,13 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
         Route::post('/sunucu/eklenti', 'ServerController@enableExtension')->name('server_extension');
 
-        Route::post('/sunucu/yukle','Server\MainController@upload')->name('server_upload')->middleware('parameters:files,path');
+        // Server File Upload Route
+        Route::post('/sunucu/yukle','Server\MainController@upload')->name('server_upload')->middleware('parameters:file,path');
     });
+
+    // Remove Server Route
+
+    Route::post('/sunucu/sil', 'Server\MainController@remove')->name('server_remove')->middleware('parameters:server_id');
 
 // SSH Key List Route
 
