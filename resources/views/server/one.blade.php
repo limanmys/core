@@ -83,5 +83,7 @@
         ],
         "submit_text" => "Aktifleştir"
     ])
+    <script>
 
+    </script>
 @endsection

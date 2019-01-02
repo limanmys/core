@@ -21,7 +21,7 @@
             </thead>
             <tbody>
             @foreach ($servers as $server)
-                <tr onclick="dummy('{{$server->_id}}')" class="highlight" oncontextmenu="rightClick(this)">
+                <tr onclick="dummy('{{$server->_id}}')" class="highlight" oncontextmenu="return rightClick(this,event)">
                     <td id="name">{{$server->name}}</td>
                     <td id="ip_address">{{$server->ip_address}}</td>
                     <td id="type">{{$server->type}}</td>
@@ -29,9 +29,9 @@
                     <td id="server_id" hidden>{{$server->_id}}</td>
                 </tr>
             @endforeach
-            <div class="dropdown-menu dropdown-menu-sm" id="context-menu">
-                <a class="dropdown-item highlight" href="#">Düzenle</a>
-                <a class="dropdown-item highlight" href="#">Sil</a>
+            <div class="dropdown-menu" id="context-menu" style="color:white">
+                <a class="dropdown-item" href="#">Düzenle</a>
+                <a class="dropdown-item" href="#">Sil</a>
             </div>
             </tbody>
         </table>
@@ -161,8 +161,21 @@
             location.href = '/sunucular/' + id;
         }
 
-        function rightClick(event){
-            console.log(event);
+        function rightClick(element,event){
+            let menu = document.getElementById('context-menu');
+            menu.classList.toggle('show');
+            menu.style.top = event.pageY;
+            menu.style.left = event.pageX;
+            menu.style.backgroundColor = 'white';
+
+            // document.addEventListener('click', function () {
+            //     menu.classList.toggle('show');
+            //     document.removeEventListener('click',null);
+            // });
+            // menu.onclick(function(event){
+            //     let menu = document.getElementById('context-menu');
+            //     menu.classList.toggle('show');
+            // });
             return false;
         }
     </script>
