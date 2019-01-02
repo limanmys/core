@@ -112,6 +112,10 @@ function checkNotifications(){
     });
 }
 
+function route(url){
+    window.location.href = window.location.href + "/" + url;
+}
+
 window.onbeforeunload = function(){
   loading(document.getElementsByTagName('main')[0],'Liman Çalışıyor');
 };

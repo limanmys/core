@@ -28,3 +28,9 @@ if(!function_exists('server_log')){
         Log::info(Auth::id()  . ":" . $server_id . ":" . $message);
     }
 }
+
+if(!function_exists('server')){
+    function server(){
+        return request('server');
+    }
+}
