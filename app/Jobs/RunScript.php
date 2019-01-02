@@ -56,7 +56,7 @@ class RunScript implements ShouldQueue
             . " -i "  . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id . " " . $service_status . " 2>&1";
         $log = shell_exec($query);
         if ($log == "active\n") {
-            $this->server->extensions = array_merge($this->server->extensions, [\request('extension')]);
+            $this->server->extensions = array_merge($this->server->extensions, [$this->extension->_id]);
             $this->server->save();
             $this->notification->type = "success";
             $this->notification->title = $this->extension->name . " kuruldu";

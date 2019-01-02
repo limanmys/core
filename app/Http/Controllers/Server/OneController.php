@@ -14,8 +14,11 @@ class OneController extends Controller
 
     public function authorized(){
         $server = \request('server');
-        $services = $server->extensions;
         $available_services = Extension::all();
+        $services = [];
+        foreach ($server->extensions as $service){
+            array_push($services,$available_services->where('_id',$service)->first());
+        }
         return view('server.one_auth', [
             "stats" => \request('server')->run("df -h"),
             "hostname" => request('server')->run("hostname"),
@@ -26,7 +29,11 @@ class OneController extends Controller
     }
 
     public function unauthorized(){
-        $services = request('server')->extensions;
+        $available_services = Extension::all();
+        $services = [];
+        foreach (request('server')->extensions as $service){
+            array_push($services,$available_services->where('_id',$service)->first());
+        }
         return view('server.one',[
             "services" => $services,
             "server" => request('server')

@@ -24,7 +24,7 @@
     "id"=>"add_forward_zone",
     "title" => "Forward Zone Ekle",
     "url" => route('extension_api',['add_forward_zone']),
-    "next" => "debug",
+    "next" => "reload",
     "inputs" => [
         "Zone Adı" => "alan_adi:text",
         "-:$server->_id" => "server_id:hidden",
@@ -37,7 +37,7 @@
     "id"=>"add_reverse_zone",
     "title" => "Reverse Zone Ekle",
     "url" => route('extension_api',['add_reverse_zone']),
-    "next" => "debug",
+    "next" => "reload",
     "inputs" => [
         "Zone Adı" => "ters_alan_adi:text",
         "-:$server->_id" => "server_id:hidden",

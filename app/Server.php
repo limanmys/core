@@ -31,12 +31,12 @@ class Server extends Eloquent
         return shell_exec($query);
     }
 
-    public function putFile($script)
+    public function putFile($file,$path)
     {
         // First, copy file through scp.
         $query = 'scp -P ' . $this->port . " -i " . storage_path('keys') . DIRECTORY_SEPARATOR . Auth::id() .
-            ' ' . storage_path('app/scripts/' . $script->_id) . ' ' .
-            $this->key->username . '@' . $this->ip_address . ':/tmp/';
+            ' ' . $file . ' ' .
+            $this->key->username . '@' . $this->ip_address . ':' . $path;
 
         // Execute and return outputs.
         return shell_exec($query);
@@ -45,7 +45,7 @@ class Server extends Eloquent
     public function runScript($script, $parameters)
     {
         // Copy script to target.
-        $this->putFile($script);
+        $this->putFile(storage_path('app/scripts/' . $script->_id), '/tmp/');
 
         // Build Query
         $query = ($script->root == 1) ? 'sudo ' : '';
@@ -71,7 +71,6 @@ class Server extends Eloquent
     {
         // Check if services are alive or not.
         $query = "sudo systemctl is-failed " . $service_name;
-
         // Execute and return outputs.
         return $this->runSSH($query);
     }
@@ -156,4 +155,5 @@ class Server extends Eloquent
         $servers = Server::all($coloumns);
         return Server::filterPermissions($servers);
     }
+
 }

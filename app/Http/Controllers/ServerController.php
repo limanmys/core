@@ -61,19 +61,12 @@ class ServerController extends Controller
 
     public function check()
     {
-        $extension = Extension::where('name', 'like', request('extension'))->first();
-        $output = Server::where('_id', \request('server_id'))->first()->isRunning($extension->service);
+        $output = request('server')->isRunning(request('service'));
         if ($output == "active\n") {
-            $result = 200;
+            return respond('btn-success');
         } else if ($output === "inactive\n") {
-            $result = 202;
-        } else {
-            $result = 201;
+            return respond('btn-secondary');
         }
-        return [
-            "result" => $result,
-            "data" => $output
-        ];
     }
 
     public function network()
@@ -140,6 +133,16 @@ class ServerController extends Controller
     public function enableExtension()
     {
         $extension = Extension::where('_id', \request('extension_id'))->first();
+
+        if(request('server')->type == "linux" || request('server')->type == "windows"){
+            $dummy = request('server')->extensions;
+            array_push($dummy,$extension->_id);
+            request('server')->extensions = $dummy;
+            request('server')->save();
+            return respond('Servis başarıyla eklendi.');
+        }
+
+
         $script = Script::where('unique_code', $extension->setup)->first();
         $server = \request('server');
         $notification = Notification::new(
@@ -167,7 +170,8 @@ class ServerController extends Controller
 
         $output = request('server')->update([
             "name" => request('name'),
-            "control_port" => request('control_port')
+            "control_port" => request('control_port'),
+            "city" => request('city')
         ]);
         return [
             "result" => 200,

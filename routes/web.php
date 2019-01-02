@@ -47,11 +47,11 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
         // Remove Server Route
 
-        Route::post('/sunucu/sil', 'ServerController@remove')->name('server_remove')->middleware('parameters:server_id');
+        Route::post('/sunucu/sil', 'Server\MainController@remove')->name('server_remove')->middleware('parameters:server_id');
 
         // Server Update Route
 
-        Route::post('/sunucu/guncelle', 'ServerController@update')->name('server_update')->middleware('parameters:server_id,name,control_port');
+        Route::post('/sunucu/guncelle', 'ServerController@update')->name('server_update')->middleware('parameters:server_id,name,control_port,city');
 
         // Server Command Route
 
@@ -59,7 +59,7 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
         // Server' Service Status Route
 
-        Route::post('/sunucu/kontrol', 'ServerController@check')->name('server_check')->middleware('parameters:extension_id,server_id');
+        Route::post('/sunucu/kontrol', 'ServerController@check')->name('server_check')->middleware('parameters:service,server_id');
 
         // Server Network Update
 
@@ -76,6 +76,8 @@ Route::group(['middleware' => ['auth','permissions']],function () {
         // Server Extension Installation Route
 
         Route::post('/sunucu/eklenti', 'ServerController@enableExtension')->name('server_extension');
+
+        Route::post('/sunucu/yukle','Server\MainController@upload')->name('server_upload')->middleware('parameters:files,path');
     });
 
 // SSH Key List Route
