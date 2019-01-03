@@ -75,6 +75,9 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
         // Server File Upload Route
         Route::post('/sunucu/yukle','Server\MainController@upload')->name('server_upload')->middleware('parameters:file,path');
+
+        // Server Terminal Route
+        Route::get('/sunucu/terminal', 'Server\MainController@terminal')->name('server_terminal');
     });
 
     // Remove Server Route
