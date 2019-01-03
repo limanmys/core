@@ -11,11 +11,11 @@ class PermissionManager
     // Main Function of Middleware
     public function handle($request, Closure $next)
     {
-
         // Ignore this middleware if user is not authenticated at all.
         if(!\Auth::check()){
             return $next($request);
         }
+
         $request->request->add(['user_id' => \Auth::id()]);
 
         // Get User Permissions.
@@ -54,6 +54,7 @@ class PermissionManager
         }
         
         // Process request if everything is ok.
+
         return $next($request);
     }
 

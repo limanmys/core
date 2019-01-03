@@ -6,38 +6,42 @@
         "title" => $server->name       
     ])
     <h5>Hostname : {{$hostname}}</h5>
-    <button class="btn btn-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
+    <button class="btn btn-outline-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
 
     @include('modal-button',[
-        "class" => "btn-primary",
+        "class" => "btn-outline-primary",
         "target_id" => "edit",
         "text" => "Düzenle"
     ]) 
     @include('modal-button',[
-        "class" => "btn-warning",
+        "class" => "btn-outline-warning",
         "target_id" => "command",
         "text" => "Komut Çalıştır"
     ])    
     @include('modal-button',[
-        "class" => "btn-secondary",
+        "class" => "btn-outline-secondary",
         "target_id" => "install_extension",
         "text" => "Servis Ekle"
     ])
     @include('modal-button',[
-        "class" => "btn-info",
+        "class" => "btn-outline-info",
         "target_id" => "change_network",
         "text" => "Network"
     ])
     @include('modal-button',[
-        "class" => "btn-primary",
+        "class" => "btn-outline-primary",
         "target_id" => "change_hostname",
         "text" => "Hostname"
     ])
     @include('modal-button',[
-        "class" => "btn-warning",
+        "class" => "btn-outline-warning",
         "target_id" => "file_upload",
         "text" => "Dosya Yükle"
-    ])<br><br>
+    ])
+    <button class="btn btn-outline-success">
+        {{__("Terminal")}}
+    </button>
+    <br><br>
     @if(count($services) > 0)
     <h4>{{__("Servis Durumları")}}</h4>
         @foreach($services as $service)
@@ -56,7 +60,7 @@
     </pre>
 
     @include('modal-button',[
-        "class" => "btn-danger",
+        "class" => "btn-outline-danger",
         "target_id" => "delete",
             "text" => "Sunucuyu Sil"
     ])

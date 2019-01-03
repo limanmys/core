@@ -18,7 +18,7 @@
             <tr onclick="location.href = location.href + '/{{$server->_id}}';" class="highlight">
                 <td>{{$server->name}}</td>
                 <td>{{$server->ip_address}}</td>
-                <td>{{$server->port}}</td>
+                <td>{{$server->control_port}}</td>
             </tr>
         @endforeach
         </tbody>
