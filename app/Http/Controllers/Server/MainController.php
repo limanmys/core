@@ -6,6 +6,9 @@ use App\Key;
 use App\Permission;
 use App\Server;
 use App\Http\Controllers\Controller;
+use Auth;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
 
 class MainController extends Controller
 {
@@ -48,5 +51,44 @@ class MainController extends Controller
             return respond("Dosya başarıyla yüklendi.");
         }
         return respond('Dosya yüklenemedi.');
+    }
+
+    public function terminal(){
+        $server = request('server');
+        $client = new Client([
+            'verify' => false,
+            'cookies' => true
+        ]);
+
+        //First, request page to get _xsrf value.
+        $response = $client->request('GET','https://localhost:4433');
+        preg_match_all('/(?<=<input type=\"hidden\" name=\"_xsrf\" value=\")(.*)(?=\")/', $response->getBody()->getContents(), $output_array);
+        $response = $client->request('POST','https://localhost:4433',[
+            "multipart" => [
+                [
+                    "name" => "hostname",
+                    "contents" => $server->ip_address,
+                ],
+                [
+                    "name" => "port",
+                    "contents" => "$server->port"
+                ],
+                [
+                    "name" => "username",
+                    "contents" => $server->key->username
+                ],
+                [
+                    "name" => "_xsrf",
+                    "contents" => $output_array[0][0]
+                ],
+                [
+                    "name" => "privatekey",
+                    "contents" => fopen(storage_path('keys') .
+                        DIRECTORY_SEPARATOR . Auth::id(),'r')
+                ]
+            ],
+        ]);
+        $json = json_decode($response->getBody()->getContents());
+        dd($json->id);
     }
 }

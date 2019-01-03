@@ -38,10 +38,11 @@
         "target_id" => "file_upload",
         "text" => "Dosya Yükle"
     ])
-    <button class="btn btn-outline-success">
-        {{__("Terminal")}}
-    </button>
-    <br><br>
+    @include('modal-button',[
+        "class" => "btn-outline-success",
+        "target_id" => "terminal",
+        "text" => "Terminal"
+    ])<br><br>
     @if(count($services) > 0)
     <h4>{{__("Servis Durumları")}}</h4>
         @foreach($services as $service)
@@ -75,6 +76,11 @@
             "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
         "submit_text" => "Sunucuyu Sil"
+    ])
+
+    @include('modal-iframe',[
+        "id" => "terminal",
+        "title" => "Terminal"
     ])
 
     @include('modal',[
