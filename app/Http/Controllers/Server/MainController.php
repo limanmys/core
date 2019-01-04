@@ -89,6 +89,8 @@ class MainController extends Controller
             ],
         ]);
         $json = json_decode($response->getBody()->getContents());
-        dd($json->id);
+        return response()->view('terminal.index',[
+            "id" => $json->id
+        ])->withCookie(cookie('_xsrf',$client->getConfig('cookies')->toArray()[0]["Value"]));
     }
 }
