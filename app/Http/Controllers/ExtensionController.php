@@ -166,7 +166,6 @@ class ExtensionController extends Controller
             }
 
         }
-
         // Return all required parameters.
         return view('feature.server', [
             "extension" => $extension,
