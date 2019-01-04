@@ -43,15 +43,5 @@
             </div>
         </div>
     </div>
-    <script>
-        function extensionModal(feature, publisher, email, status) {
-            $(".modal-title").html(feature + " eklentisi");
-            $("#creator").html("Yapımcı : " + publisher);
-            if(status === "0" || status === "2"){
-                $("#disableButton").attr("disabled","disabled");
-            }
-            $("#supportEmail").html(email).attr("href", "mailto:" + email);
-            $("#extensionModal").modal('show');
-        }
-    </script>
+
 @endsection
