@@ -13,55 +13,79 @@ class Script extends Eloquent
         $file = file_get_contents($uploadedFile);
         $rows = explode("\n", $file);
         $script = new Script();
-        for($i = 0 ; $i <= 13;$i++){
-            $rows[$i] = str_replace("#","",$rows[$i]);
+        $script = Script::fillValues($script,$rows);
+        if(Script::where('unique_code',$script->unique_code)->exists()){
+            return false;
+        };
+        $script->save();
+        return $script;
+    }
+
+    public static function createFile($script,...$parameters){
+        $script->save();;
+        $file = fopen(storage_path('app' . DIRECTORY_SEPARATOR . 'scripts' ) . DIRECTORY_SEPARATOR . $script->_id, 'w');
+        $user_inputs = array_slice($parameters[0],0,-1);
+        foreach ($user_inputs as $parameter){
+            fwrite($file,'#' . $parameter . PHP_EOL);
+        }
+        fwrite($file,$parameters[0][count($parameters[0]) -1]);
+        fclose($file);
+        return Script::fillValues($script,$user_inputs);
+    }
+
+    public static function fillValues($script, ... $parameters){
+        $parameters = $parameters[0];
+        for($i = 0 ; $i <= 12;$i++){
+            $parameters[$i] = str_replace("# ","",$parameters[$i]);
             switch ($i){
                 case 0:
-                    $script->language = $rows[$i];
+                    $script->language = $parameters[$i];
                     break;
                 case 1:
-                    $script->encoding = $rows[$i];
+                    $script->encoding = $parameters[$i];
                     break;
                 case 2:
-                    $script->root = $rows[$i];
+                    $script->root = $parameters[$i];
                     break;
                 case 3:
-                    $script->name = $rows[$i];
+                    $script->name = $parameters[$i];
                     break;
                 case 4:
-                    $script->description = $rows[$i];
+                    $script->description = $parameters[$i];
                     break;
                 case 5:
-                    $script->version = $rows[$i];
+                    $script->version = $parameters[$i];
                     break;
                 case 6:
-                    $rows[$i] = explode(',',$rows[$i]);
-                    $script->features = $rows[$i];
+                    $script->extensions = $parameters[$i];
                     break;
                 case 7:
-                    $script->inputs = $rows[$i];
+                    $script->inputs = $parameters[$i];
                     break;
                 case 8:
-                    $script->outputs = $rows[$i];
+                    $script->type = $parameters[$i];
                     break;
                 case 9:
-                    $script->type = $rows[$i];
+                    $script->authors = $parameters[$i];
                     break;
                 case 10:
-                    $script->authors = $rows[$i];
+                    $script->support_email = $parameters[$i];
                     break;
                 case 11:
-                    $script->support_email = $rows[$i];
+                    $script->company = $parameters[$i];
                     break;
                 case 12:
-                    $script->company = $rows[$i];
+                    $script->unique_code = $parameters[$i];
                     break;
                 case 13:
-                    $script->unique_code = $rows[$i];
+                    $script->regex = $parameters[$i];
                     break;
             }
         }
-        $script->save();
         return $script;
+    }
+
+    public static function extension($name){
+        return Script::where('extensions', 'like', '%' . $name . '%')->get();
     }
 }

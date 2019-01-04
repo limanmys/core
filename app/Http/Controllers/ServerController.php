@@ -3,112 +3,82 @@
 namespace App\Http\Controllers;
 
 use App\Extension;
+use App\Jobs\RunScript;
 use App\Key;
+use App\Notification;
 use App\Script;
+use App\Permission;
 use App\Server;
-use App\ServerFeature;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Auth;
 
 class ServerController extends Controller
 {
-    public function index(){
-        return view('server.index',[
-            "servers" => Server::all()
+    public static $protected = true;
+
+    public function index()
+    {
+        // Retrieve all servers.
+        $servers = Server::getAll();
+
+        return view('server.index', [
+            "servers" => $servers
         ]);
     }
 
-
-    public function add(Request $request){
-        $data = $request->all();
-        $server = new Server($data);
-        $server->user_id = Auth::id();
-        $server->extensions = [];
-        $server->save();
-        $output = Key::init(request('username'), request('password'), request('ip_address'),
-            request('port'),Auth::id());
-        $key = new Key($data);
-        $key->server_id = $server->id;
-        $key->user_id = Auth::id();
-        $key->save();
-        return [
-            "result" => 200,
-            "id" => $server->id,
-            "output" => $output
-        ];
-    }
-
-    public function remove(){
-        Server::where('_id',\request('server_id'))->delete();
+    public function remove()
+    {
+        Server::where('_id', \request('server_id'))->delete();
         Key::where('server_id', \request('server_id'))->delete();
-        return [
-            "result" => 200
-        ];
-    }
-
-    public function one(){
-        $scripts = Script::where('features','server')->get();
-        $server = \request('server');
-        $services = $server->extensions;
-        for ($i = 0 ; $i < count($services); $i++){
-            if($services[$i] == "kullanıcılar" || $services[$i] == "gruplar"){
-                unset($services[$i]);
-                array_push($services,'ldap');
-            }
+        $user_permissions = Permission::where('server', 'like', request('server_id'))->get();
+        foreach ($user_permissions as $permission) {
+            $servers = $permission->server;
+            unset($servers[array_search('server_id', $servers)]);
+            $permission->server = $servers;
+            $permission->save();
         }
-        return view('server.one',[
-            "stats" => \request('server')->run("df -h"),
-            "server" => \request('server'),
-            "services" => $services,
-            "scripts" => $scripts
-        ]);
+        return route('servers');
     }
 
-    public function run(){
-        $output = Server::where('_id',\request('server_id'))->first()->run(\request('command'));
-        return [
-            "result" => 200,
-            "data" => $output
-        ];
+    public function run()
+    {
+        return respond(request('server')->run(\request('command')));
     }
 
-    public function runScript(){
-        $script = Script::where('_id',\request('script_id'))->first();
-        $inputs = explode(',',$script->inputs);
+    public function runScript()
+    {
+        $script = Script::where('_id', \request('script_id'))->first();
+        $inputs = explode(',', $script->inputs);
         $params = "";
-        foreach ($inputs as $input){
-            $params = $params. " " . \request(explode(':',$input)[0]);
+        foreach ($inputs as $input) {
+            $params = $params . " " . \request(explode(':', $input)[0]);
         }
-        $output = Server::where('_id',\request('server_id'))->first()->runScript($script, $params);
+        $output = Server::where('_id', \request('server_id'))->first()->runScript($script, $params);
         return [
             "result" => 200,
             "data" => $output
         ];
     }
 
-    public function check(){
-        $feature = Extension::where('name','like',request('feature'))->first();
-        $output = Server::where('_id',\request('server_id'))->first()->isRunning($feature->service);
-        if($output == "active\n"){
-            $result = 200;
-        }else if($output === "inactive\n"){
-            $result = 202;
-        }else{
-            $result = 201;
+    public function check()
+    {
+        $output = request('server')->isRunning(request('service'));
+        if ($output == "active\n") {
+            return respond('btn-success');
+        } else if ($output === "inactive\n") {
+            return respond('btn-secondary');
+        } else{
+            return respond('btn-danger');
         }
-        return [
-            "result" => $result,
-            "data" => $output
-        ];
     }
 
-    public function network(){
+    public function network()
+    {
         $server = \request('server');
         $parameters = \request('ip') . ' ' . \request('cidr') . ' ' . \request('gateway') . ' ' . \request('interface');
-        $server->systemScript('network',$parameters);
+        $server->systemScript('network', $parameters);
         sleep(3);
-        $output = shell_exec("echo exit | telnet " . \request('ip') ." " . $server->port);
-        if (strpos($output,"Connected to " . \request('ip')) == false){
+        $output = shell_exec("echo exit | telnet " . \request('ip') . " " . $server->port);
+        if (strpos($output, "Connected to " . \request('ip')) == false) {
             return [
                 "result" => 201,
                 "data" => $output
@@ -118,34 +88,92 @@ class ServerController extends Controller
             'ip_address' => \request('ip')
         ]);
         Key::init($server->key["username"], request('password'), \request('ip'),
-            $server->port,Auth::id());
+            $server->port, Auth::id());
         return [
             "result" => 200,
             "data" => $output
         ];
     }
 
-    public function hostname(){
+    public function hostname()
+    {
         $server = \request('server');
-        $output = $server->systemScript('hostname',\request('hostname'));
+        $output = $server->systemScript('hostname', \request('hostname'));
         return [
             "result" => 200,
             "data" => $output
         ];
     }
 
-    public function isAlive(){
-        $output = shell_exec("echo exit | telnet " . \request('ip') ." " . \request('port'));
-        if (strpos($output,"Connected to " . \request('ip')) == false){
+    public function isAlive()
+    {
+        $output = shell_exec("echo exit | telnet " . \request('ip') . " " . \request('port'));
+        if (strpos($output, "Connected to " . \request('ip')) == false) {
             return [
                 "result" => 201,
                 "data" => $output
             ];
-        }else{
+        } else {
             return [
                 "result" => 200,
                 "data" => $output
             ];
         }
+    }
+
+    public function service()
+    {
+        $server = \request('server');
+        $service = Extension::where('name', 'like', \request('extension'))->first()->service;
+        $output = $server->run("sudo systemctl " . \request('action') . ' ' . $service);
+        return [
+            "result" => 200,
+            "data" => $output
+        ];
+    }
+
+    public function enableExtension()
+    {
+        $extension = Extension::where('_id', \request('extension_id'))->first();
+
+        if(request('server')->type == "linux" || request('server')->type == "windows"){
+            $dummy = request('server')->extensions;
+            array_push($dummy,$extension->_id);
+            request('server')->extensions = $dummy;
+            request('server')->save();
+            return respond('Servis başarıyla eklendi.');
+        }
+
+
+        $script = Script::where('unique_code', $extension->setup)->first();
+        $server = \request('server');
+        $notification = Notification::new(
+            __("Servis Yükleniyor."),
+            "onhold",
+            __(":server isimli sunucuda :new kuruluyor.",["server"=>request('server')->name,"new"=>$extension->name])
+        );
+        $job = new RunScript($script, $server,\request('domain') . " "
+            . \request('interface'),\Auth::user(),$notification ,$extension);
+        dispatch($job);
+        return respond("Kurulum talebi başarıyla alındı. Gelişmeleri bildirim üzerinden takip edebilirsiniz.");
+    }
+
+    public function update()
+    {
+        Notification::new(
+            __("Server Adı Güncellemesi"),
+            "notify",
+            __(":old isimli sunucu adı :new olarak değiştirildi.",["old"=>request('server')->name,"new"=>request('name')])
+        );
+
+        $output = request('server')->update([
+            "name" => request('name'),
+            "control_port" => request('control_port'),
+            "city" => request('city')
+        ]);
+        return [
+            "result" => 200,
+            "data" => $output
+        ];
     }
 }

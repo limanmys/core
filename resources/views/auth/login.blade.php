@@ -2,7 +2,7 @@
 
 @section('content')
         <div class="container">
-            <div class="card">
+            <div class="card" style="background-color: #343a40;border: 1px solid transparent">
                 <div class="card-header">{{ __('Giriş Yap') }}</div>
 
                 <div class="card-body">

@@ -1,17 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>
-        @isset($message)
-            {{$message}}
-        @endisset
-    </h1>
-    <h3>
-        3 Saniye içinde geri yönlendirileceksiniz...
-    </h3>
-    <script>
-        setTimeout(function () {
-            history.back();
-        },3000);
-    </script>
+    @include('title',[
+    "title" => $message
+    ])
+
+    <button class="btn btn-success" onclick="history.back()">{{__("Geri Dön")}}</button>
+
 @endsection
