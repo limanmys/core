@@ -80,7 +80,8 @@
 
     @include('modal-iframe',[
         "id" => "terminal",
-        "title" => "Terminal"
+        "url" => route('server_terminal',["server_id" => $server->_id]),
+        "title" => "$server->name sunucusu terminali"
     ])
 
     @include('modal',[
