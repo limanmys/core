@@ -162,6 +162,12 @@
             ],
             "Kullanıcılar:5c0a1c687b57f19953126e39" => [
                 "Kullanıcılar:5c0a1c687b57f19953126e39" => "extension_id:hidden"
+            ],
+            "Gruplar:5c0a1c787b57f19953126e3a" => [
+                "Gruplar:5c0a1c787b57f19953126e3a" => "extension_id:hidden"
+            ],
+            "Bilgisayarlar:5c0a1c817b57f19953126e3b" => [
+                "Bilgisayarlar:5c0a1c817b57f19953126e3b" => "extension_id:hidden"
             ]
         ],
         "inputs" => [

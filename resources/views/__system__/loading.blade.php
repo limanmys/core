@@ -1,4 +1,10 @@
-<div class="loading" hidden>
+
+@if(isset($show))
+    <div class="loading">
+@else
+    <div class="loading" hidden>
+@endif
+
     <div class="loader"></div><br>
     <span class="loading_message"></span>
     <style>
