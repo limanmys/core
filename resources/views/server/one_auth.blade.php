@@ -39,6 +39,11 @@
         "text" => "Dosya Yükle"
     ])
     @include('modal-button',[
+        "class" => "btn-outline-primary",
+        "target_id" => "file_download",
+        "text" => "Dosya İndir"
+    ])
+    @include('modal-button',[
         "class" => "btn-outline-success",
         "target_id" => "terminal",
         "text" => "Terminal"
@@ -210,15 +215,27 @@
 
     @include('modal',[
         "id"=>"file_upload",
-        "title" => "Hostname Değiştir",
+        "title" => "Dosya Yükle",
         "url" => route('server_upload'),
-        "next" => "debug",
+        "next" => "reload",
         "inputs" => [
             "Yüklenecek Dosya(lar)" => "file:file",
             "Yol" => "path:text",
             "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
         "submit_text" => "Yükle"
+    ])
+
+    @include('modal',[
+        "id"=>"file_download",
+        "onsubmit" => "downloadFile",
+        "title" => "Dosya İndir",
+        "next" => "",
+        "inputs" => [
+            "Yol" => "path:text",
+            "Sunucu Id:$server->_id" => "server_id:hidden"
+        ],
+        "submit_text" => "İndir"
     ])
 
     @include('modal',[
@@ -290,6 +307,10 @@
                 }, 3000);
             @endforeach
         @endif
-        
+
+        function downloadFile(form){
+            window.location.assign('/sunucu/indir?path=' + form.getElementsByTagName('input')[0].value + '&server_id=' + form.getElementsByTagName('input')[1].value);
+            return false;
+        }
     </script>
 @endsection

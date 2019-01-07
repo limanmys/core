@@ -42,6 +42,16 @@ class Server extends Eloquent
         return shell_exec($query);
     }
 
+    public function getFile($remote_path,$local_path){
+        // First, retrieve file through scp.
+        $query = 'scp -P ' . $this->port . " -i " . storage_path('keys') . DIRECTORY_SEPARATOR . Auth::id() .
+            ' ' . $this->key->username . '@' . $this->ip_address . ':' . $remote_path . ' ' .
+            $local_path;
+
+        // Execute and return outputs.
+        return shell_exec($query);
+    }
+
     public function runScript($script, $parameters)
     {
         // Copy script to target.
