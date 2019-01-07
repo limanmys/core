@@ -78,6 +78,9 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
         // Server Terminal Route
         Route::get('/sunucu/terminal', 'Server\MainController@terminal')->name('server_terminal');
+
+        // Server Download File Route
+        Route::get('/sunucu/indir', 'Server\MainController@download')->name('server_download')->middleware('parameters:path');
     });
 
     // Remove Server Route

@@ -53,6 +53,15 @@ class MainController extends Controller
         return respond('Dosya yüklenemedi.');
     }
 
+    public function download(){
+        // Generate random file name
+        $file = str_random('10');
+        server()->getFile(request('path'),'/tmp/' . $file);
+
+        $file_name = explode("/",request('path'));
+        return response()->download('/tmp/' . $file, $file_name[count($file_name) -1 ])->deleteFileAfterSend();
+    }
+
     public function terminal(){
         $server = request('server');
         $client = new Client([
