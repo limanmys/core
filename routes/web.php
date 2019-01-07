@@ -85,11 +85,11 @@ Route::group(['middleware' => ['auth','permissions']],function () {
         // Server Permission Grant Route
 
         Route::post('/sunucu/yetkilendir', 'Server\MainController@grant')->name('server_grant_permission')->middleware('parameters:server_id,email');
+
+        // Remove Server Route
+
+        Route::post('/sunucu/sil', 'Server\MainController@remove')->name('server_remove')->middleware('parameters:server_id');
     });
-
-    // Remove Server Route
-
-    Route::post('/sunucu/sil', 'Server\MainController@remove')->name('server_remove')->middleware('parameters:server_id');
 
 // SSH Key List Route
 
