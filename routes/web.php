@@ -81,6 +81,10 @@ Route::group(['middleware' => ['auth','permissions']],function () {
 
         // Server Download File Route
         Route::get('/sunucu/indir', 'Server\MainController@download')->name('server_download')->middleware('parameters:path');
+
+        // Server Permission Grant Route
+
+        Route::post('/sunucu/yetkilendir', 'Server\MainController@grant')->name('server_grant_permission')->middleware('parameters:server_id,email');
     });
 
     // Remove Server Route

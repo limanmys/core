@@ -17,22 +17,18 @@
         "target_id" => "install_extension",
         "text" => "Servisi Aktifleştir"
     ])<br><br>
-    @if(count($services) > 0)
+    @if(count($installed_extensions) > 0)
         <h4>{{__("Servis Durumları")}}</h4>
-        @foreach($services as $service)
-            <button type="button" class="btn btn-secondary btn-lg" style="cursor:default;" id="status_{{$service->service}}">
-                {{strtoupper($service->name)}}
+        @foreach($installed_extensions as $extension)
+            <button type="button" class="btn btn-secondary btn-lg" style="cursor:default;"
+                    id="status_{{$extension->service}}">
+                {{strtoupper($extension->name)}}
             </button>
         @endforeach
     @else
         <h4>{{__("Yüklü servis yok.")}}</h4>
     @endif
     <br><br>
-    <pre>
-        @isset($stats)
-            {{$stats}}
-        @endisset
-    </pre>
 
     @include('modal-button',[
         "class" => "btn-danger",
@@ -147,29 +143,21 @@
         ],
         "submit_text" => "Düzenle"
     ])
+    <?php
+    $new_extensions = [];
+    foreach ($available_extensions as $current) {
+        $new_extensions[$current->name . ":" . $current->_id] = [
+            $current->name . ":" . $current->_id => "extension_id:hidden"
+        ];
+    }
+    ?>
 
     @include('modal',[
         "id"=>"install_extension",
         "title" => "Servisi Aktifleştir",
         "url" => route('server_extension'),
         "next" => "message",
-        "selects" => [
-            "DNS:5c0a170f7b57f19953126e37" => [
-                "DNS:5c0a170f7b57f19953126e37" => "extension_id:hidden"
-            ],
-            "DHCP:5c0a1c5f7b57f19953126e38" => [
-                "DHCP:5c0a1c5f7b57f19953126e38" => "extension_id:hidden"
-            ],
-            "Kullanıcılar:5c0a1c687b57f19953126e39" => [
-                "Kullanıcılar:5c0a1c687b57f19953126e39" => "extension_id:hidden"
-            ],
-            "Gruplar:5c0a1c787b57f19953126e3a" => [
-                "Gruplar:5c0a1c787b57f19953126e3a" => "extension_id:hidden"
-            ],
-            "Bilgisayarlar:5c0a1c817b57f19953126e3b" => [
-                "Bilgisayarlar:5c0a1c817b57f19953126e3b" => "extension_id:hidden"
-            ]
-        ],
+        "selects" => $new_extensions,
         "inputs" => [
             "Sunucu Id:$server->_id" => "server_id:hidden"
         ],

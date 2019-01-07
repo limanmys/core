@@ -13,30 +13,28 @@ class OneController extends Controller
     }
 
     public function authorized(){
-        $server = \request('server');
-        $available_services = Extension::all();
-        $services = [];
-        foreach ($server->extensions as $service){
-            array_push($services,$available_services->where('_id',$service)->first());
-        }
         return view('server.one_auth', [
             "stats" => \request('server')->run("df -h"),
             "hostname" => request('server')->run("hostname"),
             "server" => \request('server'),
-            "available_services" => $available_services,
-            "services" => $services,
+            "installed_extensions" => $this->installedExtensions(),
+            "available_extensions" => $this->availableExtensions(),
         ]);
     }
 
     public function unauthorized(){
-        $available_services = Extension::all();
-        $services = [];
-        foreach (request('server')->extensions as $service){
-            array_push($services,$available_services->where('_id',$service)->first());
-        }
         return view('server.one',[
-            "services" => $services,
+            "installed_extensions" => $this->installedExtensions(),
+            "available_extensions" => $this->availableExtensions(),
             "server" => request('server')
         ]);
+    }
+
+    public function availableExtensions(){
+        return Extension::whereNotIn('_id',request('server')->extensions)->get();
+    }
+
+    public function installedExtensions(){
+        return Extension::whereIn('_id',request('server')->extensions)->get();
     }
 }
