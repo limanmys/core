@@ -16,6 +16,11 @@
         "class" => "btn-secondary",
         "target_id" => "install_extension",
         "text" => "Servisi Aktifleştir"
+    ])
+    @include('modal-button',[
+        "class" => "btn-info",
+        "target_id" => "give_permission",
+        "text" => "Yetki Ver"
     ])<br><br>
     @if(count($installed_extensions) > 0)
         <h4>{{__("Servis Durumları")}}</h4>
@@ -162,6 +167,19 @@
             "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
         "submit_text" => "Aktifleştir"
+    ])
+
+    @include('modal',[
+        "id"=>"give_permission",
+        "title" => "Kullanıcıya Yetki Ver",
+        "url" => route('server_grant_permission'),
+        "next" => "function(){return false;}",
+        "inputs" => [
+            "Kullanıcı Emaili" => "email:text",
+            "Sunucu Id:$server->_id" => "server_id:hidden"
+        ],
+        "text" => "Güvenlik sebebiyle kullanıcı listesi sunulmamaktadır.",
+        "submit_text" => "Yetkilendir"
     ])
 
 @endsection

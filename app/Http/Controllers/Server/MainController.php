@@ -25,8 +25,13 @@ class MainController extends Controller
 
     public function remove()
     {
-        Server::where('_id', \request('server_id'))->delete();
-        Key::where('server_id', \request('server_id'))->delete();
+        if(request('server')->user_id != Auth::id() && Auth::user()->isAdmin() == false){
+            return respond("Yalnızca kendi sunucunuzu silebilirsiniz.",202);
+        }
+        if(request('server')->type == "linux_ssh"){
+            request('server')->key->delete();
+        }
+        request('server')->delete();
         $user_permissions = Permission::where('server', 'like', request('server_id'))->get();
         foreach ($user_permissions as $permission) {
             $servers = $permission->server;
@@ -119,21 +124,23 @@ class MainController extends Controller
         // Lastly, save all information.
         $permissions->save();
 
-        // Generate key for user.
-        Key::initWithKey(request('server')->key->username, request('server')->key->_id, request('server')->ip_address,
-            request('server')->port, Auth::id(), $user->_id);
+        if(request('server')->type == "linux_ssh"){
+            // Generate key for user.
+            Key::initWithKey(request('server')->key->username, request('server')->key->_id, request('server')->ip_address,
+                request('server')->port, Auth::id(), $user->_id);
 
-        // Built key object for user.
+            // Built key object for user.
 
-        $key = new Key([
-            "name" => request('server')->key->name,
-            "username" => request('server')->key->username,
-            "server_id" => request('server')->_id
-        ]);
+            $key = new Key([
+                "name" => request('server')->key->name,
+                "username" => request('server')->key->username,
+                "server_id" => request('server')->_id
+            ]);
 
-        $key->user_id = $user->_id;
+            $key->user_id = $user->_id;
 
-        $key->save();
+            $key->save();
+        }
 
         return respond("Yetki başarıyla verildi.");
     }

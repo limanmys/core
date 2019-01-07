@@ -27,6 +27,10 @@ class ServerController extends Controller
 
     public function remove()
     {
+        if(request('server')->user_id != Auth::id()){
+            return respond('Yalnızca kendi sunucularınızı silebilirsiniz.',502);
+        }
+        dd('break');
         Server::where('_id', \request('server_id'))->delete();
         Key::where('server_id', \request('server_id'))->delete();
         $user_permissions = Permission::where('server', 'like', request('server_id'))->get();
