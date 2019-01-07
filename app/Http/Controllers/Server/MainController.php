@@ -6,6 +6,7 @@ use App\Key;
 use App\Permission;
 use App\Server;
 use App\Http\Controllers\Controller;
+use App\User;
 use Auth;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
@@ -101,5 +102,43 @@ class MainController extends Controller
         return response()->view('terminal.index',[
             "id" => $json->id
         ])->withCookie(cookie('_xsrf',$client->getConfig('cookies')->toArray()[0]["Value"]));
+    }
+
+    public function grant(){
+        $user = User::where('email',request('email'))->first();
+        if($user == null){
+            return respond("Kullanıcı bulunamadı.",404);
+        }
+        // Give User a permission to use this server.
+
+        $permissions = Permission::where('user_id',$user->_id)->first();
+        $user_servers = (Array) $permissions->server;
+        array_push($user_servers, request('server')->_id);
+        $permissions->server = $user_servers;
+
+        // Lastly, save all information.
+        $permissions->save();
+
+        // Generate key for user.
+        Key::initWithKey(request('server')->key->username, request('server')->key->_id, request('server')->ip_address,
+            request('server')->port, Auth::id(), $user->_id);
+
+        // Built key object for user.
+
+        $key = new Key([
+            "name" => request('server')->key->name,
+            "username" => request('server')->key->username,
+            "server_id" => request('server')->_id
+        ]);
+
+        $key->user_id = $user->_id;
+
+        $key->save();
+
+        return respond("Yetki başarıyla verildi.");
+    }
+
+    public function revoke(){
+
     }
 }

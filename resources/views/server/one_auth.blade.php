@@ -47,10 +47,15 @@
         "class" => "btn-outline-success",
         "target_id" => "terminal",
         "text" => "Terminal"
+    ])
+    @include('modal-button',[
+        "class" => "btn-outline-info",
+        "target_id" => "give_permission",
+        "text" => "Yetki Ver"
     ])<br><br>
-    @if(count($services) > 0)
+    @if(count($installed_extensions) > 0)
     <h4>{{__("Servis Durumları")}}</h4>
-        @foreach($services as $service)
+        @foreach($installed_extensions as $service)
             <button type="button" class="btn btn-secondary btn-lg" style="cursor:default;" id="status_{{$service->service}}">
                 {{strtoupper($service->name)}}
             </button>
@@ -214,6 +219,19 @@
     ])
 
     @include('modal',[
+        "id"=>"give_permission",
+        "title" => "Kullanıcıya Yetki Ver",
+        "url" => route('server_grant_permission'),
+        "next" => "function(){return false;}",
+        "inputs" => [
+            "Kullanıcı Emaili" => "email:text",
+            "Sunucu Id:$server->_id" => "server_id:hidden"
+        ],
+        "text" => "Güvenlik sebebiyle kullanıcı listesi sunulmamaktadır.",
+        "submit_text" => "Yetkilendir"
+    ])
+
+    @include('modal',[
         "id"=>"file_upload",
         "title" => "Dosya Yükle",
         "url" => route('server_upload'),
@@ -300,8 +318,8 @@
             });
         }
 
-        @if(count($services) > 0)
-            @foreach($services as $service)
+        @if(count($installed_extensions) > 0)
+            @foreach($installed_extensions as $service)
                 setInterval(function () {
                     checkStatus('{{$service->service}}');
                 }, 3000);

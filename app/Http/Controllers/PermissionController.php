@@ -32,7 +32,7 @@ class PermissionController extends Controller
     public function one(){
         $request = \App\LimanRequest::where('_id',request('permission_id'))->first();
         $request->user_name = \App\User::where('_id',$request->user_id)->first()->name;
-        return view('permission.one',[
+        return view('permission.requests.' . $request->type ,[
             "request" => $request
         ]);
     }
