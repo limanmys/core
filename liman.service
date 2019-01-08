@@ -7,8 +7,8 @@ Type=simple
 
 User=liman
 WorkingDirectory=/opt/liman
-ExecStart=php /opt/liman/server/artisan up
-ExecStop=php /opt/liman/server/artisan down
+ExecStart=/usr/bin/python3 -m http.server
+ExecStop=/usr/bin/php /opt/liman/server/artisan down
 Restart=on-failure
 
 [Install]
