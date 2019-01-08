@@ -6,9 +6,9 @@ After=nginx.service
 Type=simple
 
 User=liman
-WorkingDirectory=/opt/liman
+WorkingDirectory=/liman
 ExecStart=/usr/bin/python3 -m http.server
-ExecStop=/usr/bin/php /opt/liman/server/artisan down
+ExecStop=/usr/bin/php /liman/server/artisan down
 Restart=on-failure
 
 [Install]
