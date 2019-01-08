@@ -1,0 +1,14 @@
+[Unit]
+Description=Liman Background Work Service
+After=mongodb.service
+
+[Service]
+Type=simple
+
+User=liman
+WorkingDirectory=/opt/liman
+ExecStart=php /opt/liman/server/artisan queue:listen --timeout=0 --tries=1
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
