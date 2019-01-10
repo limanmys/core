@@ -114,6 +114,9 @@
     100% { transform: rotate(0); }
 }
 
+a,a:hover,.btn-link, .btn-link:hover{
+    color:white;
+}
 
 /*Dark Mode*/
 body{

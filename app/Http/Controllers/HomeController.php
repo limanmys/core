@@ -56,6 +56,6 @@ class HomeController extends Controller
         $req->speed = request('speed');
         $req->status = 0;
         $req->save();
-        return response('Alright',200);
+        return response('Talebiniz başarıyla alındı.',200);
     }
 }

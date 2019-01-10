@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Notification;
 
 use App\Notification;
+use App\Http\Controllers\Controller;
 
-class NotificationController extends Controller
+class MainController extends Controller
 {
     public function check(){
         $notifications = Notification::where([

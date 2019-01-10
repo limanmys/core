@@ -40,6 +40,7 @@
         unset($t);
         $mert = array_merge_recursive($mert,$res);
     }
+    hello_world();
 ?>
 <script src="{{asset('/js/treeview.min.js')}}"></script>
 <link rel="stylesheet" href="{{asset('/css/tree.css')}}">

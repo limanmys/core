@@ -12,12 +12,7 @@
         "class" => "btn-outline-primary",
         "target_id" => "edit",
         "text" => "Düzenle"
-    ]) 
-    @include('modal-button',[
-        "class" => "btn-outline-warning",
-        "target_id" => "command",
-        "text" => "Komut Çalıştır"
-    ])    
+    ])
     @include('modal-button',[
         "class" => "btn-outline-secondary",
         "target_id" => "install_extension",
@@ -280,32 +275,7 @@
         "submit_text" => "Değiştir"
     ])
 
-    @include('modal',[
-        "id"=>"command",
-        "title" => "Özel Komut Çalıştır",
-        "url" => route('server_run'),
-        "next" => "commandDisplay",
-        "inputs" => [
-            "Sorumluluk Reddi" => "responsibility:checkbox",
-            "Kod Alanı" => "command:textarea",
-            "Sunucu Id:$server->_id" => "server_id:hidden"
-        ],
-        "output" => "command_output",
-        "submit_text" => "Çalıştır"
-    ])
-
     <script>
-        function commandDisplay(output){
-            let element = document.getElementById("command_output");
-            let modal = document.getElementsByClassName("modal show")[0];
-            let modal_id = modal.getAttribute("id");
-            document.getElementById(modal_id + "_alert").innerHTML = "Komut Çalıştırıldı.";
-            document.getElementById(modal_id + "_alert").removeAttribute('hidden');
-            let json = JSON.parse(output);
-            element.value = json["message"];
-            element.removeAttribute('hidden');
-        }
-
         function checkStatus(service){
             let data = new FormData();
             data.append('server_id','{{$server->_id}}');

@@ -18,7 +18,7 @@ class RunScript implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(\App\Script $script,\App\Server $server, $parameters,\App\User $user, \App\Notification $notification,\App\Extension $extension)
+    public function __construct(\App\Script $script, $server, $parameters, $user, \App\Notification $notification,\App\Extension $extension)
     {
         $this->user = $user;
         $this->server = $server;

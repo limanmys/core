@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Permission;
 
 use App\User;
+use Auth;
+use App\Http\Controllers\Controller;
 
-class PermissionController extends Controller
+class MainController extends Controller
 {
     public function grant(){
         // First check if user is has permission to give permission.
@@ -31,7 +33,7 @@ class PermissionController extends Controller
 
     public function one(){
         $request = \App\LimanRequest::where('_id',request('permission_id'))->first();
-        $request->user_name = \App\User::where('_id',$request->user_id)->first()->name;
+        $request->user_name = User::where('_id',$request->user_id)->first()->name;
         return view('permission.requests.' . $request->type ,[
             "request" => $request
         ]);
