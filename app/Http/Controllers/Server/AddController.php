@@ -15,7 +15,7 @@ class AddController extends Controller
         // Create object with parameters.
         $this->server = new Server(request()->all());
 
-        $this->server->user_id = request('user_id');
+        $this->server->user_id = Auth::id();
         $this->server->extensions = [];
 
         // Check if Server is online or not.
@@ -23,34 +23,37 @@ class AddController extends Controller
             return respond("Sunucuyla bağlantı kurulamadı.",406);
         }
         $this->server->save();
+
         // Run required function for specific type.
+        $next = null;
         switch ($this->server->type){
             case("linux"):
-                return $this->linux();
+                $next = $this->linux();
                 break;
 
             case("linux_ssh"):
-                return $this->linux_ssh();
+                $next = $this->linux_ssh();
                 break;
 
             case("windows");
-                return $this->windows();
+                $next = $this->windows();
                 break;
 
             case("windows_powershell"):
-                return $this->windows_powershell();
+                $next = $this->windows_powershell();
                 break;
 
             default:
-                return respond("Sunucu türü bulunamadı.",404);
+                $next = respond("Sunucu türü bulunamadı.",404);
                 break;
         }
+        return $next;
     }
 
     private function linux_ssh(){
         // Create Key
         Key::init(request('username'), request('password'), request('ip_address'),
-            request('port'), request('user_id'));
+            request('port'), Auth::id());
 
         $this->server->port = request('port');
 
@@ -65,7 +68,7 @@ class AddController extends Controller
         if(!$this->server->sshAccessEnabled()){
             $key->delete();
             $this->server->delete();
-            return respond("SSH Kullanıcı Parola Hatası",401);
+            return respond("SSH Hatası",401);
         }
 
         return $this->grantPermissions();

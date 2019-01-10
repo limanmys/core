@@ -16,8 +16,6 @@ class PermissionManager
             return $next($request);
         }
 
-        $request->request->add(['user_id' => \Auth::id()]);
-
         // Get User Permissions.
         $permissions = \Auth::user()->permissions();
 

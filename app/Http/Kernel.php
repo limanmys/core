@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\Admin;
 use App\Http\Middleware\Language;
 use App\Http\Middleware\Parameters;
 use App\Http\Middleware\ScriptParameters;
@@ -42,6 +43,7 @@ class Kernel extends HttpKernel
         'parameters' => Parameters::class,
         'server' => Server::class,
         'permissions' => PermissionManager::class,
+        'admin' => Admin::class,
         'script_parameters' => ScriptParameters::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
