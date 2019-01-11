@@ -32,17 +32,30 @@ for($i = 0 ; $i < $users["count"] ; $i++){
                 $attributes = ldap_get_entries($ldap_connection, $search);
                 if($attributes["count"] == 0){
                     $user_details[$k]["cn"] = $k;
-                    $user_details[$k]["whencreated"] = "";
-                    $user_details[$k]["whenchanged"] = "";
-                    $user_details[$k]["name"] = "";
-                    $user_details[$k]["samaccountname"] = "";
+                    $user_details[$k]["name"] = '';
+                    $user_details[$k]["sn"] = '';
+                    $user_details[$k]["givenName"] = '';
+                    $user_details[$k]["samaccountname"] = '';
+                    $user_details[$k]["whenCreated"] = '';
+                    $user_details[$k]["whenChanged"] = '';
+                    $user_details[$k]["pwdLastSet"] = '';
+                    $user_details[$k]["lastLogon"] = '';
+                    $user_details[$k]["lastLogoff"] = '';
+                    $user_details[$k]["accountExpires"] = '';
                     continue;
                 }
                 $user_details[$k]["cn"] = $attributes[0]["cn"][0];
-                $user_details[$k]["whencreated"] = $attributes[0]["whencreated"][0];
-                $user_details[$k]["whenchanged"] = $attributes[0]["whenchanged"][0];
                 $user_details[$k]["name"] = $attributes[0]["name"][0];
+                $user_details[$k]["sn"] = $attributes[0]["sn"][0];
+                $user_details[$k]["givenName"] = $attributes[0]["givenName"][0];
                 $user_details[$k]["samaccountname"] = $attributes[0]["samaccountname"][0];
+                $user_details[$k]["whenCreated"] = $attributes[0]["whenCreated"][0];
+                $user_details[$k]["whenChanged"] = $attributes[0]["whenChanged"][0];
+                $user_details[$k]["pwdLastSet"] = $attributes[0]["pwdLastSet"][0];
+                $user_details[$k]["lastLogon"] = $attributes[0]["lastLogon"][0];
+                $user_details[$k]["lastLogoff"] = $attributes[0]["lastLogoff"][0];
+                $user_details[$k]["accountExpires"] = $attributes[0]["accountExpires"][0];
+
             }
             $t = &$t[$k];
         }
@@ -66,6 +79,22 @@ for($i = 0 ; $i < $users["count"] ; $i++){
                     <td id="cn"></td>
                 </tr>
                 <tr>
+                    <td>Name</td>
+                    <td id="name"></td>
+                </tr>
+                <tr>
+                    <td>SN</td>
+                    <td id="sn"></td>
+                </tr>
+                <tr>
+                    <td>Given Name</td>
+                    <td id="givenName"></td>
+                </tr>
+                <tr>
+                    <td>SAM Account Name</td>
+                    <td id="samaccountname"></td>
+                </tr>
+                <tr>
                     <td>When Created</td>
                     <td id="whencreated"></td>
                 </tr>
@@ -74,12 +103,20 @@ for($i = 0 ; $i < $users["count"] ; $i++){
                     <td id="whenchanged"></td>
                 </tr>
                 <tr>
-                    <td>Name</td>
-                    <td id="name"></td>
+                    <td>pwdLastSet</td>
+                    <td id="pwdLastSet"></td>
                 </tr>
                 <tr>
-                    <td>SAM Account Name</td>
-                    <td id="samaccountname"></td>
+                    <td>lastLogon</td>
+                    <td id="lastLogon"></td>
+                </tr>
+                <tr>
+                    <td>lastLogoff</td>
+                    <td id="lastLogoff"></td>
+                </tr>
+                <tr>
+                    <td>accountExpires</td>
+                    <td id="accountExpires"></td>
                 </tr>
                 </tbody>
             </table>
@@ -97,7 +134,13 @@ for($i = 0 ; $i < $users["count"] ; $i++){
         document.getElementById("whencreated").innerText = user_details[cn]["whencreated"];
         document.getElementById("whenchanged").innerText = user_details[cn]["whenchanged"];
         document.getElementById("name").innerText = user_details[cn]["name"];
+        document.getElementById("sn").innerText = user_details[cn]["sn"];
+        document.getElementById("givenName").innerText = user_details[cn]["givenName"];
         document.getElementById("samaccountname").innerText = user_details[cn]["samaccountname"];
+        document.getElementById("pwdLastSet").innerText = user_details[cn]["pwdLastSet"];
+        document.getElementById("lastLogon").innerText = user_details[cn]["lastLogon"];
+        document.getElementById("lastLogoff").innerText = user_details[cn]["lastLogoff"];
+        document.getElementById("accountExpires").innerText = user_details[cn]["accountExpires"];
     });
     let user_details = <?php echo json_encode($user_details) ?>;
 </script>
