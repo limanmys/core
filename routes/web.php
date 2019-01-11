@@ -3,6 +3,7 @@
 // Auth Routes
 
 require_once(app_path('Http/Controllers/Auth/_routes.php'));
+Route::group(['middleware' => ['auth','permissions']],function () {
 
 // Extension Routes
 
@@ -61,3 +62,4 @@ Route::post('/talep', 'HomeController@request')->name('request_send');
 // Search Page
 
 Route::post('/arama/','SearchController@index')->name('search');
+});

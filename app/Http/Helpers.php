@@ -2,9 +2,15 @@
 
 if(!function_exists('respond')){
     function respond($message, $status = 200){
-        return response([
-            "message" => __($message)
-        ],$status);
+        if(\request()->wantsJson()){
+            return response()->json([
+                "message" => __($message)
+            ],$status);
+        }else{
+            return response()->view('general.error',[
+                "message" => __($message)
+            ],$status);
+        }
     }
 }
 

@@ -12,11 +12,13 @@
         "target_id" => "edit",
         "text" => "Düzenle"
     ])
-    @include('modal-button',[
-        "class" => "btn-secondary",
-        "target_id" => "install_extension",
-        "text" => "Servisi Aktifleştir"
-    ])
+    @if(count($available_extensions))
+        @include('modal-button',[
+            "class" => "btn-secondary",
+            "target_id" => "install_extension",
+            "text" => "Servisi Aktifleştir"
+        ])
+    @endif
     @include('modal-button',[
         "class" => "btn-info",
         "target_id" => "give_permission",
@@ -156,19 +158,19 @@
         ];
     }
     ?>
-
+@if(count($available_extensions))
     @include('modal',[
         "id"=>"install_extension",
         "title" => "Servisi Aktifleştir",
         "url" => route('server_extension'),
-        "next" => "message",
+        "next" => "reload",
         "selects" => $new_extensions,
         "inputs" => [
             "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
         "submit_text" => "Aktifleştir"
     ])
-
+@endif
     @include('modal',[
         "id"=>"give_permission",
         "title" => "Kullanıcıya Yetki Ver",

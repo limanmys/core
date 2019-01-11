@@ -22,7 +22,7 @@ Route::get('/l/{extension_id}/{city}', 'Extension\MainController@city')->name('e
 
 // Extensions List Route
 
-Route::get('/eklentiler', 'Extension\SettingsController@settings_all')->name('extensions_settings');
+Route::get('/eklentiler', 'Extension\SettingsController@settings_all')->name('extensions_settings')->middleware('admin');
 
 // Extension Details Route
 
