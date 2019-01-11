@@ -19,40 +19,22 @@ class Server
             $server = \App\Server::where('_id', $server_id)->first();
             //If server is simply not found.
             if ($server == null) {
-                return $this->response(__("Sunucu bulunamadı."));
+                return respond("Sunucu bulunamadı.",404);
             }
             //Check if ssh port is active on server.
-            if ($server->isAlive() == false) {
-                return $this->response(__("Sunucuyla bağlantı kurulamadı."));
+            if (!$server->isAlive()) {
+                return respond("Sunucuyla bağlantı kurulamadı.",503);
             }
             //Check if SSH key is valid or even exist for user.
-            if ($server->integrity() == false) {
-                $message = __("SSH: Sunucuya erişmek için izniniz yok.");
-                if ($request->ajax()) {
-                    return response([
-                        "message" => $message
-                    ], 401);
-                }
-                return redirect(route('keys'));
+            if (!$server->integrity()) {
+                return respond("SSH: Sunucuya erişmek için izniniz yok.",403);
             }
             //Now that everything is checked, add server variable to request to easy access and prevent more database queries.
             $request->request->add(['server' => $server]);
         } else {
-            return $this->response(__("Server bilgisi verilmedi."));
+            return respond("Server bilgisi verilmedi.",404);
         }
         return $next($request);
     }
 
-    private function response($message)
-    {
-        if (request()->wantsJson()) {
-            return response([
-                "message" => $message
-            ], 401);
-        }else{
-            return response()->view('general.error', [
-                "message" => $message
-            ]);    
-        }
-    }
 }

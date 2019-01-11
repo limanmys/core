@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Server;
+
 class HomeController extends Controller
 {
     /**
@@ -21,8 +23,12 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $servers = Server::all();
         return view('index',[
-            "stats" => shell_exec("screenfetch")
+            "linux_count" => $servers->where('type','linux')->count(),
+            "linux_ssh_count" => $servers->where('type','linux_ssh')->count(),
+            "windows_count" => $servers->where('type','windows')->count(),
+            "windows_powershell_count" => $servers->where('type','windows_powershell')->count(),
         ]);
     }
 

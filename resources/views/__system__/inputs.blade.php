@@ -12,6 +12,7 @@
                 <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}"
                        class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required value="{{explode(":",$name)[1]}}">@if(explode(":", $input)[1] != "hidden")<br>@endif
             @elseif(isset($disabled))
+                <h5 class="@if(isset($random,$id)){{$random}} {{$id}}@endif" style="padding-top: 15px;">{{__(explode(":",$name)[0])}}</h5>
                 <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}"
                        class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required disabled hidden style="margin-top:15px">
             @elseif(explode(":", $input)[1] == "textarea")

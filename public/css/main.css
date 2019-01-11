@@ -1,31 +1,19 @@
 .sidebar {
-    padding: 48px 0 0;
+    padding-top: 48px;
 }
 
 [role="main"] {
     padding-top: 58px;
     padding-left: 20px;
-    margin-left: 70px;
+    margin-left: 200px;
     width: 100%;
     padding-right: 20px;
 }
 
-.navbar-brand {
-    padding-top: .75rem;
-    padding-bottom: .75rem;
-    font-size: 1rem;
-}
-
-.navbar .form-control {
-    padding: .75rem 1rem;
-    border-width: 0;
-    border-radius: 0;
-}
-
 .form-control-dark {
     color: #fff;
-    background-color: rgba(255, 255, 255, .1);
-    border-color: rgba(255, 255, 255, .1);
+    background-color: rgb(255, 255, 255);
+    border-color: rgb(255, 255, 255);
 }
 
 .form-control-dark:focus {
@@ -33,18 +21,18 @@
     box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
 }
 
-.highlight:hover{
+.highlight:hover {
     background-color: #28a745;
     color: white;
     cursor: pointer;
 }
 
-.card{
+.card {
     margin: 20px;
-    border:1px solid darkgrey;
+    border: 1px solid darkgrey;
 }
 
-.input_list{
+.input_list {
     /*border:1px solid darkgrey;*/
     border-radius: 3px;
     margin: 3px;
@@ -57,6 +45,7 @@
     height: 18px;
     background: green;
 }
+
 #editor {
     position: absolute;
     top: 0;
@@ -64,6 +53,7 @@
     bottom: 0;
     left: 0;
 }
+
 .column {
     float: left;
     width: 50%;
@@ -71,14 +61,18 @@
     height: 500px; /* Should be removed. Only for demonstration */
 }
 
-.notification{
+.notification {
     border-radius: 5px;
-    padding:10px;
-    margin:20px;
+    padding: 10px;
+    margin: 20px;
     margin-left: -20px;
 }
 
-.bell{
+.col-md-2 {
+    max-width: 200px;
+}
+
+.bell {
     -webkit-animation: ring 2s .5s ease-in-out infinite;
     -webkit-transform-origin: 50% 4px;
     -moz-animation: ring 2s .5s ease-in-out infinite;
@@ -88,50 +82,98 @@
 }
 
 @-webkit-keyframes ring {
-    0% { -webkit-transform: rotateZ(0); }
-    20% { -webkit-transform: rotateZ(30deg); }
-    40% { -webkit-transform: rotateZ(-30deg); }
-    60% { -webkit-transform: rotateZ(30deg); }
-    80% { -webkit-transform: rotateZ(-30deg); }
-    100% { -webkit-transform: rotateZ(0); }
+    0% {
+        -webkit-transform: rotateZ(0);
+    }
+    20% {
+        -webkit-transform: rotateZ(30deg);
+    }
+    40% {
+        -webkit-transform: rotateZ(-30deg);
+    }
+    60% {
+        -webkit-transform: rotateZ(30deg);
+    }
+    80% {
+        -webkit-transform: rotateZ(-30deg);
+    }
+    100% {
+        -webkit-transform: rotateZ(0);
+    }
 }
 
 @-moz-keyframes ring {
-    0% { -moz-transform: rotate(0); }
-    20% { -moz-transform: rotate(30deg); }
-    40% { -moz-transform: rotate(-30deg); }
-    60% { -moz-transform: rotate(30deg); }
-    80% { -moz-transform: rotate(-30deg); }
-    100% { -moz-transform: rotate(0); }
+    0% {
+        -moz-transform: rotate(0);
+    }
+    20% {
+        -moz-transform: rotate(30deg);
+    }
+    40% {
+        -moz-transform: rotate(-30deg);
+    }
+    60% {
+        -moz-transform: rotate(30deg);
+    }
+    80% {
+        -moz-transform: rotate(-30deg);
+    }
+    100% {
+        -moz-transform: rotate(0);
+    }
 }
 
 @keyframes ring {
-    0% { transform: rotate(0); }
-    20% { transform: rotate(30deg); }
-    40% { transform: rotate(-30deg); }
-    60% { transform: rotate(30deg); color: yellow;}
-    80% { transform: rotate(-30deg);}
-    100% { transform: rotate(0); }
+    0% {
+        transform: rotate(0);
+    }
+    20% {
+        transform: rotate(30deg);
+    }
+    40% {
+        transform: rotate(-30deg);
+    }
+    60% {
+        transform: rotate(30deg);
+        color: yellow;
+    }
+    80% {
+        transform: rotate(-30deg);
+    }
+    100% {
+        transform: rotate(0);
+    }
 }
 
-a,a:hover,.btn-link, .btn-link:hover{
-    color:white;
+a, a:hover, .btn-link, .btn-link:hover {
+    color: white;
 }
 
 /*Dark Mode*/
-body{
+body {
     background-color: rgb(43, 43, 45);
-    color:white;
+    color: white;
 }
-.modal-content, .card, .card-body{
+
+.modal-content, .card, .card-body {
     background-color: #2b2b2d;
 }
 
-pre{
-    color:white
+pre {
+    color: white
 }
 
-.navbar .dropdown-menu{
+.navbar .dropdown-menu {
     background-color: rgba(255, 255, 255, .1);
     border-radius: 20px;
+}
+
+.chart {
+    width: 30%;
+    min-width: 400px;
+    height: 310px;
+    background-color: #343a40;
+    border: none;
+    color: white;
+    padding: 20px
 }

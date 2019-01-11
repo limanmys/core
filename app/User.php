@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Jenssegers\Mongodb\Auth\User as Authenticatable;
 
 class User extends Authenticatable
@@ -11,6 +10,7 @@ class User extends Authenticatable
     use Notifiable;
     protected $collection = 'users';
     protected $connection = 'mongodb';
+    public $permissions = null;
     /**
      * The attributes that are mass assignable.
      *
@@ -30,27 +30,23 @@ class User extends Authenticatable
     ];
 
     public function permissions(){
-        $permissions = Permission::where('user_id',$this->_id)->first();
-        return $permissions;
+        if($this->permissions == null){
+            $this->permissions = Permission::get($this->_id);
+        }
+        return $this->permissions;
     }
 
     public function isAdmin(){
-        return ($this->status == 1) ? true : false;
+        return $this->status == 1;
     }
 
     public function hasAccess($target,$id = null){
-        if($this->isAdmin()){
-            return true;
+        if($this->permissions == null){
+            $this->permissions = Permission::get($this->_id);
         }
-        if(request('permissions')->__get($target) != null){
-            if($id != null && in_array($id,request('permissions')->__get($target))){
-                return true;
-            }else if($id != null){
-                return false;
-            }
-            return true;
-        }else{
-            return false;
+        if($this->permissions->__get($target) == null){
+            return $this->isAdmin();
         }
+        return array_search($id, $this->permissions->__get($target));
     }
 }

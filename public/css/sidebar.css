@@ -5,18 +5,27 @@
     height: 100%;
     float: left;
     position: fixed;
-    width: 60px;
+    width: 200px;
     z-index: 300;
+    padding-top: 48px;
 }
 
 .sidebar-nav {
-    background-color: #343a40;
-    /*display: block;*/
-    /*float: left;*/
-    width: 100%;
     list-style: none;
     margin: 0;
     padding: 0;
+}
+
+.navbar-brand {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+    font-size: 1rem;
+}
+
+.navbar .form-control {
+    padding: .75rem 1rem;
+    border-width: 0;
+    border-radius: 0;
 }
 
 .sidebar-nav li a {
@@ -43,5 +52,7 @@
 }
 
 .badge{
-
+    position: absolute;
+    right: 10px;
+    z-index: 301;
 }
