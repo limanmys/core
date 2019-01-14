@@ -13,7 +13,7 @@
         </div>
         <div class="col-9">
             <div class="form-group">
-                <textarea class="form-control" id="exampleFormControlTextarea1" rows="25"></textarea>
+                <textarea aria-label="textarea" class="form-control" id="exampleFormControlTextarea1" rows="25"></textarea>
             </div>
         </div>
     </div>

@@ -52,7 +52,8 @@ class PermissionManager
         if($value == null){
             return true;
         }
-        if(!array_search($value, request('permissions')->__get($target))){
+        echo $value;
+        if(!in_array($value, request('permissions')->__get($target))){
             return false;
         }
         return true;
