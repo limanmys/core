@@ -158,7 +158,6 @@
         function dummy(id) {
             let main = document.getElementsByTagName('main')[0];
             main.innerHTML = document.getElementsByClassName('loading')[0].innerHTML;
-            document.getElementsByClassName('loading_message')[0].innerHTML = "Sunucuyla bağlantı kuruluyor";
             location.href = '/sunucular/' + id;
         }
 
