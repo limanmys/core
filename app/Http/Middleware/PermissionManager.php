@@ -29,7 +29,7 @@ class PermissionManager
         // Loop through every validations
         foreach(PermissionManager::$verify as $target){
             if(!$this->check($target)){
-                return respond('Liman: Bu işlem için yetkiniz bulunmamaktadır.',403);
+                return respond('Bu işlem için yetkiniz bulunmamaktadır.',403);
             }
         }
         // Process request if everything is ok.
@@ -52,7 +52,6 @@ class PermissionManager
         if($value == null){
             return true;
         }
-        echo $value;
         if(!in_array($value, request('permissions')->__get($target))){
             return false;
         }
