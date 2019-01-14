@@ -40,14 +40,16 @@
         unset($t);
         $mert = array_merge_recursive($mert,$res);
     }
-    hello_world();
 ?>
-<script src="{{asset('/js/treeview.min.js')}}"></script>
-<link rel="stylesheet" href="{{asset('/css/tree.css')}}">
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jstree/3.3.7/themes/default/style.min.css" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/jstree/3.3.7/jstree.min.js"></script>
+
 <div class="container">
     <div class="row">
         <div class="col">
-            <div id="tree"></div>
+            <div id="ldap_tree"></div>
         </div>
         <div class="col pt-3">
             <table class="table">
@@ -77,18 +79,28 @@
         </div>
     </div>
 </div>
+<form id="s">
+    <input type="search" id="q" />
+    <button type="submit">Search</button>
+</form>
 
 <script>
-    let tree = new TreeView([
-        @include("__system__.folder",["files" => $mert])
-    ], 'tree');
-    tree.on('select',function(e){
-        let cn = e.data.name;
-        document.getElementById("uid").innerText = user_details[cn]["uid"];
-        document.getElementById("uidnumber").innerText = user_details[cn]["uidnumber"];
-        document.getElementById("homedirectory").innerText = user_details[cn]["homedirectory"];
-        document.getElementById("gidnumber").innerText = user_details[cn]["gidnumber"];
-        document.getElementById("cn").innerText = user_details[cn]["cn"];
+    function asd(){
+        $('#ldap_tree').jstree({
+            "plugins" : ["search"],
+            'core' : {
+                'data' : [
+                    @include("__system__.folder",["files" => $mert])
+                ]
+            }
+        });
+    }
+    asd();
+</script>
+
+<script>
+    $("#s").submit(function(e) {
+        e.preventDefault();
+        $("#ldap_tree").jstree(true).search($("#q").val());
     });
-    let user_details = <?php echo json_encode($user_details) ?>;
 </script>
