@@ -36,3 +36,18 @@ function _search($connection, $dn ,$filter, $extra){
     }
     return $mert;
 }
+
+function addUser($server,$password,$rdn){
+    $user["firstname"] = request("firstname");
+    $user["surname"] = request("surname");
+    $user["fullname"] = request("fullname");
+    $user["username"] = request("username");
+    $user["password"] = request("password");
+    $user["forcechangepass"] = (request()->exists('forcechangepass')) ? "true" : "false";
+    $user["neverexpired"] = (request()->exists('neverexpired')) ? "true" : "false";
+    $user["lockaccount"] = (request()->exists('lockaccount')) ? "true" : "false";
+    $user["objectclass"] = "posixAccount";
+    $user["cantchangepass"] = (request()->exists('cantchangepass')) ? "true" : "false";
+    $ldap_connection = _init($server->ip_address,$server->port, $password, $rdn);
+    ldap_add($ldap_connection,request('tree_path'),$user);
+}
