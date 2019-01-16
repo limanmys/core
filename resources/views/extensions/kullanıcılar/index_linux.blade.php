@@ -1,45 +1,7 @@
 <?php
-    $ldap_connection = ldap_connect($server->ip_address);
-    ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+    $conn = _init($server->ip_address, $server->port, "SambaPardus01", "cn=admin,dc=ldap,dc=lab");
 
-    $pass = "SambaPardus01";
-    try{
-        $result = ldap_bind($ldap_connection,"cn=admin,dc=ldap,dc=lab",$pass);
-    }catch (Exception $e){
-        echo $e->getMessage();
-    }
-    $search = ldap_search($ldap_connection, "dc=ldap,dc=lab" , "(objectclass=posixAccount)", ["dn"]);
-    $users = ldap_get_entries($ldap_connection, $search);
-    $mert = [];
-    $user_details = [];
-    for($i = 0 ; $i < $users["count"] ; $i++){
-        $user = $users[$i]["dn"];
-        $arr = explode(",", $user);
-        $arr = array_reverse($arr);
-        $current = [];
-        $tail = null;
-        $res = array();
-        $t   = &$res;
-        foreach ($arr as $k) {
-            if (empty($t[$k])) {
-                if(!starts_with($k,"cn")){
-                    $t[$k] = array();
-                }else{
-                    $t[$k] = $k;
-                    $search = ldap_search($ldap_connection, "dc=ldap,dc=lab", $k);
-                    $attributes = ldap_get_entries($ldap_connection, $search)[0];
-                    $user_details["cn=" . $attributes["cn"][0]]["uid"] = $attributes["uid"][0];
-                    $user_details["cn=" . $attributes["cn"][0]]["uidnumber"] = $attributes["uidnumber"][0];
-                    $user_details["cn=" . $attributes["cn"][0]]["homedirectory"] = $attributes["homedirectory"][0];
-                    $user_details["cn=" . $attributes["cn"][0]]["gidnumber"] = $attributes["gidnumber"][0];
-                    $user_details["cn=" . $attributes["cn"][0]]["cn"] = $attributes["cn"][0];
-                }
-                $t = &$t[$k];
-            }
-        }
-        unset($t);
-        $mert = array_merge_recursive($mert,$res);
-    }
+    $results = _search($conn, "dc=ldap,dc=lab" , "(objectclass=posixAccount)", ["dn"]);
 ?>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
@@ -90,7 +52,7 @@
             "plugins" : ["search"],
             'core' : {
                 'data' : [
-                    @include("__system__.folder",["files" => $mert])
+                    @include("__system__.folder",["files" => $results])
                 ]
             }
         });
