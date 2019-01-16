@@ -16,7 +16,6 @@ class OneController extends Controller
         // First, check requested server has key.
         $server = \request('server');
 
-
         if($server->key == null){
 
             // Redirect user if requested server is not serverless.
@@ -96,10 +95,17 @@ class OneController extends Controller
     }
 
     public function runFunction(){
-        $extension = Extension::where('_id',request('extension_id'))->first();
+        $extension = Extension::where('_id',request()->route('extension_id'))->first();
         require(base_path('resources/views/extensions/' . strtolower($extension->name) . '/functions.php'));
-        call_user_func('hello_world');
-
+        if(function_exists(request('function_name'))){
+            if(call_user_func(request('function_name'),request('server'),"SambaPardus01","cn=admin,dc=ldap,dc=lab")){
+                return respond("Kullanıcı başarıyla eklendi",200);
+            }else{
+                return respond("Kullanıcı eklenemedi, lütfen yöneticinizle iletişime geçiniz",201);
+            }
+        }else{
+            return respond("İşlev bulunamadı, lütfen yöneticinizle iletişime geçiniz.",404);
+        }
     }
 
 }

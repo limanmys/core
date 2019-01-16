@@ -21,16 +21,24 @@ class Server
             if ($server == null) {
                 return respond("Sunucu bulunamadı.",404);
             }
+
+            //Now that everything is checked, add server variable to request to easy access and prevent more database queries.
+            $request->request->add(['server' => $server]);
+
             //Check if ssh port is active on server.
             if (!$server->isAlive()) {
                 return respond("Sunucuyla bağlantı kurulamadı.",503);
             }
+            // Check if server is serverless, which means no validation required.
+            if($server->serverless){
+                return $next($request);
+            }
+
             //Check if SSH key is valid or even exist for user.
             if (!$server->integrity()) {
                 return respond("SSH: Sunucuya erişmek için izniniz yok.",403);
             }
-            //Now that everything is checked, add server variable to request to easy access and prevent more database queries.
-            $request->request->add(['server' => $server]);
+
         } else {
             return respond("Server bilgisi verilmedi.",404);
         }
