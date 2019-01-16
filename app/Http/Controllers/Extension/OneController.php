@@ -95,4 +95,11 @@ class OneController extends Controller
         }
     }
 
+    public function runFunction(){
+        $extension = Extension::where('_id',request('extension_id'))->first();
+        require(base_path('resources/views/extensions/' . strtolower($extension->name) . '/functions.php'));
+        call_user_func('hello_world');
+
+    }
+
 }

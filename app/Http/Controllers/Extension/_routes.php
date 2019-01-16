@@ -39,3 +39,6 @@ Route::post('/eklentiler/betikler/ekle', 'Extension\SettingsController@addScript
 // Extension View Script Remove
 
 Route::post('/eklentiler/betikler/sil', 'Extension\SettingsController@removeScriptFromView')->name('extension_page_script_remove');
+
+// Extension Function Api
+Route::get('/eklenti/{extension_id}/{function_name}','Extension\OneController@runFunction')->name('extension_function_api');
