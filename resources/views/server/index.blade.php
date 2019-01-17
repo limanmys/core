@@ -31,14 +31,15 @@
                     <td id="city" hidden>{{$server->city}}</td>
                 </tr>
             @endforeach
-            <div class="dropdown-menu" id="context-menu" style="color:white">
+
+            <ul class="dropdown-menu" id="context-menu" style="color:white">
                 <a class="dropdown-item" data-toggle="modal" data-target="#edit" href="#">Düzenle</a>
                 <a class="dropdown-item" data-toggle="modal" data-target="#change_hostname" href="#">Hostname Değiştir</a>
                 <a class="dropdown-item" data-toggle="modal" data-target="#delete" href="#">Sil</a>
-            </div>
+
+            </ul>
             </tbody>
         </table>
-        <div id='context-menu-bye'></div>
     @else
         <h3>{{__("Sunucunuz Bulunmuyor.")}}</h3>
     @endif
@@ -164,7 +165,6 @@
             location.href = '/sunucular/' + id;
         }
         let menu = document.getElementById('context-menu');
-        let menu_by = document.getElementById('context-menu-bye');
         function rightClick(element,event){
             menu.classList.toggle('show');
             menu.style.top = event.clientY+"px";
@@ -190,7 +190,7 @@
                     elms2[j].value=element.getElementsByTagName("td")[4].innerHTML;
                 else if(elms2[j].name === "name")
                     elms2[j].value=element.getElementsByTagName("td")[0].innerHTML;
-                else if(elms2[i].name === "control_port")
+                else if(elms2[j].name === "control_port")
                     elms2[j].value=element.getElementsByTagName("td")[3].innerHTML;
                 else if(elms2[j].name === "city")
                     elms2[j].value=element.getElementsByTagName("td")[5].innerHTML;
@@ -201,12 +201,11 @@
             }
             return false;
         }
-        menu_by.addEventListener("click",function(e){
-            menu.style.display = 'none';
-        },false);
-        menu.addEventListener("click",function(e){
-            menu.style.display = 'none';
-        },false);
+        document.onclick = function(e){
+            if(e.target.id == ''){
+                menu.style.display = 'none';
+            }
+        };
     </script>
     @include('modal',[
        "id"=>"delete",
@@ -215,7 +214,7 @@
        "text" => "isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
        "next" => "reload",
        "inputs" => [
-           "Sunucu Id:$server->_id" => "server_id:hidden"
+           "Sunucu Id:'null'" => "server_id:hidden"
        ],
        "submit_text" => "Sunucuyu Sil"
    ])
@@ -227,7 +226,7 @@
         "inputs" => [
             "Sunucu Adı" => "name:text",
             "Kontrol Portu" => "control_port:number",
-            "Sunucu Id:$server->_id" => "server_id:hidden",
+            "Sunucu Id:''" => "server_id:hidden",
             "Şehir:city" => [
                  "Adana" => "01",
                  "Adıyaman" => "02",
@@ -321,7 +320,7 @@
         "next" => "reload",
         "inputs" => [
             "Hostname" => "hostname:text",
-            "Sunucu Id:$server->_id" => "server_id:hidden"
+            "Sunucu Id:''" => "server_id:hidden"
         ],
         "submit_text" => "Değiştir"
     ])
