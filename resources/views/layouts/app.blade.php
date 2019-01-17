@@ -32,9 +32,9 @@
         <span class="px-3 text-white" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
               style="cursor: pointer;">
             @if(count($notifications) > 0)
-                <i id="full_bell" style="position: absolute;top:30%;" class="fas fa-bell bell" onclick="read()"></i>
+                <i id="full_bell" style="position: absolute;top:20%;left: 60%;" class="fas fa-bell bell" onclick="read()"></i>
             @else
-                <i id="empty_bell" style="position: absolute;top:20%;" class="far fa-bell"></i>
+                <i id="empty_bell" style="position: absolute;top:20%;left: 60%;" class="far fa-bell"></i>
             @endif
         </span>
             <ul id="notificationDiv" class="dropdown-menu shadow-lg border-dark"

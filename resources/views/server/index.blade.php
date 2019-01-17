@@ -172,29 +172,32 @@
             menu.style.backgroundColor = 'white';
             menu.style.display = 'block';
 
-           // console.log(element);
-            var elms = document.getElementById("delete").getElementsByTagName("*");
-            var elms2 = document.getElementById("edit").getElementsByTagName("*");
-            var elms3 = document.getElementById("change_hostname").getElementsByTagName("*");
+            let elms = document.getElementById("delete").getElementsByTagName("*");
+            let elms2 = document.getElementById("edit").getElementsByTagName("*");
+            let elms3 = document.getElementById("change_hostname").getElementsByTagName("*");
+
+
             for (var i = 0; i < elms.length; i++) {
                 if (elms[i].className === "modal-title")
                     elms[i].innerHTML=element.getElementsByTagName("td")[0].innerHTML;
-                if(elms[i].name === "server_id")
-                    elms[i].value=element.getElementsByTagName("td")[4].innerHTML;
+                else if(elms[i].name === "server_id")
+                    elms[i].value = element.getElementsByTagName("td")[4].innerHTML;
+                else if(elms[i].id === "delete_alert")
+                    elms[i].setAttribute('hidden',"true");
             }
-            for (var i = 0; i < elms2.length; i++) {
-                if(elms2[i].name === "server_id")
-                    elms2[i].value=element.getElementsByTagName("td")[4].innerHTML;
-                else if(elms2[i].name === "name")
-                    elms2[i].value=element.getElementsByTagName("td")[0].innerHTML;
+            for (var j = 0; j < elms2.length; j++) {
+                if(elms2[j].name === "server_id")
+                    elms2[j].value=element.getElementsByTagName("td")[4].innerHTML;
+                else if(elms2[j].name === "name")
+                    elms2[j].value=element.getElementsByTagName("td")[0].innerHTML;
                 else if(elms2[i].name === "control_port")
-                    elms2[i].value=element.getElementsByTagName("td")[3].innerHTML;
-                else if(elms2[i].name === "city")
-                    elms2[i].value=element.getElementsByTagName("td")[5].innerHTML;
+                    elms2[j].value=element.getElementsByTagName("td")[3].innerHTML;
+                else if(elms2[j].name === "city")
+                    elms2[j].value=element.getElementsByTagName("td")[5].innerHTML;
             }
-            for (var i = 0; i < elms3.length; i++) {
-                if(elms3[i].name === "server_id")
-                    elms3[i].value=element.getElementsByTagName("td")[4].innerHTML;
+            for (var k = 0; k < elms3.length; k++) {
+                if(elms3[k].name === "server_id")
+                    elms3[k].value=element.getElementsByTagName("td")[4].innerHTML;
             }
             return false;
         }
