@@ -43,19 +43,18 @@ function addUser(){
     $user["givenName"] = request("firstname");
     $user["sn"] = request("surname");
     $user["displayName"] = request("fullname");
-    $user["sAMAccountName"] = request("username");
-    $user["password"] = request("password");
-    if(request()->exists('forcechangepass')){
-        $user["pwdLastSet"] = intval(11644473600.0 + time()) * 10000000;
-    }
-    $user["userAccountControl"] = (request()->exists('neverexpired')) ? "512" : "66048";
-    if(request()->exists('lockaccount')){
-        $user["lockoutTime"] = 0;
-    }
-    $user["objectclass"] = "posixAccount";
-    if(request()->exists('cantchangepass')){
-        $user["msDS-SupportedEncryptionTypes"] = 0;
-    }
+    $user["samAccountName"] = request("username");
+//    if(request()->exists('forcechangepass')){
+//        $user["pwdLastSet"] = intval(11644473600.0 + time()) * 10000000;
+//    }
+//    $user["userAccountControl"] = (request()->exists('neverexpired')) ? "512" : "66048";
+//    if(request()->exists('lockaccount')){
+//        $user["lockoutTime"] = 0;
+//    }
+//    $user["objectclass"] = "posixAccount";
+//    if(request()->exists('cantchangepass')){
+//        $user["msDS-SupportedEncryptionTypes"] = 0;
+//    }
     $ldap_connection = _init();
     ldap_add($ldap_connection,request('tree_path'),$user);
 }
