@@ -14,7 +14,7 @@ Route::get('/l/{extension_id}/{city}/{server_id}/{unique_code}', 'Extension\OneC
 
 // Extension Page (City Select) Route
 
-Route::get('/l/{extension_id}', 'Extension\MainController@all')->name('extension_id');
+Route::get('/l/{extension_id}', 'Extension\MainController@all')->name('extension_map');
 
 // Extension City Servers Route
 
@@ -42,3 +42,9 @@ Route::post('/eklentiler/betikler/sil', 'Extension\SettingsController@removeScri
 
 // Extension Function Api
 Route::post('/eklenti/{extension_id}/{function_name}','Extension\OneController@runFunction')->name('extension_function_api')->middleware('server');
+
+// Extension Server Setting Page
+Route::get('/ayarlar/{extension_id}/{server_id}','Extension\OneController@serverSettingsPage')->name('extension_server_settings_page')->middleware('server');
+
+// Extension Server Settings
+Route::post('/ayarlar/{extension_id}/{server_id}','Extension\OneController@serverSettings')->name('extension_server_settings')->middleware('server');
