@@ -21,8 +21,11 @@ class Key extends Eloquent
             shell_exec("ssh-keygen -t rsa -f " . storage_path('keys')  . DIRECTORY_SEPARATOR . $account_name ." -q -P ''");
         }
 
-        //Trust target server
-        shell_exec("ssh-keyscan -p " . $server_port . " -H ". $server_address . " >> ~/.ssh/known_hosts");
+        //Check if server is already trusted or not.
+        if(shell_exec("ssh-keygen -F " . $server_address . " 2>/dev/null") == null){
+            // Trust Target Server
+            shell_exec("ssh-keyscan -p " . $server_port . " -H ". $server_address . " >> ~/.ssh/known_hosts");
+        }
 
         //Send Keys to target
         shell_exec("sshpass -p '" . $password . "' ssh-copy-id -i " . storage_path('keys')  . DIRECTORY_SEPARATOR . $account_name ." " . $username
@@ -40,8 +43,11 @@ class Key extends Eloquent
             shell_exec("ssh-keygen -t rsa -f " . storage_path('keys')  . DIRECTORY_SEPARATOR . $new_name ." -q -P ''");
         }
 
-        //Trust target server
-        shell_exec("ssh-keyscan -p " . $server_port . " -H ". $server_address . " >> ~/.ssh/known_hosts");
+        //Check if server is already trusted or not.
+        if(shell_exec("ssh-keygen -F " . $server_address . " 2>/dev/null") == null){
+            // Trust Target Server
+            shell_exec("ssh-keyscan -p " . $server_port . " -H ". $server_address . " >> ~/.ssh/known_hosts");
+        }
 
         //Send Keys to target
         shell_exec('cat ' . storage_path('keys')  . DIRECTORY_SEPARATOR . $new_name . ".pub | ssh -i " .

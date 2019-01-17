@@ -4,9 +4,9 @@
     @include('title',[
         "title" => "Betikler"
     ])
-    <button type="button" class="btn btn-success" onclick="window.location.href = '{{route('script_add')}}'">
-        {{ __("Betik Oluştur") }}
-    </button>
+    {{--<button type="button" class="btn btn-success" onclick="window.location.href = '{{route('script_add')}}'">--}}
+        {{--{{ __("Betik Oluştur") }}--}}
+    {{--</button>--}}
 
     @include('modal-button',[
         "class" => "btn-primary",
@@ -32,7 +32,8 @@
         </thead>
         <tbody>
         @foreach ($scripts as $script)
-            <tr class="highlight" onclick="window.location.href = '{{route('script_one',$script->_id)}}'">
+            {{--<tr class="highlight" onclick="window.location.href = '{{route('script_one',$script->_id)}}'">--}}
+            <tr class="">
                 <td>{{$script->name}}</td>
             </tr>
         @endforeach

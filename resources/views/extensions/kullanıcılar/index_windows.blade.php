@@ -1,14 +1,20 @@
 <?php
 $ldap_connection = ldap_connect($server->ip_address);
 ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
-ldap_set_option($ldap_connection, LDAP_OPT_REFERRALS, 0);
+$query = "openssl s_client -connect " . $server->ip_address . ":" . $server->control_port .
+    " 2>/dev/null </dev/null |  sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'";
+$cert = shell_exec($query);
+
+ldap_set_option($ldap_connection, LDAP_OPT_X_TLS_CACERTFILE,$cert);
+ldap_set_option($ldap_connection, LDAP_OPT_X_TLS_REQUIRE_CERT, LDAP_OPT_X_TLS_HARD);
 
 $pass = "SambaPardus01";
 try{
-    $result = ldap_bind($ldap_connection,"administrator@win.lab",$pass);
+    $result = ldap_bind($ldap_connection,"cn=administrator,cn=Users,dc=win,dc=lab",$pass);
 }catch (Exception $e){
     dd($e->getMessage());
 }
+
 $search = ldap_search($ldap_connection, "dc=win,dc=lab" , "(objectclass=person)");
 $users = ldap_get_entries($ldap_connection, $search);
 $mert = [];
@@ -46,15 +52,15 @@ for($i = 0 ; $i < $users["count"] ; $i++){
                 }
                 $user_details[$k]["cn"] = $attributes[0]["cn"][0];
                 $user_details[$k]["name"] = $attributes[0]["name"][0];
-                $user_details[$k]["sn"] = $attributes[0]["sn"][0];
-                $user_details[$k]["givenName"] = $attributes[0]["givenName"][0];
-                $user_details[$k]["samaccountname"] = $attributes[0]["samaccountname"][0];
-                $user_details[$k]["whenCreated"] = $attributes[0]["whenCreated"][0];
-                $user_details[$k]["whenChanged"] = $attributes[0]["whenChanged"][0];
-                $user_details[$k]["pwdLastSet"] = $attributes[0]["pwdLastSet"][0];
-                $user_details[$k]["lastLogon"] = $attributes[0]["lastLogon"][0];
-                $user_details[$k]["lastLogoff"] = $attributes[0]["lastLogoff"][0];
-                $user_details[$k]["accountExpires"] = $attributes[0]["accountExpires"][0];
+//                $user_details[$k]["sn"] = $attributes[0]["sn"][0];
+//                $user_details[$k]["givenName"] = $attributes[0]["givenName"][0];
+//                $user_details[$k]["samaccountname"] = $attributes[0]["samaccountname"][0];
+//                $user_details[$k]["whenCreated"] = $attributes[0]["whenCreated"][0];
+//                $user_details[$k]["whenChanged"] = $attributes[0]["whenChanged"][0];
+//                $user_details[$k]["pwdLastSet"] = $attributes[0]["pwdLastSet"][0];
+//                $user_details[$k]["lastLogon"] = $attributes[0]["lastLogon"][0];
+//                $user_details[$k]["lastLogoff"] = $attributes[0]["lastLogoff"][0];
+//                $user_details[$k]["accountExpires"] = $attributes[0]["accountExpires"][0];
 
             }
             $t = &$t[$k];
@@ -131,16 +137,16 @@ for($i = 0 ; $i < $users["count"] ; $i++){
     tree.on('select',function(e){
         let cn = e.data.name;
         document.getElementById("cn").innerText = user_details[cn]["cn"];
-        document.getElementById("whencreated").innerText = user_details[cn]["whencreated"];
-        document.getElementById("whenchanged").innerText = user_details[cn]["whenchanged"];
+        // document.getElementById("whencreated").innerText = user_details[cn]["whencreated"];
+        // document.getElementById("whenchanged").innerText = user_details[cn]["whenchanged"];
         document.getElementById("name").innerText = user_details[cn]["name"];
-        document.getElementById("sn").innerText = user_details[cn]["sn"];
-        document.getElementById("givenName").innerText = user_details[cn]["givenName"];
-        document.getElementById("samaccountname").innerText = user_details[cn]["samaccountname"];
-        document.getElementById("pwdLastSet").innerText = user_details[cn]["pwdLastSet"];
-        document.getElementById("lastLogon").innerText = user_details[cn]["lastLogon"];
-        document.getElementById("lastLogoff").innerText = user_details[cn]["lastLogoff"];
-        document.getElementById("accountExpires").innerText = user_details[cn]["accountExpires"];
+        // document.getElementById("sn").innerText = user_details[cn]["sn"];
+        // document.getElementById("givenName").innerText = user_details[cn]["givenName"];
+        // document.getElementById("samaccountname").innerText = user_details[cn]["samaccountname"];
+        // document.getElementById("pwdLastSet").innerText = user_details[cn]["pwdLastSet"];
+        // document.getElementById("lastLogon").innerText = user_details[cn]["lastLogon"];
+        // document.getElementById("lastLogoff").innerText = user_details[cn]["lastLogoff"];
+        // document.getElementById("accountExpires").innerText = user_details[cn]["accountExpires"];
     });
     let user_details = <?php echo json_encode($user_details) ?>;
 </script>

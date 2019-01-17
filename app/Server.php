@@ -120,8 +120,11 @@ class Server extends Eloquent
         if ($key == null) {
             return false;
         }
-        // Trust server again just in case.
-        shell_exec("ssh-keyscan -p " . $this->port . " -H " . $this->ip_address . " >> ~/.ssh/known_hosts");
+        //Check if server is already trusted or not.
+        if(shell_exec("ssh-keygen -F " . $this->ip_address . " 2>/dev/null") == null){
+            // Trust Target Server
+            shell_exec("ssh-keyscan -p " . $this->port . " -H ". $this->ip_address . " >> ~/.ssh/known_hosts");
+        }
 
         // Fix key file permissions again, just in case.
         $query = "chmod 400 " . storage_path('keys')  . DIRECTORY_SEPARATOR . Auth::id();

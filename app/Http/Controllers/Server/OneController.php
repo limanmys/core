@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Server;
 
 use App\Extension;
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\Server;
 use App\Jobs\RunScript;
 use App\Key;
 use App\Notification;
@@ -16,11 +17,6 @@ use GuzzleHttp\Exception\GuzzleException;
 
 class OneController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('server');
-    }
-
     public function one(){
         return (request('server')->type == "linux_ssh" || request('server')->type == "windows_powershell")
             ? $this->authorized() : $this->unauthorized();
@@ -231,7 +227,7 @@ class OneController extends Controller
             __(":old isimli sunucu adı :new olarak değiştirildi.",["old"=>request('server')->name,"new"=>request('name')])
         );
 
-        $output = request('server')->update([
+        $output = Server::where('_id',request('server_id'))->update([
             "name" => request('name'),
             "control_port" => request('control_port'),
             "city" => request('city')
