@@ -32,6 +32,9 @@ class MainController extends Controller
                 "city" => $cities[0]
             ]));
         }
+        if($cities == null){
+            return respond('Bu özelliği kullanabileceğiniz hiçbir sunucunuz yok.');
+        }
         return view('feature.index', [
             "cities" => implode(',',$cities)
         ]);

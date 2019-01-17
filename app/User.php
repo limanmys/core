@@ -47,6 +47,6 @@ class User extends Authenticatable
         if($this->permissions->__get($target) == null){
             return $this->isAdmin();
         }
-        return array_search($id, $this->permissions->__get($target));
+        return in_array($id, $this->permissions->__get($target));
     }
 }
