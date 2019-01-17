@@ -28,6 +28,7 @@
                     <td id="type">{{$server->type}}</td>
                     <td id="control_port">{{$server->control_port}}</td>
                     <td id="server_id" hidden>{{$server->_id}}</td>
+                    <td id="city" hidden>{{$server->city}}</td>
                 </tr>
             @endforeach
             <div class="dropdown-menu" id="context-menu" style="color:white">
@@ -171,7 +172,7 @@
             menu.style.backgroundColor = 'white';
             menu.style.display = 'block';
 
-
+           // console.log(element);
             var elms = document.getElementById("delete").getElementsByTagName("*");
             var elms2 = document.getElementById("edit").getElementsByTagName("*");
             var elms3 = document.getElementById("change_hostname").getElementsByTagName("*");
@@ -188,6 +189,8 @@
                     elms2[i].value=element.getElementsByTagName("td")[0].innerHTML;
                 else if(elms2[i].name === "control_port")
                     elms2[i].value=element.getElementsByTagName("td")[3].innerHTML;
+                else if(elms2[i].name === "city")
+                    elms2[i].value=element.getElementsByTagName("td")[5].innerHTML;
             }
             for (var i = 0; i < elms3.length; i++) {
                 if(elms3[i].name === "server_id")

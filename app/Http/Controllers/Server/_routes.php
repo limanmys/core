@@ -18,7 +18,7 @@ Route::post('/server/kontrol', 'Server\MainController@isAlive')->middleware('par
 Route::post('/sunucu/guncelle', 'Server\OneController@update')->name('server_update')->middleware('parameters:server_id,name,control_port,city');
 
 
-Route::group(['middleware' => ['auth', 'permissions']], function () {
+Route::group(['middleware' => ['server']], function () {
 
 
     // Single Server Details Route
