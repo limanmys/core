@@ -100,7 +100,7 @@ function loading() {
 }
 
 function checkNotifications() {
-    request('/bildirimler', null, function (response) {
+    request('/bildirimler', new FormData(), function (response) {
         document.getElementById("notificationDiv").innerHTML = response;
     });
 }

@@ -32,9 +32,9 @@
         <span class="px-3 text-white" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
               style="cursor: pointer;">
             @if(count($notifications) > 0)
-                <i class="fas fa-bell bell"></i>
+                <i id="full_bell" style="position: absolute;top:30%;" class="fas fa-bell bell" onclick="read()"></i>
             @else
-                <i class="far fa-bell"></i>
+                <i id="empty_bell" style="position: absolute;top:20%;" class="far fa-bell"></i>
             @endif
         </span>
             <ul id="notificationDiv" class="dropdown-menu shadow-lg border-dark"
@@ -164,5 +164,10 @@
     </div>
     @include('__system__.loading')
 </div>
+<script>
+    function read(){
+        document.getElementById("full_bell").className="far fa-bell";
+    }
+</script>
 </body>
 </html>
