@@ -198,13 +198,12 @@ class OneController extends Controller
         $extension = Extension::where('_id', \request('extension_id'))->first();
 
         if(request('server')->type == "linux" || request('server')->type == "windows"){
-            $dummy = request('server')->extensions;
-            array_push($dummy,$extension->_id);
-            request('server')->extensions = $dummy;
+            $extensions_array = request('server')->extensions;
+            $extensions_array[$extension->_id] = [];
+            request('server')->extensions = $extensions_array;
             request('server')->save();
             return respond('Servis başarıyla eklendi.');
         }
-
 
         $script = Script::where('unique_code', $extension->setup)->first();
         $server = \request('server');
@@ -290,10 +289,10 @@ class OneController extends Controller
     }
 
     private function availableExtensions(){
-        return Extension::whereNotIn('_id',request('server')->extensions)->get();
+        return Extension::whereNotIn('_id',array_keys(request('server')->extensions))->get();
     }
 
     private function installedExtensions(){
-        return Extension::whereIn('_id',request('server')->extensions)->get();
+        return Extension::whereIn('_id',array_keys(request('server')->extensions))->get();
     }
 }

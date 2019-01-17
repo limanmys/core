@@ -1,7 +1,7 @@
 <?php
-    $conn = _init($server->ip_address, $server->port, "SambaPardus01", "cn=admin,dc=ldap,dc=lab");
+    $conn = _init();
 
-    $results = _search($conn, "dc=ldap,dc=lab" , "(objectclass=posixAccount)", ["dn"]);
+    $results = _search($conn , "(objectclass=posixAccount)", ["dn"]);
 ?>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
@@ -12,7 +12,9 @@
     "class" => "btn-primary",
     "target_id" => "add_user",
     "text" => "Kullanıcı Ekle"
-])<br><br>
+])
+<button class="btn btn-secondary" onclick="location.href = '{{route('extension_server_settings_page',["extension_id"=>$extension->_id,"server_id"=> request('server')->_id])}}'">Ayarlar</button>
+<br><br>
 
 <div class="container">
     <div class="row">

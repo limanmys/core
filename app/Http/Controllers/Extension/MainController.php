@@ -15,9 +15,10 @@ class MainController extends Controller
         }
 
         // Get all Servers which have this extension.
-        $servers = Server::where('extensions', 'like', \request('extension_id'))->get();
+        $servers = Server::all()->filter(function($value,$key){
+            return array_key_exists(request('extension_id'),$value->extensions);
+        });
         $servers = Server::filterPermissions($servers);
-
         // Go through servers and create a city list, it will be used in javascript to highlight cities in map.
         $cities = [];
         foreach ($servers as $server) {
@@ -42,10 +43,10 @@ class MainController extends Controller
 
     public function city()
     {
-        // Get servers in requested city with requested extension.
-        $servers = Server::where('city', \request('city'))->where('extensions', 'like', \request('extension_id'))->get();
-
-        // Filters servers for permissions.
+        // Get all Servers which have this extension.
+        $servers = Server::all()->filter(function($value,$key){
+            return array_key_exists(request('extension_id'),$value->extensions);
+        });
         $servers = Server::filterPermissions($servers);
 
         // Get Extension Name
