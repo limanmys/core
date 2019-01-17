@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Extension;
 
 use App\Extension;
+use App\Http\Middleware\Server;
 use App\Script;
 use App\Http\Controllers\Controller;
 
@@ -15,6 +16,16 @@ class OneController extends Controller
 
         // First, check requested server has key.
         $server = \request('server');
+
+        // Now that we have server, let's check if required parameters set for extension.
+        foreach ($extension->setup as $key=>$setting){
+            if(!array_key_exists($key,$server->extensions[$extension->_id])){
+                return redirect(route('extension_server_settings_page',[
+                    "server_id" => $server->_id,
+                    "extension_id" => $extension->_id
+                ]));
+            }
+        }
 
         if($server->key == null){
 
@@ -98,7 +109,7 @@ class OneController extends Controller
         $extension = Extension::where('_id',request()->route('extension_id'))->first();
         require(base_path('resources/views/extensions/' . strtolower($extension->name) . '/functions.php'));
         if(function_exists(request('function_name'))){
-            if(call_user_func(request('function_name'),request('server'),"SambaPardus01","cn=admin,dc=ldap,dc=lab")){
+            if(call_user_func(request('function_name'))){
                 return respond("Kullanıcı başarıyla eklendi",200);
             }else{
                 return respond("Kullanıcı eklenemedi, lütfen yöneticinizle iletişime geçiniz",201);
@@ -108,4 +119,29 @@ class OneController extends Controller
         }
     }
 
+    public function serverSettings(){
+        $extension = Extension::where('_id',request()->route('extension_id'))->first();
+        $server_config = [];
+        foreach (array_keys($extension->setup) as $key){
+            $server_config[$key] = request($key);
+        }
+
+        $extension_arr = request('server')->extensions;
+
+        $extension_arr[$extension->_id] = $server_config;
+        \App\Server::where('_id',request('server')->_id)->update([
+            "extensions" => $extension_arr
+        ]);
+
+        return redirect(route('extension_map',[
+            "extension_id" => $extension->_id
+        ]));
+    }
+
+    public function serverSettingsPage(){
+        $extension = Extension::where('_id',request()->route('extension_id'))->first();
+        return response()->view('extensions.setup',[
+            'extension' => $extension
+        ]);
+    }
 }
