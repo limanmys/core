@@ -30,6 +30,7 @@ class Server
                 return respond("Sunucuyla bağlantı kurulamadı.",503);
             }
             // Check if server is serverless, which means no validation required.
+
             if($server->serverless){
                 return $next($request);
             }

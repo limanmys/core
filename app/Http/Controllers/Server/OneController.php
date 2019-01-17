@@ -220,13 +220,14 @@ class OneController extends Controller
 
     public function update()
     {
+        $server = \App\Server::where('_id',request('server_id'))->first();
         Notification::new(
             __("Server Adı Güncellemesi"),
             "notify",
-            __(":old isimli sunucu adı :new olarak değiştirildi.",["old"=>request('server')->name,"new"=>request('name')])
+            __(":old isimli sunucu adı :new olarak değiştirildi.",["old"=>$server->name,"new"=>request('name')])
         );
 
-        $output = Server::where('_id',request('server_id'))->update([
+        $output = $server->update([
             "name" => request('name'),
             "control_port" => request('control_port'),
             "city" => request('city')
