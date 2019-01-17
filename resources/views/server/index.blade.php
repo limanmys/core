@@ -31,11 +31,13 @@
                 </tr>
             @endforeach
             <div class="dropdown-menu" id="context-menu" style="color:white">
-                <a class="dropdown-item" href="#">Düzenle</a>
-                <a class="dropdown-item" href="#">Sil</a>
+                <a class="dropdown-item" data-toggle="modal" data-target="#edit" href="#">Düzenle</a>
+                <a class="dropdown-item" data-toggle="modal" data-target="#change_hostname" href="#">Hostname Değiştir</a>
+                <a class="dropdown-item" data-toggle="modal" data-target="#delete" href="#">Sil</a>
             </div>
             </tbody>
         </table>
+        <div id='context-menu-bye'></div>
     @else
         <h3>{{__("Sunucunuz Bulunmuyor.")}}</h3>
     @endif
@@ -160,23 +162,162 @@
             main.innerHTML = document.getElementsByClassName('loading')[0].innerHTML;
             location.href = '/sunucular/' + id;
         }
-
+        let menu = document.getElementById('context-menu');
+        let menu_by = document.getElementById('context-menu-bye');
         function rightClick(element,event){
-            let menu = document.getElementById('context-menu');
             menu.classList.toggle('show');
-            menu.style.top = event.pageY;
-            menu.style.left = event.pageX;
+            menu.style.top = event.clientY+"px";
+            menu.style.left = event.clientX+"px";
             menu.style.backgroundColor = 'white';
+            menu.style.display = 'block';
 
-            // document.addEventListener('click', function () {
-            //     menu.classList.toggle('show');
-            //     document.removeEventListener('click',null);
-            // });
-            // menu.onclick(function(event){
-            //     let menu = document.getElementById('context-menu');
-            //     menu.classList.toggle('show');
-            // });
+
+            var elms = document.getElementById("delete").getElementsByTagName("*");
+            var elms2 = document.getElementById("edit").getElementsByTagName("*");
+            var elms3 = document.getElementById("change_hostname").getElementsByTagName("*");
+            for (var i = 0; i < elms.length; i++) {
+                if (elms[i].className === "modal-title")
+                    elms[i].innerHTML=element.getElementsByTagName("td")[0].innerHTML;
+                if(elms[i].name === "server_id")
+                    elms[i].value=element.getElementsByTagName("td")[4].innerHTML;
+            }
+            for (var i = 0; i < elms2.length; i++) {
+                if(elms2[i].name === "server_id")
+                    elms2[i].value=element.getElementsByTagName("td")[4].innerHTML;
+                else if(elms2[i].name === "name")
+                    elms2[i].value=element.getElementsByTagName("td")[0].innerHTML;
+                else if(elms2[i].name === "control_port")
+                    elms2[i].value=element.getElementsByTagName("td")[3].innerHTML;
+            }
+            for (var i = 0; i < elms3.length; i++) {
+                if(elms3[i].name === "server_id")
+                    elms3[i].value=element.getElementsByTagName("td")[4].innerHTML;
+            }
             return false;
         }
+        menu_by.addEventListener("click",function(e){
+            menu.style.display = 'none';
+        },false);
+        menu.addEventListener("click",function(e){
+            menu.style.display = 'none';
+        },false);
     </script>
+    @include('modal',[
+       "id"=>"delete",
+       "title" =>"",
+       "url" => route('server_remove'),
+       "text" => "isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+       "next" => "reload",
+       "inputs" => [
+           "Sunucu Id:$server->_id" => "server_id:hidden"
+       ],
+       "submit_text" => "Sunucuyu Sil"
+   ])
+    @include('modal',[
+        "id"=>"edit",
+        "title" => "Sunucuyu Düzenle",
+        "url" => route('server_update'),
+        "next" => "reload",
+        "inputs" => [
+            "Sunucu Adı" => "name:text",
+            "Kontrol Portu" => "control_port:number",
+            "Sunucu Id:$server->_id" => "server_id:hidden",
+            "Şehir:city" => [
+                 "Adana" => "01",
+                 "Adıyaman" => "02",
+                 "Afyonkarahisar" => "03",
+                 "Ağrı" => "04",
+                 "Amasya" => "05",
+                 "Ankara" => "06",
+                 "Antalya" => "07",
+                 "Artvin" => "08",
+                 "Aydın" => "09",
+                 "Balıkesir" => "10",
+                 "Bilecik" => "11",
+                 "Bingöl" => "12",
+                 "Bitlis" => "13",
+                 "Bolu" => "14",
+                 "Burdur" => "15",
+                 "Bursa" => "16",
+                 "Çanakkale" => "17",
+                 "Çankırı" => "18",
+                 "Çorum" => "19",
+                 "Denizli" => "20",
+                 "Diyarbakır" => "21",
+                 "Edirne" => "22",
+                 "Elazığ" => "23",
+                 "Erzincan" => "24",
+                 "Erzurum" => "25",
+                 "Eskişehir" => "26",
+                 "Gaziantep" => "27",
+                 "Giresun" => "28",
+                 "Gümüşhane" => "29",
+                 "Hakkâri" => "30",
+                 "Hatay" => "31",
+                 "Isparta" => "32",
+                 "Mersin" => "33",
+                 "İstanbul" => "34",
+                 "İzmir" => "35",
+                 "Kars" => "36",
+                 "Kastamonu" => "37",
+                 "Kayseri" => "38",
+                 "Kırklareli" => "39",
+                 "Kırşehir" => "40",
+                 "Kocaeli" => "41",
+                 "Konya" => "42",
+                 "Kütahya" => "43",
+                 "Malatya" => "44",
+                 "Manisa" => "45",
+                 "Kahramanmaraş" => "46",
+                 "Mardin" => "47",
+                 "Muğla" => "48",
+                 "Muş" => "49",
+                 "Nevşehir" => "50",
+                 "Niğde" => "51",
+                 "Ordu" => "52",
+                 "Rize" => "53",
+                 "Sakarya" => "54",
+                 "Samsun" => "55",
+                 "Siirt" => "56",
+                 "Sinop" => "57",
+                 "Sivas" => "58",
+                 "Tekirdağ" => "59",
+                 "Tokat" => "60",
+                 "Trabzon" => "61",
+                 "Tunceli" => "62",
+                 "Şanlıurfa" => "63",
+                 "Uşak" => "64",
+                 "Van" => "65",
+                 "Yozgat" => "66",
+                 "Zonguldak" => "67",
+                 "Aksaray" => "68",
+                 "Bayburt" => "69",
+                 "Karaman" => "70",
+                 "Kırıkkale" => "71",
+                 "Batman" => "72",
+                 "Şırnak" => "73",
+                 "Bartın" => "74",
+                 "Ardahan" => "75",
+                 "Iğdır" => "76",
+                 "Yalova" => "77",
+                 "Karabük" => "78",
+                 "Kilis" => "79",
+                 "Osmaniye" => "80",
+                 "Düzce" => "81"
+            ],
+        ],
+        "submit_text" => "Düzenle"
+    ])
+    @include('modal',[
+        "id"=>"change_hostname",
+        "title" => "Hostname Değiştir",
+        "url" => route('server_hostname'),
+        "next" => "reload",
+        "inputs" => [
+            "Hostname" => "hostname:text",
+            "Sunucu Id:$server->_id" => "server_id:hidden"
+        ],
+        "submit_text" => "Değiştir"
+    ])
+
 @endsection
