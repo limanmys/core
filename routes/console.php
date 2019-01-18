@@ -18,10 +18,13 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->describe('Display an inspiring quote');
 
-Artisan::command('setup',function (){
+Artisan::command('init:admin',function (){
     // Check if Admin user is exists.
     $user = User::where('email','admin@liman.app')->first();
     if($user){
+        if(!$this->confirm('Administrator kullanıcısı silinip tekrar eklenecektir. Devam etmek istiyor musunuz?')){
+            return false;
+        }
         $user->delete();
     }
 
@@ -36,5 +39,13 @@ Artisan::command('setup',function (){
     $perm->user_id = $user->_id;
     $perm->server = [];
     $perm->save();
-    echo "Administrator user created with '" . $password . "' password";
+    $this->comment("Administrator kullanıcısı eklendi. Parola : " . $password . "");
+})->describe('Create administrator account to use');
+
+Artisan::command('test',function (){
+    if(is_dir(app_path('setup'))){
+        $this->comment('var');
+    }else{
+        $this->comment(__('Kurulacak bir şey bulunamadı.'));
+    }
 });
