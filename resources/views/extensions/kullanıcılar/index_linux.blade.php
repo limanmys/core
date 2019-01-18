@@ -8,11 +8,6 @@
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jstree/3.3.7/themes/default/style.min.css" />
 <script src="//cdnjs.cloudflare.com/ajax/libs/jstree/3.3.7/jstree.min.js"></script>
 
-@include('modal-button',[
-    "class" => "btn-primary",
-    "target_id" => "add_user",
-    "text" => "Kullanıcı Ekle"
-])
 <button class="btn btn-secondary" onclick="location.href = '{{route('extension_server_settings_page',["extension_id"=>$extension->_id,"server_id"=> request('server')->_id])}}'">Ayarlar</button>
 <br><br>
 
@@ -56,34 +51,116 @@
         $('#ldap_tree').jstree({
             "plugins" : [
                 "contextmenu",
-                "search"
+                "search",
+                "dnd",
+                "checkbox"
             ],
             'core' : {
                 'data' : [
                     @include("__system__.folder",["files" => $results])
-                ]
+                ],
+                "check_callback" : true
             },
             'contextmenu' : {
-                "items" : items = {
-                    addUser: {
-                        label: "{{__("Kullanıcı Ekle")}}",
-                        action: function(obj) {
-                            console.log(obj);
-                        },
-                        icon: "fa fa-cog"
-                    },
-                    deleteUser: {
-                        label: "{{__("Kullanıcıyı Sil")}}",
-                        action: function(obj) {
-                            console.log(obj);
-                        },
-                        icon: "fa fa-trash"
-                    }
-                }
+                "items" : customMenu
             }
+
         });
+
+        /*if ($(node).hasClass("folder")) {
+            // Delete the "delete" menu item
+            delete items.deleteUser;
+        }*/
     }
     asd();
+    function customMenu(node) {
+        let check=""
+        let tree_path=0
+        let name_position=0
+        if (node.text.substring(0,2)!="cn") //If node is a folder
+            check = "Folder";
+        else
+            check = "File";
+        if(check=="Folder"){
+            var items = {
+                addUser: {
+                    label: "{{__("Kullanıcı Ekle")}}",
+                    action: function(obj) {
+                        let path_useradd=GetParents(node);
+                        var modal = new Modal('#add_user');
+                        modal.show();
+                        var elms=document.getElementById("add_user").getElementsByTagName("*");
+                        for (var i = 0; i < elms.length; i++) {
+                            if(elms[i].name === "tree_path")
+                                tree_path=i;
+                            if(elms[i].name === "username"){
+                                name_position=i;
+                                elms[tree_path].value="cn="+elms[name_position].value+","+path_useradd;
+                            }
+                        }
+                        elms[name_position].onfocusout = function () {
+                            elms[tree_path].value="cn="+elms[name_position].value+","+path_useradd;
+                        }
+                    },
+                    icon: "fa fa-user"
+                },
+                deleteUser: {
+                    label: "{{__("Yetki ver")}}",
+                    action: function(obj) {
+                        console.log(obj);
+                    },
+                    icon: "fa fa-trash"
+                }
+            };
+        }
+        else if(check=="File"){
+            var items = {
+                updateUser: {
+                    label: "{{__("Kullanıcı Düzenle")}}",
+                    action: function(obj) {
+                        console.log(obj);
+                    },
+                    icon: "fa fa-cog"
+                },
+                deleteUser: {
+                    label: "{{__("Kullanıcıyı Sil")}}",
+                    action: function(obj) {
+                        console.log(obj);
+                    },
+                    icon: "fa fa-trash"
+                },
+                locationUser: {
+                    label: "{{__("Taşı")}}",
+                    action: function(obj) {
+                        console.log(obj);
+                    },
+                    icon: "fa fa-reply-all"
+                }
+            };
+        }
+        return items;
+    }
+    function GetParents(loSelectedNode) {
+        try {
+            var lnLevel = loSelectedNode.parents.length;
+            var lsSelectedID = loSelectedNode.id;
+            var loParent = $("#" + lsSelectedID);
+            var lsParents =  loSelectedNode.text + ',';
+            for (var ln = 0; ln <= lnLevel -1 ; ln++) {
+                var loParent = loParent.parent().parent();
+                if (loParent.children()[1] != undefined) {
+                    lsParents += loParent.children()[1].text + ",";
+                }
+            }
+            if (lsParents.length > 0) {
+                lsParents = lsParents.substring(0, lsParents.length - 1);
+            }
+            return lsParents;
+        }
+        catch (err) {
+            alert('Hata');
+        }
+    }
 </script>
 
 <script>
