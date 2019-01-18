@@ -65,9 +65,10 @@ sudo apt install sshpass telnet nmap python3 python3-paramiko python3-tornado -y
 sudo mv /liman/server/.env.example /liman/server/.env
 sudo ln -sf /liman/server/.env /liman/liman.conf
 ```
-#### Liman Sessionlari icin Key Olusturma
+#### Liman Sessionlari icin Key Olusturma ve Administrator Hesabı Ekleme
 ```bash
 sudo php /liman/server/artisan key:generate
+sudo php /liman/server/artisan setup
 ```
 #### Liman Kullanicisi Olusturma
 ```bash

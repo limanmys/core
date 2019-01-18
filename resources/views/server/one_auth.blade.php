@@ -6,45 +6,45 @@
         "title" => $server->name       
     ])
     <h5>Hostname : {{$hostname}}</h5>
-    <button class="btn btn-outline-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
+    <button class="btn btn-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
 
     @include('modal-button',[
-        "class" => "btn-outline-primary",
+        "class" => "btn-primary",
         "target_id" => "edit",
         "text" => "Düzenle"
     ])
     @include('modal-button',[
-        "class" => "btn-outline-secondary",
+        "class" => "btn-secondary",
         "target_id" => "install_extension",
         "text" => "Servis Ekle"
     ])
     @include('modal-button',[
-        "class" => "btn-outline-info",
+        "class" => "btn-info",
         "target_id" => "change_network",
         "text" => "Network"
     ])
     @include('modal-button',[
-        "class" => "btn-outline-primary",
+        "class" => "btn-primary",
         "target_id" => "change_hostname",
         "text" => "Hostname"
     ])
     @include('modal-button',[
-        "class" => "btn-outline-warning",
+        "class" => "btn-warning",
         "target_id" => "file_upload",
         "text" => "Dosya Yükle"
     ])
     @include('modal-button',[
-        "class" => "btn-outline-primary",
+        "class" => "btn-primary",
         "target_id" => "file_download",
         "text" => "Dosya İndir"
     ])
     @include('modal-button',[
-        "class" => "btn-outline-success",
+        "class" => "btn-success",
         "target_id" => "terminal",
         "text" => "Terminal"
     ])
     @include('modal-button',[
-        "class" => "btn-outline-info",
+        "class" => "btn-info",
         "target_id" => "give_permission",
         "text" => "Yetki Ver"
     ])<br><br>
@@ -66,7 +66,7 @@
     </pre>
 
     @include('modal-button',[
-        "class" => "btn-outline-danger",
+        "class" => "btn-danger",
         "target_id" => "delete",
             "text" => "Sunucuyu Sil"
     ])
