@@ -3,9 +3,12 @@ function _init(){
     $extension_id = request()->route('extension_id');
     $ldap_connection = ldap_connect(request('server')->ip_address, request('server')->extensions[$extension_id]["port"]);
     ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+    $pwdtxt = request('server')->extensions[$extension_id]["password"];
+    $newPassword = $pwdtxt;
+    $newPass = iconv( 'UTF-8', 'UTF-16LE', $newPassword );
+    $newPass = str_replace("\0", '', $newPass);
     try{
-        ldap_bind($ldap_connection,request('server')->extensions[$extension_id]["dn"],
-            request('server')->extensions[$extension_id]["password"]);
+        ldap_bind($ldap_connection,request('server')->extensions[$extension_id]["dn"],request('server')->extensions[$extension_id]["password"]);
     }catch (Exception $e){
         echo $e->getMessage();
     }
@@ -40,10 +43,8 @@ function _search($connection ,$filter, $extra){
 }
 
 function addUser(){
-    $user["givenName"] = request("firstname");
-    $user["sn"] = request("surname");
-    $user["displayName"] = request("fullname");
-    $user["samAccountName"] = request("username");
+    $user["cn"] = request("username");
+    $user["objectclass"] = "posixAccount";
 //    if(request()->exists('forcechangepass')){
 //        $user["pwdLastSet"] = intval(11644473600.0 + time()) * 10000000;
 //    }
