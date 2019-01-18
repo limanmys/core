@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Server;
 use App\Extension;
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\Server;
-use App\Jobs\RunScript;
+use App\Jobs\InstallService;
 use App\Key;
 use App\Notification;
 use App\Permission;
@@ -212,7 +212,7 @@ class OneController extends Controller
             "onhold",
             __(":server isimli sunucuda :new kuruluyor.",["server"=>request('server')->name,"new"=>$extension->name])
         );
-        $job = new RunScript($script, $server,\request('domain') . " "
+        $job = new InstallService($script, $server,\request('domain') . " "
             . \request('interface'),\Auth::user(),$notification ,$extension);
         dispatch($job);
         return respond("Kurulum talebi başarıyla alındı. Gelişmeleri bildirim üzerinden takip edebilirsiniz.");
