@@ -68,6 +68,7 @@ class MainController extends Controller
             new \RecursiveDirectoryIterator($path),
             \RecursiveIteratorIterator::LEAVES_ONLY
         );
+        $zip->addEmptyDir('views');
         foreach ($files as $name => $file){
             // Skip directories (they would be added automatically)
             if (!$file->isDir())
@@ -81,6 +82,9 @@ class MainController extends Controller
             }
         }
         $scripts = Script::all()->where('extensions','like',strtolower($extension->name));
+
+        $zip->addEmptyDir('scripts');
+
         foreach($scripts as $script){
             $zip->addFile(storage_path('app/scripts/') . $script->_id, 'scripts/' . $script->unique_code . '.lmns');
         }
@@ -90,5 +94,60 @@ class MainController extends Controller
         $zip->addFile($random,'db.json');
         $zip->close();
         return response()->download('/liman/export/' . $extension->name . '.lmne')->deleteFileAfterSend();
+    }
+
+    public function upload(){
+        $zip = new \ZipArchive;
+        if(!$zip->open(request()->file('extension'))){
+            return respond("Eklenti dosyasi acilamiyor.",201);
+        }
+        $random = str_random(10);
+        $zip->extractTo('/tmp/' .$random);
+        
+        //Now that we have everything, let's extract file.
+        $file = file_get_contents('/tmp/' .$random . '/db.json');
+        $json = json_decode($file,true);
+    
+        $new = new \App\Extension();
+        $new->fill($json);
+
+        $extension_folder = resource_path('views/extensions/' . strtolower($new->name));
+
+        // Delete existing folder.
+        if(is_dir($extension_folder)){
+            $this->rmdir_recursive($extension_folder);
+        }
+
+        mkdir($extension_folder);
+        
+        // Copy Views into the liman.
+        shell_exec('cp -r ' . '/tmp/' .$random . '/views/* ' .  $extension_folder);
+        
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator('/tmp/' .$random . '/scripts/'),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($files as $name => $file){
+            // Skip directories (they would be added automatically)
+            if (!$file->isDir())
+            {
+                // Get real and relative path for current file
+                $filePath = $file->getRealPath();
+                Script::readFromFile($filePath);
+            }
+        }
+
+        $new->save();
+        return respond("Eklenti basariyla eklendi",200);
+    }
+
+    private function rmdir_recursive($dir) {
+        foreach(scandir($dir) as $file) {
+            if ('.' === $file || '..' === $file) continue;
+            if (is_dir("$dir/$file")) $this->rmdir_recursive("$dir/$file");
+            else unlink("$dir/$file");
+        }
+        rmdir($dir);
     }
 }
