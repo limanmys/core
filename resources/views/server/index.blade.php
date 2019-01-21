@@ -33,9 +33,9 @@
             @endforeach
 
             <ul class="dropdown-menu" id="context-menu" style="color:white">
-                <a class="dropdown-item" data-toggle="modal" data-target="#edit" href="#">Düzenle</a>
-                <a class="dropdown-item" data-toggle="modal" data-target="#change_hostname" href="#">Hostname Değiştir</a>
-                <a class="dropdown-item" data-toggle="modal" data-target="#delete" href="#">Sil</a>
+                <a class="dropdown-item" data-toggle="modal" data-target="#edit" href="#">{{__("Düzenle")}}</a>
+                <a class="dropdown-item" data-toggle="modal" data-target="#give_permission" href="#">{{__("Yetki Ver")}}</a>
+                <a class="dropdown-item" data-toggle="modal" data-target="#delete" href="#">{{__("Sil")}}</a>
 
             </ul>
             </tbody>
@@ -174,7 +174,7 @@
 
             let elms = document.getElementById("delete").getElementsByTagName("*");
             let elms2 = document.getElementById("edit").getElementsByTagName("*");
-            let elms3 = document.getElementById("change_hostname").getElementsByTagName("*");
+            let elms3 = document.getElementById("give_permission").getElementsByTagName("*");
 
 
             for (var i = 0; i < elms.length; i++) {
@@ -314,15 +314,16 @@
         "submit_text" => "Düzenle"
     ])
     @include('modal',[
-        "id"=>"change_hostname",
-        "title" => "Hostname Değiştir",
-        "url" => route('server_hostname'),
-        "next" => "reload",
+        "id"=>"give_permission",
+        "title" => "Kullanıcıya Yetki Ver",
+        "url" => route('server_grant_permission'),
+        "next" => "function(){return true;}",
         "inputs" => [
-            "Hostname" => "hostname:text",
-            "Sunucu Id:''" => "server_id:hidden"
+            "Kullanıcı Emaili" => "email:text",
+            "Sunucu Id:a" => "server_id:hidden"
         ],
-        "submit_text" => "Değiştir"
+        "text" => "Güvenlik sebebiyle kullanıcı listesi sunulmamaktadır.",
+        "submit_text" => "Yetkilendir"
     ])
 
 @endsection

@@ -27,14 +27,10 @@ class MainController extends Controller
     public function upload(){
         $script = Script::readFromFile(\request()->file('script'));
         if(!$script){
-            return [
-                "result" => 201
-            ];
+            return respond('Betik zaten sistemde var.',201);
         }
         Storage::putFileAs('scripts',\request()->file('script'),$script->_id);
-        return [
-            "result" => 200
-        ];
+        return respond('Betik eklendi.',200);
     }
 
     public function one(){

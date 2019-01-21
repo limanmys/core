@@ -18,6 +18,7 @@
         "id"=>"scriptUpload",
         "title" => "Betik Yükle",
         "url" => route('script_upload'),
+        "next" => "reload",
         "inputs" => [
             "Lütfen Betik Dosyasını(.lmn) Seçiniz" => "script:file",
         ],
