@@ -63,7 +63,7 @@
         </ul>
         <ul class="navbar-nav px-2">
             <li class="nav-item text-nowrap" style="cursor: pointer;">
-                <a class="nav-link text-white" onclick="return request('{{route('logout')}}',null,reload)"><i
+                <a class="nav-link text-white" onclick="return request('{{route('logout')}}',new FormData(),reload)"><i
                             class="fas fa-sign-out-alt"></i></a>
             </li>
         </ul>

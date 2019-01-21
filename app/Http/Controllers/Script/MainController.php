@@ -57,4 +57,11 @@ class MainController extends Controller
         $script->save();
         return route('script_one',$script->_id);
     }
+
+    public function download(){
+        $script = Script::where('_id',request('script_id'))->first();
+
+        // Send file to the user then delete it.
+        return response()->download(storage_path('app/scripts/') . $script->_id, $script->unique_code . '.lmns');
+    }
 }

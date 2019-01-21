@@ -297,6 +297,7 @@
         @endif
 
         function downloadFile(form){
+            loading();
             window.location.assign('/sunucu/indir?path=' + form.getElementsByTagName('input')[0].value + '&server_id=' + form.getElementsByTagName('input')[1].value);
             return false;
         }

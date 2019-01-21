@@ -1,7 +1,6 @@
 <?php
 
 use App\User;
-use Illuminate\Foundation\Inspiring;
 
 Artisan::command('administrator',function (){
     // Check if Admin user is exists.
@@ -36,13 +35,7 @@ Artisan::command('test',function (){
 });
 
 Artisan::command('import',function(){
-    // if(is_dir('/liman/import')){
-    //     $files = array_values(preg_grep('~\.(lmne)$~',scandir('/liman/import')));
-    //     dd($files);
-    // }else{
-    //     $this->comment("Yuklenecek eklenti bulunamadi.");
-    //     return;
-    // }
+
     $file = file_get_contents('/liman/duygu.json');
     $json = json_decode($file,true);
 
@@ -54,7 +47,7 @@ Artisan::command('import',function(){
 });
 
 Artisan::command('export',function(){
-    $model = \App\Extension::where('_id','5c41f9438f2fa562a716a152')->first();
+    $model = \App\Extension::where('_id','5c456c958f2fa510fa60da82')->first();
     $path = resource_path('views' . DIRECTORY_SEPARATOR .'extensions' . DIRECTORY_SEPARATOR . strtolower($model->name));
     $zip = new ZipArchive();
     $zip->open('/liman/export/deneme.lmne',ZipArchive::CREATE | ZipArchive::OVERWRITE);

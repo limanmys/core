@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Extension;
 use App\Extension;
 use App\Http\Controllers\Controller;
 use App\Server;
+use App\Script;
 
 class MainController extends Controller
 {
@@ -56,5 +57,38 @@ class MainController extends Controller
             "servers" => $servers,
             "name" => $extension->name
         ]);
+    }
+
+    public function download(){
+        $extension = \App\Extension::where('_id',request('extension_id'))->first();
+        $path = resource_path('views' . DIRECTORY_SEPARATOR .'extensions' . DIRECTORY_SEPARATOR . strtolower($extension->name));
+        $zip = new \ZipArchive;
+        $zip->open('/liman/export/' . $extension->name . '.lmne',\ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($path),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        foreach ($files as $name => $file){
+            // Skip directories (they would be added automatically)
+            if (!$file->isDir())
+            {
+                // Get real and relative path for current file
+                $filePath = $file->getRealPath();
+                $relativePath = substr($filePath, strlen($path) + 1);
+
+                // Add current file to archive
+                $zip->addFile($filePath, 'views/' . $relativePath);
+            }
+        }
+        $scripts = Script::all()->where('extensions','like',strtolower($extension->name));
+        foreach($scripts as $script){
+            $zip->addFile(storage_path('app/scripts/') . $script->_id, 'scripts/' . $script->unique_code . '.lmns');
+        }
+        # DB Extraction
+        $random = '/tmp/' . str_random(6);
+        file_put_contents($random,$extension->toJson());
+        $zip->addFile($random,'db.json');
+        $zip->close();
+        return response()->download('/liman/export/' . $extension->name . '.lmne')->deleteFileAfterSend();
     }
 }
