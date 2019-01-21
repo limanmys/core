@@ -48,3 +48,6 @@ Route::get('/ayarlar/{extension_id}/{server_id}','Extension\OneController@server
 
 // Extension Server Settings
 Route::post('/ayarlar/{extension_id}/{server_id}','Extension\OneController@serverSettings')->name('extension_server_settings')->middleware('server');
+
+// Extension Download Page
+Route::get('/indir/eklenti/{extension_id}','Extension\MainController@download')->name('extension_export');
