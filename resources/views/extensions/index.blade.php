@@ -32,10 +32,10 @@
     @include('modal',[
         "id"=>"extensionUpload",
         "title" => "Eklenti Yükle",
-        "url" => route('script_upload'),
+        "url" => route('extension_upload'),
         "next" => "reload",
         "inputs" => [
-            "Lütfen Eklenti Dosyasını(.lmne) Seçiniz" => "script:file",
+            "Lütfen Eklenti Dosyasını(.lmne) Seçiniz" => "extension:file",
         ],
         "submit_text" => "Yükle"
     ])

@@ -50,4 +50,7 @@ Route::get('/ayarlar/{extension_id}/{server_id}','Extension\OneController@server
 Route::post('/ayarlar/{extension_id}/{server_id}','Extension\OneController@serverSettings')->name('extension_server_settings')->middleware('server');
 
 // Extension Download Page
-Route::get('/indir/eklenti/{extension_id}','Extension\MainController@download')->name('extension_export');
+Route::get('/indir/eklenti/{extension_id}','Extension\MainController@download')->name('extension_download');
+
+//Extension Upload Page
+Route::post('/yukle/eklenti/','Extension\MainController@upload')->name('extension_upload');
