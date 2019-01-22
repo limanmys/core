@@ -7,6 +7,7 @@ use Closure;
 
 class PermissionManager
 {
+    // Verify those values if request have this both in request url or body.
     public static $verify = [
         "extension" , "script", "server"
     ];

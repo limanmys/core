@@ -10,21 +10,28 @@
     <table class="table">
         <thead>
         <tr>
-            <th scope="col">{{ __("Anahtar Adı") }}</th>
-            <th scope="col">{{ __("Kullanıcı") }}</th>
             <th scope="col">{{ __("Sunucu") }}</th>
+            <th scope="col">{{ __("Kullanıcı") }}</th>
+            <th scope="col">{{ __("Port") }}</th>
         </tr>
         </thead>
         <tbody data-toggle="modal" data-target="#duzenle">
         @foreach ($keys as $key)
-            <tr onclick="" class="highlight">
+            <tr>
                 <td>{{$key->name}}</td>
                 <td>{{$key->username}}</td>
-                <td>{{$key->server_name}}</td>
+                <td>{{$servers->where('_id',$key->server_id)->first()->control_port}}</td>
             </tr>
         @endforeach
         </tbody>
     </table>
+
+    <?php 
+        $input_servers = [];
+        foreach($servers as $server){
+            $input_servers[$server->name] = $server->_id;
+        }
+    ?>
 
     @include('modal',[
         "id"=>"add_key",
@@ -33,7 +40,7 @@
         "next" => "reload",
         "inputs" => [
             "Adı" => "name:text",
-            "Sunucu " => "server_id:text",
+            "Sunucu Secin:server_id" => $input_servers,
             "Kullanıcı Adı" => "username:text",
             "Parola" => "password:password"
         ],

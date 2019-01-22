@@ -10,6 +10,7 @@ class MainController extends Controller
 
     public function __construct()
     {
+        // Specifiy that this controller requires admin middleware in all functions.
         $this->middleware('admin');
     }
 

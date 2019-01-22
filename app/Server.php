@@ -18,14 +18,14 @@ class Server extends Eloquent
         return $this->runSSH($command);
     }
 
-    public function runSSH($query)
+    public function runSSH($query, $extra = null)
     {
         // Log Query
         server_log($this->_id, "command_" . $query);
         // Build Query
 
         $query = "ssh -p " . $this->port . " " . $this->key->username . "@" . $this->ip_address . " -i " . storage_path('keys') .
-            DIRECTORY_SEPARATOR . Auth::id() . " " . $query . " 2>&1";
+            DIRECTORY_SEPARATOR . Auth::id() . " " . $query . " 2>&1" . $extra;
 
         // Execute and return outputs.
         return shell_exec($query);
@@ -52,31 +52,19 @@ class Server extends Eloquent
         return shell_exec($query);
     }
 
-    public function runScript($script, $parameters)
-    {
+    public function runScript($script, $parameters,$extra = null){
+
         // Copy script to target.
         $this->putFile(storage_path('app/scripts/' . $script->_id), '/tmp/');
 
         // Build Query
         $query = ($script->root == 1) ? 'sudo ' : '';
         $query = $query . substr($script->language, 1) . ' /tmp/' . $script->_id . " run " . $parameters;
-
+        
         // Execute and return outputs.
-        return $this->runSSH($query);
+        return $this->runSSH($query,$extra);
     }
-
-    public function systemScript($name, $parameters)
-    {
-        $name = $name . ".lmn";
-        $copy_file_query = 'scp -P ' . $this->port . " -i " . storage_path('keys') . DIRECTORY_SEPARATOR . Auth::id() . ' ' . storage_path('app/system_scripts/' . $name) . ' ' . $this->key->username . '@' . $this->ip_address . ':/tmp/';
-        shell_exec($copy_file_query);
-        shell_exec('sudo chmod +x /tmp/' . $name);
-        $query = 'sudo /usr/bin/env python3 /tmp/' . $name . " run " . $parameters;
-        $query = $query = "ssh -p " . $this->port . " " . $this->key->username . "@" . $this->ip_address . " -i " .
-            storage_path('keys') . DIRECTORY_SEPARATOR . Auth::id() . " " . $query . " 2>&1" . (($name == "network.lmn") ? " > /dev/null 2>/dev/null &" : "");
-        return shell_exec($query);
-    }
-
+    
     public function isRunning($service_name)
     {
         // Check if services are alive or not.
@@ -116,7 +104,6 @@ class Server extends Eloquent
             'server_id' => $this->id,
             'user_id' => Auth::id()
         ])->first();
-
         if ($key == null) {
             return false;
         }
