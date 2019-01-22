@@ -250,25 +250,23 @@
         ],
         "submit_text" => "İndir"
     ])
-
+    <?php
+        $input_extensions = [];
+        foreach($available_extensions as $extension){
+            $arr = [];
+            foreach($extension->install as $key => $parameter){
+                $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
+            }
+            $arr[$extension->name . ":" . $extension->_id] = "extension_id:hidden";
+            $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
+        }
+    ?>
     @include('modal',[
         "id"=>"install_extension",
         "title" => "Servis Yükle",
         "url" => route('server_extension'),
         "next" => "message",
-        "selects" => [
-            "DNS:5c0a170f7b57f19953126e37" => [
-                "Domain Adı" => "domain:text",
-                "Arayüz" => "interface:text",
-                "DNS:5c0a170f7b57f19953126e37" => "extension_id:hidden"
-            ],
-            "DHCP:5c0a1c5f7b57f19953126e38" => [
-                "Domain Adı" => "domain:text",
-                "Arayüz" => "interface:text",
-                "Subnet" => "subnet:text",
-                "DHCP:5c0a1c5f7b57f19953126e38" => "extension_id:hidden"
-            ]
-        ],
+        "selects" => $input_extensions,
         "inputs" => [
             "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
