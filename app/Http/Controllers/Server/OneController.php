@@ -244,7 +244,6 @@ class OneController extends Controller
         // Retrieve Service name from extension.
         $service = Extension::where('name', 'like', \request('extension'))->first()->service;
 
-        // 
         $output = server()->run("sudo systemctl " . \request('action') . ' ' . $service);
         return [
             "result" => 200,
@@ -254,9 +253,14 @@ class OneController extends Controller
 
     public function enableExtension()
     {
+        // Retrieve extension object.
         $extension = Extension::where('_id', \request('extension_id'))->first();
 
+
+        // If server is not accessible through ssh, we can assume it is already installed
         if(server()->type == "linux" || server()->type == "windows"){
+
+            // Simply, retrieve array and add extension id.
             $extensions_array = server()->extensions;
             $extensions_array[$extension->_id] = [];
             server()->extensions = $extensions_array;
@@ -264,16 +268,27 @@ class OneController extends Controller
             return respond('Servis başarıyla eklendi.');
         }
 
+        // Get Install script from extension.
         $script = Script::where('unique_code', $extension->setup)->first();
-        $server = server();
+
+        //Just a double check if script is not installed, warn user.
+        if(!$script){
+            return respond("Kurulum betiği bulunamadığı için işlem iptal edildi.",201);
+        }
+        
+        // Create a notification to inform user.
         $notification = Notification::new(
             __("Servis Yükleniyor."),
             "onhold",
             __(":server isimli sunucuda :new kuruluyor.",["server"=>server()->name,"new"=>$extension->name])
         );
-        $job = new InstallService($script, $server,\request('domain') . " "
+
+        // Create and dispatch the job immediately.
+        $job = new InstallService($script, server(),\request('domain') . " "
             . \request('interface'),\Auth::user(),$notification ,$extension);
         dispatch($job);
+
+        // Forward request and inform user.
         return respond("Kurulum talebi başarıyla alındı. Gelişmeleri bildirim üzerinden takip edebilirsiniz.");
     }
 
