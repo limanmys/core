@@ -8,15 +8,20 @@ class Server
 {
     public function handle($request, Closure $next)
     {
+        // Extract Server Id from request.
         $server_id = null;
         if ($request->route('server_id') != null) {
             $server_id = $request->route('server_id');
         } else if ($request->has('server_id')) {
             $server_id = $request->get('server_id');
         }
-        if ($request != null) {
+
+        // Check If request has server_id at all.
+        if ($server_id != null) {
+
             //Let's verify server.
             $server = \App\Server::where('_id', $server_id)->first();
+            
             //If server is simply not found.
             if ($server == null) {
                 return respond("Sunucu bulunamadı.",404);
@@ -41,6 +46,7 @@ class Server
             }
 
         } else {
+            // Route specificed using server data but request doesn't have any, so abort request.
             return respond("Server bilgisi verilmedi.",404);
         }
         return $next($request);

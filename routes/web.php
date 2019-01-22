@@ -33,6 +33,9 @@ require_once(app_path('Http/Controllers/Settings/_routes.php'));
 // Change the language
 Route::post('/locale', 'HomeController@setLocale')->name('set_locale');
 
+// Change the language
+Route::post('/theme', 'HomeController@setTheme')->name('set_theme');
+
 // Home Route
 
 Route::get('/', 'HomeController@index')->name('home');

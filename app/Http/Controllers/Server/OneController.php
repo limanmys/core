@@ -18,24 +18,30 @@ use GuzzleHttp\Exception\GuzzleException;
 class OneController extends Controller
 {
     public function one(){
-        return (request('server')->type == "linux_ssh" || request('server')->type == "windows_powershell")
+
+        // Determine if request should be considered authorized or unauthorized.
+        return (server()->type == "linux_ssh" || server()->type == "windows_powershell")
             ? $this->authorized() : $this->unauthorized();
     }
 
     public function remove()
     {
+        // Obtain Server Object
+        $server = \App\Server::where('_id',request('server_id'))->first();
+        
         // Check if authenticated user is owner or admin.
-        if(server()->user_id != Auth::id() && !Auth::user()->isAdmin()){
+        if($server->user_id != Auth::id() && !Auth::user()->isAdmin()){
             // Throw error
             return respond("Yalnızca kendi sunucunuzu silebilirsiniz.",202);
         }
+
         // If server has key, simply delete it.
-        if(request('server')->type == "linux_ssh"){
-            request('server')->key->delete();
+        if($server->type == "linux_ssh"){
+            Key::where('server_id',$server->_id)->delete();
         }
 
         // Delete the Server Object.
-        request('server')->delete();
+        $server->delete();
 
         // Redirect user to servers home page.
         return respond(route('servers'),300);
@@ -43,7 +49,10 @@ class OneController extends Controller
 
     public function serviceCheck()
     {
-        $output = request('server')->isRunning(request('service'));
+        // Check if requested service is running on server.
+        $output = server()->isRunning(request('service'));
+
+        // Return the button class name ~ color to update client.
         if ($output == "active\n") {
             return respond('btn-success');
         } else if ($output === "inactive\n") {
@@ -53,39 +62,87 @@ class OneController extends Controller
         }
     }
 
-
     public function network()
     {
-        $server = \request('server');
+        // Get Server object from Server Middleware (Request)
+        $server = server();
+
+        // Set Parameters
         $parameters = \request('ip') . ' ' . \request('cidr') . ' ' . \request('gateway') . ' ' . \request('interface');
-        $server->systemScript('network', $parameters);
+
+        // Get Script Object
+        $script = \App\Script::where('unique_code','set_network')->first();
+        
+        // Check if script exists, if not warn user.
+        if(!$script){
+            return respond('Network betigi yuklu degil.',201);
+        }
+
+        // Execute The Script
+        $output = $server->runScript($script, $parameters," > /dev/null 2>/dev/null &");
+
+        // Sleep 3 seconds because it may take a while before network up again.
         sleep(3);
+
+        // Very basically, check port and network.
         $output = shell_exec("echo exit | telnet " . \request('ip') . " " . $server->port);
         if (!strpos($output, "Connected to " . \request('ip'))) {
-            return [
-                "result" => 201,
-                "data" => $output
-            ];
+
+            // If network is not reachable, may be something went wrong, warn user about it.
+            return respond("Network degistirilemedi.",201);
         }
+
+        // Since network updated, we have to update keys as well, first get all keys.
+        $keys = Key::where('server_id',$server->_id)->get();
+
+        // Loop through each key and warn users that key is updated.
+        foreach($keys as $key){
+            
+            // Don't warn if key owns the authenticated user.
+            if($key->user_id != \Auth::id()){
+                $notification = Notification::new(
+                    __("SSH Anahtari Bozuldu"),
+                    "error",
+                    __(":server isimli sunucudaki ip adresi degistigi icin ssh anahtariniz devre disi birakildi.",["server"=>server()->name])
+                );
+            }else{
+                // Create user key.
+                Key::init($server->key["username"], request('password'), \request('ip'),
+                    $server->port, Auth::id());
+
+                // Create New Key Object.
+                $new = new Key();
+                $new->user_id = \Auth::id();
+                $new->name = $key->name;
+                $new->username = $server->key["username"];
+                $new->server_id = $server->_id;
+                $new->save();
+            }
+
+            // Delete the old key.
+            $key->delete();
+        }
+
+        // Update Server with new network configuration.
         $server->update([
             'ip_address' => \request('ip')
         ]);
-        Key::init($server->key["username"], request('password'), \request('ip'),
-            $server->port, Auth::id());
-        return [
-            "result" => 200,
-            "data" => $output
-        ];
+        
+        // Now that everything is ok, warn user.
+
+        return respond('Network basariyla guncellendi.',200);
     }
 
     public function hostname()
     {
-        $server = \request('server');
-        $output = $server->systemScript('hostname', \request('hostname'));
-        return [
-            "result" => 200,
-            "data" => $output
-        ];
+        // Obtain Script from Database
+        $script = Script::where('unique_code','set_hostname')->first();
+
+        // Simply run that script on server.
+        $output = server()->runScript($script, \request('hostname'));
+
+        // Forward request.
+        return respond("Hostname guncellendi",200);
     }
 
     public function grant(){
@@ -106,23 +163,22 @@ class OneController extends Controller
         // Give User a permission to use this server.
         $permissions = Permission::where('user_id',$user->_id)->first();
         $user_servers = (Array) $permissions->server;
-        array_push($user_servers, request('server')->_id);
+        array_push($user_servers, server()->_id);
         $permissions->server = $user_servers;
 
         // Lastly, save all information.
         $permissions->save();
 
-        if(request('server')->type == "linux_ssh"){
+        if(server()->type == "linux_ssh"){
             // Generate key for user.
-            Key::initWithKey(request('server')->key->username, request('server')->key->_id, request('server')->ip_address,
-                request('server')->port, Auth::id(), $user->_id);
+            Key::initWithKey(server()->key->username, server()->key->_id, server()->ip_address,
+                server()->port, Auth::id(), $user->_id);
 
             // Built key object for user.
-
             $key = new Key([
-                "name" => request('server')->key->name,
-                "username" => request('server')->key->username,
-                "server_id" => request('server')->_id
+                "name" => server()->key->name,
+                "username" => server()->key->username,
+                "server_id" => server()->_id
             ]);
 
             $key->user_id = $user->_id;
@@ -130,6 +186,7 @@ class OneController extends Controller
             $key->save();
         }
 
+        // Forward request.
         return respond("Yetki başarıyla verildi.");
     }
 
@@ -138,7 +195,7 @@ class OneController extends Controller
     }
 
     public function terminal(){
-        $server = request('server');
+        $server = server();
         $client = new Client([
             'verify' => false,
             'cookies' => true
@@ -174,7 +231,7 @@ class OneController extends Controller
         }catch (GuzzleException $e){
             return respond('Web SSH Servisi Çalışmıyor.',201);
         }
-        //First, request page to get _xsrf value.
+        // First, request page to get _xsrf value.
 
         $json = json_decode($response->getBody()->getContents());
         return response()->view('terminal.index',[
@@ -184,9 +241,11 @@ class OneController extends Controller
 
     public function service()
     {
-        $server = \request('server');
+        // Retrieve Service name from extension.
         $service = Extension::where('name', 'like', \request('extension'))->first()->service;
-        $output = $server->run("sudo systemctl " . \request('action') . ' ' . $service);
+
+        // 
+        $output = server()->run("sudo systemctl " . \request('action') . ' ' . $service);
         return [
             "result" => 200,
             "data" => $output
@@ -197,20 +256,20 @@ class OneController extends Controller
     {
         $extension = Extension::where('_id', \request('extension_id'))->first();
 
-        if(request('server')->type == "linux" || request('server')->type == "windows"){
-            $extensions_array = request('server')->extensions;
+        if(server()->type == "linux" || server()->type == "windows"){
+            $extensions_array = server()->extensions;
             $extensions_array[$extension->_id] = [];
-            request('server')->extensions = $extensions_array;
-            request('server')->save();
+            server()->extensions = $extensions_array;
+            server()->save();
             return respond('Servis başarıyla eklendi.');
         }
 
         $script = Script::where('unique_code', $extension->setup)->first();
-        $server = \request('server');
+        $server = server();
         $notification = Notification::new(
             __("Servis Yükleniyor."),
             "onhold",
-            __(":server isimli sunucuda :new kuruluyor.",["server"=>request('server')->name,"new"=>$extension->name])
+            __(":server isimli sunucuda :new kuruluyor.",["server"=>server()->name,"new"=>$extension->name])
         );
         $job = new InstallService($script, $server,\request('domain') . " "
             . \request('interface'),\Auth::user(),$notification ,$extension);
@@ -273,9 +332,9 @@ class OneController extends Controller
 
     private function authorized(){
         return view('server.one_auth', [
-            "stats" => \request('server')->run("df -h"),
-            "hostname" => request('server')->run("hostname"),
-            "server" => \request('server'),
+            "stats" => server()->run("df -h"),
+            "hostname" => server()->run("hostname"),
+            "server" => server(),
             "installed_extensions" => $this->installedExtensions(),
             "available_extensions" => $this->availableExtensions(),
         ]);
@@ -285,15 +344,15 @@ class OneController extends Controller
         return view('server.one',[
             "installed_extensions" => $this->installedExtensions(),
             "available_extensions" => $this->availableExtensions(),
-            "server" => request('server')
+            "server" => server()
         ]);
     }
 
     private function availableExtensions(){
-        return Extension::whereNotIn('_id',array_keys(request('server')->extensions))->get();
+        return Extension::whereNotIn('_id',array_keys(server()->extensions))->get();
     }
 
     private function installedExtensions(){
-        return Extension::whereIn('_id',array_keys(request('server')->extensions))->get();
+        return Extension::whereIn('_id',array_keys(server()->extensions))->get();
     }
 }

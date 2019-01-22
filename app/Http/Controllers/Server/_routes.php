@@ -18,6 +18,11 @@ Route::post('/server/kontrol', 'Server\MainController@isAlive')->middleware('par
 Route::post('/sunucu/guncelle', 'Server\OneController@update')->name('server_update')->middleware('parameters:server_id,name,control_port,city');
 
 
+// Remove Server Route
+
+Route::post('/sunucu/sil', 'Server\OneController@remove')->name('server_remove')->middleware('parameters:server_id');
+
+
 Route::group(['middleware' => ['server']], function () {
 
 
@@ -59,10 +64,5 @@ Route::group(['middleware' => ['server']], function () {
 // Server Permission Grant Route
 
     Route::post('/sunucu/yetkilendir', 'Server\OneController@grant')->name('server_grant_permission')->middleware('parameters:server_id,email');
-
-// Remove Server Route
-
-    Route::post('/sunucu/sil', 'Server\OneController@remove')->name('server_remove')->middleware('parameters:server_id');
-
 
 });

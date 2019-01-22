@@ -20,6 +20,10 @@
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/fa.min.css') }}">
+
+    @if(\Session::has('dark_mode'))
+        <link rel="stylesheet" href="{{ asset('css/dark.css') }}">
+    @endif
 </head>
 <body style="display: block">
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0">
@@ -55,6 +59,23 @@
                         <input type="hidden" name="locale" value="en">
                         <button class="btn btn-link text-white">
                             Türkçe
+                        </button>
+                    @endif
+
+                </form>
+            </li>
+        </ul>
+        <ul class="navbar-nav">
+            <li class="nav-item text-nowrap">
+                <form action="#" onsubmit="return request('{{route('set_theme')}}',this,reload)"
+                      style="cursor: pointer;">
+                    @if (Session::has('dark_mode'))
+                        <button class="btn btn-link text-white-">
+                            Gece
+                        </button>
+                    @else
+                        <button class="btn btn-link text-white">
+                            Gunduz
                         </button>
                     @endif
 

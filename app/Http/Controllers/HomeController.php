@@ -42,6 +42,15 @@ class HomeController extends Controller
         }
     }
 
+    public function setTheme(){
+        if(\Session::has('dark_mode')){
+            \Session::remove('dark_mode');
+        }else{
+            \Session::put('dark_mode','true');
+        }
+        return respond('Tema Guncellendi.');
+    }
+
     public function new(){
         return view('permission.request');
     }

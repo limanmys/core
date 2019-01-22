@@ -26,10 +26,13 @@ class Key extends Eloquent
             // Trust Target Server
             shell_exec("ssh-keyscan -p " . $server_port . " -H ". $server_address . " >> ~/.ssh/known_hosts");
         }
-
+        
         //Send Keys to target
         shell_exec("sshpass -p '" . $password . "' ssh-copy-id -i " . storage_path('keys')  . DIRECTORY_SEPARATOR . $account_name ." " . $username
             ."@" . $server_address ." 2>&1 -p " . $server_port);
+        
+
+        return true;
     }
 
     public static function initWithKey($username,$key,$server_address,$server_port,$current_name, $new_name){

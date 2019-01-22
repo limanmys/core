@@ -10,7 +10,7 @@ class Permission extends Eloquent
     protected $connection = 'mongodb';
 
     public static function new($user_id){
-        // Simply create new permission
+        // Simply create new permission table
         $permissions = new Permission();
         $permissions->user_id = $user_id;
 
@@ -74,4 +74,5 @@ class Permission extends Eloquent
 
         return $permissions->__get($type);
     }
+
 }

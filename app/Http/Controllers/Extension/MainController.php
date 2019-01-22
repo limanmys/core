@@ -20,6 +20,7 @@ class MainController extends Controller
             return array_key_exists(request('extension_id'),$value->extensions);
         });
         $servers = Server::filterPermissions($servers);
+
         // Go through servers and create a city list, it will be used in javascript to highlight cities in map.
         $cities = [];
         foreach ($servers as $server) {
@@ -27,6 +28,7 @@ class MainController extends Controller
                 array_push($cities,$server->city);
             }
         }
+        
         // If user have only servers in one city, redirect to it.
         if(count($cities) == 1){
             return redirect(route('extension_city',[
