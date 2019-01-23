@@ -41,9 +41,7 @@ class OneController extends Controller
 
         }else{
             // Get extension scripts
-            $scripts = Script::extension($extension->name);
-
-            // Get server object from middleware.
+            $scripts = Script::where('extensions','like',strtolower($extension->name))->get();
 
             $outputs = [];
 
@@ -52,6 +50,12 @@ class OneController extends Controller
 
                 // Get Script
                 $script = $scripts->where('unique_code', $unique_code)->first();
+                
+                // Check if required script is available or not.
+                if(!$script){
+                    return respond("Eklenti için gerekli olan betik yüklü değil, lütfen yöneticinizle görüşün.",404);
+                }
+
                 // Run Script with no parameters.
                 $output = $server->runScript($script, '');
 

@@ -1,4 +1,4 @@
-<div class="loading" style="display: none">
+<div class="loading" style="visibility: hidden">
     <div class="wrapper">
 
     </div>
@@ -13,7 +13,7 @@
             background-color: rgba(201, 76, 76, 0.5);
             filter: grayscale(1) blur(1.5rem);
             -webkit-filter: grayscale(1) blur(1.5rem);
-            z-index: 99998;
+            z-index: 999989;
         }
 
         .loader {
@@ -26,7 +26,7 @@
             position: absolute;
             left: 40%;
             top: 40%;
-            z-index: 99999;
+            z-index: 999999;
         }
 
         @keyframes spin {
