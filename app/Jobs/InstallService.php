@@ -54,10 +54,15 @@ class InstallService implements ShouldQueue
         $service_status = "sudo systemctl is-failed " . $this->extension->service;
         $query = "ssh -p " . $this->server->port . " " . $this->key->username . "@" . $this->server->ip_address
             . " -i "  . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id . " " . $service_status . " 2>&1";
+    
         $log = shell_exec($query);
         if ($log == "active\n") {
-            $this->server->extensions = array_merge($this->server->extensions, [$this->extension->_id]);
+
+            $extensions_array = $this->server->extensions;
+            $extensions_array[$this->extension->_id] = [];
+            $this->server->extensions = $extensions_array;
             $this->server->save();
+            
             $this->notification->type = "success";
             $this->notification->title = $this->extension->name . " kuruldu";
             $this->notification->message = $this->extension->name . " servisi kurulumu başarıyla tamamlandı.";

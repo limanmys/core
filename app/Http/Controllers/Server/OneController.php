@@ -71,7 +71,7 @@ class OneController extends Controller
         $parameters = \request('ip') . ' ' . \request('cidr') . ' ' . \request('gateway') . ' ' . \request('interface');
 
         // Get Script Object
-        $script = \App\Script::where('unique_code','set_network')->first();
+        $script = \App\Script::where('unique_code','server_set_network')->first();
         
         // Check if script exists, if not warn user.
         if(!$script){
@@ -136,7 +136,13 @@ class OneController extends Controller
     public function hostname()
     {
         // Obtain Script from Database
-        $script = Script::where('unique_code','set_hostname')->first();
+        $script = Script::where('unique_code','server_set_hostname')->first();
+
+        // Check If Script Exists
+        if(!$script){
+            return respond("Hostname değiştirme betiği bulunamadı.",200);
+        }
+
 
         // Simply run that script on server.
         $output = server()->runScript($script, \request('hostname'));
@@ -269,7 +275,7 @@ class OneController extends Controller
         }
 
         // Get Install script from extension.
-        $script = Script::where('unique_code', $extension->setup)->first();
+        $script = Script::where('unique_code', $extension->install_script)->first();
 
         //Just a double check if script is not installed, warn user.
         if(!$script){

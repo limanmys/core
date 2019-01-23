@@ -69,7 +69,7 @@ class Script extends Eloquent
             $parameters[$i] = str_replace("# ","",$parameters[$i]);
             switch ($i){
                 case 0:
-                    $script->language = $parameters[$i];
+                    $script->language = substr($parameters[$i],2);
                     break;
                 case 1:
                     $script->encoding = $parameters[$i];

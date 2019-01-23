@@ -2,6 +2,18 @@
 
 @section('content')
 
+    <?php
+        $input_extensions = [];
+        foreach($available_extensions as $extension){
+            $arr = [];
+            foreach($extension->install as $key => $parameter){
+                $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
+            }
+            $arr[$extension->name . ":" . $extension->_id] = "extension_id:hidden";
+            $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
+        }
+    ?>
+
     @include('title',[
         "title" => $server->name       
     ])
@@ -13,11 +25,13 @@
         "target_id" => "edit",
         "text" => "Düzenle"
     ])
-    @include('modal-button',[
-        "class" => "btn-secondary",
-        "target_id" => "install_extension",
-        "text" => "Servis Ekle"
-    ])
+    @if(count($input_extensions))
+        @include('modal-button',[
+            "class" => "btn-secondary",
+            "target_id" => "install_extension",
+            "text" => "Servis Ekle"
+        ])
+    @endif
     @include('modal-button',[
         "class" => "btn-info",
         "target_id" => "change_network",
@@ -250,29 +264,20 @@
         ],
         "submit_text" => "İndir"
     ])
-    <?php
-        $input_extensions = [];
-        foreach($available_extensions as $extension){
-            $arr = [];
-            foreach($extension->install as $key => $parameter){
-                $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
-            }
-            $arr[$extension->name . ":" . $extension->_id] = "extension_id:hidden";
-            $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
-        }
-    ?>
-    @include('modal',[
-        "id"=>"install_extension",
-        "title" => "Servis Yükle",
-        "url" => route('server_extension'),
-        "next" => "message",
-        "selects" => $input_extensions,
-        "inputs" => [
-            "Sunucu Id:$server->_id" => "server_id:hidden"
-        ],
-        "submit_text" => "Değiştir"
-    ])
-
+    
+    @if(count($input_extensions))
+        @include('modal',[
+            "id"=>"install_extension",
+            "title" => "Servis Yükle",
+            "url" => route('server_extension'),
+            "next" => "message",
+            "selects" => $input_extensions,
+            "inputs" => [
+                "Sunucu Id:$server->_id" => "server_id:hidden"
+            ],
+            "submit_text" => "Değiştir"
+        ])
+    @endif
     <script>
         function checkStatus(service){
             let data = new FormData();
@@ -295,7 +300,7 @@
         @endif
 
         function downloadFile(form){
-            loading();
+            //loading();
             window.location.assign('/sunucu/indir?path=' + form.getElementsByTagName('input')[0].value + '&server_id=' + form.getElementsByTagName('input')[1].value);
             return false;
         }
