@@ -8,8 +8,8 @@
   </div>
 </div>
 
-@if(is_array($data["dns_generate"]))
-    @foreach($data["dns_generate"] as $zone)
+@if(is_array($data["dns_list_zone"]))
+    @foreach($data["dns_list_zone"] as $zone)
         <div class="card">
             <div class="card-title">
                 <span onclick="route('zone_details?&alan_adi={{$zone["name"]}}')">{{$zone["name"]}}</span>
@@ -23,7 +23,7 @@
 @include('modal',[
     "id"=>"add_forward_zone",
     "title" => "Forward Zone Ekle",
-    "url" => route('extension_api',['add_forward_zone']),
+    "url" => route('extension_api',['dns_add_forward_zone']),
     "next" => "reload",
     "inputs" => [
         "Zone Adı" => "alan_adi:text",
@@ -36,7 +36,7 @@
 @include('modal',[
     "id"=>"add_reverse_zone",
     "title" => "Reverse Zone Ekle",
-    "url" => route('extension_api',['add_reverse_zone']),
+    "url" => route('extension_api',['dns_add_reverse_zone']),
     "next" => "reload",
     "inputs" => [
         "Zone Adı" => "ters_alan_adi:text",

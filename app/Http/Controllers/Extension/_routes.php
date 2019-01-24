@@ -10,7 +10,7 @@ Route::get('/l/{extension_id}/{city}/{server_id}/{unique_code}', 'Extension\OneC
 
 // Extension Management Route
 
-// Route::post('/extension/{unique_code}', 'ExtensionController@route')->name('extension_api')->middleware(['server', 'script_parameters']);
+Route::post('/extension/run/{unique_code}', 'Extension\OneController@route')->name('extension_api')->middleware(['server', 'script_parameters']);
 
 // Extension Page (City Select) Route
 

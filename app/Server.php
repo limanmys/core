@@ -59,7 +59,7 @@ class Server extends Eloquent
 
         // Build Query
         $query = ($script->root == 1) ? 'sudo ' : '';
-        $query = $query . substr($script->language, 1) . ' /tmp/' . $script->_id . " run " . $parameters;
+        $query = $query . $script->language . ' /tmp/' . $script->_id . " run " . $parameters;
         
         // Execute and return outputs.
         return $this->runSSH($query,$extra);

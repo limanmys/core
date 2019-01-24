@@ -103,11 +103,19 @@ class MainController extends Controller
         if(!$zip->open(request()->file('extension'))){
             return respond("Eklenti dosyasi acilamiyor.",201);
         }
+        
         $random = str_random(10);
         $zip->extractTo('/tmp/' .$random);
         
+        $path = '/tmp/' . $random;
+
+        // Control to bypass GitHub, GitLab direct zip download.
+        if(strpos(request()->file('extension')->getClientOriginalName(), '-master')){
+            $path = '/tmp/' . $random . '/' . substr(request()->file('extension')->getClientOriginalName(), 0, -4);          
+        }
+        
         //Now that we have everything, let's extract file.
-        $file = file_get_contents('/tmp/' .$random . '/db.json');
+        $file = file_get_contents($path . '/db.json');
         $json = json_decode($file,true);
     
         $new = new \App\Extension();
@@ -123,20 +131,26 @@ class MainController extends Controller
         mkdir($extension_folder);
         
         // Copy Views into the liman.
-        shell_exec('cp -r ' . '/tmp/' .$random . '/views/* ' .  $extension_folder);
+        shell_exec('cp -r ' . $path . '/views/* ' .  $extension_folder);
         
         $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator('/tmp/' .$random . '/scripts/'),
+            new \RecursiveDirectoryIterator($path . '/scripts/'),
             \RecursiveIteratorIterator::LEAVES_ONLY
         );
-
+        
         foreach ($files as $name => $file){
             // Skip directories (they would be added automatically)
             if (!$file->isDir())
             {
+                if(substr($file->getFilename(),0,1) == "."){
+                    continue;
+                }
+                
                 // Get real and relative path for current file
                 $filePath = $file->getRealPath();
-                Script::readFromFile($filePath);
+
+                $script = Script::readFromFile($filePath);
+                shell_exec('cp ' . $filePath . ' ' .storage_path('app' . DIRECTORY_SEPARATOR . 'scripts' ) . DIRECTORY_SEPARATOR . $script->_id);
             }
         }
 

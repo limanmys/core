@@ -370,7 +370,11 @@ class OneController extends Controller
     }
 
     private function availableExtensions(){
-        return Extension::whereNotIn('_id',array_keys(server()->extensions))->get();
+        // if(server()->key){
+            return Extension::whereNotIn('_id',array_keys(server()->extensions))->get();
+        // }
+        // return Extension::whereNotIn('_id',array_keys(server()->extensions))->where('serverless','true')->get();
+
     }
 
     private function installedExtensions(){
