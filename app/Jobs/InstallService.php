@@ -41,20 +41,23 @@ class InstallService implements ShouldQueue
         $this->notification->save();
         //Copy script to target.
         $copy_file_query = 'scp -P ' . $this->server->port . " -i " . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id .' ' . storage_path('app/scripts/' . $this->script->_id) .' ' . $this->key->username .'@' . $this->server->ip_address . ':/tmp/';
+        echo $copy_file_query . "\n";
         shell_exec($copy_file_query);
         $permission_query = 'sudo chmod +x /tmp/' . $this->script->_id;
         $query = "ssh -p " . $this->server->port . " " . $this->key->username . "@" . $this->server->ip_address
         . " -i "  . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id . " " . $permission_query . " 2>&1";
+        echo $query . "\n";
         shell_exec($query);
         $query = ($this->script->root == 1)? 'sudo ' : '';
-        $query = $query . substr($this->script->language,1) . ' /tmp/' .$this->script->_id . " run ".$this->parameters;
+        $query = $query . $this->script->language . ' /tmp/' .$this->script->_id . " run ".$this->parameters;
         $query = "ssh -p " . $this->server->port . " " . $this->key->username . "@" . $this->server->ip_address
             . " -i "  . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id . " " . $query . " 2>&1";
+        echo $query . "\n";
         shell_exec($query);
         $service_status = "sudo systemctl is-failed " . $this->extension->service;
         $query = "ssh -p " . $this->server->port . " " . $this->key->username . "@" . $this->server->ip_address
             . " -i "  . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id . " " . $service_status . " 2>&1";
-    
+        echo $query . "\n";
         $log = shell_exec($query);
         if ($log == "active\n") {
 

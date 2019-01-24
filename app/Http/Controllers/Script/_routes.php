@@ -10,7 +10,7 @@ Route::post('/betik/ekle', 'Script\MainController@create')->name('script_create'
 
 // Script Details Route
 
-// Route::get('/betik/{script_id}', 'Script\MainController@one')->name('script_one');
+Route::get('/betik/detay/{script_id}', 'Script\MainController@one')->name('script_one');
 
 // Script Upload Route
 

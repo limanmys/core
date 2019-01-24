@@ -6,8 +6,10 @@
         $input_extensions = [];
         foreach($available_extensions as $extension){
             $arr = [];
-            foreach($extension->install as $key => $parameter){
-                $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
+            if(isset($extension->install)){
+                foreach($extension->install as $key => $parameter){
+                    $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
+                }    
             }
             $arr[$extension->name . ":" . $extension->_id] = "extension_id:hidden";
             $input_extensions[$extension->name . ":" . $extension->_id] = $arr;

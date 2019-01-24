@@ -23,7 +23,9 @@ Artisan::command('administrator',function (){
     $perm->user_id = $user->_id;
     $perm->server = [];
     $perm->save();
-    $this->comment("Administrator kullanıcısı eklendi. Parola : " . $password . "");
+    $this->comment("Administrator kullanıcısı eklendi. ");
+    $this->comment("Email  : admin@liman.app");
+    $this->comment("Parola : " . $password . "");
 })->describe('Create administrator account to use');
 
 Artisan::command('test',function (){

@@ -65,6 +65,7 @@ class OneController extends Controller
             }
 
         }
+
         // Return all required parameters.
         return view('feature.server', [
             "extension" => $extension,
@@ -81,7 +82,7 @@ class OneController extends Controller
         $extension = request('extension');
 
         // Get Scripts of extension.
-        $scripts = Script::extension($extension->name);
+        $scripts = Script::where('extensions','like',$extension->name);
         $outputs = [];
 
         // Go through each required scripts of page and run them with proper parameters.
