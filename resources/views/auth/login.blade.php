@@ -1,63 +1,82 @@
-@extends('layouts.app')
+@extends('adminlte::master')
 
-@section('content')
-        <div class="container">
-            <div class="card" style="background-color: #343a40;border: 1px solid transparent">
-                <div class="card-header">{{ __('Giriş Yap') }}</div>
+@section('adminlte_css')
+    <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/iCheck/square/blue.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/adminlte/css/auth.css') }}">
+    @yield('css')
+@stop
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
+@section('body_class', 'login-page')
 
-                        <div class="form-group row">
-                            <label for="email" class="col-sm-4 col-form-label text-md-right">{{ __('E-Mail Adresi') }}</label>
+@section('body')
+    <div class="login-box">
+        <div class="login-logo">
+            <a href="{{ url(config('adminlte.dashboard_url', 'home')) }}">{!! config('adminlte.logo', '<b>Admin</b>LTE') !!}</a>
+        </div>
+        <!-- /.login-logo -->
+        <div class="login-box-body">
+            <p class="login-box-msg">{{ trans('adminlte::adminlte.login_message') }}</p>
+            <form action="{{ url(config('adminlte.login_url', 'login')) }}" method="post">
+                {!! csrf_field() !!}
 
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus>
-
-                                @if ($errors->has('email'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Parola') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
-
-                                @if ($errors->has('password'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-md-6 offset-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-
-                                    <label class="form-check-label" for="remember">
-                                        {{ __('Beni Hatırla') }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Giriş Yap') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                <div class="form-group has-feedback {{ $errors->has('email') ? 'has-error' : '' }}">
+                    <input type="email" name="email" class="form-control" value="{{ old('email') }}"
+                           placeholder="{{ trans('adminlte::adminlte.email') }}">
+                    <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                    @if ($errors->has('email'))
+                        <span class="help-block">
+                            <strong>{{ $errors->first('email') }}</strong>
+                        </span>
+                    @endif
                 </div>
+                <div class="form-group has-feedback {{ $errors->has('password') ? 'has-error' : '' }}">
+                    <input type="password" name="password" class="form-control"
+                           placeholder="{{ trans('adminlte::adminlte.password') }}">
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                    @if ($errors->has('password'))
+                        <span class="help-block">
+                            <strong>{{ $errors->first('password') }}</strong>
+                        </span>
+                    @endif
+                </div>
+                <div class="row">
+                    <div class="col-xs-8">
+                        <div class="checkbox icheck">
+                            <label>
+                                <input type="checkbox" name="remember"> {{ trans('adminlte::adminlte.remember_me') }}
+                            </label>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-xs-4">
+                        <button type="submit"
+                                class="btn btn-primary btn-block btn-flat">{{ trans('adminlte::adminlte.sign_in') }}</button>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </form>
+            <div class="auth-links">
+                @if (config('adminlte.register_url', 'register'))
+                    <a href="{{ url(config('adminlte.register_url', 'register')) }}"
+                       class="text-center"
+                    >{{ trans('adminlte::adminlte.register_a_new_membership') }}</a>
+                @endif
             </div>
-</div>
-@endsection
+        </div>
+        <!-- /.login-box-body -->
+    </div><!-- /.login-box -->
+@stop
+
+@section('adminlte_js')
+    <script src="{{ asset('vendor/adminlte/plugins/iCheck/icheck.min.js') }}"></script>
+    <script>
+        $(function () {
+            $('input').iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                radioClass: 'iradio_square-blue',
+                increaseArea: '20%' // optional
+            });
+        });
+    </script>
+    @yield('js')
+@stop

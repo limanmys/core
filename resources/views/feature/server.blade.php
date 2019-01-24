@@ -1,9 +1,11 @@
 @extends('layouts.app')
 
+@section('content_header')
+    <h1>{{request('server')->name}} Sunucusunda <b>{{$extension->name}}</b> Yönetimi</h1>
+@stop
+
 @section('content')
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">{{request('server')->name}} Sunucusunda <b>{{$extension->name}}</b> Yönetimi</h1>
-    </div>
+
     <button class="btn btn-success" onclick="history.back()">{{__("Geri Dön")}}</button>
         <div class="row">
             <div class="col-9">

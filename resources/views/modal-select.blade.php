@@ -2,14 +2,13 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span></button>
+                <h3 class="modal-title">
                     @isset($title)
                         {{__($title)}}
                     @endisset
-                </h1>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                </h3>
             </div>
             @if(isset($onsubmit))
                 <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return {{$onsubmit}}" target="#">

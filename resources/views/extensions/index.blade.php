@@ -21,7 +21,7 @@
         </tr>
         </thead>
         <tbody>
-        @foreach($extensions as $extension)
+        @foreach(extensions() as $extension)
             <tr>
                 <td>{{$extension->name}}</td>
             </tr>
@@ -41,7 +41,7 @@
     ])
     <?php 
         $input_extensions = [];
-        foreach($extensions as $extension){
+        foreach(extensions() as $extension){
             $input_extensions[$extension->name] = $extension->_id;
         }
     ?>

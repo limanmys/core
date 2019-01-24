@@ -11,8 +11,6 @@
             width: 100%;
             height: 100%;
             background-color: rgba(201, 76, 76, 0.5);
-            filter: grayscale(1) blur(1.5rem);
-            -webkit-filter: grayscale(1) blur(1.5rem);
             z-index: 999989;
         }
 
