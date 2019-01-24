@@ -14,3 +14,7 @@ yarn-error.log
 .phpunit.result.cache
 /storage/keys/*
 /storage/app/scripts/*
+/resources/views/extensions/*
+!/resources/views/extensions/index.blade.php
+!/resources/views/extensions/one.blade.php
+!/resources/views/extensions/setup.blade.php
