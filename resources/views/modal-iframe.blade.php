@@ -1,17 +1,17 @@
-<div class="modal fade modal-lg m-auto" id="@isset($id){{$id}}@endisset" tabindex="-1" role="dialog" aria-hidden="true" style="max-width: 1000px;max-height: 1000px">
-    <div class="modal-dialog" role="document" style="max-width: 1000px;height: 80%">
-        <div class="modal-content" style="height: 100%;">
+<div class="modal fade" id="@isset($id){{$id}}@endisset" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" style="height:70%">
+        <div class="modal-content">
             <div class="modal-header">
-                <h4>
-                    {{$title}}
-                </h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" style="color:white">&times;</span>
-                </button>
+                  <span aria-hidden="true">×</span></button>
+                <h3 class="modal-title">
+                    @isset($title)
+                        {{__($title)}}
+                    @endisset
+                </h3>
             </div>
-                <div class="modal-body" style="height: 90%;">
-                    @include('__system__.loading',['show' =>'1'])
-                    <iframe src="{{$url}}" frameborder="0" style="display:block; width:100%; height:60vh;" onload="document.querySelector('#{{$id}} .loader').style.display = 'none';"></iframe>
+                <div class="modal-body">
+                    <iframe src="{{$url}}" frameborder="0" style="display:block; width:100%; height:100%;"></iframe>
                 </div>
         </div>
     </div>

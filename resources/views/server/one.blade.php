@@ -1,10 +1,12 @@
 @extends('layouts.app')
 
+@section('content_header')
+    <h1>{{$server->name}}</h1>
+@stop
+
+
 @section('content')
 
-    @include('title',[
-        "title" => $server->name
-    ])
     <button class="btn btn-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
 
     @include('modal-button',[

@@ -1,17 +1,19 @@
 @extends('layouts.app')
 
+@section('content_header')
+    <h1>Tüm Sunucular</h1>
+@stop
+
+
 @section('content')
 
-    @include('title',[
-        "title" => "Tüm Sunucular"
-    ])
     @include('modal-button',[
         "class" => "btn-success",
         "target_id" => "add_server",
         "text" => "Server Ekle"
     ])<br><br>
-    @if(isset($servers))
-        <table class="table">
+    @if(servers())
+        <table class="hover">
             <thead>
             <tr>
                 <th scope="col">{{__("Sunucu Adı")}}</th>
@@ -21,23 +23,15 @@
             </tr>
             </thead>
             <tbody>
-            @foreach ($servers as $server)
+            @foreach (servers() as $server)
                 <tr onclick="dummy('{{$server->_id}}')" class="highlight" oncontextmenu="return rightClick(this,event)">
                     <td id="name">{{$server->name}}</td>
                     <td id="ip_address">{{$server->ip_address}}</td>
                     <td id="type">{{$server->type}}</td>
                     <td id="control_port">{{$server->control_port}}</td>
-                    <td id="server_id" hidden>{{$server->_id}}</td>
-                    <td id="city" hidden>{{$server->city}}</td>
                 </tr>
             @endforeach
 
-            <ul class="dropdown-menu" id="context-menu" style="color:white">
-                <a class="dropdown-item" data-toggle="modal" data-target="#edit" href="#">{{__("Düzenle")}}</a>
-                <a class="dropdown-item" data-toggle="modal" data-target="#give_permission" href="#">{{__("Yetki Ver")}}</a>
-                <a class="dropdown-item" data-toggle="modal" data-target="#delete" href="#">{{__("Sil")}}</a>
-
-            </ul>
             </tbody>
         </table>
     @else
@@ -160,52 +154,10 @@
 
     <script>
         function dummy(id) {
-            let main = document.getElementsByTagName('main')[0];
-            main.innerHTML = document.getElementsByClassName('loading')[0].innerHTML;
+            // let main = document.getElementsByTagName('main')[0];
+            // main.innerHTML = document.getElementsByClassName('loading')[0].innerHTML;
             location.href = '/sunucular/' + id;
         }
-        let menu = document.getElementById('context-menu');
-        function rightClick(element,event){
-            menu.classList.toggle('show');
-            menu.style.top = event.clientY+"px";
-            menu.style.left = event.clientX+"px";
-            menu.style.backgroundColor = 'white';
-            menu.style.display = 'block';
-
-            let elms = document.getElementById("delete").getElementsByTagName("*");
-            let elms2 = document.getElementById("edit").getElementsByTagName("*");
-            let elms3 = document.getElementById("give_permission").getElementsByTagName("*");
-
-
-            for (var i = 0; i < elms.length; i++) {
-                if (elms[i].className === "modal-title")
-                    elms[i].innerHTML=element.getElementsByTagName("td")[0].innerHTML;
-                else if(elms[i].name === "server_id")
-                    elms[i].value = element.getElementsByTagName("td")[4].innerHTML;
-                else if(elms[i].id === "delete_alert")
-                    elms[i].setAttribute('hidden',"true");
-            }
-            for (var j = 0; j < elms2.length; j++) {
-                if(elms2[j].name === "server_id")
-                    elms2[j].value=element.getElementsByTagName("td")[4].innerHTML;
-                else if(elms2[j].name === "name")
-                    elms2[j].value=element.getElementsByTagName("td")[0].innerHTML;
-                else if(elms2[j].name === "control_port")
-                    elms2[j].value=element.getElementsByTagName("td")[3].innerHTML;
-                else if(elms2[j].name === "city")
-                    elms2[j].value=element.getElementsByTagName("td")[5].innerHTML;
-            }
-            for (var k = 0; k < elms3.length; k++) {
-                if(elms3[k].name === "server_id")
-                    elms3[k].value=element.getElementsByTagName("td")[4].innerHTML;
-            }
-            return false;
-        }
-        document.onclick = function(e){
-            if(e.target.id == ''){
-                menu.style.display = 'none';
-            }
-        };
     </script>
     @include('modal',[
        "id"=>"delete",

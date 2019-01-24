@@ -66,3 +66,6 @@ Route::post('/talep', 'HomeController@request')->name('request_send');
 
 Route::post('/arama/','SearchController@index')->name('search');
 });
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

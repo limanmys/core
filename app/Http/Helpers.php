@@ -40,3 +40,15 @@ if(!function_exists('server')){
         return request('server');
     }
 }
+
+if(!function_exists('servers')){
+    function servers(){
+        return \App\Server::getAll();
+    }
+}
+
+if(!function_exists('extensions')){
+    function extensions(){
+        return \App\Extension::all();
+    }
+}

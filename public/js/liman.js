@@ -10,7 +10,7 @@ function request(url, data, next) {
     }
 
     if (id != null) {
-        loading();
+        // loading();
     }
     console.log(id);
     let r = new XMLHttpRequest();
@@ -26,7 +26,7 @@ function request(url, data, next) {
                 message(r.responseText);
             }
             if( id != null){
-                loading();
+                // loading();
             }
             if (r.getResponseHeader("content-type") !== "application/json") {
                 return next(r.responseText);
@@ -74,15 +74,15 @@ function search() {
     });
 }
 
-function loading() {
-    let element = document.getElementsByClassName('loading')[0];
-    console.log(element.style.visibility);
-    if(element.style.visibility === "hidden"){
-        element.style.visibility = "visible";
-    }else {
-        element.style.visibility = 'hidden';
-    }
-}
+// function loading() {
+//     let element = document.getElementsByClassName('loading')[0];
+//     console.log(element.style.visibility);
+//     if(element.style.visibility === "hidden"){
+//         element.style.visibility = "visible";
+//     }else {
+//         element.style.visibility = 'hidden';
+//     }
+// }
 
 function checkNotifications() {
     request('/bildirimler', new FormData(), function (response) {
@@ -95,15 +95,15 @@ function route(url) {
 }
 
 window.onbeforeunload = function () {
-    loading();
+    // loading();
 };
 
 window.onload = function () {
     // loading();
-    document.getElementById('notificationDiv').addEventListener('click', function (e) {
-        e.stopPropagation();
-    });
-    setInterval(checkNotifications, 3000);
+    // document.getElementById('notificationDiv').addEventListener('click', function (e) {
+        // e.stopPropagation();
+    // });
+    // setInterval(checkNotifications, 3000);
 };
 
 function message(data) {

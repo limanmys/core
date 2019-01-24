@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('content_header')
+    <h1>{{$server->name}}</h1>
+@stop
+
 @section('content')
 
     <?php
@@ -15,11 +19,6 @@
             $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
         }
     ?>
-
-    @include('title',[
-        "title" => $server->name       
-    ])
-    <h5>Hostname : {{$hostname}}</h5>
     <button class="btn btn-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
 
     @include('modal-button',[
@@ -64,6 +63,7 @@
         "target_id" => "give_permission",
         "text" => "Yetki Ver"
     ])<br><br>
+        <h5>Hostname : {{$hostname}}</h5>
     @if(count($installed_extensions) > 0)
     <h4>{{__("Servis Durumları")}}</h4>
         @foreach($installed_extensions as $service)
