@@ -6,8 +6,9 @@
     <script src="{{asset('js/liman.js')}}"></script>
     <script>
         $(document).ready(function() {
-            $('table').DataTable({
-                autoFill : true
+            $('table').not('.notDataTable').DataTable({
+                autoFill : true,
+                bFilter: true,
             });
         } );
     </script>

@@ -22,8 +22,8 @@ class Server extends Eloquent
     {
         // Log Query
         server_log($this->_id, "command_" . $query);
-        // Build Query
 
+        // Build Query
         $query = "ssh -p " . $this->port . " " . $this->key->username . "@" . $this->ip_address . " -i " . storage_path('keys') .
             DIRECTORY_SEPARATOR . Auth::id() . " " . $query . " 2>&1" . $extra;
 
@@ -60,7 +60,7 @@ class Server extends Eloquent
         // Build Query
         $query = ($script->root == 1) ? 'sudo ' : '';
         $query = $query . $script->language . ' /tmp/' . $script->_id . " run " . $parameters;
-        
+
         // Execute and return outputs.
         return $this->runSSH($query,$extra);
     }
@@ -69,6 +69,7 @@ class Server extends Eloquent
     {
         // Check if services are alive or not.
         $query = "sudo systemctl is-failed " . $service_name;
+
         // Execute and return outputs.
         return $this->runSSH($query);
     }
@@ -78,6 +79,7 @@ class Server extends Eloquent
         if ($this->type == "linux_ssh") {
             return $this->sshAccessEnabled();
         }
+
         return true;
     }
 
@@ -100,15 +102,23 @@ class Server extends Eloquent
 
     public function sshKey()
     {
+        // Retrieve Key information from database.
         $key = Key::where([
             'server_id' => $this->id,
             'user_id' => Auth::id()
         ])->first();
-        if ($key == null) {
+
+        // If there's no key, abort.
+        if (!$key) {
             return false;
         }
+
+        // Add key object to the model as a variable to access it later.
+        $this->key = $key;
+
         //Check if server is already trusted or not.
         if(shell_exec("ssh-keygen -F " . $this->ip_address . " 2>/dev/null") == null){
+
             // Trust Target Server
             shell_exec("ssh-keyscan -p " . $this->port . " -H ". $this->ip_address . " >> ~/.ssh/known_hosts");
         }
@@ -117,14 +127,13 @@ class Server extends Eloquent
         $query = "chmod 400 " . storage_path('keys')  . DIRECTORY_SEPARATOR . Auth::id();
         shell_exec($query);
 
-        $query = "ssh -p " . $this->port . " " . $key->username . "@" . $this->ip_address . " -i " . storage_path('keys') .
-            DIRECTORY_SEPARATOR . Auth::id() . " " . "whoami" . " 2>&1";
+        // Run whoami on target so we can verify key.
+        $output = $this->runSSH("whoami");
 
-        $output = shell_exec($query);
         if ($output != ($key->username . "\n")) {
             return false;
         }
-        $this->key = $key;
+
         return true;
     }
 

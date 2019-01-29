@@ -4,7 +4,6 @@
     <h1>Tüm Sunucular</h1>
 @stop
 
-
 @section('content')
 
     @include('modal-button',[
@@ -13,22 +12,26 @@
         "text" => "Server Ekle"
     ])<br><br>
     @if(servers())
-        <table class="hover">
+        <table class="hover" id="servers">
             <thead>
             <tr>
                 <th scope="col">{{__("Sunucu Adı")}}</th>
                 <th scope="col">{{__("İp Adresi")}}</th>
                 <th scope="col">{{__("Sunucu Tipi")}}</th>
                 <th scope="col">{{__("Kontrol Portu")}}</th>
+                <th scope="col" hidden>{{__("Server ID")}}</th>
+                <th scope="col" hidden>{{__("Sehir")}}</th>
             </tr>
             </thead>
             <tbody>
             @foreach (servers() as $server)
-                <tr onclick="dummy('{{$server->_id}}')" class="highlight" oncontextmenu="return rightClick(this,event)">
+                <tr id="{{$server->_id}}" onclick="dummy('{{$server->_id}}')" style="cursor: pointer">
                     <td id="name">{{$server->name}}</td>
                     <td id="ip_address">{{$server->ip_address}}</td>
                     <td id="type">{{$server->type}}</td>
                     <td id="control_port">{{$server->control_port}}</td>
+                    <td id="server_id" hidden>{{$server->_id}}</td>
+                    <td id="city" hidden>{{$server->city}}</td>
                 </tr>
             @endforeach
 
@@ -154,16 +157,33 @@
 
     <script>
         function dummy(id) {
-            // let main = document.getElementsByTagName('main')[0];
-            // main.innerHTML = document.getElementsByClassName('loading')[0].innerHTML;
             location.href = '/sunucular/' + id;
         }
+        $.contextMenu({
+            selector: '#servers tr',
+            callback: function(key, options) {
+                let target = $("#" + key);
+                $("#" + key + " input , #" + key + ' select').each(function(index, value){
+                    let server_value = $("#" + options.$trigger[0].getAttribute("id") + " #" + value.getAttribute('name')).html();
+                        $("#" + key + " select[name='" + value.getAttribute('name') + "']" + " , "
+                            + "#" + key + " input[name='" + value.getAttribute('name') + "']").val(server_value);
+                });
+                target.modal('show');
+            },
+            items: {
+                "edit": {name: "{{__("Düzenle")}}", icon: "edit"},
+                "give_permission": {name: "{{__("Yetki Ver")}}", icon: "cut"},
+                "sep1": "---------",
+                "delete": {name: "{{__("Sil")}}", icon: "delete"},
+            }
+        });
+
     </script>
     @include('modal',[
        "id"=>"delete",
-       "title" =>"",
+       "title" =>"Sunucuyu Sil",
        "url" => route('server_remove'),
-       "text" => "isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+       "text" => "Sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
        "next" => "reload",
        "inputs" => [
            "Sunucu Id:'null'" => "server_id:hidden"

@@ -87,9 +87,9 @@ return [
 
     'dashboard_url' => '/',
 
-    'logout_url' => 'logout',
+    'logout_url' => 'cikis',
 
-    'login_url' => 'login',
+    'login_url' => 'giris',
 
     'register_url' => 'register',
 
@@ -124,6 +124,11 @@ return [
             'text' => 'Eklentiler',
             'url'  => '/eklentiler',
             'icon' => 'plus',
+        ],
+        [
+            'text' => 'Betikler',
+            'url'  => '/betikler',
+            'icon' => 'subscript'
         ],
         [
             'text' => 'Yetki Talebi',

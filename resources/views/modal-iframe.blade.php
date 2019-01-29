@@ -11,7 +11,7 @@
                 </h3>
             </div>
                 <div class="modal-body">
-                    <iframe src="{{$url}}" frameborder="0" style="display:block; width:100%; height:100%;"></iframe>
+                    <iframe src="{{$url}}" frameborder="0" style="display:block; width:100%; height:100%;background-color:black;"></iframe>
                 </div>
         </div>
     </div>

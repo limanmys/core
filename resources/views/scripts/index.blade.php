@@ -1,9 +1,11 @@
 @extends('layouts.app')
 
+@section('content_header')
+    <h1>{{__("Betikler")}}</h1>
+@stop
+
 @section('content')
-    @include('title',[
-        "title" => "Betikler"
-    ])
+
     {{--<button type="button" class="btn btn-success" onclick="window.location.href = '{{route('script_add')}}'">--}}
         {{--{{ __("Betik Oluştur") }}--}}
     {{--</button>--}}
@@ -58,10 +60,19 @@
     ])
 
     <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Adı</th>
+            <th scope="col">Açıklaması</th>
+            <th scope="col">Tipi</th>
+        </tr>
+        </thead>
         <tbody>
         @foreach ($scripts as $script)
             <tr>
                 <td>{{$script->name}}</td>
+                <td>{{$script->description}}</td>
+                <td>{{$script->extensions}}</td>
             </tr>
         @endforeach
         </tbody>

@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('content')
+@section('content_header')
+    <h1>Yetki Taleplerim</h1>
+@stop
 
-@include('title',[
-    "title" => "Yetki Taleplerim"
-])
+@section('content')
 
 @include('modal-button',[
     "class" => "btn-success",

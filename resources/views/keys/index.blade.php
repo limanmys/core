@@ -1,37 +1,36 @@
 @extends('layouts.app')
 
-@section('content')
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h2>{{ __("SSH Anahtarları") }}</h2>
-    </div>
-    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add_key">
-        {{ __("Anahtar Ekle") }}
-    </button><br><br>
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">{{ __("Sunucu") }}</th>
-            <th scope="col">{{ __("Kullanıcı") }}</th>
-            <th scope="col">{{ __("Port") }}</th>
-        </tr>
-        </thead>
-        <tbody data-toggle="modal" data-target="#duzenle">
-        @foreach ($keys as $key)
-            <tr>
-                <td>{{$key->name}}</td>
-                <td>{{$key->username}}</td>
-                <td>{{$servers->where('_id',$key->server_id)->first()->control_port}}</td>
-            </tr>
-        @endforeach
-        </tbody>
-    </table>
+@section('content_header')
+    <h1>{{ __("SSH Anahtarları") }}</h1>
+@stop
 
-    <?php 
-        $input_servers = [];
-        foreach($servers as $server){
-            $input_servers[$server->name] = $server->_id;
-        }
-    ?>
+@section('content')
+
+    @include('modal-button',[
+        "text" => "Anahtar Ekle",
+        "class" => "btn-success",
+        "target_id" => "add_key"
+    ])<br><br>
+
+    @include('table',[
+        "value_list" => $keys,
+        "name_list" => [
+            "Sunucu" , "Kullanıcı" , "*hidden*" , "*hidden*"
+        ],
+        "display" => [
+            "name" , "username", "_id:key_id" , "server_id"
+        ],
+        "menu_items" => [
+            "Düzenle" => [
+                "target" => "edit",
+                "icon" => "edit"
+            ],
+            "Sil" => [
+                "target" => "delete",
+                "icon" => "delete"
+            ]
+        ]
+    ])
 
     @include('modal',[
         "id"=>"add_key",
@@ -40,10 +39,24 @@
         "next" => "reload",
         "inputs" => [
             "Adı" => "name:text",
-            "Sunucu Secin:server_id" => $input_servers,
+            "Sunucu Secin:server_id" => objectToArray($servers,"name","_id"),
             "Kullanıcı Adı" => "username:text",
             "Parola" => "password:password"
         ],
         "submit_text" => "Ekle"
+    ])
+
+    @include('modal',[
+        "id"=>"edit",
+        "title" => "Anahtarı Düzenle",
+        "url" => route('key_add'),
+        "next" => "reload",
+        "inputs" => [
+            "Adı" => "name:text",
+            "Sunucu Secin:server_id" => objectToArray($servers,"name","_id"),
+            "Kullanıcı Adı" => "username:text",
+            "Parola" => "password:password"
+        ],
+        "submit_text" => "Düzenle"
     ])
 @endsection

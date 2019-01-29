@@ -16,15 +16,12 @@ class ScriptParameters
      */
     public function handle($request, Closure $next)
     {
-        $extension_id = null;
-        if($request->route('extension_id') != null){
-            $extension_id = $request->route('extension_id');
-        }
-        if($request->has('extension_id')){
-            $extension_id = $request->get('extension_id');
-        }
 
-        $extension = \App\Extension::where('_id',$extension_id)->first();
+        // Check if extension exists.
+        $extension = \App\Extension::where('_id',request('extension_id'))->first();
+        if(!$extension){
+            return respond("Eklenti bulunamadı",404);
+        }
 
         $url = null;
         if($request->route('unique_code') != null){

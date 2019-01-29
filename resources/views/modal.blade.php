@@ -19,7 +19,7 @@
                 <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return @isset($url)request('{{$url}}',this,@isset($next){{$next}}@endisset)"@endisset target="#">
             @endif
                 <div class="modal-body">
-                    <div id="{{$id}}_alert" class="alert alert-primary" role="alert" hidden>
+                    <div id="{{$id}}_alert" class="alert" role="alert" hidden>
                     </div>
                     @if(isset($selects) && is_array($selects))
                         <h5>{{__("Servis Seçimi")}}</h5>

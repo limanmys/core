@@ -71,6 +71,8 @@ class RegisterController extends Controller
         $perm = new \App\Permission();
         $perm->user_id = $user->_id;
         $perm->server = [];
+        $perm->extension = [];
+        $perm->script = [];
         $perm->save();
         return $user;
 
