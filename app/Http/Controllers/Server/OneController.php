@@ -107,7 +107,7 @@ class OneController extends Controller
                 );
             }else{
                 // Create user key.
-                Key::init($server->key["username"], request('password'), \request('ip'),
+                $flag = Key::init($server->key["username"], request('password'), \request('ip'),
                     $server->port, Auth::id());
 
                 // Create New Key Object.
@@ -129,8 +129,12 @@ class OneController extends Controller
         ]);
         
         // Now that everything is ok, warn user.
+        if(isset($flag) && !$flag){
+            return respond('Network guncellendi fakat ssh keyi devre dışı bırakıldı, lütfen tekrar ekleyiniz.',201);
+        }else{
+            return respond('Network basariyla guncellendi.',200);
+        }
 
-        return respond('Network basariyla guncellendi.',200);
     }
 
     public function hostname()
@@ -140,7 +144,7 @@ class OneController extends Controller
 
         // Check If Script Exists
         if(!$script){
-            return respond("Hostname değiştirme betiği bulunamadı.",200);
+            return respond("Hostname değiştirme betiği bulunamadı.",201);
         }
 
 
@@ -163,7 +167,7 @@ class OneController extends Controller
 
         // If user somehow typed same email, warn user.
         if($user == Auth::user()){
-            return response("Bu email adresi size ait.",201);
+            return respond("Bu email adresi size ait.",201);
         }
 
         // Give User a permission to use this server.
@@ -177,8 +181,13 @@ class OneController extends Controller
 
         if(server()->type == "linux_ssh"){
             // Generate key for user.
-            Key::initWithKey(server()->key->username, server()->key->_id, server()->ip_address,
+            $flag = Key::initWithKey(server()->key->username, server()->key->_id, server()->ip_address,
                 server()->port, Auth::id(), $user->_id);
+
+            // Check if key initialized successfully.
+            if(!$flag){
+                return respond("SSH anahtar hatası, lütfen yönetinizle iletişime geçin.",201);
+            }
 
             // Built key object for user.
             $key = new Key([

@@ -17,18 +17,12 @@ class Language
     public function handle($request, Closure $next)
     {
         // Check if web session has a locale set for user.
-        if ($request->session()->has('locale')) {
+        if (session('locale')) {
 
             // If so, set that locale in to the app to use it later.
-            $locale = $request->session()->get('locale');
-            App::setLocale($locale);
+            App::setLocale(session('locale'));
         }
 
-        // Check if session has dark mode set.
-        if($request->session()->has('dark')){
-            $request->request->add(['dark_mode' => "true"]);
-        }
-        
         // Forward request to next target.
         return $next($request);
     }

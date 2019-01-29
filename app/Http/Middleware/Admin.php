@@ -16,7 +16,7 @@ class Admin
     public function handle($request, Closure $next)
     {
         // Check is User is admin, if not, simply abort.
-        if(!\Auth::user()->isAdmin()){
+        if(\Auth::user()->isAdmin() == false){
             return respond("Bu işlemi yapmak için yetkiniz yok",403);
         }
 

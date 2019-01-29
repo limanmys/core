@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('content_header')
+    <h1>Yetki Talepleri</h1>
+@stop
+
 @section('content')
 
 @include('title',[

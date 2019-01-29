@@ -24,6 +24,9 @@ class AddController extends Controller
         }
         $this->server->save();
 
+        // Add Server to request object to use it later.
+        request()->request->add(["server" => $this->server]);
+
         // Run required function for specific type.
         $next = null;
         switch ($this->server->type){
@@ -52,8 +55,11 @@ class AddController extends Controller
 
     private function linux_ssh(){
         // Create Key
-        Key::init(request('username'), request('password'), request('ip_address'),
+        $flag = Key::init(request('username'), request('password'), request('ip_address'),
             request('port'), Auth::id());
+        if(!$flag){
+            return respond("SSH Hatası",400);
+        }
 
         $this->server->port = request('port');
 

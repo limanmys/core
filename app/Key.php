@@ -11,6 +11,7 @@ class Key extends Eloquent
     protected $fillable = ['name', 'username' ,'server_id'];
 
     public static function init($username,$password,$server_address,$server_port,$account_name){
+
         //Create keys folder
         if (!is_dir(storage_path('keys'))) {
             shell_exec("mkdir -p " . storage_path('keys'));
@@ -30,7 +31,15 @@ class Key extends Eloquent
         //Send Keys to target
         shell_exec("sshpass -p '" . $password . "' ssh-copy-id -i " . storage_path('keys')  . DIRECTORY_SEPARATOR . $account_name ." " . $username
             ."@" . $server_address ." 2>&1 -p " . $server_port);
-        
+
+        $query = "ssh -p " . $server_port . " " . $username . "@" . $server_address . " -i " . storage_path('keys') .
+            DIRECTORY_SEPARATOR . \Auth::id() . " " . "whoami" . " 2>&1";
+
+        $output = shell_exec($query);
+
+        if ($output != ($username . "\n")) {
+            return false;
+        }
 
         return true;
     }

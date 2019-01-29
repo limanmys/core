@@ -22,6 +22,8 @@ Artisan::command('administrator',function (){
     $perm = new \App\Permission();
     $perm->user_id = $user->_id;
     $perm->server = [];
+    $perm->extension = [];
+    $perm->script = [];
     $perm->save();
     $this->comment("Administrator kullanıcısı eklendi. ");
     $this->comment("Email  : admin@liman.app");

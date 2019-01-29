@@ -1,9 +1,11 @@
 @extends('layouts.app')
 
+@section('content_header')
+    <h1>Eklenti Yönetimi</h1>
+@stop
+
 @section('content')
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h2>Eklenti Yönetimi</h2>
-    </div>
+
     @include('modal-button',[
         "class" => "btn-primary",
         "target_id" => "extensionUpload",
@@ -58,7 +60,7 @@
 <script>
         function downloadFile(form){
             window.location.assign('/indir/eklenti/' + form.getElementsByTagName('select')[0].value);
-            loading();
+            // loading();
             return false;
         }
 </script>

@@ -113,7 +113,7 @@
                   <a href="#" class="btn btn-default btn-flat">{{__("Profil")}}</a>
                 </div>
                 <div class="pull-right">
-                  <a href="#" class="btn btn-default btn-flat">{{__("Çıkış Yap")}}</a>
+                  <a onclick="request('/cikis',new FormData(),null)" class="btn btn-default btn-flat">{{__("Çıkış Yap")}}</a>
                 </div>
               </li>
             </ul>

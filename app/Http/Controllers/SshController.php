@@ -16,7 +16,7 @@ class SshController extends Controller
         $keys = Key::where('user_id',\Auth::id())->get();
 
         // Retrieve User servers that has permission.
-        $servers = Server::all();
+        $servers = Server::getAll();
 
         return view('keys.index',[
             "keys" => $keys,

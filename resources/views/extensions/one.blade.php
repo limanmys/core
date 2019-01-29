@@ -1,11 +1,13 @@
 @extends('layouts.app')
 
+@section('content_header')
+    <h1>{{$extension->name}} Eklentisi Ayarları</h1>
+@stop
+
 @section('content')
     <script src="{{asset('/js/treeview.min.js')}}"></script>
     <link rel="stylesheet" href="{{asset('/css/tree.css')}}">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h2>{{$extension->name}} Eklentisi Ayarları</h2>
-    </div>
+
     <button class="btn btn-success" onclick="history.back()">{{__("Geri Dön")}}</button>
     <div class="row">
         <div class="col-3">

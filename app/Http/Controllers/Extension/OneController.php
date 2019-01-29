@@ -97,7 +97,7 @@ class OneController extends Controller
         }
 
         $view = (\request()->ajax()) ? 'extensions.' . strtolower(\request('extension_id')) . '.' . \request('url') : 'feature.server';
-        if (!\request()->ajax()) {
+        if(view()->exists($view) && request()->method() != "POST"){
             return view($view, [
                 "result" => 200,
                 "data" => $outputs,
@@ -105,8 +105,8 @@ class OneController extends Controller
                 "extension" => $extension,
                 "scripts" => $scripts,
             ]);
-        } else {
-            return 200;
+        }else{
+            return respond("Başarıyla tamamlandı.");
         }
     }
 

@@ -12,7 +12,7 @@ function request(url, data, next) {
     if (id != null) {
         // loading();
     }
-    console.log(id);
+
     let r = new XMLHttpRequest();
     r.open("POST", url);
     r.setRequestHeader('X-CSRF-TOKEN', csrf);
@@ -107,14 +107,23 @@ window.onload = function () {
 };
 
 function message(data) {
+    console.log(data);
     let json = JSON.parse(data);
-    let modal = document.getElementsByClassName("modal show")[0];
+    let modal = document.getElementsByClassName("modal fade in")[0];
     if (!modal) {
         return;
     }
     let modal_id = modal.getAttribute("id");
-    document.getElementById(modal_id + "_alert").innerHTML = json["message"];
-    document.getElementById(modal_id + "_alert").removeAttribute('hidden');
+    let selector = $("#" + modal_id + "_alert");
+    let color = "alert-info";
+    switch (json["status"]) {
+        case 200:
+            color = "alert-success";
+            break;
+        default:
+            color = "alert-danger";
+    }
+    selector.removeClass('alert-danger').removeClass('alert-success').addClass(color).html(json["message"]).fadeIn();
 }
 
 function dismissNotification(id) {
