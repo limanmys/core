@@ -3,15 +3,11 @@
 
 // Servers Route
 
-Route::get('/sunucular', 'Server\MainController@all')->name('servers');
+Route::view('/sunucular', 'server.index')->name('servers');
 
 // Add Server Route
 
 Route::post('/sunucu/ekle', 'Server\AddController@main')->name('server_add')->middleware('parameters:ip_address,control_port,type,city');
-
-// Server Status Route (Telnet)
-
-Route::post('/server/kontrol', 'Server\MainController@isAlive')->middleware('parameters:ip,port');
 
 // Server Update Route
 

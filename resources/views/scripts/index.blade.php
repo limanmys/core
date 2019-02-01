@@ -6,38 +6,18 @@
 
 @section('content')
 
-    {{--<button type="button" class="btn btn-success" onclick="window.location.href = '{{route('script_add')}}'">--}}
-        {{--{{ __("Betik Oluştur") }}--}}
-    {{--</button>--}}
-
-    @include('modal-button',[
+    @include('l.modal-button',[
         "class" => "btn-primary",
         "target_id" => "scriptUpload",
         "text" => "Yükle"
     ])
-    @include('modal-button',[
+    @include('l.modal-button',[
         "class" => "btn-secondary",
         "target_id" => "scriptExport",
         "text" => "Indir"
     ])<br><br>
 
-    @include('modal',[
-        "id"=>"scriptUpload",
-        "title" => "Betik Yükle",
-        "url" => route('script_upload'),
-        "next" => "reload",
-        "inputs" => [
-            "Lütfen Betik Dosyasını(.lmns) Seçiniz" => "script:file",
-        ],
-        "submit_text" => "Yükle"
-    ])
-    <?php 
-        $input_scripts = [];
-        foreach($scripts as $script){
-            $input_scripts[$script->name] = $script->_id;
-        }
-    ?>
-    @include('modal',[
+    @include('l.modal',[
         "id"=>"scriptUpload",
         "title" => "Betik Yükle",
         "url" => route('script_upload'),
@@ -48,40 +28,59 @@
         "submit_text" => "Yükle"
     ])
 
-    @include('modal',[
+    @include('l.modal',[
+        "id"=>"scriptUpload",
+        "title" => "Betik Yükle",
+        "url" => route('script_upload'),
+        "next" => "reload",
+        "inputs" => [
+            "Lütfen Betik Dosyasını(.lmns) Seçiniz" => "script:file",
+        ],
+        "submit_text" => "Yükle"
+    ])
+
+    @include('l.modal',[
         "id"=>"scriptExport",
         "onsubmit" => "downloadFile",
         "title" => "Betik İndir",
         "next" => "",
         "inputs" => [
-            "Betik Secin:script_id" => $input_scripts
+            "Betik Secin:script_id" => objectToArray($scripts,"name", "_id")
         ],
         "submit_text" => "İndir"
     ])
 
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">Adı</th>
-            <th scope="col">Açıklaması</th>
-            <th scope="col">Tipi</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach ($scripts as $script)
-            <tr>
-                <td>{{$script->name}}</td>
-                <td>{{$script->description}}</td>
-                <td>{{$script->extensions}}</td>
-            </tr>
-        @endforeach
-        </tbody>
-    </table>
-<script>
-        function downloadFile(form){
+    @include('l.table',[
+        "value" => $scripts,
+        "title" => [
+            "Betik Adı" , "Açıklama" , "Tipi" , "*hidden*"
+        ],
+        "display" => [
+            "name" , "description", "extensions" , "_id:script_id"
+        ],
+        "menu" => [
+            "Sil" => [
+                "target" => "delete",
+                "icon" => "delete"
+            ]
+        ]
+    ])
+
+    @include('l.modal',[
+       "id"=>"delete",
+       "title" =>"Betiği Sil",
+       "url" => route('script_delete'),
+       "text" => "Betiği silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+       "next" => "reload",
+       "inputs" => [
+           "Betik Id:'null'" => "script_id:hidden"
+       ],
+       "submit_text" => "Sunucuyu Sil"
+    ])
+    <script>
+        function downloadFile(form) {
             window.location.assign('/indir/betik/' + form.getElementsByTagName('select')[0].value);
-            loading();
             return false;
         }
-</script>
+    </script>
 @endsection

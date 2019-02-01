@@ -33,7 +33,8 @@ class MainController extends Controller
         return respond('Betik eklendi.',200);
     }
 
-    public function one(){
+    public function one()
+    {
         $script = Script::where('_id',\request('script_id'))->first();
         try{
             $contents = Storage::get('scripts/' . $script->_id);
@@ -50,7 +51,8 @@ class MainController extends Controller
         ]);
     }
 
-    public function create(){
+    public function create()
+    {
         $script = new Script();
         $script = Script::createFile($script,["!/usr/bin/python3","-*- coding: utf-8 -*-",request('root'),\request('name'),
             \request('description'),\request('version'),\request('extensions'),\request('inputs'),\request('type'),\Auth::user()->name,\request('support_email'),\request('company'),\request('unique_code'),\request('regex'),\request('code')]);
@@ -58,10 +60,20 @@ class MainController extends Controller
         return route('script_one',$script->_id);
     }
 
-    public function download(){
-        $script = Script::where('_id',request('script_id'))->first();
+    public function download()
+    {
+        $script = Script::where('_id', request('script_id'))->first();
 
         // Send file to the user then delete it.
         return response()->download(storage_path('app/scripts/') . $script->_id, $script->unique_code . '.lmns');
     }
+
+    public function delete()
+    {
+        // Get Script
+        shell_exec('rm ' .storage_path('app/scripts/' . script()->_id));
+        script()->delete();
+        return respond("Betik başarıyla silindi",201);
+    }
+
 }

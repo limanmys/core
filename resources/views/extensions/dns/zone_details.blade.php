@@ -1,6 +1,7 @@
 @if(is_array($data["dns_list_record"]))
     <h3>Zone Detayları</h3>
     <button class="btn btn-primary" data-toggle="modal" data-target="#add_forward_zone">{{__("Kayıt Ekle")}}</button><br><br>
+
     <table class="hover">
         <thead>
         <tr>
@@ -22,7 +23,7 @@
     </table>
 @endif
 
-@include('modal',[
+@include('l.modal',[
     "id"=>"add_forward_zone",
     "title" => "Forward Zone Ekle",
     "url" => route('extension_api',['dns_add_record']),

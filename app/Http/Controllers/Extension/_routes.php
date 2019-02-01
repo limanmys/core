@@ -14,11 +14,11 @@ Route::post('/extension/run/{unique_code}', 'Extension\OneController@route')->na
 
 // Extension Page (City Select) Route
 
-Route::get('/l/{extension_id}', 'Extension\MainController@all')->name('extension_map');
+Route::get('/l/{extension_id}', 'Extension\MainController@allServers')->name('extension_map');
 
 // Extension City Servers Route
 
-Route::get('/l/{extension_id}/{city}', 'Extension\MainController@city')->name('extension_city');
+Route::view('/l/{extension_id}/{city}', 'extension_pages.city')->name('extension_city');
 
 // Extensions List Route
 

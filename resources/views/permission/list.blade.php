@@ -6,10 +6,6 @@
 
 @section('content')
 
-@include('title',[
-    "title" => "Yetki Talepleri"
-])
-
 <button class="btn btn-success" onclick="history.back()">{{__("Geri Dön")}}</button><br><br>
 <table class="table">
     <thead>
@@ -30,7 +26,7 @@
         ];
     ?>
     @foreach ($requests as $request)
-        <tr class="highlight" onclick="window.location = '{{route('request_one',$request->_id)}}'">
+        <tr class="highlight">
             <td>{{__($list[$request->type])}}</td>
             <td>{{$request->user_name}}</td>
             <td>{{$request->note}}</td>

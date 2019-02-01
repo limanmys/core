@@ -3,53 +3,49 @@
 namespace App\Http\Controllers\Extension;
 
 use App\Extension;
-use App\Http\Middleware\Server;
 use App\Script;
 use App\Http\Controllers\Controller;
 
+/**
+ * Class OneController
+ * @package App\Http\Controllers\Extension
+ */
 class OneController extends Controller
 {
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     */
     public function server()
     {
-        // Get Extension Data.
-        $extension = Extension::where('_id', \request('extension_id'))->first();
-
-        // First, check requested server has key.
-        $server = \request('server');
 
         // Now that we have server, let's check if required parameters set for extension.
-        foreach ($extension->setup as $key=>$setting){
-            if(!array_key_exists($key,$server->extensions[$extension->_id])){
+        foreach (extension()->setup as $key=>$setting){
+            if(!array_key_exists($key,server()->extensions[extension()->_id])){
                 return redirect(route('extension_server_settings_page',[
-                    "server_id" => $server->_id,
-                    "extension_id" => $extension->_id
+                    "server_id" => server()->_id,
+                    "extension_id" => extension()->_id
                 ]));
             }
         }
 
-        if($server->key == null){
-
+        if(server()->key == null){
             // Redirect user if requested server is not serverless.
-            if($extension->serverless != "true"){
-
+            if(extension()->serverless != "true"){
                 // Redirect user to keys.
-                return respond(route('keys'),300);
+                return redirect(route('keys'));
             }
 
             $scripts = [];
             $outputs = [];
 
         }else{
-            // Get extension scripts
-            $scripts = Script::where('extensions','like',strtolower($extension->name))->get();
-
             $outputs = [];
 
             // Go through each required scripts and run each of them.
-            foreach ($extension->views["index"] as $unique_code) {
+            foreach (extension()->views["index"] as $unique_code) {
 
                 // Get Script
-                $script = $scripts->where('unique_code', $unique_code)->first();
+                $script = extension()->scripts()->where('unique_code', $unique_code)->first();
                 
                 // Check if required script is available or not.
                 if(!$script){
@@ -57,7 +53,7 @@ class OneController extends Controller
                 }
 
                 // Run Script with no parameters.
-                $output = $server->runScript($script, '');
+                $output = server()->runScript($script, '');
 
                 // Decode output and set it into outputs array.
                 $output = str_replace('\n', '', $output);
@@ -67,15 +63,18 @@ class OneController extends Controller
         }
 
         // Return all required parameters.
-        return view('feature.server', [
-            "extension" => $extension,
-            "scripts" => $scripts,
+        return view('extension_pages.server', [
+            "extension" => extension(),
+            "scripts" => extension()->scripts(),
             "data" => $outputs,
             "view" => "index",
-            "server" => $server
+            "server" => server()
         ]);
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
     public function route()
     {
         // Get Extension from Middleware
@@ -96,7 +95,7 @@ class OneController extends Controller
             $outputs[$script->unique_code] = json_decode($output, true);
         }
 
-        $view = (\request()->ajax()) ? 'extensions.' . strtolower(\request('extension_id')) . '.' . \request('url') : 'feature.server';
+        $view = (\request()->ajax()) ? 'extensions.' . strtolower(\request('extension_id')) . '.' . \request('url') : 'extension_pages.server';
         if(view()->exists($view) && request()->method() != "POST"){
             return view($view, [
                 "result" => 200,
@@ -110,6 +109,9 @@ class OneController extends Controller
         }
     }
 
+    /**
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     */
     public function runFunction(){
         $extension = Extension::where('_id',request()->route('extension_id'))->first();
         require(base_path('resources/views/extensions/' . strtolower($extension->name) . '/functions.php'));
@@ -124,6 +126,9 @@ class OneController extends Controller
         }
     }
 
+    /**
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function serverSettings(){
         $extension = Extension::where('_id',request()->route('extension_id'))->first();
         $server_config = [];
@@ -143,9 +148,12 @@ class OneController extends Controller
         ]));
     }
 
+    /**
+     * @return \Illuminate\Http\Response
+     */
     public function serverSettingsPage(){
         $extension = Extension::where('_id',request()->route('extension_id'))->first();
-        return response()->view('extensions.setup',[
+        return response()->view('extension_pages.setup',[
             'extension' => $extension
         ]);
     }

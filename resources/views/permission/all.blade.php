@@ -6,7 +6,7 @@
 
 @section('content')
 
-@include('modal-button',[
+@include('l.modal-button',[
     "class" => "btn-success",
     "target_id" => "request",
     "text" => "Yetki İste"
@@ -50,7 +50,7 @@
     </tbody>
 </table>
 
-@include('modal',[
+@include('l.modal',[
     "id"=>"request",
     "title" => "Yetki İste",
     "url" => route('request_send'),

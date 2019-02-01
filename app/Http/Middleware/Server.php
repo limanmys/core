@@ -40,6 +40,9 @@ class Server
             return respond("SSH: Sunucuya erişmek için izniniz yok.", 403);
         }
 
+        // Add/Update Server Object to the request.
+        $request->request->add(['server' => $server]);
+
         return $next($request);
     }
 

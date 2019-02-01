@@ -22,3 +22,6 @@ Route::get('/betikler', 'Script\MainController@index')->name('scripts');
 
 // Script Download Route
 Route::get('/indir/betik/{script_id}','Script\MainController@download')->name('script_download');
+
+// Script Remove Route
+Route::post('/betik/sil','Script\MainController@delete')->name('script_delete')->middleware('admin');

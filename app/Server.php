@@ -5,6 +5,15 @@ namespace App;
 use Auth;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
+/**
+ * App\Server
+ *
+ * @property-read mixed $id
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Server newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Server newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Server query()
+ * @mixin \Eloquent
+ */
 class Server extends Eloquent
 {
     protected $collection = 'servers';
@@ -21,7 +30,7 @@ class Server extends Eloquent
     public function runSSH($query, $extra = null)
     {
         // Log Query
-        server_log($this->_id, "command_" . $query);
+        liman_log("server: " . $this->_id . ":command_" . $query);
 
         // Build Query
         $query = "ssh -p " . $this->port . " " . $this->key->username . "@" . $this->ip_address . " -i " . storage_path('keys') .
@@ -159,6 +168,10 @@ class Server extends Eloquent
         return $servers;
     }
 
+    /**
+     * @param array $coloumns
+     * @return \App\Server | Jenssegers\Mongodb\Eloquent\Model
+     */
     public static function getAll($coloumns = [])
     {
         $servers = Server::all($coloumns);
