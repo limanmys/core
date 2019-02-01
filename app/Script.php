@@ -4,6 +4,15 @@ namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
+/**
+ * App\Script
+ *
+ * @property-read mixed $id
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Script newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Script newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Script query()
+ * @mixin \Eloquent
+ */
 class Script extends Eloquent
 {
     protected $collection = 'scripts';

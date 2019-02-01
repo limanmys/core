@@ -47,7 +47,7 @@
                     </button>
                 @include('modal',[
                     "id"=>"deneme",
-                    "title" => "Merhaba Ertan",
+                    "l.title" => "Merhaba Ertan",
                     "url" => "/user/add",
                     "inputs" => [
                         "Kullanıcı Adı" => "username:text",

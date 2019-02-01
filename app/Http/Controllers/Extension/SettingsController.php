@@ -6,15 +6,26 @@ use App\Extension;
 use App\Http\Controllers\Controller;
 use App\Script;
 
+/**
+ * Class SettingsController
+ * @package App\Http\Controllers\Extension
+ */
 class SettingsController extends Controller
 {
     // Extension Management Home Page
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function settings_all()
     {
-        return view('extensions.index');
+        return view('extension_pages.manager');
     }
 
     // Extension Management Page
+
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function settings_one()
     {
         $extension = Extension::where('_id',\request('extension_id'))->first();
@@ -33,6 +44,11 @@ class SettingsController extends Controller
     }
 
     // Search through folders and extract pages.
+
+    /**
+     * @param $path
+     * @return array
+     */
     private function tree($path)
     {
         // If file is not path, simply return.
@@ -69,6 +85,9 @@ class SettingsController extends Controller
         return $files;
     }
 
+    /**
+     * @return array
+     */
     public function getScriptsOfView(){
         $extension = Extension::find(request('extension_id'));
         if(array_key_exists(request('view'),$extension->views)){
@@ -79,6 +98,9 @@ class SettingsController extends Controller
         return $arr;
     }
 
+    /**
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
     public function addScriptToView(){
         $extension = Extension::find(request('extension_id'));
         $temp = $extension->views;
@@ -92,6 +114,9 @@ class SettingsController extends Controller
         return response(__("Başarıyla Eklendi."),200);
     }
 
+    /**
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
     public function removeScriptFromView(){
         $extension = Extension::find(request('extension_id'));
         $temp = $extension->views;

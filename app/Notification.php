@@ -4,6 +4,15 @@ namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
+/**
+ * App\Notification
+ *
+ * @property-read mixed $id
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Notification newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Notification newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Notification query()
+ * @mixin \Eloquent
+ */
 class Notification extends Eloquent
 {
     protected $collection = 'notifications';

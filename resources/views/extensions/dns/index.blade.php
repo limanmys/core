@@ -46,7 +46,7 @@
     @endforeach
 @endif
 
-@include('modal',[
+@include('l.modal',[
     "id"=>"add_forward_zone",
     "title" => "Forward Zone Ekle",
     "url" => route('extension_api',['dns_add_forward_zone']),
@@ -59,7 +59,7 @@
     "submit_text" => "Ekle"
 ])
 
-@include('modal',[
+@include('l.modal',[
     "id"=>"add_reverse_zone",
     "title" => "Reverse Zone Ekle",
     "url" => route('extension_api',['dns_add_reverse_zone']),
@@ -72,7 +72,7 @@
     "submit_text" => "Ekle"
 ])
 
-@include('modal',[
+@include('l.modal',[
    "id"=>"delete",
    "title" =>"Zone'u Sil",
    "url" => route('extension_api',['dns_delete_zone']),

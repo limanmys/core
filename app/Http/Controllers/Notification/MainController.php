@@ -13,7 +13,7 @@ class MainController extends Controller
             "read" => false
         ])->orderBy('updated_at','desc')->take(5)->get();
         return response()
-            ->view('__system__.notifications',
+            ->view('l.notifications',
                 [
                     "notifications" => $notifications
                 ])

@@ -4,6 +4,15 @@ namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
+/**
+ * App\Permission
+ *
+ * @property-read mixed $id
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Permission newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Permission newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Permission query()
+ * @mixin \Eloquent
+ */
 class Permission extends Eloquent
 {
     protected $collection = 'permissions';

@@ -13,6 +13,7 @@ function request(url, data, next) {
         // loading();
     }
 
+    modalData = data;
     let r = new XMLHttpRequest();
     r.open("POST", url);
     r.setRequestHeader('X-CSRF-TOKEN', csrf);
@@ -74,16 +75,6 @@ function search() {
     });
 }
 
-// function loading() {
-//     let element = document.getElementsByClassName('loading')[0];
-//     console.log(element.style.visibility);
-//     if(element.style.visibility === "hidden"){
-//         element.style.visibility = "visible";
-//     }else {
-//         element.style.visibility = 'hidden';
-//     }
-// }
-
 function checkNotifications() {
     request('/bildirimler', new FormData(), function (response) {
         document.getElementById("notificationDiv").innerHTML = response;
@@ -107,7 +98,6 @@ window.onload = function () {
 };
 
 function message(data) {
-    console.log(data);
     let json = JSON.parse(data);
     let modal = document.getElementsByClassName("modal fade in")[0];
     if (!modal) {
@@ -123,7 +113,9 @@ function message(data) {
         default:
             color = "alert-danger";
     }
-    selector.removeClass('alert-danger').removeClass('alert-success').addClass(color).html(json["message"]).fadeIn();
+    if(json["message"]){
+        selector.removeClass('alert-danger').removeClass('alert-success').addClass(color).html(json["message"]).fadeIn();
+    }
 }
 
 function dismissNotification(id) {
@@ -133,5 +125,23 @@ function dismissNotification(id) {
         checkNotifications();
     });
 }
+let inputs =[];
+let modalData = [];
+
+function updateTable(){
+    for(var i = 0;i< inputs.length ; i++){
+        let element = inputs[i][0];
+        $(element).html(modalData.get(element.id));
+    }
+    let current_modal = $('.modal:visible');
+    if(current_modal.length){
+        current_modal.modal('hide');
+    }
+}
+
+function deleteFromTable(){
+
+}
+
 
 let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');
