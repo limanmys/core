@@ -139,14 +139,11 @@ class MainController extends Controller
     /**
      * @param $dir
      */
-    private function rmdir_recursive($dir)
-    {
-        foreach (scandir($dir) as $file) {
-            if(is_dir("$dir/$file") && ('.' === $file || '..' === $file)){
-                $this->rmdir_recursive("$dir/$file");
-            }else{
-                unlink("$dir/$file");
-            }
+    private function rmdir_recursive($dir) {
+        foreach(scandir($dir) as $file) {
+            if ('.' === $file || '..' === $file) continue;
+            if (is_dir("$dir/$file")) $this->rmdir_recursive("$dir/$file");
+            else unlink("$dir/$file");
         }
         rmdir($dir);
     }
