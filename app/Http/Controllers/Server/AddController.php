@@ -9,9 +9,21 @@ use Auth;
 
 class AddController extends Controller
 {
+    /**
+     * @var \App\Server
+     */
     public $server;
 
-    public function main(){
+    public function main()
+    {
+        // Check if name is already in use.
+        if(Server::where([
+            'user_id' => auth()->id(),
+            "name" => request('name')
+        ])->exists()){
+            return respond("Bu sunucu ismiyle bir sunucunuz zaten var.",201);
+        }
+
         // Create object with parameters.
         $this->server = new Server(request()->all());
 
@@ -76,6 +88,15 @@ class AddController extends Controller
             $this->server->delete();
             return respond("SSH Hatası",401);
         }
+
+        foreach(extensions() as $extension){
+            if($this->server->isRunning($extension->service) == "active\n"){
+                $extensions_array = $this->server->extensions;
+                $extensions_array[$extension->_id] = [];
+                $this->server->extensions = $extensions_array;
+                $this->server->save();
+            }
+        };
 
         return $this->grantPermissions();
     }

@@ -51,7 +51,7 @@ Artisan::command('import',function(){
 });
 
 Artisan::command('export',function(){
-    $model = \App\Extension::where('_id','5c456c958f2fa510fa60da82')->first();
+    $model = \App\Extension::where('_id','5c4884c68f2fa558e309f045')->first();
     $path = resource_path('views' . DIRECTORY_SEPARATOR .'extensions' . DIRECTORY_SEPARATOR . strtolower($model->name));
     $zip = new ZipArchive();
     $zip->open('/liman/export/deneme.lmne',ZipArchive::CREATE | ZipArchive::OVERWRITE);

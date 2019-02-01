@@ -125,6 +125,7 @@ function dismissNotification(id) {
         checkNotifications();
     });
 }
+
 let inputs =[];
 let modalData = [];
 
