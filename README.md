@@ -58,7 +58,7 @@ sudo chown `id -u` /data/db
 ```
 #### Gerekli Paketler
 ```bash
-sudo apt install sshpass telnet nmap python3 python3-paramiko python3-tornado -y
+sudo apt install sshpass telnet nmap python3 python3-paramiko python3-tornado dnsutils -y
 ```
 #### Config Dosyasi Linkleme
 ```bash
