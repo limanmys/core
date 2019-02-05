@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
+
 if (!function_exists('respond')) {
     /**
      * @param $message
@@ -41,7 +43,7 @@ if (!function_exists('liman_log')) {
      */
     function liman_log($message)
     {
-        Log::info(Auth::id() . ":" . $message);
+        Log::info(auth()->id() . ":" . $message);
     }
 }
 if (!function_exists('server')) {
@@ -86,6 +88,23 @@ if (!function_exists('extensions')) {
         return \App\Extension::getAll();
     }
 }
+
+if (!function_exists('extensionRoute')) {
+    /**
+     * @param string $route
+     * @return string
+     */
+    function extensionRoute($route)
+    {
+        return route('extension_server_route',[
+            "extension_id" => request()->route('extension_id'),
+            "server_id" => request()->route('server_id'),
+            "city" => request()->route('city'),
+            "unique_code" => $route
+        ]);
+    }
+}
+
 
 if (!function_exists('extension')) {
     /**

@@ -8,13 +8,17 @@
         "php": "^7.1.3",
         "ext-json": "*",
         "ext-ldap": "*",
+        "ext-zip": "*",
+	"ext-simplexml" : "*",
         "barryvdh/laravel-ide-helper": "^2.5",
         "fideloper/proxy": "^4.0",
         "guzzlehttp/guzzle": "~6.0",
         "jenssegers/mongodb": "^3.4",
         "jeroennoten/laravel-adminlte": "^1.24",
         "laravel/framework": "5.7.*",
-        "laravel/tinker": "^1.0"
+        "laravel/tinker": "^1.0",
+        "phpseclib/phpseclib": "^2.0",
+        "twig/twig": "^2.6"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.2",

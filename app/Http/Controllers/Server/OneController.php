@@ -64,9 +64,6 @@ class OneController extends Controller
 
     public function network()
     {
-        // Get Server object from Server Middleware (Request)
-        $server = server();
-
         // Set Parameters
         $parameters = \request('ip') . ' ' . \request('cidr') . ' ' . \request('gateway') . ' ' . \request('interface');
 
@@ -79,13 +76,14 @@ class OneController extends Controller
         }
 
         // Execute The Script
-        $output = $server->runScript($script, $parameters," > /dev/null 2>/dev/null &");
+        $output = server()->runScript($script, $parameters," > /dev/null 2>/dev/null &");
 
         // Sleep 3 seconds because it may take a while before network up again.
         sleep(3);
 
         // Very basically, check port and network.
-        $output = shell_exec("echo exit | telnet " . \request('ip') . " " . $server->port);
+        $output = shell_exec("echo exit | telnet " . \request('ip') . " " . server()->port);
+        return respond($output,201);
         if (!strpos($output, "Connected to " . \request('ip'))) {
 
             // If network is not reachable, may be something went wrong, warn user about it.
@@ -93,7 +91,7 @@ class OneController extends Controller
         }
 
         // Since network updated, we have to update keys as well, first get all keys.
-        $keys = Key::where('server_id',$server->_id)->get();
+        $keys = Key::where('server_id',server()->_id)->get();
 
         // Loop through each key and warn users that key is updated.
         foreach($keys as $key){
@@ -107,15 +105,16 @@ class OneController extends Controller
                 );
             }else{
                 // Create user key.
-                $flag = Key::init($server->key["username"], request('password'), \request('ip'),
-                    $server->port, Auth::id());
+                $flag = Key::init(server()->key["username"], request('password'), \request('ip'),
+                    server()->port, Auth::id());
 
                 // Create New Key Object.
-                $new = new Key();
-                $new->user_id = \Auth::id();
-                $new->name = $key->name;
-                $new->username = $server->key["username"];
-                $new->server_id = $server->_id;
+                $new = new Key([
+                    "user_id" => auth()->id,
+                    "name" => $key->name,
+                    "username" => server()->key("username"),
+                    "server_id" => server()->_id
+                ]);
                 $new->save();
             }
 
@@ -124,7 +123,7 @@ class OneController extends Controller
         }
 
         // Update Server with new network configuration.
-        $server->update([
+        server()->update([
             'ip_address' => \request('ip')
         ]);
         
@@ -205,8 +204,17 @@ class OneController extends Controller
         return respond("Yetki başarıyla verildi.");
     }
 
-    public function revoke(){
+    public function revoke()
+    {
+        // Check if user owns the server or admin. If not, abort.
+        if(server()->user_id != auth()->user()->_id && !auth()->user()->isAdmin()){
+            return respond("Bu işlem için yetkiniz yok.",201);
+        }
 
+        // Find User
+        Permission::revoke(request('user_id'), 'server', server()->user_id);
+
+        return respond("Yetki başarıyla alındı.",200);
     }
 
     public function terminal(){

@@ -89,6 +89,10 @@ window.onbeforeunload = function () {
     // loading();
 };
 
+$(".modal").on('show.bs.modal', function(modal) {
+    $("#" + modal.target.id + " .alert").fadeOut(0);
+});
+
 window.onload = function () {
     // loading();
     // document.getElementById('notificationDiv').addEventListener('click', function (e) {

@@ -14,6 +14,7 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Server query()
  * @mixin \Eloquent
  */
+
 class Server extends Eloquent
 {
     protected $collection = 'servers';
@@ -29,13 +30,10 @@ class Server extends Eloquent
 
     public function runSSH($query, $extra = null)
     {
-        // Log Query
-        liman_log("server: " . $this->_id . ":command_" . $query);
-
+        ServerLog::new($query . $extra);
         // Build Query
         $query = "ssh -p " . $this->port . " " . $this->key->username . "@" . $this->ip_address . " -i " . storage_path('keys') .
             DIRECTORY_SEPARATOR . Auth::id() . " " . $query . " 2>&1" . $extra;
-
         // Execute and return outputs.
         return shell_exec($query);
     }

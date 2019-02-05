@@ -33,8 +33,14 @@
                            class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required disabled hidden style="margin-top:15px">
                 @endif
             @elseif(explode(":", $input)[1] == "textarea")
-                <textarea name="{{explode(":", $input)[0]}}"
-                       class="form-control" required></textarea><br>
+                @if(count($inputs))
+                    <textarea name="{{explode(":", $input)[0]}}"
+                              class="form-control" required style="height: 60%"></textarea><br>
+                @else
+                    <textarea name="{{explode(":", $input)[0]}}"
+                              class="form-control" required></textarea><br>
+                @endif
+
             @else
                 @if(explode(":", $input)[1] == "checkbox")
                     <div class="form-check">

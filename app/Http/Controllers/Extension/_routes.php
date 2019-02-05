@@ -6,7 +6,7 @@ Route::get('/l/{extension_id}/{city}/{server_id}', 'Extension\OneController@serv
 
 // Extension' Server' Any Route Handler
 
-Route::get('/l/{extension_id}/{city}/{server_id}/{unique_code}', 'Extension\OneController@route')->middleware(['server','script_parameters']);
+Route::get('/l/{extension_id}/{city}/{server_id}/{unique_code}', 'Extension\OneController@route')->middleware(['server','script_parameters'])->name('extension_server_route');
 
 // Extension Management Route
 

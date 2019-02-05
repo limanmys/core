@@ -7,17 +7,17 @@
 @section('content')
 
     <?php
-        $input_extensions = [];
-        foreach($available_extensions as $extension){
-            $arr = [];
-            if(isset($extension->install)){
-                foreach($extension->install as $key => $parameter){
-                    $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
-                }    
+    $input_extensions = [];
+    foreach ($available_extensions as $extension) {
+        $arr = [];
+        if (isset($extension->install)) {
+            foreach ($extension->install as $key => $parameter) {
+                $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
             }
-            $arr[$extension->name . ":" . $extension->_id] = "extension_id:hidden";
-            $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
         }
+        $arr[$extension->name . ":" . $extension->_id] = "extension_id:hidden";
+        $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
+    }
     ?>
     <button class="btn btn-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
 
@@ -38,16 +38,19 @@
         "target_id" => "change_network",
         "text" => "Network"
     ])
+
     @include('l.modal-button',[
         "class" => "btn-primary",
         "target_id" => "change_hostname",
         "text" => "Hostname"
     ])
+
     @include('l.modal-button',[
         "class" => "btn-warning",
         "target_id" => "file_upload",
         "text" => "Dosya Yükle"
     ])
+
     @include('l.modal-button',[
         "class" => "btn-primary",
         "target_id" => "file_download",
@@ -58,16 +61,34 @@
         "target_id" => "terminal",
         "text" => "Terminal"
     ])
+
     @include('l.modal-button',[
         "class" => "btn-info",
         "target_id" => "give_permission",
         "text" => "Yetki Ver"
-    ])<br><br>
-        <h5>Hostname : {{$hostname}}</h5>
+    ])
+    @if(server()->user_id == auth()->id() || auth()->user()->isAdmin())
+        @include('l.modal-button',[
+            "class" => "btn-primary",
+            "target_id" => "revoke_permission",
+            "text" => "Yetki Al"
+        ])
+    @endif
+
+    @include('l.modal-button',[
+        "class" => "btn-danger",
+        "target_id" => "log_table",
+        "text" => "Sunucu Logları"
+    ])
+
+    <br><br>
+
+    <h5>Hostname : {{$hostname}}</h5>
     @if(count($installed_extensions) > 0)
-    <h4>{{__("Servis Durumları")}}</h4>
+        <h4>{{__("Servis Durumları")}}</h4>
         @foreach($installed_extensions as $service)
-            <button type="button" class="btn btn-secondary btn-lg" style="cursor:default;" id="status_{{$service->service}}">
+            <button type="button" class="btn btn-secondary btn-lg" style="cursor:default;"
+                    id="status_{{$service->service}}">
                 {{strtoupper($service->name)}}
             </button>
         @endforeach
@@ -89,9 +110,9 @@
 
     @include('l.modal',[
         "id"=>"delete",
-        "title" => $server->name,
+        "title" => "Sunucuyu Sil",
         "url" => route('server_remove'),
-        "text" => "isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+        "text" => "$server->name isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
         "next" => "redirect",
         "inputs" => [
             "Sunucu Id:$server->_id" => "server_id:hidden"
@@ -128,6 +149,7 @@
             "İp Adresi" => "ip:text",
             "Cidr Adresi" => "cidr:text",
             "Gateway" => "gateway:text",
+            "DNS Adresi" => "dns:text",
             "Arayüz" => "interface:text",
             "SSH Parolası" => "password:password",
             "Sunucu Id:$server->_id" => "server_id:hidden"
@@ -159,6 +181,19 @@
         "text" => "Güvenlik sebebiyle kullanıcı listesi sunulmamaktadır.",
         "submit_text" => "Yetkilendir"
     ])
+    @if(server()->user_id == auth()->id() || auth()->user()->isAdmin())
+        @include('l.modal',[
+            "id"=>"revoke_permission",
+            "title" => "Kullanıcıdan Yetki Al",
+            "url" => route('server_revoke_permission'),
+            "next" => "function(){return false;}",
+            "inputs" => [
+                "Kullanıcı Seçin:user_id" => objectToArray(\App\Permission::getUsersofType(server()->_id,'server'),"name","_id"),
+                "Sunucu Id:$server->_id" => "server_id:hidden"
+            ],
+            "submit_text" => "Yetkisini al"
+        ])
+    @endif
 
     @include('l.modal',[
         "id"=>"file_upload",
@@ -184,7 +219,19 @@
         ],
         "submit_text" => "İndir"
     ])
-    
+    @include('l.modal-table',[
+        "id" => "log_table",
+        "title" => "Sunucu Logları",
+        "table" => [
+            "value" => \App\ServerLog::retrieve(true),
+            "title" => [
+                "Komut" , "User ID", "Tarih"
+            ],
+            "display" => [
+                "command" , "username", "created_at"
+            ],
+        ]
+    ])
     @if(count($input_extensions))
         @include('l.modal',[
             "id"=>"install_extension",
@@ -199,11 +246,11 @@
         ])
     @endif
     <script>
-        function checkStatus(service){
+        function checkStatus(service) {
             let data = new FormData();
-            data.append('server_id','{{$server->_id}}');
-            data.append('service',service);
-            request('{{route('server_check')}}', data, function(response){
+            data.append('server_id', '{{$server->_id}}');
+            data.append('service', service);
+            request('{{route('server_check')}}', data, function (response) {
                 let json = JSON.parse(response);
                 let element = document.getElementById('status_' + service);
                 element.classList.remove('btn-secondary');
@@ -212,14 +259,15 @@
         }
 
         @if(count($installed_extensions) > 0)
-            @foreach($installed_extensions as $service)
-                setInterval(function () {
-                    checkStatus('{{$service->service}}');
-                }, 3000);
-            @endforeach
+        @foreach($installed_extensions as $service)
+        setInterval(function () {
+            checkStatus('{{$service->service}}');
+        }, 3000);
+
+        @endforeach
         @endif
 
-        function downloadFile(form){
+        function downloadFile(form) {
             //loading();
             window.location.assign('/sunucu/indir?path=' + form.getElementsByTagName('input')[0].value + '&server_id=' + form.getElementsByTagName('input')[1].value);
             return false;
