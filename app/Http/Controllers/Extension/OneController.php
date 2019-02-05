@@ -116,11 +116,7 @@ class OneController extends Controller
         $extension = Extension::where('_id',request()->route('extension_id'))->first();
         require(base_path('resources/views/extensions/' . strtolower($extension->name) . '/functions.php'));
         if(function_exists(request('function_name'))){
-            if(call_user_func(request('function_name'))){
-                return respond("Kullanıcı başarıyla eklendi",200);
-            }else{
-                return respond("Kullanıcı eklenemedi, lütfen yöneticinizle iletişime geçiniz",201);
-            }
+            return call_user_func(request('function_name'));
         }else{
             return respond("İşlev bulunamadı, lütfen yöneticinizle iletişime geçiniz.",404);
         }

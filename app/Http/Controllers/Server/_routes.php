@@ -18,6 +18,9 @@ Route::post('/sunucu/guncelle', 'Server\OneController@update')->name('server_upd
 
 Route::post('/sunucu/sil', 'Server\OneController@remove')->name('server_remove')->middleware('parameters:server_id');
 
+// Remove Server Permission
+
+Route::post('/sunucu/yetkial','Server\OneController@revoke')->name('server_revoke_permission')->middleware('parameters:user_id,server_id');
 
 Route::group(['middleware' => ['server']], function () {
 
@@ -31,7 +34,7 @@ Route::group(['middleware' => ['server']], function () {
 
 // Server Network Update
 
-    Route::post('/sunucu/network', 'Server\OneController@network')->name('server_network')->middleware('parameters:ip,cidr,gateway,interface,password');
+    Route::post('/sunucu/network', 'Server\OneController@network')->name('server_network')->middleware('parameters:ip,cidr,gateway,interface,password,dns');
 
 // Server Hostname Update
 

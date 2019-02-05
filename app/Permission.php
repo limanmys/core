@@ -18,7 +18,8 @@ class Permission extends Eloquent
     protected $collection = 'permissions';
     protected $connection = 'mongodb';
 
-    public static function new($user_id){
+    public static function new($user_id)
+    {
         // Simply create new permission table
         $permissions = new Permission();
         $permissions->user_id = $user_id;
@@ -35,15 +36,16 @@ class Permission extends Eloquent
         return $permissions;
     }
 
-    public static function grant($user_id, $type, $id){
+    public static function grant($user_id, $type, $id)
+    {
         // Retrieve Permissions
-        $permissions = Permission::where('user_id',$user_id)->first();
+        $permissions = Permission::where('user_id', $user_id)->first();
 
         // Get Array
         $current = $permissions->__get($type);
 
         // Add Array
-        array_push($current,$id);
+        array_push($current, $id);
 
         // Set Array
         $permissions->__set($type, $current);
@@ -54,16 +56,17 @@ class Permission extends Eloquent
         return $permissions;
     }
 
-    public static function revoke($user_id, $type, $id){
+    public static function revoke($user_id, $type, $id)
+    {
         // Retrieve Permissions
-        $permissions = Permission::where('user_id',$user_id)->first();
+        $permissions = Permission::where('user_id', $user_id)->first();
 
         // Get Array
         $current = $permissions->__get($type);
-
+        $old = $current;
         // Search and Delete Id
-        unset($current[array_search($id,$type)]);
-
+        unset($current[array_search($id, $current)]);
+        dd($id,array_search($id, $current),$current, $old);
         // Update Object
         $permissions->__set($type, array_values($current));
 
@@ -73,15 +76,24 @@ class Permission extends Eloquent
         return $permissions;
     }
 
-    public static function get($user_id, $type = null){
+    public static function get($user_id, $type = null)
+    {
         // Retrieve Permissions
-        $permissions = Permission::where('user_id',$user_id)->first();
+        $permissions = Permission::where('user_id', $user_id)->first();
 
-        if($type == null){
+        if ($type == null) {
             return $permissions;
         }
 
         return $permissions->__get($type);
     }
 
+    public static function getUsersofType($id, $type)
+    {
+        // Get User Id's as array
+        $users = Permission::where($type, 'like', $id)->pluck('user_id')->all();
+
+        // Retrieve objects using that array.
+        return User::findMany($users);
+    }
 }
