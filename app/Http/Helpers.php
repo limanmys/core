@@ -120,6 +120,33 @@ if (!function_exists('extension')) {
     }
 }
 
+if (!function_exists('extensionDb')) {
+    /**
+     * @param null $id
+     * @return \App\Extension
+     */
+    function extensionDb($key)
+    {
+        $extension_id = request()->route('extension_id');
+        return request('server')->extensions[$extension_id][$key];
+    }
+}
+
+if (!function_exists('getCertificate')) {
+
+    /**
+     * @param $server
+     * @param $ip_address
+     * @return string|null
+     */
+    function getCertificate($server, $ip_address)
+    {
+        $query = "openssl s_client -connect " . $server . ":" . $ip_address .
+            " 2>/dev/null </dev/null |  sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'";
+        return shell_exec($query);
+    }
+}
+
 if (!function_exists('getObject')) {
     /**
      * @param $type
