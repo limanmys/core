@@ -132,8 +132,8 @@
         "url" => route('server_update'),
         "next" => "reload",
         "inputs" => [
-            "Sunucu Adı:$server->name" => "name:text",
-            "Kontrol Portu:$server->control_port" => "control_port:number",
+            "Sunucu Adı" => "name:text",
+            "Kontrol Portu" => "control_port:number",
             "Şehir:city" => cities(),
             "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
