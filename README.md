@@ -27,7 +27,7 @@ sudo apt update
 #### PHP ve diger kutuphanelerin kurulumu
 ```bash
 sudo apt install php-fpm -y
-sudo apt install php php-mongodb php-ldap php-mbstring php-xml php-zip -y
+sudo apt install php php-mongodb php-ldap php-mbstring php-xml php-zip php-simplexml -y
 ```
 #### Ubuntu'daki olmayan guncel surumun kurulumu
 ```bash
