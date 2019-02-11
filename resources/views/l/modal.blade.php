@@ -10,9 +10,7 @@
                     @endisset
                 </h3>
             </div>
-            <?php
-                $rand = bin2hex(random_bytes(10));
-            ?>
+            @php($rand = bin2hex(random_bytes(10)))
             @isset($onsubmit)
                 <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return {{$onsubmit}}(this)" target="#">
             @else
