@@ -27,7 +27,7 @@ sudo apt update
 #### PHP ve diger kutuphanelerin kurulumu
 ```bash
 sudo apt install php-fpm -y
-sudo apt install php php-mongodb php-ldap php-mbstring php-xml php-zip -y
+sudo apt install php php-mongodb php-ldap php-mbstring php-xml php-zip php-simplexml -y
 ```
 #### Ubuntu'daki olmayan guncel surumun kurulumu
 ```bash
@@ -94,6 +94,11 @@ sudo systemctl enable liman-webssh
 sudo sed -i "s/www-data/liman/g" /etc/nginx/nginx.conf
 sudo sed -i "s/www-data/liman/g" /etc/php/7.2/fpm/pool.d/www.conf
 ```
+#### Ldap Eklentisi İçin Ek Ayar
+```bash
+echo "TLS_REQCERT     never" > sudo tee --append /etc/ldap/ldap.conf
+```
+
 #### ** Gecici Cozum **
 ```bash
 sudo sed -i "s/if origin is not/if False and origin is not/g" /usr/lib/python3/dist-packages/tornado/websocket.py
