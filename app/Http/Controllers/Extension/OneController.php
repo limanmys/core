@@ -153,4 +153,12 @@ class OneController extends Controller
             'extension' => $extension
         ]);
     }
+
+    public function remove()
+    {
+        $query = 'rm -rf ' . base_path('resources/views/extensions/' . strtolower(extension()->name));
+        shell_exec($query);
+        extension()->delete();
+        return respond('Eklenti Başarıyla Silindi');
+    }
 }

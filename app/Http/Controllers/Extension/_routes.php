@@ -52,5 +52,8 @@ Route::post('/ayarlar/{extension_id}/{server_id}','Extension\OneController@serve
 // Extension Download Page
 Route::get('/indir/eklenti/{extension_id}','Extension\MainController@download')->name('extension_download');
 
-//Extension Upload Page
+// Extension Upload Page
 Route::post('/yukle/eklenti/','Extension\MainController@upload')->name('extension_upload');
+
+// Extension Remove Page
+Route::post('/eklenti/sil','Extension\OneController@remove')->name('extension_remove')->middleware('admin');
