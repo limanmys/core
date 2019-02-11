@@ -16,21 +16,24 @@
         "target_id" => "extensionExport",
         "text" => "Indir"
     ])<br><br>
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">Eklenti Adı</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach(extensions() as $extension)
-            <tr>
-                <td>{{$extension->name}}</td>
-            </tr>
-        @endforeach
-        </tbody>
-    </table>
-    
+
+    @include('l.table',[
+        "value" => extensions(),
+        "title" => [
+            "Eklenti Adı" , "*hidden*"
+        ],
+        "display" => [
+            "name" , "_id:extension_id"
+        ],
+        "menu" => [
+            "Sil" => [
+                "target" => "delete",
+                "icon" => "delete"
+            ]
+        ],
+        "onclick" => "details"
+    ])
+
     @include('l.modal',[
         "id"=>"extensionUpload",
         "title" => "Eklenti Yükle",
@@ -57,6 +60,19 @@
         ],
         "submit_text" => "İndir"
     ])
+
+    @include('l.modal',[
+       "id"=>"delete",
+       "title" =>"Eklentiyi Sil",
+       "url" => route('extension_remove'),
+       "text" => "Eklentiyi silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+       "next" => "reload",
+       "inputs" => [
+           "Extension Id:'null'" => "extension_id:hidden"
+       ],
+       "submit_text" => "Sunucuyu Sil"
+   ])
+
 <script>
         function downloadFile(form){
             window.location.assign('/indir/eklenti/' + form.getElementsByTagName('select')[0].value);
