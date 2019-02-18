@@ -1,19 +1,20 @@
 @extends('layouts.app')
 
-@section('content_header')
-    <h1>{{$server->name}}</h1>
-@stop
-
-
 @section('content')
-
-    <button class="btn btn-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{route('home')}}">Ana Sayfa</a></li>
+            <li class="breadcrumb-item"><a href="{{route('servers')}}">Sunucular</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{$server->name}}</li>
+        </ol>
+    </nav>
 
     @include('l.modal-button',[
         "class" => "btn-primary",
         "target_id" => "edit",
         "text" => "Düzenle"
     ])
+
     @if(count($available_extensions))
         @include('l.modal-button',[
             "class" => "btn-secondary",
