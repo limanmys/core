@@ -43,7 +43,11 @@ class ServerLog extends Eloquent
         $scripts = \App\Script::all();
 
         foreach ($logs as $log){
-            $log->username = $users->find($log->user_id)->first()->name;
+            $user = $users->where('_id', $log->user_id)->first();
+            if(!$user){
+                continue;
+            }
+            $log->username = $user->name;
             if(strpos($log->command, "sudo /usr/bin/env python3 /tmp/") == 0){
                 if (preg_match('/\/tmp\/([a-zA-Z0-9_]*) /', $log->command, $script_id) == 1) {
                     $script = $scripts->find($script_id[1]);

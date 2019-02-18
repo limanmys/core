@@ -176,6 +176,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Jenssegers\Mongodb\MongodbServiceProvider::class,
         Jenssegers\Mongodb\MongodbQueueServiceProvider::class,
+        Collective\Remote\RemoteServiceProvider::class,
     ],
 
     /*
@@ -224,7 +225,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
+        'SSH' => Collective\Remote\RemoteFacade::class,
     ],
 
 ];
