@@ -6,7 +6,7 @@ use App\Extension;
 use App\Script;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Storage;
+use Illuminate\Support\Facades\Storage;
 
 class MainController extends Controller
 {
@@ -55,7 +55,7 @@ class MainController extends Controller
     {
         $script = new Script();
         $script = Script::createFile($script,["!/usr/bin/python3","-*- coding: utf-8 -*-",request('root'),\request('name'),
-            \request('description'),\request('version'),\request('extensions'),\request('inputs'),\request('type'),\Auth::user()->name,\request('support_email'),\request('company'),\request('unique_code'),\request('regex'),\request('code')]);
+            \request('description'),\request('version'),\request('extensions'),\request('inputs'),\request('type'),auth()->user()->name,\request('support_email'),\request('company'),\request('unique_code'),\request('regex'),\request('code')]);
         $script->save();
         return route('script_one',$script->_id);
     }

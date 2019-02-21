@@ -12,6 +12,7 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Server newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Server newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Server query()
+ * @method static \Illuminate\Database\Query\Builder|\App\Server where($field, $value)
  * @mixin \Eloquent
  */
 

@@ -3,24 +3,10 @@
 namespace App\Http\Controllers\Permission;
 
 use App\User;
-use Auth;
 use App\Http\Controllers\Controller;
 
 class MainController extends Controller
 {
-    public function grant(){
-        // First check if user is has permission to give permission.
-        if($this->ability(request('type'),request('id')) == false){
-            abort('Not allowed!',403);
-        }
-    }
-
-    private function ability($type,$id){
-        if(Auth::user()->isAdmin()){
-            return true;
-        }
-    }
-
     public function all(){
         $requests = \App\LimanRequest::all();
         foreach($requests as $r){

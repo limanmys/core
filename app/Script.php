@@ -11,13 +11,25 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Script newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Script newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Script query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Script save()
+ * @method static \Illuminate\Database\Query\Builder|\App\Script where($field, $value, $extra = null)
  * @mixin \Eloquent
  */
 class Script extends Eloquent
 {
+    /**
+     * @var string
+     */
     protected $collection = 'scripts';
+    /**
+     * @var string
+     */
     protected $connection = 'mongodb';
 
+    /**
+     * @param $uploadedFile
+     * @return Script|bool
+     */
     public static function readFromFile($uploadedFile){
         
         // Read values from text file.
@@ -42,7 +54,12 @@ class Script extends Eloquent
         return $script;
     }
 
-    public static function createFile($script,...$parameters){
+    /**
+     * @param $script
+     * @param mixed ...$parameters
+     * @return mixed
+     */
+    public static function createFile($script, ...$parameters){
         
         // Save script in order to generate unique _id.
         $script->save();
@@ -68,6 +85,11 @@ class Script extends Eloquent
         return Script::fillValues($script,$user_inputs);
     }
 
+    /**
+     * @param $script
+     * @param mixed ...$parameters
+     * @return mixed
+     */
     public static function fillValues($script, ... $parameters){
 
         // Just a dummy control the correct parameters.

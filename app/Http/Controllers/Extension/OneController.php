@@ -17,7 +17,6 @@ class OneController extends Controller
      */
     public function server()
     {
-
         // Now that we have server, let's check if required parameters set for extension.
         foreach (extension()->setup as $key=>$setting){
             if(!array_key_exists($key,server()->extensions[extension()->_id])){
@@ -35,7 +34,6 @@ class OneController extends Controller
                 return redirect(route('keys'));
             }
 
-            $scripts = [];
             $outputs = [];
 
         }else{
@@ -90,7 +88,7 @@ class OneController extends Controller
             foreach (explode(',', $script->inputs) as $input) {
                 $parameters = $parameters . " " . \request(explode(':', $input)[0]);
             }
-            $output = \request('server')->runScript($script, $parameters);
+            $output = server()->runScript($script, $parameters);
             $output = str_replace('\n', '', $output);
             $outputs[$script->unique_code] = json_decode($output, true);
         }
@@ -158,7 +156,11 @@ class OneController extends Controller
     {
         $query = 'rm -rf ' . base_path('resources/views/extensions/' . strtolower(extension()->name));
         shell_exec($query);
-        extension()->delete();
+        try{
+            extension()->delete();
+        }catch (\Exception $exception){
+            return respond('Eklenti silinemedi',201);
+        }
         return respond('Eklenti Başarıyla Silindi');
     }
 }
