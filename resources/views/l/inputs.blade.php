@@ -1,11 +1,20 @@
     @foreach ($inputs as $name => $input)
         @if(is_array($input))
-            <h5>{{__(explode(":",$name)[0])}}</h5>
-            <select name="{{explode(":",$name)[1]}}" class="form-control" required>
-                @foreach ($input as $key => $value)
-                    <option value="{{$value}}">{{__($key)}}</option>
-                @endforeach
-            </select><br>
+            @if(isset($disabled))
+                {{--<h5>{{__(explode(":",$name)[0])}}</h5>--}}
+                <select name="{{explode(":",$name)[1]}}" class="form-control" required disabled hidden>
+                    @foreach ($input as $key => $value)
+                        <option value="{{$value}}">{{__($key)}}</option>
+                    @endforeach
+                </select><br>
+            @else
+                <h5>{{__(explode(":",$name)[0])}}</h5>
+                <select name="{{explode(":",$name)[1]}}" class="form-control" required>
+                    @foreach ($input as $key => $value)
+                        <option value="{{$value}}">{{__($key)}}</option>
+                    @endforeach
+                </select><br>
+            @endif
         @else
             @if(explode(":", $input)[1] == "hidden")
                 @if(explode(":", $input)[1] == "checkbox")

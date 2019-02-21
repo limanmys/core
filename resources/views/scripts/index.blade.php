@@ -1,32 +1,17 @@
 @extends('layouts.app')
 
-@section('content_header')
-    <h1>{{__("Betikler")}}</h1>
-@stop
-
 @section('content')
-
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{__("Betikler")}}</li>
+        </ol>
+    </nav>
     @include('l.modal-button',[
         "class" => "btn-primary",
         "target_id" => "scriptUpload",
         "text" => "Yükle"
-    ])
-    @include('l.modal-button',[
-        "class" => "btn-secondary",
-        "target_id" => "scriptExport",
-        "text" => "Indir"
     ])<br><br>
-
-    @include('l.modal',[
-        "id"=>"scriptUpload",
-        "title" => "Betik Yükle",
-        "url" => route('script_upload'),
-        "next" => "reload",
-        "inputs" => [
-            "Lütfen Betik Dosyasını(.lmns) Seçiniz" => "script:file",
-        ],
-        "submit_text" => "Yükle"
-    ])
 
     @include('l.modal',[
         "id"=>"scriptUpload",
@@ -59,6 +44,10 @@
             "name" , "description", "extensions" , "_id:script_id"
         ],
         "menu" => [
+            "İndir" => [
+                "target" => "scriptExport",
+                "icon" => "get"
+            ],
             "Sil" => [
                 "target" => "delete",
                 "icon" => "delete"

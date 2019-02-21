@@ -257,25 +257,12 @@
 <script>
 function svgturkiyeharitasi() {
     const element = document.querySelector('#svg-turkiye-haritasi');
-    const info = document.querySelector('.sehir_adi');
-    element.addEventListener(
-        'mouseover',
-        function(event) {
-            if (event.target.tagName === 'path' && event.target.parentNode.id !== 'guney-kibris') {
-                info.innerHTML = [
-                    '<div>',
-                    event.target.parentNode.getAttribute('data-iladi'),
-                    '</div>'
-                ].join('');
-            }
-        }
-    );
+
     element.addEventListener(
         'click',
         function(event) {
             if (event.target.tagName === 'path') {
                 const parent = event.target.parentNode;
-                const id = parent.getAttribute('id');
                 window.location.href = window.location.href + '/' + (parent.getAttribute('data-plakakodu'));
             }
         }

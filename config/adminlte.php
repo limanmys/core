@@ -131,9 +131,19 @@ return [
             'icon' => 'subscript'
         ],
         [
+            'text' => 'Widgetlar',
+            'url'  => '/widgetlar',
+            'icon' => 'key'
+        ],
+        [
             'text' => 'Yetki Talebi',
             'url'  => '/taleplerim',
             'icon' => 'lock',
+        ],
+        [
+            'text' => 'İzin Ayarları',
+            'url'  => '/ayarlar',
+            'icon' => 'plus',
         ],
     ],
 

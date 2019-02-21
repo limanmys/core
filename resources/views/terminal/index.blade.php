@@ -10,7 +10,7 @@
     <div id="terminal"></div>
 </div>
 
-<script src="{{asset('js/terminal/xterm.min.js')}}"></script>
-<script src="{{asset('js/terminal/main.js')}}"></script>
+<script src="{{asset('js/xterm.min.js')}}"></script>
+<script src="{{asset('js/terminal.js')}}"></script>
 </body>
 </html>

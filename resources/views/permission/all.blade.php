@@ -1,11 +1,12 @@
 @extends('layouts.app')
 
-@section('content_header')
-    <h1>Yetki Taleplerim</h1>
-@stop
-
 @section('content')
-
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{__("Yetki Taleplerim")}}</li>
+        </ol>
+    </nav>
 @include('l.modal-button',[
     "class" => "btn-success",
     "target_id" => "request",

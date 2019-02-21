@@ -16,7 +16,7 @@
         </thead>
         <tbody>
         @foreach ($value as $k)
-            <tr id="{{str_random(10)}}" @isset($onclick)onclick="{{$onclick}}(this)" @endisset>
+            <tr class="tableRow" id="{{str_random(10)}}" @isset($onclick)onclick="{{$onclick}}(this)" @endisset>
                 @foreach($display as $item)
                     @if($item == "server_id" || $item == "extension_id" || $item == "script_id")
                         @if(is_array($k))
@@ -49,7 +49,7 @@
             var {{$setCurrentVariable}};
             @endisset
             $.contextMenu({
-                selector: '#{{$rand}} tr',
+                selector: '#{{$rand}} .tableRow',
                 callback: function (key, options) {
                     @isset($setCurrentVariable)
                     {{$setCurrentVariable}} = options.$trigger[0].getAttribute("id");
@@ -64,6 +64,7 @@
                                 + "#" + key + " input[name='" + value.getAttribute('name') + "']").val(element_value);
                         }
                     });
+                    console.log(inputs);
                     target.modal('show');
                 },
                 items: {

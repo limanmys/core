@@ -20,7 +20,7 @@
                     <div id="{{$id}}_alert" class="alert" role="alert" hidden>
                     </div>
                     @if(isset($selects) && is_array($selects))
-                        <h5>{{__("Servis Seçimi")}}</h5>
+                        <h5>{{__("Tipi")}}</h5>
                         <select class="form-control" required onchange="cs_{{$id}}(this.value)">
                             @foreach ($selects as $key => $select)
                                 <option value="{{explode(":",$key)[1]}}">{{__(explode(":",$key)[0])}}</option>
@@ -58,11 +58,14 @@
 @isset($selects)
     <script type="text/javascript">
         function cs_{{$id}}(target){
+            console.log(target,{{$id}});
             Array.prototype.forEach.call(document.getElementsByClassName('{{$id}}'),function(element){
+                console.log('asdasd');
                 element.setAttribute('hidden',"true");
                 element.setAttribute('disabled',"true");
             });
             Array.prototype.forEach.call(document.getElementsByClassName(target),function(element){
+                console.log('gizledi');
                 element.removeAttribute('hidden');
                 element.removeAttribute('disabled');
             });
