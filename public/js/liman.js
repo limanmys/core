@@ -55,6 +55,33 @@ function redirect(url) {
     window.location.href = url;
 }
 
+function toogleEdit(selector){
+    $(selector).each(function(){
+        if($(this).get(0).tagName === "SPAN") {
+            $(this).changeElementType("input");
+        }else{
+            $(this).changeElementType("span");
+        }
+    });
+}
+
+(function($) {
+    $.fn.changeElementType = function(newType) {
+        var attrs = {};
+        $.each(this[0].attributes, function(idx, attr) {
+            attrs[attr.nodeName] = attr.nodeValue;
+        });
+
+        this.replaceWith(function() {
+            if($(this).get(0).tagName === "SPAN"){
+                return $("<" + newType + "/>", attrs).val($(this).html());
+            }else{
+                return $("<" + newType + "/>", attrs).html($(this).val());
+            }
+        });
+    }
+})(jQuery);
+
 function debug(data) {
     console.log(data);
 }
@@ -133,11 +160,32 @@ function dismissNotification(id) {
 let inputs =[];
 let modalData = [];
 
-function updateTable(){
-    for(var i = 0;i< inputs.length ; i++){
+function updateTable(extraVariableName = null){
+    for(let i = 0;i< inputs.length ; i++){
         let element = inputs[i][0];
-        $(element).html(modalData.get(element.id));
+        if(!extraVariableName.startsWith('{')){
+            $(element).html(modalData.get(element.id + extraVariableName));
+        }else{
+            $(element).html(modalData.get(element.id));
+        }
     }
+    let current_modal = $('.modal:visible');
+    if(current_modal.length){
+        current_modal.modal('hide');
+    }
+}
+
+function addToTable(){
+    let newRow = [];
+    let selector = $('table tr:eq(1) td');
+    if(selector.length === 0){
+        location.reload();
+    }
+    console.log(selector);
+    selector.each(function(){
+        newRow.push(modalData.get(this.id));
+    });
+    $('table').not('.notDataTable').DataTable().row.add(newRow).draw(true);
     let current_modal = $('.modal:visible');
     if(current_modal.length){
         current_modal.modal('hide');

@@ -80,12 +80,14 @@ if (!function_exists('servers')) {
 }
 
 if (!function_exists('extensions')) {
+
     /**
+     * @param null $filter
      * @return array
      */
-    function extensions()
+    function extensions($filter = [])
     {
-        return \App\Extension::getAll();
+        return \App\Extension::getAll($filter);
     }
 }
 
@@ -127,8 +129,8 @@ if (!function_exists('extensionDb')) {
      */
     function extensionDb($key)
     {
-        $extension_id = request()->route('extension_id');
-        return request('server')->extensions[$extension_id][$key];
+        $extension_id = request('extension_id');
+        return server()->extensions[$extension_id][$key];
     }
 }
 
@@ -186,7 +188,12 @@ if (!function_exists('objectToArray')) {
     {
         $combined_array = [];
         foreach($array as $item){
-            $combined_array[$item->__get($key)] = $item->__get($value);
+            if(is_array($item)){
+                $combined_array[$item[$key]] = $item[$value];
+            }else{
+                $combined_array[$item->__get($key)] = $item->__get($value);
+            }
+
         }
         return $combined_array;
     }
@@ -196,8 +203,8 @@ if(!function_exists('cities')){
     /**
      * @return array
      */
-    function cities(){
-        return [
+    function cities($city = null){
+        $cities = [
             "Adana" => "01",
             "Adıyaman" => "02",
             "Afyonkarahisar" => "03",
@@ -280,5 +287,9 @@ if(!function_exists('cities')){
             "Osmaniye" => "80",
             "Düzce" => "81"
         ];
+        if($city){
+            return array_search($city, $cities);
+        }
+        return $cities;
     }
 }

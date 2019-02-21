@@ -4,15 +4,6 @@ namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
-/**
- * App\Key
- *
- * @property-read mixed $id
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Key newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Key newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Key query()
- * @mixin \Eloquent
- */
 class Key extends Eloquent
 {
     protected $collection = 'keys';

@@ -1,14 +1,16 @@
 @extends('layouts.app')
 
-@section('content_header')
-    <h1>{{extension()->name}} {{ __('Sunucuları') }}</h1>
-@stop
-
 @section('content')
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
+            <li class="breadcrumb-item"><a href="/l/{{extension()->_id}}?noRedirect">{{extension()->name}} {{ __('Sunucuları') }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{cities(request('city'))}}</li>
+        </ol>
+    </nav>
 
-    <button class="btn btn-success" onclick="history.back();">{{ __('Geri Dön') }}</button><br><br>
     @include('l.table',[
-        "value" => \App\Extension::servers(request('city')),
+        "value" => extension()->servers(request('city')),
         "title" => [
             "Sunucu Adı" , "İp Adresi" , "Sunucu Tipi" , "Kontrol Portu", "*hidden*" ,"*hidden*"
         ],

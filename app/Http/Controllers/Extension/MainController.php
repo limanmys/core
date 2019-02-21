@@ -9,7 +9,21 @@ class MainController extends Controller
 {
     public function allServers()
     {
-        $cities = array_values(objectToArray(extension()->servers(), "city", "city"));
+        $servers = extension()->servers();
+        $cities = array_values(objectToArray($servers, "city", "city"));
+        if($servers->count() == 1 && !request()->has('noRedirect')){
+            return redirect(route('extension_server',[
+                "server_id" => $servers->first()->_id,
+                "extension_id" => extension()->_id,
+                "city" => $cities[0]
+            ]));
+        }
+        if(count($cities) == 1 && !request()->has('noRedirect')){
+            return redirect(route('extension_city',[
+                "extension_id" => extension()->_id,
+                "city" => $cities[0]
+            ]));
+        }
 
         return view('extension_pages.index', [
             "cities" => implode(',', $cities)

@@ -1,11 +1,13 @@
 @extends('layouts.app')
 
-@section('content_header')
-    <h1>{{$server->name}}</h1>
-@stop
-
 @section('content')
-
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
+            <li class="breadcrumb-item"><a href="{{route('servers')}}">{{__("Sunucular")}}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{$server->name}}</li>
+        </ol>
+    </nav>
     <?php
     $input_extensions = [];
     foreach ($available_extensions as $extension) {

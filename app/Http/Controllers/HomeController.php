@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Server;
+use App\Widget;
 use function MongoDB\generate_index_name;
 use Twig_Sandbox_SecurityPolicy;
 
@@ -25,12 +26,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $servers = Server::all();
+        $widgets = Widget::all();
+        foreach($widgets as $widget){
+            $widget->server_name = Server::where('_id',$widget->server_id)->first()->name;
+        }
         return view('index',[
-            "linux_count" => $servers->where('type','linux')->count(),
-            "linux_ssh_count" => $servers->where('type','linux_ssh')->count(),
-            "windows_count" => $servers->where('type','windows')->count(),
-            "windows_powershell_count" => $servers->where('type','windows_powershell')->count(),
+            "widgets" => $widgets
         ]);
     }
 

@@ -26,7 +26,7 @@ class Extension extends Eloquent
         return $extension;
     }
 
-    public static function servers($city = null)
+    public function servers($city = null,$extension_id = null)
     {
         // Get all Servers which have this extension.
         if($city){
@@ -35,7 +35,7 @@ class Extension extends Eloquent
             });
         }
         return Server::getAll()->filter(function($value){
-            return array_key_exists(request('extension_id'),$value->extensions);
+            return array_key_exists($this->_id,$value->extensions);
         });
     }
 
