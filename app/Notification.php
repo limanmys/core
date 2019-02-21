@@ -11,6 +11,7 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Notification newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Notification newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Notification query()
+ * @method static \Illuminate\Database\Query\Builder|\App\Notification where($value)
  * @mixin \Eloquent
  */
 class Notification extends Eloquent

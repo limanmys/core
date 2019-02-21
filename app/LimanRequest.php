@@ -11,6 +11,7 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\LimanRequest newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\LimanRequest newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\LimanRequest query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\LimanRequest where($value, $key)
  * @mixin \Eloquent
  */
 class LimanRequest extends Eloquent

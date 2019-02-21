@@ -5,31 +5,32 @@ namespace App\Http\Controllers\Extension;
 use App\Http\Controllers\Controller;
 use App\Script;
 
+/**
+ * Class MainController
+ * @package App\Http\Controllers\Extension
+ */
 class MainController extends Controller
 {
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function allServers()
     {
+        // Get Servers of Extension
         $servers = extension()->servers();
-        $cities = array_values(objectToArray($servers, "city", "city"));
-        if($servers->count() == 1 && !request()->has('noRedirect')){
-            return redirect(route('extension_server',[
-                "server_id" => $servers->first()->_id,
-                "extension_id" => extension()->_id,
-                "city" => $cities[0]
-            ]));
-        }
-        if(count($cities) == 1 && !request()->has('noRedirect')){
-            return redirect(route('extension_city',[
-                "extension_id" => extension()->_id,
-                "city" => $cities[0]
-            ]));
-        }
 
+        // Extract Cities of the Servers.
+        $cities = array_values(objectToArray($servers, "city", "city"));
+
+        // Render View with Cities
         return view('extension_pages.index', [
             "cities" => implode(',', $cities)
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
     public function download()
     {
         // Generate Extension Folder Path
@@ -94,21 +95,28 @@ class MainController extends Controller
 
         // Try to open zip file.
         if (!$zip->open(request()->file('extension'))) {
-            return respond("Eklenti dosyasi acilamiyor.", 201);
+            return respond("Eklenti Dosyası Açılamıyor.", 201);
         }
 
         // Determine a random tmp folder to extract files
         $path = '/tmp/' . str_random(10);
+
+        // Extract Zip to the Temp Folder.
         $zip->extractTo($path);
 
-        // Control to bypass GitHub, GitLab direct zip download.
+        // Control to bypass GitHub, GitLab which corrupts when direct zip download.
         if (strpos(request()->file('extension')->getClientOriginalName(), '-master')) {
             $path = $path . '/' . substr(request()->file('extension')->getClientOriginalName(), 0, -4);
         }
 
-        //Now that we have everything, let's extract file.
+        // Now that we have everything, let's extract database.
         $file = file_get_contents($path . '/db.json');
         $json = json_decode($file, true);
+
+        // Check If Extension Already Exists.
+        if(\App\Extension::where('name',$json["name"])->exists()){
+            return respond("Eklenti Zaten Yüklü",201);
+        }
 
         // Create extension object and fill values.
         $new = new \App\Extension();
@@ -155,9 +163,14 @@ class MainController extends Controller
      */
     private function rmdir_recursive($dir) {
         foreach(scandir($dir) as $file) {
-            if ('.' === $file || '..' === $file) continue;
-            if (is_dir("$dir/$file")) $this->rmdir_recursive("$dir/$file");
-            else unlink("$dir/$file");
+            if ('.' === $file || '..' === $file){
+                continue;
+            }
+            if (is_dir("$dir/$file")){
+                $this->rmdir_recursive("$dir/$file");
+            }else{
+                unlink("$dir/$file");
+            }
         }
         rmdir($dir);
     }

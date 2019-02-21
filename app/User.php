@@ -13,6 +13,8 @@ use Jenssegers\Mongodb\Auth\User as Authenticatable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User find($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User where($value, $key)
  * @mixin \Eloquent
  */
 class User extends Authenticatable

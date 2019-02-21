@@ -96,4 +96,15 @@ class Permission extends Eloquent
         // Retrieve objects using that array.
         return User::findMany($users);
     }
+
+    public static function can($user_id, $type, $id)
+    {
+        $permissions = Permission::get($user_id, $type);
+
+        if(!$permissions || !in_array($permissions, $id)){
+            return false;
+        }
+
+        return true;
+    }
 }

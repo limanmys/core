@@ -9,7 +9,7 @@ class MainController extends Controller
 {
     public function check(){
         $notifications = Notification::where([
-            "user_id" => \Auth::id(),
+            "user_id" => auth()->id(),
             "read" => false
         ])->orderBy('updated_at','desc')->take(5)->get();
         return response()
@@ -22,7 +22,7 @@ class MainController extends Controller
 
     public function read(){
         $notification = Notification::where([
-            "user_id" => \Auth::id(),
+            "user_id" => auth()->id(),
             "_id" => request('notification_id')
         ])->first();
         $notification->read = true;
