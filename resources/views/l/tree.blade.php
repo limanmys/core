@@ -1,8 +1,8 @@
 @php($random = str_random(20))
-
+<input class="form-control" type="search" onchange="search{{$random}}()" id="q"/>
+<br>
 <div id="{{$random}}"></div>
 <script>
-
     $('#{{$random}}').jstree({
         "plugins": [
             @isset($menu)
@@ -45,7 +45,7 @@
         catch (err) {}
     }
 
-    function searchTree() {
+    function search{{$random}}() {
         $('#{{$random}}').jstree(true).search($("#q").val());
     }
 

@@ -10,7 +10,13 @@ function request(url, data, next) {
     }
 
     if (id != null) {
-        // loading();
+        Swal.fire({
+            position: 'center',
+            type: 'info',
+            title: 'Yükleniyor...',
+            showConfirmButton: false,
+            allowOutsideClick : false,
+        });
     }
 
     modalData = data;
@@ -23,6 +29,7 @@ function request(url, data, next) {
     }, 300);
     r.onreadystatechange = function () {
         if (r.readyState === 4) {
+            Swal.close();
             if (id != null && (r.status !== 200 || r.status !== 300)) {
                 message(r.responseText);
             }
@@ -53,6 +60,10 @@ function redirect(url) {
     if (url === "")
         return;
     window.location.href = url;
+}
+
+function nothing(){
+    return false;
 }
 
 function toogleEdit(selector){
@@ -113,7 +124,13 @@ function route(url) {
 }
 
 window.onbeforeunload = function () {
-    // loading();
+    Swal.fire({
+        position: 'center',
+        type: 'info',
+        title: 'Yükleniyor...',
+        showConfirmButton: false,
+        allowOutsideClick : false,
+    });
 };
 
 $(".modal").on('show.bs.modal', function(modal) {
@@ -121,11 +138,7 @@ $(".modal").on('show.bs.modal', function(modal) {
 });
 
 window.onload = function () {
-    // loading();
-    // document.getElementById('notificationDiv').addEventListener('click', function (e) {
-        // e.stopPropagation();
-    // });
-    // setInterval(checkNotifications, 3000);
+    Swal.close();
 };
 
 function message(data) {
