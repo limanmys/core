@@ -69,6 +69,8 @@
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jstree/3.3.7/themes/default/style.min.css" />
 <script src="//cdnjs.cloudflare.com/ajax/libs/jstree/3.3.7/jstree.min.js"></script>
 <script src="{{asset('js/bootstrap-editable.min.js')}}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+
 @yield('body')
 @yield('adminlte_js')
 

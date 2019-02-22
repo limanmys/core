@@ -33,7 +33,7 @@ if (!function_exists('notifications')) {
         return \App\Notification::where([
             "user_id" => \Auth::id(),
             "read" => false
-        ])->orderBy('updated_at', 'desc')->take(5)->get();
+        ])->orderBy('updated_at', 'desc')->get();
     }
 }
 

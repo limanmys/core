@@ -61,55 +61,31 @@
           <li class="dropdown notifications-menu" style="margin-top:6px">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <i class="fa fa-bell-o"></i>
-              <span class="label label-warning">10</span>
+              <span class="label label-warning" id="notificationCount">{{notifications()->count()}}</span>
             </a>
             <ul class="dropdown-menu">
-              <li class="header">You have 10 notifications</li>
+              <li class="header">
+                  <button class="btn btn-secondary float-right" onclick="readNotifications()"><i class="fa fa-check"></i></button>
+                  <span style="line-height: 40px;font-size: 15px">
+                      {{__(":count bildiriminiz var.",[
+                        "count" => notifications()->count()
+                    ])}}
+                  </span>
+              </li>
               <li>
                 <!-- inner menu: contains the actual data -->
                 <ul class="menu">
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-users text-aqua"></i> 5 new members joined today
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-warning text-yellow"></i> Very long description here that may not fit into the
-                      page and may cause design problems
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-users text-red"></i> 5 new members joined
-                    </a>
-                  </li>
-
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-shopping-cart text-green"></i> 25 sales made
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-user text-red"></i> You changed your username
-                    </a>
-                  </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-user text-red"></i> You changed your username
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-user text-red"></i> You changed your username
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-user text-red"></i> You changed your username
-                        </a>
-                    </li>
+                  @foreach (notifications() as $notification)
+                        <li>
+                            <a href="#">
+                                @if($notification->read)
+                                    <i class="fa fa-info text-info"></i>{{$notification->title}}
+                                @else
+                                    <i class="fa fa-info text-warning"></i>{{$notification->title}}
+                                @endif
+                            </a>
+                        </li>
+                  @endforeach
                 </ul>
               </li>
               {{--<li class="footer"><a href="#">View all</a></li>--}}
