@@ -2,179 +2,142 @@
 
 namespace App;
 
-use Auth;
+use App\Classes\Connector\SSHConnector;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
 /**
- * App\Server
- *
- * @property-read mixed $id
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Server newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Server newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Server query()
- * @method static \Illuminate\Database\Query\Builder|\App\Server where($field, $value)
- * @mixin \Eloquent
+ * Class Server
+ * @package App
+ * @method static \Illuminate\Database\Query\Builder|\Server where($field, $value)
+ * @method static \Illuminate\Database\Query\Builder|\Server find($field)
  */
-
 class Server extends Eloquent
 {
+    /**
+     * @var string
+     */
     protected $collection = 'servers';
+    /**
+     * @var string
+     */
     protected $connection = 'mongodb';
+    /**
+     * @var array
+     */
     protected $fillable = ['name', 'ip_address', 'city', 'type', 'control_port'];
+    /**
+     * @var
+     */
     public $key;
 
+    /**
+     * @return SSHConnector
+     * @throws Exceptions\Key\NotFound
+     * @throws \Throwable
+     */
+    private function connector()
+    {
+        if($this->type == "linux_ssh"){
+            return new SSHConnector($this,auth()->id());
+        }
+    }
+
+    /**
+     * @param $command
+     * @return string
+     * @throws Exceptions\Key\NotFound
+     * @throws \Throwable
+     */
     public function run($command)
     {
         // Execute and return outputs.
-        return $this->runSSH($command);
+        return $this->connector()->execute($command);
     }
 
-    public function runSSH($query, $extra = null)
+    /**
+     * @param $file
+     * @param $path
+     * @return bool
+     * @throws Exceptions\Key\NotFound
+     * @throws \Throwable
+     */
+    public function putFile($file, $path)
     {
-        ServerLog::new($query . $extra);
-        // Build Query
-        $query = "ssh -p " . $this->port . " " . $this->key->username . "@" . $this->ip_address . " -i " . storage_path('keys') .
-            DIRECTORY_SEPARATOR . Auth::id() . " " . $query . " 2>&1" . $extra;
-        // Execute and return outputs.
-        return shell_exec($query);
+        return $this->connector()->sendFile($file,$path);
     }
 
-    public function putFile($file,$path)
+    /**
+     * @param $remote_path
+     * @param $local_path
+     * @return bool
+     * @throws Exceptions\Key\NotFound
+     * @throws \Throwable
+     */
+    public function getFile($remote_path, $local_path)
     {
-        // First, copy file through scp.
-        $query = 'scp -P ' . $this->port . " -i " . storage_path('keys') . DIRECTORY_SEPARATOR . Auth::id() .
-            ' ' . $file . ' ' .
-            $this->key->username . '@' . $this->ip_address . ':' . $path;
-
-        // Execute and return outputs.
-        return shell_exec($query);
+        return $this->connector()->receiveFile($local_path, $remote_path);
     }
 
-    public function getFile($remote_path,$local_path){
-        // First, retrieve file through scp.
-        $query = 'scp -P ' . $this->port . " -i " . storage_path('keys') . DIRECTORY_SEPARATOR . Auth::id() .
-            ' ' . $this->key->username . '@' . $this->ip_address . ':' . $remote_path . ' ' .
-            $local_path;
+    /**
+     * @param $script
+     * @param $parameters
+     * @param null $extra
+     * @return string
+     * @throws Exceptions\Key\NotFound
+     * @throws \Throwable
+     */
+    public function runScript($script, $parameters, $extra = null)
+    {
+        // Create Connector Object
+        $connector = $this->connector();
 
-        // Execute and return outputs.
-        return shell_exec($query);
-    }
+        // Send Script To Server with Execute Permission
+        $connector->sendFile(storage_path('app/scripts/' . $script->_id), '/tmp/' . $script->_id,0555);
 
-    public function runScript($script, $parameters,$extra = null){
-
-        // Copy script to target.
-        $this->putFile(storage_path('app/scripts/' . $script->_id), '/tmp/');
-
-        // Build Query
+        // Create Query
         $query = ($script->root == 1) ? 'sudo ' : '';
-        $query = $query . $script->language . ' /tmp/' . $script->_id . " run " . $parameters;
+        $query = $query . $script->language . ' /tmp/' . $script->_id . " run " . $parameters . $extra;
 
         // Execute and return outputs.
-        return $this->runSSH($query,$extra);
+        return $this->connector()->execute($query);
     }
-    
+
+    /**
+     * @param $service_name
+     * @return string
+     * @throws Exceptions\Key\NotFound
+     * @throws \Throwable
+     */
     public function isRunning($service_name)
     {
         // Check if services are alive or not.
         $query = "sudo systemctl is-failed " . $service_name;
 
         // Execute and return outputs.
-        return $this->runSSH($query);
-    }
-
-    public function integrity()
-    {
-        if ($this->type == "linux_ssh") {
-            return $this->sshAccessEnabled();
-        }
-
-        return true;
-    }
-
-    public function isAlive()
-    {
-        // Use telnet to check if server alive.
-        $output = shell_exec("echo exit | telnet " . $this->ip_address . " " . $this->control_port);
-
-        return strpos($output, "Connected to " . $this->ip_address);
-    }
-
-    public function sshAccessEnabled()
-    {
-        $key = $this->sshKey();
-        if (!$this->isAlive() || !$key) {
-            return false;
-        }
-        return true;
-    }
-
-    public function sshKey()
-    {
-        // Retrieve Key information from database.
-        $key = Key::where([
-            'server_id' => $this->id,
-            'user_id' => Auth::id()
-        ])->first();
-
-        // If there's no key, abort.
-        if (!$key) {
-            return false;
-        }
-
-        // Add key object to the model as a variable to access it later.
-        $this->key = $key;
-
-        //Check if server is already trusted or not.
-        if(shell_exec("ssh-keygen -F " . $this->ip_address . " 2>/dev/null") == null){
-
-            // Trust Target Server
-            shell_exec("ssh-keyscan -p " . $this->port . " -H ". $this->ip_address . " >> ~/.ssh/known_hosts");
-        }
-
-        // Fix key file permissions again, just in case.
-        $query = "chmod 400 " . storage_path('keys')  . DIRECTORY_SEPARATOR . Auth::id();
-        shell_exec($query);
-
-        // Run whoami on target so we can verify key.
-        $output = $this->runSSH("whoami");
-
-        if ($output != ($key->username . "\n")) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public static function filterPermissions($raw_servers)
-    {
-        // Ignore permissions if user is admin.
-        if (\Auth::user()->isAdmin()) {
-            return $raw_servers;
-        }
-
-        // Get permissions from middleware.
-        $permissions = request('permissions');
-
-        // Create new array for permitted servers
-        $servers = [];
-
-        // Loop through each server and add permitted ones in servers array.
-        foreach ($raw_servers as $server) {
-            if (in_array($server->_id, $permissions->server)) {
-                array_push($servers, $server);
-            }
-        }
-        return $servers;
+        return $this->connector()->execute($query);
     }
 
     /**
-     * @param array $coloumns
-     * @return \App\Server | Jenssegers\Mongodb\Eloquent\Model
+     * @return bool
      */
-    public static function getAll($coloumns = [])
+    public function isAlive()
     {
-        $servers = Server::all($coloumns);
-        return Server::filterPermissions($servers);
+        // Simply Check Port If It's Alive
+        if(is_resource(@fsockopen($this->ip_address,$this->control_port,$errno, $errstr,env('SERVER_CONNECTION_TIMEOUT')))){
+            return true;
+        }else{
+            // Abort, Since server is unavailable.
+            abort(504, __("Sunucuya Bağlanılamadı."));
+        }
+        return false;
+    }
+
+    /**
+     * @return Server|\Illuminate\Database\Query\Builder
+     */
+    public static function getAll()
+    {
+        return Server::find(Permission::get(auth()->id(), 'server'));
     }
 
 }
