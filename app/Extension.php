@@ -88,7 +88,7 @@ class Extension extends Eloquent
     public static function filterPermissions($raw_extensions)
     {
         // Ignore permissions if user is admin.
-        if (\Auth::user()->isAdmin()) {
+        if (auth()->user()->isAdmin()) {
             return $raw_extensions;
         }
 

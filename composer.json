@@ -7,17 +7,17 @@
     "require": {
         "php": "^7.3",
         "ext-json": "*",
-        "ext-ssh2": "*",
-        "ext-openssl" : "*",
         "ext-ldap": "*",
+        "ext-openssl": "*",
         "ext-simplexml": "*",
+        "ext-ssh2": "*",
         "ext-zip": "*",
-        "fideloper/proxy": "^4.0",
         "guzzlehttp/guzzle": "~6.0",
         "jenssegers/mongodb": "^3.4",
         "jeroennoten/laravel-adminlte": "^1.24",
         "laravel/framework": "5.7.*",
-        "laravel/tinker": "^1.0"
+        "laravel/tinker": "^1.0",
+        "phpseclib/phpseclib": "^2.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.2",

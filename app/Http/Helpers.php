@@ -52,10 +52,10 @@ if (!function_exists('server')) {
      */
     function server()
     {
-        $server = request('server');
-        $key = \App\Key::where('server_id',$server->_id)->first();
-        $server->key = $key;
-        return $server;
+//        $server = request('server');
+//        $key = \App\Key::where('server_id',$server->_id)->first();
+//        $server->key = $key;
+        return request('server');
     }
 }
 
@@ -65,7 +65,7 @@ if (!function_exists('script')) {
      */
     function script()
     {
-        return \App\Script::where('_id', request('script_id'))->first();
+        return request('script');
     }
 }
 

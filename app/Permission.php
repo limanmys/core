@@ -78,6 +78,9 @@ class Permission extends Eloquent
 
     public static function get($user_id, $type = null)
     {
+        if(User::find($user_id)->isAdmin()){
+            return Server::all()->pluck('_id')->toArray();
+        }
         // Retrieve Permissions
         $permissions = Permission::where('user_id', $user_id)->first();
 

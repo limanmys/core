@@ -1,24 +1,8 @@
 <?php
 
 // Auth Routes
-
-Route::post('/onur_giris',function(){
-    return response()->json([
-        "token" => str_random(64),
-        "username" => request('username'),
-        "password" => request('password')
-    ]);
-});
-
-Route::post('/onur_politikalar',function(){
-    return response()->json([
-        "mert" => str_random(32),
-        "onur" => str_random(32),
-        "deneme" => "CBlUOAERxzecDjiPLzgI5DNfDNy7jyLC"
-    ]);
-});
-
 require_once(app_path('Http/Controllers/Auth/_routes.php'));
+
 Route::group(['middleware' => ['auth','permissions']],function () {
 
 // Extension Routes
@@ -61,11 +45,11 @@ Route::get('/', 'HomeController@index')->name('home');
 
 // SSH Key List Route
 
-Route::get('/anahtarlar', 'SshController@index')->name('keys');
+Route::get('/anahtarlar', 'KeyController@index')->name('keys');
 
 // SSH Key Add Route
 
-Route::post('/anahtar/ekle', 'SshController@add')->name('key_add');
+Route::post('/anahtar/ekle', 'KeyController@add')->name('key_add');
 
 // User Details Route
 
@@ -83,10 +67,4 @@ Route::post('/talep', 'HomeController@request')->name('request_send');
 
 Route::post('/arama/','SearchController@index')->name('search');
 
-});
-
-Route::get('/test',function(){
-    $server = \App\Server::find('5c57c1538f2fa57b2a4bad2b');
-    $connector = new \App\Classes\SSHConnector($server);
-    return "<pre>" . $connector->test() . "</pre>";
 });
