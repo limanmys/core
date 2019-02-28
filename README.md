@@ -26,14 +26,8 @@ sudo apt update
 ```
 #### PHP ve diger kutuphanelerin kurulumu
 ```bash
-sudo apt install php-fpm -y
-sudo apt install php php-mongodb php-ldap php-mbstring php-xml php-zip php-simplexml -y
-```
-#### Ubuntu'daki olmayan guncel surumun kurulumu
-```bash
-wget http://ppa.launchpad.net/ondrej/php/ubuntu/pool/main/p/php-mongodb/php-mongodb_1.5.3-1+ubuntu18.04.1+deb.sury.org+10_amd64.deb
-sudo dpkg -i php-mongodb_1.5.3-1+ubuntu18.04.1+deb.sury.org+10_amd64.deb
-sudo rm php-mongodb_1.5.3-1+ubuntu18.04.1+deb.sury.org+10_amd64.deb
+sudo apt install php7.3-fpm -y
+sudo apt install php7.3 php7.3-mongodb php7.3-ldap php7.3-mbstring php7.3-xml php7.3-zip php7.3-simplexml php7.3-ssh2 -y
 ```
 #### Nginx Kurulumu
 ```bash
@@ -58,7 +52,7 @@ sudo chown `id -u` /data/db
 ```
 #### Gerekli Paketler
 ```bash
-sudo apt install nmap python3 python3-paramiko python3-tornado dnsutils -y
+sudo apt install python3 python3-paramiko python3-tornado dnsutils -y
 ```
 #### Config Dosyasi Linkleme
 ```bash
