@@ -52,7 +52,7 @@ sudo chown `id -u` /data/db
 ```
 #### Gerekli Paketler
 ```bash
-sudo apt install python3 python3-paramiko python3-tornado dnsutils -y
+sudo apt install unzip python3 python3-paramiko python3-tornado dnsutils -y
 ```
 #### Config Dosyasi Linkleme
 ```bash
