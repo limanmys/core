@@ -8,11 +8,11 @@ class ServerLog extends Eloquent
 {
     protected $collection = 'server_log';
     protected $connection = 'mongodb';
-    protected $fillable = ['command', 'server_id', 'user_id'];
+    protected $fillable = ['command', 'server_id', 'user_id','output'];
     public static $dont_log = [
         "hostname", "sudo systemctl is-failed bind9", "df -h" , "whoami"
     ];
-    public static function new($command, $server_id = null,$user_id = null)
+    public static function new($command, $output, $server_id = null,$user_id = null)
     {
         if(in_array($command, ServerLog::$dont_log)){
             return false;
@@ -20,7 +20,8 @@ class ServerLog extends Eloquent
         $log = new ServerLog([
            "command" => $command,
             "user_id" => ($user_id == null) ? auth()->user()->_id : $user_id,
-            "server_id" => ($server_id == null) ? server()->_id : $server_id
+            "server_id" => ($server_id == null) ? server()->_id : $server_id,
+            "output" => $output
         ]);
         $log->save();
         return $log;

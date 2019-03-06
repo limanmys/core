@@ -1,4 +1,4 @@
-@php($random = str_random(20))
+@php($random = (isset($id)? $id : str_random(20)))
 <input class="form-control" type="search" onchange="search{{$random}}()" id="q"/>
 <br>
 <div id="{{$random}}"></div>

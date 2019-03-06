@@ -58,8 +58,9 @@ class SSHConnector implements Connector
      */
     public function execute($command)
     {
-        ServerLog::new($command, $this->server->_id);
-        return $this->ssh->exec($command);
+        $output = $this->ssh->exec($command);
+        ServerLog::new($command,$output, $this->server->_id);
+        return $output;
     }
 
     /**

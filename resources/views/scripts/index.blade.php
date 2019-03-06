@@ -38,10 +38,10 @@
     @include('l.table',[
         "value" => $scripts,
         "title" => [
-            "Betik Adı" , "Açıklama" , "Tipi" , "*hidden*"
+            "Betik Adı" , "Açıklama" , "Tipi" , "Kodu", "*hidden*", "Son Güncelleme"
         ],
         "display" => [
-            "name" , "description", "extensions" , "_id:script_id"
+            "name" , "description", "extensions" , "unique_code", "_id:script_id" , "updated_at"
         ],
         "menu" => [
             "İndir" => [
@@ -64,7 +64,7 @@
        "inputs" => [
            "Betik Id:'null'" => "script_id:hidden"
        ],
-       "submit_text" => "Sunucuyu Sil"
+       "submit_text" => "Betiği Sil"
     ])
     <script>
         function downloadFile(form) {

@@ -67,4 +67,6 @@ Route::post('/talep', 'HomeController@request')->name('request_send');
 
 Route::post('/arama/','SearchController@index')->name('search');
 
+Route::view('/logs/{log_id}','logs.one');
+
 });

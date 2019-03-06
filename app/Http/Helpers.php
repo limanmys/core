@@ -107,7 +107,6 @@ if (!function_exists('extensionRoute')) {
     }
 }
 
-
 if (!function_exists('extension')) {
     /**
      * @param null $id
@@ -130,7 +129,7 @@ if (!function_exists('extensionDb')) {
     function extensionDb($key)
     {
         $extension_id = request('extension_id');
-        return server()->extensions[$extension_id][$key];
+        return auth()->user()->settings[server()->_id][extension()->_id][$key];
     }
 }
 
