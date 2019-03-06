@@ -227,11 +227,12 @@
         "table" => [
             "value" => \App\ServerLog::retrieve(true),
             "title" => [
-                "Komut" , "User ID", "Tarih"
+                "Komut" , "User ID", "Tarih", "Log Id"
             ],
             "display" => [
-                "command" , "username", "created_at"
+                "command" , "username", "created_at", "_id"
             ],
+            "onclick" => "logDetails"
         ]
     ])
     @if(count($input_extensions))
@@ -273,6 +274,11 @@
             //loading();
             window.location.assign('/sunucu/indir?path=' + form.getElementsByTagName('input')[0].value + '&server_id=' + form.getElementsByTagName('input')[1].value);
             return false;
+        }
+
+        function logDetails(element){
+            let log_id = element.querySelector('#_id').innerHTML;
+            window.location.href = "/logs/" + log_id
         }
     </script>
 @endsection

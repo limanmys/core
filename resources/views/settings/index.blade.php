@@ -7,7 +7,6 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Sistem Ayarları")}}</li>
         </ol>
     </nav>
-    <input class="form-control" type="search" onchange="searchTree()" id="q"/><br>
     @include('l.tree',[
             "data" => objectToArray(\App\User::all(), "email", "name"),
             "search",
