@@ -45,7 +45,7 @@ return [
     |
     */
 
-    'skin' => 'blue-light',
+    'skin' => 'blue',
 
     /*
     |--------------------------------------------------------------------------
@@ -180,7 +180,6 @@ return [
 
     'plugins' => [
         'datatables' => true,
-        'select2'    => true,
         'chartjs'    => true,
     ],
 ];

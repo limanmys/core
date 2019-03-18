@@ -18,6 +18,9 @@ use GuzzleHttp\Exception\GuzzleException;
 class OneController extends Controller
 {
     public function one(){
+        if(!\server()){
+            abort(504,"Sunucu Bulunamadı.");
+        }
 
         // Determine if request should be considered authorized or unauthorized.
         return (server()->type == "linux_ssh" || server()->type == "windows_powershell")
@@ -39,6 +42,9 @@ class OneController extends Controller
         if($server->type == "linux_ssh"){
             Key::where('server_id',$server->_id)->delete();
         }
+        \App\Widget::where([
+            "server_id" => $server->_id
+        ])->delete();
 
         // Delete the Server Object.
         $server->delete();
@@ -65,7 +71,8 @@ class OneController extends Controller
     public function network()
     {
         // Set Parameters
-        $parameters = \request('ip') . ' ' . \request('cidr') . ' ' . \request('gateway') . ' ' . \request('interface');
+        $parameters = \request('ip') . ' ' . \request('cidr') . ' ' . \request('gateway') . ' ' . \request('interface')
+        . ' ' . request('dns');
 
         // Get Script Object
         $script = \App\Script::where('unique_code','server_set_network')->first();
@@ -76,50 +83,18 @@ class OneController extends Controller
         }
 
         // Execute The Script
-        $output = server()->runScript($script, $parameters," > /dev/null 2>/dev/null &");
+        server()->runScript($script, $parameters," > /dev/null 2>/dev/null &");
 
         // Sleep 3 seconds because it may take a while before network up again.
         sleep(3);
 
         // Very basically, check port and network.
         $output = shell_exec("echo exit | telnet " . \request('ip') . " " . server()->port);
-        return respond($output,201);
+
         if (!strpos($output, "Connected to " . \request('ip'))) {
 
             // If network is not reachable, may be something went wrong, warn user about it.
             return respond("Network degistirilemedi.",201);
-        }
-
-        // Since network updated, we have to update keys as well, first get all keys.
-        $keys = Key::where('server_id',server()->_id)->get();
-
-        // Loop through each key and warn users that key is updated.
-        foreach($keys as $key){
-            
-            // Don't warn if key owns the authenticated user.
-            if($key->user_id != \Auth::id()){
-                $notification = Notification::new(
-                    __("SSH Anahtari Bozuldu"),
-                    "error",
-                    __(":server isimli sunucudaki ip adresi degistigi icin ssh anahtariniz devre disi birakildi.",["server"=>server()->name])
-                );
-            }else{
-                // Create user key.
-                $flag = Key::init(server()->key["username"], request('password'), \request('ip'),
-                    server()->port, Auth::id());
-
-                // Create New Key Object.
-                $new = new Key([
-                    "user_id" => auth()->id,
-                    "name" => $key->name,
-                    "username" => server()->key("username"),
-                    "server_id" => server()->_id
-                ]);
-                $new->save();
-            }
-
-            // Delete the old key.
-            $key->delete();
         }
 
         // Update Server with new network configuration.
@@ -226,6 +201,7 @@ class OneController extends Controller
         try{
             $response = $client->request('GET','https://localhost:4433');
             preg_match_all('/(?<=<input type=\"hidden\" name=\"_xsrf\" value=\")(.*)(?=\")/', $response->getBody()->getContents(), $output_array);
+            $limanKey = str_random(16);
             $response = $client->request('POST','https://localhost:4433',[
                 "multipart" => [
                     [
@@ -238,16 +214,24 @@ class OneController extends Controller
                     ],
                     [
                         "name" => "username",
-                        "contents" => $server->key->username
+                        "contents" => serverKey()->username
                     ],
                     [
                         "name" => "_xsrf",
                         "contents" => $output_array[0][0]
                     ],
                     [
+                        "name" => "password",
+                        "contents" => env('APP_KEY') . auth()->id()
+                    ],
+                    [
                         "name" => "privatekey",
                         "contents" => fopen(storage_path('keys') .
                             DIRECTORY_SEPARATOR . Auth::id(),'r')
+                    ],
+                    [
+                        "name" => "limanKey",
+                        "contents" => $limanKey
                     ]
                 ],
             ]);
@@ -258,7 +242,8 @@ class OneController extends Controller
 
         $json = json_decode($response->getBody()->getContents());
         return response()->view('terminal.index',[
-            "id" => $json->id
+            "id" => $json->id,
+            "limanKey" => $limanKey
         ])->withCookie(cookie('_xsrf',$client->getConfig('cookies')->toArray()[0]["Value"]));
     }
 
@@ -291,14 +276,18 @@ class OneController extends Controller
             return respond('Servis başarıyla eklendi.');
         }
 
+        if(array_key_exists("install",$extension->views)){
+            return respond("Kurulum betiği bulunamadığı için işlem iptal edildi.",201);
+        }
+
         // Get Install script from extension.
-        $script = Script::where('unique_code', $extension->install_script)->first();
+        $script = Script::where('unique_code', $extension->views["install"])->first();
 
         //Just a double check if script is not installed, warn user.
         if(!$script){
             return respond("Kurulum betiği bulunamadığı için işlem iptal edildi.",201);
         }
-        
+
         // Create a notification to inform user.
         $notification = Notification::new(
             __("Servis Yükleniyor."),
@@ -308,7 +297,7 @@ class OneController extends Controller
 
         // Create and dispatch the job immediately.
         $job = new InstallService($script, server(),\request('domain') . " "
-            . \request('interface'),\Auth::user(),$notification ,$extension);
+            . \request('interface'),auth()->id(),$notification ,$extension);
         dispatch($job);
 
         // Forward request and inform user.
@@ -335,7 +324,8 @@ class OneController extends Controller
         ];
     }
 
-    public function upload(){
+    public function upload()
+    {
 
         // Store file in /tmp directory.
         request()->file('file')->move('/tmp/',request()->file('file')->getClientOriginalName());
@@ -355,7 +345,8 @@ class OneController extends Controller
         return respond('Dosya yüklenemedi.');
     }
 
-    public function download(){
+    public function download()
+    {
 
         // Generate random file name
         $file = str_random('10');
@@ -368,7 +359,8 @@ class OneController extends Controller
         return response()->download('/tmp/' . $file, $file_name[count($file_name) -1 ])->deleteFileAfterSend();
     }
 
-    private function authorized(){
+    private function authorized()
+    {
         return view('server.one_auth', [
             "stats" => server()->run("df -h"),
             "hostname" => server()->run("hostname"),
@@ -378,7 +370,8 @@ class OneController extends Controller
         ]);
     }
 
-    private function unauthorized(){
+    private function unauthorized()
+    {
         return view('server.one',[
             "installed_extensions" => $this->installedExtensions(),
             "available_extensions" => $this->availableExtensions(),
@@ -386,7 +379,8 @@ class OneController extends Controller
         ]);
     }
 
-    private function availableExtensions(){
+    private function availableExtensions()
+    {
         // if(server()->key){
             return Extension::whereNotIn('_id',array_keys(server()->extensions))->get();
         // }
@@ -394,7 +388,9 @@ class OneController extends Controller
 
     }
 
-    private function installedExtensions(){
+    private function installedExtensions()
+    {
         return Extension::whereIn('_id',array_keys(server()->extensions))->get();
     }
+
 }

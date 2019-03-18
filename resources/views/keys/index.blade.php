@@ -19,16 +19,16 @@
             "Sunucu" , "Kullanıcı" , "*hidden*" , "*hidden*"
         ],
         "display" => [
-            "name" , "username", "_id:key_id" , "server_id"
+            "server_name" , "username", "_id:key_id" , "server_id"
         ],
         "menu" => [
             "Düzenle" => [
                 "target" => "edit",
-                "icon" => "edit"
+                "icon" => "fa-edit"
             ],
             "Sil" => [
                 "target" => "delete",
-                "icon" => "delete"
+                "icon" => "fa-trash"
             ]
         ]
     ])
@@ -39,7 +39,6 @@
         "url" => route('key_add'),
         "next" => "reload",
         "inputs" => [
-            "Adı" => "name:text",
             "Sunucu Seçin:server_id" => objectToArray($servers,"name","_id"),
             "Kullanıcı Adı" => "username:text",
             "Parola" => "password:password"
@@ -60,4 +59,15 @@
         ],
         "submit_text" => "Düzenle"
     ])
+    @include('l.modal',[
+       "id"=>"delete",
+       "title" =>"Anahtarı Sil",
+       "url" => route('key_delete'),
+       "text" => "Anahtarı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+       "next" => "reload",
+       "inputs" => [
+           "Key Id:'null'" => "key_id:hidden"
+       ],
+       "submit_text" => "Sunucuyu Sil"
+   ])
 @endsection

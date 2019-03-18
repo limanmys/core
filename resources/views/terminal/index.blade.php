@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link href="{{asset('css/terminal/xterm.min.css')}}" rel="stylesheet" type="text/css"/>
 </head>
-<body onload="start({{$id}})">
+<body onload="start('{{$id}}','{{$limanKey}}')">
 
 <div class="container">
     <div id="terminal"></div>

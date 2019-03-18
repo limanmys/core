@@ -34,6 +34,7 @@ class AddController extends Controller
         if(!$this->server->isAlive()){
             return respond("Sunucuyla bağlantı kurulamadı.",406);
         }
+        $this->server->port = request('port');
         $this->server->save();
 
         // Add Server to request object to use it later.
@@ -65,38 +66,29 @@ class AddController extends Controller
         return $next;
     }
 
-    private function linux_ssh(){
-        // Create Key
-        $flag = Key::init(request('username'), request('password'), request('ip_address'),
-            request('port'), Auth::id());
-        if(!$flag){
-            return respond("SSH Hatası",400);
-        }
-
-        $this->server->port = request('port');
-
+    private function linux_ssh()
+    {
         $key = new Key(request()->all());
 
         $key->server_id = $this->server->id;
         $key->user_id = Auth::id();
-
         $key->save();
 
-        // Validate Key Installation.
-        if(!$this->server->sshAccessEnabled()){
+        // Create Key
+        $flag = \App\Classes\Connector\SSHConnector::create($this->server,request('username'), request('password'),auth()->id(),$key);
+        if(!$flag){
             $key->delete();
-            $this->server->delete();
-            return respond("SSH Hatası",401);
+            return respond("SSH Hatası",400);
         }
 
-        foreach(extensions() as $extension){
-            if($this->server->isRunning($extension->service) == "active\n"){
-                $extensions_array = $this->server->extensions;
-                $extensions_array[$extension->_id] = [];
-                $this->server->extensions = $extensions_array;
-                $this->server->save();
-            }
-        };
+//        foreach(extensions() as $extension){
+//            if($this->server->run("(systemctl list-units | grep $extension->service  && echo \"OK\" || echo \"NOK\") | tail -1") != "OK\n"){
+//                $extensions_array = $this->server->extensions;
+//                $extensions_array[$extension->_id] = [];
+//                $this->server->extensions = $extensions_array;
+//                $this->server->save();
+//            }
+//        };
 
         return $this->grantPermissions();
     }
@@ -113,8 +105,8 @@ class AddController extends Controller
         return $this->grantPermissions();
     }
 
-    private function grantPermissions(){
-
+    private function grantPermissions()
+    {
         // Give User a permission to use this server.
         $permissions = request('permissions');
         $user_servers = (Array) $permissions->server;

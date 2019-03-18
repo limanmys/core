@@ -175,6 +175,7 @@ class TestCaseTest extends TestCase
         $this->assertTrue($test->assertPostConditions);
         $this->assertTrue($test->tearDown);
         $this->assertEquals(BaseTestRunner::STATUS_ERROR, $test->getStatus());
+        $this->assertSame('throw Exception in tearDown()', $test->getStatusMessage());
     }
 
     public function testExceptionInTestIsDetectedInTeardown(): void
@@ -654,11 +655,13 @@ class TestCaseTest extends TestCase
 
     /**
      * @requires PHP 7
-     * @expectedException \TypeError
      */
     public function testTypeErrorCanBeExpected(): void
     {
         $o = new \ClassWithScalarTypeDeclarations;
+
+        $this->expectException(\TypeError::class);
+
         $o->foo(null, null);
     }
 

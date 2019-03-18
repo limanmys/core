@@ -62,9 +62,9 @@ class Mailer implements MailerContract, MailQueueContract
     protected $to;
 
     /**
-     * The queue implementation.
+     * The queue factory implementation.
      *
-     * @var \Illuminate\Contracts\Queue\Queue
+     * @var \Illuminate\Contracts\Queue\Factory
      */
     protected $queue;
 
@@ -172,7 +172,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Send a new message when only a raw text part.
+     * Send a new message with only a raw text part.
      *
      * @param  string  $text
      * @param  mixed  $callback
@@ -184,7 +184,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Send a new message when only a plain part.
+     * Send a new message with only a plain part.
      *
      * @param  string  $view
      * @param  array  $data
@@ -380,7 +380,11 @@ class Mailer implements MailerContract, MailQueueContract
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
-        return $view->queue(is_null($queue) ? $this->queue : $queue);
+        if (is_string($queue)) {
+            $view->onQueue($queue);
+        }
+
+        return $view->queue($this->queue);
     }
 
     /**

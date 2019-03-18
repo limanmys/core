@@ -10,7 +10,7 @@ class ServerLog extends Eloquent
     protected $connection = 'mongodb';
     protected $fillable = ['command', 'server_id', 'user_id','output'];
     public static $dont_log = [
-        "hostname", "sudo systemctl is-failed bind9", "df -h" , "whoami"
+        "hostname", "df -h" , "whoami", "sudo systemctl is-failed bind9"
     ];
     public static function new($command, $output, $server_id = null,$user_id = null)
     {
@@ -32,7 +32,7 @@ class ServerLog extends Eloquent
         // First, Retrieve Logs.
         $logs = ServerLog::where([
             "server_id" => ($server_id == null) ? server()->_id : $server_id
-        ])->get();
+        ])->get()->reverse();
 
         // If it's not requested as readable, which means id's only without logic.
         if(!$readable){

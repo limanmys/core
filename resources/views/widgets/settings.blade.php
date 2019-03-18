@@ -7,12 +7,8 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Widgetlar")}}</li>
         </ol>
     </nav>
-
-    @include('l.modal-button',[
-    "class" => "btn-success",
-    "target_id" => "add_server",
-    "text" => "Widget Ekle"
-])<br><br>
+    <button class="btn btn-success" onclick="window.location.href = '{{route('widget_add_page')}}'">{{__("Widget Ekle")}}</button>
+    <br><br>
 
     @include('l.modal',[
         "id"=>"add_server",
@@ -41,11 +37,11 @@
         "menu" => [
             "Düzenle" => [
                 "target" => "edit",
-                "icon" => "edit"
+                "icon" => "fa-edit"
             ],
             "Sil" => [
                 "target" => "delete",
-                "icon" => "delete"
+                "icon" => "fa-trash"
             ]
         ]
     ])

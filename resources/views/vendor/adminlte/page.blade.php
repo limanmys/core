@@ -14,7 +14,7 @@
 ][config('adminlte.layout')] : '') . (config('adminlte.collapse_sidebar') ? ' sidebar-collapse ' : ''))
 
 @section('body')
-    <div class="wrapper">
+    <div class="wrapper" style="height: auto">
 
         <!-- Main Header -->
 <header class="main-header">
@@ -58,38 +58,8 @@
         <ul class="nav navbar-nav">
 
           <!-- Notifications: style can be found in dropdown.less -->
-          <li class="dropdown notifications-menu" style="margin-top:6px">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <i class="fa fa-bell-o"></i>
-              <span class="label label-warning" id="notificationCount">{{notifications()->count()}}</span>
-            </a>
-            <ul class="dropdown-menu">
-              <li class="header">
-                  <button class="btn btn-secondary float-right" onclick="readNotifications()"><i class="fa fa-check"></i></button>
-                  <span style="line-height: 40px;font-size: 15px">
-                      {{__(":count bildiriminiz var.",[
-                        "count" => notifications()->count()
-                    ])}}
-                  </span>
-              </li>
-              <li>
-                <!-- inner menu: contains the actual data -->
-                <ul class="menu">
-                  @foreach (notifications() as $notification)
-                        <li>
-                            <a href="#">
-                                @if($notification->read)
-                                    <i class="fa fa-info text-info"></i>{{$notification->title}}
-                                @else
-                                    <i class="fa fa-info text-warning"></i>{{$notification->title}}
-                                @endif
-                            </a>
-                        </li>
-                  @endforeach
-                </ul>
-              </li>
-              {{--<li class="footer"><a href="#">View all</a></li>--}}
-            </ul>
+          <li id="notifications-menu" class="dropdown notifications-menu" style="margin-top:6px">
+              @include('l.notifications')
           </li>
 
           <!-- User Account: style can be found in dropdown.less -->

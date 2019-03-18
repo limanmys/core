@@ -17,7 +17,7 @@
 
     @if(count($available_extensions))
         @include('l.modal-button',[
-            "class" => "btn-secondary",
+            "class" => "btn-primary",
             "target_id" => "install_extension",
             "text" => "Servisi Aktifleştir"
         ])
@@ -26,13 +26,19 @@
         "class" => "btn-info",
         "target_id" => "give_permission",
         "text" => "Yetki Ver"
-    ])<br><br>
+    ])
+    @include('l.modal-button',[
+        "class" => "btn-danger",
+        "target_id" => "log_table",
+        "text" => "Sunucu Logları"
+    ])
+    <br><br>
     @if(count($installed_extensions) > 0)
         <h4>{{__("Servis Durumları")}}</h4>
         @foreach($installed_extensions as $extension)
-            <button type="button" class="btn btn-secondary btn-lg" style="cursor:default;"
+            <button type="button" class="btn btn-outline-primary btn-lg" style="cursor:default;"
                     id="status_{{$extension->service}}">
-                {{strtoupper($extension->name)}}
+                {{$extension->name}}
             </button>
         @endforeach
     @else
@@ -45,7 +51,20 @@
         "target_id" => "delete",
             "text" => "Sunucuyu Sil"
     ])
-
+    @include('l.modal-table',[
+            "id" => "log_table",
+            "title" => "Sunucu Logları",
+            "table" => [
+                "value" => \App\ServerLog::retrieve(true),
+                "title" => [
+                    "Komut" , "User ID", "Tarih", "Log Id"
+                ],
+                "display" => [
+                    "command" , "username", "created_at", "_id"
+                ],
+                "onclick" => "logDetails"
+            ]
+        ])
     @include('l.modal',[
         "id"=>"delete",
         "title" => $server->name,
@@ -105,5 +124,31 @@
         "text" => "Güvenlik sebebiyle kullanıcı listesi sunulmamaktadır.",
         "submit_text" => "Yetkilendir"
     ])
+<script>
+    function checkStatus(service) {
+        let data = new FormData();
+        data.append('server_id', '{{$server->_id}}');
+        data.append('service', service);
+        request('{{route('server_check')}}', data, function (response) {
+            let json = JSON.parse(response);
+            let element = document.getElementById('status_' + service);
+            element.classList.remove('btn-secondary');
+            element.classList.add(json["message"]);
+        });
+    }
 
+    @if(count($installed_extensions) > 0)
+    @foreach($installed_extensions as $service)
+    setInterval(function () {
+        checkStatus('{{$service->service}}');
+    }, 3000);
+
+    @endforeach
+    @endif
+
+    function logDetails(element){
+        let log_id = element.querySelector('#_id').innerHTML;
+        window.location.href = "/logs/" + log_id
+    }
+</script>
 @endsection

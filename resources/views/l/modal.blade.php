@@ -49,7 +49,11 @@
                     @endisset
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">@isset($submit_text){{__($submit_text)}}@endisset</button>
+                    @isset($noEnter)
+                        <button type="button" class="btn btn-success">@isset($submit_text){{__($submit_text)}}@endisset</button>
+                    @else
+                        <button type="submit" class="btn btn-success">@isset($submit_text){{__($submit_text)}}@endisset</button>
+                    @endisset
                 </div>
             </form>
         </div>
@@ -58,14 +62,11 @@
 @isset($selects)
     <script type="text/javascript">
         function cs_{{$id}}(target){
-            console.log(target,{{$id}});
             Array.prototype.forEach.call(document.getElementsByClassName('{{$id}}'),function(element){
-                console.log('asdasd');
                 element.setAttribute('hidden',"true");
                 element.setAttribute('disabled',"true");
             });
             Array.prototype.forEach.call(document.getElementsByClassName(target),function(element){
-                console.log('gizledi');
                 element.removeAttribute('hidden');
                 element.removeAttribute('disabled');
             });

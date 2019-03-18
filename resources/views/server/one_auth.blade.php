@@ -30,7 +30,7 @@
     ])
     @if(count($input_extensions))
         @include('l.modal-button',[
-            "class" => "btn-secondary",
+            "class" => "btn-primary",
             "target_id" => "install_extension",
             "text" => "Servis Ekle"
         ])
@@ -88,10 +88,10 @@
     <h5>Hostname : {{$hostname}}</h5>
     @if(count($installed_extensions) > 0)
         <h4>{{__("Servis Durumları")}}</h4>
-        @foreach($installed_extensions as $service)
-            <button type="button" class="btn btn-secondary btn-lg" style="cursor:default;"
-                    id="status_{{$service->service}}">
-                {{strtoupper($service->name)}}
+        @foreach($installed_extensions as $extension)
+            <button type="button" class="btn btn-outline-primary btn-lg" style="cursor:default;"
+                    id="status_{{$extension->service}}">
+                {{$extension->name}}
             </button>
         @endforeach
     @else

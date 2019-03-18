@@ -16,23 +16,23 @@
     @include('l.table',[
         "value" => servers(),
         "title" => [
-            "Sunucu Adı" , "İp Adresi" , "Sunucu Tipi" , "Kontrol Portu", "*hidden*" ,"*hidden*"
+            "Sunucu Adı" , "İp Adresi" , "*hidden*" , "Kontrol Portu", "*hidden*" ,"*hidden*"
         ],
         "display" => [
-            "name" , "ip_address", "type" , "control_port", "city:city", "_id:server_id"
+            "name" , "ip_address", "type:type" , "control_port", "city:city", "_id:server_id"
         ],
         "menu" => [
             "Düzenle" => [
                 "target" => "edit",
-                "icon" => "edit"
+                "icon" => "fa-edit"
             ],
             "Yetki Ver" => [
                 "target" => "give_permission",
-                "icon" => "edit"
+                "icon" => "fa-unlock"
             ],
             "Sil" => [
                 "target" => "delete",
-                "icon" => "delete"
+                "icon" => "fa-trash"
             ]
         ],
         "onclick" => "details"

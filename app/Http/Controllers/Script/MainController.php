@@ -73,7 +73,7 @@ class MainController extends Controller
         // Get Script
         shell_exec('rm ' .storage_path('app/scripts/' . script()->_id));
         script()->delete();
-        return respond("Betik başarıyla silindi",201);
+        return respond("Betik başarıyla silindi",200);
     }
 
 }

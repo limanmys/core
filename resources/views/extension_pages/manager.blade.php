@@ -16,20 +16,22 @@
         "class" => "btn-secondary",
         "target_id" => "extensionExport",
         "text" => "Indir"
-    ])<br><br>
+    ])
+    <button class="btn btn-info" onclick="location.href = '{{route('extension_new_view')}}'">{{__("Yeni")}}</button>
+    <br><br>
 
     @include('l.table',[
         "value" => extensions(),
         "title" => [
-            "Eklenti Adı" , "*hidden*"
+            "Eklenti Adı" , "Versiyon", "*hidden*"
         ],
         "display" => [
-            "name" , "_id:extension_id"
+            "name" , "version", "_id:extension_id"
         ],
         "menu" => [
             "Sil" => [
                 "target" => "delete",
-                "icon" => "delete"
+                "icon" => "fa-trash"
             ]
         ],
         "onclick" => "details"
@@ -79,6 +81,11 @@
             window.location.assign('/indir/eklenti/' + form.getElementsByTagName('select')[0].value);
             // loading();
             return false;
+        }
+
+        function details(element){
+            let extension_id = element.querySelector('#extension_id').innerHTML;
+            window.location.href = "/eklentiler/" + extension_id
         }
 </script>
 @endsection

@@ -51,6 +51,8 @@ Route::get('/anahtarlar', 'KeyController@index')->name('keys');
 
 Route::post('/anahtar/ekle', 'KeyController@add')->name('key_add');
 
+Route::post('/anahtar/sil', 'KeyController@delete')->name('key_delete');
+
 // User Details Route
 
 Route::get('/kullanici/{user_id}', 'UserController@one')->name('user');

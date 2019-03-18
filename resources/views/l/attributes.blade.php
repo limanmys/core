@@ -19,11 +19,13 @@
                     </div>
                 </div>
                 <div class="box-body">
+                    @isset($onSave)
                     <button id="{{$rand}}_edit" class="btn btn-primary"
                             onclick="edit_{{$rand}}()">{{__("Düzenle")}}</button>
                     <button id="{{$rand}}_save" class="btn btn-success" onclick="save_{{$rand}}()"
                             disabled>{{__("Kaydet")}}</button>
                     <br>
+                    @endisset
                     @foreach ($data as $key=>$value)
                         @include('l.attribute',[
                             "title" => $key,

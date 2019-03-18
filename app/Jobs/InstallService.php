@@ -2,27 +2,57 @@
 
 namespace App\Jobs;
 
+use App\Classes\Connector\SSHConnector;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
+/**
+ * Class InstallService
+ * @package App\Jobs
+ */
 class InstallService implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    protected $script,$server,$user, $parameters, $notification, $extension, $key;
+    /**
+     * @var \App\Script
+     */
+    /**
+     * @var \App\Script
+     */
+    /**
+     * @var \App\Script
+     */
+    /**
+     * @var \App\Script
+     */
+    /**
+     * @var \App\Notification|\App\Script
+     */
+    /**
+     * @var \App\Extension|\App\Notification|\App\Script
+     */
+    /**
+     * @var \App\Extension|\App\Notification|\App\Script
+     */
+    protected $script,$server,$user_id, $parameters, $notification, $extension;
+
 
     /**
-     * Create a new job instance.
-     *
-     * @return void
+     * InstallService constructor.
+     * @param \App\Script $script
+     * @param $server
+     * @param $parameters
+     * @param $user_id
+     * @param \App\Notification $notification
+     * @param \App\Extension $extension
      */
-    public function __construct(\App\Script $script, $server, $parameters, $user, \App\Notification $notification,\App\Extension $extension)
+    public function __construct(\App\Script $script, $server, $parameters, $user_id, \App\Notification $notification, \App\Extension $extension)
     {
-        $this->user = $user;
+        $this->user_id = $user_id;
         $this->server = $server;
-        $this->key = $server->key;
         $this->script = $script;
         $this->parameters = $parameters;
         $this->notification = $notification;
@@ -30,42 +60,23 @@ class InstallService implements ShouldQueue
     }
 
     /**
-     * Execute the job.
-     *
-     * @return void
+     * @throws \Throwable
      */
     public function handle()
     {
         $this->notification->type = "working";
-        $this->read = false;
+        $this->notification->read = false;
         $this->notification->save();
-        //Copy script to target.
-        $copy_file_query = 'scp -P ' . $this->server->port . " -i " . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id .' ' . storage_path('app/scripts/' . $this->script->_id) .' ' . $this->key->username .'@' . $this->server->ip_address . ':/tmp/';
-        echo $copy_file_query . "\n";
-        shell_exec($copy_file_query);
-        $permission_query = 'sudo chmod +x /tmp/' . $this->script->_id;
-        $query = "ssh -p " . $this->server->port . " " . $this->key->username . "@" . $this->server->ip_address
-        . " -i "  . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id . " " . $permission_query . " 2>&1";
-        echo $query . "\n";
-        shell_exec($query);
-        $query = ($this->script->root == 1)? 'sudo ' : '';
-        $query = $query . $this->script->language . ' /tmp/' .$this->script->_id . " run ".$this->parameters;
-        $query = "ssh -p " . $this->server->port . " " . $this->key->username . "@" . $this->server->ip_address
-            . " -i "  . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id . " " . $query . " 2>&1";
-        echo $query . "\n";
-        shell_exec($query);
-        $service_status = "sudo systemctl is-failed " . $this->extension->service;
-        $query = "ssh -p " . $this->server->port . " " . $this->key->username . "@" . $this->server->ip_address
-            . " -i "  . storage_path('keys') . DIRECTORY_SEPARATOR . $this->user->_id . " " . $service_status . " 2>&1";
-        echo $query . "\n";
-        $log = shell_exec($query);
-        if ($log == "active\n") {
 
-            $extensions_array = $this->server->extensions;
-            $extensions_array[$this->extension->_id] = [];
-            $this->server->extensions = $extensions_array;
-            $this->server->save();
-            
+        $ssh = new SSHConnector($this->server, $this->user_id);
+
+        $ssh->runScript($this->script,$this->parameters);
+        $status = $ssh->execute("(systemctl list-units | grep " . $this->extension->service . "  && echo \"OK\" || echo \"NOK\") | tail -1");
+        $extensions_array = $this->server->extensions;
+        $extensions_array[$this->extension->_id] = [];
+        $this->server->extensions = $extensions_array;
+        $this->server->save();
+        if ($status == "OK\n") {
             $this->notification->type = "success";
             $this->notification->title = $this->extension->name . " kuruldu";
             $this->notification->message = $this->extension->name . " servisi kurulumu başarıyla tamamlandı.";
@@ -77,6 +88,9 @@ class InstallService implements ShouldQueue
         $this->notification->save();
     }
 
+    /**
+     *
+     */
     public function failed(){
         $this->notification->type = "error";
         $this->notification->title = "Hata Oluştu";

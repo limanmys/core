@@ -43,7 +43,7 @@
         }
         @endisset
     }).on('select_node.jstree', function (e, data) {
-        alert('clicked');
+
     });
     @isset($search)
         function searchTree() {
