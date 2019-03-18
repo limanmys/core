@@ -63,6 +63,10 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      */
     public function boot()
     {
+        if (!$this->app['config']->get('app.debug')) {
+            return;
+        }
+        
         $configPath = __DIR__ . '/../config/debugbar.php';
         $this->publishes([$configPath => $this->getConfigPath()], 'config');
 
@@ -84,6 +88,11 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
                 'as' => 'debugbar.clockwork',
             ]);
 
+            $router->get('telescope/{id}', [
+                'uses' => 'TelescopeController@show',
+                'as' => 'debugbar.telescope',
+            ]);
+            
             $router->get('assets/stylesheets', [
                 'uses' => 'AssetController@css',
                 'as' => 'debugbar.assets.css',

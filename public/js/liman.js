@@ -115,7 +115,7 @@ function search() {
 
 function checkNotifications() {
     request('/bildirimler', new FormData(), function (response) {
-        document.getElementById("notificationDiv").innerHTML = response;
+        document.getElementById("notifications-menu").innerHTML = response;
     });
 }
 
@@ -162,10 +162,9 @@ function message(data) {
     }
 }
 
-function dismissNotification(id) {
+function readNotifications(id) {
     let data = new FormData();
-    data.append('notification_id', id);
-    request('/bildirim/oku', data, function () {
+    request('/bildirimler/oku', data, function () {
         checkNotifications();
     });
 }
@@ -205,9 +204,10 @@ function addToTable(){
     }
 }
 
-function deleteFromTable(){
-
-}
-
+window.onload = function(){
+  setInterval(function(){
+      checkNotifications();
+  },3000);
+};
 
 let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');

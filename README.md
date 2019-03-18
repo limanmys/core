@@ -90,7 +90,7 @@ sudo sed -i "s/www-data/liman/g" /etc/php/7.2/fpm/pool.d/www.conf
 ```
 #### Ldap Eklentisi İçin Ek Ayar
 ```bash
-echo "TLS_REQCERT     never" > sudo tee --append /etc/ldap/ldap.conf
+echo "TLS_REQCERT     never" | sudo tee --append /etc/ldap/ldap.conf
 ```
 
 #### ** Gecici Cozum **

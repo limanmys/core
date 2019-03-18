@@ -2,6 +2,13 @@
 
 All notable changes in `sebastianbergmann/environment` are documented in this file using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [4.1.0] - 2019-02-01
+
+### Added
+
+* Implemented `Runtime::getNameWithVersionAndCodeCoverageDriver()` method
+* Implemented [#34](https://github.com/sebastianbergmann/environment/pull/34): Support for PCOV extension
+
 ## [4.0.2] - 2019-01-28
 
 ### Fixed
@@ -68,6 +75,7 @@ All notable changes in `sebastianbergmann/environment` are documented in this fi
 
 * This component is no longer supported on PHP 5.6
 
+[4.1.0]: https://github.com/sebastianbergmann/phpunit/compare/4.0.2...4.1.0
 [4.0.2]: https://github.com/sebastianbergmann/phpunit/compare/4.0.1...4.0.2
 [4.0.1]: https://github.com/sebastianbergmann/phpunit/compare/66691f8e2dc4641909166b275a9a4f45c0e89092...4.0.1
 [4.0.0]: https://github.com/sebastianbergmann/phpunit/compare/3.1.0...66691f8e2dc4641909166b275a9a4f45c0e89092

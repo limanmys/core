@@ -11,11 +11,8 @@ php:
   - 7.1
   - 7.2
   - 7.3
-  - master
 
 matrix:
-  allow_failures:
-    - php: master
   fast_finish: true
 
 env:
@@ -53,7 +50,7 @@ notifications:
 jobs:
   include:
     - stage: Static Code Analysis
-      php: 7.2
+      php: 7.3
       env: php-cs-fixer
       install:
         - phpenv config-rm xdebug.ini

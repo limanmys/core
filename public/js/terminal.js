@@ -54,9 +54,9 @@ function read_file_as_text(file, callback, decoder) {
     }
 }
 
-function start(id) {
+function start(id,key) {
     let ws_url = 'wss://' + window.location.hostname + ':4433/',
-        url = ws_url + 'ws?id=' + id,
+        url = ws_url + 'ws?id=' + id + '&limanKey=' + key,
         sock = new window.WebSocket(url),
         encoding = 'utf-8',
         decoder = window.TextDecoder ? new window.TextDecoder(encoding) : encoding,

@@ -9,6 +9,6 @@ class Widget extends Eloquent
     protected $collection = 'widgets';
     protected $connection = 'mongodb';
     protected $fillable = [
-      "title", "type", "server_id", "extension_id", "script_id", "function_name", "display_type"
+      "title", "type", "server_id", "extension_id", "script_id", "widget_name", "display_type"
     ];
 }

@@ -91,15 +91,7 @@ class Server extends Eloquent
         // Create Connector Object
         $connector = $this->connector();
 
-        // Send Script To Server with Execute Permission
-        $connector->sendFile(storage_path('app/scripts/' . $script->_id), '/tmp/' . $script->_id,0555);
-
-        // Create Query
-        $query = ($script->root == 1) ? 'sudo ' : '';
-        $query = $query . $script->language . ' /tmp/' . $script->_id . " run " . $parameters . $extra;
-
-        // Execute and return outputs.
-        return $this->connector()->execute($query);
+        return $connector->runScript($script,$parameters,$extra);
     }
 
     /**
@@ -110,11 +102,14 @@ class Server extends Eloquent
      */
     public function isRunning($service_name)
     {
+        if($this->type == "windows" || $this->type == "linux"){
+            return is_resource(@fsockopen($this->ip_address,$this->control_port,$errno, $errstr,env('SERVER_CONNECTION_TIMEOUT')));
+        }
         // Check if services are alive or not.
         $query = "sudo systemctl is-failed " . $service_name;
 
         // Execute and return outputs.
-        return $this->connector()->execute($query);
+        return ($this->connector()->execute($query) == "active\n") ? true : false;
     }
 
     /**

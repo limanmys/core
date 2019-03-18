@@ -1,5 +1,4 @@
-<h3>Zone Listesi</h3>
-
+<h3>{{__("Zone Listesi")}}</h3>
 <div class="input-group-btn">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
     {{__("Zone Ekle")}} <span class="fa fa-caret-down"></span></button>
@@ -16,32 +15,53 @@
                 <h3 class="box-title">{{$zone["name"]}}</h3>
             </div>
             <div class="box-body">
-                Type : {{$zone["type"]}}<br><br>
-                <table class="notDataTable">
-                    <tr>
-                        <td style="width:50px;text-align:center">NS</td>
-                        <td style="width:50px;text-align:center">A</td>
-                        <td style="width:50px;text-align:center">CNAME</td>
-                        <td style="width:50px;text-align:center">AAAA</td>
-                        <td style="width:50px;text-align:center">MX</td>
-                        <td style="width:50px;text-align:center">SOA</td>
-                        <td style="width:50px;text-align:center">TOTAL</td>
-                    </tr>
-                    <tr>
-                        <td style="width:50px;text-align:center">{{$zone["records"]["NS"]}}</td>
-                        <td style="width:50px;text-align:center">{{$zone["records"]["A"]}}</td>
-                        <td style="width:50px;text-align:center">{{$zone["records"]["CNAME"]}}</td>
-                        <td style="width:50px;text-align:center">{{$zone["records"]["AAAA"]}}</td>
-                        <td style="width:50px;text-align:center">{{$zone["records"]["MX"]}}</td>
-                        <td style="width:50px;text-align:center">{{$zone["records"]["SOA"]}}</td>
-                        <td style="width:50px;text-align:center">{{$zone["records"]["total"]}}</td>
-                    </tr>
-                </table>
+                @php($rand = str_random(3))
+                Type : <b>{{$zone["type"]}}</b><br><br>
+                <canvas id="{{$rand}}_pie"></canvas>
             </div>
             <div class="box-footer">
                 <button class="btn btn-primary" onclick="route('zone_details?&alan_adi={{$zone['name']}}')">{{__("Kayıtları Gör")}}</button>
-                <button class="btn btn-danger" onclick="route('zone_details?&alan_adi={{$zone['name']}}')" style="float:right;">{{__("Zone'u Sil")}}</button>
+                <button class="btn btn-danger" onclick="removeZone('{{$zone["name"]}}')" style="float:right;">{{__("Zone'u Sil")}}</button>
             </div>
+            <script>
+
+                let config_{{$rand}} = {
+                    type: 'pie',
+                    data: {
+                        datasets: [{
+                            data: [
+                                @foreach($zone["records"] as $record)
+                                {{$record}},
+                                @endforeach
+                            ],
+                            backgroundColor: [
+                                '#f303a0',
+                                '#8df53f',
+                                '#157298',
+                                '#243f32',
+                                '#8dd9b0',
+                                '#15aeff',
+                                '#731bc8',
+                                '#c33b9e',
+                                '#a56559',
+                                '#9cda73',
+                                '#bc6d21'
+                            ],
+                            label: 'Dataset 1'
+                        }],
+                        labels: [
+                            @foreach($zone["records"] as $key=>$record)
+                            '{{$key}}',
+                            @endforeach
+                        ]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                };
+                let ctx_{{$rand}} = document.getElementById('{{$rand}}_pie').getContext('2d');
+                window.myPie = new Chart(ctx_{{$rand}}, config_{{$rand}});
+            </script>
         </div>
     @endforeach
 @endif
@@ -75,11 +95,20 @@
 @include('l.modal',[
    "id"=>"delete",
    "title" =>"Zone'u Sil",
-   "url" => route('extension_api',['dns_delete_zone']),
+   "url" => route('extension_api',['dns_remove_zone']),
    "text" => "Bu zone'u silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
    "next" => "reload",
    "inputs" => [
-       "Sunucu Id:'null'" => "server_id:hidden"
+       "Sunucu Id:" . server()->_id => "server_id:hidden",
+       "extension_id:" . extension()->_id => "extension_id:hidden",
+       "zone:zone" => "zone:hidden"
    ],
-   "submit_text" => "Sunucuyu Sil"
+   "submit_text" => "Zone'u Sil"
 ])
+
+<script>
+    function removeZone(zone){
+        $("#delete [name='zone']").val(zone);
+        $("#delete").modal('show');
+    }
+</script>

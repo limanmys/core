@@ -23,7 +23,9 @@
         }
         @endisset
     }).on('select_node.jstree', function (e, data) {
-        {{$click}}(uiGetParents(data));
+        @isset($click)
+                {{$click}}(uiGetParents(data));
+        @endisset
     });
     function uiGetParents(loSelectedNode) {
         try {

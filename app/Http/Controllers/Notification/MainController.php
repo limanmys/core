@@ -25,8 +25,22 @@ class MainController extends Controller
             "user_id" => auth()->id(),
             "_id" => request('notification_id')
         ])->first();
+        if(!$notification){
+            return respond("Bildirim Bulunamadi",201);
+        }
         $notification->read = true;
         $notification->save();
         return $notification->_id;
     }
+
+    public function readAll()
+    {
+        Notification::where([
+            "user_id" => auth()->id(),
+        ])->update([
+            "read" => true
+        ]);
+        return respond("Hepsi Okundu",200);
+    }
+
 }

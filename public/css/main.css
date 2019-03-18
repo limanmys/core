@@ -4,3 +4,7 @@ input[hidden]{
 select[hidden]{
     display: none;
 }
+
+.hover:hover{
+    background-color:darkgreen;
+}

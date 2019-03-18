@@ -20,12 +20,12 @@ final class Runtime
     private static $binary;
 
     /**
-     * Returns true when Xdebug is supported or
+     * Returns true when Xdebug or PCOV is available or
      * the runtime used is PHPDBG.
      */
     public function canCollectCodeCoverage(): bool
     {
-        return $this->hasXdebug() || $this->hasPHPDBGCodeCoverage();
+        return $this->hasXdebug() || $this->hasPCOV() || $this->hasPHPDBGCodeCoverage();
     }
 
     /**
@@ -104,6 +104,29 @@ final class Runtime
     public function getNameWithVersion(): string
     {
         return $this->getName() . ' ' . $this->getVersion();
+    }
+
+    public function getNameWithVersionAndCodeCoverageDriver(): string
+    {
+        if (!$this->canCollectCodeCoverage() || $this->hasPHPDBGCodeCoverage()) {
+            return $this->getNameWithVersion();
+        }
+
+        if ($this->hasXdebug()) {
+            return \sprintf(
+                '%s with Xdebug %s',
+                $this->getNameWithVersion(),
+                \phpversion('xdebug')
+            );
+        }
+
+        if ($this->hasPCOV()) {
+            return \sprintf(
+                '%s with PCOV %s',
+                $this->getNameWithVersion(),
+                \phpversion('pcov')
+            );
+        }
     }
 
     public function getName(): string
@@ -186,5 +209,13 @@ final class Runtime
     public function hasPHPDBGCodeCoverage(): bool
     {
         return $this->isPHPDBG();
+    }
+
+    /**
+     * Returns true when the runtime used is PHP with PCOV loaded and enabled
+     */
+    public function hasPCOV(): bool
+    {
+        return $this->isPHP() && \extension_loaded('pcov') && \ini_get('pcov.enabled');
     }
 }

@@ -1,10 +1,16 @@
 @if(!isset($title) && !isset($value) && !isset($display))
     @php(__("Tablo Oluşturulamadı."))
 @else
-    @php($rand = str_random(10))
-    <table class="table hover" id="{{$rand}}">
+    @isset($id)
+        @php($rand = $id)
+    @else
+        @php($rand = str_random(10))
+    @endisset
+
+    <table class="table table-striped table-hover" id="{{$rand}}">
         <thead>
         <tr>
+            <th scope="col">#</th>
             @foreach($title as $i)
                 @if($i == "*hidden*")
                     <th scope="col" hidden>{{ __($i) }}</th>
@@ -14,9 +20,10 @@
             @endforeach
         </tr>
         </thead>
-        <tbody>
+        <tbody class="table-striped">
         @foreach ($value as $k)
-            <tr class="tableRow" id="{{str_random(10)}}" @isset($onclick)onclick="{{$onclick}}(this)" @endisset>
+            <tr class="tableRow" id="{{str_random(10)}}" @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this)" @endisset>
+                <td>{{$loop->iteration}}</td>
                 @foreach($display as $item)
                     @if($item == "server_id" || $item == "extension_id" || $item == "script_id")
                         @if(is_array($k))

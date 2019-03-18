@@ -46,6 +46,7 @@ if (!function_exists('liman_log')) {
         Log::info(auth()->id() . ":" . $message);
     }
 }
+
 if (!function_exists('server')) {
     /**
      * @return \App\Server
@@ -128,7 +129,6 @@ if (!function_exists('extensionDb')) {
      */
     function extensionDb($key)
     {
-        $extension_id = request('extension_id');
         return auth()->user()->settings[server()->_id][extension()->_id][$key];
     }
 }
@@ -136,13 +136,16 @@ if (!function_exists('extensionDb')) {
 if (!function_exists('getCertificate')) {
 
     /**
-     * @param $server
      * @param $ip_address
+     * @param $port
      * @return string|null
      */
-    function getCertificate($server, $ip_address)
+    function getCertificate($ip_address, $port)
     {
-        $query = "openssl s_client -connect " . $server . ":" . $ip_address .
+        if(!$port){
+            abort(504,"HATAAAAAA");
+        }
+        $query = "timeout 3 openssl s_client -connect " . $ip_address . ":" . $port .
             " 2>/dev/null </dev/null |  sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'";
         return shell_exec($query);
     }
@@ -195,6 +198,16 @@ if (!function_exists('objectToArray')) {
 
         }
         return $combined_array;
+    }
+}
+
+if (!function_exists('serverKey')) {
+    /**
+     * @return App\Key
+     */
+    function serverKey()
+    {
+        return App\Key::where('server_id',server()->_id)->first();
     }
 }
 
@@ -292,3 +305,4 @@ if(!function_exists('cities')){
         return $cities;
     }
 }
+

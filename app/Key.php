@@ -13,6 +13,6 @@ class Key extends Eloquent
 {
     protected $collection = 'keys';
     protected $connection = 'mongodb';
-    protected $fillable = ['name', 'username' ,'server_id'];
+    protected $fillable = ['username' ,'server_id'];
 
 }

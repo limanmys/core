@@ -26,7 +26,7 @@ class Extension extends Eloquent
      * @var array
      */
     protected $fillable = [
-        "name" , "status" , "service" , "icon", "publisher", "support", "serverless", "setup", "views", "parameters" , "install" , "install_script"
+        "name" , "status" , "service" , "icon", "publisher", "support", "serverless", "setup", "views", "parameters" , "install" , "install_script", "version"
     ];
 
     /**
@@ -40,7 +40,7 @@ class Extension extends Eloquent
 
         // If object is not found, abort
         if($extension == null){
-            abort(404);
+            abort(504,"Eklenti Bulunamadı");
         }
 
         return $extension;
@@ -64,11 +64,13 @@ class Extension extends Eloquent
         });
     }
 
+
     /**
+     * @param null $name
      * @return Script[]|\Illuminate\Database\Eloquent\Collection
      */
-    public static function scripts(){
-        return Script::all()->where('extensions','like',strtolower(extension()->name));
+    public static function scripts($name = null){
+        return Script::all()->where('extensions','like',strtolower(($name == null) ? extension()->name : $name));
     }
 
     /**

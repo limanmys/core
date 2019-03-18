@@ -46,11 +46,11 @@
         "menu" => [
             "İndir" => [
                 "target" => "scriptExport",
-                "icon" => "get"
+                "icon" => "fa-download"
             ],
             "Sil" => [
                 "target" => "delete",
-                "icon" => "delete"
+                "icon" => "fa-trash"
             ]
         ]
     ])

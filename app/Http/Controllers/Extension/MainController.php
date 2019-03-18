@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Extension;
 
+use App\Extension;
 use App\Http\Controllers\Controller;
 use App\Script;
 
@@ -40,7 +41,7 @@ class MainController extends Controller
         $zip = new \ZipArchive;
 
         // Create Zip
-        $zip->open('/liman/export/' . extension()->name . '.lmne', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $zip->open('/tmp/' . extension()->name . '.lmne', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
         // Iterator to search all files in folder.
         $files = new \RecursiveIteratorIterator(
@@ -73,20 +74,22 @@ class MainController extends Controller
         }
 
         // Extract database in to json.
-        file_put_contents('/liman/export/' . extension()->name . '_db.json', extension()->toJson());
+        file_put_contents('/tmp/' . extension()->name . '_db.json', extension()->toJson());
 
         // Add file
-        $zip->addFile('/liman/export/' . extension()->name . '_db.json', 'db.json');
+        $zip->addFile('/tmp/' . extension()->name . '_db.json', 'db.json');
 
         // Close/Compress zip
         $zip->close();
 
         // Return zip as download and delete it after sent.
-        return response()->download('/liman/export/' . extension()->name . '.lmne')->deleteFileAfterSend();
+        return response()->download('/tmp/' . extension()->name . '.lmne')->deleteFileAfterSend();
     }
+
 
     /**
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @throws \Exception
      */
     public function upload()
     {
@@ -114,12 +117,19 @@ class MainController extends Controller
         $json = json_decode($file, true);
 
         // Check If Extension Already Exists.
-        if(\App\Extension::where('name',$json["name"])->exists()){
-            return respond("Eklenti Zaten Yüklü",201);
+        $extension = \App\Extension::where('name',$json["name"])->first();
+        if($extension){
+            if($extension->version == $json["version"]){
+                return respond("Eklentinin bu sürümü zaten yüklü",201);
+            }
         }
 
         // Create extension object and fill values.
-        $new = new \App\Extension();
+        if($extension){
+            $new = $extension;
+        }else{
+            $new = new Extension();
+        }
         $new->fill($json);
         $new->save();
 
@@ -151,7 +161,9 @@ class MainController extends Controller
                 $filePath = $file->getRealPath();
 
                 $script = Script::readFromFile($filePath);
-                shell_exec('cp ' . $filePath . ' ' . storage_path('app' . DIRECTORY_SEPARATOR . 'scripts') . DIRECTORY_SEPARATOR . $script->_id);
+                if($script){
+                    shell_exec('cp ' . $filePath . ' ' . storage_path('app' . DIRECTORY_SEPARATOR . 'scripts') . DIRECTORY_SEPARATOR . $script->_id);
+                }
             }
         }
 

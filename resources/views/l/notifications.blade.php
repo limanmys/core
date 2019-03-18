@@ -1,36 +1,36 @@
-@if(count($notifications) == 0)
-    <li class="header alert alert-success" style="margin:15px;">{{__("Hiç okunmamış mesajınız yok")}}</li>
-@else
-<li>
-    <ul id="notificationArea" class="menu" style="list-style: none">
-        @foreach($notifications->take(3) as $notification)
-            @switch($notification->type)
-                @case("notify")
-                <li class="notification alert alert-info">
-                @break
-                @case("success")
-                <li class="notification alert alert-success">
-                @break
-                @case("working")
-                @case("onhold")
-                <li class="notification alert alert-warning">
-                @break
-                @case("error")
-                <li class="notification alert alert-danger">
-                @break
-                @default
-                <li class="notification alert alert-secondary">
-                    @endswitch
-                    <button type="button" class="close" onclick="dismissNotification('{{$notification->_id}}')">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                    <b>{{$notification->title}}</b>
-                    <p>{{$notification->message}}</p>
+<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+    <i class="fa fa-bell-o"></i>
+    <span class="label label-warning" id="notificationCount">{{notifications()->count()}}</span>
+</a>
+<ul class="dropdown-menu">
+    <li class="header">
+        <button class="btn btn-primary float-right" onclick="readNotifications()"><i class="fa fa-check"></i></button>
+        <span style="line-height: 40px;font-size: 15px">
+                      {{__(":count bildiriminiz var.",[
+                        "count" => notifications()->count()
+                    ])}}
+                  </span>
+    </li>
+    <li>
+        <ul class="menu">
+            @foreach (notifications() as $notification)
+                <li>
+                    <a href="/bildirim/{{$notification->_id}}">
+                        @switch($notification->type)
+                            @case('error')
+                            <span style="color: #f56954;width: 100%">
+                                {{$notification->title}}
+                            </span>
+                            @break
+                            @default
+                            <span style="color: #00a65a;width: 100%">
+                                {{$notification->title}}
+                            </span>
+                            @break
+                        @endswitch
+                    </a>
                 </li>
-                @endforeach
-    </ul>
-</li>
-@if(count($notifications) > 3)
-    <a href="/bildirimler">Devamı</a>
-@endif
-@endif
+            @endforeach
+        </ul>
+    </li>
+</ul>

@@ -16,7 +16,8 @@ class OneController extends Controller
     {
         // Now that we have server, let's check if required parameters set for extension.
         foreach (extension()->setup as $key => $setting) {
-            if (!array_key_exists(server()->_id,auth()->user()->settings) ||
+            if (!auth()->user()->getAttribute('settings') ||
+                !array_key_exists(server()->_id,auth()->user()->settings) ||
                 !array_key_exists(extension()->_id,auth()->user()->settings[server()->_id]) ||
                 !array_key_exists($key, auth()->user()->settings[server()->_id][extension()->_id])) {
                 return redirect(route('extension_server_settings_page', [
@@ -155,5 +156,19 @@ class OneController extends Controller
             return respond('Eklenti silinemedi', 201);
         }
         return respond('Eklenti Başarıyla Silindi');
+    }
+
+    public function page()
+    {
+        $file = file_get_contents(resource_path('views/extensions/') . strtolower(extension()->name) . '/' . request('page_name') . '.blade.php');
+        return view('l.editor',[
+            "file" => $file
+        ]);
+    }
+
+    public function updateCode()
+    {
+        file_put_contents(public_path('deneme.blade.php'),json_decode(request('code')));
+        return "OK";
     }
 }

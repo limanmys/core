@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Server;
 use App\Widget;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class MainController extends Controller
 {
     public function add()
     {
-        $widget =  new Widget(request()->all());
+        $widget = new Widget(request()->all());
+        $widget->widget_name = explode(':',request('widget_name'))[0];
+        $widget->title = explode(':',request('widget_name'))[1];
         $widget->save();
         return respond('Widget Eklendi',200);
     }

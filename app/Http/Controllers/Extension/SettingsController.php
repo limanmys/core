@@ -36,7 +36,7 @@ class SettingsController extends Controller
         // Retrieve scripts from database.
         $scripts = Script::where('extensions', 'like', $extension->name)->get();
         // Return view with required parameters.
-        return view('extensions.one', [
+        return view('extension_pages.one', [
             "extension" => $extension,
             "files" => $files,
             "scripts" => $scripts
@@ -126,5 +126,17 @@ class SettingsController extends Controller
             return response(__("Sayfa Bulunamadı."),404);
         }
         return response(__("Başarıyla kaldırıldı."),200);
+    }
+
+    public function update()
+    {
+        $params = [];
+        if(request('type') == "general"){
+            $params = request()->all();
+        }else{
+            $params = [request('type') => request(request('type'))];
+        }
+        extension()->update($params);
+        return respond("Guncellendi",200);
     }
 }
