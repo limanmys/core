@@ -37,7 +37,7 @@
         "id"=>"add_key",
         "title" => "SSH Anahtar Ekle",
         "url" => route('key_add'),
-        "next" => "reload",
+        "next" => "debug",
         "inputs" => [
             "Sunucu Seçin:server_id" => objectToArray($servers,"name","_id"),
             "Kullanıcı Adı" => "username:text",

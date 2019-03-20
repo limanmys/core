@@ -25,14 +25,7 @@
             <tr class="tableRow" id="{{str_random(10)}}" @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this)" @endisset>
                 <td>{{$loop->iteration}}</td>
                 @foreach($display as $item)
-                    @if($item == "server_id" || $item == "extension_id" || $item == "script_id")
-                        @if(is_array($k))
-                            <td id="{{$item}}" hidden>{{$k[$item]}}</td>
-                        @else
-                            <td id="{{$item}}" hidden>{{$k->__get($item)}}</td>
-                        @endif
-
-                    @elseif(count(explode(':',$item)) > 1)
+                    @if(count(explode(':',$item)) > 1)
                         @if(is_array($k))
                             <td id="{{explode(':',$item)[1]}}" hidden>{{$k[explode(':',$item)[0]]}}</td>
                         @else
@@ -62,6 +55,10 @@
                     {{$setCurrentVariable}} = options.$trigger[0].getAttribute("id");
                     @endisset
                     let target = $("#" + key);
+                    if(target.length === 0){
+                        window[key](options.$trigger[0]);
+                        return;
+                    }
                     inputs =[];
                     $("#" + key + " input , #" + key + ' select').each(function (index, value) {
                         let element_value = $("#" + options.$trigger[0].getAttribute("id") + " #" + value.getAttribute('name')).html();
@@ -71,7 +68,6 @@
                                 + "#" + key + " input[name='" + value.getAttribute('name') + "']").val(element_value);
                         }
                     });
-                    console.log(inputs);
                     target.modal('show');
                 },
                 items: {

@@ -17,7 +17,11 @@
         "target_id" => "extensionExport",
         "text" => "Indir"
     ])
-    <button class="btn btn-info" onclick="location.href = '{{route('extension_new_view')}}'">{{__("Yeni")}}</button>
+    @include('l.modal-button',[
+        "class" => "btn-info",
+        "target_id" => "newExtension",
+        "text" => "Yeni"
+    ])
     <br><br>
 
     @include('l.table',[
@@ -62,6 +66,16 @@
             "Eklenti Secin:extension_id" => $input_extensions
         ],
         "submit_text" => "İndir"
+    ])
+
+    @include('l.modal',[
+        "id"=>"newExtension",
+        "url" => route('extension_new'),
+        "title" => "Yeni Eklenti Oluştur",
+        "inputs" => [
+            "Eklenti Adı" => "name:text"
+        ],
+        "submit_text" => "Oluştur"
     ])
 
     @include('l.modal',[

@@ -12,10 +12,10 @@
                         "server_id" => request()->route('server_id')
                     ])}}" method="POST">
         @csrf
-        @foreach($extension->setup as $key => $item)
+        @foreach($extension->database as $item)
             @include('l.inputs',[
                 "inputs" => [
-                    $item["name"] => $key . ":" . $item["type"]
+                    $item["name"] => $item["variable"] . ":" . $item["type"]
                 ]
             ])
         @endforeach

@@ -186,4 +186,27 @@ class MainController extends Controller
         }
         rmdir($dir);
     }
+
+    public function newExtension()
+    {
+        $ext = new \App\Extension();
+        $ext->name = request('name');
+        $ext->publisher = auth()->user()->name;
+        $ext->version = "1.0";
+        $ext->database = [];
+        $ext->widgets = [];
+        $ext->views = [
+            [
+                "name" => "index",
+                "scripts" => ""
+            ]
+        ];
+        $ext->status = 0;
+        $ext->save();
+        $folder = resource_path('views/extensions/') . strtolower(request('name'));
+        mkdir($folder);
+        touch($folder  . '/index.blade.php');
+        touch($folder  . '/functions.php');
+        return respond(route('extension_one',$ext->_id),300);
+    }
 }

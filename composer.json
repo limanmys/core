@@ -12,10 +12,11 @@
         "ext-xml": "*",
         "ext-ssh2": "*",
         "ext-zip": "*",
+        "ext-mysqli" : "*",
         "guzzlehttp/guzzle": "~6.0",
         "jenssegers/mongodb": "^3.4",
         "jeroennoten/laravel-adminlte": "^1.24",
-        "laravel/framework": "5.7.*",
+        "laravel/framework": "5.8.*",
         "laravel/tinker": "^1.0",
         "phpseclib/phpseclib": "^2.0"
     },

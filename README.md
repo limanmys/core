@@ -27,7 +27,7 @@ sudo apt update
 #### PHP ve diger kutuphanelerin kurulumu
 ```bash
 sudo apt install php7.3-fpm -y
-sudo apt install php7.3 php7.3-mongodb php7.3-ldap php7.3-mbstring php7.3-xml php7.3-zip php7.3-simplexml php7.3-ssh2 -y
+sudo apt install php7.3 php7.3-mongodb php7.3-ldap php7.3-mbstring php7.3-xml php7.3-zip php7.3-simplexml php7.3-ssh2 php7.3-mysqli -y
 ```
 #### Nginx Kurulumu
 ```bash

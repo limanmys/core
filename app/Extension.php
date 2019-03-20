@@ -26,7 +26,8 @@ class Extension extends Eloquent
      * @var array
      */
     protected $fillable = [
-        "name" , "status" , "service" , "icon", "publisher", "support", "serverless", "setup", "views", "parameters" , "install" , "install_script", "version"
+        "name" , "status" , "service" , "icon", "publisher", "support", "serverless",
+        "setup", "views", "parameters" , "install" , "install_script", "version", "database", "widgets"
     ];
 
     /**
