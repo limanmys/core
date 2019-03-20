@@ -28,7 +28,7 @@ class SettingsController extends Controller
      */
     public function settings_one()
     {
-        $extension = Extension::where('_id',\request('extension_id'))->first();
+        $extension = Extension::where('_id', \request('extension_id'))->first();
 
         // Go through all files and list them as tree style in array.
         $files = $this->tree(resource_path('views' . DIRECTORY_SEPARATOR . 'extensions' . DIRECTORY_SEPARATOR . strtolower($extension->name)));
@@ -88,11 +88,12 @@ class SettingsController extends Controller
     /**
      * @return array
      */
-    public function getScriptsOfView(){
+    public function getScriptsOfView()
+    {
         $extension = Extension::find(request('extension_id'));
-        if(array_key_exists(request('view'),$extension->views)){
+        if (array_key_exists(request('view'), $extension->views)) {
             $arr = $extension->views[request('view')];
-        }else{
+        } else {
             $arr = [];
         }
         return $arr;
@@ -101,42 +102,122 @@ class SettingsController extends Controller
     /**
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
-    public function addScriptToView(){
+    public function addScriptToView()
+    {
         $extension = Extension::find(request('extension_id'));
         $temp = $extension->views;
-        if(array_key_exists(request('view'),$extension->views)){
-            array_push($temp[request('view')],request('unique_code'));
-        }else{
+        if (array_key_exists(request('view'), $extension->views)) {
+            array_push($temp[request('view')], request('unique_code'));
+        } else {
             $temp[request('view')] = [request('unique_code')];
         }
         $extension->views = $temp;
         $extension->save();
-        return response(__("Başarıyla Eklendi."),200);
+        return response(__("Başarıyla Eklendi."), 200);
     }
 
     /**
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
-    public function removeScriptFromView(){
+    public function removeScriptFromView()
+    {
         $extension = Extension::find(request('extension_id'));
         $temp = $extension->views;
-        if(array_key_exists(request('view'),$extension->views)){
+        if (array_key_exists(request('view'), $extension->views)) {
             unset($temp[request('view')][array_search(request('unique_code'), $temp[request('view')])]);
-        }else{
-            return response(__("Sayfa Bulunamadı."),404);
+        } else {
+            return response(__("Sayfa Bulunamadı."), 404);
         }
-        return response(__("Başarıyla kaldırıldı."),200);
+        return response(__("Başarıyla kaldırıldı."), 200);
     }
 
     public function update()
     {
         $params = [];
-        if(request('type') == "general"){
+        if (request('type') == "general") {
             $params = request()->all();
-        }else{
-            $params = [request('type') => request(request('type'))];
+        } else {
+            $values = extension()->__get(request('table'));
+            foreach ($values as $key => $value) {
+                if ($value["name"] == request('name_old')) {
+                    switch (request('table')) {
+                        case "database":
+                            $values[$key]["variable"] = request('variable');
+                            $values[$key]["type"] = request('type');
+                            $values[$key]["name"] = request('name');
+                            break;
+                        case "widgets":
+                            $values[$key]["target"] = request('target');
+                            $values[$key]["type"] = request('type');
+                            $values[$key]["name"] = request('name');
+                            break;
+                        case "views":
+                            $values[$key]["scripts"] = request('scripts');
+                            $values[$key]["name"] = request('name');
+                            break;
+                    }
+                    break;
+                }
+            }
+            $params = [request('table') => $values];
         }
         extension()->update($params);
-        return respond("Guncellendi",200);
+
+        return respond("Guncellendi", 200);
     }
+
+    public function add()
+    {
+        $params = [];
+        $values = extension()->__get(request('table'));
+        switch (request('table')) {
+            case "database":
+                array_push($values, [
+                    "variable" => request('variable'),
+                    "type" => request('type'),
+                    "name" => request('name'),
+                ]);
+                break;
+            case "widgets":
+                array_push($values, [
+                    "target" => request('target'),
+                    "type" => request('type'),
+                    "name" => request('name'),
+                ]);
+                break;
+            case "views":
+                array_push($values, [
+                    "scripts" => request('scripts'),
+                    "name" => request('name'),
+                ]);
+                $file = resource_path('views/extensions/') . strtolower(extension()->name) . '/' . request('name') . '.blade.php';
+                touch($file);
+                break;
+        }
+        $params = [request('table') => $values];
+        extension()->update($params);
+
+        return respond("Eklendi", 200);
+    }
+
+    public function remove()
+    {
+        $params = [];
+        $values = extension()->__get(request('table'));
+        foreach ($values as $key => $value) {
+            if ($value["name"] == request('name')) {
+                unset($values[$key]);
+                break;
+            }
+        }
+        if(request('table') == "views"){
+            $file = resource_path('views/extensions/') . strtolower(extension()->name) . '/' . request('name') . '.blade.php';
+            unlink($file);
+        }
+        $params = [request('table') => $values];
+        extension()->update($params);
+
+        return respond("Silindi", 200);
+    }
+
 }

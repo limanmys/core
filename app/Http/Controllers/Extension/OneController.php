@@ -15,11 +15,11 @@ class OneController extends Controller
     public function server()
     {
         // Now that we have server, let's check if required parameters set for extension.
-        foreach (extension()->setup as $key => $setting) {
+        foreach (extension()->database as $setting) {
             if (!auth()->user()->getAttribute('settings') ||
                 !array_key_exists(server()->_id,auth()->user()->settings) ||
                 !array_key_exists(extension()->_id,auth()->user()->settings[server()->_id]) ||
-                !array_key_exists($key, auth()->user()->settings[server()->_id][extension()->_id])) {
+                !array_key_exists($setting["variable"], auth()->user()->settings[server()->_id][extension()->_id])) {
                 return redirect(route('extension_server_settings_page', [
                     "server_id" => server()->_id,
                     "extension_id" => extension()->_id
@@ -30,25 +30,33 @@ class OneController extends Controller
         $outputs = [];
 
         // Go through each required scripts and run each of them.
-        if (extension()->views["index"]) {
-            foreach (extension()->views["index"] as $unique_code) {
-
-                // Get Script
-                $script = extension()->scripts()->where('unique_code', $unique_code)->first();
-
-                // Check if required script is available or not.
-                if (!$script) {
-                    return respond("Eklenti için gerekli olan betik yüklü değil, lütfen yöneticinizle görüşün.", 404);
+        $views = extension()->views;
+        foreach ($views as $view){
+            if($view["name"] == "index"){
+                $scripts = explode(',',$view["scripts"]);
+                if(count($scripts) == 1 && $scripts[0] == ""){
+                    break;
                 }
+                foreach ($scripts as $unique_code){
+                    // Get Script
+                    $script = extension()->scripts()->where('unique_code', $unique_code)->first();
 
-                // Run Script with no parameters.
-                $output = server()->runScript($script, '');
+                    // Check if required script is available or not.
+                    if (!$script) {
+                        return respond("Eklenti için gerekli olan betik yüklü değil, lütfen yöneticinizle görüşün.", 404);
+                    }
 
-                // Decode output and set it into outputs array.
-                $output = str_replace('\n', '', $output);
-                $outputs[$unique_code] = json_decode($output, true);
+                    // Run Script with no parameters.
+                    $output = server()->runScript($script, '');
+
+                    // Decode output and set it into outputs array.
+                    $output = str_replace('\n', '', $output);
+                    $outputs[$unique_code] = json_decode($output, true);
+                }
+                break;
             }
         }
+
         // Return all required parameters.
         return view('extension_pages.server', [
             "extension" => extension(),
@@ -119,8 +127,8 @@ class OneController extends Controller
     public function serverSettings()
     {
         $extension_config = [];
-        foreach (array_keys(extension()->setup) as $key) {
-            $extension_config[$key] = request($key);
+        foreach (extension()->database as $key) {
+            $extension_config[$key["variable"]] = request($key["variable"]);
         }
 
         $settings = auth()->user()->settings;
@@ -168,7 +176,8 @@ class OneController extends Controller
 
     public function updateCode()
     {
-        file_put_contents(public_path('deneme.blade.php'),json_decode(request('code')));
-        return "OK";
+        $file = resource_path('views/extensions/') . strtolower(extension()->name) . '/' . request('page') . '.blade.php';
+        file_put_contents($file,json_decode(request('code')));
+        return respond("Kaydedildi",200);
     }
 }

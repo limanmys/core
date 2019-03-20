@@ -20,6 +20,7 @@ class SSHConnector implements Connector
     protected $connection;
     protected $server;
     protected $ssh;
+    protected $key;
     protected $user_id;
     protected $username;
     /**
@@ -85,7 +86,7 @@ class SSHConnector implements Connector
      */
     public function runScript($script, $parameters, $extra = null)
     {
-        $flag = $this->sendFile(storage_path('app/scripts/' . $script->_id), '/tmp/' . $script->_id,0555);
+        $this->sendFile(storage_path('app/scripts/' . $script->_id), '/tmp/' . $script->_id,0555);
         $query = ($script->root == 1) ? 'sudo ' : '';
         $query = $query . $script->language . ' /tmp/' . $script->_id . " run " . $parameters . $extra;
         return $this->execute($query);

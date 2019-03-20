@@ -44,12 +44,25 @@
         }
 
         function save(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Kaydediliyor...")}}',
+                showConfirmButton: false,
+            });
             let code = JSON.stringify(window.editor.getValue());
             let data = new FormData();
             data.append('code',code);
+            data.append('page','{{request('page_name')}}');
             data.append('extension_id','{{extension()->_id}}');
             request('{{route('extension_code_update')}}',data,function(response){
-                console.log(response);
+                Swal.fire({
+                    position: 'center',
+                    type: 'success',
+                    title: "{{__("Başarıyla kaydedildi")}}",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             });
         }
     </script>
