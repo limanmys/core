@@ -266,7 +266,7 @@ class OneController extends Controller
 
 
         // If server is not accessible through ssh, we can assume it is already installed
-        if(server()->type == "linux" || server()->type == "windows"){
+//        if(server()->type == "linux" || server()->type == "windows"){
 
             // Simply, retrieve array and add extension id.
             $extensions_array = server()->extensions;
@@ -274,7 +274,7 @@ class OneController extends Controller
             server()->extensions = $extensions_array;
             server()->save();
             return respond('Servis başarıyla eklendi.');
-        }
+//        }
 
         if(array_key_exists("install",$extension->views)){
             return respond("Kurulum betiği bulunamadığı için işlem iptal edildi.",201);
