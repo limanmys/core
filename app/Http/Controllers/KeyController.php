@@ -31,6 +31,13 @@ class KeyController extends Controller
 
     public function add()
     {
+        if(Key::where([
+            'user_id' => auth()->id(),
+            'server_id' => request('server_id')
+        ])->first()){
+            return respond('Zaten bir anahtariniz var.',201);
+        }
+
         // Create object with request parameters, acceptable parameters defined in Key $fillable variable.
         $key = new Key(request()->all());
 
@@ -41,11 +48,19 @@ class KeyController extends Controller
 
         // Init key with parameters.
         if(request('server')->type == "linux_ssh"){
-            SSHConnector::create(request('server'),request('username'),request('password'),auth()->id(),$key);
+            try{
+                $flag = SSHConnector::create(request('server'),request('username'),request('password'),auth()->id(),$key);
+            }catch (\Exception $exception){
+                $flag = "Bilinmeyen bir hata oluştu.";
+            }
+        }
+        if($flag != "OK"){
+            $key->delete();
+            return respond($flag,201);
         }
 
         // Forward request.
-        return respond('SSH Anahtari Basariyla Eklendi',200);
+        return respond('Anahtar Basariyla Eklendi',200);
     }
 
     public function delete()

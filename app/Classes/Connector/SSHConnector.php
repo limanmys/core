@@ -143,18 +143,47 @@ class SSHConnector implements Connector
             $rsa->comment = "liman";
             $rsa->setPublicKeyFormat(RSA::PUBLIC_FORMAT_OPENSSH);
             $keys = $rsa->createKey(4096);
-            file_put_contents(storage_path('keys') . DIRECTORY_SEPARATOR . $user_id,$keys["privatekey"]);
-            file_put_contents(storage_path('keys') . DIRECTORY_SEPARATOR . $user_id . ".pub",$keys["publickey"]);
+            file_put_contents(storage_path('keys') . DIRECTORY_SEPARATOR . $user_id, $keys["privatekey"]);
+            file_put_contents(storage_path('keys') . DIRECTORY_SEPARATOR . $user_id . ".pub", $keys["publickey"]);
         }else{
             $keys["publickey"] = file_get_contents(storage_path('keys') . DIRECTORY_SEPARATOR . $user_id . ".pub");
         }
+        try{
+            $ssh = new SSH2($server->ip_address, $server->port);
+        }catch (\Exception $exception){
+            return __("Sunucuya bağlanılamadı");
+        }
 
-        $ssh = new SSH2($server->ip_address, $server->port);
-        $ssh->login($username,$password);
+        $flag = $ssh->login($username,$password);
+
+        if(!$flag){
+            return __("Bu Kullanıcı Adı ve Şifre ile Giriş Yapılamadı.");
+        }
+
         $query = 'sudo -S <<< "' . $password. '"';
+
         $ssh->exec($query . ' useradd -m liman');
+        $flag = $ssh->exec('[ -d "/home/liman" ] && echo "OK"');
+        if($flag != "OK\n"){
+            $ssh->exec($query . ' mkdir -p /home/liman');
+            $flag = $ssh->exec('[ -d "/home/liman" ] && echo "OK"');
+            if($flag != "OK\n"){
+                return __("Liman Kullanıcısı Eklenemedi.");
+            }
+        }
+
         $ssh->exec($query . ' mkdir -p /home/liman/.ssh');
+        $flag = $ssh->exec('[ -d "/home/liman/.ssh" ] && echo "OK"');
+        if($flag != "OK\n"){
+            return __("Gerekli klasör oluşturulamadı.");
+        }
+
         $ssh->exec($query . ' touch /home/liman/.ssh/authorized_keys');
+        $flag = $ssh->exec('[ -e "/home/liman/.ssh" ] && echo "OK"');
+        if($flag != "OK\n"){
+            return __("Gerekli dosya oluşturulamadı.");
+        }
+
         $ssh->exec('sudo -S sh -c "echo \'' . $keys["publickey"] .'\' >> /home/liman/.ssh/authorized_keys " <<< "' . $password .'"');
         $ssh->exec('sudo -S <<< "' . $password . '" passwd -l liman');
         $ssh->exec('sudo -S sh -c "echo \'liman  ALL=(ALL:ALL) NOPASSWD:ALL\' >> /etc/sudoers " <<< "' . $password .'"');
@@ -162,7 +191,11 @@ class SSHConnector implements Connector
 
         $key->username = "liman";
         $key->save();
-
-        return true;
+        try{
+            new SSHConnector($server, $user_id);
+        }catch (\Exception $exception){
+            return __("Anahtar eklendi fakat giriş yapılamadı, lütfen yönetime bildiriniz.");
+        }
+        return "OK";
     }
 }
