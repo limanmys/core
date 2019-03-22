@@ -59,18 +59,15 @@
                         </label>
                     </div><br>
                 @else
-                    {{--@if(explode(":", $name) > 1)--}}
-{{--                        <h5>{{explode(":", $name)[0]}}</h5>--}}
-                        {{--<input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}"--}}
-                               {{--class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required--}}
-                               {{--value="{{explode(":", $name)[1]}}"--}}
-{{--                        >@if(explode(":", $input)[1] != "hidden")<br>@endif--}}
-                    {{--@else--}}
+                    @if(substr(explode(":", $input)[0],0,2) != "d-")
                         <h5>{{$name}}</h5>
                         <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}"
                                class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required>@if(explode(":", $input)[1] != "hidden")<br>@endif
-                    {{--@endif--}}
-
+                    @else
+                        <h5>{{$name}}</h5>
+                        <input type="{{explode(":", $input)[1]}}" name="{{substr(explode(":", $input)[0],2)}}" placeholder="{{__($name)}}"
+                               class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif">@if(explode(":", $input)[1] != "hidden")<br>@endif
+                    @endif
                 @endif
             @endif
         @endif

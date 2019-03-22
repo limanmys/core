@@ -170,7 +170,7 @@
                     "next" => "updateTable",
                     "inputs" => [
                         "Sayfa Adı" => "name:text",
-                        "Çalışacak Betik/Fonksiyon" => "scripts:text",
+                        "Çalışacak Betik/Fonksiyon" => "d-scripts:text",
                         "Sayfa Adı:a" => "name_old:hidden",
                         "table:views" => "table:hidden",
                         "Çalışacak Betik/Fonksiyon:a" => "scripts_old:hidden",
