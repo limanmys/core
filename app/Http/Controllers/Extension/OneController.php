@@ -12,12 +12,15 @@ use App\Http\Controllers\Controller;
  */
 class OneController extends Controller
 {
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     * @throws \Throwable
+     */
     public function server()
     {
         // Now that we have server, let's check if required parameters set for extension.
         foreach (extension()->database as $setting) {
-            if (!auth()->user()->getAttribute('settings') ||
-                !array_key_exists(server()->_id,auth()->user()->settings) ||
+            if (!array_key_exists(server()->_id,auth()->user()->settings) ||
                 !array_key_exists(extension()->_id,auth()->user()->settings[server()->_id]) ||
                 !array_key_exists($setting["variable"], auth()->user()->settings[server()->_id][extension()->_id])) {
                 return redirect(route('extension_server_settings_page', [
@@ -67,8 +70,10 @@ class OneController extends Controller
         ]);
     }
 
+
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     * @throws \Throwable
      */
     public function route()
     {
@@ -154,11 +159,13 @@ class OneController extends Controller
         ]);
     }
 
+    /**
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     */
     public function remove()
     {
-        $query = 'rm -rf ' . base_path('resources/views/extensions/' . strtolower(extension()->name));
-        shell_exec($query);
         try {
+            self::rmdir_recursive(resource_path('views' . DIRECTORY_SEPARATOR . 'extensions' . DIRECTORY_SEPARATOR . strtolower(extension()->name)));
             extension()->delete();
         } catch (\Exception $exception) {
             return respond('Eklenti silinemedi', 201);
@@ -166,18 +173,43 @@ class OneController extends Controller
         return respond('Eklenti Başarıyla Silindi');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function page()
     {
-        $file = file_get_contents(resource_path('views/extensions/') . strtolower(extension()->name) . '/' . request('page_name') . '.blade.php');
+        if(request('page_name') == "functions"){
+            $fileName = request('page_name') . '.php';
+        }else{
+            $fileName = request('page_name') . '.blade.php';
+        }
+        $file = file_get_contents(resource_path('views/extensions/') . strtolower(extension()->name) . '/' . $fileName);
         return view('l.editor',[
             "file" => $file
         ]);
     }
 
+    /**
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     */
     public function updateCode()
     {
         $file = resource_path('views/extensions/') . strtolower(extension()->name) . '/' . request('page') . '.blade.php';
         file_put_contents($file,json_decode(request('code')));
         return respond("Kaydedildi",200);
+    }
+
+    private function rmdir_recursive($dir) {
+        foreach(scandir($dir) as $file) {
+            if ('.' === $file || '..' === $file){
+                continue;
+            }
+            if (is_dir("$dir/$file")){
+                $this->rmdir_recursive("$dir/$file");
+            }else{
+                unlink("$dir/$file");
+            }
+        }
+        rmdir($dir);
     }
 }

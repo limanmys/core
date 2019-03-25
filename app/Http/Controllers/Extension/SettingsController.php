@@ -133,7 +133,6 @@ class SettingsController extends Controller
 
     public function update()
     {
-        $params = [];
         if (request('type') == "general") {
             $params = request()->all();
         } else {
@@ -168,7 +167,6 @@ class SettingsController extends Controller
 
     public function add()
     {
-        $params = [];
         $values = extension()->__get(request('table'));
         switch (request('table')) {
             case "database":
@@ -202,7 +200,6 @@ class SettingsController extends Controller
 
     public function remove()
     {
-        $params = [];
         $values = extension()->__get(request('table'));
         foreach ($values as $key => $value) {
             if ($value["name"] == request('name')) {
