@@ -77,11 +77,6 @@ class OneController extends Controller
      */
     public function route()
     {
-        // Get Extension from Middleware
-        $extension = request('extension');
-
-        // Get Scripts of extension.
-        $scripts = Script::where('extensions', 'like', $extension->name);
         $outputs = [];
 
         // Go through each required scripts of page and run them with proper parameters.
@@ -102,10 +97,7 @@ class OneController extends Controller
         if (view()->exists($view) && request()->method() != "POST") {
             return view($view, [
                 "result" => 200,
-                "data" => $outputs,
                 "view" => \request('url'),
-                "extension" => $extension,
-                "scripts" => $scripts,
             ]);
         } else {
             return respond("Başarıyla tamamlandı.");
