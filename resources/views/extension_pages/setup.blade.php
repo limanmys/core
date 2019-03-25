@@ -13,11 +13,19 @@
                     ])}}" method="POST">
         @csrf
         @foreach($extension->database as $item)
-            @include('l.inputs',[
+            @if($item["variable"] == "certificate")
+                <h5>{{$item["name"]}}</h5>
+                <textarea name="certificate" cols="30" rows="10" class="form-control">
+
+                </textarea><br>
+            @else
+                @include('l.inputs',[
                 "inputs" => [
                     $item["name"] => $item["variable"] . ":" . $item["type"]
                 ]
             ])
+            @endif
+
         @endforeach
         <button type="submit" class="btn btn-success">Kaydet</button>
     </form>

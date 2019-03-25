@@ -133,24 +133,6 @@ if (!function_exists('extensionDb')) {
     }
 }
 
-if (!function_exists('getCertificate')) {
-
-    /**
-     * @param $ip_address
-     * @param $port
-     * @return string|null
-     */
-    function getCertificate($ip_address, $port)
-    {
-        if(!$port){
-            abort(504,"HATAAAAAA");
-        }
-        $query = "timeout 3 openssl s_client -connect " . $ip_address . ":" . $port .
-            " 2>/dev/null </dev/null |  sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'";
-        return shell_exec($query);
-    }
-}
-
 if (!function_exists('getObject')) {
     /**
      * @param $type
