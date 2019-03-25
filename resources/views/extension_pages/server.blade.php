@@ -12,10 +12,10 @@
     </ol>
     <div class="card">
         <div class="card-body mainArea">
-            @if(is_file(base_path('resources/views/extensions/' . strtolower($extension->name) . '/functions.php')))
-                <?php require(base_path('resources/views/extensions/' . strtolower($extension->name) . '/functions.php')); ?>
+            @if(is_file(base_path('resources/views/extensions/' . strtolower(extension()->name) . '/functions.php')))
+                <?php require(base_path('resources/views/extensions/' . strtolower(extension()->name) . '/functions.php')); ?>
             @endif
-            @include('extensions.' . strtolower($extension->name) . '.' . $view)
+            @include('extensions.' . strtolower(extension()->name) . '.' . $view)
         </div>
     </div>
 @endsection
