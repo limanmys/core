@@ -98,6 +98,7 @@ class OneController extends Controller
             return view($view, [
                 "result" => 200,
                 "data" => $outputs,
+                "extension" => extension(),
                 "view" => \request('url')
             ]);
         } else {
