@@ -20,8 +20,13 @@ class OneController extends Controller
     {
         // Now that we have server, let's check if required parameters set for extension.
         foreach (extension()->database as $setting) {
+<<<<<<< HEAD
             if (!array_key_exists(server()->_id,auth()->user()->settings) ||
                 !array_key_exists(extension()->_id,auth()->user()->settings[server()->_id]) ||
+=======
+            if (!array_key_exists(server()->_id, auth()->user()->settings) ||
+                !array_key_exists(extension()->_id, auth()->user()->settings[server()->_id]) ||
+>>>>>>> origin/master
                 !array_key_exists($setting["variable"], auth()->user()->settings[server()->_id][extension()->_id])) {
                 return redirect(route('extension_server_settings_page', [
                     "server_id" => server()->_id,
@@ -34,6 +39,7 @@ class OneController extends Controller
 
         // Go through each required scripts and run each of them.
         $views = extension()->views;
+<<<<<<< HEAD
         foreach ($views as $view){
             if($view["name"] == "index"){
                 $scripts = explode(',',$view["scripts"]);
@@ -41,6 +47,15 @@ class OneController extends Controller
                     break;
                 }
                 foreach ($scripts as $unique_code){
+=======
+        foreach ($views as $view) {
+            if ($view["name"] == "index") {
+                $scripts = explode(',', $view["scripts"]);
+                if (count($scripts) == 1 && $scripts[0] == "") {
+                    break;
+                }
+                foreach ($scripts as $unique_code) {
+>>>>>>> origin/master
                     // Get Script
                     $script = extension()->scripts()->where('unique_code', $unique_code)->first();
 
@@ -79,11 +94,36 @@ class OneController extends Controller
     {
         $outputs = [];
 
+<<<<<<< HEAD
         // Go through each required scripts of page and run them with proper parameters.
         foreach ($scripts as $script) {
             $parameters = '';
             if(!$script){
                 abort(504,"Eklenti için gereken betik bulunamadı");
+=======
+        $codes = "";
+
+        foreach (extension()->views as $view) {
+            if ($view["name"] == request('unique_code')) {
+                $codes = $view["scripts"];
+                break;
+            }
+        }
+        if (request()->method() == "POST") {
+            $codes = request('unique_code');
+        }
+
+        $scripts = [];
+        foreach (explode(',', $codes) as $code) {
+            array_push($scripts, Script::where('unique_code', $code)->first());
+        }
+
+        // Go through each required scripts of page and run them with proper parameters.
+        foreach ($scripts as $script) {
+            $parameters = '';
+            if (!$script) {
+                abort(504, "Eklenti için gereken betik bulunamadı");
+>>>>>>> origin/master
             }
             foreach (explode(',', $script->inputs) as $input) {
                 $parameters = $parameters . " " . \request(explode(':', $input)[0]);
@@ -98,8 +138,12 @@ class OneController extends Controller
             return view($view, [
                 "result" => 200,
                 "data" => $outputs,
+<<<<<<< HEAD
                 "extension" => extension(),
                 "view" => \request('url')
+=======
+                "view" => \request('url'),
+>>>>>>> origin/master
             ]);
         } else {
             return respond("Başarıyla tamamlandı.");
@@ -172,6 +216,7 @@ class OneController extends Controller
      */
     public function page()
     {
+<<<<<<< HEAD
         if(request('page_name') == "functions"){
             $fileName = request('page_name') . '.php';
         }else{
@@ -179,6 +224,15 @@ class OneController extends Controller
         }
         $file = file_get_contents(resource_path('views/extensions/') . strtolower(extension()->name) . '/' . $fileName);
         return view('l.editor',[
+=======
+        if (request('page_name') == "functions") {
+            $fileName = request('page_name') . '.php';
+        } else {
+            $fileName = request('page_name') . '.blade.php';
+        }
+        $file = file_get_contents(resource_path('views/extensions/') . strtolower(extension()->name) . '/' . $fileName);
+        return view('l.editor', [
+>>>>>>> origin/master
             "file" => $file
         ]);
     }
@@ -189,6 +243,7 @@ class OneController extends Controller
     public function updateCode()
     {
         $file = resource_path('views/extensions/') . strtolower(extension()->name) . '/' . request('page') . '.blade.php';
+<<<<<<< HEAD
         file_put_contents($file,json_decode(request('code')));
         return respond("Kaydedildi",200);
     }
@@ -201,6 +256,21 @@ class OneController extends Controller
             if (is_dir("$dir/$file")){
                 $this->rmdir_recursive("$dir/$file");
             }else{
+=======
+        file_put_contents($file, json_decode(request('code')));
+        return respond("Kaydedildi", 200);
+    }
+
+    private function rmdir_recursive($dir)
+    {
+        foreach (scandir($dir) as $file) {
+            if ('.' === $file || '..' === $file) {
+                continue;
+            }
+            if (is_dir("$dir/$file")) {
+                $this->rmdir_recursive("$dir/$file");
+            } else {
+>>>>>>> origin/master
                 unlink("$dir/$file");
             }
         }

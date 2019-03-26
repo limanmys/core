@@ -4,13 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Permission;
 use App\User;
+<<<<<<< HEAD
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+=======
+>>>>>>> origin/master
 
 class UserController extends Controller
 {
 
+<<<<<<< HEAD
     public function one()
     {
         $user = User::where('_id',\Auth::id())->first();
@@ -24,6 +28,12 @@ class UserController extends Controller
         $flag = Validator::make(request()->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+=======
+    public function one(){
+        $user = User::where('_id',\Auth::id())->first();
+        return view('users.one',[
+            "user" => $user
+>>>>>>> origin/master
         ]);
 
         try{
@@ -56,6 +66,7 @@ class UserController extends Controller
         return respond("Kullanıcı Başarıyla Eklendi. Parola : " . $password,200);
     }
 
+<<<<<<< HEAD
     public function remove()
     {
         // Delete Permissions
@@ -80,4 +91,6 @@ class UserController extends Controller
         return respond("Yeni Parola : " . $password,200);
     }
 
+=======
+>>>>>>> origin/master
 }

@@ -141,7 +141,11 @@ return [
             'icon' => 'lock',
         ],
         [
+<<<<<<< HEAD
             'text' => 'Ayarlar',
+=======
+            'text' => 'İzin Ayarları',
+>>>>>>> origin/master
             'url'  => '/ayarlar',
             'icon' => 'plus',
         ],

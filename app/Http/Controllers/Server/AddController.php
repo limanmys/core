@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Server;
 
 use App\Http\Controllers\Controller;
 use App\Key;
+<<<<<<< HEAD
 use App\Script;
+=======
+>>>>>>> origin/master
 use App\Server;
 use Auth;
 
@@ -82,6 +85,7 @@ class AddController extends Controller
             return respond("SSH Hatası",400);
         }
 
+<<<<<<< HEAD
         foreach (extensions() as $extension){
             $script = Script::where('unique_code',strtolower($extension->name) . "_discover")->first();
             if($script){
@@ -96,6 +100,16 @@ class AddController extends Controller
                 }
             }
         }
+=======
+//        foreach(extensions() as $extension){
+//            if($this->server->run("(systemctl list-units | grep $extension->service  && echo \"OK\" || echo \"NOK\") | tail -1") != "OK\n"){
+//                $extensions_array = $this->server->extensions;
+//                $extensions_array[$extension->_id] = [];
+//                $this->server->extensions = $extensions_array;
+//                $this->server->save();
+//            }
+//        };
+>>>>>>> origin/master
 
         return $this->grantPermissions();
     }
