@@ -69,6 +69,15 @@ Route::post('/talep', 'HomeController@request')->name('request_send');
 
 Route::post('/arama/','SearchController@index')->name('search');
 
+// Log View Route
 Route::view('/logs/{log_id}','logs.one');
 
+// User Add
+Route::post('/kullanici/ekle','UserController@add')->name('user_add')->middleware('admin');
+
+// User Remove
+Route::post('/kullanici/sil','UserController@remove')->name('user_remove')->middleware('admin');
+
+// User Remove
+Route::post('/kullanici/parola/sifirla','UserController@passwordReset')->name('user_password_reset')->middleware('admin');
 });

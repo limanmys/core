@@ -141,7 +141,7 @@ return [
             'icon' => 'lock',
         ],
         [
-            'text' => 'İzin Ayarları',
+            'text' => 'Ayarlar',
             'url'  => '/ayarlar',
             'icon' => 'plus',
         ],
