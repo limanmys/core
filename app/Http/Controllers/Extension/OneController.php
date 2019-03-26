@@ -79,17 +79,6 @@ class OneController extends Controller
     {
         $outputs = [];
 
-        $codes= "";
-        foreach (extension()->views as $view){
-            if($view["name"] == request('unique_code')){
-                $codes = $view["scripts"];
-            }
-        }
-        $scripts = [];
-        foreach (explode(',',$codes) as $code){
-            array_push($scripts,Script::where('unique_code',$code)->first());
-        }
-
         // Go through each required scripts of page and run them with proper parameters.
         foreach ($scripts as $script) {
             $parameters = '';
@@ -108,8 +97,8 @@ class OneController extends Controller
         if (view()->exists($view) && request()->method() != "POST") {
             return view($view, [
                 "result" => 200,
-                "data" => "outputs",
-                "view" => \request('url'),
+                "data" => $outputs,
+                "view" => \request('url')
             ]);
         } else {
             return respond("Başarıyla tamamlandı.");
