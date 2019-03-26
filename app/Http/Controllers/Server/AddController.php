@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Server;
 
 use App\Http\Controllers\Controller;
 use App\Key;
+use App\Script;
 use App\Server;
 use Auth;
 
@@ -81,14 +82,20 @@ class AddController extends Controller
             return respond("SSH Hatası",400);
         }
 
-//        foreach(extensions() as $extension){
-//            if($this->server->run("(systemctl list-units | grep $extension->service  && echo \"OK\" || echo \"NOK\") | tail -1") != "OK\n"){
-//                $extensions_array = $this->server->extensions;
-//                $extensions_array[$extension->_id] = [];
-//                $this->server->extensions = $extensions_array;
-//                $this->server->save();
-//            }
-//        };
+        foreach (extensions() as $extension){
+            $script = Script::where('unique_code',strtolower($extension->name) . "_discover")->first();
+            if($script){
+                try{
+                    $output = $this->server->runScript($script,"");
+                }catch (\Exception $exception){};
+                if($output == "yes\n"){
+                    $extensions_array = $this->server->extensions;
+                    $extensions_array[$extension->_id] = [];
+                    $this->server->extensions = $extensions_array;
+                    $this->server->save();
+                }
+            }
+        }
 
         return $this->grantPermissions();
     }
