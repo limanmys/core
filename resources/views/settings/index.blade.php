@@ -4,7 +4,6 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-<<<<<<< HEAD
             <li class="breadcrumb-item active" aria-current="page">{{__("Ayarlar")}}</li>
         </ol>
     </nav>
@@ -82,28 +81,4 @@
        ],
        "submit_text" => "Parolayı Sıfırla"
    ])
-=======
-            <li class="breadcrumb-item active" aria-current="page">{{__("Sistem Ayarları")}}</li>
-        </ol>
-    </nav>
-    @include('l.tree',[
-            "data" => objectToArray(\App\User::all(), "email", "name"),
-            "search",
-            "click" => "setDetails",
-            "menu" => [
-                "Parola Sıfırla" => "setDetails"
-            ]
-        ])
-    <script>
-        function setDetails(data)
-        {
-            console.log(data);
-        }
-
-        function passwordReset()
-        {
->>>>>>> origin/master
-
-        }
-    </script>
 @endsection

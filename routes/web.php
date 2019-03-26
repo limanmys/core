@@ -69,7 +69,6 @@ Route::post('/talep', 'HomeController@request')->name('request_send');
 
 Route::post('/arama/','SearchController@index')->name('search');
 
-<<<<<<< HEAD
 // Log View Route
 Route::view('/logs/{log_id}','logs.one');
 
@@ -81,8 +80,7 @@ Route::post('/kullanici/sil','UserController@remove')->name('user_remove')->midd
 
 // User Remove
 Route::post('/kullanici/parola/sifirla','UserController@passwordReset')->name('user_password_reset')->middleware('admin');
-=======
+
 Route::view('/logs/{log_id}','logs.one');
 
->>>>>>> origin/master
 });
