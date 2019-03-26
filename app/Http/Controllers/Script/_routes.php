@@ -18,7 +18,7 @@ Route::post('/betik/yukle', 'Script\MainController@upload')->name('script_upload
 
 // Script List Route
 
-Route::get('/betikler', 'Script\MainController@index')->name('scripts');
+Route::get('/betikler', 'Script\MainController@index')->name('scripts')->middleware('admin');
 
 // Script Download Route
 Route::get('/indir/betik/{script_id}','Script\MainController@download')->name('script_download');
