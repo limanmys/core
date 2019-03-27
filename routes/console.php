@@ -17,7 +17,8 @@ Artisan::command('administrator',function (){
         'name' => "administrator",
         'email' => "admin@liman.app",
         'password' => Hash::make($password),
-        'status' => "1"
+        'status' => "1",
+        'settings' => []
     ]);
     $perm = new \App\Permission();
     $perm->user_id = $user->_id;
