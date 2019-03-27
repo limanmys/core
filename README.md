@@ -1,104 +1,121 @@
+#### İlk Güncelleme
+```bash
+sudo apt update
+sudo apt upgrade -y
+```
+
 #### Gerekli Klasorleri Olusturmak
 ```bash
 sudo mkdir -p /liman/{server,certs,logs,webssh}
-
 sudo mkdir -p /data/db/
 ```
 
-#### Git Kurulumu
+#### Liman Kullanıcısı Oluşturma
 ```bash
-sudo apt install git -y
+sudo useradd liman -M
+sudo chmod -R o= /liman
+sudo chown -R liman:liman /liman
 ```
-#### Dosyalari Indirmek
+
+#### PHP kütüphaneleri kurulumu
 ```bash
-sudo git clone https://github.com/mertcelen/liman.git /liman/server
-sudo git clone https://github.com/mertcelen/webssh.git /liman/webssh
-```
-#### Sistem Servislerinin Kopyalanmasi
-```bash
-sudo cp /liman/server/liman-queue.service /etc/systemd/system/liman-queue.service
-sudo cp /liman/webssh/liman-webssh.service /etc/systemd/system/liman-webssh.service
-sudo cp /liman/server/liman.service /etc/systemd/system/liman.service
-```
-#### Depolari Guncellemek
-```bash
+sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
 sudo apt update
-```
-#### PHP ve diger kutuphanelerin kurulumu
-```bash
+sudo apt upgrade -y
+
 sudo apt install php7.3-fpm -y
 sudo apt install php7.3 php7.3-mongodb php7.3-ldap php7.3-mbstring php7.3-xml php7.3-zip php7.3-simplexml php7.3-ssh2 php7.3-mysqli -y
 ```
-#### Nginx Kurulumu
+
+#### Git Kurulumu ve Dosyaları çıkartmak (bunun yerine dışarıdan da çekilebilir)
+```bash
+sudo apt install git
+sudo git clone https://github.com/mertcelen/liman.git /liman/server
+```
+
+#### liman izinlerini düzenlemek
+```bash
+sudo chown -R liman:liman /liman
+```
+
+#### Web Sunucusu Kurulumu
 ```bash
 sudo apt install nginx -y
 ```
-#### Self Signed Sertifika
+
+#### Self-Signed Sertifika oluşturma
 ```bash
+sudo mkdir -p /liman/certs/
 sudo openssl req \
    -new \
    -newkey rsa:4096 \
    -days 365 \
    -nodes \
    -x509 \
-   -subj "/C=TR/ST=Ankara/L=Merkez/O=deneme/CN=liman" \
+   -subj "/C=TR/ST=Ankara/L=Merkez/O=aciklab/CN=liman" \
    -keyout /liman/certs/liman.key \
    -out /liman/certs/liman.crt
 ```
-#### MongoDB Kurulumu
-```bash
-sudo apt install mongodb -y
+
+#### MongoDB kurulumu (ubuntu 18.04 için xenial yerine bionic yazılacak)
+```bash 
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
 sudo chown `id -u` /data/db
 ```
-#### Gerekli Paketler
-```bash
-sudo apt install unzip python3 python3-paramiko python3-tornado dnsutils -y
+
+#### Composer Kurulumu ve çalıştırma 
 ```
-#### Config Dosyasi Linkleme
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === '48e3236262b34d30969dca3c37281b3b4bbe3221bda826ac6a9a62d6444cdb0dcd0615698a5cbe587c3f0fe57a54d8f5') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+sudo cp composer.phar /usr/bin/composer
+sudo chmod +x /usr/bin/composer
+cd /liman/server
+composer install
+```
+
+#### Liman yönetici hesabı açma
+```bash
+sudo php /liman/server/artisan key:generate
+sudo systemctl restart mongod
+sudo php /liman/server/artisan administrator
+```
+
+#### Yapılandırma Dosyası bağlama
 ```bash
 sudo cp /liman/server/.env.example /liman/server/.env
 sudo ln -sf /liman/server/.env /liman/liman.conf
 ```
-#### Liman Sessionlari icin Key Olusturma ve Administrator Hesabı Ekleme
-```bash
-sudo php /liman/server/artisan key:generate
-sudo php /liman/server/artisan setup
-```
-#### Liman Kullanicisi Olusturma
-```bash
-sudo useradd liman -M
-sudo chmod -R o= /liman
-sudo chown -R liman:liman /liman
-```
-#### Nginx Ayarlari
+
+#### Nginx Yapılandırma Ayarları
 ```bash
 sudo cp /liman/server/nginx.conf /etc/nginx/sites-available/liman.conf
 sudo ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
+sudo sed -i "s/php7.2/php7.3/g" /etc/nginx/sites-enabled/liman.conf
+sudo rm /etc/nginx/sites-enabled/default.conf
 ```
-#### Servisleri Aktiflestirmek
+
+#### Servisleri Aktifleştirmek
 ```bash
 sudo systemctl enable nginx
 sudo systemctl enable mongodb
-sudo systemctl enable liman
-sudo systemctl enable liman-queue
-sudo systemctl enable liman-webssh
 ```
-#### Nginx ve PHP FPM ayarlari
+#### Nginx ve PHP FPM ayarları
 ```bash
 sudo sed -i "s/www-data/liman/g" /etc/nginx/nginx.conf
-sudo sed -i "s/www-data/liman/g" /etc/php/7.2/fpm/pool.d/www.conf
+sudo sed -i "s/www-data/liman/g" /etc/php/7.3/fpm/pool.d/www.conf
 ```
-#### Ldap Eklentisi İçin Ek Ayar
+#### LDAP bağımlı eklentiler için özel ayar
 ```bash
 echo "TLS_REQCERT     never" | sudo tee --append /etc/ldap/ldap.conf
 ```
 
-#### ** Gecici Cozum **
+#### Web Sunucusunu Ayağa Kaldırmak
 ```bash
-sudo sed -i "s/if origin is not/if False and origin is not/g" /usr/lib/python3/dist-packages/tornado/websocket.py
-```
-#### Web Sunucusunu Ayaga Kaldirmak
-```bash
-sudo systemctl restart php7.2-fpm
+sudo systemctl restart php7.3-fpm
 sudo systemctl restart nginx
 ```
