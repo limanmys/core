@@ -58,7 +58,6 @@ class Server extends Eloquent
      * @param $file
      * @param $path
      * @return bool
-     * @throws Exceptions\Key\NotFound
      * @throws \Throwable
      */
     public function putFile($file, $path)

@@ -10,11 +10,16 @@ class ServerLog extends Eloquent
     protected $connection = 'mongodb';
     protected $fillable = ['command', 'server_id', 'user_id','output'];
     public static $dont_log = [
-        "hostname", "df -h" , "whoami", "sudo systemctl is-failed bind9"
+        "hostname", "df -h" , "whoami", "sudo systemctl is-failed "
     ];
     public static function new($command, $output, $server_id = null,$user_id = null)
     {
-        if(in_array($command, ServerLog::$dont_log)){
+        foreach (self::$dont_log as $check){
+            if(strpos($command, $check)){
+                return false;
+            }
+        }
+        if(in_array($command, self::$dont_log)){
             return false;
         }
         $log = new ServerLog([
@@ -32,7 +37,7 @@ class ServerLog extends Eloquent
         // First, Retrieve Logs.
         $logs = ServerLog::where([
             "server_id" => ($server_id == null) ? server()->_id : $server_id
-        ])->get()->reverse();
+        ])->orderBy('updated_at', 'DESC')->get();
 
         // If it's not requested as readable, which means id's only without logic.
         if(!$readable){
@@ -53,7 +58,7 @@ class ServerLog extends Eloquent
                 if (preg_match('/\/tmp\/([a-zA-Z0-9_]*) /', $log->command, $script_id) == 1) {
                     $script = $scripts->find($script_id[1]);
                     if($script) {
-                        $log->command = $script->name . " (". substr($log->command, 60) .")";
+                        $log->command = $script->name . " (". substr($log->command, 56) .")";
                     }
                 }
             }

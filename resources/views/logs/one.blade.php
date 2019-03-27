@@ -5,7 +5,5 @@
 @section('content')
     <input class="form-control" value="{{$log->command}}"/><br><br>
 
-    <textarea class="form-control" aria-label="output" style="width: 80%;height: 70%">
-        {{$log->output}}
-    </textarea>
+    <textarea class="form-control" aria-label="output" style="width: 80%;height: 70%">{{substr($log->output,0,-1)}}</textarea>
 @endsection

@@ -20,7 +20,7 @@ Route::post('/sunucu/sil', 'Server\OneController@remove')->name('server_remove')
 
 // Remove Server Permission
 
-Route::post('/sunucu/yetkial','Server\OneController@revoke')->name('server_revoke_permission')->middleware('parameters:user_id,server_id');
+Route::post('/sunucu/yetkial', 'Server\OneController@revoke')->name('server_revoke_permission')->middleware('parameters:user_id,server_id');
 
 Route::group(['middleware' => ['server']], function () {
 
@@ -32,35 +32,31 @@ Route::group(['middleware' => ['server']], function () {
     // Server' Service Status Route
     Route::post('/sunucu/kontrol', 'Server\OneController@serviceCheck')->name('server_check')->middleware('parameters:service,server_id');
 
-// Server Network Update
-
-    Route::post('/sunucu/network', 'Server\OneController@network')->name('server_network')->middleware('parameters:ip,cidr,gateway,interface,password,dns');
-
-// Server Hostname Update
+    // Server Hostname Update
 
     Route::post('/sunucu/hostname', 'Server\OneController@hostname')->name('server_hostname')->middleware('parameters:hostname');
 
-// Server Service Run,Stop,Enable,Disable Route
+    // Server Service Run,Stop,Enable,Disable Route
 
     Route::post('/sunucu/servis', 'Server\OneController@service')->name('server_service')->middleware('parameters:extension_id,action');
 
-// Server Extension Installation Route
+    // Server Extension Installation Route
 
     Route::post('/sunucu/eklenti', 'Server\OneController@enableExtension')->name('server_extension');
 
-// Server File Upload Route
+    // Server File Upload Route
 
     Route::post('/sunucu/yukle', 'Server\OneController@upload')->name('server_upload')->middleware('parameters:file,path');
 
-// Server Terminal Route
+    // Server Terminal Route
 
     Route::get('/sunucu/terminal', 'Server\OneController@terminal')->name('server_terminal');
 
-// Server Download File Route
+    // Server Download File Route
 
     Route::get('/sunucu/indir', 'Server\OneController@download')->name('server_download')->middleware('parameters:path');
 
-// Server Permission Grant Route
+    // Server Permission Grant Route
 
     Route::post('/sunucu/yetkilendir', 'Server\OneController@grant')->name('server_grant_permission')->middleware('parameters:server_id,email');
 

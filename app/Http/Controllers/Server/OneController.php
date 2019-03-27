@@ -14,6 +14,7 @@ use App\User;
 use Auth;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Str;
 
 class OneController extends Controller
 {
@@ -342,14 +343,13 @@ class OneController extends Controller
         if($flag == "1\n"){
             return respond("Dosya başarıyla yüklendi.");
         }
-        return respond('Dosya yüklenemedi.');
+        return respond('Dosya yüklenemedi.',201);
     }
 
     public function download()
     {
-
         // Generate random file name
-        $file = str_random('10');
+        $file = Str::random();
         server()->getFile(request('path'),'/tmp/' . $file);
 
         // Extract file name from path.

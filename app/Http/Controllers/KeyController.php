@@ -51,7 +51,7 @@ class KeyController extends Controller
             try{
                 $flag = SSHConnector::create(request('server'),request('username'),request('password'),auth()->id(),$key);
             }catch (\Exception $exception){
-                $flag = "Bilinmeyen bir hata oluştu.";
+                $flag = "Sunucuya bağlanılamadı.";
             }
         }
         if($flag != "OK"){

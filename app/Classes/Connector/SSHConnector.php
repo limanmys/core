@@ -67,14 +67,13 @@ class SSHConnector implements Connector
         }
     }
 
-    /**
-     * @param $command
-     * @return string
-     */
-    public function execute($command)
+
+    public function execute($command,$flag = true)
     {
         $output = $this->ssh->exec($command);
-        ServerLog::new($command,$output, $this->server->_id,$this->user_id);
+        if($flag){
+            ServerLog::new($command,$output, $this->server->_id,$this->user_id);
+        }
         return $output;
     }
 
@@ -87,9 +86,29 @@ class SSHConnector implements Connector
     public function runScript($script, $parameters, $extra = null)
     {
         $this->sendFile(storage_path('app/scripts/' . $script->_id), '/tmp/' . $script->_id,0555);
+
+        // First Let's Run Before Part Of the Script
+        $query = ($script->root == 1) ? 'sudo ' : '';
+        $query = $query . $script->language . ' /tmp/' . $script->_id . " before " . $parameters . $extra;
+        $before = $this->execute($query);
+        if($before != "ok\n"){
+            abort(504, $before);
+        }
+
+        // Run Part Of The Script
         $query = ($script->root == 1) ? 'sudo ' : '';
         $query = $query . $script->language . ' /tmp/' . $script->_id . " run " . $parameters . $extra;
-        return $this->execute($query);
+        $output = $this->execute($query);
+
+        // Run After Part Of the Script
+        $query = ($script->root == 1) ? 'sudo ' : '';
+        $query = $query . $script->language . ' /tmp/' . $script->_id . " after " . $parameters . $extra;
+        $after = $this->execute($query);
+        if($after != "ok\n"){
+            abort(504, $after);
+        }
+
+        return $output;
     }
 
     /**

@@ -35,11 +35,11 @@
             "text" => "Servis Ekle"
         ])
     @endif
-    @include('l.modal-button',[
-        "class" => "btn-info",
-        "target_id" => "change_network",
-        "text" => "Network"
-    ])
+    {{--@include('l.modal-button',[--}}
+        {{--"class" => "btn-info",--}}
+        {{--"target_id" => "change_network",--}}
+        {{--"text" => "Network"--}}
+    {{--])--}}
 
     @include('l.modal-button',[
         "class" => "btn-primary",
@@ -153,7 +153,6 @@
             "Gateway" => "gateway:text",
             "DNS Adresi" => "dns:text",
             "Arayüz" => "interface:text",
-            "SSH Parolası" => "password:password",
             "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
         "submit_text" => "Değiştir"
@@ -240,7 +239,7 @@
             "id"=>"install_extension",
             "title" => "Servis Yükle",
             "url" => route('server_extension'),
-            "next" => "message",
+            "next" => "reload",
             "selects" => $input_extensions,
             "inputs" => [
                 "Sunucu Id:$server->_id" => "server_id:hidden"
