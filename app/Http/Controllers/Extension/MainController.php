@@ -171,9 +171,6 @@ class MainController extends Controller
             \RecursiveIteratorIterator::LEAVES_ONLY
         );
 
-        // Create Folder Just In Case.
-        mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'scripts'));
-
         foreach ($files as $file) {
             // Skip directories (they would be added automatically)
             if (!$file->isDir()) {
