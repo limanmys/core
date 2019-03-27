@@ -138,22 +138,6 @@
     ])
 
     @include('l.modal',[
-        "id"=>"change_network",
-        "title" => "Network Değiştir",
-        "url" => route('server_network'),
-        "next" => "reload",
-        "inputs" => [
-            "İp Adresi" => "ip:text",
-            "Cidr Adresi" => "cidr:text",
-            "Gateway" => "gateway:text",
-            "DNS Adresi" => "dns:text",
-            "Arayüz" => "interface:text",
-            "Sunucu Id:$server->_id" => "server_id:hidden"
-        ],
-        "submit_text" => "Değiştir"
-    ])
-
-    @include('l.modal',[
         "id"=>"change_hostname",
         "title" => "Hostname Değiştir",
         "url" => route('server_hostname'),
