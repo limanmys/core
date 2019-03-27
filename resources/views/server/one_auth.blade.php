@@ -35,11 +35,6 @@
             "text" => "Servis Ekle"
         ])
     @endif
-    {{--@include('l.modal-button',[--}}
-        {{--"class" => "btn-info",--}}
-        {{--"target_id" => "change_network",--}}
-        {{--"text" => "Network"--}}
-    {{--])--}}
 
     @include('l.modal-button',[
         "class" => "btn-primary",
