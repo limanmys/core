@@ -103,7 +103,7 @@ class OneController extends Controller
                 abort(504, "Eklenti için gereken betik bulunamadı");
             }
             foreach (explode(',', $script->inputs) as $input) {
-                $parameters = $parameters . " " . \request(explode(':', $input)[0]);
+                $parameters = $parameters . " '" . \request(explode(':', $input)[0]) . "'";
             }
             $output = server()->runScript($script, $parameters);
             $output = str_replace('\n', '', $output);

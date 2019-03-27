@@ -69,48 +69,6 @@ class OneController extends Controller
         }
     }
 
-    public function network()
-    {
-        // Set Parameters
-        $parameters = \request('ip') . ' ' . \request('cidr') . ' ' . \request('gateway') . ' ' . \request('interface')
-        . ' ' . request('dns');
-
-        // Get Script Object
-        $script = \App\Script::where('unique_code','server_set_network')->first();
-        
-        // Check if script exists, if not warn user.
-        if(!$script){
-            return respond('Network betigi yuklu degil.',201);
-        }
-
-        // Execute The Script
-        server()->runScript($script, $parameters," > /dev/null 2>/dev/null &");
-
-        // Sleep 3 seconds because it may take a while before network up again.
-        sleep(3);
-
-        // Very basically, check port and network.
-        $output = shell_exec("echo exit | telnet " . \request('ip') . " " . server()->port);
-
-        if (!strpos($output, "Connected to " . \request('ip'))) {
-
-            // If network is not reachable, may be something went wrong, warn user about it.
-            return respond("Network degistirilemedi.",201);
-        }
-
-        // Update Server with new network configuration.
-        server()->update([
-            'ip_address' => \request('ip')
-        ]);
-        
-        // Now that everything is ok, warn user.
-        if(isset($flag) && !$flag){
-            return respond('Network guncellendi fakat ssh keyi devre dışı bırakıldı, lütfen tekrar ekleyiniz.',201);
-        }else{
-            return respond('Network basariyla guncellendi.',200);
-        }
-
-    }
 
     public function hostname()
     {
@@ -124,7 +82,7 @@ class OneController extends Controller
 
 
         // Simply run that script on server.
-        $output = server()->runScript($script, \request('hostname'));
+        $output = server()->runScript($script, "'" . \request('hostname') . "'");
 
         // Forward request.
         return respond("Hostname guncellendi",200);

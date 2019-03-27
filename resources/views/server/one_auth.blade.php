@@ -21,7 +21,6 @@
         $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
     }
     ?>
-    <button class="btn btn-success" onclick="location.href = '/sunucular/';">{{__("Geri Dön")}}</button>
 
     @include('l.modal-button',[
         "class" => "btn-primary",
