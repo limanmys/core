@@ -152,6 +152,8 @@ function message(data) {
     let color = "alert-info";
     switch (json["status"]) {
         case 200:
+        case 300:
+        case 301:
             color = "alert-success";
             break;
         default:
