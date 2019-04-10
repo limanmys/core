@@ -205,11 +205,3 @@ function addToTable(){
         current_modal.modal('hide');
     }
 }
-
-window.onload = function(){
-  setInterval(function(){
-      checkNotifications();
-  },3000);
-};
-
-let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');

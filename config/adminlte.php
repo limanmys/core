@@ -111,8 +111,6 @@ return [
             'text'        => 'Sunucular',
             'url'         => '/sunucular',
             'icon'        => 'server',
-            'label'       => 'Yeni',
-            'label_color' => 'success',
         ],
         'Diğer',
         [
