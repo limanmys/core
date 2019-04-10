@@ -10,6 +10,7 @@
         <li class="breadcrumb-item active" aria-current="page"><a
                     href="/l/{{extension()->_id}}/{{request('city')}}/{{server()->_id}}">{{server()->name}}</a></li>
     </ol>
+    <button class="btn btn-primary" onclick="location.href = '{{route('server_one',server()->_id)}}'">{{__("Sunucu Detayları")}}</button>
     <div class="card">
         <div class="card-body mainArea">
             @if(is_file(base_path('resources/views/extensions/' . strtolower(extension()->name) . '/functions.php')))
