@@ -176,6 +176,10 @@ class OneController extends Controller
     {
         try {
             self::rmdir_recursive(resource_path('views' . DIRECTORY_SEPARATOR . 'extensions' . DIRECTORY_SEPARATOR . strtolower(extension()->name)));
+            foreach (Script::where('extensions','like',strtolower(extension()->name))->get() as $script){
+                shell_exec('rm ' .storage_path('app/scripts/' . $script->_id));
+                $script->delete();
+            }
             extension()->delete();
         } catch (\Exception $exception) {
             return respond('Eklenti silinemedi', 201);
