@@ -10,6 +10,7 @@ use App\Key;
 use App\Notification;
 use App\Permission;
 use App\Script;
+use App\ServerLog;
 use App\User;
 use Auth;
 use GuzzleHttp\Client;
@@ -293,14 +294,15 @@ class OneController extends Controller
         server()->putFile('/tmp/' .request()->file('file')->getClientOriginalName(), \request('path'));
 
         // Build query to check if file exists in server to validate.
-        $query = '[[ -f ' . request('path') .
-            request()->file('file')->getClientOriginalName()  . ' ]] && echo "1" || echo "0"';
-        $flag = server()->run($query);
+        $query = "(ls " . request('path') . " >> /dev/null 2>&1 && echo 1) || echo 0";
+        $flag = server()->run($query,false);
 
         // Respond according to the flag.
         if($flag == "1\n"){
+            ServerLog::new("Dosya Yükleme " . request('path'),"Sunucuya dosya yüklendi\n" . request('path') . " ",server()->_id,auth()->id());
             return respond("Dosya başarıyla yüklendi.");
         }
+        ServerLog::new("Dosya Yükleme " . request('path'),"Sunucuya dosya yüklenemedi\n" . request('path') . " ", server()->_id,auth()->id());
         return respond('Dosya yüklenemedi.',201);
     }
 

@@ -177,7 +177,7 @@
         "id"=>"file_upload",
         "title" => "Dosya Yükle",
         "url" => route('server_upload'),
-        "next" => "reload",
+        "next" => "nothing",
         "inputs" => [
             "Yüklenecek Dosya(lar)" => "file:file",
             "Yol" => "path:text",

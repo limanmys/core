@@ -44,14 +44,14 @@ class Server extends Eloquent
 
     /**
      * @param $command
+     * @param $flag
      * @return string
-     * @throws Exceptions\Key\NotFound
      * @throws \Throwable
      */
-    public function run($command)
+    public function run($command,$flag = true)
     {
         // Execute and return outputs.
-        return $this->connector()->execute($command);
+        return $this->connector()->execute($command,$flag);
     }
 
     /**
