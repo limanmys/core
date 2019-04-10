@@ -226,7 +226,8 @@ class MainController extends Controller
                     "scripts" => ""
                 ]
             ],
-            "status" => 0
+            "status" => 0,
+            "service" => ""
         ]);
 
         $ext->save();

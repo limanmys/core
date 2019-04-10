@@ -32,6 +32,8 @@
                 <input id="icon" type="text" name="icon" class="form-control" value="{{$extension->icon}}">
                 <h3>{{__("Versiyon")}}</h3>
                 <input id="version" type="text" name="version" class="form-control" value="{{$extension->version}}">
+                <h3>{{__("Servis")}}</h3>
+                <input id="service" type="text" name="service" class="form-control" value="{{$extension->service}}">
                 <h3>{{__("Eklenti için sunucuda betik çalıştırılması gerekiyor mu?")}}</h3>
                 <div class="bd-example">
                     <div class="form-check form-check-inline">
@@ -290,6 +292,7 @@
             data.append('icon',$("#icon").val());
             data.append('support',$("#support").val());
             data.append('version',$("#version").val());
+            data.append('service',$("#service").val());
             data.append('serverless',$("input[name=serverless]:checked").val());
 
             request('{{route('extension_settings_update')}}',data,function(){
