@@ -90,8 +90,9 @@ class SSHConnector implements Connector
         // First Let's Run Before Part Of the Script
         $query = ($script->root == 1) ? 'sudo ' : '';
         $query = $query . $script->language . ' /tmp/' . $script->_id . " before " . $parameters . $extra;
-        $before = $this->execute($query);
+        $before = $this->execute($query,false);
         if($before != "ok\n"){
+            ServerLog::new($query,$before, $this->server->_id,$this->user_id);
             abort(504, $before);
         }
 
@@ -103,8 +104,9 @@ class SSHConnector implements Connector
         // Run After Part Of the Script
         $query = ($script->root == 1) ? 'sudo ' : '';
         $query = $query . $script->language . ' /tmp/' . $script->_id . " after " . $parameters . $extra;
-        $after = $this->execute($query);
+        $after = $this->execute($query,false);
         if($after != "ok\n"){
+            ServerLog::new($query,$after, $this->server->_id,$this->user_id);
             abort(504, $after);
         }
 
