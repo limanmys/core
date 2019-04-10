@@ -4,6 +4,7 @@ namespace App\Classes\Connector;
 
 use App\Key;
 use App\ServerLog;
+use phpseclib\Crypt\Hash;
 use phpseclib\Crypt\RSA;
 use phpseclib\Net\SFTP;
 use phpseclib\Net\SSH2;
@@ -85,7 +86,16 @@ class SSHConnector implements Connector
      */
     public function runScript($script, $parameters, $extra = null)
     {
-        $this->sendFile(storage_path('app/scripts/' . $script->_id), '/tmp/' . $script->_id,0555);
+        $localPath = storage_path('app/scripts/' . $script->_id);
+        $remotePath = '/tmp/' . $script->_id;
+        $this->sendFile($localPath, $remotePath,0555);
+
+        $localHash = md5_file($localPath);
+        $remoteHash = explode(' ',substr($this->execute('md5sum ' . $remotePath),0 , -1))[0];
+
+        if($localHash != $remoteHash){
+            abort(504,"Betik gönderilemedi, internet kesintisi oluşmuş veya disk dolmuş olabilir.");
+        }
 
         // First Let's Run Before Part Of the Script
         $query = ($script->root == 1) ? 'sudo ' : '';
