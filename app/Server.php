@@ -108,7 +108,7 @@ class Server extends Eloquent
         $query = "sudo systemctl is-failed " . $service_name;
 
         // Execute and return outputs.
-        return ($this->connector()->execute($query) == "active\n") ? true : false;
+        return ($this->connector()->execute($query,false) == "active\n") ? true : false;
     }
 
     /**

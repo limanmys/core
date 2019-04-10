@@ -14,6 +14,11 @@
 ][config('adminlte.layout')] : '') . (config('adminlte.collapse_sidebar') ? ' sidebar-collapse ' : ''))
 
 @section('body')
+    @if(auth()->user()->status == "1")
+        <div class="alert-warning">
+            <center> {{__("Yönetici Hesabı İle Giriş Yaptınız.")}}</center>
+        </div>
+    @endif
     <div class="wrapper" style="height: auto">
 
         <!-- Main Header -->
