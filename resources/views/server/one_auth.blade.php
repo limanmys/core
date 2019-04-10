@@ -83,8 +83,7 @@
     @if(count($installed_extensions) > 0)
         <h4>{{__("Servis Durumları")}}</h4>
         @foreach($installed_extensions as $extension)
-            <button type="button" class="btn btn-outline-primary btn-lg" style="cursor:default;"
-                    id="status_{{$extension->service}}">
+            <button type="button" class="btn btn-outline-primary btn-lg status_{{$extension->service}}" style="cursor:default;">
                 {{$extension->name}}
             </button>
         @endforeach
@@ -232,9 +231,8 @@
             data.append('service', service);
             request('{{route('server_check')}}', data, function (response) {
                 let json = JSON.parse(response);
-                let element = document.getElementById('status_' + service);
-                element.classList.remove('btn-secondary');
-                element.classList.add(json["message"]);
+                let element = $(".status_" + service);
+                element.removeClass('btn-secondary').addClass(json["message"]);
             });
         }
 
