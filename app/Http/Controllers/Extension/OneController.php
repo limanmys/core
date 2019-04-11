@@ -54,7 +54,7 @@ class OneController extends Controller
 
                     // Decode output and set it into outputs array.
                     $output = str_replace('\n', '', $output);
-                    $outputs[$unique_code] = json_decode($output, true);
+                    $outputs[trim($unique_code)] = json_decode($output, true);
                 }
                 break;
             }
