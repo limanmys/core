@@ -4,7 +4,6 @@ namespace App\Classes\Connector;
 
 use App\Key;
 use App\ServerLog;
-use phpseclib\Crypt\Hash;
 use phpseclib\Crypt\RSA;
 use phpseclib\Net\SFTP;
 use phpseclib\Net\SSH2;
@@ -50,7 +49,7 @@ class SSHConnector implements Connector
                 abort(504,"Anahtarınız ile giriş yapılamadı.");
             }
         }catch (\Exception $exception){
-            abort(504,$exception->getMessage());
+            abort(504,"Sunucuya Bağlanılamadı");
         }
 
         $this->ssh = $ssh;
@@ -91,7 +90,7 @@ class SSHConnector implements Connector
         $this->sendFile($localPath, $remotePath,0555);
 
         $localHash = md5_file($localPath);
-        $remoteHash = explode(' ',substr($this->execute('md5sum ' . $remotePath),0 , -1))[0];
+        $remoteHash = explode(' ',substr($this->execute('md5sum ' . $remotePath,false),0 , -1))[0];
 
         if($localHash != $remoteHash){
             abort(504,"Betik gönderilemedi, internet kesintisi oluşmuş veya disk dolmuş olabilir.");

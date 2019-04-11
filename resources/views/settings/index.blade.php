@@ -11,7 +11,9 @@
         "class" => "btn-success",
         "target_id" => "add_user",
         "text" => "Kullanıcı Ekle"
-    ])<br><br>
+    ])
+    <button class="btn btn-danger" onclick="location.href = '{{route('settings_server')}}'">{{__("Sunucu Ayarları")}}</button>
+    <br><br>
     @include('l.table',[
         "value" => \App\User::all(),
         "title" => [
@@ -81,4 +83,10 @@
        ],
        "submit_text" => "Parolayı Sıfırla"
    ])
+    <script>
+        function details(row) {
+            let user_id = row.querySelector('#user_id').innerHTML;
+            location.href = '/ayarlar/' + user_id;
+        }
+    </script>
 @endsection

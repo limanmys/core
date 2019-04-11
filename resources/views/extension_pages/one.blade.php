@@ -270,7 +270,6 @@
             </div>
             <!-- /.tab-pane -->
         </div>
-        <!-- /.tab-content -->
     </div>
     <script>
         function editPage(element){

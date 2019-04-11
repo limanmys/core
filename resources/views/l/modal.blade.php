@@ -1,6 +1,6 @@
 <div class="modal fade" id="@isset($id){{$id}}@endisset" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
+        <div class="modal-content" style="width: 100%">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">×</span></button>
@@ -16,7 +16,7 @@
             @else
                 <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return @isset($url)request('{{$url}}',this,@isset($next){{$next}}@endisset)"@endisset target="#">
             @endif
-                <div class="modal-body">
+                <div class="modal-body" style="width: 100%">
                     <div id="{{$id}}_alert" class="alert" role="alert" hidden>
                     </div>
                     @if(isset($selects) && is_array($selects))

@@ -2,4 +2,12 @@
 
 // Settings Route
 
-Route::get('/ayarlar', 'Settings\MainController@index')->name('settings');
+Route::get('/ayarlar', 'Settings\MainController@index')->name('settings')->middleware('admin');
+
+Route::get('/ayarlar/{user_id}','Settings\MainController@one')->name('settings_one')->middleware('admin');
+
+Route::post('/ayarlar/liste','Settings\MainController@getList')->name('settings_get_list')->middleware('admin');
+
+Route::post('/ayar/yetki/ekle','Settings\MainController@addList')->name('settings_add_to_list')->middleware('admin');
+
+Route::view('/ayar/sunucu','settings.server')->middleware('admin')->name('settings_server');
