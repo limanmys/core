@@ -42,7 +42,7 @@ class OneController extends Controller
                 }
                 foreach ($scripts as $unique_code) {
                     // Get Script
-                    $script = extension()->scripts()->where('unique_code', $unique_code)->first();
+                    $script = extension()->scripts()->where('unique_code', trim($unique_code))->first();
 
                     // Check if required script is available or not.
                     if (!$script) {
