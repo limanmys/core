@@ -60,4 +60,6 @@ Route::group(['middleware' => ['server']], function () {
 
     Route::post('/sunucu/yetkilendir', 'Server\OneController@grant')->name('server_grant_permission')->middleware('parameters:server_id,email');
 
+    Route::post('/sunucu/favori','Server\OneController@favorite')->name('server_favorite')->middleware('parameters:server_id,action');
+
 });

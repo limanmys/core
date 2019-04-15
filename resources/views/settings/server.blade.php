@@ -28,7 +28,7 @@
                     <input type="text" class="form-control" value="{{env('LOG_PATH')}}">
                     <h4>{{__("Sunucu Bağlantı Zaman Aşımı")}}</h4>
                     <input type="text" class="form-control" value="{{env('SERVER_CONNECTION_TIMEOUT')}}"><br>
-                    <button type="submit" class="btn btn-danger">{{__("Değişiklikleri Kaydet")}}</button>
+                    <button disabled type="button" class="btn btn-danger">{{__("Değişiklikleri Kaydet")}}</button>
                 </form>
             </div>
             <div class="tab-pane" id="tab_2">
@@ -45,7 +45,7 @@
                     <input type="text" class="form-control" value="{{env('DB_USERNAME')}}">
                     <h4>{{__("Parola")}}</h4>
                     <input type="text" class="form-control" value="{{env('DB_PASSWORD')}}"><br>
-                    <button type="submit" class="btn btn-danger">{{__("Değişiklikleri Kaydet")}}</button>
+                    <button disabled type="button" class="btn btn-danger">{{__("Değişiklikleri Kaydet")}}</button>
                 </form>
             </div>
         </div>

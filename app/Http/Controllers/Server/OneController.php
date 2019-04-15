@@ -353,4 +353,22 @@ class OneController extends Controller
         return Extension::whereIn('_id',array_keys(server()->extensions))->get();
     }
 
+    public function favorite()
+    {
+        $favorites = auth()->user()->favorites;
+        if(!$favorites){
+            $favorites = [];
+        }
+        if(request('action') == "true"){
+            array_push($favorites,server()->_id);
+        }else{
+            $key = array_search(server()->_id,$favorites);
+            unset($favorites[$key]);
+        }
+        auth()->user()->favorites = $favorites;
+        auth()->user()->save();
+
+        return respond("Düzenlendi.",200);
+    }
+
 }

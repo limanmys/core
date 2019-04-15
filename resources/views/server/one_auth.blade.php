@@ -21,7 +21,11 @@
         $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
     }
     ?>
-
+    @if(isset(server()->favorite) && server()->favorite == "true")
+        <button onclick="favorite('false')" class="btn btn-warning">{{__("Favorilerden Sil")}}</button>
+    @else
+        <button onclick="favorite('true')" class="btn btn-warning">{{__("Favorilere Ekle")}}</button>
+    @endif
     @include('l.modal-button',[
         "class" => "btn-primary",
         "target_id" => "edit",
@@ -84,7 +88,8 @@
         <h4>{{__("Servis Durumları")}}</h4>
         @foreach($installed_extensions as $extension)
             <button type="button" class="btn btn-outline-primary btn-lg status_{{$extension->service}}"
-                    style="cursor:default;" onclick="location.href = '{{route('extension_server',["extension_id" => $extension->_id, "city" => $server->city, "server_id" => $server->_id])}}'">
+                    style="cursor:default;"
+                    onclick="location.href = '{{route('extension_server',["extension_id" => $extension->_id, "city" => $server->city, "server_id" => $server->_id])}}'">
                 {{$extension->name}}
             </button>
         @endforeach
@@ -252,9 +257,18 @@
             return false;
         }
 
-        function logDetails(element){
+        function logDetails(element) {
             let log_id = element.querySelector('#_id').innerHTML;
             window.location.href = "/logs/" + log_id
+        }
+
+        function favorite(action) {
+            let form = new FormData();
+            form.append('server_id', '{{server()->_id}}');
+            form.append('action', action);
+            request('{{route('server_favorite')}}', form, function (response) {
+                location.reload();
+            })
         }
     </script>
 @endsection

@@ -113,9 +113,8 @@ class MainController extends Controller
         // Extract Zip to the Temp Folder.
         $zip->extractTo($path);
 
-        // Control to bypass GitHub, GitLab which corrupts when direct zip download.
-        if (strpos(request()->file('extension')->getClientOriginalName(), '-master')) {
-            $path = $path . '/' . substr(request()->file('extension')->getClientOriginalName(), 0, -4);
+        if(count(scandir($path)) == 3){
+            $path = $path . '/' . scandir($path)[2];
         }
 
         // Now that we have everything, let's extract database.

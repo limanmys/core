@@ -11,6 +11,7 @@
         "ext-xml": "*",
         "ext-ssh2": "*",
         "ext-zip": "*",
+        "ext-ldap" : "*",
         "guzzlehttp/guzzle": "~6.0",
         "jenssegers/mongodb": "^3.4",
         "jeroennoten/laravel-adminlte": "^1.24",

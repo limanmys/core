@@ -8,7 +8,11 @@
             <li class="breadcrumb-item active" aria-current="page">{{$server->name}}</li>
         </ol>
     </nav>
-
+    @if(isset(auth()->user()->favorites) && in_array(server()->_id,auth()->user()->favorites))
+        <button onclick="favorite('false')" class="btn btn-warning">{{__("Favorilerden Sil")}}</button>
+    @else
+        <button onclick="favorite('true')" class="btn btn-warning">{{__("Favorilere Ekle")}}</button>
+    @endif
     @include('l.modal-button',[
         "class" => "btn-primary",
         "target_id" => "edit",
@@ -148,6 +152,14 @@
     function logDetails(element){
         let log_id = element.querySelector('#_id').innerHTML;
         window.location.href = "/logs/" + log_id
+    }
+    function favorite(action){
+        let form = new FormData();
+        form.append('server_id','<?php echo e(server()->_id); ?>');
+        form.append('action',action);
+        request('<?php echo e(route('server_favorite')); ?>',form,function (response) {
+            location.reload();
+        })
     }
 </script>
 @endsection

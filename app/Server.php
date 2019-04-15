@@ -131,6 +131,9 @@ class Server extends Eloquent
      */
     public static function getAll()
     {
+        if(auth()->user()->isAdmin()){
+            return Server::all();
+        }
         return Server::find(Permission::get(auth()->id(), 'server'));
     }
 

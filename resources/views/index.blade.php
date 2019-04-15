@@ -8,18 +8,22 @@
     </nav>
 
     <section class="content">
-        @foreach($widgets as $widget)
-            <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box">
-                    <span class="info-box-icon bg-aqua" style="padding-top:20px"><i class="fa fa-user"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">{{$widget->server_name . " " . __("Sunucusu")}}</span>
-                        <span class="info-box-number" id="{{$widget->_id}}">{{$widget->title}}</span>
-                        <span class="float-right limanWidget" id="{{$widget->_id}}" style="font-size: 20px"></span>
+        @if($widgets->count())
+            @foreach($widgets as $widget)
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-aqua" style="padding-top:20px"><i class="fa fa-user"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">{{$widget->server_name . " " . __("Sunucusu")}}</span>
+                            <span class="info-box-number" id="{{$widget->_id}}">{{$widget->title}}</span>
+                            <span class="float-right limanWidget" id="{{$widget->_id}}" style="font-size: 20px"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        @endforeach
+            @endforeach
+        @else
+            {{__("Liman Sistem Yönetimi'ne Hoşgeldiniz!")}}
+        @endif
     </section>
 
     <script>

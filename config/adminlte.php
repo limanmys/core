@@ -27,43 +27,7 @@ return [
     'register_url' => 'register',
 
     'menu' => [
-        'Sunucular',
-        [
-            'text'        => 'Sunucular',
-            'url'         => '/sunucular',
-            'icon'        => 'server',
-        ],
-        'Diğer',
-        [
-            'text' => 'Anahtarlar',
-            'url'  => '/anahtarlar',
-            'icon' => 'key',
-        ],
-        [
-            'text' => 'Eklentiler',
-            'url'  => '/eklentiler',
-            'icon' => 'plus',
-        ],
-        [
-            'text' => 'Betikler',
-            'url'  => '/betikler',
-            'icon' => 'subscript'
-        ],
-        [
-            'text' => 'Widgetlar',
-            'url'  => '/widgetlar',
-            'icon' => 'key'
-        ],
-        [
-            'text' => 'Yetki Talebi',
-            'url'  => '/taleplerim',
-            'icon' => 'lock',
-        ],
-        [
-            'text' => 'Ayarlar',
-            'url'  => '/ayarlar',
-            'icon' => 'plus',
-        ],
+
     ],
 
     'filters' => [
