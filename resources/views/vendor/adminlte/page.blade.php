@@ -175,20 +175,20 @@
                         @if(auth()->user()->isAdmin())
                             <li class="header">{{__("Yönetim")}}</li>
                             <li class="">
-                                <a href="https://localhost/eklentiler">
+                                <a href="/eklentiler">
                                     <i class="fa fa-fw fa-plus "></i>
                                     <span>{{__("Eklentiler")}}</span>
                                 </a>
                             </li>
                             <li class="">
-                                <a href="https://localhost/betikler"
+                                <a href="/betikler"
                                 >
                                     <i class="fa fa-fw fa-subscript "></i>
                                     <span>{{__("Betikler")}}</span>
                                 </a>
                             </li>
                             <li class="">
-                                <a href="https://localhost/ayarlar"
+                                <a href="/ayarlar"
                                 >
                                     <i class="fa fa-fw fa-plus "></i>
                                     <span>{{__("Ayarlar")}}</span>
@@ -199,13 +199,13 @@
 
                         <li class="header">{{__("Ayarlar")}}</li>
                         <li class="">
-                            <a href="https://localhost/anahtarlar">
+                            <a href="/anahtarlar">
                                 <i class="fa fa-fw fa-key "></i>
                                 <span>{{__("Anahtarlar")}}</span>
                             </a>
                         </li>
                         <li class="">
-                            <a href="https://localhost/widgetlar"
+                            <a href="/widgetlar"
                             >
                                 <i class="fa fa-fw fa-key "></i>
                                 <span>{{__("Widgetlar")}}</span>
