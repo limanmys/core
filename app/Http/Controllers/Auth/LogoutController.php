@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class LogoutController
@@ -16,7 +17,8 @@ class LogoutController extends Controller
     public function logout()
     {
         //Logout User
-        auth()->logout();
+        Auth::logout();
+        session()->flush();
 
         //Redirect User
         return respond(route('login'),300);

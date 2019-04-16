@@ -1,32 +1,20 @@
 @extends('layouts.master')
 
-@section('adminlte_css')
-    <link rel="stylesheet"
-          href="{{ asset('vendor/adminlte/dist/css/skins/skin-blue.min.css')}} ">
-    @stack('css')
-    @yield('css')
-@stop
-
 @section('body_class', 'skin-blue sidebar-mini ' . ((\Session::has('collapse')) ? 'sidebar-collapse' : ''))
 
 @section('body')
-    @if(auth()->user()->status == "1")
-        <div class="alert-warning" align="center">
-            {{__("Yönetici Hesabı İle Giriş Yaptınız.")}}
-        </div>
-    @endif
-    <div class="wrapper" style="height: auto">
-        @auth
-            <script>
-                window.onload = function () {
-                    setInterval(function () {
-                        checkNotifications();
-                    }, 3000);
-                };
-                let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');
-            </script>
+    @auth
+        @if(auth()->user()->status == "1")
+            <div class="alert-warning" align="center">
+                {{__("Yönetici Hesabı İle Giriş Yaptınız.")}}
+            </div>
+        @endif
     @endauth
+
+    <div class="wrapper" style="height: auto">
+
     <!-- Main Header -->
+            @auth
         <header class="main-header">
 
             <a href="/" class="logo">
@@ -43,7 +31,10 @@
                    onclick="request('{{route('set_collapse')}}',new FormData(),null)">
                     <span class="sr-only">{{__("Geri Dön")}}</span>
                 </a>
-
+                <span style="line-height: 50px;color: white;">
+                    Build : 16.04.2019 16:27
+{{--                    Build : {{date('d.m.Y H:i')}}--}}
+                </span>
                 <!-- Navbar Right Menu -->
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
@@ -63,7 +54,7 @@
                                 <!-- Menu Footer-->
                                 <li class="user-footer">
                                     <div class="pull-left">
-                                        <a href="#"
+                                        <a href="{{route('my_profile')}}"
                                            class="btn btn-default btn-flat">{{__("Profil")}}</a>
                                     </div>
                                     <div class="pull-right">
@@ -199,7 +190,7 @@
             </section>
             <!-- /.sidebar -->
         </aside>
-
+        @endauth
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
@@ -219,27 +210,38 @@
     </div>
 
     <script>
-        function terminal(serverId, name) {
-            let elm = $("#terminal");
-            $("#terminal .modal-body iframe").attr('src', '/sunucu/terminal?server_id=' + serverId);
-            $("#terminal .modal-title").html(name + '{{__(" sunucusu terminali")}}');
-            elm.modal('show');
-            elm.on('hidden.bs.modal', function () {
-                $("#terminal .modal-body iframe").attr('src', '');
-            })
-        }
+
     </script>
+    @include('l.modal-iframe',[
+        "id" => "terminal",
+        "url" => '',
+        "title" => ""
+    ])
 @stop
-@include('l.modal-iframe',[
-    "id" => "terminal",
-    "url" => '',
-    "title" => ""
-])
+
 
 @section('adminlte_js')
     <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>
     @stack('js')
+    @auth
+    <script>
+        window.onload = function () {
+            Swal.close();
+            $('table').not('.notDataTable').DataTable({
+                autoFill : true,
+                bFilter: true,
+                destroy: true,
+                "language" : {
+                    url : "{{asset('turkce.json')}}"
+                }
+            });
+            setInterval(function () {
+                checkNotifications();
+            }, 3000);
+        };
 
+    </script>
+@endauth
     @yield('js')
 @stop
 

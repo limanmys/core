@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Permission;
 use App\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -81,4 +82,28 @@ class UserController extends Controller
         return respond("Yeni Parola : " . $password,200);
     }
 
+    public function selfUpdate()
+    {
+        $flag = Validator::make(request()->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'string', 'min:6'],
+        ]);
+
+        try{
+            $flag->validate();
+        }catch (\Exception $exception){
+            dd($flag->errors());
+            return respond($flag->errors(),201);
+        }
+
+        auth()->user()->update([
+           'name' => request('name'),
+           'password' => Hash::make(request('password'))
+        ]);
+
+        Auth::logout();
+        session()->flush();
+
+        return respond('Kullanıcı Başarıyla Güncellendi, lütfen tekrar giriş yapın.',200);
+    }
 }

@@ -1,19 +1,19 @@
-@extends('adminlte::master')
+@extends('layouts.app')
 
 @section('body_class', 'login-page')
 
 @section('body')
     <div class="login-box">
         <div class="login-logo">
-            <a href="{{ route('login') }}">{!! config('adminlte.logo', '<b>Liman</b>') !!}</a>
+            <a href="{{ route('login') }}"><b>Liman</b></a>
         </div>
         <!-- /.login-logo -->
         <div class="login-box-body">
-            <form action="{{ url(config('adminlte.login_url', 'login')) }}" method="post">
+            <form action="{{ route('login')}}" method="post">
                 @csrf
                 <div class="form-group has-feedback {{ $errors->has('email') ? 'has-error' : '' }}">
                     <input type="email" name="email" class="form-control" value="{{ old('email') }}"
-                           placeholder="{{ trans('adminlte::adminlte.email') }}" required>
+                           placeholder="{{__("Email Adresi")}}" required>
                     <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
                     @if ($errors->has('email'))
                         <span class="help-block">
@@ -23,7 +23,7 @@
                 </div>
                 <div class="form-group has-feedback {{ $errors->has('password') ? 'has-error' : '' }}">
                     <input type="password" name="password" class="form-control"
-                           placeholder="{{ trans('adminlte::adminlte.password') }}" required>
+                           placeholder="{{__("Parola")}}" required>
                     <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                     @if ($errors->has('password'))
                         <span class="help-block">
@@ -35,12 +35,12 @@
                     <div class="col-xs-7" style="margin-left:20px;margin-right: 8px;">
                         <div class="checkbox icheck">
                             <label>
-                                <input type="checkbox" name="remember"> {{ trans('adminlte::adminlte.remember_me') }}
+                                <input type="checkbox" name="remember"> {{__("Beni Hatırla")}}
                             </label>
                         </div>
                     </div>
                     <div class="col-xs-4">
-                        <button type="submit" class="btn btn-primary btn-block btn-flat">{{ trans('adminlte::adminlte.sign_in') }}</button>
+                        <button type="submit" class="btn btn-primary btn-block btn-flat">{{__("Giriş Yap ")}}</button>
                     </div>
                 </div>
             </form>

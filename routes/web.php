@@ -87,4 +87,7 @@ Route::post('/kullanici/parola/sifirla','UserController@passwordReset')->name('u
 
 Route::view('/logs/{log_id}','logs.one');
 
+Route::view('/profil','user.self')->name('my_profile');
+
+Route::post('/profil','UserController@selfUpdate')->name('profile_update');
 });

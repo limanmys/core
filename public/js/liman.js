@@ -1,3 +1,4 @@
+let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');
 
 function request(url, data, next) {
     let id = null;
@@ -137,10 +138,6 @@ $(".modal").on('show.bs.modal', function(modal) {
     $("#" + modal.target.id + " .alert").fadeOut(0);
 });
 
-window.onload = function () {
-    Swal.close();
-};
-
 function message(data) {
     let json = JSON.parse(data);
     let modal = document.getElementsByClassName("modal fade in")[0];
@@ -204,4 +201,14 @@ function addToTable(){
     if(current_modal.length){
         current_modal.modal('hide');
     }
+}
+
+function terminal(serverId, name) {
+    let elm = $("#terminal");
+    $("#terminal .modal-body iframe").attr('src', '/sunucu/terminal?server_id=' + serverId);
+    $("#terminal .modal-title").html(name + '{{__(" sunucusu terminali")}}');
+    elm.modal('show');
+    elm.on('hidden.bs.modal', function () {
+        $("#terminal .modal-body iframe").attr('src', '');
+    })
 }
