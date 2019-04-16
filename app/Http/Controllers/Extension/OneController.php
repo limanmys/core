@@ -98,7 +98,7 @@ class OneController extends Controller
 
         $scripts = [];
         foreach (explode(',', trim($codes)) as $code) {
-            array_push($scripts, Script::where('unique_code', $code)->first());
+            array_push($scripts, Script::where('unique_code', trim($code))->first());
         }
 
         // Go through each required scripts of page and run them with proper parameters.

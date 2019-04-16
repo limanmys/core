@@ -81,6 +81,9 @@ class OneController extends Controller
             return respond("Hostname değiştirme betiği bulunamadı.",201);
         }
 
+        if(!Permission::can(auth()->id(),'script',$script->_id)){
+            abort(504, "'" . $script->name . "' betiğini çalıştırmak için yetkiniz yok.");
+        }
 
         // Simply run that script on server.
         $output = server()->runScript($script, "'" . \request('hostname') . "'");

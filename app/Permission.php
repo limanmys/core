@@ -99,6 +99,10 @@ class Permission extends Eloquent
 
     public static function can($user_id, $type, $id)
     {
+        if(User::find($user_id)->isAdmin()){
+            return true;
+        }
+
         $permissions = Permission::get($user_id, $type);
 
         if(!$permissions || !in_array($id, $permissions)){
