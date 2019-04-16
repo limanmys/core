@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\LimanRequest;
 use App\Server;
 use App\Widget;
 use function MongoDB\generate_index_name;
@@ -59,14 +60,33 @@ class HomeController extends Controller
     }
 
     public function all(){
-        $requests = \App\LimanRequest::where('user_id',\Auth::id())->get();
+        $requests = LimanRequest::where('user_id',auth()->id())->get();
+        foreach ($requests as $request){
+            switch ($request->status){
+                case "0":
+                    $request->status = __("Talep Alındı");
+                    break;
+                case "1":
+                    $request->status = __("İşleniyor");
+                    break;
+                case "2":
+                    $request->status = __("Tamamlandı.");
+                    break;
+                case "3":
+                    $request->status = __("Reddedildi.");
+                    break;
+                default:
+                    $request->status = __("Bilinmeyen.");
+                    break;
+            }
+        }
         return view('permission.all',[
             "requests" => $requests
         ]);
     }
 
     public function request(){
-        $req = new \App\LimanRequest();
+        $req = new LimanRequest();
         $req->user_id = \Auth::id();
         $req->email = \Auth::user()->email;
         $req->note = request('note');
@@ -74,7 +94,7 @@ class HomeController extends Controller
         $req->speed = request('speed');
         $req->status = 0;
         $req->save();
-        return response('Talebiniz başarıyla alındı.',200);
+        return respond('Talebiniz başarıyla alındı.',200);
     }
 
     public function deneme(){

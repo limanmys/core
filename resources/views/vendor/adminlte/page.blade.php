@@ -105,121 +105,129 @@
                 </nav>
         </header>
 
-    @if(config('adminlte.layout') != 'top-nav')
-        <!-- Left side column. contains the logo and sidebar -->
-            <aside class="main-sidebar">
+        <aside class="main-sidebar">
 
-                <!-- sidebar: style can be found in sidebar.less -->
-                <section class="sidebar">
-                    <ul class="sidebar-menu" data-widget="tree">
-                        <!-- Sidebar Menu -->
-                        @if(auth()->user()->favorites && count(auth()->user()->favorites))
-                            <li class="header">{{__("Favori Sunucular")}}</li>
-                            @foreach(\App\Server::find(auth()->user()->favorites) as $favorite)
-                                <li class="treeview">
-                                    <a href="#">
-                                        <i class="fa fa-fw fa-server "></i>
-                                        <span>{{$favorite->name}}</span>
-                                        <span class="pull-right-container">
+            <section class="sidebar">
+
+                <ul class="sidebar-menu" data-widget="tree">
+                    <!-- Sidebar Menu -->
+                    @if(auth()->user()->favorites && count(auth()->user()->favorites))
+                        <li class="header">{{__("Favori Sunucular")}}</li>
+                        @foreach(\App\Server::find(auth()->user()->favorites) as $favorite)
+                            <li class="treeview">
+                                <a href="#">
+                                    <i class="fa fa-fw fa-server "></i>
+                                    <span>{{$favorite->name}}</span>
+                                    <span class="pull-right-container">
                                             <i class="fa fa-angle-left pull-right"></i>
                                         </span>
-                                    </a>
-                                    <ul class="treeview-menu">
+                                </a>
+                                <ul class="treeview-menu">
+                                    <li class="">
+                                        <a href="/sunucular/{{$favorite->_id}}">
+                                            <i class="fa fa-fw fa-info "></i>
+                                            <span>{{__("Sunucu Detayları")}}</span>
+                                        </a>
+                                    </li>
+
+                                    @foreach(\App\Extension::find(array_keys($favorite->extensions)) as $extension)
                                         <li class="">
-                                            <a href="/sunucular/{{$favorite->_id}}">
-                                                <i class="fa fa-fw fa-info "></i>
-                                                <span>{{__("Sunucu Detayları")}}</span>
+                                            <a href="/l/{{$extension->_id}}/{{$favorite->city}}/{{$favorite->_id}}">
+                                                <i class="fa fa-fw fa-{{$extension->icon}} "></i>
+                                                <span>{{$extension->name}}</span>
                                             </a>
                                         </li>
+                                    @endforeach
+                                    @if($favorite->type == "linux_ssh")
+                                        <li class="">
+                                            <a onclick="terminal('{{$favorite->_id}}','{{$favorite->name}}')" href="#">
+                                                <i class="fa fa-fw fa-info "></i>
+                                                <span>{{__("Terminal")}}</span>
+                                            </a>
+                                        </li>
+                                    @endif
+                                </ul>
 
-                                        @foreach(\App\Extension::find(array_keys($favorite->extensions)) as $extension)
-                                            <li class="">
-                                                <a href="/l/{{$extension->_id}}/{{$favorite->city}}/{{$favorite->_id}}">
-                                                    <i class="fa fa-fw fa-{{$extension->icon}} "></i>
-                                                    <span>{{$extension->name}}</span>
-                                                </a>
-                                            </li>
-                                        @endforeach
-                                        @if($favorite->type == "linux_ssh")
-                                            <li class="">
-                                                <a onclick="terminal('{{$favorite->_id}}','{{$favorite->name}}')" href="#">
-                                                    <i class="fa fa-fw fa-info "></i>
-                                                    <span>{{__("Terminal")}}</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                    </ul>
-
-                                </li>
-                            @endforeach
-                        @endif
-                        <li class="header">{{__("Sunucular")}}</li>
-                        <li class="">
-                            <a href="/sunucular">
-                                <i class="fa fa-fw fa-server "></i>
-                                <span>{{__("Sunucular")}}</span>
-                            </a>
-                        </li>
-                        @if(count(extensions()))
-                            <li class="header">{{__("Eklentiler")}}</li>
-                        @endif
-                        @foreach(extensions() as $extension)
-                            <li class="">
-                                <a href="/l/{{$extension->_id}}">
-                                    <i class="fa fa-fw fa-{{$extension->icon}} "></i>
-                                    <span>{{__($extension->name)}}</span>
-                                </a>
                             </li>
                         @endforeach
-
-                        @if(auth()->user()->isAdmin())
-                            <li class="header">{{__("Yönetim")}}</li>
-                            <li class="">
-                                <a href="/eklentiler">
-                                    <i class="fa fa-fw fa-plus "></i>
-                                    <span>{{__("Eklentiler")}}</span>
-                                </a>
-                            </li>
-                            <li class="">
-                                <a href="/betikler"
-                                >
-                                    <i class="fa fa-fw fa-subscript "></i>
-                                    <span>{{__("Betikler")}}</span>
-                                </a>
-                            </li>
-                            <li class="">
-                                <a href="/ayarlar"
-                                >
-                                    <i class="fa fa-fw fa-plus "></i>
-                                    <span>{{__("Ayarlar")}}</span>
-                                </a>
-                            </li>
-
-                        @endif
-
-                        <li class="header">{{__("Ayarlar")}}</li>
+                    @endif
+                    <li class="header">{{__("Sunucular")}}</li>
+                    <li class="">
+                        <a href="/sunucular">
+                            <i class="fa fa-fw fa-server "></i>
+                            <span>{{__("Sunucular")}}</span>
+                        </a>
+                    </li>
+                    @if(count(extensions()))
+                        <li class="header">{{__("Eklentiler")}}</li>
+                    @endif
+                    @foreach(extensions() as $extension)
                         <li class="">
-                            <a href="/anahtarlar">
-                                <i class="fa fa-fw fa-key "></i>
-                                <span>{{__("Anahtarlar")}}</span>
+                            <a href="/l/{{$extension->_id}}">
+                                <i class="fa fa-fw fa-{{$extension->icon}} "></i>
+                                <span>{{__($extension->name)}}</span>
+                            </a>
+                        </li>
+                    @endforeach
+
+                    @if(auth()->user()->isAdmin())
+                        <li class="header">{{__("Yönetim Paneli")}}</li>
+                        <li class="">
+                            <a href="/eklentiler">
+                                <i class="fa fa-fw fa-plus "></i>
+                                <span>{{__("Eklentiler")}}</span>
                             </a>
                         </li>
                         <li class="">
-                            <a href="/widgetlar"
-                            >
-                                <i class="fa fa-fw fa-key "></i>
-                                <span>{{__("Widgetlar")}}</span>
+                            <a href="/betikler">
+                                <i class="fa fa-fw fa-subscript "></i>
+                                <span>{{__("Betikler")}}</span>
                             </a>
                         </li>
+                        <li class="">
+                            <a href="/ayarlar">
+                                <i class="fa fa-fw fa-plus "></i>
+                                <span>{{__("Ayarlar")}}</span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="/talepler">
+                                <i class="fa fa-fw fa-plus "></i>
+                                <span>{{__("Yetki Talepleri")}}</span>
+                            </a>
+                        </li>
+                    @else
+                        <li class="header">{{__("Yetki Talebi")}}</li>
+                        <li class="">
+                            <a href="/taleplerim">
+                                <i class="fa fa-fw fa-key "></i>
+                                <span>{{__("Taleplerim")}}</span>
+                            </a>
+                        </li>
+                    @endif
 
-                    </ul>
-                    <!-- /.sidebar-menu -->
-                </section>
-                <!-- /.sidebar -->
-            </aside>
-    @endif
+                    <li class="header">{{__("Ayarlar")}}</li>
+                    <li class="">
+                        <a href="/anahtarlar">
+                            <i class="fa fa-fw fa-key "></i>
+                            <span>{{__("Anahtarlar")}}</span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a href="/widgetlar"
+                        >
+                            <i class="fa fa-fw fa-key "></i>
+                            <span>{{__("Widgetlar")}}</span>
+                        </a>
+                    </li>
 
-    <!-- Content Wrapper. Contains page content -->
+                </ul>
+                <!-- /.sidebar-menu -->
+            </section>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
             <section class="content-header">
@@ -236,15 +244,15 @@
         <!-- /.content-wrapper -->
 
     </div>
-    <!-- ./wrapper -->
+
     <script>
-        function terminal(serverId,name) {
+        function terminal(serverId, name) {
             let elm = $("#terminal");
-            $("#terminal .modal-body iframe").attr('src','/sunucu/terminal?server_id=' + serverId);
+            $("#terminal .modal-body iframe").attr('src', '/sunucu/terminal?server_id=' + serverId);
             $("#terminal .modal-title").html(name + '{{__(" sunucusu terminali")}}');
             elm.modal('show');
             elm.on('hidden.bs.modal', function () {
-                $("#terminal .modal-body iframe").attr('src','');
+                $("#terminal .modal-body iframe").attr('src', '');
             })
         }
     </script>

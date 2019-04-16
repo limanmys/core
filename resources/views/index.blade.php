@@ -15,7 +15,7 @@
                         <div class="info-box-content">
                             <span class="info-box-text">{{$widget->server_name . " " . __("Sunucusu")}}</span>
                             <span class="info-box-number" id="{{$widget->_id}}">{{$widget->title}}</span>
-                            <span class="float-right limanWidget" id="{{$widget->_id}}" style="font-size: 20px"></span>
+                            <span class="float-right limanWidget" id="{{$widget->_id}}" style="font-size: 20px">{{__("Yükleniyor...")}}</span>
                         </div>
                     </div>
                 </div>

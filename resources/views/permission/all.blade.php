@@ -10,27 +10,26 @@
 @include('l.modal-button',[
     "class" => "btn-success",
     "target_id" => "request",
-    "text" => "Yetki İste"
+    "text" => "Talep Oluştur"
 ])<br><br>
     <h3>{{__("Talepleriniz")}}</h3>
     @include('l.table',[
             "value" => $requests,
             "title" => [
-                "Açıklama" , "Durumu", "Kullanıcı Adı", "*hidden*"
+                "Açıklama" , "Durumu", "*hidden*"
             ],
             "display" => [
-                "note" , "status", "user_name", "_id:server_id"
-            ],
-            "onclick" => "details"
+                "note" , "status", "_id:server_id"
+            ]
         ])
 
 @include('l.modal',[
     "id"=>"request",
-    "title" => "Yetki İste",
+    "title" => "Talep Oluştur",
     "url" => route('request_send'),
     "next" => "reload",
     "inputs" => [
-        "Yetki Tipi:type" => [
+        "Talep Tipi:type" => [
             "Sunucu" => "server",
             "Betik" => "script",
             "Eklenti" => "extension",
@@ -42,6 +41,6 @@
         ],
         "Açıklama" => "note:text"
     ],
-    "submit_text" => "Talep Aç"
+    "submit_text" => "Oluştur"
 ])
 @endsection

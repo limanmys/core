@@ -37,7 +37,7 @@ class SSHConnector implements Connector
        try{
            $ssh = new SSH2($server->ip_address, $server->port);
        }catch (\Exception $exception){
-           abort(504,"Sunucuya Bağlanılamadı");
+           abort(504,"Sunucuya Bağlanılamadı, " . $exception->getMessage());
        }
         $this->user_id = $user_id;
         $this->username = $key->username;
@@ -49,7 +49,7 @@ class SSHConnector implements Connector
                 abort(504,"Anahtarınız ile giriş yapılamadı.");
             }
         }catch (\Exception $exception){
-            abort(504,"Sunucuya Bağlanılamadı");
+            abort(504,"Sunucuya Bağlanılamadı, " . $exception->getMessage());
         }
 
         $this->ssh = $ssh;
