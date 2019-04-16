@@ -39,6 +39,10 @@ Route::post('/locale', 'HomeController@setLocale')->name('set_locale');
 // Change the language
 Route::post('/theme', 'HomeController@setTheme')->name('set_theme');
 
+// Set Collapse
+
+Route::post('/collapse','HomeController@collapse')->name('set_collapse');
+
 // Home Route
 
 Route::get('/', 'HomeController@index')->name('home');

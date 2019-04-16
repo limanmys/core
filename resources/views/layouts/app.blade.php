@@ -7,7 +7,7 @@
     @yield('css')
 @stop
 
-@section('body_class', 'skin-blue sidebar-mini sidebar-collapse')
+@section('body_class', 'skin-blue sidebar-mini ' . ((\Session::has('collapse')) ? 'sidebar-collapse' : ''))
 
 @section('body')
     @if(auth()->user()->status == "1")
@@ -39,7 +39,8 @@
             <!-- Header Navbar -->
             <nav class="navbar navbar-static-top" role="navigation">
                 <!-- Sidebar toggle button-->
-                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button"
+                   onclick="request('{{route('set_collapse')}}',new FormData(),null)">
                     <span class="sr-only">{{__("Geri Dön")}}</span>
                 </a>
 

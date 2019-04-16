@@ -6,6 +6,7 @@ use App\LimanRequest;
 use App\Server;
 use App\Widget;
 use function MongoDB\generate_index_name;
+use mysql_xdevapi\Session;
 use Twig_Sandbox_SecurityPolicy;
 
 class HomeController extends Controller
@@ -44,6 +45,16 @@ class HomeController extends Controller
         }else{
             return response('Language not found',404);
         }
+    }
+
+    public function collapse()
+    {
+        if(\Session::has('collapse')){
+            \Session::remove('collapse');
+        }else{
+            \Session::put('collapse','');
+        }
+        return respond('Ok',200);
     }
 
     public function setTheme(){
