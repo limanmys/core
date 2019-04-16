@@ -209,9 +209,6 @@
 
     </div>
 
-    <script>
-
-    </script>
     @include('l.modal-iframe',[
         "id" => "terminal",
         "url" => '',
@@ -222,27 +219,6 @@
 
 @section('adminlte_js')
     <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>
-    @stack('js')
-    @auth
-    <script>
-        window.onload = function () {
-            Swal.close();
-            $('table').not('.notDataTable').DataTable({
-                autoFill : true,
-                bFilter: true,
-                destroy: true,
-                "language" : {
-                    url : "{{asset('turkce.json')}}"
-                }
-            });
-            setInterval(function () {
-                checkNotifications();
-            }, 3000);
-        };
-
-    </script>
-@endauth
-    @yield('js')
 @stop
 
 

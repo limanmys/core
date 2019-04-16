@@ -16,4 +16,23 @@
 
 @yield('body')
 </body>
+<script>
+    window.onload = function () {
+        Swal.close();
+        $('table').not('.notDataTable').DataTable({
+            autoFill : true,
+            bFilter: true,
+            destroy: true,
+            "language" : {
+                url : "{{asset('turkce.json')}}"
+            }
+        });
+        @if(auth()->check())
+        setInterval(function () {
+            checkNotifications();
+        }, 3000);
+        @endif
+    };
+
+</script>
 </html>
