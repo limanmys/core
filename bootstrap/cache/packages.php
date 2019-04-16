@@ -32,13 +32,6 @@
       1 => 'Jenssegers\\Mongodb\\MongodbQueueServiceProvider',
     ),
   ),
-  'jeroennoten/laravel-adminlte' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'JeroenNoten\\LaravelAdminLte\\ServiceProvider',
-    ),
-  ),
   'laravel/tinker' => 
   array (
     'providers' => 
