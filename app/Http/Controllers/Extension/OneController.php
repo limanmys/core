@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Extension;
 
 use App\Extension;
+use App\Permission;
 use App\Script;
 use App\Http\Controllers\Controller;
 
@@ -49,6 +50,10 @@ class OneController extends Controller
                         return respond("Eklenti için gerekli olan betik yüklü değil, lütfen yöneticinizle görüşün.", 404);
                     }
 
+                    if(!Permission::can(auth()->id(),'script',$script->_id)){
+                        abort(504, "Eklenti için yetkiniz var fakat '" . $script->name . "' betiğini çalıştırmak için yetkiniz yok.");
+                    }
+
                     // Run Script with no parameters.
                     $output = server()->runScript($script, '');
 
@@ -92,7 +97,7 @@ class OneController extends Controller
         }
 
         $scripts = [];
-        foreach (explode(',', $codes) as $code) {
+        foreach (explode(',', trim($codes)) as $code) {
             array_push($scripts, Script::where('unique_code', $code)->first());
         }
 
@@ -102,6 +107,11 @@ class OneController extends Controller
             if (!$script) {
                 abort(504, "Eklenti için gereken betik bulunamadı");
             }
+
+            if(!Permission::can(auth()->id(),'script',$script->_id)){
+                abort(504, "Eklenti için yetkiniz var fakat '" . $script->name . "' betiğini çalıştırmak için yetkiniz yok.");
+            }
+
             foreach (explode(',', $script->inputs) as $input) {
                 $parameters = $parameters . " '" . \request(explode(':', $input)[0]) . "'";
             }

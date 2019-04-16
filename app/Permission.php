@@ -101,7 +101,7 @@ class Permission extends Eloquent
     {
         $permissions = Permission::get($user_id, $type);
 
-        if(!$permissions || !in_array($permissions, $id)){
+        if(!$permissions || !in_array($id, $permissions)){
             return false;
         }
 
