@@ -45,9 +45,10 @@ class UserController extends Controller
             'name' => request('name'),
             'email' => request('email'),
             'password' => Hash::make($password),
-            'settings' => [],
             'status' => (request('type') == "administrator") ? "1" : "0"
         ]);
+        $user->settings = [];
+        $user->save();
 
         // Create Permissions For User
         Permission::new($user->_id);
