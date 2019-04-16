@@ -6,7 +6,6 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Ana Sayfa")}}</li>
         </ol>
     </nav>
-
     <section class="content">
         @if($widgets->count())
             @foreach($widgets as $widget)
