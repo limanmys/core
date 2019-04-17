@@ -30,6 +30,6 @@ Artisan::command('administrator',function (){
     $perm->script = [];
     $perm->save();
     $this->comment("Administrator kullanıcısı eklendi. ");
-    $this->comment("Email  : admin@liman.app");
+    $this->comment("Email  : admin@liman.dev");
     $this->comment("Parola : " . $password . "");
 })->describe('Create administrator account to use');
