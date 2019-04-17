@@ -7,8 +7,7 @@
         </li>
         <li class="breadcrumb-item"><a
                     href="/l/{{extension()->_id}}/{{request('city')}}">{{cities(request('city'))}}</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a
-                    href="/l/{{extension()->_id}}/{{request('city')}}/{{server()->_id}}">{{server()->name}}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{server()->name}}</li>
     </ol>
     <button class="btn btn-primary" onclick="location.href = '{{route('server_one',server()->_id)}}'">{{__("Sunucu Detayları")}}</button>
     <div class="card">

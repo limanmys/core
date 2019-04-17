@@ -21,7 +21,7 @@
         $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
     }
     ?>
-    @if(isset(server()->favorite) && server()->favorite == "true")
+    @if(isset(auth()->user()->favorites) && in_array(server()->_id,auth()->user()->favorites))
         <button onclick="favorite('false')" class="btn btn-warning">{{__("Favorilerden Sil")}}</button>
     @else
         <button onclick="favorite('true')" class="btn btn-warning">{{__("Favorilere Ekle")}}</button>
@@ -252,7 +252,6 @@
         @endif
 
         function downloadFile(form) {
-            //loading();
             window.location.assign('/sunucu/indir?path=' + form.getElementsByTagName('input')[0].value + '&server_id=' + form.getElementsByTagName('input')[1].value);
             return false;
         }

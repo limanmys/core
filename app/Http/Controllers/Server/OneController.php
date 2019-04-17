@@ -362,13 +362,14 @@ class OneController extends Controller
         if(!$favorites){
             $favorites = [];
         }
+        $favorites = array_unique($favorites);
         if(request('action') == "true"){
             array_push($favorites,server()->_id);
         }else{
             $key = array_search(server()->_id,$favorites);
             unset($favorites[$key]);
         }
-        auth()->user()->favorites = $favorites;
+        auth()->user()->favorites = array_values($favorites);
         auth()->user()->save();
 
         return respond("Düzenlendi.",200);
