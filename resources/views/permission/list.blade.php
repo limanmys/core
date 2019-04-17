@@ -8,44 +8,61 @@
         </ol>
     </nav>
 <button class="btn btn-success" onclick="history.back()">{{__("Geri Dön")}}</button><br><br>
-<table class="table">
-    <thead>
-    <tr>
-        <th scope="col">{{__("Tipi")}}</th>
-        <th scope="col">{{__("Kullanıcı")}}</th>
-        <th scope="col">{{__("Notu")}}</th>
-        <th scope="col">{{__("Durumu")}}</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php
-        $list = [
-             "server" => "Sunucu",
-             "script" => "Betik",
-             "extension" => "Eklenti",
-             "other" => "Diğer"
-        ];
-    ?>
-    @foreach ($requests as $request)
-        <tr class="highlight">
-            <td>{{__($list[$request->type])}}</td>
-            <td>{{$request->user_name}}</td>
-            <td>{{$request->note}}</td>
-            <td>
-                @switch($request->status)
-                    @case(0)
-                        {{__("Talep Alındı")}}
-                        @break
-                    @case(1)
-                        {{__("İşleniyor")}}
-                        @break
-                    @default
-                        {{__("Tamamlandı.")}}
-                @endswitch
-            </td>
-        </tr>
-    @endforeach
-    </tbody>
-</table>
+@include('l.table',[
+        "value" => $requests,
+        "title" => [
+            "Tipi" , "Kullanıcı Adı" , "Not" , "Önem Derecesi", "Durumu", "*hidden*"
+        ],
+        "display" => [
+            "type" , "user_name", "note" , "speed", "status", "_id:request_id"
+        ],
+        "menu" => [
+            "İşleniyor" => [
+                "target" => "working",
+                "icon" => "fa-cog"
+            ],
+            "Tamamlandı" => [
+                "target" => "completed",
+                "icon" => "fa-thumbs-up"
+            ],
+            "Reddet" => [
+                "target" => "deny",
+                "icon" => "fa-thumbs-down"
+            ],
+            "Sil" => [
+                "target" => "deleteRequest",
+                "icon" => "fa-trash"
+            ]
+        ],
+])
+    <script>
+        function update(current,status) {
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Kaydediliyor.")}}',
+                showConfirmButton: false,
+            });
+            let form = new FormData();
+            form.append('status',status);
+            form.append('request_id',current.querySelector('#request_id').innerHTML);
+            request('{{route('request_update')}}',form,function () {
+                Swal.close();
+                location.reload();
+            })
+        }
+        function working(current) {
+            update(current,'1');
+        }
+        function completed(current) {
+            update(current,'2');
+        }
+        function deny(current) {
+            update(current,'3');
+        }
+        function deleteRequest(current) {
+            update(current,'4');
+        }
+    </script>
 
 @endsection

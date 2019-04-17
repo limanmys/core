@@ -80,7 +80,7 @@
                         @foreach(\App\Server::find(auth()->user()->favorites) as $favorite)
                             <li class="treeview">
                                 <a href="#">
-                                    <i class="fa fa-fw fa-server "></i>
+                                    <i class="fa fa-server "></i>
                                     <span>{{$favorite->name}}</span>
                                     <span class="pull-right-container">
                                             <i class="fa fa-angle-left pull-right"></i>
@@ -89,7 +89,7 @@
                                 <ul class="treeview-menu">
                                     <li class="">
                                         <a href="/sunucular/{{$favorite->_id}}">
-                                            <i class="fa fa-fw fa-info "></i>
+                                            <i class="fa fa-info "></i>
                                             <span>{{__("Sunucu Detayları")}}</span>
                                         </a>
                                     </li>
@@ -97,7 +97,7 @@
                                     @foreach(\App\Extension::find(array_keys($favorite->extensions)) as $extension)
                                         <li class="">
                                             <a href="/l/{{$extension->_id}}/{{$favorite->city}}/{{$favorite->_id}}">
-                                                <i class="fa fa-fw fa-{{$extension->icon}} "></i>
+                                                <i class="fa fa-{{$extension->icon}} "></i>
                                                 <span>{{$extension->name}}</span>
                                             </a>
                                         </li>
@@ -105,7 +105,7 @@
                                     @if($favorite->type == "linux_ssh")
                                         <li class="">
                                             <a onclick="terminal('{{$favorite->_id}}','{{$favorite->name}}')" href="#">
-                                                <i class="fa fa-fw fa-info "></i>
+                                                <i class="fa fa-info "></i>
                                                 <span>{{__("Terminal")}}</span>
                                             </a>
                                         </li>
@@ -118,7 +118,7 @@
                     <li class="header">{{__("Sunucular")}}</li>
                     <li class="">
                         <a href="/sunucular">
-                            <i class="fa fa-fw fa-server "></i>
+                            <i class="fa fa-server "></i>
                             <span>{{__("Sunucular")}}</span>
                         </a>
                     </li>
@@ -128,7 +128,7 @@
                     @foreach(extensions() as $extension)
                         <li class="">
                             <a href="/l/{{$extension->_id}}">
-                                <i class="fa fa-fw fa-{{$extension->icon}} "></i>
+                                <i class="fa fa-{{$extension->icon}} "></i>
                                 <span>{{__($extension->name)}}</span>
                             </a>
                         </li>
@@ -138,33 +138,38 @@
                         <li class="header">{{__("Yönetim Paneli")}}</li>
                         <li class="">
                             <a href="/eklentiler">
-                                <i class="fa fa-fw fa-plus "></i>
+                                <i class="fa fa-plus "></i>
                                 <span>{{__("Eklentiler")}}</span>
                             </a>
                         </li>
                         <li class="">
                             <a href="/betikler">
-                                <i class="fa fa-fw fa-subscript "></i>
+                                <i class="fa fa-subscript "></i>
                                 <span>{{__("Betikler")}}</span>
                             </a>
                         </li>
                         <li class="">
                             <a href="/ayarlar">
-                                <i class="fa fa-fw fa-plus "></i>
+                                <i class="fa fa-cog "></i>
                                 <span>{{__("Ayarlar")}}</span>
                             </a>
                         </li>
                         <li class="">
                             <a href="/talepler">
-                                <i class="fa fa-fw fa-plus "></i>
+                                <i class="fa fa-plus "></i>
                                 <span>{{__("Yetki Talepleri")}}</span>
+                                @if(\App\LimanRequest::where('status',0)->count())
+                                    <span class="pull-right-container">
+                                        <small class="label pull-right bg-green">{{\App\LimanRequest::where('status',0)->count()}}</small>
+                                    </span>
+                                @endif
                             </a>
                         </li>
                     @else
                         <li class="header">{{__("Yetki Talebi")}}</li>
                         <li class="">
                             <a href="/taleplerim">
-                                <i class="fa fa-fw fa-key "></i>
+                                <i class="fa fa-key "></i>
                                 <span>{{__("Taleplerim")}}</span>
                             </a>
                         </li>
@@ -173,14 +178,13 @@
                     <li class="header">{{__("Ayarlar")}}</li>
                     <li class="">
                         <a href="/anahtarlar">
-                            <i class="fa fa-fw fa-key "></i>
+                            <i class="fa fa-key "></i>
                             <span>{{__("Anahtarlar")}}</span>
                         </a>
                     </li>
                     <li class="">
-                        <a href="/widgetlar"
-                        >
-                            <i class="fa fa-fw fa-key "></i>
+                        <a href="/widgetlar">
+                            <i class="fa fa-pie-chart" aria-hidden="true"></i>
                             <span>{{__("Widgetlar")}}</span>
                         </a>
                     </li>

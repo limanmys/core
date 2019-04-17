@@ -20,7 +20,11 @@
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="tab_1">
-                Merhaba Dunya
+                <h3>{{__("Kullanıcı Türü")}}</h3>
+                <select name="status" class="form-control" >
+                    <option value="0" @if($user->status == "0") selected @endif>{{__("Kullanıcı")}}</option>
+                    <option value="1" @if($user->status == "1") selected @endif>{{__("Yönetici")}}</option>
+                </select>
             </div>
             <div class="tab-pane" id="tab_2">
                 <button onclick="getList('extension')" class="btn btn-success">{{__("Eklenti Ekle")}}</button><br><br>

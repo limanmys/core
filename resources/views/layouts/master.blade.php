@@ -27,6 +27,10 @@
                 url : "{{asset('turkce.json')}}"
             }
         });
+        let title = $(".breadcrumb-item.active").html();
+        if(title !== undefined){
+            document.title = title + " / Liman";
+        }
         @if(auth()->check())
         setInterval(function () {
             checkNotifications();

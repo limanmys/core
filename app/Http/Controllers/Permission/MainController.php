@@ -10,8 +10,33 @@ class MainController extends Controller
 {
     public function all(){
         $requests = LimanRequest::all();
-        foreach($requests as $r){
-            $r->user_name = User::find($r->user_id)->name;
+        foreach($requests as $request){
+            $request->user_name = User::find($request->user_id)->name;
+            switch ($request->status){
+                case "0":
+                    $request->status = __("Talep Alındı");
+                    break;
+                case "1":
+                    $request->status = __("İşleniyor");
+                    break;
+                case "2":
+                    $request->status = __("Tamamlandı.");
+                    break;
+                case "3":
+                    $request->status = __("Reddedildi.");
+                    break;
+                default:
+                    $request->status = __("Bilinmeyen.");
+                    break;
+            }
+            switch ($request->speed){
+                case "normal":
+                    $request->speed = __("Normal");
+                    break;
+                case "urgent":
+                    $request->speed = __("ACİL");
+                    break;
+            }
         }
         return view('permission.list',[
             "requests" => $requests
@@ -24,5 +49,17 @@ class MainController extends Controller
         return view('permission.requests.' . $request->type ,[
             "request" => $request
         ]);
+    }
+
+    public function requestUpdate()
+    {
+        $request = LimanRequest::where('_id',request('request_id'))->first();
+        if(request('status') == "4"){
+            $request->delete();
+            return respond("Talep Silindi",200);
+        }
+        $request->status = request('status');
+        $request->save();
+        return respond("Talep Güncellendi",200);
     }
 }
