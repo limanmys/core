@@ -7,7 +7,7 @@
         @php($rand = str_random(10))
     @endisset
 
-    <table class="table table-striped table-hover" id="{{$rand}}">
+    <table class="table table-striped table-hover nowrap" id="{{$rand}}" style="width: 100%">
         <thead>
         <tr>
             <th scope="col">#</th>
@@ -23,7 +23,7 @@
         <tbody class="table-striped">
         @foreach ($value as $k)
             <tr class="tableRow" id="{{str_random(10)}}" @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this)" @endisset>
-                <td>{{$loop->iteration}}</td>
+                <td style="width: 10px">{{$loop->iteration}}</td>
                 @foreach($display as $item)
                     @if(count(explode(':',$item)) > 1)
                         @if(is_array($k))

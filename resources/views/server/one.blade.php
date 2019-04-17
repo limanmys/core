@@ -61,10 +61,10 @@
             "table" => [
                 "value" => \App\ServerLog::retrieve(true),
                 "title" => [
-                    "Komut" , "User ID", "Tarih", "Log Id"
+                    "Komut" , "User ID", "Tarih", "*hidden*"
                 ],
                 "display" => [
-                    "command" , "username", "created_at", "_id"
+                    "command" , "username", "created_at", "_id:_id"
                 ],
                 "onclick" => "logDetails"
             ]

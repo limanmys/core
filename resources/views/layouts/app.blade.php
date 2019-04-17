@@ -32,7 +32,7 @@
                     <span class="sr-only">{{__("Geri Dön")}}</span>
                 </a>
                 <span style="line-height: 50px;color: white;">
-                    Build : 16.04.2019 16:27
+                    Build : 17.04.2019 11:16
 {{--                    Build : {{date('d.m.Y H:i')}}--}}
                 </span>
                 <!-- Navbar Right Menu -->

@@ -5,10 +5,10 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
             <li class="breadcrumb-item"><a href="{{route('settings')}}">{{__("Ayarlar")}}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{$user->name}}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{$user->name . __(" Kullanıcısı Ayarları")}}</li>
         </ol>
     </nav>
-    <h2>{{__("Kullanıcı Ayarları")}}</h2>
+    <h2>{{$user->name . __(" Kullanıcısı Ayarları")}}</h2>
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">{{__("Genel Ayarlar")}}</a></li>
@@ -20,21 +20,28 @@
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="tab_1">
-                <h3>{{__("Kullanıcı Türü")}}</h3>
-                <select name="status" class="form-control" >
-                    <option value="0" @if($user->status == "0") selected @endif>{{__("Kullanıcı")}}</option>
-                    <option value="1" @if($user->status == "1") selected @endif>{{__("Yönetici")}}</option>
-                </select>
+                <div style="width: 300px;">
+                    <h4>{{__("Hesap Türü")}}</h4>
+                    <select name="status" class="form-control" >
+                        <option value="0" @if($user->status == "0") selected @endif>{{__("Kullanıcı")}}</option>
+                        <option value="1" @if($user->status == "1") selected @endif>{{__("Yönetici")}}</option>
+                    </select>
+                    <h4>{{__("Adı")}}</h4>
+                    <input class="form-control" type="text" value="{{$user->name}}">
+                    <h4>{{__("Email Adresi")}}</h4>
+                    <input class="form-control" type="text" value="{{$user->email}}">
+                </div>
             </div>
+
             <div class="tab-pane" id="tab_2">
                 <button onclick="getList('extension')" class="btn btn-success">{{__("Eklenti Ekle")}}</button><br><br>
                 @include('l.table',[
                     "value" => $extensions,
                     "title" => [
-                        "Adı" , "Id"
+                        "Adı" , "*hidden*"
                     ],
                     "display" => [
-                        "name" , "_id"
+                        "name" , "_id:_id"
                     ],
                 ])
             </div>
@@ -43,10 +50,10 @@
                 @include('l.table',[
                     "value" => $scripts,
                     "title" => [
-                        "Adı" , "Id"
+                        "Adı" , "*hidden*"
                     ],
                     "display" => [
-                        "name" , "_id"
+                        "name" , "_id:_id"
                     ],
                 ])
             </div>
@@ -55,10 +62,10 @@
                 @include('l.table',[
                     "value" => $servers,
                     "title" => [
-                        "Adı" , "Id"
+                        "Adı" , "*hidden*"
                     ],
                     "display" => [
-                        "name" , "_id"
+                        "name" , "_id:_id"
                     ],
                 ])
             </div>
