@@ -3,15 +3,7 @@
 @section('body_class', 'skin-blue sidebar-mini ' . ((\Session::has('collapse')) ? 'sidebar-collapse' : ''))
 
 @section('body')
-    @auth
-        @if(auth()->user()->status == "1")
-            <div class="alert-warning" align="center">
-                {{__("Yönetici Hesabı İle Giriş Yaptınız.")}}
-            </div>
-        @endif
-    @endauth
-
-    <div class="wrapper" style="height: auto">
+    <div class="wrapper">
 
     <!-- Main Header -->
             @auth
@@ -23,7 +15,6 @@
 
                 <span class="logo-lg"><b>Liman</b></span>
             </a>
-
             <!-- Header Navbar -->
             <nav class="navbar navbar-static-top" role="navigation">
                 <!-- Sidebar toggle button-->
@@ -31,17 +22,22 @@
                    onclick="request('{{route('set_collapse')}}',new FormData(),null)">
                     <span class="sr-only">{{__("Geri Dön")}}</span>
                 </a>
-                <span style="line-height: 50px;color: white;">
-                    Build : 17.04.2019 11:16
+                <span style="line-height: 50px;color: white;font-weight: bolder">
+
 {{--                    Build : {{date('d.m.Y H:i')}}--}}
+                    @if(auth()->user()->status == "1")
+                        {{__("Yönetici Hesabı İle Giriş Yaptınız.")}}
+                    @endif
                 </span>
+
                 <!-- Navbar Right Menu -->
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
-
+                        <li style="color:white;line-height: 50px">
+                            Build : 17.04.2019 11:32
+                        </li>
                         <!-- Notifications: style can be found in dropdown.less -->
-                        <li id="notifications-menu" class="dropdown notifications-menu"
-                            style="margin-top:6px">
+                        <li id="notifications-menu" class="dropdown notifications-menu">
                             @include('l.notifications')
                         </li>
 
