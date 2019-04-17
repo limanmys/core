@@ -34,18 +34,20 @@
                 for(let k in json) {
                     element.append('<option value="'+ k+ '">' + json[k] + '</option>');
                 }
-                if(Object.keys(json).length === 1){
+                if(Object.keys(json).length > 0){
                     getWidgets();
+                    element.removeAttr('disabled');
+                }else{
+                    $("#widget_name").html('').addAttr('disabled','');
                 }
-                element.removeAttr('disabled');
             });
         }
 
         function getWidgets(){
+            $("#widget_name").html('');
             let form = new FormData();
             form.append('extension_id',$("#extension_id").val());
             request('{{route('widget_list')}}',form,function(response){
-                console.log(response);
                 let json = JSON.parse(response);
                 let element = $("#widget_name");
                 element.html('');

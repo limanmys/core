@@ -23,10 +23,6 @@
             "name" , "email", "_id:user_id" ,
         ],
         "menu" => [
-            "Yetkileri Düzenle" => [
-                "target" => "edit",
-                "icon" => "fa-edit"
-            ],
             "Parolayı Sıfırla" => [
                 "target" => "passwordReset",
                 "icon" => "fa-lock"
@@ -38,7 +34,6 @@
         ],
         "onclick" => "details"
     ])
-
 
     @include('l.modal',[
         "id"=>"add_user",

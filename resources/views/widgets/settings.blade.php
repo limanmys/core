@@ -20,7 +20,6 @@
             "Eklenti Seçin:extension_id" => objectToArray(extensions(),"name","_id"),
             "Başlık" => "title:text",
             "type:-" => "type:hidden",
-            "Fonksiyon Adı" => "function_name:text",
             "display_type:-" => "display_type:hidden"
         ],
         "submit_text" => "Ekle"
@@ -29,10 +28,10 @@
     @include('l.table',[
         "value" => $widgets,
         "title" => [
-            "Sunucu" , "Başlık" , "Fonksiyon Adı", "*hidden*"
+            "Sunucu" , "Başlık" , "*hidden*"
         ],
         "display" => [
-            "server_name" , "title" , "function_name", "_id:widget_id"
+            "server_name" , "title" ,"_id:widget_id"
         ],
         "menu" => [
             "Düzenle" => [
@@ -56,7 +55,6 @@
             "Eklenti Seçin:extension_id" => objectToArray(extensions(),"name","_id"),
             "Başlık" => "title:text",
             "type:-" => "type:hidden",
-            "Fonksiyon Adı" => "function_name:text",
             "display_type:-" => "display_type:hidden",
             "widget_id:widget_id" => "widget_id:hidden"
         ],

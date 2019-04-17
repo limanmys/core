@@ -92,8 +92,7 @@ class UserController extends Controller
         try{
             $flag->validate();
         }catch (\Exception $exception){
-            dd($flag->errors());
-            return respond($flag->errors(),201);
+            return respond("Girilen veri geçerli değil.",201);
         }
 
         auth()->user()->update([
@@ -105,5 +104,28 @@ class UserController extends Controller
         session()->flush();
 
         return respond('Kullanıcı Başarıyla Güncellendi, lütfen tekrar giriş yapın.',200);
+    }
+
+    public function adminUpdate()
+    {
+        $flag = Validator::make(request()->all(), [
+            'username' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email'],
+        ]);
+
+        try{
+            $flag->validate();
+        }catch (\Exception $exception){
+            return respond("Girilen veri geçerli değil.",201);
+        }
+
+        $user = User::find(request('user_id'))->first();
+        $user->update([
+            'name' => request('username'),
+            'email' => request('email'),
+            'status' => request('status')
+        ]);
+
+        return respond('Kullanıcı Güncellendi.',200);
     }
 }

@@ -16,10 +16,10 @@
     @include('l.table',[
             "value" => $requests,
             "title" => [
-                "Açıklama" , "Durumu", "*hidden*"
+                "Açıklama" , "Durumu", "Son Guncelleme", "*hidden*"
             ],
             "display" => [
-                "note" , "status", "_id:server_id"
+                "note" , "status", "updated_at", "_id:server_id"
             ]
         ])
 

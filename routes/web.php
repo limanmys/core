@@ -90,4 +90,6 @@ Route::view('/logs/{log_id}','logs.one');
 Route::view('/profil','user.self')->name('my_profile');
 
 Route::post('/profil','UserController@selfUpdate')->name('profile_update');
+
+Route::post('/user/update','UserController@adminUpdate')->name('update_user')->middleware('admin');
 });

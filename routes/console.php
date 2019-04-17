@@ -16,7 +16,7 @@ Artisan::command('administrator',function (){
 
     $user = User::create([
         'name' => "administrator",
-        'email' => "admin@liman.app",
+        'email' => "admin@liman.dev",
         'password' => Hash::make($password),
         'status' => "1"
     ]);
