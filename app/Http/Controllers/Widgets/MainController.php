@@ -20,7 +20,7 @@ class MainController extends Controller
 
     public function settings()
     {
-        $widgets = Widget::all();
+        $widgets = Widget::where('user_id',auth()->id())->get();
         foreach ($widgets as $widget){
             $widget->server_name = Server::where('_id',$widget->server_id)->first()->name;
         }

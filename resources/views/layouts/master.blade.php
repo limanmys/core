@@ -7,7 +7,6 @@
 
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link rel="stylesheet" href="{{asset('/css/liman.css')}}">
-    <link rel="stylesheet" href="{{ asset('vendor/adminlte/dist/css/skins/skin-blue.min.css')}} ">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="hold-transition @yield('body_class')">
@@ -37,6 +36,16 @@
         }, 3000);
         @endif
     };
+
+    function terminal(serverId, name) {
+        let elm = $("#terminal");
+        $("#terminal .modal-body iframe").attr('src', '/sunucu/terminal?server_id=' + serverId);
+        $("#terminal .modal-title").html(name + '{{__(" sunucusu terminali")}}');
+        elm.modal('show');
+        elm.on('hidden.bs.modal', function () {
+            $("#terminal .modal-body iframe").attr('src', '');
+        })
+    }
 
 </script>
 </html>

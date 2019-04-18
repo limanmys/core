@@ -12,7 +12,7 @@
     <script src="{{asset('js/editor/loader.js')}}"></script>
     <button class="btn btn-success" onclick="history.back()">{{__("Geri Dön")}}</button>
     <button class="btn btn-danger" onclick="save()">{{__("Kaydet")}}</button><br><br>
-    <div id="codeEditor" style="width: 100%;height: 85%">
+    <div id="codeEditor" style="width: 100%;height: 50em">
     </div>
     <div id="code" style="display: none;">{{$file}}</div>
     <script>

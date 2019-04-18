@@ -133,6 +133,48 @@ if (!function_exists('extensionDb')) {
     }
 }
 
+if (!function_exists('extensionAPI')) {
+    /**
+     * @param null $id
+     * @return \App\Extension
+     */
+    function extensionAPI($server_id,$extension_name, $target_name)
+    {
+        $server = \App\Server::find($server_id)->first();
+        if(!$server){
+            abort(504,"Eklenti tarafından belirtilen dış sunucu bulunamadı.");
+        }
+
+        if(!\App\Permission::can(auth()->id(),'server',$server_id)){
+            abort(504, "Eklenti tarafından belirtilen sunucu (". $server->name .") için yetkiniz yok.");
+        }
+
+        $extension = \App\Extension::where('name','like',$extension_name)->first();
+        if(!$extension){
+            abort(504,"Eklenti tarafından belirtilen dış eklenti bulunamadı.");
+        }
+
+        if(!\App\Permission::can(auth()->id(),'extension',$extension->_id)){
+            abort(504, "Eklenti tarafından belirtilen eklenti (". $extension->name .") için yetkiniz yok.");
+        }
+
+        if($extension->serverless){
+            return "asd";
+        }else{
+            $script = \App\Script::where('unique_code',$target_name)->first();
+            if(!$script){
+                abort(504,"Eklenti tarafından belirtilen dış betik bulunamadı.");
+            }
+
+            if(!\App\Permission::can(auth()->id(),'script',$script->_id)){
+                abort(504, "Eklenti tarafından belirtilen betik (". $script->name .") için yetkiniz yok.");
+            }
+        }
+
+        return "asd";
+    }
+}
+
 if (!function_exists('getObject')) {
     /**
      * @param $type

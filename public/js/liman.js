@@ -202,13 +202,3 @@ function addToTable(){
         current_modal.modal('hide');
     }
 }
-
-function terminal(serverId, name) {
-    let elm = $("#terminal");
-    $("#terminal .modal-body iframe").attr('src', '/sunucu/terminal?server_id=' + serverId);
-    $("#terminal .modal-title").html(name + '{{__(" sunucusu terminali")}}');
-    elm.modal('show');
-    elm.on('hidden.bs.modal', function () {
-        $("#terminal .modal-body iframe").attr('src', '');
-    })
-}

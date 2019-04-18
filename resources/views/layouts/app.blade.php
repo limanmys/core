@@ -23,8 +23,6 @@
                     <span class="sr-only">{{__("Geri Dön")}}</span>
                 </a>
                 <span style="line-height: 50px;color: white;font-weight: bolder">
-
-{{--                    Build : {{date('d.m.Y H:i')}}--}}
                     @if(auth()->user()->status == "1")
                         {{__("Yönetici Hesabı İle Giriş Yaptınız.")}}
                     @endif
@@ -34,7 +32,7 @@
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
                         <li style="color:white;line-height: 50px">
-                            Build : 17.04.2019 11:32
+                            Build : 18.04.2019 16:29
                         </li>
                         <!-- Notifications: style can be found in dropdown.less -->
                         <li id="notifications-menu" class="dropdown notifications-menu">

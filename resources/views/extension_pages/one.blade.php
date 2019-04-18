@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    @php($flag = ($extension->serverless == "true") ? true : false)
+    @php($flag = ($extension->serverless == "true") ? false : true)
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
@@ -38,12 +38,12 @@
                 <div class="bd-example">
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="serverless"
-                               value="true" @if($flag)checked @endif>
+                               value="false" @if($flag)checked @endif>
                         <label class="form-check-label" for="inlineRadio1">{{__("Evet")}}</label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="serverless"
-                               value="false" @if(!$flag)checked @endif>
+                               value="true" @if(!$flag)checked @endif>
                         <label class="form-check-label" for="inlineRadio2">{{__("Hayır")}}</label>
                     </div>
                 </div>

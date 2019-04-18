@@ -6,8 +6,8 @@
 </head>
 <body onload="start('{{$id}}','{{$limanKey}}')">
 
-<div class="container">
-    <div id="terminal"></div>
+<div class="container" style="height: 100%;">
+    <div id="terminal" style="height: 100%"></div>
 </div>
 
 <script src="{{asset('js/xterm.min.js')}}"></script>
