@@ -32,7 +32,7 @@
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
                         <li style="color:white;line-height: 50px">
-                            Build : 18.04.2019 16:29
+                            Build : 24.04.2019 17:11
                         </li>
                         <!-- Notifications: style can be found in dropdown.less -->
                         <li id="notifications-menu" class="dropdown notifications-menu">
