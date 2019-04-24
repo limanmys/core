@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Server;
 
 use App\Extension;
 use App\Http\Controllers\Controller;
-use App\Http\Middleware\Server;
 use App\Jobs\InstallService;
 use App\Key;
 use App\Notification;
@@ -227,17 +226,11 @@ class OneController extends Controller
         // Retrieve extension object.
         $extension = Extension::where('_id', \request('extension_id'))->first();
 
-
-        // If server is not accessible through ssh, we can assume it is already installed
-//        if(server()->type == "linux" || server()->type == "windows"){
-
-            // Simply, retrieve array and add extension id.
-            $extensions_array = server()->extensions;
-            $extensions_array[$extension->_id] = [];
-            server()->extensions = $extensions_array;
-            server()->save();
-            return respond('Servis başarıyla eklendi.');
-//        }
+        $extensions_array = server()->extensions;
+        $extensions_array[$extension->_id] = [];
+        server()->extensions = $extensions_array;
+        server()->save();
+        return respond('Servis başarıyla eklendi.');
 
         if(array_key_exists("install",$extension->views)){
             return respond("Kurulum betiği bulunamadığı için işlem iptal edildi.",201);
@@ -375,4 +368,15 @@ class OneController extends Controller
         return respond("Düzenlendi.",200);
     }
 
+    public function stats()
+    {
+        $disk = substr(server()->run('df -h | grep ^/dev ',false),0,-1);
+        $ram = server()->run("free -m | awk '/Mem:/ { total=($6/$2)*100 } END { printf(\"%3.1f\", total) }'",false);
+        $cpu = substr(server()->run("grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'",false),0,-1);
+        return [
+            "disk" => $disk,
+            "ram" => $ram,
+            "cpu" => $cpu
+        ];
+    }
 }

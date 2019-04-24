@@ -62,4 +62,5 @@ Route::group(['middleware' => ['server']], function () {
 
     Route::post('/sunucu/favori','Server\OneController@favorite')->name('server_favorite')->middleware('parameters:server_id,action');
 
+    Route::post('/sunucu/durum','Server\OneController@stats')->name('server_stats');
 });

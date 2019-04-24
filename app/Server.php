@@ -33,7 +33,6 @@ class Server extends Eloquent
     /**
      * @return SSHConnector
      * @throws Exceptions\Key\NotFound
-     * @throws \Throwable
      */
     private function connector()
     {
@@ -44,14 +43,13 @@ class Server extends Eloquent
 
     /**
      * @param $command
-     * @param $flag
+     * @param $log
      * @return string
-     * @throws \Throwable
      */
-    public function run($command,$flag = true)
+    public function run($command,$log = true)
     {
         // Execute and return outputs.
-        return $this->connector()->execute($command,$flag);
+        return $this->connector()->execute($command,$log);
     }
 
     /**

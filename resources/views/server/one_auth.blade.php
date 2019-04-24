@@ -8,6 +8,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{$server->name}}</li>
         </ol>
     </nav>
+    <hr>
     <?php
     $input_extensions = [];
     foreach ($available_extensions as $extension) {
@@ -80,8 +81,7 @@
         "target_id" => "log_table",
         "text" => "Sunucu Logları"
     ])
-
-    <br><br>
+    <hr>
 
     <h5>Hostname : {{$hostname}}</h5>
     @if(count($installed_extensions) > 0)
@@ -97,12 +97,24 @@
         <h4>{{__("Yüklü servis yok.")}}</h4>
     @endif
     <br><br>
-    <pre>
-        @isset($stats)
-            {{$stats}}
-        @endisset
-    </pre>
+    <table class="notDataTable">
+        <thead>
+        <tr>
+            <th>{{__("Cpu Kulllanımı")}}</th>
+            <th>{{__("Disk Kulllanımı")}}</th>
+            <th>{{__("Ram Kulllanımı")}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td style="padding-right: 50px"><canvas id="cpu" width="100px" height="200px" style="float:left"></canvas></td>
+            <td style="padding-right: 50px" id="disk"></td>
+            <td style="padding-right: 50px"><canvas id="ram" width="100px" height="200px" style="float:left;"></canvas></td>
+        </tr>
+        </tbody>
+    </table>
 
+    <br>
     @include('l.modal-button',[
         "class" => "btn-danger",
         "target_id" => "delete",
@@ -250,7 +262,79 @@
 
         @endforeach
         @endif
+        setInterval(function () {
+            stats();
+        },54000);
+        function stats() {
+            let form = new FormData();
+            form.append('server_id','{{server()->_id}}');
+            request('{{route('server_stats')}}',form,function (response) {
+                data = JSON.parse(response);
 
+                let ramCanvas = document.getElementById("ram").getContext('2d');
+                ramCanvas.clearRect(0,0,ramCanvas.width,ramCanvas.height);
+
+                let ramChart = new Chart($("#ram"),{
+                    type: 'pie',
+                    data: {
+                        datasets: [{
+                            data: [data['ram'], 100 - parseFloat(data['ram'])],
+                            backgroundColor: [
+                                "#ff8397",
+                                "#56d798",
+                            ],
+                            hoverBackgroundColor: [
+                                "#ff8397",
+                                "#56d798",
+                            ]
+                        }],
+
+                        labels: [
+                            '{{__("Dolu")}}',
+                            '{{__("Boş")}}',
+                        ]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: false,
+                        legend: false,
+                    }
+                });
+
+                let cpuCanvas = document.getElementById("cpu").getContext('2d');
+                cpuCanvas.clearRect(0,0,cpuCanvas.width,cpuCanvas.height);
+
+                let cpuChart = new Chart($("#cpu"),{
+                    type: 'pie',
+                    data: {
+                        datasets: [{
+                            data: [Math.round(data['cpu'] * 10 ) / 10, 100 - Math.round( parseFloat(data['cpu']) * 10 ) / 10],
+                            backgroundColor: [
+                                "#ff8397",
+                                "#56d798",
+                            ],
+                            hoverBackgroundColor: [
+                                "#ff8397",
+                                "#56d798",
+                            ]
+                        }],
+
+                        labels: [
+                            '{{__("Dolu")}}',
+                            '{{__("Boş")}}',
+                        ]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: false,
+                        legend: false,
+                    }
+                });
+
+                $("#disk").html(data['disk']);
+            })
+        }
+        stats();
         function downloadFile(form) {
             window.location.assign('/sunucu/indir?path=' + form.getElementsByTagName('input')[0].value + '&server_id=' + form.getElementsByTagName('input')[1].value);
             return false;
