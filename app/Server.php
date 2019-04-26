@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Classes\Connector\SSHConnector;
+use App\Classes\Connector\WinRMConnector;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
 /**
@@ -38,6 +39,8 @@ class Server extends Eloquent
     {
         if($this->type == "linux_ssh"){
             return new SSHConnector($this,auth()->id());
+        }elseif($this->type == "windows_powershell"){
+            return new WinRMConnector($this,auth()->id());
         }
     }
 

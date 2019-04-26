@@ -318,7 +318,6 @@ class OneController extends Controller
     private function authorized()
     {
         return view('server.one_auth', [
-            "stats" => server()->run("df -h"),
             "hostname" => server()->run("hostname"),
             "server" => server(),
             "installed_extensions" => $this->installedExtensions(),

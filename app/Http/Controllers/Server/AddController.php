@@ -78,6 +78,7 @@ class AddController extends Controller
         // Create Key
         $flag = \App\Classes\Connector\SSHConnector::create($this->server,request('username'), request('password'),auth()->id(),$key);
         if(!$flag){
+            $this->server->delete();
             $key->delete();
             return respond("SSH Hatası",400);
         }
@@ -117,6 +118,19 @@ class AddController extends Controller
     }
 
     private function windows_powershell(){
+        $key = new Key(request()->all());
+
+        $key->server_id = $this->server->id;
+        $key->user_id = Auth::id();
+        $key->save();
+        $flag = \App\Classes\Connector\WinRMConnector::create($this->server,request('username'), request('password'),auth()->id(),$key);
+
+        if(!$flag){
+            $this->server->delete();
+            $key->delete();
+            return respond("WinRM Hatası",400);
+        }
+        
         return $this->grantPermissions();
     }
 
