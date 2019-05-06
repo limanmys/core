@@ -238,6 +238,16 @@ class MainController extends Controller
         touch($folder  . '/index.blade.php');
         touch($folder  . '/functions.php');
 
+        if((intval(shell_exec("grep -c '^mert:' /etc/passwd"))) ? false : true){
+            shell_exec('sudo useradd -r -s /bin/false liman-' . $ext->_id);
+        }
+
+        shell_exec('sudo chown liman-' . $ext->_id . ':liman "' . $folder . '/index.blade.php"');
+        shell_exec('sudo chmod 664 "' . $folder . ' /index.blade.php"');
+
+        shell_exec('sudo chown liman-' . $ext->_id . ':liman "' . $folder . '/functions.php"');
+        shell_exec('sudo chmod 664 "' . $folder . ' /functions.php"');
+
         return respond(route('extension_one',$ext->_id),300);
     }
 }

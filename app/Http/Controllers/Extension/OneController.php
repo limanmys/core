@@ -190,10 +190,12 @@ class OneController extends Controller
                 shell_exec('rm ' .storage_path('app/scripts/' . $script->_id));
                 $script->delete();
             }
+            shell_exec('sudo userdel ' . extension()->_id);
             extension()->delete();
         } catch (\Exception $exception) {
             return respond('Eklenti silinemedi', 201);
         }
+
         return respond('Eklenti Başarıyla Silindi');
     }
 

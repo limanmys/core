@@ -4,7 +4,7 @@ use App\User;
 
 Artisan::command('administrator',function (){
     // Check if Admin user is exists.
-    $user = User::where('email','admin@liman.app')->first();
+    $user = User::where('email','admin@liman.dev')->first();
     if($user){
         if(!$this->confirm('Administrator kullanıcısı silinip tekrar eklenecektir. Devam etmek istiyor musunuz?')){
             return false;

@@ -12,10 +12,10 @@ class WinRMConnector implements Connector
         ])->first()) || abort(504,"WinRM Anahtarınız yok.");
         $checkScript = "/usr/bin/python3 /liman/server/storage/winrm_validate.py '" . $server->ip_address . "' '" 
         . storage_path('keys/windows') . DIRECTORY_SEPARATOR . $user_id . "_cert.pem' '" 
-        . storage_path('keys/windows') . DIRECTORY_SEPARATOR . $user_id . "_prv.pem' '123456'";
+        . storage_path('keys/windows') . DIRECTORY_SEPARATOR . $user_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()). "'";
         $output = shell_exec($checkScript);
         if($output != "ok\n"){
-            abort(504,"Sertifika Gecerli Degil");
+            abort(504,"Sertifikanız geçerli değil.");
         }
         return true;
     }
@@ -29,24 +29,28 @@ class WinRMConnector implements Connector
     {
         $executeScript = "/usr/bin/python3 /liman/server/storage/winrm_execute.py '" . server()->ip_address . "' '" 
         . storage_path('keys/windows') . DIRECTORY_SEPARATOR . auth()->user()->_id . "_cert.pem' '" 
-        . storage_path('keys/windows') . DIRECTORY_SEPARATOR . auth()->user()->_id . "_prv.pem' '123456'";
+        . storage_path('keys/windows') . DIRECTORY_SEPARATOR . auth()->user()->_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'";
         return shell_exec($executeScript . " " . $command)
 ;    }
 
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
-
+        $receiveFile = "/usr/bin/python3 /liman/server/storage/winrm_sendfile.py '" . server()->ip_address . "' '"
+            . storage_path('keys/windows') . DIRECTORY_SEPARATOR . auth()->user()->_id . "_cert.pem' '"
+            . storage_path('keys/windows') . DIRECTORY_SEPARATOR . auth()->user()->_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'" .
+            " '$remotePath' '$localPath'";
+        shell_exec($receiveFile);
+        return true;
     }
 
     public function receiveFile($localPath, $remotePath)
     {
         $receiveFile = "/usr/bin/python3 /liman/server/storage/winrm_getfile.py '" . server()->ip_address . "' '" 
         . storage_path('keys/windows') . DIRECTORY_SEPARATOR . auth()->user()->_id . "_cert.pem' '" 
-        . storage_path('keys/windows') . DIRECTORY_SEPARATOR . auth()->user()->_id . "_prv.pem' '123456'" .
+        . storage_path('keys/windows') . DIRECTORY_SEPARATOR . auth()->user()->_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'" .
         " '$remotePath' '$localPath'";
         shell_exec($receiveFile);
         return is_file($localPath);
-
     }
 
     public function runScript($script,$parameters, $extra = null)
@@ -58,17 +62,17 @@ class WinRMConnector implements Connector
     {
         $beforeScript = "/usr/bin/python3 /liman/server/storage/winrm_cert.py before '" . $server->ip_address . "' '$username' '$password' '" 
         . storage_path('keys/windows') . DIRECTORY_SEPARATOR . $user_id . "_cert.pem' '" 
-        . storage_path('keys/windows') . DIRECTORY_SEPARATOR . $user_id . "_prv.pem' '123456'";
+        . storage_path('keys/windows') . DIRECTORY_SEPARATOR . $user_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()). "'";
         $beforeOutput = shell_exec($beforeScript);
-        
         if($beforeOutput != "ok\n"){
+            $key->delete();
             $server->delete();
             abort(504,$beforeOutput);
         }
 
     	$runScript = "/usr/bin/python3 /liman/server/storage/winrm_cert.py run '" . $server->ip_address . "' '$username' '$password' '" 
         . storage_path('keys/windows') . DIRECTORY_SEPARATOR . $user_id . "_cert.pem' '" 
-        . storage_path('keys/windows') . DIRECTORY_SEPARATOR . $user_id . "_prv.pem' '123456'";
+        . storage_path('keys/windows') . DIRECTORY_SEPARATOR . $user_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'";
         $output = shell_exec($runScript);
     	return true;
     }
