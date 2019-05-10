@@ -43,7 +43,7 @@ class SSHConnector implements Connector
         $this->username = $key->username;
         $rsa = new RSA();
         $rsa->password = env("APP_KEY") . $user_id;
-        $rsa->loadKey(file_get_contents(storage_path('keys') . DIRECTORY_SEPARATOR . $user_id));
+        $rsa->loadKey(file_get_contents(storage_path('keys') . DIRECTORY_SEPARATOR . 'linux' . DIRECTORY_SEPARATOR . $user_id));
         try{
             if(!$ssh->login($key->username,$rsa)){
                 abort(504,"Anahtarınız ile giriş yapılamadı.");
@@ -133,7 +133,7 @@ class SSHConnector implements Connector
         $sftp = new SFTP($this->server->ip_address, $this->server->port);
         $key = new RSA();
         $key->password = env("APP_KEY") . $this->user_id;
-        $key->loadKey(file_get_contents(storage_path('keys') . DIRECTORY_SEPARATOR . $this->user_id));
+        $key->loadKey(file_get_contents(storage_path('keys') . DIRECTORY_SEPARATOR . 'linux' . DIRECTORY_SEPARATOR . $this->user_id));
         if(!$sftp->login($this->username,$key)){
             abort(504,"Anahtar Hatası");
         }
@@ -150,7 +150,7 @@ class SSHConnector implements Connector
         $sftp = new SFTP($this->server->ip_address, $this->server->port);
         $key = new RSA();
         $key->password = env("APP_KEY") . $this->user_id;
-        $key->loadKey(file_get_contents(storage_path('keys') . DIRECTORY_SEPARATOR . $this->user_id));
+        $key->loadKey(file_get_contents(storage_path('keys') . DIRECTORY_SEPARATOR . 'linux' . DIRECTORY_SEPARATOR . $this->user_id));
         if(!$sftp->login($this->username,$key)){
             abort(504,"Anahtar Hatası");
         }
@@ -167,16 +167,16 @@ class SSHConnector implements Connector
      */
     public static function create(\App\Server $server, $username, $password, $user_id,$key)
     {
-        if(!is_file(storage_path('keys') . DIRECTORY_SEPARATOR . $user_id)){
+        if(!is_file(storage_path('keys') . DIRECTORY_SEPARATOR . 'linux' . DIRECTORY_SEPARATOR . $user_id)){
             $rsa = new RSA();
             $rsa->password = env("APP_KEY") . $user_id;
             $rsa->comment = "liman";
             $rsa->setPublicKeyFormat(RSA::PUBLIC_FORMAT_OPENSSH);
             $keys = $rsa->createKey(4096);
-            file_put_contents(storage_path('keys') . DIRECTORY_SEPARATOR . $user_id, $keys["privatekey"]);
-            file_put_contents(storage_path('keys') . DIRECTORY_SEPARATOR . $user_id . ".pub", $keys["publickey"]);
+            file_put_contents(storage_path('keys') . DIRECTORY_SEPARATOR . 'linux' . DIRECTORY_SEPARATOR . $user_id, $keys["privatekey"]);
+            file_put_contents(storage_path('keys') . DIRECTORY_SEPARATOR . 'linux' . DIRECTORY_SEPARATOR . $user_id . ".pub", $keys["publickey"]);
         }else{
-            $keys["publickey"] = file_get_contents(storage_path('keys') . DIRECTORY_SEPARATOR . $user_id . ".pub");
+            $keys["publickey"] = file_get_contents(storage_path('keys') . DIRECTORY_SEPARATOR . 'linux' . DIRECTORY_SEPARATOR . $user_id . ".pub");
         }
         try{
             $ssh = new SSH2($server->ip_address, $server->port);

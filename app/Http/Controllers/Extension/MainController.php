@@ -138,6 +138,10 @@ class MainController extends Controller
         $new->fill($json);
         $new->save();
 
+        if((intval(shell_exec("grep -c '^liman-: " . $new->_id  . "' /etc/passwd"))) ? false : true){
+            shell_exec('sudo useradd -r -s /bin/sh liman-' . $new->_id);
+        }
+
         $extension_folder = resource_path('views/extensions/' . strtolower($json["name"]));
 
         // Delete existing folder.
@@ -161,6 +165,8 @@ class MainController extends Controller
                 }
 
                 copy($view->getRealPath(),$extension_folder . DIRECTORY_SEPARATOR . $view->getFilename());
+                shell_exec('sudo chown liman-' . $new->_id . ':liman "' . $extension_folder . DIRECTORY_SEPARATOR . $view->getFilename() . '"');
+                shell_exec('sudo chmod 664 "' . $extension_folder . DIRECTORY_SEPARATOR . $view->getFilename() . '"');
             }
 
         }
@@ -186,6 +192,8 @@ class MainController extends Controller
                 }
             }
         }
+
+        $folder = resource_path('views/extensions/') . strtolower(request('name'));
 
         return respond(route('extension_one',$new->_id),300);
     }
@@ -238,16 +246,16 @@ class MainController extends Controller
         touch($folder  . '/index.blade.php');
         touch($folder  . '/functions.php');
 
-        if((intval(shell_exec("grep -c '^mert:' /etc/passwd"))) ? false : true){
-            shell_exec('sudo useradd -r -s /bin/false liman-' . $ext->_id);
+        if((intval(shell_exec("grep -c '^liman-: " . $ext->_id  . "' /etc/passwd"))) ? false : true){
+            shell_exec('sudo useradd -r -s /bin/sh liman-' . $ext->_id);
         }
 
-        shell_exec('sudo chown liman-' . $ext->_id . ':liman "' . $folder . '/index.blade.php"');
-        shell_exec('sudo chmod 664 "' . $folder . ' /index.blade.php"');
+        shell_exec('sudo chown liman-' . $ext->_id . ':liman "' . trim($folder) . '/index.blade.php"');
+        shell_exec('sudo chmod 664 "' . trim($folder) . '/index.blade.php"');
 
-        shell_exec('sudo chown liman-' . $ext->_id . ':liman "' . $folder . '/functions.php"');
-        shell_exec('sudo chmod 664 "' . $folder . ' /functions.php"');
-
+        shell_exec('sudo chown liman-' . $ext->_id . ':liman "' . trim($folder) . '/functions.php"');
+        shell_exec('sudo chmod 664 "' . trim($folder) . '/functions.php"');
+        
         return respond(route('extension_one',$ext->_id),300);
     }
 }

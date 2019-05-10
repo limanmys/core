@@ -39,10 +39,19 @@ class OneController extends Controller
             return respond("Yalnızca kendi sunucunuzu silebilirsiniz.",202);
         }
 
+        if($server->type == "windows_powershell"){
+            if(is_file(storage_path('keys/windows/') . Auth::id() . server()->id)){
+                unlink(storage_path('keys/windows/') . Auth::id() . server()->id);
+            }
+        
+            Key::where('server_id',$server->_id)->delete();
+        }
+
         // If server has key, simply delete it.
         if($server->type == "linux_ssh"){
             Key::where('server_id',$server->_id)->delete();
         }
+
         \App\Widget::where([
             "server_id" => $server->_id
         ])->delete();
@@ -336,16 +345,18 @@ class OneController extends Controller
 
     private function availableExtensions()
     {
-        // if(server()->key){
-            return Extension::whereNotIn('_id',array_keys(server()->extensions))->get();
-        // }
-        // return Extension::whereNotIn('_id',array_keys(server()->extensions))->where('serverless','true')->get();
-
+        if(auth()->user()->isAdmin()){
+            return Extension::all()->whereNotIn('_id',array_keys(server()->extensions));
+        }
+        return Extension::find(Permission::get(Auth::user()->_id,'extension'))->whereNotIn('_id',array_keys(server()->extensions));
     }
 
     private function installedExtensions()
     {
-        return Extension::whereIn('_id',array_keys(server()->extensions))->get();
+        if(auth()->user()->isAdmin()){
+            return Extension::find(array_keys(server()->extensions));
+        }
+        return Extension::find(Permission::get(Auth::user()->_id,'extension'))->whereIn('_id',array_keys(server()->extensions));
     }
 
     public function favorite()

@@ -32,7 +32,7 @@
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
                         <li style="color:white;line-height: 50px">
-                            Build : 24.04.2019 17:11
+                            Build : 09.05.2019 16:30 
                         </li>
                         <!-- Notifications: style can be found in dropdown.less -->
                         <li id="notifications-menu" class="dropdown notifications-menu">
@@ -89,6 +89,9 @@
                                     </li>
 
                                     @foreach(\App\Extension::find(array_keys($favorite->extensions)) as $extension)
+                                    @if(\App\Permission::can(auth()->user()->_id,'extension',$extension->_id) == false)
+                                        @continue
+                                    @endif
                                         <li class="">
                                             <a href="/l/{{$extension->_id}}/{{$favorite->city}}/{{$favorite->_id}}">
                                                 <i class="fa fa-{{$extension->icon}} "></i>

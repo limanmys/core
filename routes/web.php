@@ -93,3 +93,11 @@ Route::post('/profil','UserController@selfUpdate')->name('profile_update');
 
 Route::post('/user/update','UserController@adminUpdate')->name('update_user')->middleware('admin');
 });
+
+Route::post('/lmn/private/extensionApi','Extension\OneController@internalExtensionApi');
+
+Route::post('/lmn/private/runCommandApi','Extension\OneController@internalRunCommandApi');
+
+Route::post('/lmn/private/putFileApi','Extension\OneController@internalPutFileApi');
+
+Route::post('/lmn/private/getFileApi','Extension\OneController@internalGetFileApi');

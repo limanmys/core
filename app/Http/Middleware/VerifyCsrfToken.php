@@ -19,6 +19,9 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        "/onur*"
+        "/lmn/private/extensionApi",
+        "/lmn/private/runCommandApi",
+        "/lmn/private/putFileApi",
+        "/lmn/private/getFileApi"
     ];
 }

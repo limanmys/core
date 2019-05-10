@@ -7,7 +7,7 @@
         @php($rand = str_random(10))
     @endisset
 
-    <table class="table table-striped table-hover nowrap" id="{{$rand}}" style="width: 100%">
+<table class="table table-striped table-hover nowrap @isset($noInitialize){{"notDataTable"}}@endisset" id="{{$rand}}" style="width: 100%">
         <thead>
         <tr>
             <th scope="col">#</th>

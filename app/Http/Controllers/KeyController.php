@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Classes\Connector\SSHConnector;
 use App\Key;
 use App\Server;
+use App\Classes\Connector\WinRMConnector;
 
 class KeyController extends Controller
 {
@@ -16,8 +17,7 @@ class KeyController extends Controller
         $keys = Key::where('user_id',auth()->id())->get();
 
         // Retrieve User servers that has permission.
-        $servers = Server::getAll();
-        $servers = $servers->where('type','linux_ssh');
+        $servers = servers()->whereIn('type',['windows_powershell','linux_ssh']);
         foreach ($keys as $key){
             $server = $servers->where('_id',$key->server_id)->first();
             $key->server_name = ($server) ? $server->name : __("Sunucu Silinmiş.");
@@ -46,14 +46,29 @@ class KeyController extends Controller
 
         $key->save();
 
+        $server = Server::where('_id',request('server_id'))->first();
+        
+        if(!$server){
+            abort(504,"Sunucu Bulunamadi");
+        }
+
         // Init key with parameters.
-        if(request('server')->type == "linux_ssh"){
+        if($server->type == "linux_ssh"){
             try{
-                $flag = SSHConnector::create(request('server'),request('username'),request('password'),auth()->id(),$key);
+                $flag = SSHConnector::create($server,request('username'),request('password'),auth()->id(),$key);
             }catch (\Exception $exception){
                 $flag = "Sunucuya bağlanılamadı.";
             }
         }
+        if($server->type == "windows_powershell"){
+            try{
+                $flag = WinRMConnector::create($server,request('username'),request('password'),auth()->id(),$key);
+            }catch (\Exception $exception){
+                $flag = $exception->getMessage();
+            }
+        }
+
+
         if($flag != "OK"){
             $key->delete();
             return respond($flag,201);
@@ -65,7 +80,8 @@ class KeyController extends Controller
 
     public function delete()
     {
-        \App\Key::where('_id',request('key_id'))->delete();
+        $key = \App\Key::where('_id',request('key_id'))->first();
+        $key->delete();
         return respond("Anahtar Silindi");
     }
 }

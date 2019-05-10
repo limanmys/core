@@ -23,7 +23,7 @@
             <div class="tab-pane active" id="tab_1">
                 <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button>
                 <h3>{{__("Eklenti Adı")}}</h3>
-                <input id="extensionName" type="text" name="name" class="form-control" value="{{$extension->name}}">
+                <input id="extensionName" type="text" class="form-control" value="{{$extension->name}}" disabled>
                 <h3>{{__("Yayınlayan")}}</h3>
                 <input type="text" name="name" class="form-control" value="{{$extension->publisher}}" disabled>
                 <h3>{{__("Destek Email'i")}}</h3>

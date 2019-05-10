@@ -35,14 +35,16 @@
                     <div style="width: 300px;height: 300px;display: block;float: left;padding-top: 75px;margin-left:50px;">
                         <button class="btn btn-danger btn-block" onclick="removeUser()">{{__("Kullanıcıyı Sil")}}</button><br>
                         <button class="btn btn-warning btn-block" onclick="resetPassword()">{{__("Parola Sıfırla")}}</button><br>
-                        <button class="btn btn-success btn-block" type="submit">{{__("Değişiklikleri Kaydet")}}</button>
+                        <button class="btn btn-success btn-block" type="submit" disabled>{{__("Değişiklikleri Kaydet")}}</button>
                     </div>
                 </form>
             </div>
 
             <div class="tab-pane" id="tab_2">
-                <button onclick="getList('extension')" class="btn btn-success">{{__("Eklenti Ekle")}}</button><br><br>
+                <button onclick="getList('extension')" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                <button onclick="removePermission('extension')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
                 @include('l.table',[
+                    "id" => "extension_table",
                     "value" => $extensions,
                     "title" => [
                         "Adı" , "*hidden*"
@@ -50,11 +52,14 @@
                     "display" => [
                         "name" , "_id:_id"
                     ],
+                    "noInitialize" => "true"
                 ])
             </div>
             <div class="tab-pane" id="tab_3">
-                <button onclick="getList('script')" class="btn btn-success">{{__("Betik Ekle")}}</button><br><br>
+                <button onclick="getList('script')" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                <button onclick="removePermission('script')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
                 @include('l.table',[
+                    "id" => "script_table",
                     "value" => $scripts,
                     "title" => [
                         "Adı" , "*hidden*"
@@ -62,11 +67,14 @@
                     "display" => [
                         "name" , "_id:_id"
                     ],
+                    "noInitialize" => "true"
                 ])
             </div>
             <div class="tab-pane" id="tab_4">
-                <button onclick="getList('server')" class="btn btn-success">{{__("Sunucu Ekle")}}</button><br><br>
+                <button onclick="getList('server')" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                <button onclick="removePermission('server')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
                 @include('l.table',[
+                    "id" => "server_table",
                     "value" => $servers,
                     "title" => [
                         "Adı" , "*hidden*"
@@ -74,6 +82,7 @@
                     "display" => [
                         "name" , "_id:_id"
                     ],
+                    "noInitialize" => "true"
                 ])
             </div>
         </div>
@@ -155,6 +164,48 @@
                 $("#" + type + "_modal").modal('show');
             })
         }
+        
+        function removePermission(element){
+            let data = [];
+            let table = $("#" + element + "_table").DataTable();
+            table.rows( { selected: true } ).data().each(function(element){
+                data.push(element[1]);
+            });
+
+            if(data === []){
+                Swal.fire({
+                    type: 'error',
+                    title: 'Lütfen önce seçim yapınız.',
+                    timer : 2000
+                });
+                return false;
+            }
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Siliniyor...")}}',
+                showConfirmButton: false,
+            });
+
+            let form = new FormData();
+            form.append('ids',JSON.stringify(data));
+            form.append('user_id','{{$user->_id}}');
+            form.append('type',element);
+            request('{{route('settings_remove_from_list')}}', form, function (response) {
+                let json = JSON.parse(response);
+                Swal.fire({
+                        position: 'center',
+                        type: 'success',
+                        title: json["message"],
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    setTimeout(function () {
+                        location.reload();
+                },2000);
+            });
+            return false;
+        }
 
         function addData(modalElement) {
             Swal.fire({
@@ -218,5 +269,4 @@
             $("#removeUser").modal('show');
         }
     </script>
-
 @endsection

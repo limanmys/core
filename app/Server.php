@@ -5,6 +5,7 @@ namespace App;
 use App\Classes\Connector\SSHConnector;
 use App\Classes\Connector\WinRMConnector;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class Server
@@ -38,9 +39,11 @@ class Server extends Eloquent
     private function connector()
     {
         if($this->type == "linux_ssh"){
-            return new SSHConnector($this,auth()->id());
+            return new SSHConnector($this,Auth::id());
         }elseif($this->type == "windows_powershell"){
-            return new WinRMConnector($this,auth()->id());
+            return new WinRMConnector($this,Auth::id());
+        }else{
+            abort(504,"Bu sunucuda komut çalıştırmak için bir bağlantınız yok.");
         }
     }
 

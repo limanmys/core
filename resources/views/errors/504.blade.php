@@ -1,4 +1,4 @@
-@if(request()->wantsJson())
+@if(request()->wantsJson() || $_SERVER['REMOTE_ADDR'] == "127.0.0.1")
     @php(respond(__($exception->getMessage()),201))
 @else
     @extends('layouts.app')

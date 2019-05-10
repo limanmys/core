@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Extension;
 use App\Extension;
 use App\Permission;
 use App\Script;
+use App\Server;
+use App\Token;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\User;
 
 /**
  * Class OneController
@@ -14,16 +18,18 @@ use App\Http\Controllers\Controller;
 class OneController extends Controller
 {
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     * @return Illuminate\View\View
      * @throws \Throwable
      */
-    public function server()
+    public function renderView()
     {
         // Now that we have server, let's check if required parameters set for extension.
         foreach (extension()->database as $setting) {
-            if (!array_key_exists(server()->_id, auth()->user()->settings) ||
+            if (
+                !array_key_exists(server()->_id, auth()->user()->settings) ||
                 !array_key_exists(extension()->_id, auth()->user()->settings[server()->_id]) ||
-                !array_key_exists($setting["variable"], auth()->user()->settings[server()->_id][extension()->_id])) {
+                !array_key_exists($setting["variable"], auth()->user()->settings[server()->_id][extension()->_id])
+            ) {
                 return redirect(route('extension_server_settings_page', [
                     "server_id" => server()->_id,
                     "extension_id" => extension()->_id
@@ -33,10 +39,12 @@ class OneController extends Controller
 
         $outputs = [];
 
+        $viewName = (request('unique_code')) ? request('unique_code') : "index";
+
         // Go through each required scripts and run each of them.
         $views = extension()->views;
         foreach ($views as $view) {
-            if ($view["name"] == "index") {
+            if ($view["name"] == $viewName) {
                 $scripts = explode(',', $view["scripts"]);
                 if (count($scripts) == 1 && $scripts[0] == "") {
                     break;
@@ -50,12 +58,16 @@ class OneController extends Controller
                         return respond("Eklenti için gerekli olan betik yüklü değil, lütfen yöneticinizle görüşün.", 404);
                     }
 
-                    if(!Permission::can(auth()->id(),'script',$script->_id)){
+                    if (!Permission::can(auth()->id(), 'script', $script->_id)) {
                         abort(504, "Eklenti için yetkiniz var fakat '" . $script->name . "' betiğini çalıştırmak için yetkiniz yok.");
                     }
 
-                    // Run Script with no parameters.
-                    $output = server()->runScript($script, '');
+                    $parameters = "";
+                    foreach (explode(',', $script->inputs) as $input) {
+                        $parameters = $parameters . " '" . \request(explode(':', $input)[0]) . "'";
+                    }
+
+                    $output = server()->runScript($script, $parameters);
 
                     // Decode output and set it into outputs array.
                     $output = str_replace('\n', '', $output);
@@ -65,71 +77,14 @@ class OneController extends Controller
             }
         }
 
+        $command = self::generateSandboxCommand(server(), extension(), Auth::user()->settings, Auth::id(), $outputs, $viewName, null);
+        $output = shell_exec($command);
+
         // Return all required parameters.
         return view('extension_pages.server', [
-            "extension" => extension(),
-            "scripts" => extension()->scripts(),
-            "data" => $outputs,
-            "view" => "index",
-            "server" => server()
+            "view" => $output,
+            "command" => $command
         ]);
-    }
-
-
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Illuminate\View\View
-     * @throws \Throwable
-     */
-    public function route()
-    {
-        $outputs = [];
-
-        $codes = "";
-
-        foreach (extension()->views as $view) {
-            if ($view["name"] == request('unique_code')) {
-                $codes = $view["scripts"];
-                break;
-            }
-        }
-        if (request()->method() == "POST") {
-            $codes = request('unique_code');
-        }
-
-        $scripts = [];
-        foreach (explode(',', trim($codes)) as $code) {
-            array_push($scripts, Script::where('unique_code', trim($code))->first());
-        }
-
-        // Go through each required scripts of page and run them with proper parameters.
-        foreach ($scripts as $script) {
-            $parameters = '';
-            if (!$script) {
-                abort(504, "Eklenti için gereken betik bulunamadı");
-            }
-
-            if(!Permission::can(auth()->id(),'script',$script->_id)){
-                abort(504, "Eklenti için yetkiniz var fakat '" . $script->name . "' betiğini çalıştırmak için yetkiniz yok.");
-            }
-
-            foreach (explode(',', $script->inputs) as $input) {
-                $parameters = $parameters . " '" . \request(explode(':', $input)[0]) . "'";
-            }
-            $output = server()->runScript($script, $parameters);
-            $output = str_replace('\n', '', $output);
-            $outputs[$script->unique_code] = json_decode($output, true);
-        }
-
-        $view = (\request()->ajax()) ? 'extensions.' . strtolower(\request('extension_id')) . '.' . \request('url') : 'extension_pages.server';
-        if (view()->exists($view) && request()->method() != "POST") {
-            return view($view, [
-                "result" => 200,
-                "data" => $outputs,
-                "view" => \request('url'),
-            ]);
-        } else {
-            return respond("Başarıyla tamamlandı.");
-        }
     }
 
     /**
@@ -137,13 +92,92 @@ class OneController extends Controller
      */
     public function runFunction()
     {
-        $extension = Extension::where('_id', request()->route('extension_id'))->first();
-        require(base_path('resources/views/extensions/' . strtolower($extension->name) . '/functions.php'));
-        if (function_exists(request('function_name'))) {
-            return call_user_func(request('function_name'));
-        } else {
-            return respond("İşlev bulunamadı, lütfen yöneticinizle iletişime geçiniz.", 404);
+        // Before Everything, check if it's a function or script.
+        if (Script::where('unique_code', request('function_name'))->exists()) {
+            $script = Script::where('unique_code', request('function_name'))->first();
+            $parameters = "";
+            foreach (explode(',', $script->inputs) as $input) {
+                $parameters = $parameters . " '" . \request(explode(':', $input)[0]) . "'";
+            }
+            return respond(server()->runScript($script, $parameters));
         }
+
+        $command = self::generateSandboxCommand(server(), extension(), Auth::user()->settings, Auth::id(), "null", "null", request('function_name'));
+
+        return shell_exec($command);
+    }
+
+    public function internalExtensionApi()
+    {
+        if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
+            abort(403, 'Not Allowed');
+        }
+
+        $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
+        $extension = Extension::find(request('extension_id')) or abort(404, 'Eklenti Bulunamadi');
+        $user = User::find('5ccfd364de10b7018150e4f2');
+        $command = self::generateSandboxCommand($server, $extension, $user->settings, $user->_id, "null", "null", request('target'));
+        $output = shell_exec($command);
+        return $output;
+    }
+
+    public function internalRunCommandApi()
+    {
+        if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
+            return 'Not Allowed';
+        }
+        $token = Token::where('token',request('token'))->first() or abort(403,"Token gecersiz");
+        
+        Auth::loginUsingId($token->user_id);
+
+        $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
+        
+        if($server->type != "linux_ssh" && $server->type != "windows_powershell"){
+            return "Bu sunucuda komut çalıştıramazsınız.";
+        }
+        request()->request->add(['server' => $server]);
+        $output = $server->run(request('command'));
+        return $output;
+    }
+
+    public function internalPutFileApi()
+    {
+        if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
+            return 'Not Allowed';
+        }
+        $token = Token::where('token',request('token'))->first() or abort(403,"Token gecersiz");
+        
+        Auth::loginUsingId($token->user_id);
+
+        $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
+        
+        if($server->type != "linux_ssh" && $server->type != "windows_powershell"){
+            return "Bu sunucuda komut çalıştıramazsınız.";
+        }
+
+        request()->request->add(['server' => $server]);
+        $output = $server->putFile(request('localPath'),request('remotePath'));
+        return "ok";
+    }
+
+    public function internalGetFileApi()
+    {
+        if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
+            return 'Not Allowed';
+        }
+        $token = Token::where('token',request('token'))->first() or abort(403,"Token gecersiz");
+        
+        Auth::loginUsingId($token->user_id);
+
+        $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
+        
+        if($server->type != "linux_ssh" && $server->type != "windows_powershell"){
+            return "Bu sunucuda komut çalıştıramazsınız.";
+        }
+        
+        request()->request->add(['server' => $server]);
+        $output = $server->getFile(request('remotePath'),request('localPath'));
+        return "ok";
     }
 
     /**
@@ -186,11 +220,11 @@ class OneController extends Controller
     {
         try {
             self::rmdir_recursive(resource_path('views' . DIRECTORY_SEPARATOR . 'extensions' . DIRECTORY_SEPARATOR . strtolower(extension()->name)));
-            foreach (Script::where('extensions','like',strtolower(extension()->name))->get() as $script){
-                shell_exec('rm ' .storage_path('app/scripts/' . $script->_id));
+            foreach (Script::where('extensions', 'like', strtolower(extension()->name))->get() as $script) {
+                shell_exec('rm ' . storage_path('app/scripts/' . $script->_id));
                 $script->delete();
             }
-            shell_exec('sudo userdel ' . extension()->_id);
+            shell_exec('sudo userdel liman-' . extension()->_id);
             extension()->delete();
         } catch (\Exception $exception) {
             return respond('Eklenti silinemedi', 201);
@@ -238,5 +272,56 @@ class OneController extends Controller
             }
         }
         rmdir($dir);
+    }
+
+    private function generateSandboxCommand($serverObj, \App\Extension $extensionObj, $user_settings, $user_id, $outputs, $viewName, $functionName)
+    {
+        $functions = resource_path('views/extensions/' . strtolower($extensionObj->name) . "/functions.php");
+
+        $combinerFile = storage_path('sandbox/index.php');
+
+        $server = str_replace('"', '*m*', json_encode($serverObj->toArray()));
+
+        $extension = str_replace('"', '*m*', json_encode($extensionObj->toArray()));
+
+        if (
+            !array_key_exists($serverObj->_id, $user_settings) ||
+            !array_key_exists($extensionObj->_id, $user_settings[$serverObj->_id])
+        ) {
+            $extensionDb = "";
+        } else {
+            $extensionDb = str_replace('"', '*m*', json_encode($user_settings[$serverObj->_id][$extensionObj->_id]));
+        }
+
+        $outputsJson = str_replace('"', '*m*', json_encode($outputs));
+
+        $request = request()->all();
+        unset($request["permissions"]);
+        unset($request["extension"]);
+        unset($request["server"]);
+        unset($request["script"]);
+        unset($request["server_id"]);
+        $request = str_replace('"', '*m*', json_encode($request));
+
+        $apiRoute = route('extension_function_api', [
+            "extension_id" => $extensionObj->_id,
+            "function_name" => ""
+        ]);
+
+        $navigationRoute = route('extension_server_route', [
+            "server_id" => $serverObj->_id,
+            "extension_id" => $extensionObj->_id,
+            "city" => $serverObj->city,
+            "unique_code" => ""
+        ]);
+
+        $token = Token::create($user_id);
+
+        $command = "sudo runuser liman-" . $extensionObj->_id .
+            " -c '/usr/bin/php -d display_errors=on $combinerFile $functions "
+            . strtolower($extensionObj->name) .
+            " $viewName \"$server\" \"$extension\" \"$extensionDb\" \"$outputsJson\" \"$request\" \"$functionName\" \"$apiRoute\" \"$navigationRoute\" \"$token\"'";
+
+        return $command;
     }
 }

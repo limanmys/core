@@ -66,7 +66,7 @@ class Permission extends Eloquent
         $old = $current;
         // Search and Delete Id
         unset($current[array_search($id, $current)]);
-        dd($id,array_search($id, $current),$current, $old);
+
         // Update Object
         $permissions->__set($type, array_values($current));
 

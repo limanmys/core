@@ -8,6 +8,7 @@ use App\Script;
 use App\Server;
 use App\User;
 use App\Http\Controllers\Controller;
+use function GuzzleHttp\json_decode;
 
 class MainController extends Controller
 {
@@ -103,21 +104,17 @@ class MainController extends Controller
 
     public function addList()
     {
-        try{
-            $permissions = Permission::where('user_id',request('user_id'))->first();
-            $data = $permissions->__get(request('type'));
-            $new = array_merge(json_decode(request('ids')), $data);
-            $permissions->__set(request('type'),$new);
-            $permissions->save();
-            return [
-                "message" => "Yetki Başarıyla Verildi.",
-                "status" => "yes"
-            ];
-        }catch (\Exception $exception){
-            return [
-                "message" => "Yetki Verilemedi.",
-                "status" => "no"
-            ];
+        foreach(json_decode(request('ids'),true) as $id){
+            Permission::grant(request('user_id'),request('type'),$id);
         }
+        return respond(__("Başarılı"),200);
+    }
+
+    public function removeFromList()
+    {
+        foreach(json_decode(request('ids'),true) as $id){
+            Permission::revoke(request('user_id'),request('type'),$id);
+        }
+        return respond(__("Başarılı"),200);
     }
 }

@@ -53,9 +53,9 @@ if (!function_exists('server')) {
      */
     function server()
     {
-//        $server = request('server');
-//        $key = \App\Key::where('server_id',$server->_id)->first();
-//        $server->key = $key;
+        if(!request('server')){
+            abort(504,"Sunucu Bulunamadi");
+        }
         return request('server');
     }
 }
