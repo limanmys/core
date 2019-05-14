@@ -1,9 +1,10 @@
+
 @php($rand = str_random(3))
 <?php
-    if(server()->type == "linux" || server()->type == "linux_ssh"){
-        $data = $data["linux"];
-    }else{
+    if(extensionDb("server_type") == "Active Directory" || extensionDb("server_type") == "Samba"){
         $data = $data["windows"];
+    }else{
+        $data = $data["linux"];
     }
 ?>
 @isset($open)
