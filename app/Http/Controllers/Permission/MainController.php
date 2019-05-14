@@ -11,7 +11,15 @@ class MainController extends Controller
     public function all(){
         $requests = LimanRequest::all();
         foreach($requests as $request){
-            $request->user_name = User::find($request->user_id)->name;
+            $user = User::find($request->user_id);
+            if(!$user){
+                $request->user_name = "Kullanici Silinmis";
+                $request->user_id = "";
+            }else{
+                $request->user_name = $user->name;
+                $request->user_id = $user->_id;
+            }
+
             switch ($request->status){
                 case "0":
                     $request->status = __("Talep Alındı");

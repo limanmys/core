@@ -28,6 +28,7 @@ class Permission extends Eloquent
         $permissions->server = [];
         $permissions->extension = [];
         $permissions->script = [];
+        $permissions->function = [];
 
         // Save Permissions
         $permissions->save();
@@ -41,15 +42,17 @@ class Permission extends Eloquent
         // Retrieve Permissions
         $permissions = Permission::where('user_id', $user_id)->first();
 
-        // Get Array
-        $current = $permissions->__get($type);
-
+        if($permissions->__get($type) != null){
+            $current = $permissions->__get($type);
+        }else{
+            $current = [];
+        }
         // Add Array
         array_push($current, $id);
 
         // Set Array
         $permissions->__set($type, $current);
-
+        
         // Save and Return Permissions
         $permissions->save();
 

@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    @php($flag = ($extension->serverless == "true") ? false : true)
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
@@ -18,6 +17,7 @@
             <li id="server_type"><a href="#tab_2_2" data-toggle="tab" aria-expanded="false">{{__("Sayfa Ayarları")}}</a>
             </li>
             <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false">{{__("Widgetlar")}}</a></li>
+            <li class=""><a href="#tab_4" data-toggle="tab" aria-expanded="false">{{__("Fonksiyonlar")}}</a></li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="tab_1">
@@ -34,19 +34,6 @@
                 <input id="version" type="text" name="version" class="form-control" value="{{$extension->version}}">
                 <h3>{{__("Servis")}}</h3>
                 <input id="service" type="text" name="service" class="form-control" value="{{$extension->service}}">
-                <h3>{{__("Eklenti için sunucuda betik çalıştırılması gerekiyor mu?")}}</h3>
-                <div class="bd-example">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="serverless"
-                               value="false" @if($flag)checked @endif>
-                        <label class="form-check-label" for="inlineRadio1">{{__("Evet")}}</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="serverless"
-                               value="true" @if(!$flag)checked @endif>
-                        <label class="form-check-label" for="inlineRadio2">{{__("Hayır")}}</label>
-                    </div>
-                </div>
             </div>
             <!-- /.tab-pane -->
             <div class="tab-pane" id="tab_2">
@@ -268,6 +255,17 @@
                     "submit_text" => "Widget'ı Sil"
                 ])
             </div>
+            <div class="tab-pane" id="tab_4">
+                @include('l.table',[
+                    "value" => $functions,
+                    "title" => [
+                        "Fonksiyon Adı" ,
+                    ],
+                    "display" => [
+                        "name"
+                    ]
+                ])
+            </div>
             <!-- /.tab-pane -->
         </div>
     </div>
@@ -292,7 +290,6 @@
             data.append('support',$("#support").val());
             data.append('version',$("#version").val());
             data.append('service',$("#service").val());
-            data.append('serverless',$("input[name=serverless]:checked").val());
 
             request('{{route('extension_settings_update')}}',data,function(){
                 Swal.fire({

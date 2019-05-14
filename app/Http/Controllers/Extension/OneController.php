@@ -95,13 +95,20 @@ class OneController extends Controller
         // Before Everything, check if it's a function or script.
         if (Script::where('unique_code', request('function_name'))->exists()) {
             $script = Script::where('unique_code', request('function_name'))->first();
+            if(!Permission::can(Auth::id(),'script',$script->_id)){
+                abort(504,$script->name . " betiği için yetkiniz yok.");
+            }
+            
             $parameters = "";
             foreach (explode(',', $script->inputs) as $input) {
                 $parameters = $parameters . " '" . \request(explode(':', $input)[0]) . "'";
             }
             return respond(server()->runScript($script, $parameters));
         }
-
+        if(!Permission::can(Auth::id(),"function",strtolower(extension()->name) . "_" . strtolower(request('function_name')))){
+            abort(504,request('function_name') . " için yetkiniz yok.");
+        }
+        
         $command = self::generateSandboxCommand(server(), extension(), Auth::user()->settings, Auth::id(), "null", "null", request('function_name'));
 
         return shell_exec($command);
@@ -112,10 +119,23 @@ class OneController extends Controller
         if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
             abort(403, 'Not Allowed');
         }
+        $token = Token::where('token',request('token'))->first() or abort(403,"Token gecersiz");
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
+        if(!Permission::can($token->user_id,'server',$server->_id)){
+            return "Sunucu icin yetkiniz yok.";
+        }
+
         $extension = Extension::find(request('extension_id')) or abort(404, 'Eklenti Bulunamadi');
-        $user = User::find('5ccfd364de10b7018150e4f2');
+        if(!Permission::can($token->user_id,'extension',$extension->_id)){
+            return "Eklenti icin yetkiniz yok.";
+        }
+
+        if(!Permission::can($token->user_id,"function",strtolower(extension()->name) . "_" . strtolower(request('target')))){
+            return request('target') . " fonksiyonu için yetkiniz yok.";
+        }
+        
+        $user = User::find($token->user_id);
         $command = self::generateSandboxCommand($server, $extension, $user->settings, $user->_id, "null", "null", request('target'));
         $output = shell_exec($command);
         return $output;
@@ -131,10 +151,14 @@ class OneController extends Controller
         Auth::loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
-        
+        if(!Permission::can($token->user_id,'server',$server->_id)){
+            return "Sunucu icin yetkiniz yok.";
+        }
+
         if($server->type != "linux_ssh" && $server->type != "windows_powershell"){
             return "Bu sunucuda komut çalıştıramazsınız.";
         }
+
         request()->request->add(['server' => $server]);
         $output = $server->run(request('command'));
         return $output;

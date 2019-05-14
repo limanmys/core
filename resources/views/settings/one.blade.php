@@ -5,10 +5,10 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
             <li class="breadcrumb-item"><a href="{{route('settings')}}">{{__("Ayarlar")}}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{$user->name . __(" Kullanıcısı Ayarları")}}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{$user->name . __(" kullanıcısı ayarları")}}</li>
         </ol>
     </nav>
-    <h2>{{$user->name . __(" Kullanıcısı Ayarları")}}</h2>
+    <h2>{{$user->name . __(" kullanıcısı ayarları")}}</h2>
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">{{__("Genel Ayarlar")}}</a></li>
@@ -17,6 +17,7 @@
             <li id="server_type"><a href="#tab_3" data-toggle="tab" aria-expanded="false">{{__("Betik Yetkileri")}}</a>
             </li>
             <li class=""><a href="#tab_4" data-toggle="tab" aria-expanded="false">{{__("Sunucu Yetkileri")}}</a></li>
+            <li class=""><a href="#tab_5" data-toggle="tab" aria-expanded="false">{{__("Fonksiyon Yetkileri")}}</a></li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="tab_1" style="height: 300px;">
@@ -85,6 +86,46 @@
                     "noInitialize" => "true"
                 ])
             </div>
+            <div class="tab-pane" id="tab_5">
+                <button class="btn btn-success" data-toggle="modal" data-target="#functionsModal"><i class="fa fa-plus"></i></button>
+                <button onclick="removeFunctions()" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
+                @include('l.table',[
+                    "id" => "extensionFunctions",
+                    "value" => $functions,
+                    "title" => [
+                        "Fonksiyon Adı" , "Eklenti"
+                    ],
+                    "display" => [
+                        "name" , "extension_name"
+                    ],
+                ])
+            </div>
+                
+                <div id="functionsModal" class="modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                        <h3 class="modal-title">{{__("Fonksiyon Yetkileri")}}</h3>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                                    <h4>{{__("Lütfen Bir Eklenti Seçin")}}</h4>
+                                    <select id="extensionId" class="form-control" onchange="getFunctionList()">
+                                        <option selected disabled>{{__("...")}}</option>
+                                        @foreach(extensions() as $extension)
+                                            <option value="{{$extension->_id}}">{{$extension->name}}</option>
+                                        @endforeach
+                                    </select><br>
+                                <div class="functionsTable"></div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-success" onclick="addFunctions()">{{__("Seçili Fonksiyonlara Yetki Ver")}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     @include('l.modal',[
@@ -130,6 +171,67 @@
        "submit_text" => "Parolayı Sıfırla"
    ])
     <script>
+        function getFunctionList(){
+            let extension_id = $("#extensionId :selected").val();
+            let form = new FormData();
+            form.append('extension_id', extension_id);
+            form.append('user_id','{{$user->_id}}');
+            request('{{route('extension_function_list')}}', form, function (response) {
+                $(".functionsTable").html(response);
+                $('.functionsTable table').DataTable({
+                bFilter: true,
+                select: {
+                    style: 'multi'
+                },
+                "language" : {
+                    url : "/turkce.json"
+                }
+            });
+            });
+        }
+
+        function addFunctions(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Güncelleniyor...")}}',
+                showConfirmButton: false,
+            });
+            let data = [];
+            let table = $('.functionsTable table').DataTable();
+            table.rows( { selected: true } ).data().each(function(element){
+                data.push(element[1]);
+            });
+            let form = new FormData();
+            let extension_id = $("#extensionId :selected").val();
+            form.append("extension_id",extension_id);
+            form.append("functions",data);
+            form.append("user_id",'{{$user->_id}}')
+            request('{{route("extension_function_add")}}',form,function(){
+                location.reload();
+            });
+        }
+
+        function removeFunctions(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Güncelleniyor...")}}',
+                showConfirmButton: false,
+            });
+            let data = [];
+            let table = $('#extensionFunctions').DataTable();
+            table.rows( { selected: true } ).data().each(function(element){
+                data.push(element[1]);
+            });
+            let form = new FormData();
+            form.append("functions",data);
+            form.append("user_id",'{{$user->_id}}')
+            request('{{route("extension_function_remove")}}',form,function(){
+                location.reload();
+            });
+        }
+
         function updateUser(data) {
             Swal.fire({
                 position: 'center',
@@ -225,8 +327,7 @@
             form.append('type',modalElement.getAttribute('id').split('_')[0]);
             request('{{route('settings_add_to_list')}}', form, function (response) {
                 let json = JSON.parse(response);
-                if(json["status"] === "yes"){
-                    Swal.fire({
+                Swal.fire({
                         position: 'center',
                         type: 'success',
                         title: json["message"],
@@ -236,15 +337,6 @@
                     setTimeout(function () {
                         location.reload();
                     },2000);
-                }else{
-                    Swal.fire({
-                        position: 'center',
-                        type: 'error',
-                        title: json["message"],
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                }
             });
             return false;
         }

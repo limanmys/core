@@ -22,6 +22,20 @@
             @if($item["variable"] == "certificate")
                 <h5>{{$item["name"]}}</h5>
                 <textarea name="certificate" cols="30" rows="10" class="form-control"></textarea><br>
+            @elseif($item["type"] == "extension")
+                <h5>{{$item["name"]}}</h5>
+                <select class="form-control" name="{{$item["variable"]}}">
+                    @foreach(extensions() as $extension)
+                        <option value="{{$extension->_id}}">{{$extension->name}}</option>
+                    @endforeach
+                </select><br>
+            @elseif($item["type"] == "server")
+                <h5>{{$item["name"]}}</h5>
+                <select class="form-control" name="{{$item["variable"]}}">
+                    @foreach(servers() as $server)
+                        <option value="{{$server->_id}}">{{$server->name}}</option>
+                    @endforeach
+                </select><br>    
             @else
                 @include('l.inputs',[
                 "inputs" => [

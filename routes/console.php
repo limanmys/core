@@ -1,7 +1,7 @@
 <?php
 
 use App\User;
-
+use App\Permission;
 Artisan::command('administrator',function (){
     // Check if Admin user is exists.
     $user = User::where('email','admin@liman.dev')->first();
@@ -23,12 +23,8 @@ Artisan::command('administrator',function (){
     $user->settings = [];
     $user->save();
 
-    $perm = new \App\Permission();
-    $perm->user_id = $user->_id;
-    $perm->server = [];
-    $perm->extension = [];
-    $perm->script = [];
-    $perm->save();
+    Permission::new($user->_id);
+
     $this->comment("Administrator kullanıcısı eklendi. ");
     $this->comment("Email  : admin@liman.dev");
     $this->comment("Parola : " . $password . "");

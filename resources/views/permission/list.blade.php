@@ -11,10 +11,10 @@
 @include('l.table',[
         "value" => $requests,
         "title" => [
-            "Tipi" , "Kullanıcı Adı" , "Not" , "Önem Derecesi", "Durumu", "*hidden*"
+            "Tipi" , "Kullanıcı Adı" , "Not" , "Önem Derecesi", "Durumu", "*hidden*", "*hidden*"
         ],
         "display" => [
-            "type" , "user_name", "note" , "speed", "status", "_id:request_id"
+            "type" , "user_name", "note" , "speed", "status", "_id:request_id" , "user_id:user_id"
         ],
         "menu" => [
             "İşleniyor" => [
@@ -34,8 +34,14 @@
                 "icon" => "fa-trash"
             ]
         ],
+        "onclick" => "userSettings"
 ])
     <script>
+
+        function userSettings(element){
+            let user_id = element.querySelector('#user_id').innerHTML;
+            window.location.href = "/ayarlar/" + user_id
+        }
         function update(current,status) {
             Swal.fire({
                 position: 'center',

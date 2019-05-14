@@ -201,10 +201,17 @@ function getPath($filename = null){
     return dirname($argv[1]) . "/" . $filename;
 }
 
+$functions = get_defined_functions();
+$keys = array_keys($functions['user']);
+$last_index = array_pop($keys);
+
 // Functions PHP
 if(is_file($argv[1])){
     include($argv[1]);
 }
+
+$functions = get_defined_functions();
+$new_functions = array_slice($functions['user'], $last_index + 1);
 
 if($argv[3] == "null"){
     echo json_encode(call_user_func($argv[9]),true);

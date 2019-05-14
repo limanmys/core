@@ -21,6 +21,13 @@ function request(url, data, next) {
     }
 
     modalData = data;
+    
+    let server_id = $('meta[name=server_id]').attr("content");
+    let extension_id = $('meta[name=extension_id]').attr("content");
+
+    (server_id != "") && data.append('server_id',server_id);
+    (extension_id != "") && data.append('extension_id',extension_id);
+
     let r = new XMLHttpRequest();
     r.open("POST", url);
     r.setRequestHeader('X-CSRF-TOKEN', csrf);

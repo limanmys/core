@@ -150,6 +150,8 @@ class MainController extends Controller
         }
 
         mkdir($extension_folder);
+        shell_exec('sudo chown ' . $new->_id . ':liman ' . $extension_folder);
+        shell_exec('sudo chmod 770 ' . $extension_folder);
 
         // Copy Views into the liman.
         $views = new \RecursiveIteratorIterator(
@@ -242,6 +244,8 @@ class MainController extends Controller
         $folder = resource_path('views/extensions/') . strtolower(request('name'));
 
         mkdir($folder);
+        shell_exec('sudo chown ' . $ext->_id . ':liman ' . $folder);
+        shell_exec('sudo chmod 770 ' . $folder);
 
         touch($folder  . '/index.blade.php');
         touch($folder  . '/functions.php');

@@ -35,11 +35,17 @@ class SettingsController extends Controller
 
         // Retrieve scripts from database.
         $scripts = Script::where('extensions', 'like', $extension->name)->get();
+
+        $output = shell_exec("sudo runuser liman-" . $extension->_id . " -c '/usr/bin/php -d display_errors=on /liman/server/storage/sandbox/list.php /liman/server/resources/views/extensions/" . strtolower($extension->name) . "/functions.php'");
+
+        $functions = json_decode($output, true);
+
         // Return view with required parameters.
         return view('extension_pages.one', [
             "extension" => $extension,
             "files" => $files,
-            "scripts" => $scripts
+            "scripts" => $scripts,
+            "functions" => $functions
         ]);
     }
 

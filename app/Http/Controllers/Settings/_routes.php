@@ -13,3 +13,9 @@ Route::post('/ayar/yetki/ekle','Settings\MainController@addList')->name('setting
 Route::post('/ayar/yetki/sil','Settings\MainController@removeFromList')->name('settings_remove_from_list')->middleware('admin');
 
 Route::view('/ayar/sunucu','settings.server')->middleware('admin')->name('settings_server');
+
+Route::post('/ayar/eklenti/fonksiyonlar','Settings\MainController@getExtensionFunctions')->middleware('admin')->name('extension_function_list');
+
+Route::post('/ayar/eklenti/fonksiyonlar/ekle','Settings\MainController@addFunctionPermissions')->middleware('admin')->name('extension_function_add');
+
+Route::post('/ayar/eklenti/fonksiyonlar/sil','Settings\MainController@removeFunctionPermissions')->middleware('admin')->name('extension_function_remove');

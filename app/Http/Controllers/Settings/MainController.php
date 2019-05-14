@@ -8,7 +8,7 @@ use App\Script;
 use App\Server;
 use App\User;
 use App\Http\Controllers\Controller;
-use function GuzzleHttp\json_decode;
+use Illuminate\Support\Facades\Auth;
 
 class MainController extends Controller
 {
@@ -62,11 +62,22 @@ class MainController extends Controller
                 array_push($extensions,$extension);
             }
         }
+
+        $functions = [];
+
+        foreach ($permissions->function as $function){
+            array_push($functions,[
+                "extension_name" => explode('_',$function)[0],
+                "name" => explode('_',$function)[1]
+            ]);
+        }
+
         return view('settings.one',[
             "user" => $user,
             "servers" => $servers,
             "extensions" => $extensions,
-            "scripts" => $scripts
+            "scripts" => $scripts,
+            "functions" => $functions
         ]);
     }
 
@@ -114,6 +125,44 @@ class MainController extends Controller
     {
         foreach(json_decode(request('ids'),true) as $id){
             Permission::revoke(request('user_id'),request('type'),$id);
+        }
+        return respond(__("Başarılı"),200);
+    }
+
+    public function getExtensionFunctions(){
+        $output = shell_exec("sudo runuser liman-" . extension()->_id . " -c '/usr/bin/php -d display_errors=on /liman/server/storage/sandbox/list.php /liman/server/resources/views/extensions/" . strtolower(extension()->name) . "/functions.php'");
+        $functions = [];
+        $allFunctions = json_decode($output, true);
+        foreach($allFunctions as $function){
+            if(Permission::can(request('user_id'),"function",strtolower(extension()->name) . "_" . $function["name"])){
+                continue;
+            }
+
+            array_push($functions,[
+                "name" => $function["name"]
+            ]);
+        }
+        return view('l.table',[
+            "value" => $functions,
+            "title" => [
+                "Fonksiyon Adı" ,
+            ],
+            "display" => [
+                "name"
+            ]
+        ]);
+    }
+
+    public function addFunctionPermissions(){
+        foreach(explode(",",request('functions')) as $function){
+             Permission::grant(request('user_id'),"function",strtolower(extension()->name) . "_" . $function);
+        }
+        return respond(__("Başarılı"),200);
+    }
+
+    public function removeFunctionPermissions(){
+        foreach(explode(",",request('functions')) as $function){
+             Permission::revoke(request('user_id'),"function",$function);
         }
         return respond(__("Başarılı"),200);
     }
