@@ -150,7 +150,7 @@ class MainController extends Controller
         }
 
         mkdir($extension_folder);
-        shell_exec('sudo chown ' . $new->_id . ':liman ' . $extension_folder);
+        shell_exec('sudo chown liman-' . $new->_id . ':liman ' . $extension_folder);
         shell_exec('sudo chmod 770 ' . $extension_folder);
 
         // Copy Views into the liman.
