@@ -64,7 +64,7 @@ class UserController extends Controller
         Permission::where('user_id', request('user_id'))->delete();
 
         // Delete User
-        User::find(request('user_id'))->delete();
+        User::where("_id", request('user_id'))->delete();
 
         // Respond
         return respond("Kullanıcı Silindi",200);
@@ -119,7 +119,8 @@ class UserController extends Controller
             return respond("Girilen veri geçerli değil.",201);
         }
 
-        $user = User::find(request('user_id'))->first();
+        $user = User::where("_id", request('user_id'))->first();
+
         $user->update([
             'name' => request('username'),
             'email' => request('email'),

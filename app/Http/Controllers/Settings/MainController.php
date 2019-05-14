@@ -44,7 +44,7 @@ class MainController extends Controller
                 array_push($servers,$server);
             }
         }
-
+        
         $scripts = [];
 
         foreach ($permissions->script as $script_id){

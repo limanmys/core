@@ -34,9 +34,9 @@
                         <input class="form-control" type="text" value="{{$user->email}}" name="email">
                     </div>
                     <div style="width: 300px;height: 300px;display: block;float: left;padding-top: 75px;margin-left:50px;">
-                        <button class="btn btn-danger btn-block" onclick="removeUser()">{{__("Kullanıcıyı Sil")}}</button><br>
-                        <button class="btn btn-warning btn-block" onclick="resetPassword()">{{__("Parola Sıfırla")}}</button><br>
-                        <button class="btn btn-success btn-block" type="submit" disabled>{{__("Değişiklikleri Kaydet")}}</button>
+                        <button class="btn btn-danger btn-block" onclick="removeUser();return false;">{{__("Kullanıcıyı Sil")}}</button><br>
+                        <button class="btn btn-warning btn-block" onclick="resetPassword();return false;">{{__("Parola Sıfırla")}}</button><br>
+                        <button class="btn btn-success btn-block" type="submit">{{__("Değişiklikleri Kaydet")}}</button>
                     </div>
                 </form>
             </div>
@@ -243,6 +243,7 @@
             form.append('user_id','{{$user->_id}}');
             request('{{route('update_user')}}',form,function () {
                 Swal.close();
+                location.reload();
             });
             return false;
         }
