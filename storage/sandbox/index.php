@@ -43,11 +43,11 @@ function API($target){
     return $argv[10] . "/" . $target;
 }
 
-function respond($message,$code = 200){
-    echo [
-        "message" => json_encode($message,true),
-        "code" => $code
-    ];
+function respond($message,$code = "200"){
+    return json_encode([
+        "message" => $message,
+        "status" => $code
+    ]);
 }
 
 function navigate($name,$params = []){
@@ -214,7 +214,11 @@ $functions = get_defined_functions();
 $new_functions = array_slice($functions['user'], $last_index + 1);
 
 if($argv[3] == "null"){
-    echo json_encode(call_user_func($argv[9]),true);
+    set_error_handler(function(){
+        return "error";
+    });
+    echo call_user_func($argv[9]);
+    restore_error_handler();
 }else{
     $blade = new Blade(dirname(dirname(dirname($argv[1]))),"/tmp");
     echo $blade->render("extensions." . $argv[2] . "." . $argv[3],[

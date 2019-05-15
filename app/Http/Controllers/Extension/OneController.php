@@ -10,6 +10,7 @@ use App\Token;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\User;
+use App\Classes\Sandbox\Validator;
 
 /**
  * Class OneController
@@ -40,7 +41,9 @@ class OneController extends Controller
         $outputs = [];
 
         $viewName = (request('unique_code')) ? request('unique_code') : "index";
-
+        
+        $results = Validator::do(resource_path('views/extensions/') . strtolower(extension()->name) . "/" . $viewName . ".blade.php");
+        
         // Go through each required scripts and run each of them.
         $views = extension()->views;
         foreach ($views as $view) {

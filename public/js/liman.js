@@ -48,13 +48,14 @@ function request(url, data, next) {
                 return next(r.responseText);
             }
             let response = JSON.parse(r.responseText);
-
+            
             switch (r.status) {
                 case 200:
                     return next(r.responseText);
                 case 300:
                     return window.location = response["message"];
             }
+            
         }
     };
     return false;

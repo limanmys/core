@@ -137,11 +137,11 @@ class MainController extends Controller
             if(Permission::can(request('user_id'),"function",strtolower(extension()->name) . "_" . $function["name"])){
                 continue;
             }
-
             array_push($functions,[
                 "name" => $function["name"]
             ]);
         }
+
         return view('l.table',[
             "value" => $functions,
             "title" => [
