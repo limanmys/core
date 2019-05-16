@@ -24,27 +24,12 @@
         @endisset
     }).on('select_node.jstree', function (e, data) {
         @isset($click)
-                {{$click}}(uiGetParents(data));
+                {{$click}}(getPath());
         @endisset
     });
-    function uiGetParents(loSelectedNode) {
-        try {
-            let lnLevel = loSelectedNode.node.parents.length;
-            let lsSelectedID = loSelectedNode.node.id;
-            let loParent = $("#" + lsSelectedID);
-            let lsParents =  loSelectedNode.node.text + ',';
-            for (let ln = 0; ln <= lnLevel -1 ; ln++) {
-                loParent = loParent.parent().parent();
-                if (loParent.children()[1] !== undefined) {
-                    lsParents += loParent.children()[1].text + ",";
-                }
-            }
-            if (lsParents.length > 0) {
-                lsParents = lsParents.substring(0, lsParents.length - 1);
-            }
-            return lsParents;
-        }
-        catch (err) {}
+
+    function getPath() {
+        return $('#{{$random}}').jstree().get_path($('#{{$random}}').jstree("get_selected")[0], ',',true)
     }
 
     function search{{$random}}() {
