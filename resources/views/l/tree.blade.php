@@ -29,7 +29,13 @@
     });
 
     function getPath() {
-        return $('#{{$random}}').jstree().get_path($('#{{$random}}').jstree("get_selected")[0], ',',true)
+        @isset($ldapStyle)
+            let path = $('#{{$random}}').jstree().get_path($('#{{$random}}').jstree("get_selected")[0], ',',true);
+            return path.split(",").reverse().join(',');
+        @else
+            return $('#{{$random}}').jstree().get_path($('#{{$random}}').jstree("get_selected")[0], ',',true)
+        @endisset
+        
     }
 
     function search{{$random}}() {
