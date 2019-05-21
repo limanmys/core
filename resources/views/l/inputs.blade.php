@@ -53,8 +53,8 @@
     @else
         @if(explode(":", $input)[1] == "checkbox")
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="{{explode(":", $input)[0]}}">
-                <label class="form-check-label h5">
+                <input class="form-control-input" type="checkbox" name="{{explode(":", $input)[0]}}">
+                <label class="form-control-label h5">
                     {{$name}}
                 </label>
             </div><br>

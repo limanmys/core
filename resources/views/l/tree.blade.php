@@ -9,7 +9,8 @@
             "contextmenu",
             @endisset
             "search",
-            "state"
+            "state",
+            "wholerow"
         ],
         'core': {
             'data': [
@@ -19,7 +20,7 @@
         },
         @isset($menu)
         'contextmenu': {
-            items: customMenu
+            items: {{$random}}customMenu
         }
         @endisset
     }).on('select_node.jstree', function (e, data) {
@@ -43,7 +44,7 @@
     }
 
     @isset($menu)
-    function customMenu() {
+    function {{$random}}customMenu() {
         return {
             @foreach($menu as $key=>$item)
             '{{random_int(1,100)}}': {

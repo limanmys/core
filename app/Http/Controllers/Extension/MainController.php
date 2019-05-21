@@ -181,7 +181,7 @@ class MainController extends Controller
         foreach ($files as $file) {
             // Skip directories (they would be added automatically)
             if (!$file->isDir()) {
-                if (substr($file->getFilename(), 0, 1) == ".") {
+                if (substr($file->getFilename(), 0, 1) == "." || !Str::endsWith($view->getFilename(),".lmns")) {
                     continue;
                 }
 
