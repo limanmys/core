@@ -140,5 +140,8 @@ php artisan config:cache
 ```
 
 # For Winrm Connection
-```sudo apt install python3-pip
-pip3 install pypsrp```
+
+```bash
+sudo apt install python3-pip
+pip3 install pypsrp
+```
