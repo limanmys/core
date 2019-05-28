@@ -17,7 +17,6 @@
                 "server_id" => server()->_id,
             ])}}'"><i class="fa fa-server"></i></button>
     </div>
-    {{-- <pre>{{$command}}</pre> --}}
     <div class="card">
         <div class="card-body mainArea">{!!$view!!}</div>
     </div>

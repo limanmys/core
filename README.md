@@ -138,10 +138,3 @@ php artisan cache:clear
 php artisan view:clear
 php artisan config:cache
 ```
-
-# For Winrm Connection
-
-```bash
-sudo apt install python3-pip
-pip3 install pypsrp
-```

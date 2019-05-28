@@ -5,7 +5,16 @@ namespace App\Http\Controllers\Extension;
 use App\Extension;
 use App\Http\Controllers\Controller;
 use App\Script;
+use Exception;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use ZipArchive;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 /**
  * Class MainController
@@ -14,7 +23,7 @@ use Illuminate\Support\Str;
 class MainController extends Controller
 {
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function allServers()
     {
@@ -31,26 +40,26 @@ class MainController extends Controller
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @return BinaryFileResponse
      */
     public function download()
     {
         // Generate Extension Folder Path
-        $path = resource_path('views' . DIRECTORY_SEPARATOR . 'extensions' . DIRECTORY_SEPARATOR . strtolower(extension()->name));
+        $path = env("EXTENSIONS_PATH") . strtolower(extension()->name);
 
         // Initialize Zip Archive Object to use it later.
-        $zip = new \ZipArchive;
+        $zip = new ZipArchive;
 
         // Random Temporary Folder
         $exportedFile = '/tmp/' . Str::random();
 
         // Create Zip
-        $zip->open($exportedFile . '.lmne', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $zip->open($exportedFile . '.lmne', ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
         // Iterator to search all files in folder.
-        $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($path),
-            \RecursiveIteratorIterator::LEAVES_ONLY
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path),
+            RecursiveIteratorIterator::LEAVES_ONLY
         );
 
         // Create Folder to put views in
@@ -76,7 +85,7 @@ class MainController extends Controller
 
         // Simply, go through scripts and add them in to zip.
         foreach (extension()->scripts() as $script) {
-            $zip->addFile(storage_path('app/scripts/') . $script->_id, 'scripts/' . $script->unique_code . '.lmns');
+            $zip->addFile(env('SCRIPTS_PATH') . $script->_id, 'scripts/' . $script->unique_code . '.lmns');
         }
 
         // Extract database in to json.
@@ -92,15 +101,14 @@ class MainController extends Controller
         return response()->download($exportedFile . '.lmne', extension()->name . "-" . extension()->version . ".lmne")->deleteFileAfterSend();
     }
 
-
     /**
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
-     * @throws \Exception
+     * @return JsonResponse|Response
+     * @throws Exception
      */
     public function upload()
     {
         // Initialize Zip Archive Object to use it later.
-        $zip = new \ZipArchive;
+        $zip = new ZipArchive;
 
         // Try to open zip file.
         if (!$zip->open(request()->file('extension'))) {
@@ -113,7 +121,7 @@ class MainController extends Controller
         // Extract Zip to the Temp Folder.
         $zip->extractTo($path);
 
-        if(count(scandir($path)) == 3){
+        if (count(scandir($path)) == 3) {
             $path = $path . '/' . scandir($path)[2];
         }
 
@@ -122,100 +130,80 @@ class MainController extends Controller
         $json = json_decode($file, true);
 
         // Check If Extension Already Exists.
-        $extension = Extension::where('name',$json["name"])->first();
-        if($extension){
-            if($extension->version == $json["version"]){
-                return respond("Eklentinin bu sürümü zaten yüklü",201);
+        $extension = Extension::where('name', $json["name"])->first();
+
+        if ($extension) {
+            if ($extension->version == $json["version"]) {
+                return respond("Eklentinin bu sürümü zaten yüklü", 201);
             }
         }
 
         // Create extension object and fill values.
-        if($extension){
+        if ($extension) {
             $new = $extension;
-        }else{
+        } else {
             $new = new Extension();
         }
         $new->fill($json);
         $new->save();
 
-        if((intval(shell_exec("grep -c '^liman-: " . $new->_id  . "' /etc/passwd"))) ? false : true){
+        // Add User if not exists
+        if ((intval(shell_exec("grep -c '^liman-: " . $new->_id . "' /etc/passwd"))) ? false : true) {
             shell_exec('sudo useradd -r -s /bin/sh liman-' . $new->_id);
         }
 
-        $extension_folder = resource_path('views/extensions/' . strtolower($json["name"]));
+        $extension_folder = env('EXTENSIONS_PATH') . strtolower($json["name"]);
 
-        // Delete existing folder.
-        if (is_dir($extension_folder)) {
-            $this->rmdir_recursive($extension_folder);
+        // Create folder.
+        if (!is_dir($extension_folder)) {
+            mkdir($extension_folder);
         }
 
-        mkdir($extension_folder);
         shell_exec('sudo chown liman-' . $new->_id . ':liman ' . $extension_folder);
         shell_exec('sudo chmod 770 ' . $extension_folder);
 
         // Copy Views into the liman.
-        $views = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($path . '/views/'),
-            \RecursiveIteratorIterator::LEAVES_ONLY
+        $views = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path . '/views/'),
+            RecursiveIteratorIterator::LEAVES_ONLY
         );
 
-        foreach ($views as $view){
+        foreach ($views as $view) {
             // Skip directories (they would be added automatically)
             if (!$view->isDir()) {
                 if (substr($view->getFilename(), 0, 1) == ".") {
                     continue;
                 }
 
-                copy($view->getRealPath(),$extension_folder . DIRECTORY_SEPARATOR . $view->getFilename());
+                copy($view->getRealPath(), $extension_folder . DIRECTORY_SEPARATOR . $view->getFilename());
                 shell_exec('sudo chown liman-' . $new->_id . ':liman "' . $extension_folder . DIRECTORY_SEPARATOR . $view->getFilename() . '"');
                 shell_exec('sudo chmod 664 "' . $extension_folder . DIRECTORY_SEPARATOR . $view->getFilename() . '"');
             }
 
         }
 
-        $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($path . '/scripts/'),
-            \RecursiveIteratorIterator::LEAVES_ONLY
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path . '/scripts/'),
+            RecursiveIteratorIterator::LEAVES_ONLY
         );
-
         foreach ($files as $file) {
             // Skip directories (they would be added automatically)
             if (!$file->isDir()) {
-                if (substr($file->getFilename(), 0, 1) == "." || !Str::endsWith($view->getFilename(),".lmns")) {
+                if (substr($file->getFilename(), 0, 1) == "." || !Str::endsWith($file->getFilename(), ".lmns")) {
                     continue;
                 }
-
                 // Get real and relative path for current file
                 $filePath = $file->getRealPath();
 
                 $script = Script::readFromFile($filePath);
-                if($script){
-                    copy($filePath,storage_path('app' . DIRECTORY_SEPARATOR . 'scripts') . DIRECTORY_SEPARATOR . $script->_id);
+                if ($script) {
+                    copy($filePath, env('SCRIPTS_PATH') . $script->_id);
                 }
             }
         }
-
-        $folder = resource_path('views/extensions/') . strtolower(request('name'));
-
-        return respond(route('extension_one',$new->_id),300);
+        return respond(route('extension_one', $new->_id), 300);
     }
 
-    /**
-     * @param $dir
-     */
-    private function rmdir_recursive($dir) {
-        foreach(scandir($dir) as $file) {
-            if ('.' === $file || '..' === $file){
-                continue;
-            }
-            if (is_dir("$dir/$file")){
-                $this->rmdir_recursive("$dir/$file");
-            }else{
-                unlink("$dir/$file");
-            }
-        }
-        rmdir($dir);
-    }
 
     public function newExtension()
     {
@@ -241,16 +229,19 @@ class MainController extends Controller
 
         $ext->save();
 
-        $folder = resource_path('views/extensions/') . strtolower(request('name'));
+        $folder = env('EXTENSIONS_PATH') . strtolower(request('name'));
 
-        mkdir($folder);
+        if (!is_dir($folder)) {
+            mkdir($folder);
+        }
+
         shell_exec('sudo chown ' . $ext->_id . ':liman ' . $folder);
         shell_exec('sudo chmod 770 ' . $folder);
 
-        touch($folder  . '/index.blade.php');
-        touch($folder  . '/functions.php');
+        touch($folder . '/index.blade.php');
+        touch($folder . '/functions.php');
 
-        if((intval(shell_exec("grep -c '^liman-: " . $ext->_id  . "' /etc/passwd"))) ? false : true){
+        if ((intval(shell_exec("grep -c '^liman-: " . $ext->_id . "' /etc/passwd"))) ? false : true) {
             shell_exec('sudo useradd -r -s /bin/sh liman-' . $ext->_id);
         }
 
@@ -259,7 +250,7 @@ class MainController extends Controller
 
         shell_exec('sudo chown liman-' . $ext->_id . ':liman "' . trim($folder) . '/functions.php"');
         shell_exec('sudo chmod 664 "' . trim($folder) . '/functions.php"');
-        
-        return respond(route('extension_one',$ext->_id),300);
+
+        return respond(route('extension_one', $ext->_id), 300);
     }
 }

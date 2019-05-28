@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Extension;
 use App\Extension;
 use App\Http\Controllers\Controller;
 use App\Script;
+use Illuminate\Support\Str;
 
 /**
  * Class SettingsController
@@ -28,21 +29,29 @@ class SettingsController extends Controller
      */
     public function settings_one()
     {
-        $extension = Extension::where('_id', \request('extension_id'))->first();
-
         // Go through all files and list them as tree style in array.
-        $files = $this->tree(resource_path('views' . DIRECTORY_SEPARATOR . 'extensions' . DIRECTORY_SEPARATOR . strtolower($extension->name)));
+        $files = $this->tree(env('EXTENSIONS_PATH') . strtolower(extension()->name));
 
         // Retrieve scripts from database.
-        $scripts = Script::where('extensions', 'like', $extension->name)->get();
+        $scripts = Script::where('extensions', 'like', extension()->name)->get();
 
-        $output = shell_exec("sudo runuser liman-" . $extension->_id . " -c '/usr/bin/php -d display_errors=on /liman/server/storage/sandbox/list.php /liman/server/resources/views/extensions/" . strtolower($extension->name) . "/functions.php'");
-
-        $functions = json_decode($output, true);
+        $functionsFile = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/functions.php";
+        if (is_file($functionsFile)) {
+            $functionsFile = file_get_contents(env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/functions.php");
+            preg_match_all('/^\s*function (.*)(?=\()/m', $functionsFile, $results);
+            $functions = [];
+            foreach ($results[1] as $result) {
+                array_push($functions, [
+                    "name" => $result
+                ]);
+            }
+        } else {
+            $functions = [];
+        }
 
         // Return view with required parameters.
         return view('extension_pages.one', [
-            "extension" => $extension,
+            "extension" => extension(),
             "files" => $files,
             "scripts" => $scripts,
             "functions" => $functions
@@ -194,8 +203,12 @@ class SettingsController extends Controller
                     "scripts" => request('scripts'),
                     "name" => request('name'),
                 ]);
-                $file = resource_path('views/extensions/') . strtolower(extension()->name) . '/' . request('name') . '.blade.php';
-                touch($file);
+                $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/' . request('name') . '.blade.php';
+
+                if(!is_file($file)){
+                    touch($file);
+                }
+
                 break;
         }
         $params = [request('table') => $values];
@@ -213,14 +226,16 @@ class SettingsController extends Controller
                 break;
             }
         }
-        if(request('table') == "views"){
-            $file = resource_path('views/extensions/') . strtolower(extension()->name) . '/' . request('name') . '.blade.php';
-            unlink($file);
+        if (request('table') == "views") {
+            $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/' . request('name') . '.blade.php';
+            if(is_file($file)){
+                unlink($file);
+            }
         }
         $params = [request('table') => $values];
         extension()->update($params);
 
-        return respond("Silindi", 200);
+        return respond("Eklenti Silindi.", 200);
     }
 
 }

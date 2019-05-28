@@ -87,7 +87,7 @@
        "inputs" => [
            "Extension Id:'null'" => "extension_id:hidden"
        ],
-       "submit_text" => "Sunucuyu Sil"
+       "submit_text" => "Eklentiyi Sil"
    ])
 
 <script>

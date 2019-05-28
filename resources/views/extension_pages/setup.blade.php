@@ -37,14 +37,14 @@
                     @endforeach
                 </select><br>    
             @else
-                @include('l.inputs',[
-                "inputs" => [
-                    $item["name"] => $item["variable"] . ":" . $item["type"]
-                ]
-            ])
+                <h5>{{__($item["name"])}}</h5>
+                <input class="form-control" type="{{$item["type"]}}"
+                       name="{{$item["variable"]}}" placeholder="{{__($item["name"])}}"
+                       @if($item["type"] != "password") value="{{extensionDb($item["variable"])}}" @endif>
             @endif
 
         @endforeach
+        <br>
         <button type="submit" class="btn btn-success">{{__("Kaydet")}}</button>
     </form>
 @else

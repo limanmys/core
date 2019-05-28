@@ -130,9 +130,20 @@ class MainController extends Controller
     }
 
     public function getExtensionFunctions(){
-        $output = shell_exec("sudo runuser liman-" . extension()->_id . " -c '/usr/bin/php -d display_errors=on /liman/server/storage/sandbox/list.php /liman/server/resources/views/extensions/" . strtolower(extension()->name) . "/functions.php'");
+        $functionsFile = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/functions.php";
+        $allFunctions = [];
+        if (is_file($functionsFile)) {
+            $functionsFile = file_get_contents(env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/functions.php");
+            preg_match_all('/^\s*function (.*)(?=\()/m', $functionsFile, $results);
+            $allFunctions = [];
+            foreach ($results[1] as $result) {
+                array_push($allFunctions, [
+                    "name" => $result
+                ]);
+            }
+        }
+
         $functions = [];
-        $allFunctions = json_decode($output, true);
         foreach($allFunctions as $function){
             if(Permission::can(request('user_id'),"function",strtolower(extension()->name) . "_" . $function["name"])){
                 continue;

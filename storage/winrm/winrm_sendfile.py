@@ -22,12 +22,12 @@ try:
 
     client.copy(source, destination)
 
-    if os.path.exists(source) == False:
-        raise Exception
+    #if os.path.exists(source) == False:
+    #    raise Exception
 
-    output2,streams2,had_errors2 = client.execute_ps("Get-Item " + destination)
-    if not source in output2:
-        raise Exception
+    #output2,streams2,had_errors2 = client.execute_ps("Get-Item " + destination)
+    #if not source in output2:
+#        raise Exception
 except:
     process = subprocess.Popen(("rm temp.pem").split(), stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     poutput, perror = process.communicate()

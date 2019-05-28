@@ -38,7 +38,7 @@ class WinRMConnector implements Connector
         $receiveFile = "/usr/bin/python3 /liman/server/storage/winrm/winrm_sendfile.py '" . server()->ip_address . "' '"
             . storage_path('keys/windows') . DIRECTORY_SEPARATOR . auth()->user()->_id . server()->_id . "_cert.pem' '"
             . storage_path('keys/windows') . DIRECTORY_SEPARATOR . auth()->user()->_id . server()->_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'" .
-            " '$remotePath' '$localPath'";
+            " '$localPath' '$remotePath'";
         shell_exec($receiveFile);
         return true;
     }

@@ -81,6 +81,14 @@ class KeyController extends Controller
     public function delete()
     {
         $key = \App\Key::where('_id',request('key_id'))->first();
+        if(!$key){
+            abort(504,"Anahtar Bulunamadi");
+        }
+
+        if(Server::where('_id',$key->server_id)->exists()){
+            $server = Server::where('_id',$key->server_id)->first();
+        }
+
         $key->delete();
         return respond("Anahtar Silindi");
     }

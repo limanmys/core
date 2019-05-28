@@ -125,11 +125,16 @@ if (!function_exists('extension')) {
 if (!function_exists('extensionDb')) {
     /**
      * @param null $id
-     * @return \App\Extension
+     * @return String
      */
     function extensionDb($key)
     {
-        return auth()->user()->settings[server()->_id][extension()->_id][$key];
+        try{
+            return auth()->user()->settings[server()->_id][extension()->_id][$key];
+        }catch (Exception $exception){
+            return "";
+        }
+
     }
 }
 

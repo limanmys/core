@@ -8,12 +8,7 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
  * App\Script
  *
  * @property-read mixed $id
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Script newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Script newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Script query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Script save()
- * @method static \Illuminate\Database\Query\Builder|\App\Script where($field, $value, $extra = null)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Script extends Eloquent
 {
@@ -59,13 +54,13 @@ class Script extends Eloquent
      * @param mixed ...$parameters
      * @return mixed
      */
-    public static function createFile($script, ...$parameters){
+    public static function createFile(Script $script, ...$parameters){
         
         // Save script in order to generate unique _id.
         $script->save();
 
         //Create File Writer
-        $file = fopen(storage_path('app' . DIRECTORY_SEPARATOR . 'scripts' ) . DIRECTORY_SEPARATOR . $script->_id, 'w');
+        $file = fopen(env('SCRIPTS_PATH') . $script->_id, 'w');
 
         // Simply slice the parameters of the function, ex: unique_code, company etc.
         $user_inputs = array_slice($parameters[0],0,-1);

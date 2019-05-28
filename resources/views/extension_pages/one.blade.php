@@ -6,7 +6,7 @@
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
             <li class="breadcrumb-item" aria-current="page"><a
                         href="{{route('extensions_settings')}}">{{__("Eklenti Yönetimi")}}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ $extension->name }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ extension()->name }}</li>
         </ol>
     </nav>
     <div class="nav-tabs-custom">
@@ -23,17 +23,17 @@
             <div class="tab-pane active" id="tab_1">
                 <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button>
                 <h3>{{__("Eklenti Adı")}}</h3>
-                <input id="extensionName" type="text" class="form-control" value="{{$extension->name}}" disabled>
+                <input id="extensionName" type="text" class="form-control" value="{{extension()->name}}" disabled>
                 <h3>{{__("Yayınlayan")}}</h3>
-                <input type="text" name="name" class="form-control" value="{{$extension->publisher}}" disabled>
+                <input type="text" name="name" class="form-control" value="{{extension()->publisher}}" disabled>
                 <h3>{{__("Destek Email'i")}}</h3>
-                <input id="support" type="text" name="email" class="form-control" value="{{$extension->support}}">
+                <input id="support" type="text" name="email" class="form-control" value="{{extension()->support}}">
                 <h3>{{__("Logo (Font Awesome Ikon)")}}</h3>
-                <input id="icon" type="text" name="icon" class="form-control" value="{{$extension->icon}}">
+                <input id="icon" type="text" name="icon" class="form-control" value="{{extension()->icon}}">
                 <h3>{{__("Versiyon")}}</h3>
-                <input id="version" type="text" name="version" class="form-control" value="{{$extension->version}}">
+                <input id="version" type="text" name="version" class="form-control" value="{{extension()->version}}">
                 <h3>{{__("Servis")}}</h3>
-                <input id="service" type="text" name="service" class="form-control" value="{{$extension->service}}">
+                <input id="service" type="text" name="service" class="form-control" value="{{extension()->service}}">
             </div>
             <!-- /.tab-pane -->
             <div class="tab-pane" id="tab_2">
@@ -43,7 +43,7 @@
                     "text" => "Veri Ekle"
                 ])<br><br>
                 @include('l.table',[
-                    "value" => $extension->database,
+                    "value" => extension()->database,
                     "title" => [
                         "Adı" , "Türü" , "Variable Adı", "" , "", ""
                     ],
@@ -71,8 +71,7 @@
                         "Sayfa Adı" => "name:text",
                         "Türü" => "type:text",
                         "Variable Adı" => "variable:text",
-                        "table:database" => "table:hidden",
-                        "-:" . extension()->_id => "extension_id:hidden"
+                        "table:database" => "table:hidden"
                     ],
                     "submit_text" => "Veri Ekle"
                 ])
@@ -89,8 +88,7 @@
                         "Sayfa Adı:a" => "name_old:hidden",
                         "Türü:a" => "type_old:hidden",
                         "Variable Adı:a" => "variable_old:hidden",
-                        "table:database" => "table:hidden",
-                        "-:" . extension()->_id => "extension_id:hidden"
+                        "table:database" => "table:hidden"
                     ],
                     "submit_text" => "Veri Düzenle"
                 ])
@@ -104,8 +102,7 @@
                         "Sayfa Adı:a" => "name:hidden",
                         "Türü:a" => "type:hidden",
                         "Variable Adı:a" => "variable:hidden",
-                        "table:database" => "table:hidden",
-                        "-:" . extension()->_id => "extension_id:hidden"
+                        "table:database" => "table:hidden"
                     ],
                     "submit_text" => "Veri'yi Sil"
                 ])
@@ -117,7 +114,7 @@
                     "text" => "Sayfa Ekle"
                 ])<br><br>
                 @include('l.table',[
-                    "value" => $extension->views,
+                    "value" => extension()->views,
                     "title" => [
                         "Sayfa Adı" , "Çalışacak Betik/Fonksiyon" , "", ""
                     ],
@@ -147,8 +144,7 @@
                     "inputs" => [
                         "Sayfa Adı" => "name:text",
                         "table:views" => "table:hidden",
-                        "Çalışacak Betik/Fonksiyon" => "scripts:text",
-                        "-:" . extension()->_id => "extension_id:hidden"
+                        "Çalışacak Betik/Fonksiyon" => "scripts:text"
                     ],
                     "submit_text" => "Sayfa Ekle"
                 ])
@@ -162,8 +158,7 @@
                         "Çalışacak Betik/Fonksiyon" => "d-scripts:text",
                         "Sayfa Adı:a" => "name_old:hidden",
                         "table:views" => "table:hidden",
-                        "Çalışacak Betik/Fonksiyon:a" => "scripts_old:hidden",
-                        "-:" . extension()->_id => "extension_id:hidden"
+                        "Çalışacak Betik/Fonksiyon:a" => "scripts_old:hidden"
                     ],
                     "submit_text" => "Sayfa Düzenle"
                 ])
@@ -176,8 +171,7 @@
                     "inputs" => [
                         "Sayfa Adı:a" => "name:hidden",
                         "table:views" => "table:hidden",
-                        "Çalışacak Betik/Fonksiyon:a" => "scripts:hidden",
-                        "-:" . extension()->_id => "extension_id:hidden"
+                        "Çalışacak Betik/Fonksiyon:a" => "scripts:hidden"
                     ],
                     "submit_text" => "Sayfa'yı Sil"
                 ])
@@ -190,7 +184,7 @@
                     "text" => "Widget Ekle"
                 ])<br><br>
                 @include('l.table',[
-                    "value" => $extension->widgets,
+                    "value" => extension()->widgets,
                     "title" => [
                         "Widget Adı" , "Türü" , "Çalışacak Betik/Fonksiyon" , "", "", ""
                     ],
@@ -217,8 +211,7 @@
                         "Widget Adı" => "name:text",
                         "Türü" => "type:text",
                         "table:widgets" => "table:hidden",
-                        "Çalışacak Betik/Fonksiyon" => "target:text",
-                        "-:" . extension()->_id => "extension_id:hidden"
+                        "Çalışacak Betik/Fonksiyon" => "target:text"
                     ],
                     "submit_text" => "Widget Ekle"
                 ])
@@ -234,8 +227,7 @@
                         "Widget Adı:a" => "name_old:hidden",
                         "table:widgets" => "table:hidden",
                         "Türü:a" => "type_old:hidden",
-                        "Çalışacak Betik/Fonksiyon:a" => "target_old:hidden",
-                        "-:" . extension()->_id => "extension_id:hidden"
+                        "Çalışacak Betik/Fonksiyon:a" => "target_old:hidden"
                     ],
                     "submit_text" => "Widget Düzenle"
                 ])
@@ -249,8 +241,7 @@
                         "Widget Adı:a" => "name:hidden",
                         "Türü:a" => "type:hidden",
                         "table:widgets" => "table:hidden",
-                        "Çalışacak Betik/Fonksiyon:a" => "target:hidden",
-                        "-:" . extension()->_id => "extension_id:hidden"
+                        "Çalışacak Betik/Fonksiyon:a" => "target:hidden"
                     ],
                     "submit_text" => "Widget'ı Sil"
                 ])
@@ -283,7 +274,6 @@
                 showConfirmButton: false,
             });
             let data = new FormData();
-            data.append('extension_id','{{extension()->_id}}');
             data.append('type',type);
             data.append('name',$("#extensionName").val());
             data.append('icon',$("#icon").val());

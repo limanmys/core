@@ -107,28 +107,5 @@ class HomeController extends Controller
         $req->save();
         return respond('Talebiniz başarıyla alındı.',200);
     }
-
-    public function deneme(){
-        $loader = new \Twig_Loader_Filesystem(app_path() . '/../resources/views/twig');
-        $twig = new \Twig_Environment($loader,["auto_reload" => true,"debug" => true]);
-        $tags = ['if'];
-        $filters = ['upper','for'];
-        $methods = [
-            'Article' => ['getTitle', 'getBody'],
-        ];
-        $properties = [
-            'Article' => ['title', 'body'],
-        ];
-        $functions = ['echo','for'];
-
-        $policy = new Twig_Sandbox_SecurityPolicy($tags, $filters, $methods, $properties, $functions);
-
-        $sandbox = new \Twig_Extension_Sandbox($policy,true);
-        $twig->addExtension($sandbox);
-
-        return $twig->render('deneme.twig',[
-            "mert" => "celen",
-            "server" => servers()
-        ]);
-    }
+    
 }

@@ -41,9 +41,25 @@ class OneController extends Controller
         $outputs = [];
 
         $viewName = (request('unique_code')) ? request('unique_code') : "index";
-        
-        $results = Validator::do(resource_path('views/extensions/') . strtolower(extension()->name) . "/" . $viewName . ".blade.php");
-        
+
+        $flag = false;
+        foreach (extension()->views as $view){
+            if($view["name"] == $viewName){
+                $flag = true;
+                break;
+            }
+        }
+
+        if(!$flag){
+            abort(504,"Sayfa bulunamadı");
+        }
+
+        if (!is_file(env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/" . $viewName . ".blade.php")) {
+            abort(504,"Sayfa bulunamadı");
+        }
+
+//        $results = Validator::do(env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/" . $viewName . ".blade.php");
+
         // Go through each required scripts and run each of them.
         $views = extension()->views;
         foreach ($views as $view) {
@@ -67,7 +83,7 @@ class OneController extends Controller
 
                     $parameters = "";
                     foreach (explode(',', $script->inputs) as $input) {
-                        $parameters = $parameters . " '" . \request(explode(':', $input)[0]) . "'";
+                        $parameters = $parameters . " '" . request(explode(':', $input)[0]) . "'";
                     }
 
                     $output = server()->runScript($script, $parameters);
@@ -98,20 +114,20 @@ class OneController extends Controller
         // Before Everything, check if it's a function or script.
         if (Script::where('unique_code', request('function_name'))->exists()) {
             $script = Script::where('unique_code', request('function_name'))->first();
-            if(!Permission::can(Auth::id(),'script',$script->_id)){
-                abort(504,$script->name . " betiği için yetkiniz yok.");
+            if (!Permission::can(Auth::id(), 'script', $script->_id)) {
+                abort(504, $script->name . " betiği için yetkiniz yok.");
             }
-            
+
             $parameters = "";
             foreach (explode(',', $script->inputs) as $input) {
                 $parameters = $parameters . " '" . \request(explode(':', $input)[0]) . "'";
             }
             return respond(server()->runScript($script, $parameters));
         }
-        if(!Permission::can(Auth::id(),"function",strtolower(extension()->name) . "_" . strtolower(request('function_name')))){
-            abort(504,request('function_name') . " için yetkiniz yok.");
+        if (!Permission::can(Auth::id(), "function", strtolower(extension()->name) . "_" . strtolower(request('function_name')))) {
+            abort(504, request('function_name') . " için yetkiniz yok.");
         }
-        
+
         $command = self::generateSandboxCommand(server(), extension(), Auth::user()->settings, Auth::id(), "null", "null", request('function_name'));
 
         return shell_exec($command);
@@ -122,22 +138,22 @@ class OneController extends Controller
         if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
             abort(403, 'Not Allowed');
         }
-        $token = Token::where('token',request('token'))->first() or abort(403,"Token gecersiz");
+        $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
-        if(!Permission::can($token->user_id,'server',$server->_id)){
+        if (!Permission::can($token->user_id, 'server', $server->_id)) {
             return "Sunucu icin yetkiniz yok.";
         }
 
         $extension = Extension::find(request('extension_id')) or abort(404, 'Eklenti Bulunamadi');
-        if(!Permission::can($token->user_id,'extension',$extension->_id)){
+        if (!Permission::can($token->user_id, 'extension', $extension->_id)) {
             return "Eklenti icin yetkiniz yok.";
         }
 
-        if(!Permission::can($token->user_id,"function",strtolower(extension()->name) . "_" . strtolower(request('target')))){
+        if (!Permission::can($token->user_id, "function", strtolower(extension()->name) . "_" . strtolower(request('target')))) {
             return request('target') . " fonksiyonu için yetkiniz yok.";
         }
-        
+
         $user = User::find($token->user_id);
         $command = self::generateSandboxCommand($server, $extension, $user->settings, $user->_id, "null", "null", request('target'));
         $output = shell_exec($command);
@@ -149,16 +165,16 @@ class OneController extends Controller
         if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
             return 'Not Allowed';
         }
-        $token = Token::where('token',request('token'))->first() or abort(403,"Token gecersiz");
-        
+        $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+
         Auth::loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
-        if(!Permission::can($token->user_id,'server',$server->_id)){
+        if (!Permission::can($token->user_id, 'server', $server->_id)) {
             return "Sunucu icin yetkiniz yok.";
         }
 
-        if($server->type != "linux_ssh" && $server->type != "windows_powershell"){
+        if ($server->type != "linux_ssh" && $server->type != "windows_powershell") {
             return "Bu sunucuda komut çalıştıramazsınız.";
         }
 
@@ -172,19 +188,19 @@ class OneController extends Controller
         if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
             return 'Not Allowed';
         }
-        $token = Token::where('token',request('token'))->first() or abort(403,"Token gecersiz");
-        
+        $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+
         Auth::loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
-        
-        if($server->type != "linux_ssh" && $server->type != "windows_powershell"){
+
+        if ($server->type != "linux_ssh" && $server->type != "windows_powershell") {
             return "Bu sunucuda komut çalıştıramazsınız.";
         }
 
         request()->request->add(['server' => $server]);
-        $output = $server->putFile(request('localPath'),request('remotePath'));
-        return "ok";
+        $output = $server->putFile(request('localPath'), request('remotePath'));
+        return ($output) ? "ok" : "no";
     }
 
     public function internalGetFileApi()
@@ -192,18 +208,18 @@ class OneController extends Controller
         if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
             return 'Not Allowed';
         }
-        $token = Token::where('token',request('token'))->first() or abort(403,"Token gecersiz");
-        
+        $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+
         Auth::loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
-        
-        if($server->type != "linux_ssh" && $server->type != "windows_powershell"){
+
+        if ($server->type != "linux_ssh" && $server->type != "windows_powershell") {
             return "Bu sunucuda komut çalıştıramazsınız.";
         }
-        
+
         request()->request->add(['server' => $server]);
-        $output = $server->getFile(request('remotePath'),request('localPath'));
+        $output = $server->getFile(request('remotePath'), request('localPath'));
         return "ok";
     }
 
@@ -246,9 +262,9 @@ class OneController extends Controller
     public function remove()
     {
         try {
-            self::rmdir_recursive(resource_path('views' . DIRECTORY_SEPARATOR . 'extensions' . DIRECTORY_SEPARATOR . strtolower(extension()->name)));
+            self::rmdir_recursive(env('EXTENSIONS_PATH') . strtolower(extension()->name));
             foreach (Script::where('extensions', 'like', strtolower(extension()->name))->get() as $script) {
-                shell_exec('rm ' . storage_path('app/scripts/' . $script->_id));
+                shell_exec('rm ' . env('SCRIPTS_PATH') . $script->_id);
                 $script->delete();
             }
             shell_exec('sudo userdel liman-' . extension()->_id);
@@ -270,7 +286,7 @@ class OneController extends Controller
         } else {
             $fileName = request('page_name') . '.blade.php';
         }
-        $file = file_get_contents(resource_path('views/extensions/') . strtolower(extension()->name) . '/' . $fileName);
+        $file = file_get_contents(env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/' . $fileName);
         return view('l.editor', [
             "file" => $file
         ]);
@@ -281,7 +297,7 @@ class OneController extends Controller
      */
     public function updateCode()
     {
-        $file = resource_path('views/extensions/') . strtolower(extension()->name) . '/' . request('page') . '.blade.php';
+        $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/' . request('page') . '.blade.php';
         file_put_contents($file, json_decode(request('code')));
         return respond("Kaydedildi", 200);
     }
@@ -303,9 +319,9 @@ class OneController extends Controller
 
     private function generateSandboxCommand($serverObj, \App\Extension $extensionObj, $user_settings, $user_id, $outputs, $viewName, $functionName)
     {
-        $functions = resource_path('views/extensions/' . strtolower($extensionObj->name) . "/functions.php");
+        $functions = env('EXTENSIONS_PATH') . strtolower($extensionObj->name) . "/functions.php";
 
-        $combinerFile = storage_path('sandbox/index.php');
+        $combinerFile = env('SANDBOX_PATH') . "index.php";
 
         $server = str_replace('"', '*m*', json_encode($serverObj->toArray()));
 
