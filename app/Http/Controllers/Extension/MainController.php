@@ -207,6 +207,8 @@ class MainController extends Controller
 
     public function newExtension()
     {
+        $folder = env('EXTENSIONS_PATH') . strtolower(request('name'));
+
         $ext = new Extension([
             "name" => request('name'),
             "publisher" => auth()->user()->name,
@@ -217,10 +219,6 @@ class MainController extends Controller
                 [
                     "name" => "index",
                     "scripts" => ""
-                ],
-                [
-                    "name" => "functions",
-                    "scripts" => ""
                 ]
             ],
             "status" => 0,
@@ -229,21 +227,19 @@ class MainController extends Controller
 
         $ext->save();
 
-        $folder = env('EXTENSIONS_PATH') . strtolower(request('name'));
-
         if (!is_dir($folder)) {
             mkdir($folder);
         }
 
-        shell_exec('sudo chown ' . $ext->_id . ':liman ' . $folder);
+        if ((intval(shell_exec("grep -c '^liman-: " . $ext->_id . "' /etc/passwd"))) ? false : true) {
+            shell_exec('sudo useradd -r -s /bin/sh liman-' . $ext->_id);
+        }
+
+        shell_exec('sudo chown liman-' . $ext->_id . ':liman ' . $folder);
         shell_exec('sudo chmod 770 ' . $folder);
 
         touch($folder . '/index.blade.php');
         touch($folder . '/functions.php');
-
-        if ((intval(shell_exec("grep -c '^liman-: " . $ext->_id . "' /etc/passwd"))) ? false : true) {
-            shell_exec('sudo useradd -r -s /bin/sh liman-' . $ext->_id);
-        }
 
         shell_exec('sudo chown liman-' . $ext->_id . ':liman "' . trim($folder) . '/index.blade.php"');
         shell_exec('sudo chmod 664 "' . trim($folder) . '/index.blade.php"');
