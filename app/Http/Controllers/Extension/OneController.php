@@ -9,6 +9,14 @@ use App\Server;
 use App\Token;
 use App\Http\Controllers\Controller;
 use App\User;
+use Exception;
+use function request;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Redirector;
+use Illuminate\View\View;
 
 /**
  * Class OneController
@@ -104,7 +112,7 @@ class OneController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return JsonResponse|Response
      */
     public function runFunction()
     {
@@ -117,7 +125,7 @@ class OneController extends Controller
 
             $parameters = "";
             foreach (explode(',', $script->inputs) as $input) {
-                $parameters = $parameters . " '" . \request(explode(':', $input)[0]) . "'";
+                $parameters = $parameters . " '" . request(explode(':', $input)[0]) . "'";
             }
             return respond(server()->runScript($script, $parameters));
         }
@@ -221,7 +229,7 @@ class OneController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return RedirectResponse|Redirector
      */
     public function serverSettings()
     {
@@ -233,7 +241,7 @@ class OneController extends Controller
         $settings = auth()->user()->settings;
 
         $settings[server()->_id][extension()->_id] = $extension_config;
-        \App\User::where('_id', auth()->id())->update([
+        User::where('_id', auth()->id())->update([
             "settings" => $settings
         ]);
 
@@ -243,7 +251,7 @@ class OneController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function serverSettingsPage()
     {
@@ -254,7 +262,7 @@ class OneController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return JsonResponse|Response
      */
     public function remove()
     {
@@ -266,7 +274,7 @@ class OneController extends Controller
             }
             shell_exec('sudo userdel liman-' . extension()->_id);
             extension()->delete();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return respond('Eklenti silinemedi', 201);
         }
 
@@ -274,7 +282,7 @@ class OneController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function page()
     {
@@ -290,7 +298,7 @@ class OneController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return JsonResponse|Response
      */
     public function updateCode()
     {
@@ -314,7 +322,7 @@ class OneController extends Controller
         rmdir($dir);
     }
 
-    private function generateSandboxCommand($serverObj, \App\Extension $extensionObj, $user_settings, $user_id, $outputs, $viewName, $functionName)
+    private function generateSandboxCommand($serverObj, Extension $extensionObj, $user_settings, $user_id, $outputs, $viewName, $functionName)
     {
         $functions = env('EXTENSIONS_PATH') . strtolower($extensionObj->name) . "/functions.php";
 
