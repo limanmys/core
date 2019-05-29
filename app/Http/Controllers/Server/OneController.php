@@ -113,7 +113,7 @@ class OneController extends Controller
         }
 
         // If user somehow typed same email, warn user.
-        if ($user == Auth::user()) {
+        if ($user == auth()->user()) {
             return respond("Bu email adresi size ait.", 201);
         }
 
@@ -129,7 +129,7 @@ class OneController extends Controller
         if (server()->type == "linux_ssh") {
             // Generate key for user.
             $flag = Key::initWithKey(server()->key->username, server()->key->_id, server()->ip_address,
-                server()->port, Auth::id(), $user->_id);
+                server()->port, auth()->user()->_id(), $user->_id);
 
             // Check if key initialized successfully.
             if (!$flag) {
@@ -351,7 +351,7 @@ class OneController extends Controller
         if (auth()->user()->isAdmin()) {
             return Extension::all()->whereNotIn('_id', array_keys(server()->extensions));
         }
-        return Extension::find(Permission::get(Auth::user()->_id, 'extension'))->whereNotIn('_id', array_keys(server()->extensions));
+        return Extension::find(Permission::get(auth()->user()->_id, 'extension'))->whereNotIn('_id', array_keys(server()->extensions));
     }
 
     private function installedExtensions()
@@ -359,7 +359,7 @@ class OneController extends Controller
         if (auth()->user()->isAdmin()) {
             return Extension::find(array_keys(server()->extensions));
         }
-        return Extension::find(Permission::get(Auth::user()->_id, 'extension'))->whereIn('_id', array_keys(server()->extensions));
+        return Extension::find(Permission::get(auth()->user()->_id, 'extension'))->whereIn('_id', array_keys(server()->extensions));
     }
 
     public function favorite()
