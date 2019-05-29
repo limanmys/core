@@ -8,7 +8,6 @@ use App\Script;
 use App\Server;
 use App\Token;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\User;
 
 /**
@@ -19,7 +18,6 @@ class OneController extends Controller
 {
     /**
      * @return Illuminate\View\View
-     * @throws \Throwable
      */
     public function renderView()
     {
@@ -77,7 +75,7 @@ class OneController extends Controller
                     }
 
                     if (!Permission::can(auth()->id(), 'script', $script->_id)) {
-                        abort(504, "Eklenti için yetkiniz var fakat '" . $script->name . "' betiğini çalıştırmak için yetkiniz yok.");
+                        abort(403, "Eklenti için yetkiniz var fakat '" . $script->name . "' betiğini çalıştırmak için yetkiniz yok.");
                     }
 
                     $parameters = "";
@@ -95,7 +93,7 @@ class OneController extends Controller
             }
         }
 
-        $command = self::generateSandboxCommand(server(), extension(), Auth::user()->settings, Auth::id(), $outputs, $viewName, null);
+        $command = self::generateSandboxCommand(server(), extension(), auth()->user()->settings, auth()->id(), $outputs, $viewName, null);
         $output = shell_exec($command);
 
         // Return all required parameters.
@@ -113,8 +111,8 @@ class OneController extends Controller
         // Before Everything, check if it's a function or script.
         if (Script::where('unique_code', request('function_name'))->exists()) {
             $script = Script::where('unique_code', request('function_name'))->first();
-            if (!Permission::can(Auth::id(), 'script', $script->_id)) {
-                abort(504, $script->name . " betiği için yetkiniz yok.");
+            if (!Permission::can(auth()->id(), 'script', $script->_id)) {
+                abort(403, $script->name . " betiği için yetkiniz yok.");
             }
 
             $parameters = "";
@@ -123,11 +121,11 @@ class OneController extends Controller
             }
             return respond(server()->runScript($script, $parameters));
         }
-        if (!Permission::can(Auth::id(), "function", strtolower(extension()->name) . "_" . strtolower(request('function_name')))) {
-            abort(504, request('function_name') . " için yetkiniz yok.");
+        if (!Permission::can(auth()->id(), "function", strtolower(extension()->name) . "_" . request('function_name'))) {
+            abort(403, request('function_name') . " için yetkiniz yok.");
         }
 
-        $command = self::generateSandboxCommand(server(), extension(), Auth::user()->settings, Auth::id(), "null", "null", request('function_name'));
+        $command = self::generateSandboxCommand(server(), extension(), auth()->user()->settings, auth()->id(), "null", "null", request('function_name'));
 
         return shell_exec($command);
     }
@@ -166,7 +164,7 @@ class OneController extends Controller
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
 
-        Auth::loginUsingId($token->user_id);
+        auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
         if (!Permission::can($token->user_id, 'server', $server->_id)) {
@@ -189,7 +187,7 @@ class OneController extends Controller
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
 
-        Auth::loginUsingId($token->user_id);
+        auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
 
@@ -209,7 +207,7 @@ class OneController extends Controller
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
 
-        Auth::loginUsingId($token->user_id);
+        auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
 

@@ -52,8 +52,18 @@ function request(url, data, next) {
             switch (r.status) {
                 case 200:
                     return next(r.responseText);
+                    break;
                 case 300:
                     return window.location = response["message"];
+                    break;
+                case 403:
+                    Swal.fire({
+                        position: 'center',
+                        type: 'error',
+                        title: response["message"],
+                        showConfirmButton: false,
+                    });
+                    break;
             }
             
         }
