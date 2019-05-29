@@ -13,7 +13,7 @@ class Parameters
             if(!request()->has($parameter) || !strlen(request($parameter))){
 
                 // If found something that is missing, abort the process and warn user.
-                return respond("Missing parameter > $parameter", 403);
+                return respond("Eksik Parametre > $parameter", 403);
             }
         }
 

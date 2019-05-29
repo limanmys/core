@@ -1,16 +1,25 @@
 <?php
 
+use App\Extension;
+use App\Notification;
+use App\Script;
+use App\Server;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
 if (!function_exists('respond')) {
     /**
      * @param $message
      * @param int $status
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return JsonResponse|Response
      */
     function respond($message, $status = 200)
     {
-        if (\request()->wantsJson()) {
+        if (request()->wantsJson()) {
             return response()->json([
                 "message" => __($message),
                 "status" => $status
@@ -30,8 +39,8 @@ if (!function_exists('notifications')) {
      */
     function notifications()
     {
-        return \App\Notification::where([
-            "user_id" => \Auth::id(),
+        return Notification::where([
+            "user_id" => auth()->id(),
             "read" => false
         ])->orderBy('updated_at', 'desc')->get();
     }
@@ -49,7 +58,7 @@ if (!function_exists('liman_log')) {
 
 if (!function_exists('server')) {
     /**
-     * @return \App\Server
+     * @return array|Request|string
      */
     function server()
     {
@@ -72,23 +81,23 @@ if (!function_exists('script')) {
 
 if (!function_exists('servers')) {
     /**
-     * @return array
+     * @return Server|Builder
      */
     function servers()
     {
-        return \App\Server::getAll();
+        return Server::getAll();
     }
 }
 
 if (!function_exists('extensions')) {
 
     /**
-     * @param null $filter
+     * @param array $filter
      * @return array
      */
     function extensions($filter = [])
     {
-        return \App\Extension::getAll($filter);
+        return Extension::getAll($filter);
     }
 }
 
@@ -111,20 +120,20 @@ if (!function_exists('extensionRoute')) {
 if (!function_exists('extension')) {
     /**
      * @param null $id
-     * @return \App\Extension
+     * @return Extension
      */
     function extension($id = null)
     {
         if($id == null){
             $id = request('extension_id');
         }
-        return \App\Extension::one($id);
+        return Extension::one($id);
     }
 }
 
 if (!function_exists('extensionDb')) {
     /**
-     * @param null $id
+     * @param $key
      * @return String
      */
     function extensionDb($key)
@@ -143,7 +152,7 @@ if (!function_exists('getObject')) {
     /**
      * @param $type
      * @param null $id
-     * @return bool
+     * @return Extension|bool|Model|Builder|object
      */
     function getObject($type, $id = null)
     {
@@ -151,15 +160,15 @@ if (!function_exists('getObject')) {
         switch ($type) {
             case "Script":
             case "script":
-                return \App\Script::where('_id', $id)->first();
+                return Script::where('_id', $id)->first();
                 break;
             case "Extension":
             case "extension":
-                return \App\Extension::where('_id', $id)->first();
+                return Extension::where('_id', $id)->first();
                 break;
             case "Server":
             case "server":
-                return \App\Server::where('_id', $id)->first();
+                return Server::where('_id', $id)->first();
                 break;
             default:
                 return false;
@@ -201,7 +210,8 @@ if (!function_exists('serverKey')) {
 
 if(!function_exists('cities')){
     /**
-     * @return array
+     * @param null $city
+     * @return array|false|int|string
      */
     function cities($city = null){
         $cities = [

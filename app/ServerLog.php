@@ -4,6 +4,9 @@ namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
+/**
+ * @method static where(array $array)
+ */
 class ServerLog extends Eloquent
 {
     protected $collection = 'server_log';
@@ -45,8 +48,8 @@ class ServerLog extends Eloquent
         }
 
         // First, convert user_id's into the user names.
-        $users = \App\User::all();
-        $scripts = \App\Script::all();
+        $users = User::all();
+        $scripts = Script::all();
 
         foreach ($logs as $log){
             $user = $users->where('_id', $log->user_id)->first();

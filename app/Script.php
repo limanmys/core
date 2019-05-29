@@ -9,6 +9,7 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
  *
  * @property-read mixed $id
  * @mixin Eloquent
+ * @method static where(string $string, $id)
  */
 class Script extends Eloquent
 {

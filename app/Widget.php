@@ -4,6 +4,9 @@ namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
+/**
+ * @method static where(array $array)
+ */
 class Widget extends Eloquent
 {
     protected $collection = 'widgets';

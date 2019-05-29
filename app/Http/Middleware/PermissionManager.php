@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Permission;
 use Closure;
 
 class PermissionManager
@@ -15,10 +16,10 @@ class PermissionManager
     public function handle($request, Closure $next)
     {
         // Get User Permissions
-        $request->request->add(['permissions' => \App\Permission::where('user_id', auth()->id())->first()]);
+        $request->request->add(['permissions' => Permission::where('user_id', auth()->id())->first()]);
 
         // If user is admin, allow request.
-        if(\Auth::user()->isAdmin()){
+        if(auth()->user()->isAdmin()){
             $this->initializeObjects();
             return $next($request);
         }

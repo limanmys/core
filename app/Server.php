@@ -5,13 +5,14 @@ namespace App;
 use App\Classes\Connector\SSHConnector;
 use App\Classes\Connector\WinRMConnector;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Query\Builder;
 
 /**
  * Class Server
  * @package App
- * @method static \Illuminate\Database\Query\Builder|\Server where($field, $value)
- * @method static \Illuminate\Database\Query\Builder|\Server find($field)
+ * @method static Builder|Server where($field, $value)
+ * @method static Builder|Server find($field)
  */
 class Server extends Eloquent
 {
@@ -33,15 +34,14 @@ class Server extends Eloquent
     public $key;
 
     /**
-     * @return SSHConnector
-     * @throws Exceptions\Key\NotFound
+     * @return SSHConnector|WinRMConnector
      */
     private function connector()
     {
         if($this->type == "linux_ssh"){
-            return new SSHConnector($this,Auth::id());
+            return new SSHConnector($this,auth()->id());
         }elseif($this->type == "windows_powershell"){
-            return new WinRMConnector($this,Auth::id());
+            return new WinRMConnector($this,auth()->id());
         }else{
             abort(504,"Bu sunucuda komut çalıştırmak için bir bağlantınız yok.");
         }
@@ -73,8 +73,6 @@ class Server extends Eloquent
      * @param $remote_path
      * @param $local_path
      * @return bool
-     * @throws Exceptions\Key\NotFound
-     * @throws \Throwable
      */
     public function getFile($remote_path, $local_path)
     {
@@ -86,8 +84,6 @@ class Server extends Eloquent
      * @param $parameters
      * @param null $extra
      * @return string
-     * @throws Exceptions\Key\NotFound
-     * @throws \Throwable
      */
     public function runScript($script, $parameters, $extra = null)
     {
@@ -100,8 +96,6 @@ class Server extends Eloquent
     /**
      * @param $service_name
      * @return string
-     * @throws Exceptions\Key\NotFound
-     * @throws \Throwable
      */
     public function isRunning($service_name)
     {
@@ -131,7 +125,7 @@ class Server extends Eloquent
     }
 
     /**
-     * @return Server|\Illuminate\Database\Query\Builder
+     * @return Server|Server[]|Collection|Builder
      */
     public static function getAll()
     {

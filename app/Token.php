@@ -4,8 +4,10 @@ namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
 
+/**
+ * @method static where(string $string, $param)
+ */
 class Token extends Eloquent
 {
     protected $collection = 'token';
@@ -15,7 +17,7 @@ class Token extends Eloquent
     public static function create($user_id = null)
     {
         // Delete Old Tokens
-        $old = Token::where('user_id',($user_id) ? $user_id : Auth::user()->_id)->get();
+//        $old = Token::where('user_id',($user_id) ? $user_id : auth()->id())->get();
         // if($old) $old->destroy();
 
         $token = $token = Str::random(32);
@@ -25,7 +27,7 @@ class Token extends Eloquent
 
         $obj = new Token();
         $obj->token = $token;
-        $obj->user_id = ($user_id) ? $user_id : Auth::user()->_id;
+        $obj->user_id = ($user_id) ? $user_id : auth()->id();
         $obj->save();
         return $token;
     }

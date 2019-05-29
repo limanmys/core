@@ -3,16 +3,17 @@
 namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * App\Notification
  *
  * @property-read mixed $id
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Notification newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Notification newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Notification query()
- * @method static \Illuminate\Database\Query\Builder|\App\Notification where($value)
- * @mixin \Eloquent
+ * @method static Builder|Notification newModelQuery()
+ * @method static Builder|Notification newQuery()
+ * @method static Builder|Notification query()
+ * @method static \Illuminate\Database\Query\Builder|Notification where($value)
+ * @mixin Eloquent
  */
 class Notification extends Eloquent
 {
@@ -23,7 +24,7 @@ class Notification extends Eloquent
 
         // Create a notification object and fill values.
         $notification = new Notification();
-        $notification->user_id = \Auth::id();
+        $notification->user_id = auth()->id();
         $notification->title = $title;
         $notification->type = $type;
         $notification->message = $message;

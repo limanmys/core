@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Server;
 
 use App\Extension;
 use App\Http\Controllers\Controller;
-use App\Jobs\InstallService;
 use App\Key;
 use App\Notification;
 use App\Permission;
@@ -12,6 +11,7 @@ use App\Script;
 use App\Server;
 use App\ServerLog;
 use App\User;
+use App\Widget;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Str;
@@ -53,7 +53,7 @@ class OneController extends Controller
             Key::where('server_id', $server->_id)->delete();
         }
 
-        \App\Widget::where([
+        Widget::where([
             "server_id" => $server->_id
         ])->delete();
 
@@ -129,7 +129,7 @@ class OneController extends Controller
         if (server()->type == "linux_ssh") {
             // Generate key for user.
             $flag = Key::initWithKey(server()->key->username, server()->key->_id, server()->ip_address,
-                server()->port, auth()->user()->_id(), $user->_id);
+                server()->port, auth()->id(), $user->_id);
 
             // Check if key initialized successfully.
             if (!$flag) {
@@ -155,7 +155,7 @@ class OneController extends Controller
     public function revoke()
     {
         // Check if user owns the server or admin. If not, abort.
-        if (server()->user_id != auth()->user()->_id && !auth()->user()->isAdmin()) {
+        if (server()->user_id != auth()->id() && !auth()->user()->isAdmin()) {
             return respond("Bu işlem için yetkiniz yok.", 201);
         }
 
@@ -351,7 +351,7 @@ class OneController extends Controller
         if (auth()->user()->isAdmin()) {
             return Extension::all()->whereNotIn('_id', array_keys(server()->extensions));
         }
-        return Extension::find(Permission::get(auth()->user()->_id, 'extension'))->whereNotIn('_id', array_keys(server()->extensions));
+        return Extension::find(Permission::get(auth()->id(), 'extension'))->whereNotIn('_id', array_keys(server()->extensions));
     }
 
     private function installedExtensions()
@@ -359,7 +359,7 @@ class OneController extends Controller
         if (auth()->user()->isAdmin()) {
             return Extension::find(array_keys(server()->extensions));
         }
-        return Extension::find(Permission::get(auth()->user()->_id, 'extension'))->whereIn('_id', array_keys(server()->extensions));
+        return Extension::find(Permission::get(auth()->id(), 'extension'))->whereIn('_id', array_keys(server()->extensions));
     }
 
     public function favorite()

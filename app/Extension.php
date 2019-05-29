@@ -3,13 +3,15 @@
 namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Query\Builder;
 
 /**
  * Class Extension
  * @package App
- * @method static \Illuminate\Database\Query\Builder|\App\Extension where($field, $value)
- * @method static \Illuminate\Database\Query\Builder|\App\Extension find($field)
- * @method static \Illuminate\Database\Query\Builder|\App\Extension delete()
+ * @method static Builder|Extension where($field, $value)
+ * @method static Builder|Extension find($field)
+ * @method static Builder|Extension delete()
  */
 class Extension extends Eloquent
 {
@@ -49,10 +51,9 @@ class Extension extends Eloquent
 
     /**
      * @param null $city
-     * @param null $extension_id
      * @return mixed
      */
-    public function servers($city = null, $extension_id = null)
+    public function servers($city = null)
     {
         // Get all Servers which have this extension.
         if($city){
@@ -68,7 +69,7 @@ class Extension extends Eloquent
 
     /**
      * @param null $name
-     * @return Script[]|\Illuminate\Database\Eloquent\Collection
+     * @return Script[]|Collection
      */
     public static function scripts($name = null){
         return Script::all()->where('extensions','like',strtolower(($name == null) ? extension()->name : $name));

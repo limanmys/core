@@ -10,7 +10,6 @@ use App\Token;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\User;
-use App\Classes\Sandbox\Validator;
 
 /**
  * Class OneController

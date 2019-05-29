@@ -5,9 +5,6 @@ namespace App\Http\Controllers;
 use App\LimanRequest;
 use App\Server;
 use App\Widget;
-use function MongoDB\generate_index_name;
-use mysql_xdevapi\Session;
-use Twig_Sandbox_SecurityPolicy;
 
 class HomeController extends Controller
 {
@@ -98,8 +95,8 @@ class HomeController extends Controller
 
     public function request(){
         $req = new LimanRequest();
-        $req->user_id = \Auth::id();
-        $req->email = \Auth::user()->email;
+        $req->user_id = auth()->id();
+        $req->email = auth()->user()->email;
         $req->note = request('note');
         $req->type = request('type');
         $req->speed = request('speed');

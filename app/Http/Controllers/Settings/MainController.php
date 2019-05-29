@@ -8,7 +8,6 @@ use App\Script;
 use App\Server;
 use App\User;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 
 class MainController extends Controller
 {

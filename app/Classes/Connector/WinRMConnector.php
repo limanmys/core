@@ -28,16 +28,16 @@ class WinRMConnector implements Connector
     public function execute($command)
     {
         $executeScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_execute.py '" . server()->ip_address . "' '" 
-        . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->_id . server()->_id . "_cert.pem' '"
-        . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->_id . server()->_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'";
+        . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->_id . "_cert.pem' '"
+        . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'";
         return shell_exec($executeScript . " " . $command)
 ;    }
 
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
         $receiveFile = "/usr/bin/python3 /liman/server/storage/winrm/winrm_sendfile.py '" . server()->ip_address . "' '"
-            . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->_id . server()->_id . "_cert.pem' '"
-            . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->_id . server()->_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'" .
+            . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->_id . "_cert.pem' '"
+            . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'" .
             " '$localPath' '$remotePath'";
         shell_exec($receiveFile);
         return true;
@@ -46,8 +46,8 @@ class WinRMConnector implements Connector
     public function receiveFile($localPath, $remotePath)
     {
         $receiveFile = "/usr/bin/python3 /liman/server/storage/winrm/winrm_getfile.py '" . server()->ip_address . "' '" 
-        . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->_id . server()->_id . "_cert.pem' '"
-        . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->_id . server()->_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'" .
+        . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->_id . "_cert.pem' '"
+        . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'" .
         " '$remotePath' '$localPath'";
         shell_exec($receiveFile);
         return is_file($localPath);

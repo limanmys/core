@@ -23,7 +23,7 @@ class OneController extends Controller
         request()->request->add(['widget' => $widget]);
         request()->request->add(['extension_id' => $extension->_id]);
         request()->request->add(['extension' => $extension]);
-        $command = self::generateSandboxCommand($server, $extension, auth()->user()->settings, auth()->user()->_id, "null", "null", $widget->widget_name);
+        $command = self::generateSandboxCommand($server, $extension, auth()->user()->settings, auth()->id(), "null", "null", $widget->widget_name);
         return __("<b>Geçici Olarak Devre Dışı</b>");
     }
 

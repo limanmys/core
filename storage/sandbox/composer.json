@@ -1,4 +1,0 @@
-{"name":"dummy app","description":"This app is only a dummy for downloading with the option require.","homepage":"https://php-download.com/","type":"project","require":{"jenssegers/blade":"^1.1.0.0",
-        "larapack/dd": "^1.1",
-                "phpseclib/phpseclib": "~2.0",
-                "guzzlehttp/guzzle": "^6.3"}}

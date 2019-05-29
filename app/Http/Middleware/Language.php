@@ -3,15 +3,15 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\App;
+use Illuminate\Http\Request;
 
 class Language
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  Request  $request
+     * @param  Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -20,7 +20,7 @@ class Language
         if (session('locale')) {
 
             // If so, set that locale in to the app to use it later.
-            App::setLocale(session('locale'));
+            app()->setLocale(session('locale'));
         }
 
         // Forward request to next target.

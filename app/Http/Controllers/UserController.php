@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Permission;
 use App\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +13,7 @@ class UserController extends Controller
 
     public function one()
     {
-        $user = User::where('_id',\Auth::id())->first();
+        $user = User::where('_id',auth()->id())->first();
         return view('users.one',[
             "user" => $user
         ]);
@@ -100,7 +99,7 @@ class UserController extends Controller
            'password' => Hash::make(request('password'))
         ]);
 
-        Auth::logout();
+        auth()->logout();
         session()->flush();
 
         return respond('Kullanıcı Başarıyla Güncellendi, lütfen tekrar giriş yapın.',200);
