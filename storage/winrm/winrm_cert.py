@@ -57,7 +57,7 @@ def checkCert() :
     ### Check is certificate exist
     # output, streams, had_errors = client.execute_ps("Get-ChildItem -Recurse -Path WSMan:\localhost\ClientCertificate | Where-Object { $_.Value -eq \"administrator\"} ")
     output, streams, had_errors = client.execute_ps("""
-    Get-ChildItem -Path cert:/LocalMachine/My | Where-Object { $_.Subject -eq "CN=%s" }""" % certPath.split(".")[0])
+    Get-ChildItem -Path cert:/LocalMachine/My | Where-Object { $_.Subject -eq "CN=%s" }""" % subject)
     return False if output == "" else True
     # print("User already exist in Client Certificates.")
 
