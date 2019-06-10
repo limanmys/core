@@ -38,4 +38,5 @@ sudo openssl req \
 sudo systemctl restart nginx
 sudo systemctl enable nginx
 
+sudo apt-get install python3-setuptools
 sudo runuser liman -c "pip3 install pypsrp"
