@@ -44,9 +44,14 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <span class="hidden-xs">{{auth()->user()->name}}</span>
                             </a>
+
                             <ul class="dropdown-menu">
                                 <!-- Menu Footer-->
                                 <li class="user-footer">
+                                    <div>
+                                        {{__("Giriş Yapılan son ip adresi : ") . auth()->user()->last_login_ip}}
+                                        {{__("Giriş Tarihi : " . auth()->user()->last_login_at)}}<br><br>
+                                    </div>
                                     <div class="pull-left">
                                         <a href="{{route('my_profile')}}"
                                            class="btn btn-default btn-flat">{{__("Profil")}}</a>

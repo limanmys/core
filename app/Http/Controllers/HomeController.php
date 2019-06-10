@@ -25,6 +25,7 @@ class HomeController extends Controller
      */
     public function index()
     {
+        system_log(7,"HOMEPAGE");
         $widgets = Widget::where('user_id',auth()->id())->get();
         foreach($widgets as $widget){
             $widget->server_name = Server::where('_id',$widget->server_id)->first()->name;
@@ -35,6 +36,7 @@ class HomeController extends Controller
     }
 
     public function setLocale(){
+        system_log(7,"SET_LOCALE");
         $languages = ["tr","en"];
         if(request()->has('locale') && in_array(request('locale'),$languages)){
             \Session::put('locale', request('locale'));

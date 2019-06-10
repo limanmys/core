@@ -32,7 +32,9 @@ class MainController extends Controller
 
         // Extract Cities of the Servers.
         $cities = array_values(objectToArray($servers, "city", "city"));
-
+        system_log(7,"EXTENSION_SERVERS_INDEX",[
+            "extension_id" => extension()->_id
+        ]);
         // Render View with Cities
         return view('extension_pages.index', [
             "cities" => implode(',', $cities)
@@ -97,6 +99,10 @@ class MainController extends Controller
         // Close/Compress zip
         $zip->close();
 
+        system_log(6,"EXTENSION_DOWNLOAD",[
+            "extension_id" => extension()->_id
+        ]);
+
         // Return zip as download and delete it after sent.
         return response()->download($exportedFile . '.lmne', extension()->name . "-" . extension()->version . ".lmne")->deleteFileAfterSend();
     }
@@ -112,6 +118,9 @@ class MainController extends Controller
 
         // Try to open zip file.
         if (!$zip->open(request()->file('extension'))) {
+            system_log(7,"EXTENSION_UPLOAD_FAILED_CORRUPTED",[
+                "extension_id" => extension()->_id
+            ]);
             return respond("Eklenti Dosyası Açılamıyor.", 201);
         }
 
@@ -134,6 +143,9 @@ class MainController extends Controller
 
         if ($extension) {
             if ($extension->version == $json["version"]) {
+                system_log(7,"EXTENSION_UPLOAD_FAILED_ALREADY_INSTALLED",[
+                    "extension_id" => extension()->_id
+                ]);
                 return respond("Eklentinin bu sürümü zaten yüklü", 201);
             }
         }
@@ -201,6 +213,10 @@ class MainController extends Controller
                 }
             }
         }
+        system_log(3,"EXTENSION_UPLOAD",[
+            "extension_id" => extension()->_id
+        ]);
+
         return respond(route('extension_one', $new->_id), 300);
     }
 
@@ -246,6 +262,10 @@ class MainController extends Controller
 
         shell_exec('sudo chown liman-' . $ext->_id . ':liman "' . trim($folder) . '/functions.php"');
         shell_exec('sudo chmod 664 "' . trim($folder) . '/functions.php"');
+
+        system_log(6,"EXTENSION_CREATE",[
+            "extension_id" => extension()->_id
+        ]);
 
         return respond(route('extension_one', $ext->_id), 300);
     }

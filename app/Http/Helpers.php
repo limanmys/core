@@ -46,13 +46,44 @@ if (!function_exists('notifications')) {
     }
 }
 
-if (!function_exists('liman_log')) {
+if (!function_exists('system_log')) {
+
     /**
+     * @param $level
      * @param $message
+     * @param array $array
      */
-    function liman_log($message)
+    function system_log($level, $message, $array = [])
     {
-        Log::info(auth()->id() . ":" . $message);
+        $array["user_id"] = auth()->id();
+        $array["ip_address"] = request()->ip();
+
+        switch ($level){
+            case 1:
+                Log::emergency($message,$array);
+                break;
+            case 2:
+                Log::alert($message,$array);
+                break;
+            case 3:
+                Log::critical($message,$array);
+                break;
+            case 4:
+                Log::error($message,$array);
+                break;
+            case 5:
+                Log::warning($message,$array);
+                break;
+            case 6:
+                Log::notice($message,$array);
+                break;
+            case 7:
+                Log::info($message,$array);
+                break;
+            default:
+                Log::debug($message,$array);
+                break;
+        }
     }
 }
 
@@ -303,4 +334,6 @@ if(!function_exists('cities')){
         return $cities;
     }
 }
+
+
 

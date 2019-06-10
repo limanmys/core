@@ -16,6 +16,7 @@ class LogoutController extends Controller
      */
     public function logout()
     {
+        system_log(7,"LOGOUT_SUCCESS");
         //Logout User
         Auth::logout();
         session()->flush();
