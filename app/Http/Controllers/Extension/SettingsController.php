@@ -19,6 +19,7 @@ class SettingsController extends Controller
      */
     public function settings_all()
     {
+        system_log(7,"EXTENSION_LIST");
         return view('extension_pages.manager');
     }
 
@@ -48,6 +49,10 @@ class SettingsController extends Controller
         } else {
             $functions = [];
         }
+
+        system_log(7,"EXTENSION_SETTINGS_PAGE",[
+            "extension_id" => extension()->_id,
+        ]);
 
         // Return view with required parameters.
         return view('extension_pages.one', [
@@ -111,6 +116,10 @@ class SettingsController extends Controller
         } else {
             $arr = [];
         }
+        system_log(7,"EXTENSION_VIEW_SCRIPTS",[
+            "extension_id" => extension()->_id,
+        ]);
+
         return $arr;
     }
 
@@ -128,6 +137,11 @@ class SettingsController extends Controller
         }
         $extension->views = $temp;
         $extension->save();
+
+        system_log(7,"EXTENSION_VIEW_SCRIPTS_UPDATE",[
+            "extension_id" => extension()->_id,
+        ]);
+
         return response(__("Başarıyla Eklendi."), 200);
     }
 
@@ -143,6 +157,9 @@ class SettingsController extends Controller
         } else {
             return response(__("Sayfa Bulunamadı."), 404);
         }
+        system_log(7,"EXTENSION_VIEW_SCRIPTS_REMOVE",[
+            "extension_id" => extension()->_id,
+        ]);
         return response(__("Başarıyla kaldırıldı."), 200);
     }
 
@@ -179,6 +196,11 @@ class SettingsController extends Controller
             $params = [request('table') => $values];
         }
         extension()->update($params);
+
+        system_log(7,"EXTENSION_SETTINGS_UPDATE",[
+            "extension_id" => extension()->_id,
+            "settings_type" => request('table')
+        ]);
 
         return respond("Guncellendi", 200);
     }
@@ -217,6 +239,11 @@ class SettingsController extends Controller
         $params = [request('table') => $values];
         extension()->update($params);
 
+        system_log(7,"EXTENSION_SETTINGS_ADD",[
+            "extension_id" => extension()->_id,
+            "settings_type" => request('table')
+        ]);
+
         return respond("Eklendi", 200);
     }
 
@@ -237,6 +264,11 @@ class SettingsController extends Controller
         }
         $params = [request('table') => $values];
         extension()->update($params);
+
+        system_log(7,"EXTENSION_SETTINGS_REMOVE",[
+            "extension_id" => extension()->_id,
+            "settings_type" => request('table')
+        ]);
 
         return respond("Eklenti Silindi.", 200);
     }
