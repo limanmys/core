@@ -266,7 +266,7 @@
         @endif
         setInterval(function () {
             stats();
-        },54000);
+        },27000);
         function stats() {
             let form = new FormData();
             form.append('server_id','{{server()->_id}}');

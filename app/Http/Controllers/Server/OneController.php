@@ -383,9 +383,21 @@ class OneController extends Controller
 
     public function stats()
     {
-        $disk = substr(server()->run('df -h | grep ^/dev ', false), 0, -1);
-        $ram = server()->run("free -m | awk '/Mem:/ { total=($6/$2)*100 } END { printf(\"%3.1f\", total) }'", false);
-        $cpu = substr(server()->run("grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'", false), 0, -1);
+        if(server()->type == "linux_ssh"){
+            $disk = substr(server()->run('df -h | grep ^/dev ', false), 0, -1);
+            $ram = server()->run("free -m | awk '/Mem:/ { total=($6/$2)*100 } END { printf(\"%3.1f\", total) }'", false);
+            $cpu = substr(server()->run("grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'", false), 0, -1);
+        }elseif (server()->type == "windows_powershell"){
+            $cpu = substr(server()->run("Get-WmiObject win32_processor | Measure-Object -property LoadPercentage -Average | Select Average"),23,-3);
+            $disk = round(floatval(server()->run("(Get-WmiObject -Class Win32_logicalDisk | ? {\\\$_.DriveType -eq '3'}).FreeSpace / (Get-WmiObject -Class Win32_logicalDisk | ? {\\\$_.DriveType -eq '3'}).Size * 100")),2);
+            try{
+                $usedRam = intval(substr(server()->run("Get-Counter '\Memory\Available MBytes'"),390,-335));
+                $totalRam = intval(server()->run("[math]::Round((Get-WmiObject Win32_ComputerSystem).totalphysicalmemory / (1024 * 1024))"));
+                $ram = round($usedRam / $totalRam * 100,2);
+            }catch (\Exception $exception){
+                $ram = "0";
+            }
+        }
         return [
             "disk" => $disk,
             "ram" => $ram,

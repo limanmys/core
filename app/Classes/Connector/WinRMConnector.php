@@ -2,11 +2,14 @@
 
 namespace App\Classes\Connector;
 
+use App\Key;
+use App\Server;
+
 class WinRMConnector implements Connector
 {
-    public function __construct(\App\Server $server,$user_id)
+    public function __construct(Server $server, $user_id)
     {
-        ($key = \App\Key::where([
+        ($key = Key::where([
             "user_id" => $user_id,
             "server_id" => $server->_id
         ])->first()) || abort(504,"WinRM Anahtarınız yok.");
@@ -30,7 +33,7 @@ class WinRMConnector implements Connector
         $executeScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_execute.py '" . server()->ip_address . "' '" 
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->_id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->_id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'";
-        return shell_exec($executeScript . " " . $command)
+        return shell_exec($executeScript . " \"" . $command . "\"");
 ;    }
 
     public function sendFile($localPath, $remotePath, $permissions = 0644)
@@ -58,7 +61,7 @@ class WinRMConnector implements Connector
 
     }
 
-    public static function create(\App\Server $server, $username, $password, $user_id,$key)
+    public static function create(Server $server, $username, $password, $user_id, $key)
     {
         $beforeScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_cert.py before '" . $server->ip_address . "' '$username' '$password' '" 
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->_id . "_cert.pem' '"
