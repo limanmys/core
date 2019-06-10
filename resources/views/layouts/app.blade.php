@@ -32,7 +32,7 @@
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
                         <li style="color:white;line-height: 50px">
-                            Build : 27.05.2019 11:38
+                            {{__("Versiyon : ") . env('APP_VERSION')}}
                         </li>
                         <!-- Notifications: style can be found in dropdown.less -->
                         <li id="notifications-menu" class="dropdown notifications-menu">
