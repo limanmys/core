@@ -1,4 +1,14 @@
 os: linux
 language: php
 dist: xenial
-install: ./build_tools/liman_req.sh
+before_install:
+  - chmod +x ./build_tools/liman_req.sh
+  - ./build_tools/liman_req.sh
+  - rm ./build-tools/liman_req.sh
+  - cd build-tools
+  - mkdir liman
+  - git clone --depth=50 --branch=master https://github.com/mertcelen/liman.git liman/server
+  - git clone --depth=50 --branch=master https://github.com/mertcelen/liman-sandbox.git liman/sandbox
+  - chmod +x ./build_tools/create_deb.sh
+script:
+  - ./build_tools/create_deb.sh `cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`

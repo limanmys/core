@@ -1,21 +1,9 @@
 # USAGE:
 # bash create_liman_deb.sh current/liman/path/ packagename version
-# örn1: bash create_liman_deb.sh liman-master.zip liman 0.40a190515 liman-sandbox.zip
+# örn1: bash create_liman_deb.sh 0.40a190515
 
-mkdir -p $2-$3/liman/server/
-unzip $1 -d $2-$3/liman/server
-
-unzip $4 -d $2-$3/liman/sandbox
-
-mv $2-$3/liman/server/*/* $2-$3/liman/server/.
-mv $2-$3/liman/server/*/.* $2-$3/liman/server/.
-
-mv $2-$3/liman/sandbox/*/* $2-$3/liman/sandbox/.
-mv $2-$3/liman/sandbox/*/.* $2-$3/liman/sandbox/.
-
-#cp -ra $1/* $2-$3/liman/server/.
-cd $2-$3
 mkdir DEBIAN
+
 touch DEBIAN/postinst
 touch DEBIAN/md5sums
 touch DEBIAN/control
@@ -40,15 +28,16 @@ systemctl restart php7.3-fpm
 """ > DEBIAN/postinst
 chmod 775 DEBIAN/postinst
 
-echo """Package: $2
-Version: $3
+echo """Package: Liman
+Version: $1
 Installed-Size: 29892
-Maintainer: mert çelen <mcelen@havelsan.com.tr>
+Maintainer: Mert ÇELEN <mcelen@havelsan.com.tr>
 Section: admin
 Architecture: amd64
 Priority: important
-Description: sensei mert
- very very sensei mert""" > DEBIAN/control
+Description: Liman
+ Liman System Manager""" > DEBIAN/control
 
 cd ../
-dpkg-deb --build $2-$3
+
+dpkg-deb --build build_tools
