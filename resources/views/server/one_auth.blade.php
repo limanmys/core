@@ -245,7 +245,9 @@
     <script>
         function checkStatus(service) {
             let data = new FormData();
-            data.append('server_id', '{{$server->_id}}');
+            if(!service){
+                return false;
+            }
             data.append('service', service);
             request('{{route('server_check')}}', data, function (response) {
                 let json = JSON.parse(response);
