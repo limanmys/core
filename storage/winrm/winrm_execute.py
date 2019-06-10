@@ -21,11 +21,11 @@ try:
     if had_errors:
         raise Exception
     print(output)
-    process = subprocess.Popen(("rm temp.pem").split(), stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    output, error = process.communicate()
+    # process = subprocess.Popen(("rm temp.pem").split(), stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    # output, error = process.communicate()
 
 except:
     print("Invalid command")
-    process = subprocess.Popen(("rm temp.pem").split(), stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    output, error = process.communicate()
+    # process = subprocess.Popen(("rm temp.pem").split(), stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    # output, error = process.communicate()
     exit()
