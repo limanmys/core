@@ -1,0 +1,3 @@
+os: linux
+dist: xenial
+install: ./build_tools/liman_req.sh
