@@ -15,7 +15,8 @@ script:
   - mv `pwd`/../build_tools.deb `pwd`/../liman-`cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
 deploy:
   provider: releases
-  api_key: GITHUB_TOKEN
+  api_key:
+    secure: GITHUB_TOKEN
   file: /home/travis/build/mertcelen/liman/liman-`cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
   skip_cleanup: true
   draft: true
