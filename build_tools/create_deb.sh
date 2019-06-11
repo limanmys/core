@@ -41,3 +41,4 @@ Description: Liman
 cd ../
 
 dpkg-deb --build build_tools
+ls -la .
