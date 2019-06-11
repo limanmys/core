@@ -9,6 +9,6 @@ before_install:
   - mkdir liman
   - git clone --depth=50 --branch=master https://github.com/mertcelen/liman.git liman/server
   - git clone --depth=50 --branch=master https://github.com/mertcelen/liman-sandbox.git liman/sandbox
-  - chmod +x ./build_tools/create_deb.sh
+  - chmod +x create_deb.sh
 script:
-  - ./build_tools/create_deb.sh `cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`
+  - ./create_deb.sh `cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`
