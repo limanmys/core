@@ -6,14 +6,15 @@ before_install:
 #  - ./build_tools/liman_req.sh
   - rm `pwd`/build_tools/liman_req.sh
   - cd build_tools
-  - mkdir liman
-  - git clone --depth=50 --branch=master https://github.com/mertcelen/liman.git liman/server
-  - git clone --depth=50 --branch=master https://github.com/mertcelen/liman-sandbox.git liman/sandbox
+  - mkdir -p build/liman
+  - git clone --depth=50 --branch=master https://github.com/mertcelen/liman.git build/liman/server
+  - git clone --depth=50 --branch=master https://github.com/mertcelen/liman-sandbox.git build/liman/sandbox
   - chmod +x create_deb.sh
 script:
   - ./create_deb.sh `cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`
   - pwd
   - ls -la `pwd`
+  - ls -la ../
   - mv `pwd`/build_tools.deb `pwd`/liman-`cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
 deploy:
   provider: releases
