@@ -4,9 +4,8 @@ dist: xenial
 before_install:
   - chmod +x ./build_tools/liman_req.sh
   - ./build_tools/liman_req.sh
-  - pwd
-  - rm `pwd`/build-tools/liman_req.sh
-  - cd build-tools
+  - rm `pwd`/build_tools/liman_req.sh
+  - cd build_tools
   - mkdir liman
   - git clone --depth=50 --branch=master https://github.com/mertcelen/liman.git liman/server
   - git clone --depth=50 --branch=master https://github.com/mertcelen/liman-sandbox.git liman/sandbox
