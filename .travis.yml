@@ -2,8 +2,8 @@ os: linux
 language: php
 dist: xenial
 before_install:
-  - chmod +x ./build_tools/liman_req.sh
-  - ./build_tools/liman_req.sh
+#  - chmod +x ./build_tools/liman_req.sh
+#  - ./build_tools/liman_req.sh
   - rm `pwd`/build_tools/liman_req.sh
   - cd build_tools
   - mkdir liman
@@ -12,7 +12,6 @@ before_install:
   - chmod +x create_deb.sh
 script:
   - ./create_deb.sh `cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`
-  - ls -la /
   - pwd
   - mv build_tools.deb liman-`cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
 deploy:
