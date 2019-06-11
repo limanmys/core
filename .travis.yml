@@ -12,9 +12,10 @@ before_install:
   - chmod +x create_deb.sh
 script:
   - ./create_deb.sh `cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`
+  - mv build_tools.deb liman-`cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
 deploy:
   provider: releases
   api_key: GITHUB_TOKEN
-  file:
+  file: liman-`cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
   skip_cleanup: true
   draft: true
