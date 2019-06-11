@@ -23,6 +23,6 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-  tag: V-`cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`
+  tag: v-`cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`
   prerelease: true
   name: Liman Version `cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`
