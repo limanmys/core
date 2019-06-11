@@ -6,16 +6,17 @@ before_install:
 #  - ./build_tools/liman_req.sh
   - rm `pwd`/build_tools/liman_req.sh
   - cd build_tools
-  - mkdir -p build/liman
-  - git clone --depth=50 --branch=master https://github.com/mertcelen/liman.git build/liman/server
-  - git clone --depth=50 --branch=master https://github.com/mertcelen/liman-sandbox.git build/liman/sandbox
-  - chmod +x create_deb.sh
+  - mkdir -p liman
+  - git clone --depth=50 --branch=master https://github.com/mertcelen/liman.git liman/server
+  - git clone --depth=50 --branch=master https://github.com/mertcelen/liman-sandbox.git liman/sandbox
+  - mv create_deb.sh ../create_deb.sh
+  - chmod +x ../create_deb.sh
 script:
-  - ./create_deb.sh `cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`
+  - ../create_deb.sh `cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`
   - mv `pwd`/../build_tools.deb `pwd`/../liman-`cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
 deploy:
   provider: releases
   api_key: ${GITHUB_TOKEN}
   file: /home/travis/build/mertcelen/liman/liman-`cat ../.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
   skip_cleanup: true
-  draft: true
+  prerelease: true
