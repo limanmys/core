@@ -118,9 +118,7 @@ class MainController extends Controller
 
         // Try to open zip file.
         if (!$zip->open(request()->file('extension'))) {
-            system_log(7,"EXTENSION_UPLOAD_FAILED_CORRUPTED",[
-                "extension_id" => extension()->_id
-            ]);
+            system_log(7,"EXTENSION_UPLOAD_FAILED_CORRUPTED");
             return respond("Eklenti Dosyası Açılamıyor.", 201);
         }
 
@@ -143,9 +141,7 @@ class MainController extends Controller
 
         if ($extension) {
             if ($extension->version == $json["version"]) {
-                system_log(7,"EXTENSION_UPLOAD_FAILED_ALREADY_INSTALLED",[
-                    "extension_id" => extension()->_id
-                ]);
+                system_log(7,"EXTENSION_UPLOAD_FAILED_ALREADY_INSTALLED");
                 return respond("Eklentinin bu sürümü zaten yüklü", 201);
             }
         }
@@ -213,8 +209,8 @@ class MainController extends Controller
                 }
             }
         }
-        system_log(3,"EXTENSION_UPLOAD",[
-            "extension_id" => extension()->_id
+        system_log(3,"EXTENSION_UPLOAD_SUCCESS",[
+            "extension_id" => $new->_id
         ]);
 
         return respond(route('extension_one', $new->_id), 300);
