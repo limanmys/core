@@ -46,6 +46,8 @@ class MainController extends Controller
                     break;
             }
         }
+        system_log(7,"REQUEST_LIST");
+
         return view('permission.list',[
             "requests" => $requests
         ]);
@@ -54,6 +56,11 @@ class MainController extends Controller
     public function one(){
         $request = LimanRequest::where('_id',request('permission_id'))->first();
         $request->user_name = User::where('_id',$request->user_id)->first()->name;
+
+        system_log(7,"REQUEST_DETAILS",[
+            "request_id" => $request
+        ]);
+
         return view('permission.requests.' . $request->type ,[
             "request" => $request
         ]);
@@ -62,6 +69,11 @@ class MainController extends Controller
     public function requestUpdate()
     {
         $request = LimanRequest::where('_id',request('request_id'))->first();
+
+        system_log(7,"REQUEST_UPDATE",[
+            "action" => $request
+        ]);
+
         if(request('status') == "4"){
             $request->delete();
             return respond("Talep Silindi",200);

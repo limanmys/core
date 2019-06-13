@@ -11,9 +11,9 @@
 
             <a href="/" class="logo">
 
-                <span class="logo-mini"><b>L</b></span>
+                <span class="logo-mini"><img src="/images/liman_logo_white.png" alt="logo" height="35px" style="margin-top:5px"></span>
 
-                <span class="logo-lg"><b>Liman</b></span>
+                <span class="logo-lg"><img src="/images/liman_logo_white.png" alt="logo" height="35px" style="float: left;margin-top:5px"><b>Liman MYS</b></span>
             </a>
             <!-- Header Navbar -->
             <nav class="navbar navbar-static-top" role="navigation">
@@ -22,9 +22,9 @@
                    onclick="request('{{route('set_collapse')}}',new FormData(),null)">
                     <span class="sr-only">{{__("Geri Dön")}}</span>
                 </a>
-                <span style="line-height: 50px;color: white;font-weight: bolder">
+                <span style="line-height: 50px;color: orangered;font-weight: bolder">
                     @if(auth()->user()->status == "1")
-                        {{__("Yönetici Hesabı İle Giriş Yaptınız.")}}
+                        {{__("Tam Yetkili Yönetici Hesabı İle Giriş Yaptınız.")}}
                     @endif
                 </span>
 
