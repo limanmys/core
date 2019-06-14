@@ -364,8 +364,7 @@ class OneController extends Controller
     {
         $extension = Extension::where('_id', request()->route('extension_id'))->first();
         system_log(7,"EXTENSION_SETTINGS_PAGE",[
-            "extension_id" => extension()->_id,
-            "server_id" => server()->_id,
+            "extension_id" => extension()->_id
         ]);
         return response()->view('extension_pages.setup', [
             'extension' => $extension
@@ -407,7 +406,6 @@ class OneController extends Controller
         $file = file_get_contents(env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/' . $fileName);
         system_log(7,"EXTENSION_CODE_EDITOR",[
             "extension_id" => extension()->_id,
-            "server_id" => server()->_id,
             "file" => $fileName
         ]);
         return view('l.editor', [

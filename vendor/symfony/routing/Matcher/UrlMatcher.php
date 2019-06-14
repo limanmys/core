@@ -32,6 +32,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     const REQUIREMENT_MISMATCH = 1;
     const ROUTE_MATCH = 2;
 
+    /** @var RequestContext */
     protected $context;
 
     /**
@@ -88,7 +89,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             return $ret;
         }
 
-        if ('/' === $pathinfo && !$this->allow) {
+        if ('/' === $pathinfo && !$this->allow && !$this->allowSchemes) {
             throw new NoConfigurationException();
         }
 
@@ -158,16 +159,12 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 
             $hasTrailingVar = $trimmedPathinfo !== $pathinfo && preg_match('#\{\w+\}/?$#', $route->getPath());
 
-            if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
-                if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods))) {
-                    return $this->allow = $this->allowSchemes = [];
+            if ($hasTrailingVar && ($hasTrailingSlash || (null === $m = $matches[\count($compiledRoute->getPathVariables())] ?? null) || '/' !== ($m[-1] ?? '/')) && preg_match($regex, $trimmedPathinfo, $m)) {
+                if ($hasTrailingSlash) {
+                    $matches = $m;
+                } else {
+                    $hasTrailingVar = false;
                 }
-
-                continue;
-            }
-
-            if ($hasTrailingSlash && $hasTrailingVar && preg_match($regex, $trimmedPathinfo, $m)) {
-                $matches = $m;
             }
 
             $hostMatches = [];
@@ -181,20 +178,20 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            $hasRequiredScheme = !$route->getSchemes() || $route->hasScheme($this->context->getScheme());
-            if ($requiredMethods) {
-                if (!\in_array($method, $requiredMethods)) {
-                    if ($hasRequiredScheme) {
-                        $this->allow = array_merge($this->allow, $requiredMethods);
-                    }
-
-                    continue;
+            if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods))) {
+                    return $this->allow = $this->allowSchemes = [];
                 }
+                continue;
             }
 
-            if (!$hasRequiredScheme) {
+            if ($route->getSchemes() && !$route->hasScheme($this->context->getScheme())) {
                 $this->allowSchemes = array_merge($this->allowSchemes, $route->getSchemes());
+                continue;
+            }
 
+            if ($requiredMethods && !\in_array($method, $requiredMethods)) {
+                $this->allow = array_merge($this->allow, $requiredMethods);
                 continue;
             }
 
