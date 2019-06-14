@@ -260,7 +260,7 @@ class MainController extends Controller
         shell_exec('sudo chmod 664 "' . trim($folder) . '/functions.php"');
 
         system_log(6,"EXTENSION_CREATE",[
-            "extension_id" => extension()->_id
+            "extension_id" => $ext->_id
         ]);
 
         return respond(route('extension_one', $ext->_id), 300);

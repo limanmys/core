@@ -246,7 +246,7 @@ class OneController extends Controller
         if ($server->type != "linux_ssh" && $server->type != "windows_powershell") {
             system_log(7,"EXTENSION_INTERNAL_RUN_COMMAND_FAILED",[
                 "extension_id" => extension()->_id,
-                "server_id" => server()->_id
+                "server_id" => request('server_id')
             ]);
             return "Bu sunucuda komut çalıştıramazsınız.";
         }
