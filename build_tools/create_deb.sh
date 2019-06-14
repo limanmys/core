@@ -1,7 +1,7 @@
 # USAGE:
 # bash create_liman_deb.sh current/liman/path/ packagename version
 # örn1: bash create_liman_deb.sh 0.40a190515
-cd build_tools
+#cd build_tools
 
 mkdir DEBIAN
 
