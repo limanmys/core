@@ -18,6 +18,7 @@ before_install:
   - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y.%m.%d-%s')}
   - git tag $TRAVIS_TAG
   - sed -i "s/APP_VERSION=Development/APP_VERSION=$TRAVIS_TAG/g" liman/server/.env
+  - pwd
   - ls -la
   - cat liman/server/.env
 script:
