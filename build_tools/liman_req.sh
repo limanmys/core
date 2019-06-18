@@ -8,7 +8,7 @@ sudo chmod -R o= /liman /home/liman
 sudo chown -R liman:liman /liman /home/liman
 sudo apt update
 sudo apt upgrade -y
-sudo apt -y install git apt-transport-https ca-certificates dirmngr python3-pip unzip
+sudo apt -y install git apt-transport-https ca-certificates dirmngr python3-pip unzip dnsutils
 sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
 sudo apt update && sudo apt upgrade -y
