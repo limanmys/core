@@ -387,9 +387,7 @@ class OneController extends Controller
         } catch (Exception $exception) {
             return respond('Eklenti silinemedi', 201);
         }
-        system_log(3,"EXTENSION_REMOVE",[
-            "extension_id" => extension()->_id,
-        ]);
+        system_log(3,"EXTENSION_REMOVE");
         return respond('Eklenti Başarıyla Silindi');
     }
 
@@ -422,7 +420,6 @@ class OneController extends Controller
         file_put_contents($file, json_decode(request('code')));
         system_log(7,"EXTENSION_CODE_UPDATE",[
             "extension_id" => extension()->_id,
-            "server_id" => server()->_id,
             "file" => request('page')
         ]);
         return respond("Kaydedildi", 200);

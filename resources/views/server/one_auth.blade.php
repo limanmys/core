@@ -8,59 +8,30 @@
             <li class="breadcrumb-item active" aria-current="page">{{$server->name}}</li>
         </ol>
     </nav>
-    <hr>
-    <?php
-    $input_extensions = [];
-    foreach ($available_extensions as $extension) {
-        $arr = [];
-        if (isset($extension->install)) {
-            foreach ($extension->install as $key => $parameter) {
-                $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
-            }
-        }
-        $arr[$extension->name . ":" . $extension->_id] = "extension_id:hidden";
-        $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
-    }
-    ?>
+    <h2>{{server()->name}}</h2>
+    <h4>{{$hostname}}</h4>
+
     @if(isset(auth()->user()->favorites) && in_array(server()->_id,auth()->user()->favorites))
-        <button onclick="favorite('false')" class="btn btn-warning">{{__("Favorilerden Sil")}}</button>
+        <button onclick="favorite('false')" class="btn btn-warning fa fa-star-o"></button>
     @else
-        <button onclick="favorite('true')" class="btn btn-warning">{{__("Favorilere Ekle")}}</button>
-    @endif
-    @include('l.modal-button',[
-        "class" => "btn-primary",
-        "target_id" => "edit",
-        "text" => "Düzenle"
-    ])
-    @if(count($input_extensions))
-        @include('l.modal-button',[
-            "class" => "btn-primary",
-            "target_id" => "install_extension",
-            "text" => "Servis Ekle"
-        ])
+        <button onclick="favorite('true')" class="btn btn-success fa fa-star"></button>
     @endif
 
     @include('l.modal-button',[
-        "class" => "btn-primary",
-        "target_id" => "change_hostname",
-        "text" => "Hostname"
-    ])
-
-    @include('l.modal-button',[
-        "class" => "btn-warning",
+        "class" => "btn-primary fa fa-upload",
         "target_id" => "file_upload",
-        "text" => "Dosya Yükle"
+        "text" => "Yükle"
     ])
 
     @include('l.modal-button',[
-        "class" => "btn-primary",
+        "class" => "btn-primary fa fa-download",
         "target_id" => "file_download",
-        "text" => "Dosya İndir"
+        "text" => "İndir"
     ])
     @include('l.modal-button',[
-        "class" => "btn-success",
+        "class" => "btn-success fa fa-terminal",
         "target_id" => "terminal",
-        "text" => "Terminal"
+        "text" => ""
     ])
 
     @include('l.modal-button',[
@@ -80,41 +51,152 @@
         "class" => "btn-danger",
         "target_id" => "log_table",
         "text" => "Sunucu Logları"
-    ])
-    <hr>
+    ])<br><br>
+    <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#usageTab" data-toggle="tab" aria-expanded="false">{{__("Sistem Durumu")}}</a>
+            </li>
+            <li class=""><a href="#extensionsTab" data-toggle="tab" aria-expanded="false">{{__("Eklentiler")}}</a></li>
+            <li class=""><a href="#servicesTab" data-toggle="tab" aria-expanded="false">{{__("Servisler")}}</a></li>
+            <li class=""><a href="#packagesTab" data-toggle="tab" aria-expanded="false">{{__("Paketler")}}</a></li>
+            <li class=""><a href="#settingsTab" data-toggle="tab" aria-expanded="false">{{__("Ayarlar")}}</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="usageTab">
+                <table class="notDataTable">
+                    <thead>
+                    <tr>
+                        <td>{{__("Cpu Kullanımı")}}</td>
+                        <td>{{__("Disk Kullanımı")}}</td>
+                        <td>{{__("Ram Kullanımı")}}</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td style="padding-right: 50px">
+                            <canvas id="cpu" width="100px" height="200px" style="float:left"></canvas>
+                        </td>
+                        <td style="padding-right: 50px">
+                            <canvas id="disk" width="100px" height="200px" style="float:left"></canvas>
+                        </td>
+                        <td style="padding-right: 50px">
+                            <canvas id="ram" width="100px" height="200px" style="float:left;"></canvas>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane" id="extensionsTab">
+                <?php
+                $input_extensions = [];
+                foreach ($available_extensions as $extension) {
+                    $arr = [];
+                    if (isset($extension->install)) {
+                        foreach ($extension->install as $key => $parameter) {
+                            $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
+                        }
+                    }
+                    $arr[$extension->name . ":" . $extension->_id] = "extension_id:hidden";
+                    $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
+                }
+                ?>
+                @if(count($installed_extensions) > 0)
+                    <h4>{{__("Eklenti Durumları")}}</h4>
+                    @foreach($installed_extensions as $extension)
+                        <button type="button" class="btn btn-outline-primary btn-lg status_{{$extension->service}}"
+                                style="cursor:default;"
+                                onclick="location.href = '{{route('extension_server',["extension_id" => $extension->_id, "city" => $server->city, "server_id" => $server->_id])}}'">
+                            {{$extension->name}}
+                        </button>
+                    @endforeach
+                @else
+                    <h4>{{__("Yüklü eklenti yok.")}}</h4>
+                @endif
+            </div>
+            <div class="tab-pane" id="servicesTab">
+                @if(server()->type == "windows_powershell")
+                    <pre>{!! server()->run("Get-Service",false) !!}</pre>
+                @else
+                    <?php
+                    $raw = server()->run("systemctl list-units | grep service | awk '{print $1 \":\"$2\" \"$3\" \"$4\":\"$5\" \"$6\" \"$7\" \"$8\" \"$9\" \"$10}'",false);
+                    $services = [];
+                    foreach (explode("\n", $raw) as $package) {
+                        if ($package == "") {
+                            continue;
+                        }
+                        $row = explode(":", trim($package));
+                        try {
+                            array_push($services, [
+                                "name" => $row[0],
+                                "status" => $row[1],
+                                "description" => $row[2]
+                            ]);
+                        } catch (Exception $exception) {
+                        }
+                    }
+                    ?>
+                        @include('l.table',[
+                            "value" => $services,
+                            "title" => [
+                                "Servis Adı" , "Durumu" , "Açıklaması"
+                            ],
+                            "display" => [
+                                "name" , "status" , "description"
+                            ],
+                        ])
+                @endif
+            </div>
+            <div class="tab-pane" id="packagesTab">
+                @if(server()->type == "windows_powershell")
+                    <pre>{!! server()->run("Get-Service",false) !!}</pre>
+                @else
+                    <?php
+                    $raw = server()->run("sudo apt list --installed 2>/dev/null | sed '1,1d'",false);
+                    $packages = [];
+                    foreach (explode("\n", $raw) as $package) {
+                        if ($package == "") {
+                            continue;
+                        }
+                        $row = explode(" ", $package);
+                        try {
+                            array_push($packages, [
+                                "name" => $row[0],
+                                "version" => $row[1],
+                                "type" => $row[2],
+                                "status" => $row[3]
+                            ]);
+                        } catch (Exception $exception) {
+                        }
+                    }
+                    ?>
+                    @include('l.table',[
+                        "value" => $packages,
+                        "title" => [
+                            "Paket Adı" , "Versiyon" , "Tip" , "Durumu"
+                        ],
+                        "display" => [
+                            "name" , "version", "type" , "status"
+                        ],
+                    ])
+                @endif
+            </div>
+            <div class="tab-pane" id="settingsTab">
+                @include('l.modal-button',[
+                    "class" => "btn-primary fa fa-pencil",
+                    "target_id" => "edit",
+                    "text" => "Bilgileri Düzenle"
+                ])
+                @if(count($input_extensions))
+                    @include('l.modal-button',[
+                        "class" => "btn-primary",
+                        "target_id" => "install_extension",
+                        "text" => "Eklenti Ekle"
+                    ])
+                @endif
+            </div>
+        </div>
+    </div>
 
-    <h5>Hostname : {{$hostname}}</h5>
-    @if(count($installed_extensions) > 0)
-        <h4>{{__("Servis Durumları")}}</h4>
-        @foreach($installed_extensions as $extension)
-            <button type="button" class="btn btn-outline-primary btn-lg status_{{$extension->service}}"
-                    style="cursor:default;"
-                    onclick="location.href = '{{route('extension_server',["extension_id" => $extension->_id, "city" => $server->city, "server_id" => $server->_id])}}'">
-                {{$extension->name}}
-            </button>
-        @endforeach
-    @else
-        <h4>{{__("Yüklü servis yok.")}}</h4>
-    @endif
-    <br><br>
-    <table class="notDataTable">
-        <thead>
-        <tr>
-            <th>{{__("Cpu Kulllanımı")}}</th>
-            <th>{{__("Disk Kulllanımı")}}</th>
-            <th>{{__("Ram Kulllanımı")}}</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td style="padding-right: 50px"><canvas id="cpu" width="100px" height="200px" style="float:left"></canvas></td>
-            <td style="padding-right: 50px" id="disk"></td>
-            <td style="padding-right: 50px"><canvas id="ram" width="100px" height="200px" style="float:left;"></canvas></td>
-        </tr>
-        </tbody>
-    </table>
-
-    <br>
     @include('l.modal-button',[
         "class" => "btn-danger",
         "target_id" => "delete",
@@ -141,7 +223,7 @@
 
     @include('l.modal',[
         "id"=>"edit",
-        "title" => "Sunucuyu Düzenle",
+        "title" => "Bilgileri Düzenle",
         "url" => route('server_update'),
         "next" => "reload",
         "inputs" => [
@@ -245,7 +327,7 @@
     <script>
         function checkStatus(service) {
             let data = new FormData();
-            if(!service){
+            if (!service) {
                 return false;
             }
             data.append('service', service);
@@ -266,17 +348,18 @@
         @endif
         setInterval(function () {
             stats();
-        },27000);
+        }, 27000);
+
         function stats() {
             let form = new FormData();
-            form.append('server_id','{{server()->_id}}');
-            request('{{route('server_stats')}}',form,function (response) {
+            form.append('server_id', '{{server()->_id}}');
+            request('{{route('server_stats')}}', form, function (response) {
                 data = JSON.parse(response);
 
                 let ramCanvas = document.getElementById("ram").getContext('2d');
-                ramCanvas.clearRect(0,0,ramCanvas.width,ramCanvas.height);
+                ramCanvas.clearRect(0, 0, ramCanvas.width, ramCanvas.height);
 
-                let ramChart = new Chart($("#ram"),{
+                let ramChart = new Chart($("#ram"), {
                     type: 'pie',
                     data: {
                         datasets: [{
@@ -304,13 +387,13 @@
                 });
 
                 let cpuCanvas = document.getElementById("cpu").getContext('2d');
-                cpuCanvas.clearRect(0,0,cpuCanvas.width,cpuCanvas.height);
+                cpuCanvas.clearRect(0, 0, cpuCanvas.width, cpuCanvas.height);
 
-                let cpuChart = new Chart($("#cpu"),{
+                let cpuChart = new Chart($("#cpu"), {
                     type: 'pie',
                     data: {
                         datasets: [{
-                            data: [Math.round(data['cpu'] * 10 ) / 10, 100 - Math.round( parseFloat(data['cpu']) * 10 ) / 10],
+                            data: [Math.round(data['cpu'] * 10) / 10, 100 - Math.round(parseFloat(data['cpu']) * 10) / 10],
                             backgroundColor: [
                                 "#ff8397",
                                 "#56d798",
@@ -333,10 +416,37 @@
                     }
                 });
 
-                $("#disk").html(data['disk']);
+                let diskChart = new Chart($("#disk"), {
+                    type: 'pie',
+                    data: {
+                        datasets: [{
+                            data: [Math.round(data['disk'] * 10) / 10, 100 - Math.round(parseFloat(data['cpu']) * 10) / 10],
+                            backgroundColor: [
+                                "#ff8397",
+                                "#56d798",
+                            ],
+                            hoverBackgroundColor: [
+                                "#ff8397",
+                                "#56d798",
+                            ]
+                        }],
+
+                        labels: [
+                            '{{__("Dolu")}}',
+                            '{{__("Boş")}}',
+                        ]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: false,
+                        legend: false,
+                    }
+                });
             })
         }
+
         stats();
+
         function downloadFile(form) {
             window.location.assign('/sunucu/indir?path=' + form.getElementsByTagName('input')[0].value + '&server_id=' + form.getElementsByTagName('input')[1].value);
             return false;
