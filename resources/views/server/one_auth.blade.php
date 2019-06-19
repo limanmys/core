@@ -28,30 +28,15 @@
         "target_id" => "file_download",
         "text" => "İndir"
     ])
-    @include('l.modal-button',[
-        "class" => "btn-success fa fa-terminal",
-        "target_id" => "terminal",
-        "text" => ""
-    ])
-
-    @include('l.modal-button',[
-        "class" => "btn-info",
-        "target_id" => "give_permission",
-        "text" => "Yetki Ver"
-    ])
-    @if(server()->user_id == auth()->id() || auth()->user()->isAdmin())
+    @if(server()->type == "linux_ssh")
         @include('l.modal-button',[
-            "class" => "btn-primary",
-            "target_id" => "revoke_permission",
-            "text" => "Yetki Al"
+            "class" => "btn-success fa fa-terminal",
+            "target_id" => "terminal",
+            "text" => "Terminal"
         ])
     @endif
 
-    @include('l.modal-button',[
-        "class" => "btn-danger",
-        "target_id" => "log_table",
-        "text" => "Sunucu Logları"
-    ])<br><br>
+    <br><br>
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#usageTab" data-toggle="tab" aria-expanded="false">{{__("Sistem Durumu")}}</a>
@@ -87,6 +72,7 @@
                 </table>
             </div>
             <div class="tab-pane" id="extensionsTab">
+
                 <?php
                 $input_extensions = [];
                 foreach ($available_extensions as $extension) {
@@ -100,6 +86,13 @@
                     $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
                 }
                 ?>
+                    @if(count($input_extensions))
+                        @include('l.modal-button',[
+                            "class" => "btn-primary",
+                            "target_id" => "install_extension",
+                            "text" => "+"
+                        ])
+                    @endif
                 @if(count($installed_extensions) > 0)
                     <h4>{{__("Eklenti Durumları")}}</h4>
                     @foreach($installed_extensions as $extension)
@@ -186,13 +179,23 @@
                     "target_id" => "edit",
                     "text" => "Bilgileri Düzenle"
                 ])
-                @if(count($input_extensions))
+                @include('l.modal-button',[
+                    "class" => "btn-info",
+                    "target_id" => "give_permission",
+                    "text" => "Yetki Ver"
+                ])
+                @if(server()->user_id == auth()->id() || auth()->user()->isAdmin())
                     @include('l.modal-button',[
                         "class" => "btn-primary",
-                        "target_id" => "install_extension",
-                        "text" => "Eklenti Ekle"
+                        "target_id" => "revoke_permission",
+                        "text" => "Yetki Al"
                     ])
                 @endif
+                @include('l.modal-button',[
+                    "class" => "btn-danger",
+                    "target_id" => "log_table",
+                    "text" => "Sunucu Logları"
+                ])
             </div>
         </div>
     </div>
@@ -279,7 +282,7 @@
         "url" => route('server_upload'),
         "next" => "nothing",
         "inputs" => [
-            "Yüklenecek Dosya(lar)" => "file:file",
+            "Yüklenecek Dosya" => "file:file",
             "Yol" => "path:text",
             "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
@@ -314,7 +317,7 @@
     @if(count($input_extensions))
         @include('l.modal',[
             "id"=>"install_extension",
-            "title" => "Servis Yükle",
+            "title" => "Eklenti Ekle",
             "url" => route('server_extension'),
             "next" => "reload",
             "selects" => $input_extensions,
