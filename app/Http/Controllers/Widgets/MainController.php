@@ -14,6 +14,7 @@ class MainController extends Controller
         $widget->widget_name = explode(':',request('widget_name'))[0];
         $widget->title = explode(':',request('widget_name'))[1];
         $widget->user_id = auth()->id();
+        $widget->type = explode(':',request('widget_name'))[2];
         $widget->save();
         return respond('Widget Eklendi',200);
     }

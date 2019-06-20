@@ -48,6 +48,16 @@
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="usageTab">
+                @if(count($installed_extensions) > 0)
+                    @foreach($installed_extensions as $extension)
+                        <button type="button" class="btn btn-outline-primary btn-lg status_{{$extension->service}}"
+                                style="cursor:default;"
+                                onclick="location.href = '{{route('extension_server',["extension_id" => $extension->_id, "city" => $server->city, "server_id" => $server->_id])}}'">
+                            {{$extension->name}}
+                        </button>
+                    @endforeach
+                @endif
+                <br><br>
                 <table class="notDataTable">
                     <thead>
                     <tr>
@@ -59,12 +69,21 @@
                     <tbody>
                     <tr>
                         <td style="padding-right: 50px">
+                            <span id="cpuText" style="text-align: center;font-weight: bold">
+                                {{__("Yükleniyor...")}}
+                            </span><br>
                             <canvas id="cpu" width="100px" height="200px" style="float:left"></canvas>
                         </td>
                         <td style="padding-right: 50px">
+                            <span id="diskText" style="text-align: center;font-weight: bold">
+                                {{__("Yükleniyor...")}}
+                            </span><br>
                             <canvas id="disk" width="100px" height="200px" style="float:left"></canvas>
                         </td>
                         <td style="padding-right: 50px">
+                            <span id="ramText" style="text-align: center;font-weight: bold">
+                                {{__("Yükleniyor...")}}
+                            </span><br>
                             <canvas id="ram" width="100px" height="200px" style="float:left;"></canvas>
                         </td>
                     </tr>
@@ -108,7 +127,31 @@
             </div>
             <div class="tab-pane" id="servicesTab">
                 @if(server()->type == "windows_powershell")
-                    <pre>{!! server()->run("Get-Service",false) !!}</pre>
+                    <?php
+                    $rawServices = server()->run("(Get-WmiObject win32_service | select Name, DisplayName, State, StartMode) -replace '\s\s+',':'");
+                    $services = [];
+                    foreach (explode('}',$rawServices) as $service){
+                        $row = explode(";",substr($service,2));
+                        try{
+                            array_push($services,[
+                                "name" => trim(explode('=',$row[0])[1]),
+                                "displayName" => trim(explode('=',$row[1])[1]),
+                                "state" => trim(explode('=',$row[2])[1]),
+                                "startMode" => trim(explode('=',$row[3])[1])
+                            ]);
+                        }catch (Exception $exception){
+                        }
+                    }
+                    ?>
+                        @include('l.table',[
+                                "value" => $services,
+                                "title" => [
+                                    "Servis Adı" , "Durumu" , "Açıklaması"
+                                ],
+                                "display" => [
+                                    "name" , "state" , "displayName"
+                                ],
+                            ])
                 @else
                     <?php
                     $raw = server()->run("systemctl list-units | grep service | awk '{print $1 \":\"$2\" \"$3\" \"$4\":\"$5\" \"$6\" \"$7\" \"$8\" \"$9\" \"$10}'",false);
@@ -358,7 +401,9 @@
             form.append('server_id', '{{server()->_id}}');
             request('{{route('server_stats')}}', form, function (response) {
                 data = JSON.parse(response);
-
+                $("#diskText").html("%" + data['disk']);
+                $("#ramText").html("%" + data['ram']);
+                $("#cpuText").html("%" + data['cpu']);
                 let ramCanvas = document.getElementById("ram").getContext('2d');
                 ramCanvas.clearRect(0, 0, ramCanvas.width, ramCanvas.height);
 

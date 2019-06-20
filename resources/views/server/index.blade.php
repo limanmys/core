@@ -10,7 +10,7 @@
     @include('l.modal-button',[
         "class" => "btn-success",
         "target_id" => "add_server",
-        "text" => "Server Ekle"
+        "text" => "Sunucu Ekle"
     ])<br><br>
 
     @include('l.table',[

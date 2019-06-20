@@ -22,7 +22,7 @@
                    onclick="request('{{route('set_collapse')}}',new FormData(),null)">
                     <span class="sr-only">{{__("Geri Dön")}}</span>
                 </a>
-                <span style="line-height: 50px;color: orangered;font-weight: bolder">
+                <span style="line-height: 50px;color: white;font-weight: bolder">
                     @if(auth()->user()->status == "1")
                         {{__("Tam Yetkili Yönetici Hesabı İle Giriş Yaptınız.")}}
                     @endif

@@ -52,7 +52,7 @@
                 let element = $("#widget_name");
                 element.html('');
                 for(let k in json) {
-                    element.append('<option value="'+ json[k]["target"] + ':' + json[k]["name"] +'">' + json[k]["name"] + '</option>');
+                    element.append('<option value="'+ json[k]["target"] + ':' + json[k]["name"] + ':' + json[k]["type"]+'">' + json[k]["name"] + '</option>');
                 }
                 element.removeAttr('disabled');
             });
