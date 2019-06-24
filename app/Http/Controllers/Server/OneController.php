@@ -200,8 +200,7 @@ class OneController extends Controller
                     ],
                     [
                         "name" => "privatekey",
-                        "contents" => fopen(storage_path('keys') .
-                            DIRECTORY_SEPARATOR . auth()->id(), 'r')
+                        "contents" => fopen(env('KEYS_PATH') . DIRECTORY_SEPARATOR . "linux" . DIRECTORY_SEPARATOR . auth()->id(), 'r')
                     ],
                     [
                         "name" => "limanKey",

@@ -377,16 +377,20 @@ class OneController extends Controller
     public function remove()
     {
         try {
-            self::rmdir_recursive(env('EXTENSIONS_PATH') . strtolower(extension()->name));
+            shell_exec("sudo rm -r " . env('EXTENSIONS_PATH') . strtolower(extension()->name));
+        } catch (Exception $exception) {
+        }
+
+        try{
             foreach (Script::where('extensions', 'like', strtolower(extension()->name))->get() as $script) {
                 shell_exec('rm ' . env('SCRIPTS_PATH') . $script->_id);
                 $script->delete();
             }
             shell_exec('sudo userdel liman-' . extension()->_id);
             extension()->delete();
-        } catch (Exception $exception) {
-            return respond('Eklenti silinemedi', 201);
+        }catch (Exception $exception){
         }
+
         system_log(3,"EXTENSION_REMOVE");
         return respond('Eklenti Başarıyla Silindi');
     }

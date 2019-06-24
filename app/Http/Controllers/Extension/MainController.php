@@ -134,6 +134,7 @@ class MainController extends Controller
 
         // Now that we have everything, let's extract database.
         $file = file_get_contents($path . '/db.json');
+
         $json = json_decode($file, true);
 
         // Check If Extension Already Exists.
@@ -170,30 +171,16 @@ class MainController extends Controller
         shell_exec('sudo chown liman-' . $new->_id . ':liman ' . $extension_folder);
         shell_exec('sudo chmod 770 ' . $extension_folder);
 
-        // Copy Views into the liman.
-        $views = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($path . '/views/'),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
+        shell_exec("sudo cp -r " . $path .  DIRECTORY_SEPARATOR . "views/* " . $extension_folder);
 
-        foreach ($views as $view) {
-            // Skip directories (they would be added automatically)
-            if (!$view->isDir()) {
-                if (substr($view->getFilename(), 0, 1) == ".") {
-                    continue;
-                }
-
-                copy($view->getRealPath(), $extension_folder . DIRECTORY_SEPARATOR . $view->getFilename());
-                shell_exec('sudo chown liman-' . $new->_id . ':liman "' . $extension_folder . DIRECTORY_SEPARATOR . $view->getFilename() . '"');
-                shell_exec('sudo chmod 664 "' . $extension_folder . DIRECTORY_SEPARATOR . $view->getFilename() . '"');
-            }
-
-        }
+        shell_exec("sudo chown -R liman-" . $new->_id . ':liman "' . $extension_folder. '"');
+        shell_exec("sudo chmod 770 \"" . $extension_folder ."\"");
 
         $files = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($path . '/scripts/'),
             RecursiveIteratorIterator::LEAVES_ONLY
         );
+
         foreach ($files as $file) {
             // Skip directories (they would be added automatically)
             if (!$file->isDir()) {
