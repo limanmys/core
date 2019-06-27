@@ -12,7 +12,7 @@
     <form action="{{route('widget_add')}}" method="POST">
         <select class="form-control" onchange="getExtensions()" id="server_id" required name="server_id">
             @foreach(servers() as $server)
-                <option value="{{$server->_id}}">{{$server->name}}</option>
+                <option value="{{$server->id}}">{{$server->name}}</option>
             @endforeach
         </select><br>
         <h4>{{__("Eklenti")}}</h4>

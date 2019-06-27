@@ -134,9 +134,6 @@ trait Macro
         );
 
         foreach ($methods as $method) {
-            if ($method->isConstructor() || $method->isDestructor()) {
-                continue;
-            }
             $method->setAccessible(true);
 
             static::macro($method->name, $method->invoke($mixin));

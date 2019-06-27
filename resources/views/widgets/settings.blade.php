@@ -16,8 +16,8 @@
         "url" => route('widget_add'),
         "next" => "addToTable",
         "inputs" => [
-            "Sunucu Seçin:server_id" => objectToArray(servers(),"name","_id"),
-            "Eklenti Seçin:extension_id" => objectToArray(extensions(),"name","_id"),
+            "Sunucu Seçin:server_id" => objectToArray(servers(),"name","id"),
+            "Eklenti Seçin:extension_id" => objectToArray(extensions(),"name","id"),
             "Başlık" => "title:text",
             "type:-" => "type:hidden",
             "display_type:-" => "display_type:hidden"
@@ -31,7 +31,7 @@
             "Sunucu" , "Başlık" , "*hidden*"
         ],
         "display" => [
-            "server_name" , "title" ,"_id:widget_id"
+            "server_name" , "title" ,"id:widget_id"
         ],
         "menu" => [
             "Düzenle" => [
@@ -51,8 +51,8 @@
         "url" => route('widget_update'),
         "next" => "updateTable",
         "inputs" => [
-            "Sunucu Seçin:server_id" => objectToArray(servers(),"name","_id"),
-            "Eklenti Seçin:extension_id" => objectToArray(extensions(),"name","_id"),
+            "Sunucu Seçin:server_id" => objectToArray(servers(),"name","id"),
+            "Eklenti Seçin:extension_id" => objectToArray(extensions(),"name","id"),
             "Başlık" => "title:text",
             "type:-" => "type:hidden",
             "display_type:-" => "display_type:hidden",

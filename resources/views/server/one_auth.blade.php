@@ -8,90 +8,104 @@
             <li class="breadcrumb-item active" aria-current="page">{{$server->name}}</li>
         </ol>
     </nav>
-    <h2>{{server()->name}}</h2>
-    <h4>{{$hostname}}</h4>
+    <div class="serverName" style="margin-top:-20px;">
+        @if(\Illuminate\Support\Facades\DB::table("user_favorites")->where(["user_id" => auth()->user()->id,"server_id" => server()->id])->exists())
+            <button onclick="favorite('false')" class="btn btn-warning fa fa-star-o" style="margin-top:-15px"></button>
+        @else
+            <button onclick="favorite('true')" class="btn btn-success fa fa-star" style="margin-top:-15px"></button>
+        @endif
+        <h2 style="display: inline-block;">{{server()->name}}</h2>
+    </div>
 
-    @if(isset(auth()->user()->favorites) && in_array(server()->_id,auth()->user()->favorites))
-        <button onclick="favorite('false')" class="btn btn-warning fa fa-star-o"></button>
-    @else
-        <button onclick="favorite('true')" class="btn btn-success fa fa-star"></button>
-    @endif
-
-    @include('l.modal-button',[
-        "class" => "btn-primary fa fa-upload",
-        "target_id" => "file_upload",
-        "text" => "Yükle"
-    ])
-
-    @include('l.modal-button',[
-        "class" => "btn-primary fa fa-download",
-        "target_id" => "file_download",
-        "text" => "İndir"
-    ])
-    @if(server()->type == "linux_ssh")
-        @include('l.modal-button',[
-            "class" => "btn-success fa fa-terminal",
-            "target_id" => "terminal",
-            "text" => "Terminal"
-        ])
-    @endif
-
-    <br><br>
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#usageTab" data-toggle="tab" aria-expanded="false">{{__("Sistem Durumu")}}</a>
             </li>
             <li class=""><a href="#extensionsTab" data-toggle="tab" aria-expanded="false">{{__("Eklentiler")}}</a></li>
-            <li class=""><a href="#servicesTab" data-toggle="tab" aria-expanded="false">{{__("Servisler")}}</a></li>
-            <li class=""><a href="#packagesTab" data-toggle="tab" aria-expanded="false">{{__("Paketler")}}</a></li>
+            @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
+                <li class=""><a href="#servicesTab" data-toggle="tab" aria-expanded="false">{{__("Servisler")}}</a></li>
+                @if(server()->type == "linux_ssh")
+                    <li class=""><a href="#packagesTab" data-toggle="tab" aria-expanded="false">{{__("Paketler")}}</a></li>
+                @endif
+                <li class=""><a href="#filesTab" data-toggle="tab" aria-expanded="false">{{__("Dosya Transferi")}}</a></li>
+            @endif
+            @if(server()->type == "linux_ssh")
+                <li class=""><a href="#terminalTab" data-toggle="tab" aria-expanded="false">{{__("Terminal")}}</a></li>
+            @endif
             <li class=""><a href="#settingsTab" data-toggle="tab" aria-expanded="false">{{__("Ayarlar")}}</a></li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="usageTab">
-                @if(count($installed_extensions) > 0)
+                @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
+                    <h4>Hostname : {{server()->run("hostname")}}</h4>
+                @endif
+                <h4>{{__("İp Adresi : ") . server()->ip_address }}</h4>
+                @if($installed_extensions->count() > 0)
+                    <h4>{{__("Eklenti Durumları")}}</h4>
                     @foreach($installed_extensions as $extension)
-                        <button type="button" class="btn btn-outline-primary btn-lg status_{{$extension->service}}"
+                        <button type="button" class="btn btn-outline-primary btn-lg"
                                 style="cursor:default;"
-                                onclick="location.href = '{{route('extension_server',["extension_id" => $extension->_id, "city" => $server->city, "server_id" => $server->_id])}}'">
+                                onclick="location.href = '{{route('extension_server',["extension_id" => $extension->id, "city" => $server->city, "server_id" => $server->id])}}'">
                             {{$extension->name}}
                         </button>
                     @endforeach
+                @else
+                    <h4>{{__("Yüklü eklenti yok.")}}</h4>
                 @endif
-                <br><br>
-                <table class="notDataTable">
-                    <thead>
-                    <tr>
-                        <td>{{__("Cpu Kullanımı")}}</td>
-                        <td>{{__("Disk Kullanımı")}}</td>
-                        <td>{{__("Ram Kullanımı")}}</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td style="padding-right: 50px">
-                            <span id="cpuText" style="text-align: center;font-weight: bold">
-                                {{__("Yükleniyor...")}}
-                            </span><br>
-                            <canvas id="cpu" width="100px" height="200px" style="float:left"></canvas>
-                        </td>
-                        <td style="padding-right: 50px">
-                            <span id="diskText" style="text-align: center;font-weight: bold">
-                                {{__("Yükleniyor...")}}
-                            </span><br>
-                            <canvas id="disk" width="100px" height="200px" style="float:left"></canvas>
-                        </td>
-                        <td style="padding-right: 50px">
-                            <span id="ramText" style="text-align: center;font-weight: bold">
-                                {{__("Yükleniyor...")}}
-                            </span><br>
-                            <canvas id="ram" width="100px" height="200px" style="float:left;"></canvas>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
+                    <br><br>
+                    <hr>
+                    <h4>{{__("Kaynak Kullanımı")}}</h4>
+                    <table class="notDataTable">
+                        <thead>
+                        <tr>
+                            <td>{{__("Cpu Kullanımı")}}</td>
+                            <td>{{__("Disk Kullanımı")}}</td>
+                            <td>{{__("Ram Kullanımı")}}</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="padding-right: 50px">
+                                <span id="cpuText" style="text-align: center;font-weight: bold">
+                                    {{__("Yükleniyor...")}}
+                                </span><br>
+                                <canvas id="cpu" width="400px" height="200px" style="float:left"></canvas>
+                            </td>
+                            <td style="padding-right: 50px">
+                                <span id="diskText" style="text-align: center;font-weight: bold">
+                                    {{__("Yükleniyor...")}}
+                                </span><br>
+                                <canvas id="disk" width="400px" height="200px" style="float:left"></canvas>
+                            </td>
+                            <td style="padding-right: 50px">
+                                <span id="ramText" style="text-align: center;font-weight: bold">
+                                    {{__("Yükleniyor...")}}
+                                </span><br>
+                                <canvas id="ram" width="400px" height="200px" style="float:left;"></canvas>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <hr>
+                @endif
             </div>
             <div class="tab-pane" id="extensionsTab">
-
+                @if(auth()->user()->id == server()->user_id || auth()->user()->isAdmin())
+                    <button class="btn btn-success" data-toggle="modal" data-target="#install_extension"><i
+                                class="fa fa-plus"></i></button>
+                    <button onclick="removePermission('script')" class="btn btn-danger"><i class="fa fa-minus"></i>
+                    </button><br><br>
+                @endif
+                @include('l.table',[
+                    "value" => $installed_extensions,
+                    "title" => [
+                        "Eklenti Adı" , "Versiyon", "*hidden*"
+                    ],
+                    "display" => [
+                        "name" , "version", "id:extension_id"
+                    ]
+                ])
                 <?php
                 $input_extensions = [];
                 foreach ($available_extensions as $extension) {
@@ -101,153 +115,148 @@
                             $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
                         }
                     }
-                    $arr[$extension->name . ":" . $extension->_id] = "extension_id:hidden";
-                    $input_extensions[$extension->name . ":" . $extension->_id] = $arr;
+                    $arr[$extension->name . ":" . $extension->id] = "extension_id:hidden";
+                    $input_extensions[$extension->name . ":" . $extension->id] = $arr;
                 }
                 ?>
-                    @if(count($input_extensions))
-                        @include('l.modal-button',[
-                            "class" => "btn-primary",
-                            "target_id" => "install_extension",
-                            "text" => "+"
-                        ])
-                    @endif
-                @if(count($installed_extensions) > 0)
-                    <h4>{{__("Eklenti Durumları")}}</h4>
-                    @foreach($installed_extensions as $extension)
-                        <button type="button" class="btn btn-outline-primary btn-lg status_{{$extension->service}}"
-                                style="cursor:default;"
-                                onclick="location.href = '{{route('extension_server',["extension_id" => $extension->_id, "city" => $server->city, "server_id" => $server->_id])}}'">
-                            {{$extension->name}}
-                        </button>
-                    @endforeach
-                @else
-                    <h4>{{__("Yüklü eklenti yok.")}}</h4>
-                @endif
+
             </div>
-            <div class="tab-pane" id="servicesTab">
-                @if(server()->type == "windows_powershell")
-                    <?php
-                    $rawServices = server()->run("(Get-WmiObject win32_service | select Name, DisplayName, State, StartMode) -replace '\s\s+',':'");
-                    $services = [];
-                    foreach (explode('}',$rawServices) as $service){
-                        $row = explode(";",substr($service,2));
-                        try{
-                            array_push($services,[
-                                "name" => trim(explode('=',$row[0])[1]),
-                                "displayName" => trim(explode('=',$row[1])[1]),
-                                "state" => trim(explode('=',$row[2])[1]),
-                                "startMode" => trim(explode('=',$row[3])[1])
-                            ]);
-                        }catch (Exception $exception){
-                        }
-                    }
-                    ?>
-                        @include('l.table',[
-                                "value" => $services,
-                                "title" => [
-                                    "Servis Adı" , "Durumu" , "Açıklaması"
-                                ],
-                                "display" => [
-                                    "name" , "state" , "displayName"
-                                ],
-                            ])
-                @else
-                    <?php
-                    $raw = server()->run("systemctl list-units | grep service | awk '{print $1 \":\"$2\" \"$3\" \"$4\":\"$5\" \"$6\" \"$7\" \"$8\" \"$9\" \"$10}'",false);
-                    $services = [];
-                    foreach (explode("\n", $raw) as $package) {
-                        if ($package == "") {
-                            continue;
-                        }
-                        $row = explode(":", trim($package));
-                        try {
-                            array_push($services, [
-                                "name" => $row[0],
-                                "status" => $row[1],
-                                "description" => $row[2]
-                            ]);
-                        } catch (Exception $exception) {
-                        }
-                    }
-                    ?>
-                        @include('l.table',[
-                            "value" => $services,
-                            "title" => [
-                                "Servis Adı" , "Durumu" , "Açıklaması"
-                            ],
-                            "display" => [
-                                "name" , "status" , "description"
-                            ],
-                        ])
-                @endif
+            <div class="tab-pane" id="terminalTab">
+                <iframe src="{{route('server_terminal',["server_id" => $server->id])}}"
+                        style="width: 100%;height: 600px;background: black"></iframe>
             </div>
-            <div class="tab-pane" id="packagesTab">
-                @if(server()->type == "windows_powershell")
-                    <pre>{!! server()->run("Get-Service",false) !!}</pre>
-                @else
-                    <?php
-                    $raw = server()->run("sudo apt list --installed 2>/dev/null | sed '1,1d'",false);
-                    $packages = [];
-                    foreach (explode("\n", $raw) as $package) {
-                        if ($package == "") {
-                            continue;
-                        }
-                        $row = explode(" ", $package);
-                        try {
-                            array_push($packages, [
-                                "name" => $row[0],
-                                "version" => $row[1],
-                                "type" => $row[2],
-                                "status" => $row[3]
-                            ]);
-                        } catch (Exception $exception) {
-                        }
-                    }
-                    ?>
-                    @include('l.table',[
-                        "value" => $packages,
-                        "title" => [
-                            "Paket Adı" , "Versiyon" , "Tip" , "Durumu"
-                        ],
-                        "display" => [
-                            "name" , "version", "type" , "status"
-                        ],
+            <div class="tab-pane" id="filesTab">
+                @include('l.modal-button',[
+                        "class" => "btn-primary fa fa-upload",
+                        "target_id" => "file_upload",
+                        "text" => "Yükle"
                     ])
-                @endif
+
+                @include('l.modal-button',[
+                    "class" => "btn-primary fa fa-download",
+                    "target_id" => "file_download",
+                    "text" => "İndir"
+                ])
             </div>
+            @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
+                <div class="tab-pane" id="servicesTab">
+
+                </div>
+            @endif
+            @if(server()->type == "linux_ssh")
+                <div class="tab-pane" id="packagesTab">
+
+                </div>
+            @endif
             <div class="tab-pane" id="settingsTab">
-                @include('l.modal-button',[
-                    "class" => "btn-primary fa fa-pencil",
-                    "target_id" => "edit",
-                    "text" => "Bilgileri Düzenle"
-                ])
-                @include('l.modal-button',[
-                    "class" => "btn-info",
-                    "target_id" => "give_permission",
-                    "text" => "Yetki Ver"
-                ])
-                @if(server()->user_id == auth()->id() || auth()->user()->isAdmin())
-                    @include('l.modal-button',[
-                        "class" => "btn-primary",
-                        "target_id" => "revoke_permission",
-                        "text" => "Yetki Al"
-                    ])
-                @endif
+                <form id="edit_form" onsubmit="return request('{{route('server_update')}}',this,reload)" target="#">
+                    <div class="modal-body" style="width: 100%">
+                        <div id="edit_alert" class="alert" role="alert" hidden="">
+                        </div>
+                        <h5>{{__("Sunucu Adı")}}</h5>
+                        <input type="text" name="name" placeholder="Sunucu Adı" class="form-control " required=""
+                               value="{{server()->name}}"><br>
+                        <h5>{{__("Kontrol Portu")}}</h5>
+                        <input type="number" name="control_port" placeholder="Kontrol Portu" class="form-control "
+                               required="" value="{{server()->control_port}}"><br>
+                        <h5>{{__("Şehir")}}</h5>
+                        <select name="city" class="form-control" required="">
+                            <option value="01">Adana</option>
+                            <option value="02">Adıyaman</option>
+                            <option value="03">Afyonkarahisar</option>
+                            <option value="04">Ağrı</option>
+                            <option value="05">Amasya</option>
+                            <option value="06">Ankara</option>
+                            <option value="07">Antalya</option>
+                            <option value="08">Artvin</option>
+                            <option value="09">Aydın</option>
+                            <option value="10">Balıkesir</option>
+                            <option value="11">Bilecik</option>
+                            <option value="12">Bingöl</option>
+                            <option value="13">Bitlis</option>
+                            <option value="14">Bolu</option>
+                            <option value="15">Burdur</option>
+                            <option value="16">Bursa</option>
+                            <option value="17">Çanakkale</option>
+                            <option value="18">Çankırı</option>
+                            <option value="19">Çorum</option>
+                            <option value="20">Denizli</option>
+                            <option value="21">Diyarbakır</option>
+                            <option value="22">Edirne</option>
+                            <option value="23">Elazığ</option>
+                            <option value="24">Erzincan</option>
+                            <option value="25">Erzurum</option>
+                            <option value="26">Eskişehir</option>
+                            <option value="27">Gaziantep</option>
+                            <option value="28">Giresun</option>
+                            <option value="29">Gümüşhane</option>
+                            <option value="30">Hakkâri</option>
+                            <option value="31">Hatay</option>
+                            <option value="32">Isparta</option>
+                            <option value="33">Mersin</option>
+                            <option value="34">İstanbul</option>
+                            <option value="35">İzmir</option>
+                            <option value="36">Kars</option>
+                            <option value="37">Kastamonu</option>
+                            <option value="38">Kayseri</option>
+                            <option value="39">Kırklareli</option>
+                            <option value="40">Kırşehir</option>
+                            <option value="41">Kocaeli</option>
+                            <option value="42">Konya</option>
+                            <option value="43">Kütahya</option>
+                            <option value="44">Malatya</option>
+                            <option value="45">Manisa</option>
+                            <option value="46">Kahramanmaraş</option>
+                            <option value="47">Mardin</option>
+                            <option value="48">Muğla</option>
+                            <option value="49">Muş</option>
+                            <option value="50">Nevşehir</option>
+                            <option value="51">Niğde</option>
+                            <option value="52">Ordu</option>
+                            <option value="53">Rize</option>
+                            <option value="54">Sakarya</option>
+                            <option value="55">Samsun</option>
+                            <option value="56">Siirt</option>
+                            <option value="57">Sinop</option>
+                            <option value="58">Sivas</option>
+                            <option value="59">Tekirdağ</option>
+                            <option value="60">Tokat</option>
+                            <option value="61">Trabzon</option>
+                            <option value="62">Tunceli</option>
+                            <option value="63">Şanlıurfa</option>
+                            <option value="64">Uşak</option>
+                            <option value="65">Van</option>
+                            <option value="66">Yozgat</option>
+                            <option value="67">Zonguldak</option>
+                            <option value="68">Aksaray</option>
+                            <option value="69">Bayburt</option>
+                            <option value="70">Karaman</option>
+                            <option value="71">Kırıkkale</option>
+                            <option value="72">Batman</option>
+                            <option value="73">Şırnak</option>
+                            <option value="74">Bartın</option>
+                            <option value="75">Ardahan</option>
+                            <option value="76">Iğdır</option>
+                            <option value="77">Yalova</option>
+                            <option value="78">Karabük</option>
+                            <option value="79">Kilis</option>
+                            <option value="80">Osmaniye</option>
+                            <option value="81">Düzce</option>
+                        </select><br>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">{{__("Bilgileri Güncelle")}}</button>
+                    </div>
+                </form>
                 @include('l.modal-button',[
                     "class" => "btn-danger",
-                    "target_id" => "log_table",
-                    "text" => "Sunucu Logları"
+                    "target_id" => "delete",
+                        "text" => "Sunucuyu Sil"
                 ])
             </div>
+
         </div>
     </div>
-
-    @include('l.modal-button',[
-        "class" => "btn-danger",
-        "target_id" => "delete",
-            "text" => "Sunucuyu Sil"
-    ])
 
     @include('l.modal',[
         "id"=>"delete",
@@ -255,16 +264,7 @@
         "url" => route('server_remove'),
         "text" => "$server->name isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
         "next" => "redirect",
-        "inputs" => [
-            "Sunucu Id:$server->_id" => "server_id:hidden"
-        ],
         "submit_text" => "Sunucuyu Sil"
-    ])
-
-    @include('l.modal-iframe',[
-        "id" => "terminal",
-        "url" => route('server_terminal',["server_id" => $server->_id]),
-        "title" => "$server->name sunucusu terminali"
     ])
 
     @include('l.modal',[
@@ -276,7 +276,6 @@
             "Sunucu Adı" => "name:text",
             "Kontrol Portu" => "control_port:number",
             "Şehir:city" => cities(),
-            "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
         "submit_text" => "Düzenle"
     ])
@@ -288,36 +287,9 @@
         "next" => "reload",
         "inputs" => [
             "Hostname" => "hostname:text",
-            "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
         "submit_text" => "Değiştir"
     ])
-
-    @include('l.modal',[
-        "id"=>"give_permission",
-        "title" => "Kullanıcıya Yetki Ver",
-        "url" => route('server_grant_permission'),
-        "next" => "function(){return false;}",
-        "inputs" => [
-            "Kullanıcı Emaili" => "email:text",
-            "Sunucu Id:$server->_id" => "server_id:hidden"
-        ],
-        "text" => "Güvenlik sebebiyle kullanıcı listesi sunulmamaktadır.",
-        "submit_text" => "Yetkilendir"
-    ])
-    @if(server()->user_id == auth()->id() || auth()->user()->isAdmin())
-        @include('l.modal',[
-            "id"=>"revoke_permission",
-            "title" => "Kullanıcıdan Yetki Al",
-            "url" => route('server_revoke_permission'),
-            "next" => "function(){return false;}",
-            "inputs" => [
-                "Kullanıcı Seçin:user_id" => objectToArray(\App\Permission::getUsersofType(server()->_id,'server'),"name","_id"),
-                "Sunucu Id:$server->_id" => "server_id:hidden"
-            ],
-            "submit_text" => "Yetkisini al"
-        ])
-    @endif
 
     @include('l.modal',[
         "id"=>"file_upload",
@@ -327,7 +299,6 @@
         "inputs" => [
             "Yüklenecek Dosya" => "file:file",
             "Yol" => "path:text",
-            "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
         "submit_text" => "Yükle"
     ])
@@ -339,7 +310,6 @@
         "next" => "",
         "inputs" => [
             "Yol" => "path:text",
-            "Sunucu Id:$server->_id" => "server_id:hidden"
         ],
         "submit_text" => "İndir"
     ])
@@ -347,7 +317,7 @@
         "id" => "log_table",
         "title" => "Sunucu Logları",
         "table" => [
-            "value" => \App\ServerLog::retrieve(true),
+            "value" => [],
             "title" => [
                 "Komut" , "User ID", "Tarih", "*hidden*"
             ],
@@ -365,7 +335,6 @@
             "next" => "reload",
             "selects" => $input_extensions,
             "inputs" => [
-                "Sunucu Id:$server->_id" => "server_id:hidden"
             ],
             "submit_text" => "Değiştir"
         ])
@@ -384,7 +353,7 @@
             });
         }
 
-        @if(count($installed_extensions) > 0)
+        @if($installed_extensions->count() > 0)
         @foreach($installed_extensions as $service)
         setInterval(function () {
             checkStatus('{{$service->service}}');
@@ -392,114 +361,72 @@
 
         @endforeach
         @endif
+                @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
         setInterval(function () {
             stats();
-        }, 27000);
+        }, 30000);
 
-        function stats() {
-            let form = new FormData();
-            form.append('server_id', '{{server()->_id}}');
-            request('{{route('server_stats')}}', form, function (response) {
-                data = JSON.parse(response);
-                $("#diskText").html("%" + data['disk']);
-                $("#ramText").html("%" + data['ram']);
-                $("#cpuText").html("%" + data['cpu']);
-                let ramCanvas = document.getElementById("ram").getContext('2d');
-                ramCanvas.clearRect(0, 0, ramCanvas.width, ramCanvas.height);
+        let ramChart, cpuChart, diskChart;
+        stats();
 
-                let ramChart = new Chart($("#ram"), {
-                    type: 'pie',
-                    data: {
-                        datasets: [{
-                            data: [data['ram'], 100 - parseFloat(data['ram'])],
-                            backgroundColor: [
-                                "#ff8397",
-                                "#56d798",
-                            ],
-                            hoverBackgroundColor: [
-                                "#ff8397",
-                                "#56d798",
-                            ]
-                        }],
+        function updateChart(element, time, data) {
+            // First, Update Text
+            $("#" + element + "Text").html("%" + data);
+            window[element + "Chart"].data.labels.push(time);
+            window[element + "Chart"].data.datasets.forEach((dataset) => {
+                dataset.data.push(data);
+            });
+            window[element + "Chart"].update();
+        }
 
-                        labels: [
-                            '{{__("Dolu")}}',
-                            '{{__("Boş")}}',
-                        ]
+        function createChart(element, time, data) {
+            window[element + "Chart"] = new Chart($("#" + element), {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        data: data,
+                    }],
+                    labels: [
+                        time,
+                    ]
+                },
+                options: {
+                    animation: false,
+                    responsive: false,
+                    legend: false,
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: 100
+                            }
+                        }]
                     },
-                    options: {
-                        animation: false,
-                        responsive: false,
-                        legend: false,
-                    }
-                });
-
-                let cpuCanvas = document.getElementById("cpu").getContext('2d');
-                cpuCanvas.clearRect(0, 0, cpuCanvas.width, cpuCanvas.height);
-
-                let cpuChart = new Chart($("#cpu"), {
-                    type: 'pie',
-                    data: {
-                        datasets: [{
-                            data: [Math.round(data['cpu'] * 10) / 10, 100 - Math.round(parseFloat(data['cpu']) * 10) / 10],
-                            backgroundColor: [
-                                "#ff8397",
-                                "#56d798",
-                            ],
-                            hoverBackgroundColor: [
-                                "#ff8397",
-                                "#56d798",
-                            ]
-                        }],
-
-                        labels: [
-                            '{{__("Dolu")}}',
-                            '{{__("Boş")}}',
-                        ]
-                    },
-                    options: {
-                        animation: false,
-                        responsive: false,
-                        legend: false,
-                    }
-                });
-
-                let diskChart = new Chart($("#disk"), {
-                    type: 'pie',
-                    data: {
-                        datasets: [{
-                            data: [Math.round(data['disk'] * 10) / 10, 100 - Math.round(parseFloat(data['cpu']) * 10) / 10],
-                            backgroundColor: [
-                                "#ff8397",
-                                "#56d798",
-                            ],
-                            hoverBackgroundColor: [
-                                "#ff8397",
-                                "#56d798",
-                            ]
-                        }],
-
-                        labels: [
-                            '{{__("Dolu")}}',
-                            '{{__("Boş")}}',
-                        ]
-                    },
-                    options: {
-                        animation: false,
-                        responsive: false,
-                        legend: false,
-                    }
-                });
+                }
             })
         }
 
-        stats();
+        function stats() {
+            let form = new FormData();
+            form.append('server_id', '{{server()->id}}');
+            request('{{route('server_stats')}}', form, function (response) {
+                data = JSON.parse(response);
+                updateChart("disk", data['time'], data['disk']);
+                updateChart("ram", data['time'], data['ram']);
+                updateChart("cpu", data['time'], data['cpu']);
+            })
+        }
+
+        createChart("ram", "{{\Carbon\Carbon::now()->format("H:i:s")}}", ["0"]);
+        createChart("cpu", "{{\Carbon\Carbon::now()->format("H:i:s")}}", ["0"]);
+        createChart("disk", "{{\Carbon\Carbon::now()->format("H:i:s")}}", ["0"]);
 
         function downloadFile(form) {
             window.location.assign('/sunucu/indir?path=' + form.getElementsByTagName('input')[0].value + '&server_id=' + form.getElementsByTagName('input')[1].value);
             return false;
         }
-
+        @endif
         function logDetails(element) {
             let log_id = element.querySelector('#_id').innerHTML;
             window.location.href = "/logs/" + log_id
@@ -507,7 +434,7 @@
 
         function favorite(action) {
             let form = new FormData();
-            form.append('server_id', '{{server()->_id}}');
+            form.append('server_id', '{{server()->id}}');
             form.append('action', action);
             request('{{route('server_favorite')}}', form, function (response) {
                 location.reload();

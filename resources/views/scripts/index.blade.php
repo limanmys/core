@@ -30,7 +30,7 @@
         "title" => "Betik İndir",
         "next" => "",
         "inputs" => [
-            "Betik Secin:script_id" => objectToArray($scripts,"name", "_id")
+            "Betik Secin:script_id" => objectToArray($scripts,"name", "id")
         ],
         "submit_text" => "İndir"
     ])
@@ -41,7 +41,7 @@
             "Betik Adı" , "Açıklama" , "Tipi" , "Kodu", "*hidden*", "Son Güncelleme"
         ],
         "display" => [
-            "name" , "description", "extensions" , "unique_code", "_id:script_id" , "updated_at"
+            "name" , "description", "extensions" , "unique_code", "id:script_id" , "updated_at"
         ],
         "menu" => [
             "İndir" => [

@@ -138,11 +138,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     {
         $response = new StreamedResponse;
 
-        $filename = $name ?? basename($path);
-
-        $disposition = $response->headers->makeDisposition(
-            $disposition, $filename, Str::ascii($filename)
-        );
+        $disposition = $response->headers->makeDisposition($disposition, $name ?? basename($path));
 
         $response->headers->replace($headers + [
             'Content-Type' => $this->mimeType($path),
@@ -419,7 +415,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function readStream($path)
     {
         try {
-            return $this->driver->readStream($path) ?: null;
+            $resource = $this->driver->readStream($path);
+
+            return $resource ? $resource : null;
         } catch (FileNotFoundException $e) {
             throw new ContractFileNotFoundException($e->getMessage(), $e->getCode(), $e);
         }

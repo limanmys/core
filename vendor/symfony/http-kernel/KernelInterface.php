@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  *
  * @method string getProjectDir() Gets the project dir (path of the project's composer file) - not defining it is deprecated since Symfony 4.2
  */
-interface KernelInterface extends HttpKernelInterface
+interface KernelInterface extends HttpKernelInterface, \Serializable
 {
     /**
      * Returns an array of bundles to register.

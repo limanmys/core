@@ -53,7 +53,6 @@ class NodeDumperTest extends \PHPUnit\Framework\TestCase
                 value: Foo
             )
             byRef: false
-            unpack: false
         )
     )
 )'

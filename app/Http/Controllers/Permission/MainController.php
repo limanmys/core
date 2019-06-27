@@ -17,7 +17,7 @@ class MainController extends Controller
                 $request->user_id = "";
             }else{
                 $request->user_name = $user->name;
-                $request->user_id = $user->_id;
+                $request->user_id = $user->id;
             }
 
             switch ($request->status){
@@ -54,8 +54,8 @@ class MainController extends Controller
     }
 
     public function one(){
-        $request = LimanRequest::where('_id',request('permission_id'))->first();
-        $request->user_name = User::where('_id',$request->user_id)->first()->name;
+        $request = LimanRequest::where('id',request('permission_id'))->first();
+        $request->user_name = User::where('id',$request->user_id)->first()->name;
 
         system_log(7,"REQUEST_DETAILS",[
             "request_id" => $request
@@ -68,7 +68,7 @@ class MainController extends Controller
 
     public function requestUpdate()
     {
-        $request = LimanRequest::where('_id',request('request_id'))->first();
+        $request = LimanRequest::where('id',request('request_id'))->first();
 
         system_log(7,"REQUEST_UPDATE",[
             "action" => $request
@@ -78,6 +78,7 @@ class MainController extends Controller
             $request->delete();
             return respond("Talep Silindi",200);
         }
+
         $request->status = request('status');
         $request->save();
         return respond("Talep Güncellendi",200);

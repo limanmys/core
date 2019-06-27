@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -13,10 +13,9 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder|LimanRequest newQuery()
  * @method static Builder|LimanRequest query()
  * @method static Builder|LimanRequest where($value, $key)
- * @mixin Eloquent
+ * @mixin Model
  */
-class LimanRequest extends Eloquent
+class LimanRequest extends Model
 {
-    protected $collection = 'requests';
-    protected $connection = 'mongodb';
+
 }

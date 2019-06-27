@@ -32,10 +32,10 @@ class SSHConnector implements Connector
     {
         ($key = Key::where([
             "user_id" => $user_id,
-            "server_id" => $server->_id
+            "server_id" => $server->id
         ])->first()) || abort(504,"SSH Anahtarınız yok.");
        try{
-           $ssh = new SSH2($server->ip_address, $server->port);
+           $ssh = new SSH2($server->ip_address, $server->control_port);
        }catch (\Exception $exception){
            abort(504,"Sunucuya Bağlanılamadı, " . $exception->getMessage());
        }
@@ -72,7 +72,7 @@ class SSHConnector implements Connector
     {
         $output = $this->ssh->exec($command);
         if($flag){
-            ServerLog::new($command,$output, $this->server->_id,$this->user_id);
+//            ServerLog::new($command,$output, $this->server->id,$this->user_id);
         }
         return $output;
     }
@@ -85,8 +85,8 @@ class SSHConnector implements Connector
      */
     public function runScript($script, $parameters, $extra = null)
     {
-        $localPath = env('SCRIPTS_PATH') . $script->_id;
-        $remotePath = '/tmp/' . $script->_id;
+        $localPath = env('SCRIPTS_PATH') . $script->id;
+        $remotePath = '/tmp/' . $script->id;
         $this->sendFile($localPath, $remotePath,0555);
 
         $localHash = md5_file($localPath);
@@ -98,24 +98,24 @@ class SSHConnector implements Connector
 
         // First Let's Run Before Part Of the Script
         $query = ($script->root == 1) ? 'sudo ' : '';
-        $query = $query . $script->language . ' /tmp/' . $script->_id . " before " . $parameters . $extra;
+        $query = $query . $script->language . ' /tmp/' . $script->id . " before " . $parameters . $extra;
         $before = $this->execute($query,false);
         if($before != "ok\n"){
-            ServerLog::new($query,$before, $this->server->_id,$this->user_id);
+//            ServerLog::new($query,$before, $this->server->id,$this->user_id);
             abort(504, $before);
         }
 
         // Run Part Of The Script
         $query = ($script->root == 1) ? 'sudo ' : '';
-        $query = $query . $script->language . ' /tmp/' . $script->_id . " run " . $parameters . $extra;
+        $query = $query . $script->language . ' /tmp/' . $script->id . " run " . $parameters . $extra;
         $output = $this->execute($query);
 
         // Run After Part Of the Script
         $query = ($script->root == 1) ? 'sudo ' : '';
-        $query = $query . $script->language . ' /tmp/' . $script->_id . " after " . $parameters . $extra;
+        $query = $query . $script->language . ' /tmp/' . $script->id . " after " . $parameters . $extra;
         $after = $this->execute($query,false);
         if($after != "ok\n"){
-            ServerLog::new($query,$after, $this->server->_id,$this->user_id);
+//            ServerLog::new($query,$after, $this->server->id,$this->user_id);
             abort(504, $after);
         }
 
@@ -130,7 +130,7 @@ class SSHConnector implements Connector
      */
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
-        $sftp = new SFTP($this->server->ip_address, $this->server->port);
+        $sftp = new SFTP($this->server->ip_address, $this->server->control_port);
         $key = new RSA();
         $key->password = env("APP_KEY") . $this->user_id;
         $key->loadKey(file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $this->user_id));
@@ -147,7 +147,7 @@ class SSHConnector implements Connector
      */
     public function receiveFile($localPath, $remotePath)
     {
-        $sftp = new SFTP($this->server->ip_address, $this->server->port);
+        $sftp = new SFTP($this->server->ip_address, $this->server->control_port);
         $key = new RSA();
         $key->password = env("APP_KEY") . $this->user_id;
         $key->loadKey(file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $this->user_id));
@@ -179,7 +179,7 @@ class SSHConnector implements Connector
             $keys["publickey"] = file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $user_id . ".pub");
         }
         try{
-            $ssh = new SSH2($server->ip_address, $server->port);
+            $ssh = new SSH2($server->ip_address, $server->control_port);
         }catch (\Exception $exception){
             return __("Sunucuya bağlanılamadı");
         }

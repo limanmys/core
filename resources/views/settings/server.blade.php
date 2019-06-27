@@ -12,7 +12,7 @@
         <ul class="nav nav-tabs">
             <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">{{__("Genel Ayarlar")}}</a></li>
             <li id="server_type"><a href="#tab_2" data-toggle="tab"
-                                    aria-expanded="false">{{__("MongoDB Ayarları")}}</a></li>
+                                    aria-expanded="false">{{__("Veritabanı Ayarları")}}</a></li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="tab_1">
@@ -33,18 +33,10 @@
             </div>
             <div class="tab-pane" id="tab_2">
                 <form action="">
-                    <h3><b>{{__("MongoDB Ayarları")}}</b></h3><br>
+                    <h3><b>{{__("Veritabanı Ayarları")}}</b></h3><br>
                     <h5>{{__("Dikkat: Yaptığınız değişikler ile sunucuya erişiminizi kaybedebilirsiniz.")}}</h5>
-                    <h4>{{__("Bağlantı Adresi")}}</h4>
-                    <input type="text" class="form-control" value="{{env('DB_HOST')}}">
-                    <h4>{{__("Bağlantı Portu")}}</h4>
-                    <input type="text" class="form-control" value="{{env('DB_PORT')}}">
-                    <h4>{{__("Veritabanı Adı")}}</h4>
-                    <input type="text" class="form-control" value="{{env('DB_DATABASE')}}">
-                    <h4>{{__("Kullanıcı Adı")}}</h4>
-                    <input type="text" class="form-control" value="{{env('DB_USERNAME')}}">
-                    <h4>{{__("Parola")}}</h4>
-                    <input type="text" class="form-control" value="{{env('DB_PASSWORD')}}"><br>
+                    <h4>{{__("Veritabanı Konumu")}}</h4>
+                    <input type="text" class="form-control" value="{{env('DB_PATH')}}"><br>
                     <button disabled type="button" class="btn btn-danger">{{__("Değişiklikleri Kaydet")}}</button>
                 </form>
             </div>

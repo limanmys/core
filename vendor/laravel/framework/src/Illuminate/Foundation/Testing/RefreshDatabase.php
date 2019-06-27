@@ -50,10 +50,9 @@ trait RefreshDatabase
     protected function refreshTestDatabase()
     {
         if (! RefreshDatabaseState::$migrated) {
-            $this->artisan('migrate:fresh', [
-                '--drop-views' => $this->shouldDropViews(),
-                '--drop-types' => $this->shouldDropTypes(),
-            ]);
+            $this->artisan('migrate:fresh', $this->shouldDropViews() ? [
+                '--drop-views' => true,
+            ] : []);
 
             $this->app[Kernel::class]->setArtisan(null);
 
@@ -114,16 +113,5 @@ trait RefreshDatabase
     {
         return property_exists($this, 'dropViews')
                             ? $this->dropViews : false;
-    }
-
-    /**
-     * Determine if types should be dropped when refreshing the database.
-     *
-     * @return bool
-     */
-    protected function shouldDropTypes()
-    {
-        return property_exists($this, 'dropTypes')
-                            ? $this->dropTypes : false;
     }
 }

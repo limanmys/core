@@ -19,7 +19,7 @@ class Do_ extends Node\Stmt
      * @param array       $attributes Additional attributes
      */
     public function __construct(Node\Expr $cond, array $stmts = [], array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->cond = $cond;
         $this->stmts = $stmts;
     }

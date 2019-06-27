@@ -16,7 +16,7 @@ class ShellExec extends Expr
      * @param array $attributes Additional attributes
      */
     public function __construct(array $parts, array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->parts = $parts;
     }
 

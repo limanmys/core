@@ -27,7 +27,7 @@ class TranslationDataCollectorTest extends TestCase
     public function testCollectEmptyMessages()
     {
         $translator = $this->getTranslator();
-        $translator->expects($this->any())->method('getCollectedMessages')->willReturn([]);
+        $translator->expects($this->any())->method('getCollectedMessages')->will($this->returnValue([]));
 
         $dataCollector = new TranslationDataCollector($translator);
         $dataCollector->lateCollect();
@@ -125,7 +125,7 @@ class TranslationDataCollectorTest extends TestCase
         ];
 
         $translator = $this->getTranslator();
-        $translator->expects($this->any())->method('getCollectedMessages')->willReturn($collectedMessages);
+        $translator->expects($this->any())->method('getCollectedMessages')->will($this->returnValue($collectedMessages));
 
         $dataCollector = new TranslationDataCollector($translator);
         $dataCollector->lateCollect();

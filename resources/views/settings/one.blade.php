@@ -51,7 +51,7 @@
                         "Adı" , "*hidden*"
                     ],
                     "display" => [
-                        "name" , "_id:_id"
+                        "name" , "id:id"
                     ],
                     "noInitialize" => "true"
                 ])
@@ -66,7 +66,7 @@
                         "Adı" , "*hidden*"
                     ],
                     "display" => [
-                        "name" , "_id:_id"
+                        "name" , "id:id"
                     ],
                     "noInitialize" => "true"
                 ])
@@ -81,7 +81,7 @@
                         "Adı" , "*hidden*"
                     ],
                     "display" => [
-                        "name" , "_id:_id"
+                        "name" , "id:id"
                     ],
                     "noInitialize" => "true"
                 ])
@@ -115,7 +115,7 @@
                                     <select id="extensionId" class="form-control" onchange="getFunctionList()">
                                         <option selected disabled>{{__("...")}}</option>
                                         @foreach(extensions() as $extension)
-                                            <option value="{{$extension->_id}}">{{$extension->name}}</option>
+                                            <option value="{{$extension->id}}">{{$extension->name}}</option>
                                         @endforeach
                                     </select><br>
                                 <div class="functionsTable"></div>
@@ -175,7 +175,7 @@
             let extension_id = $("#extensionId :selected").val();
             let form = new FormData();
             form.append('extension_id', extension_id);
-            form.append('user_id','{{$user->_id}}');
+            form.append('user_id','{{$user->id}}');
             request('{{route('extension_function_list')}}', form, function (response) {
                 $(".functionsTable").html(response);
                 $('.functionsTable table').DataTable({
@@ -206,7 +206,7 @@
             let extension_id = $("#extensionId :selected").val();
             form.append("extension_id",extension_id);
             form.append("functions",data);
-            form.append("user_id",'{{$user->_id}}')
+            form.append("user_id",'{{$user->id}}');
             request('{{route("extension_function_add")}}',form,function(){
                 location.reload();
             });
@@ -222,13 +222,23 @@
             let data = [];
             let table = $('#extensionFunctions').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
-                data.push(element[1]);
+                data.push(element[2] + "_" + element[1]);
             });
             let form = new FormData();
             form.append("functions",data);
-            form.append("user_id",'{{$user->_id}}')
-            request('{{route("extension_function_remove")}}',form,function(){
-                location.reload();
+            form.append("user_id",'{{$user->id}}');
+            request('{{route("extension_function_remove")}}',form,function(response){
+                let json = JSON.parse(response);
+                Swal.fire({
+                    position: 'center',
+                    type: 'success',
+                    title: json["message"],
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                setTimeout(function () {
+                    location.reload();
+                },2000);
             });
         }
 
@@ -240,7 +250,7 @@
                 showConfirmButton: false,
             });
             let form = new FormData(data);
-            form.append('user_id','{{$user->_id}}');
+            form.append('user_id','{{$user->id}}');
             request('{{route('update_user')}}',form,function () {
                 Swal.close();
                 location.reload();
@@ -251,7 +261,7 @@
         function getList(type) {
             let form = new FormData();
             form.append('type', type);
-            form.append('user_id','{{$user->_id}}');
+            form.append('user_id','{{$user->id}}');
             request('{{route('settings_get_list')}}', form, function (response) {
                 Swal.close();
                 $("#" + type + "_modal .modal-body").html(response);
@@ -272,7 +282,7 @@
             let data = [];
             let table = $("#" + element + "_table").DataTable();
             table.rows( { selected: true } ).data().each(function(element){
-                data.push(element[1]);
+                data.push(element[2]);
             });
 
             if(data === []){
@@ -292,7 +302,7 @@
 
             let form = new FormData();
             form.append('ids',JSON.stringify(data));
-            form.append('user_id','{{$user->_id}}');
+            form.append('user_id','{{$user->id}}');
             form.append('type',element);
             request('{{route('settings_remove_from_list')}}', form, function (response) {
                 let json = JSON.parse(response);
@@ -324,7 +334,7 @@
             });
             let form = new FormData();
             form.append('ids',JSON.stringify(data));
-            form.append('user_id','{{$user->_id}}');
+            form.append('user_id','{{$user->id}}');
             form.append('type',modalElement.getAttribute('id').split('_')[0]);
             request('{{route('settings_add_to_list')}}', form, function (response) {
                 let json = JSON.parse(response);
@@ -353,12 +363,12 @@
         });
 
         function resetPassword(){
-            $("#resetPassword [name='user_id']").val('{{$user->_id}}');
+            $("#resetPassword [name='user_id']").val('{{$user->id}}');
             $("#resetPassword").modal('show');
         }
 
         function removeUser(){
-            $("#removeUser [name='user_id']").val('{{$user->_id}}');
+            $("#removeUser [name='user_id']").val('{{$user->id}}');
             $("#removeUser").modal('show');
         }
     </script>

@@ -173,7 +173,11 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
      */
     protected function notificationsFor($notifiable, $notification)
     {
-        return $this->notifications[get_class($notifiable)][$notifiable->getKey()][$notification] ?? [];
+        if (isset($this->notifications[get_class($notifiable)][$notifiable->getKey()][$notification])) {
+            return $this->notifications[get_class($notifiable)][$notifiable->getKey()][$notification];
+        }
+
+        return [];
     }
 
     /**

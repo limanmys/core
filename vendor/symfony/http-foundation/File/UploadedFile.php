@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\File\Exception\IniSizeFileException;
 use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
 use Symfony\Component\HttpFoundation\File\Exception\NoTmpDirFileException;
 use Symfony\Component\HttpFoundation\File\Exception\PartialFileException;
-use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
 /**
  * A file uploaded through a form.
@@ -140,7 +140,10 @@ class UploadedFile extends File
      */
     public function guessClientExtension()
     {
-        return MimeTypes::getDefault()->getExtensions($this->getClientMimeType())[0] ?? null;
+        $type = $this->getClientMimeType();
+        $guesser = ExtensionGuesser::getInstance();
+
+        return $guesser->guess($type);
     }
 
     /**

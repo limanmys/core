@@ -16,7 +16,7 @@ class NullableType extends NodeAbstract
      * @param array                  $attributes Additional attributes
      */
     public function __construct($type, array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->type = \is_string($type) ? new Identifier($type) : $type;
     }
 

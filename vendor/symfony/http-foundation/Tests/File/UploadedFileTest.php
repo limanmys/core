@@ -33,7 +33,7 @@ class UploadedFileTest extends TestCase
 
     public function testConstructWhenFileNotExists()
     {
-        $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
 
         new UploadedFile(
             __DIR__.'/Fixtures/not_here',
@@ -92,18 +92,6 @@ class UploadedFileTest extends TestCase
         );
 
         $this->assertEquals('jpeg', $file->guessClientExtension());
-    }
-
-    public function testCaseSensitiveMimeType()
-    {
-        $file = new UploadedFile(
-            __DIR__.'/Fixtures/case-sensitive-mime-type.xlsm',
-            'test.xlsm',
-            'application/vnd.ms-excel.sheet.macroEnabled.12',
-            null
-        );
-
-        $this->assertEquals('xlsm', $file->guessClientExtension());
     }
 
     public function testErrorIsOkByDefault()

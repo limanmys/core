@@ -17,7 +17,6 @@
  * - JD Isaacks
  * - Jens Herlevsen
  * - Ulrik McArdle (mcardle)
- * - Frederik Sauer (FrittenKeeZ)
  */
 return [
     'year' => ':count år|:count år',
@@ -25,13 +24,13 @@ return [
     'y' => ':count år|:count år',
     'month' => ':count måned|:count måneder',
     'a_month' => 'en måned|:count måneder',
-    'm' => ':count mdr.',
+    'm' => ':count mån.',
     'week' => ':count uge|:count uger',
     'a_week' => 'en uge|:count uger',
     'w' => ':count u.',
     'day' => ':count dag|:count dage',
     'a_day' => ':count dag|:count dage',
-    'd' => ':count d.',
+    'd' => 'en d.',
     'hour' => ':count time|:count timer',
     'a_hour' => 'en time|:count timer',
     'h' => ':count t.',

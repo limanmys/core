@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -15,11 +15,8 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static \Illuminate\Database\Query\Builder|Notification where($value)
  * @mixin Eloquent
  */
-class Notification extends Eloquent
+class Notification extends Model
 {
-    protected $collection = 'notifications';
-    protected $connection = 'mongodb';
-
     public static function new($title, $type, $message, $server_id = null, $extension_id = null, $level = 0){
 
         // Create a notification object and fill values.

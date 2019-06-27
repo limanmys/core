@@ -43,8 +43,7 @@ class JsonResponseTest extends TestCase
         $this->assertSame('0', $response->getContent());
 
         $response = new JsonResponse(0.1);
-        $this->assertEquals('0.1', $response->getContent());
-        $this->assertInternalType('string', $response->getContent());
+        $this->assertSame('0.1', $response->getContent());
 
         $response = new JsonResponse(true);
         $this->assertSame('true', $response->getContent());
@@ -132,8 +131,7 @@ class JsonResponseTest extends TestCase
 
         $response = JsonResponse::create(0.1);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
-        $this->assertEquals('0.1', $response->getContent());
-        $this->assertInternalType('string', $response->getContent());
+        $this->assertSame('0.1', $response->getContent());
 
         $response = JsonResponse::create(true);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);

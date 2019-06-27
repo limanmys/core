@@ -23,14 +23,14 @@ class FileLocatorTest extends TestCase
             ->expects($this->atLeastOnce())
             ->method('locateResource')
             ->with('@BundleName/some/path', null, true)
-            ->willReturn('/bundle-name/some/path');
+            ->will($this->returnValue('/bundle-name/some/path'));
         $locator = new FileLocator($kernel);
         $this->assertEquals('/bundle-name/some/path', $locator->locate('@BundleName/some/path'));
 
         $kernel
             ->expects($this->never())
             ->method('locateResource');
-        $this->expectException('LogicException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('LogicException');
         $locator->locate('/some/path');
     }
 

@@ -33,7 +33,7 @@ class MainController extends Controller
         // Extract Cities of the Servers.
         $cities = array_values(objectToArray($servers, "city", "city"));
         system_log(7,"EXTENSION_SERVERS_INDEX",[
-            "extension_id" => extension()->_id
+            "extension_id" => extension()->id
         ]);
         // Render View with Cities
         return view('extension_pages.index', [
@@ -77,6 +77,11 @@ class MainController extends Controller
                 $filePath = $file->getRealPath();
                 $relativePath = substr($filePath, strlen($path) + 1);
 
+                // Ignore If it's db.json file
+                if($relativePath == "db.json"){
+                    continue;
+                }
+
                 // Add current file to archive
                 $zip->addFile($filePath, 'views/' . $relativePath);
             }
@@ -87,20 +92,17 @@ class MainController extends Controller
 
         // Simply, go through scripts and add them in to zip.
         foreach (extension()->scripts() as $script) {
-            $zip->addFile(env('SCRIPTS_PATH') . $script->_id, 'scripts/' . $script->unique_code . '.lmns');
+            $zip->addFile(env('SCRIPTS_PATH') . $script->id, 'scripts/' . $script->unique_code . '.lmns');
         }
 
-        // Extract database in to json.
-        file_put_contents($exportedFile . '_db.json', extension()->toJson());
-
         // Add file
-        $zip->addFile($exportedFile . '_db.json', 'db.json');
+        $zip->addFile($path . DIRECTORY_SEPARATOR . "db.json", 'db.json');
 
         // Close/Compress zip
         $zip->close();
 
         system_log(6,"EXTENSION_DOWNLOAD",[
-            "extension_id" => extension()->_id
+            "extension_id" => extension()->id
         ]);
 
         // Return zip as download and delete it after sent.
@@ -157,8 +159,8 @@ class MainController extends Controller
         $new->save();
 
         // Add User if not exists
-        if ((intval(shell_exec("grep -c '^liman-: " . $new->_id . "' /etc/passwd"))) ? false : true) {
-            shell_exec('sudo useradd -r -s /bin/sh liman-' . $new->_id);
+        if ((intval(shell_exec("grep -c '^liman-: " . $new->id . "' /etc/passwd"))) ? false : true) {
+            shell_exec('sudo useradd -r -s /bin/sh liman-' . $new->id);
         }
 
         $extension_folder = env('EXTENSIONS_PATH') . strtolower($json["name"]);
@@ -168,13 +170,18 @@ class MainController extends Controller
             mkdir($extension_folder);
         }
 
-        shell_exec('sudo chown liman-' . $new->_id . ':liman ' . $extension_folder);
+        shell_exec("sudo cp " . $path . '/db.json' . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
+
+        shell_exec('sudo chown liman-' . $new->id . ':liman ' . $extension_folder);
         shell_exec('sudo chmod 770 ' . $extension_folder);
 
         shell_exec("sudo cp -r " . $path .  DIRECTORY_SEPARATOR . "views/* " . $extension_folder);
 
-        shell_exec("sudo chown -R liman-" . $new->_id . ':liman "' . $extension_folder. '"');
-        shell_exec("sudo chmod 770 \"" . $extension_folder ."\"");
+        shell_exec("sudo chown -R liman-" . $new->id . ':liman "' . $extension_folder. '"');
+        shell_exec("sudo chmod -R 770 \"" . $extension_folder ."\"");
+
+        shell_exec("sudo chown liman:liman-". $new->id . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
+        shell_exec("sudo chmod 640 " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
 
         $files = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($path . '/scripts/'),
@@ -192,15 +199,15 @@ class MainController extends Controller
 
                 $script = Script::readFromFile($filePath);
                 if ($script) {
-                    copy($filePath, env('SCRIPTS_PATH') . $script->_id);
+                    copy($filePath, env('SCRIPTS_PATH') . $script->id);
                 }
             }
         }
         system_log(3,"EXTENSION_UPLOAD_SUCCESS",[
-            "extension_id" => $new->_id
+            "extension_id" => $new->id
         ]);
 
-        return respond(route('extension_one', $new->_id), 300);
+        return respond(route('extension_one', $new->id), 300);
     }
 
 
@@ -208,10 +215,21 @@ class MainController extends Controller
     {
         $folder = env('EXTENSIONS_PATH') . strtolower(request('name'));
 
+        if(Extension::where("name",request("name"))->exists()){
+            return respond("Bu isimle zaten bir eklenti var.",201);
+        }
+
         $ext = new Extension([
+            "name" => request("name"),
+            "version" => "0.0.1",
+            "icon" => ""
+        ]);
+        $ext->save();
+
+        $json = [
             "name" => request('name'),
             "publisher" => auth()->user()->name,
-            "version" => "0.1",
+            "version" => "0.0.1",
             "database" => [],
             "widgets" => [],
             "views" => [
@@ -221,35 +239,43 @@ class MainController extends Controller
                 ]
             ],
             "status" => 0,
-            "service" => ""
-        ]);
-
-        $ext->save();
+            "service" => "",
+            "support" => auth()->user()->email,
+            "icon" => ""
+        ];
 
         if (!is_dir($folder)) {
             mkdir($folder);
         }
 
-        if ((intval(shell_exec("grep -c '^liman-: " . $ext->_id . "' /etc/passwd"))) ? false : true) {
-            shell_exec('sudo useradd -r -s /bin/sh liman-' . $ext->_id);
+        touch($folder . DIRECTORY_SEPARATOR . "db.json");
+
+        file_put_contents($folder . DIRECTORY_SEPARATOR . "db.json",json_encode($json));
+
+
+        if ((intval(shell_exec("grep -c '^liman-: " . $ext->id . "' /etc/passwd"))) ? false : true) {
+            shell_exec('sudo useradd -r -s /bin/sh liman-' . $ext->id);
         }
 
-        shell_exec('sudo chown liman-' . $ext->_id . ':liman ' . $folder);
+        shell_exec('sudo chown liman-' . $ext->id . ':liman ' . $folder);
         shell_exec('sudo chmod 770 ' . $folder);
 
         touch($folder . '/index.blade.php');
         touch($folder . '/functions.php');
 
-        shell_exec('sudo chown liman-' . $ext->_id . ':liman "' . trim($folder) . '/index.blade.php"');
+        shell_exec('sudo chown liman-' . $ext->id . ':liman "' . trim($folder) . '/index.blade.php"');
         shell_exec('sudo chmod 664 "' . trim($folder) . '/index.blade.php"');
 
-        shell_exec('sudo chown liman-' . $ext->_id . ':liman "' . trim($folder) . '/functions.php"');
+        shell_exec('sudo chown liman-' . $ext->id . ':liman "' . trim($folder) . '/functions.php"');
         shell_exec('sudo chmod 664 "' . trim($folder) . '/functions.php"');
 
+        shell_exec("sudo chown liman:liman-". $ext->id . " " . $folder . DIRECTORY_SEPARATOR . "db.json");
+        shell_exec("sudo chmod 640 " . $folder . DIRECTORY_SEPARATOR . "db.json");
+
         system_log(6,"EXTENSION_CREATE",[
-            "extension_id" => $ext->_id
+            "extension_id" => $ext->id
         ]);
 
-        return respond(route('extension_one', $ext->_id), 300);
+        return respond(route('extension_one', $ext->id), 300);
     }
 }

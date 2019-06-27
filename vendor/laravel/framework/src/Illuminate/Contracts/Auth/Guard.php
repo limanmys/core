@@ -28,7 +28,7 @@ interface Guard
     /**
      * Get the ID for the currently authenticated user.
      *
-     * @return int|string|null
+     * @return int|null
      */
     public function id();
 

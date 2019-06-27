@@ -155,7 +155,7 @@ class Event
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
      * @param  string  $command
-     * @param  \DateTimeZone|string|null $timezone
+     * @param  \DateTimeZone|string $timezone
      * @return void
      */
     public function __construct(EventMutex $mutex, $command, $timezone = null)
@@ -418,23 +418,6 @@ class Event
     }
 
     /**
-     * E-mail the results of the scheduled operation if it fails.
-     *
-     * @param  array|mixed  $addresses
-     * @return $this
-     */
-    public function emailOutputOnFailure($addresses)
-    {
-        $this->ensureOutputIsBeingCaptured();
-
-        $addresses = Arr::wrap($addresses);
-
-        return $this->onFailure(function (Mailer $mailer) use ($addresses) {
-            $this->emailOutput($mailer, $addresses, false);
-        });
-    }
-
-    /**
      * Ensure that the command output is being captured.
      *
      * @return void
@@ -529,32 +512,6 @@ class Event
     public function thenPingIf($value, $url)
     {
         return $value ? $this->thenPing($url) : $this;
-    }
-
-    /**
-     * Register a callback to ping a given URL if the operation succeeds.
-     *
-     * @param  string  $url
-     * @return $this
-     */
-    public function pingOnSuccess($url)
-    {
-        return $this->onSuccess(function () use ($url) {
-            (new HttpClient)->get($url);
-        });
-    }
-
-    /**
-     * Register a callback to ping a given URL if the operation fails.
-     *
-     * @param  string  $url
-     * @return $this
-     */
-    public function pingOnFailure($url)
-    {
-        return $this->onFailure(function () use ($url) {
-            (new HttpClient)->get($url);
-        });
     }
 
     /**
@@ -703,36 +660,6 @@ class Event
         $this->afterCallbacks[] = $callback;
 
         return $this;
-    }
-
-    /**
-     * Register a callback to be called if the operation succeeds.
-     *
-     * @param  \Closure  $callback
-     * @return $this
-     */
-    public function onSuccess(Closure $callback)
-    {
-        return $this->then(function (Container $container) use ($callback) {
-            if (0 === $this->exitCode) {
-                $container->call($callback);
-            }
-        });
-    }
-
-    /**
-     * Register a callback to be called if the operation fails.
-     *
-     * @param  \Closure  $callback
-     * @return $this
-     */
-    public function onFailure(Closure $callback)
-    {
-        return $this->then(function (Container $container) use ($callback) {
-            if (0 !== $this->exitCode) {
-                $container->call($callback);
-            }
-        });
     }
 
     /**

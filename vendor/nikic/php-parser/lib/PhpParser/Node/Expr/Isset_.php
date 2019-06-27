@@ -16,7 +16,7 @@ class Isset_ extends Expr
      * @param array  $attributes Additional attributes
      */
     public function __construct(array $vars, array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->vars = $vars;
     }
 

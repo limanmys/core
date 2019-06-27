@@ -25,7 +25,7 @@ class Property extends Node\Stmt
      * @param null|string|Identifier|Name|NullableType $type       Type declaration
      */
     public function __construct(int $flags, array $props, array $attributes = [], $type = null) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->flags = $flags;
         $this->props = $props;
         $this->type = \is_string($type) ? new Identifier($type) : $type;

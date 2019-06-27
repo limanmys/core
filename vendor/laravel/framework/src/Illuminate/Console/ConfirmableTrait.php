@@ -22,7 +22,7 @@ trait ConfirmableTrait
         $shouldConfirm = $callback instanceof Closure ? call_user_func($callback) : $callback;
 
         if ($shouldConfirm) {
-            if ($this->hasOption('force') && $this->option('force')) {
+            if ($this->option('force')) {
                 return true;
             }
 

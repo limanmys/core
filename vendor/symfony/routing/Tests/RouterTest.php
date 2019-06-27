@@ -88,31 +88,53 @@ class RouterTest extends TestCase
 
         $this->loader->expects($this->once())
             ->method('load')->with('routing.yml', 'ResourceType')
-            ->willReturn($routeCollection);
+            ->will($this->returnValue($routeCollection));
 
         $this->assertSame($routeCollection, $this->router->getRouteCollection());
     }
 
-    public function testMatcherIsCreatedIfCacheIsNotConfigured()
+    /**
+     * @dataProvider provideMatcherOptionsPreventingCaching
+     */
+    public function testMatcherIsCreatedIfCacheIsNotConfigured($option)
     {
-        $this->router->setOption('cache_dir', null);
+        $this->router->setOption($option, null);
 
         $this->loader->expects($this->once())
             ->method('load')->with('routing.yml', null)
-            ->willReturn(new RouteCollection());
+            ->will($this->returnValue(new RouteCollection()));
 
         $this->assertInstanceOf('Symfony\\Component\\Routing\\Matcher\\UrlMatcher', $this->router->getMatcher());
     }
 
-    public function testGeneratorIsCreatedIfCacheIsNotConfigured()
+    public function provideMatcherOptionsPreventingCaching()
     {
-        $this->router->setOption('cache_dir', null);
+        return [
+            ['cache_dir'],
+            ['matcher_cache_class'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideGeneratorOptionsPreventingCaching
+     */
+    public function testGeneratorIsCreatedIfCacheIsNotConfigured($option)
+    {
+        $this->router->setOption($option, null);
 
         $this->loader->expects($this->once())
             ->method('load')->with('routing.yml', null)
-            ->willReturn(new RouteCollection());
+            ->will($this->returnValue(new RouteCollection()));
 
         $this->assertInstanceOf('Symfony\\Component\\Routing\\Generator\\UrlGenerator', $this->router->getGenerator());
+    }
+
+    public function provideGeneratorOptionsPreventingCaching()
+    {
+        return [
+            ['cache_dir'],
+            ['generator_cache_class'],
+        ];
     }
 
     public function testMatchRequestWithUrlMatcherInterface()

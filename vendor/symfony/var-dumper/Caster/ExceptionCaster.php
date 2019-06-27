@@ -236,7 +236,7 @@ class ExceptionCaster
                             $ellipsis += 1 + \strlen($f['line']);
                         }
                     }
-                    $srcAttr .= sprintf('&separator= &file=%s&line=%d', rawurlencode($f['file']), $f['line']);
+                    $srcAttr .= '&separator= ';
                 } else {
                     $srcAttr .= '&separator=:';
                 }

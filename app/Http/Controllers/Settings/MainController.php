@@ -33,41 +33,23 @@ class MainController extends Controller
             abort(504,"Kullanıcı Bulunamadı.");
         }
 
-        $permissions = Permission::where('user_id',request('user_id'))->first();
+        $permissions = Permission::where('user_id',request('user_id'));
 
-        $servers = [];
+        $servers = Server::find($permissions->whereNotNull("server_id")->pluck("server_id")->toArray());
 
-        foreach ($permissions->server as $server_id){
-            $server = Server::find($server_id);
-            if($server){
-                array_push($servers,$server);
-            }
-        }
-        
-        $scripts = [];
+        $permissions = Permission::where('user_id',request('user_id'));
+        $scripts = Script::find($permissions->whereNotNull("script_id")->pluck("script_id")->toArray());
 
-        foreach ($permissions->script as $script_id){
-            $script = Script::find($script_id);
-            if($script){
-                array_push($scripts,$script);
-            }
-        }
+        $permissions = Permission::where('user_id',request('user_id'));
+        $extensions = Extension::find($permissions->whereNotNull("extension_id")->pluck("extension_id")->toArray());
 
-        $extensions = [];
-
-        foreach ($permissions->extension as $extension_id){
-            $extension = Extension::find($extension_id);
-            if($extension){
-                array_push($extensions,$extension);
-            }
-        }
-
+        $permissions = Permission::where('user_id',request('user_id'));
         $functions = [];
 
-        foreach ($permissions->function as $function){
+        foreach ($permissions->whereNotNull("function")->get() as $item){
             array_push($functions,[
-                "extension_name" => explode('_',$function)[0],
-                "name" => explode('_',$function)[1]
+                "extension_name" => explode('_',$item->function)[0],
+                "name" => explode('_',$item->function)[1]
             ]);
         }
 
@@ -82,25 +64,25 @@ class MainController extends Controller
 
     public function getList()
     {
-        $permissions = Permission::where('user_id',request('user_id'))->first();
+        $permissions = Permission::where("user_id",request("user_id"));
         $data = [];
         $title = [];
         $display = [];
         switch (request('type')){
             case "server":
-                $data = Server::whereNotIn('_id',$permissions->server)->get();
+                $data = Server::whereNotIn('id',$permissions->whereNotNull("server_id")->pluck("server_id")->toArray())->get();
                 $title = ["*hidden*", "İsim" , "Türü", "İp Adresi"];
-                $display = ["_id:_id", "name" , "type", "ip_address"];
+                $display = ["id:id", "name" , "type", "ip_address"];
                 break;
             case "extension":
-                $data = Extension::whereNotIn('_id',$permissions->extension)->get();
+                $data = Extension::whereNotIn('id',$permissions->whereNotNull("extension_id")->pluck("extension_id")->toArray())->get();
                 $title = ["*hidden*", "İsim"];
-                $display = ["_id:_id", "name"];
+                $display = ["id:id", "name"];
                 break;
             case "script":
-                $data = Script::whereNotIn('_id',$permissions->script)->get();
+                $data = Script::whereNotIn('id',$permissions->whereNotNull("script_id")->pluck("script_id")->toArray())->get();
                 $title = ["*hidden*", "İsim" , "Eklenti"];
-                $display = [ "_id:_id", "name" , "extensions"];
+                $display = [ "id:id", "name" , "extensions"];
                 break;
             default:
                 abort(504,"Tip Bulunamadı");
@@ -115,7 +97,7 @@ class MainController extends Controller
     public function addList()
     {
         foreach(json_decode(request('ids'),true) as $id){
-            Permission::grant(request('user_id'),request('type'),$id);
+            Permission::grant(request('user_id'),request('type') . "_id",$id);
         }
         return respond(__("Başarılı"),200);
     }
@@ -123,7 +105,7 @@ class MainController extends Controller
     public function removeFromList()
     {
         foreach(json_decode(request('ids'),true) as $id){
-            Permission::revoke(request('user_id'),request('type'),$id);
+            Permission::revoke(request('user_id'),request('type') . "_id",$id);
         }
         return respond(__("Başarılı"),200);
     }

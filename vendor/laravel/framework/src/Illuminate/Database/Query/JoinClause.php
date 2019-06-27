@@ -21,32 +21,11 @@ class JoinClause extends Builder
     public $table;
 
     /**
-     * The connection of the parent query builder.
+     * The parent query builder instance.
      *
-     * @var \Illuminate\Database\ConnectionInterface
+     * @var \Illuminate\Database\Query\Builder
      */
-    protected $parentConnection;
-
-    /**
-     * The grammar of the parent query builder.
-     *
-     * @var \Illuminate\Database\Query\Grammars\Grammar
-     */
-    protected $parentGrammar;
-
-    /**
-     * The processor of the parent query builder.
-     *
-     * @var \Illuminate\Database\Query\Processors\Processor
-     */
-    protected $parentProcessor;
-
-    /**
-     * The class name of the parent query builder.
-     *
-     * @var string
-     */
-    protected $parentClass;
+    private $parentQuery;
 
     /**
      * Create a new join clause instance.
@@ -60,13 +39,10 @@ class JoinClause extends Builder
     {
         $this->type = $type;
         $this->table = $table;
-        $this->parentClass = get_class($parentQuery);
-        $this->parentGrammar = $parentQuery->getGrammar();
-        $this->parentProcessor = $parentQuery->getProcessor();
-        $this->parentConnection = $parentQuery->getConnection();
+        $this->parentQuery = $parentQuery;
 
         parent::__construct(
-            $this->parentConnection, $this->parentGrammar, $this->parentProcessor
+            $parentQuery->getConnection(), $parentQuery->getGrammar(), $parentQuery->getProcessor()
         );
     }
 
@@ -119,7 +95,7 @@ class JoinClause extends Builder
      */
     public function newQuery()
     {
-        return new static($this->newParentQuery(), $this->type, $this->table);
+        return new static($this->parentQuery, $this->type, $this->table);
     }
 
     /**
@@ -129,18 +105,6 @@ class JoinClause extends Builder
      */
     protected function forSubQuery()
     {
-        return $this->newParentQuery()->newQuery();
-    }
-
-    /**
-     * Create a new parent query instance.
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    protected function newParentQuery()
-    {
-        $class = $this->parentClass;
-
-        return new $class($this->parentConnection, $this->parentGrammar, $this->parentProcessor);
+        return $this->parentQuery->newQuery();
     }
 }

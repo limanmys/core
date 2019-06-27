@@ -204,7 +204,7 @@ trait Localization
     {
         $message = static::getTranslationMessageWith($translator, $key, null, $key);
         if ($message instanceof Closure) {
-            return (string) $message(...array_values($parameters));
+            return $message(...array_values($parameters));
         }
 
         if ($number !== null) {
@@ -214,7 +214,7 @@ trait Localization
             $parameters[':count'] = $parameters['%count%'];
         }
 
-        return (string) $translator->transChoice($key, $number, $parameters);
+        return $translator->transChoice($key, $number, $parameters);
     }
 
     /**
@@ -329,7 +329,7 @@ trait Localization
 
             foreach ($fromTranslations as $index => $word) {
                 if (preg_match("/^$word\$/i", $chunk)) {
-                    return $toTranslations[$index] ?? '';
+                    return $toTranslations[$index];
                 }
             }
 

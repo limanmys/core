@@ -6,8 +6,8 @@ use Symfony\Component\HttpKernel\Exception\GoneHttpException;
 
 class GoneHttpExceptionTest extends HttpExceptionTest
 {
-    protected function createException(string $message = null, \Throwable $previous = null, ?int $code = 0, array $headers = [])
+    protected function createException()
     {
-        return new GoneHttpException($message, $previous, $code, $headers);
+        return new GoneHttpException();
     }
 }

@@ -15,8 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\SessionListener;
 use Symfony\Component\HttpKernel\EventListener\TestSessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -46,7 +46,7 @@ class TestSessionListenerTest extends TestCase
         $this->session = $this->getSession();
         $this->listener->expects($this->any())
              ->method('getSession')
-             ->willReturn($this->session);
+             ->will($this->returnValue($this->session));
     }
 
     public function testShouldSaveMasterRequestSession()
@@ -95,9 +95,9 @@ class TestSessionListenerTest extends TestCase
         $this->sessionIsEmpty();
         $this->fixSessionId('456');
 
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
 
         $response = $this->filterResponse(new Request(), HttpKernelInterface::MASTER_REQUEST);
@@ -114,9 +114,9 @@ class TestSessionListenerTest extends TestCase
         $this->sessionIsEmpty();
         $this->fixSessionId('456');
 
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
 
         $response = new Response('', 200, ['Set-Cookie' => $existing]);
@@ -145,8 +145,8 @@ class TestSessionListenerTest extends TestCase
 
     public function testDoesNotThrowIfRequestDoesNotHaveASession()
     {
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
-        $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, new Response());
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, new Response());
 
         $this->listener->onKernelResponse($event);
 
@@ -157,8 +157,8 @@ class TestSessionListenerTest extends TestCase
     {
         $request->setSession($this->session);
         $response = $response ?: new Response();
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
-        $event = new ResponseEvent($kernel, $request, $type, $response);
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $event = new FilterResponseEvent($kernel, $request, $type, $response);
 
         $this->listener->onKernelResponse($event);
 
@@ -183,28 +183,28 @@ class TestSessionListenerTest extends TestCase
     {
         $this->session->expects($this->once())
             ->method('isStarted')
-            ->willReturn(true);
+            ->will($this->returnValue(true));
     }
 
     private function sessionHasNotBeenStarted()
     {
         $this->session->expects($this->once())
             ->method('isStarted')
-            ->willReturn(false);
+            ->will($this->returnValue(false));
     }
 
     private function sessionIsEmpty()
     {
         $this->session->expects($this->once())
             ->method('isEmpty')
-            ->willReturn(true);
+            ->will($this->returnValue(true));
     }
 
     private function fixSessionId($sessionId)
     {
         $this->session->expects($this->any())
             ->method('getId')
-            ->willReturn($sessionId);
+            ->will($this->returnValue($sessionId));
     }
 
     private function getSession()
@@ -214,7 +214,7 @@ class TestSessionListenerTest extends TestCase
             ->getMock();
 
         // set return value for getName()
-        $mock->expects($this->any())->method('getName')->willReturn('MOCKSESSID');
+        $mock->expects($this->any())->method('getName')->will($this->returnValue('MOCKSESSID'));
 
         return $mock;
     }

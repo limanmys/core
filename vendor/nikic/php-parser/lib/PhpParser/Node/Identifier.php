@@ -25,7 +25,7 @@ class Identifier extends NodeAbstract
      * @param array  $attributes Additional attributes
      */
     public function __construct(string $name, array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->name = $name;
     }
 

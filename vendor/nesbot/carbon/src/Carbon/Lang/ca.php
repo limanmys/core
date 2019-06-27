@@ -19,30 +19,29 @@
  * - Quentí
  * - Víctor Díaz
  * - Xavi
- * - qcardona
  */
 return [
     'year' => ':count any|:count anys',
     'a_year' => 'un any|:count anys',
-    'y' => ':count any|:count anys',
+    'y' => ':count a.',
     'month' => ':count mes|:count mesos',
     'a_month' => 'un mes|:count mesos',
-    'm' => ':count mes|:count mesos',
+    'm' => ':count me.',
     'week' => ':count setmana|:count setmanes',
     'a_week' => 'una setmana|:count setmanes',
-    'w' => ':count setmana|:count setmanes',
+    'w' => ':count st.',
     'day' => ':count dia|:count dies',
     'a_day' => 'un dia|:count dies',
-    'd' => ':count d',
+    'd' => ':count d.',
     'hour' => ':count hora|:count hores',
     'a_hour' => 'una hora|:count hores',
-    'h' => ':count h',
+    'h' => ':count h.',
     'minute' => ':count minut|:count minuts',
     'a_minute' => 'un minut|:count minuts',
-    'min' => ':count min',
+    'min' => ':count mi.',
     'second' => ':count segon|:count segons',
     'a_second' => 'uns segons|:count segons',
-    's' => ':count s',
+    's' => ':count sg.',
     'ago' => 'fa :time',
     'from_now' => 'd\'aquí :time',
     'after' => ':time després',

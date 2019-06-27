@@ -99,8 +99,7 @@ class Kernel implements KernelContract
     protected function defineConsoleSchedule()
     {
         $this->app->singleton(Schedule::class, function ($app) {
-            return (new Schedule($this->scheduleTimezone()))
-                    ->useCache($this->scheduleCache());
+            return new Schedule($this->scheduleTimezone());
         });
 
         $schedule = $this->app->make(Schedule::class);
@@ -109,20 +108,10 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Get the name of the cache store that should manage scheduling mutexes.
-     *
-     * @return string
-     */
-    protected function scheduleCache()
-    {
-        return $_ENV['SCHEDULE_CACHE_DRIVER'] ?? null;
-    }
-
-    /**
      * Run the console application.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface|null  $output
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return int
      */
     public function handle($input, $output = null)
@@ -263,7 +252,7 @@ class Kernel implements KernelContract
      *
      * @param  string  $command
      * @param  array  $parameters
-     * @param  \Symfony\Component\Console\Output\OutputInterface|null  $outputBuffer
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $outputBuffer
      * @return int
      *
      * @throws \Symfony\Component\Console\Exception\CommandNotFoundException

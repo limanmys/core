@@ -143,7 +143,7 @@ class PdoSessionHandlerTest extends TestCase
         $stream = $this->createStream($content);
 
         $pdo->prepareResult->expects($this->once())->method('fetchAll')
-            ->willReturn([[$stream, 42, time()]]);
+            ->will($this->returnValue([[$stream, 42, time()]]));
 
         $storage = new PdoSessionHandler($pdo);
         $result = $storage->read('foo');
@@ -170,14 +170,14 @@ class PdoSessionHandlerTest extends TestCase
         $exception = null;
 
         $selectStmt->expects($this->atLeast(2))->method('fetchAll')
-            ->willReturnCallback(function () use (&$exception, $stream) {
+            ->will($this->returnCallback(function () use (&$exception, $stream) {
                 return $exception ? [[$stream, 42, time()]] : [];
-            });
+            }));
 
         $insertStmt->expects($this->once())->method('execute')
-            ->willReturnCallback(function () use (&$exception) {
+            ->will($this->returnCallback(function () use (&$exception) {
                 throw $exception = new \PDOException('', '23');
-            });
+            }));
 
         $storage = new PdoSessionHandler($pdo);
         $result = $storage->read('foo');

@@ -14,7 +14,7 @@
             "Tipi" , "Kullanıcı Adı" , "Not" , "Önem Derecesi", "Durumu", "*hidden*", "*hidden*"
         ],
         "display" => [
-            "type" , "user_name", "note" , "speed", "status", "_id:request_id" , "user_id:user_id"
+            "type" , "user_name", "note" , "speed", "status", "id:request_id" , "user_id:user_id"
         ],
         "menu" => [
             "İşleniyor" => [

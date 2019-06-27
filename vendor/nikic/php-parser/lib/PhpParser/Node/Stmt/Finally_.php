@@ -16,7 +16,7 @@ class Finally_ extends Node\Stmt
      * @param array       $attributes Additional attributes
      */
     public function __construct(array $stmts = [], array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->stmts = $stmts;
     }
 

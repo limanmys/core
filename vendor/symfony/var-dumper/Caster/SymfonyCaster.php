@@ -40,12 +40,4 @@ class SymfonyCaster
 
         return $a;
     }
-
-    public static function castHttpClient($client, array $a, Stub $stub, $isNested)
-    {
-        $multiKey = sprintf("\0%s\0multi", \get_class($client));
-        $a[$multiKey] = new CutStub($a[$multiKey]);
-
-        return $a;
-    }
 }

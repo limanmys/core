@@ -2,16 +2,15 @@
 
 namespace App;
 
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 /**
  * @method static where(string $string, $param)
  */
-class Token extends Eloquent
+class Token extends Model
 {
-    protected $collection = 'token';
-    protected $connection = 'mongodb';
+
     protected $fillable = ['token', 'user_id'];
 
     public static function create($user_id = null)

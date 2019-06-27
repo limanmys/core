@@ -162,7 +162,7 @@ class InvocationMocker implements MethodNameMatch
     /**
      * @return InvocationMocker
      */
-    public function willThrowException(\Throwable $exception)
+    public function willThrowException(\Exception $exception)
     {
         $stub = new Stub\Exception($exception);
 

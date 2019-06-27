@@ -30,7 +30,7 @@
             "Eklenti Adı" , "Versiyon", "*hidden*"
         ],
         "display" => [
-            "name" , "version", "_id:extension_id"
+            "name" , "version", "id:extension_id"
         ],
         "menu" => [
             "Sil" => [
@@ -54,7 +54,7 @@
     <?php 
         $input_extensions = [];
         foreach(extensions() as $extension){
-            $input_extensions[$extension->name] = $extension->_id;
+            $input_extensions[$extension->name] = $extension->id;
         }
     ?>
     @include('l.modal',[

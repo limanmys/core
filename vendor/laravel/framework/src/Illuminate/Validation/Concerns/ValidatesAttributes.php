@@ -891,9 +891,7 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) > $parameters[0];
         }
 
-        if (! $this->isSameType($value, $comparedToValue)) {
-            return false;
-        }
+        $this->requireSameType($value, $comparedToValue);
 
         return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue);
     }
@@ -918,9 +916,7 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) < $parameters[0];
         }
 
-        if (! $this->isSameType($value, $comparedToValue)) {
-            return false;
-        }
+        $this->requireSameType($value, $comparedToValue);
 
         return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue);
     }
@@ -945,9 +941,7 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) >= $parameters[0];
         }
 
-        if (! $this->isSameType($value, $comparedToValue)) {
-            return false;
-        }
+        $this->requireSameType($value, $comparedToValue);
 
         return $this->getSize($attribute, $value) >= $this->getSize($attribute, $comparedToValue);
     }
@@ -972,9 +966,7 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) <= $parameters[0];
         }
 
-        if (! $this->isSameType($value, $comparedToValue)) {
-            return false;
-        }
+        $this->requireSameType($value, $comparedToValue);
 
         return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue);
     }
@@ -1541,19 +1533,6 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate the attribute ends with a given substring.
-     *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
-     * @return bool
-     */
-    public function validateEndsWith($attribute, $value, $parameters)
-    {
-        return Str::endsWith($value, $parameters);
-    }
-
-    /**
      * Validate that an attribute is a string.
      *
      * @param  string  $attribute
@@ -1742,15 +1721,19 @@ trait ValidatesAttributes
     }
 
     /**
-     * Check if the parameters are of the same type.
+     * Require comparison values to be of the same type.
      *
      * @param  mixed  $first
      * @param  mixed  $second
-     * @return bool
+     * @return void
+     *
+     * @throws \InvalidArgumentException
      */
-    protected function isSameType($first, $second)
+    protected function requireSameType($first, $second)
     {
-        return gettype($first) == gettype($second);
+        if (gettype($first) != gettype($second)) {
+            throw new InvalidArgumentException('The values under comparison must be of the same type');
+        }
     }
 
     /**

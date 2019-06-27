@@ -44,15 +44,17 @@ final class Timer
         return \microtime(true) - \array_pop(self::$startTimes);
     }
 
-    public static function bytesToString(float $bytes): string
+    public static function bytesToString(int $bytes): string
     {
         foreach (self::$sizes as $unit => $value) {
             if ($bytes >= $value) {
-                return \sprintf('%.2f %s', $bytes >= 1024 ? $bytes / $value : $bytes, $unit);
+                $size = \sprintf('%.2f', $bytes >= 1024 ? $bytes / $value : $bytes);
+
+                return $size . ' ' . $unit;
             }
         }
 
-        return $bytes . ' byte' . ((int) $bytes !== 1 ? 's' : '');
+        return $bytes . ' byte' . ($bytes !== 1 ? 's' : '');
     }
 
     public static function secondsToTimeString(float $time): string

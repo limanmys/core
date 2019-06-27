@@ -18,7 +18,7 @@ class Error extends Expr
      * @param array $attributes Additional attributes
      */
     public function __construct(array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
     }
 
     public function getSubNodeNames() : array {

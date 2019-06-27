@@ -50,7 +50,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $primaryKey = 'id';
 
     /**
-     * The "type" of the primary key ID.
+     * The "type" of the auto-incrementing ID.
      *
      * @var string
      */
@@ -293,10 +293,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static function isIgnoringTouch($class = null)
     {
         $class = $class ?: static::class;
-
-        if (! get_class_vars($class)['timestamps'] || ! $class::UPDATED_AT) {
-            return true;
-        }
 
         foreach (static::$ignoreOnTouch as $ignoredClass) {
             if ($class === $ignoredClass || is_subclass_of($class, $ignoredClass)) {
@@ -1291,7 +1287,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getTable()
     {
-        return $this->table ?? Str::snake(Str::pluralStudly(class_basename($this)));
+        return isset($this->table)
+            ? $this->table
+            : Str::snake(Str::pluralStudly(class_basename($this)));
     }
 
     /**

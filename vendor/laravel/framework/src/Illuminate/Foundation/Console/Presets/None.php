@@ -15,7 +15,6 @@ class None extends Preset
     {
         static::updatePackages();
         static::updateBootstrapping();
-        static::updateWebpackConfiguration();
 
         tap(new Filesystem, function ($filesystem) {
             $filesystem->deleteDirectory(resource_path('js/components'));
@@ -39,7 +38,6 @@ class None extends Preset
             $packages['jquery'],
             $packages['popper.js'],
             $packages['vue'],
-            $packages['vue-template-compiler'],
             $packages['@babel/preset-react'],
             $packages['react'],
             $packages['react-dom']
@@ -58,15 +56,5 @@ class None extends Preset
         file_put_contents(resource_path('sass/app.scss'), ''.PHP_EOL);
         copy(__DIR__.'/none-stubs/app.js', resource_path('js/app.js'));
         copy(__DIR__.'/none-stubs/bootstrap.js', resource_path('js/bootstrap.js'));
-    }
-
-    /**
-     * Update the Webpack configuration.
-     *
-     * @return void
-     */
-    protected static function updateWebpackConfiguration()
-    {
-        copy(__DIR__.'/none-stubs/webpack.mix.js', base_path('webpack.mix.js'));
     }
 }

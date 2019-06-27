@@ -23,7 +23,7 @@ class MainController extends Controller
     {
         $widgets = Widget::where('user_id',auth()->id())->get();
         foreach ($widgets as $widget){
-            $widget->server_name = Server::where('_id',$widget->server_id)->first()->name;
+            $widget->server_name = Server::where('id',$widget->server_id)->first()->name;
         }
         return view('widgets.settings',[
             "widgets" => $widgets

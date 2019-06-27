@@ -28,7 +28,7 @@ class EmailValidator
     }
 
     /**
-     * @param string          $email
+     * @param                 $email
      * @param EmailValidation $emailValidation
      * @return bool
      */

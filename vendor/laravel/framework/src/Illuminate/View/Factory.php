@@ -66,7 +66,6 @@ class Factory implements FactoryContract
         'blade.php' => 'blade',
         'php' => 'php',
         'css' => 'file',
-        'html' => 'file',
     ];
 
     /**
@@ -308,7 +307,7 @@ class Factory implements FactoryContract
      * Add a piece of shared data to the environment.
      *
      * @param  array|string  $key
-     * @param  mixed|null  $value
+     * @param  mixed  $value
      * @return mixed
      */
     public function share($key, $value = null)
@@ -410,7 +409,7 @@ class Factory implements FactoryContract
      *
      * @param  string    $extension
      * @param  string    $engine
-     * @param  \Closure|null  $resolver
+     * @param  \Closure  $resolver
      * @return void
      */
     public function addExtension($extension, $engine, $resolver = null)

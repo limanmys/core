@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-4.3.0
------
-
- * added Finder::ignoreVCSIgnored() to ignore files based on rules listed in .gitignore
-
 4.2.0
 -----
 

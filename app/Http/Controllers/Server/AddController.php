@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Server;
 
 use App\Http\Controllers\Controller;
 use App\Key;
+use App\Permission;
 use App\Script;
 use App\Server;
-use Auth;
+use Illuminate\Support\Facades\DB;
 
 class AddController extends Controller
 {
@@ -22,20 +23,21 @@ class AddController extends Controller
             'user_id' => auth()->id(),
             "name" => request('name')
         ])->exists()){
-            return respond("Bu sunucu ismiyle bir sunucunuz zaten var.",201);
+            return respond("Bu sunucu ismiyle bir sunucu zaten var.",201);
         }
 
         // Create object with parameters.
-        $this->server = new Server(request()->all());
+        $this->server = new Server();
+        $this->server->fill(request()->all());
+//        $this->server = new Server(request()->all());
 
-        $this->server->user_id = Auth::id();
-        $this->server->extensions = [];
+        $this->server->user_id = auth()->id();
 
         // Check if Server is online or not.
         if(!$this->server->isAlive()){
             return respond("Sunucuyla bağlantı kurulamadı.",406);
         }
-        $this->server->port = request('port');
+
         $this->server->save();
 
         // Add Server to request object to use it later.
@@ -72,7 +74,7 @@ class AddController extends Controller
         $key = new Key(request()->all());
 
         $key->server_id = $this->server->id;
-        $key->user_id = Auth::id();
+        $key->user_id = auth()->user()->id;
         $key->save();
 
         // Create Key
@@ -88,23 +90,15 @@ class AddController extends Controller
             if($script){
                 try{
                     $output = $this->server->runScript($script,"");
+                    if($output == "YES\n"){
+                        DB::table('server_extensions')->insert([
+                            "server_id" => $this->server()->id,
+                            "extension_id" => $extension->id
+                        ]);
+                    }
                 }catch (\Exception $exception){};
-                if($output == "yes\n"){
-                    $extensions_array = $this->server->extensions;
-                    $extensions_array[$extension->_id] = [];
-                    $this->server->extensions = $extensions_array;
-                    $this->server->save();
-                }
             }
         }
-//        foreach(extensions() as $extension){
-//            if($this->server->run("(systemctl list-units | grep $extension->service  && echo \"OK\" || echo \"NOK\") | tail -1") != "OK\n"){
-//                $extensions_array = $this->server->extensions;
-//                $extensions_array[$extension->_id] = [];
-//                $this->server->extensions = $extensions_array;
-//                $this->server->save();
-//            }
-//        };
 
         return $this->grantPermissions();
     }
@@ -121,7 +115,7 @@ class AddController extends Controller
         $key = new Key(request()->all());
 
         $key->server_id = $this->server->id;
-        $key->user_id = Auth::id();
+        $key->user_id = auth()->user()->id;
         $key->save();
         $flag = \App\Classes\Connector\WinRMConnector::create($this->server,request('username'), request('password'),auth()->id(),$key);
 
@@ -136,16 +130,11 @@ class AddController extends Controller
 
     private function grantPermissions()
     {
-        // Give User a permission to use this server.
-        $permissions = request('permissions');
-        $user_servers = (Array) $permissions->server;
-        array_push($user_servers, $this->server->_id);
-        $permissions->server = $user_servers;
+        $permission = new Permission();
+        $permission->server_id = $this->server->id;
+        $permission->user_id = auth()->id();
+        $permission->save();
 
-        // Lastly, save all information.
-        $permissions->save();
-        $this->server->save();
-
-        return respond(route('server_one',$this->server->_id),300);
+        return respond(route('server_one',$this->server->id),300);
     }
 }

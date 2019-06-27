@@ -91,7 +91,7 @@ interface Filesystem
      *
      * @param  string  $path
      * @param  string  $data
-     * @return bool
+     * @return int
      */
     public function prepend($path, $data);
 
@@ -100,7 +100,7 @@ interface Filesystem
      *
      * @param  string  $path
      * @param  string  $data
-     * @return bool
+     * @return int
      */
     public function append($path, $data);
 

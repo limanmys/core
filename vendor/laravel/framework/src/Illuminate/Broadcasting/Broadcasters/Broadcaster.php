@@ -294,6 +294,8 @@ abstract class Broadcaster implements BroadcasterContract
                 return $user;
             }
         }
+
+        return null;
     }
 
     /**

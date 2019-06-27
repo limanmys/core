@@ -6,8 +6,8 @@ use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
 class PreconditionRequiredHttpExceptionTest extends HttpExceptionTest
 {
-    protected function createException(string $message = null, \Throwable $previous = null, ?int $code = 0, array $headers = [])
+    protected function createException()
     {
-        return new PreconditionRequiredHttpException($message, $previous, $code, $headers);
+        return new PreconditionRequiredHttpException();
     }
 }

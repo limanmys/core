@@ -154,7 +154,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $mock = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $mock->expects($this->any())
             ->method('isInteractive')
-            ->willReturn($interactive);
+            ->will($this->returnValue($interactive));
 
         return $mock;
     }

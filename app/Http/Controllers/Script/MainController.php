@@ -34,9 +34,9 @@ class MainController extends Controller
             return respond("Dosya okunamadi",201);
         }
 
-        file_put_contents(env('SCRIPTS_PATH') . $script->_id ,file_get_contents(request()->file('script')));
+        file_put_contents(env('SCRIPTS_PATH') . $script->id ,file_get_contents(request()->file('script')));
 
-//        Storage::putFileAs('scripts',request()->file('script'),$script->_id);
+//        Storage::putFileAs('scripts',request()->file('script'),$script->id);
         return respond('Betik eklendi.',200);
     }
 
@@ -44,7 +44,7 @@ class MainController extends Controller
     {
 //        $script = Script::where('_id',request('script_id'))->first();
 //        try{
-//            $contents = Storage::get('scripts/' . $script->_id);
+//            $contents = Storage::get('scripts/' . $script->id);
 //        }catch (\Exception $exception){
 //            return respond('Dosya Bulanamadı',404);
 //        }
@@ -64,22 +64,22 @@ class MainController extends Controller
 //        $script = Script::createFile($script,["!/usr/bin/python3","-*- coding: utf-8 -*-",request('root'),\request('name'),
 //            \request('description'),\request('version'),\request('extensions'),\request('inputs'),\request('type'),auth()->user()->name,\request('support_email'),\request('company'),\request('unique_code'),\request('regex'),\request('code')]);
 //        $script->save();
-//        return route('script_one',$script->_id);
+//        return route('script_one',$script->id);
     }
 
     public function download()
     {
-        $script = Script::where('_id', request('script_id'))->first();
+        $script = Script::where('id', request('script_id'))->first();
 
         // Send file to the user then delete it.
-        return response()->download(env('SCRIPTS_PATH') . $script->_id, $script->unique_code . '.lmns');
+        return response()->download(env('SCRIPTS_PATH') . $script->id, $script->unique_code . '.lmns');
     }
 
     public function delete()
     {
         // Get Script
-        if(is_file(env('SCRIPTS_PATH') . script()->_id)){
-            unlink(env('SCRIPTS_PATH') . script()->_id);
+        if(is_file(env('SCRIPTS_PATH') . script()->id)){
+            unlink(env('SCRIPTS_PATH') . script()->id);
         }
         script()->delete();
         return respond("Betik başarıyla silindi",200);

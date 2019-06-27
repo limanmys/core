@@ -15,9 +15,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * @deprecated since Symfony 4.3, use ViewEvent instead
+ * Allows to create a response for the return value of a controller.
+ *
+ * Call setResponse() to set the response that will be returned for the
+ * current request. The propagation of this event is stopped as soon as a
+ * response is set.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class GetResponseForControllerResultEvent extends RequestEvent
+class GetResponseForControllerResultEvent extends GetResponseEvent
 {
     /**
      * The return value of the controller.

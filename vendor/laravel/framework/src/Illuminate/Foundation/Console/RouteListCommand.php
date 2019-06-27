@@ -27,11 +27,11 @@ class RouteListCommand extends Command
     protected $description = 'List all registered routes';
 
     /**
-     * The router instance.
+     * An array of all the registered routes.
      *
-     * @var \Illuminate\Routing\Router
+     * @var \Illuminate\Routing\RouteCollection
      */
-    protected $router;
+    protected $routes;
 
     /**
      * The table headers for the command.
@@ -57,7 +57,7 @@ class RouteListCommand extends Command
     {
         parent::__construct();
 
-        $this->router = $router;
+        $this->routes = $router->getRoutes();
     }
 
     /**
@@ -67,7 +67,7 @@ class RouteListCommand extends Command
      */
     public function handle()
     {
-        if (empty($this->router->getRoutes())) {
+        if (empty($this->routes)) {
             return $this->error("Your application doesn't have any routes.");
         }
 
@@ -85,7 +85,7 @@ class RouteListCommand extends Command
      */
     protected function getRoutes()
     {
-        $routes = collect($this->router->getRoutes())->map(function ($route) {
+        $routes = collect($this->routes)->map(function ($route) {
             return $this->getRouteInformation($route);
         })->filter()->all();
 
@@ -210,31 +210,10 @@ class RouteListCommand extends Command
         }
 
         if ($columns = $this->option('columns')) {
-            return array_intersect($availableColumns, $this->parseColumns($columns));
+            return array_intersect($availableColumns, $columns);
         }
 
         return $availableColumns;
-    }
-
-    /**
-     * Parse the column list.
-     *
-     * @param  array  $columns
-     * @return array
-     */
-    protected function parseColumns(array $columns)
-    {
-        $results = [];
-
-        foreach ($columns as $i => $column) {
-            if (Str::contains($column, ',')) {
-                $results = array_merge($results, explode(',', $column));
-            } else {
-                $results[] = $column;
-            }
-        }
-
-        return $results;
     }
 
     /**
@@ -246,11 +225,17 @@ class RouteListCommand extends Command
     {
         return [
             ['columns', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Columns to include in the route table'],
+
             ['compact', 'c', InputOption::VALUE_NONE, 'Only show method, URI and action columns'],
+
             ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method'],
+
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
+
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],
+
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
+
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
         ];
     }

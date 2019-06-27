@@ -19,8 +19,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Validates Requests.
  *
  * @author Magnus Nordlander <magnus@fervo.se>
- *
- * @final since Symfony 4.3
  */
 class ValidateRequestListener implements EventSubscriberInterface
 {

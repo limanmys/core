@@ -33,7 +33,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return "select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
+        return 'select * from information_schema.tables where table_schema = ? and table_name = ?';
     }
 
     /**
@@ -588,17 +588,6 @@ class MySqlGrammar extends Grammar
     protected function typeEnum(Fluent $column)
     {
         return sprintf('enum(%s)', $this->quoteString($column->allowed));
-    }
-
-    /**
-     * Create the column definition for a set enumeration type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeSet(Fluent $column)
-    {
-        return sprintf('set(%s)', $this->quoteString($column->allowed));
     }
 
     /**

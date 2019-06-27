@@ -56,7 +56,6 @@ class SettingsController extends Controller
 
         // Return view with required parameters.
         return view('extension_pages.one', [
-            "extension" => extension(),
             "files" => $files,
             "scripts" => $scripts,
             "functions" => $functions
@@ -117,7 +116,7 @@ class SettingsController extends Controller
             $arr = [];
         }
         system_log(7,"EXTENSION_VIEW_SCRIPTS",[
-            "extension_id" => extension()->_id,
+            "extension_id" => extension()->id,
         ]);
 
         return $arr;
@@ -139,7 +138,7 @@ class SettingsController extends Controller
         $extension->save();
 
         system_log(7,"EXTENSION_VIEW_SCRIPTS_UPDATE",[
-            "extension_id" => extension()->_id,
+            "extension_id" => extension()->id,
         ]);
 
         return response(__("Başarıyla Eklendi."), 200);
@@ -158,17 +157,20 @@ class SettingsController extends Controller
             return response(__("Sayfa Bulunamadı."), 404);
         }
         system_log(7,"EXTENSION_VIEW_SCRIPTS_REMOVE",[
-            "extension_id" => extension()->_id,
+            "extension_id" => extension()->id,
         ]);
         return response(__("Başarıyla kaldırıldı."), 200);
     }
 
     public function update()
     {
+        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+
         if (request('type') == "general") {
             $params = request()->all();
+//            extension()->update($params);
         } else {
-            $values = extension()->__get(request('table'));
+            $values = $extension[request('table')];
             foreach ($values as $key => $value) {
                 if ($value["name"] == request('name_old')) {
                     switch (request('table')) {
@@ -193,9 +195,10 @@ class SettingsController extends Controller
                     break;
                 }
             }
-            $params = [request('table') => $values];
+            $extension[request("table")] = $values;
         }
-        extension()->update($params);
+
+        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension));
 
         system_log(7,"EXTENSION_SETTINGS_UPDATE",[
             "extension_id" => extension()->_id,
@@ -207,7 +210,9 @@ class SettingsController extends Controller
 
     public function add()
     {
-        $values = extension()->__get(request('table'));
+        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+
+        $values = $extension[request('table')];
         switch (request('table')) {
             case "database":
                 array_push($values, [
@@ -236,11 +241,12 @@ class SettingsController extends Controller
 
                 break;
         }
-        $params = [request('table') => $values];
-        extension()->update($params);
+        $extension[request('table')] = $values;
+
+        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension));
 
         system_log(7,"EXTENSION_SETTINGS_ADD",[
-            "extension_id" => extension()->_id,
+            "extension_id" => extension()->id,
             "settings_type" => request('table')
         ]);
 
@@ -249,7 +255,9 @@ class SettingsController extends Controller
 
     public function remove()
     {
-        $values = extension()->__get(request('table'));
+        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+
+        $values = $extension[request('table')];
         foreach ($values as $key => $value) {
             if ($value["name"] == request('name')) {
                 unset($values[$key]);
@@ -262,11 +270,12 @@ class SettingsController extends Controller
                 unlink($file);
             }
         }
-        $params = [request('table') => $values];
-        extension()->update($params);
+        $extension[request('table')] = $values;
+
+        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension));
 
         system_log(7,"EXTENSION_SETTINGS_REMOVE",[
-            "extension_id" => extension()->_id,
+            "extension_id" => extension()->id,
             "settings_type" => request('table')
         ]);
 

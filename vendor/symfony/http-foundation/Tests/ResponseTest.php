@@ -1004,15 +1004,14 @@ class ResponseTest extends ResponseTestCase
 
         $ianaHttpStatusCodes = new \DOMDocument();
 
-        $context = stream_context_create([
+        libxml_set_streams_context(stream_context_create([
             'http' => [
                 'method' => 'GET',
                 'timeout' => 30,
-                'user_agent' => __METHOD__,
             ],
-        ]);
+        ]));
 
-        $ianaHttpStatusCodes->loadXML(file_get_contents('https://www.iana.org/assignments/http-status-codes/http-status-codes.xml', false, $context));
+        $ianaHttpStatusCodes->load('https://www.iana.org/assignments/http-status-codes/http-status-codes.xml');
         if (!$ianaHttpStatusCodes->relaxNGValidate(__DIR__.'/schema/http-status-codes.rng')) {
             self::fail('Invalid IANA\'s HTTP status code list.');
         }

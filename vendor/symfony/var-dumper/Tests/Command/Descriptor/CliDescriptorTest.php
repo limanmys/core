@@ -12,7 +12,6 @@
 namespace Symfony\Component\VarDumper\Tests\Command\Descriptor;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Command\Descriptor\CliDescriptor;
@@ -21,30 +20,24 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 class CliDescriptorTest extends TestCase
 {
     private static $timezone;
-    private static $prevTerminalEmulator;
 
     public static function setUpBeforeClass()
     {
         self::$timezone = date_default_timezone_get();
         date_default_timezone_set('UTC');
-
-        self::$prevTerminalEmulator = getenv('TERMINAL_EMULATOR');
-        putenv('TERMINAL_EMULATOR');
     }
 
     public static function tearDownAfterClass()
     {
         date_default_timezone_set(self::$timezone);
-        putenv('TERMINAL_EMULATOR'.(self::$prevTerminalEmulator ? '='.self::$prevTerminalEmulator : ''));
     }
 
     /**
      * @dataProvider provideContext
      */
-    public function testDescribe(array $context, string $expectedOutput, bool $decorated = false)
+    public function testDescribe(array $context, string $expectedOutput)
     {
         $output = new BufferedOutput();
-        $output->setDecorated($decorated);
         $descriptor = new CliDescriptor(new CliDumper(function ($s) {
             return $s;
         }));
@@ -86,20 +79,7 @@ TXT
                     'file_link' => 'phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30',
                 ],
             ],
-            method_exists(OutputFormatterStyle::class, 'setHref') ?
-                <<<TXT
-Received from client #1
------------------------
-
- -------- -------------------------------------------------------------------------------- 
-  date     Fri, 14 Dec 2018 16:17:48 +0000                                                 
-  source   CliDescriptorTest.php on line 30                                                
-  file     src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php  
- -------- -------------------------------------------------------------------------------- 
-
-TXT
-                :
-                <<<TXT
+            <<<TXT
 Received from client #1
 -----------------------
 
@@ -113,25 +93,6 @@ Open source in your IDE/browser:
 phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30
 TXT
         ];
-
-        if (method_exists(OutputFormatterStyle::class, 'setHref')) {
-            yield 'source with hyperlink' => [
-                [
-                    'source' => [
-                        'name' => 'CliDescriptorTest.php',
-                        'line' => 30,
-                        'file_relative' => 'src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
-                        'file_link' => 'phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30',
-                    ],
-                ],
-                <<<TXT
-%A
-  source   \033]8;;phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30\033\CliDescriptorTest.php on line 30\033]8;;\033%A
-%A
-TXT
-                , true,
-            ];
-        }
 
         yield 'cli' => [
             [

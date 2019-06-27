@@ -18,30 +18,29 @@
  * - JD Isaacks
  * - Murat Yüksel
  * - Baran Şengül
- * - Selami (selamialtin)
  */
 return [
     'year' => ':count yıl',
     'a_year' => '{1}bir yıl|]1,Inf[:count yıl',
-    'y' => ':countyıl',
+    'y' => ':count yıl',
     'month' => ':count ay',
     'a_month' => '{1}bir ay|]1,Inf[:count ay',
-    'm' => ':countay',
+    'm' => ':count ay',
     'week' => ':count hafta',
     'a_week' => '{1}bir hafta|]1,Inf[:count hafta',
-    'w' => ':counth',
+    'w' => ':count hafta',
     'day' => ':count gün',
     'a_day' => '{1}bir gün|]1,Inf[:count gün',
-    'd' => ':countg',
+    'd' => ':count gün',
     'hour' => ':count saat',
     'a_hour' => '{1}bir saat|]1,Inf[:count saat',
-    'h' => ':countsa',
+    'h' => ':count saat',
     'minute' => ':count dakika',
     'a_minute' => '{1}bir dakika|]1,Inf[:count dakika',
-    'min' => ':countdk',
+    'min' => ':count dakika',
     'second' => ':count saniye',
     'a_second' => '{1}birkaç saniye|]1,Inf[:count saniye',
-    's' => ':countsn',
+    's' => ':count saniye',
     'ago' => ':time önce',
     'from_now' => ':time sonra',
     'after' => ':time sonra',

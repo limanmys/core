@@ -1,6 +1,6 @@
 <?php
 
-use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherTrait;
+use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherTrait;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -9,7 +9,7 @@ use Symfony\Component\Routing\RequestContext;
  */
 class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 {
-    use CompiledUrlMatcherTrait;
+    use PhpMatcherTrait;
 
     public function __construct(RequestContext $context)
     {
@@ -24,10 +24,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 .')/?$}sD',
         ];
         $this->dynamicRoutes = [
-            27 => [
-                [['_route' => 'dynamic'], ['var'], null, null, false, true, null],
-                [null, null, null, null, false, false, 0],
-            ],
+            27 => [[['_route' => 'dynamic'], ['var'], null, null, false, true, null]],
         ];
         $this->checkCondition = static function ($condition, $context, $request) {
             switch ($condition) {

@@ -16,7 +16,7 @@ class PermissionManager
     public function handle($request, Closure $next)
     {
         // Get User Permissions
-        $request->request->add(['permissions' => Permission::where('user_id', auth()->id())->first()]);
+        $request->request->add(['permissions' => auth()->user()->permissions]);
 
         // If user is admin, allow request.
         if(auth()->user()->isAdmin()){
@@ -47,13 +47,7 @@ class PermissionManager
             return true;
         }
 
-        // Check if specific id exists in permissions.
-        if(!request('permissions')->__isset($target) || !in_array($value, request('permissions')->__get($target))){
-            return false;
-        }
-
-        // If everything is passed, allow.
-        return true;
+        return Permission::can(auth()->user()->id,$target,$value);
     }
 
     private function initializeObjects(){

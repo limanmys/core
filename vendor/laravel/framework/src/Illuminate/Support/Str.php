@@ -113,24 +113,6 @@ class Str
     }
 
     /**
-     * Determine if a given string contains all array values.
-     *
-     * @param  string  $haystack
-     * @param  array  $needles
-     * @return bool
-     */
-    public static function containsAll($haystack, array $needles)
-    {
-        foreach ($needles as $needle) {
-            if (! static::contains($haystack, $needle)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack
@@ -345,15 +327,11 @@ class Str
      */
     public static function replaceArray($search, array $replace, $subject)
     {
-        $segments = explode($search, $subject);
-
-        $result = array_shift($segments);
-
-        foreach ($segments as $segment) {
-            $result .= (array_shift($replace) ?? $search).$segment;
+        foreach ($replace as $value) {
+            $subject = static::replaceFirst($search, $value, $subject);
         }
 
-        return $result;
+        return $subject;
     }
 
     /**

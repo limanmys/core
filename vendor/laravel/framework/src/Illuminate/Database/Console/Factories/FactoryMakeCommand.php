@@ -46,22 +46,12 @@ class FactoryMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $namespaceModel = $this->option('model')
+        $model = $this->option('model')
                         ? $this->qualifyClass($this->option('model'))
-                        : trim($this->rootNamespace(), '\\').'\\Model';
-
-        $model = class_basename($namespaceModel);
+                        : 'Model';
 
         return str_replace(
-            [
-                'NamespacedDummyModel',
-                'DummyModel',
-            ],
-            [
-                $namespaceModel,
-                $model,
-            ],
-            parent::buildClass($name)
+            'DummyModel', $model, parent::buildClass($name)
         );
     }
 

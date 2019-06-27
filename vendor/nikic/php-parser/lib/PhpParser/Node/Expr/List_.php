@@ -16,7 +16,7 @@ class List_ extends Expr
      * @param array              $attributes Additional attributes
      */
     public function __construct(array $items, array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->items = $items;
     }
 

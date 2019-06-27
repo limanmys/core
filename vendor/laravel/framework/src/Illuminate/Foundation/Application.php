@@ -29,7 +29,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.8.23';
+    const VERSION = '5.8.11';
 
     /**
      * The base path for the Laravel installation.
@@ -517,16 +517,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function isLocal()
     {
         return $this['env'] === 'local';
-    }
-
-    /**
-     * Determine if application is in production environment.
-     *
-     * @return bool
-     */
-    public function isProduction()
-    {
-        return $this['env'] === 'production';
     }
 
     /**
@@ -1128,7 +1118,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function registerCoreContainerAliases()
     {
         foreach ([
-            'app'                  => [self::class, \Illuminate\Contracts\Container\Container::class, \Illuminate\Contracts\Foundation\Application::class,  \Psr\Container\ContainerInterface::class],
+            'app'                  => [\Illuminate\Foundation\Application::class, \Illuminate\Contracts\Container\Container::class, \Illuminate\Contracts\Foundation\Application::class,  \Psr\Container\ContainerInterface::class],
             'auth'                 => [\Illuminate\Auth\AuthManager::class, \Illuminate\Contracts\Auth\Factory::class],
             'auth.driver'          => [\Illuminate\Contracts\Auth\Guard::class],
             'blade.compiler'       => [\Illuminate\View\Compilers\BladeCompiler::class],

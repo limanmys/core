@@ -23,7 +23,7 @@ class Namespace_ extends Node\Stmt
      * @param array            $attributes Additional attributes
      */
     public function __construct(Node\Name $name = null, $stmts = [], array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->name = $name;
         $this->stmts = $stmts;
     }

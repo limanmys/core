@@ -3,29 +3,24 @@
 use App\User;
 use App\Permission;
 Artisan::command('administrator',function (){
-    // Check if Admin user is exists.
-    $user = User::where('email','admin@liman.dev')->first();
-    if($user){
-        if(!$this->confirm('Administrator kullanıcısı silinip tekrar eklenecektir. Devam etmek istiyor musunuz?')){
-            return false;
-        }
-        $user->delete();
-    }
 
     $password = \Illuminate\Support\Str::random();
 
-    $user = User::create([
-        'name' => "administrator",
-        'email' => "admin@liman.dev",
-        'password' => Hash::make($password),
-        'status' => "1"
+    $user = new User();
+    $user->fill([
+        "name" => "Administrator",
+        "email" => "administrator@liman.app",
+        "password" => \Illuminate\Support\Facades\Hash::make($password),
+        "status" => 1,
     ]);
-    $user->settings = [];
+
     $user->save();
 
-    Permission::new($user->_id);
-
     $this->comment("Administrator kullanıcısı eklendi. ");
-    $this->comment("Email  : admin@liman.dev");
+    $this->comment("Email  : administrator@liman.app");
     $this->comment("Parola : " . $password . "");
 })->describe('Create administrator account to use');
+
+Artisan::command("create:db",function(){
+
+});

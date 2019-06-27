@@ -17,7 +17,7 @@ class Goto_ extends Stmt
      * @param array             $attributes Additional attributes
      */
     public function __construct($name, array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->name = \is_string($name) ? new Identifier($name) : $name;
     }
 

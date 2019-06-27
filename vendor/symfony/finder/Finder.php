@@ -13,7 +13,6 @@ namespace Symfony\Component\Finder;
 
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
-use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 use Symfony\Component\Finder\Iterator\DateRangeFilterIterator;
 use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
@@ -40,7 +39,6 @@ class Finder implements \IteratorAggregate, \Countable
 {
     const IGNORE_VCS_FILES = 1;
     const IGNORE_DOT_FILES = 2;
-    const IGNORE_VCS_IGNORED_FILES = 4;
 
     private $mode = 0;
     private $names = [];
@@ -376,24 +374,6 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Forces Finder to obey .gitignore and ignore files based on rules listed there.
-     *
-     * This option is disabled by default.
-     *
-     * @return $this
-     */
-    public function ignoreVCSIgnored(bool $ignoreVCSIgnored)
-    {
-        if ($ignoreVCSIgnored) {
-            $this->ignore |= static::IGNORE_VCS_IGNORED_FILES;
-        } else {
-            $this->ignore &= ~static::IGNORE_VCS_IGNORED_FILES;
-        }
-
-        return $this;
-    }
-
-    /**
      * Adds VCS patterns.
      *
      * @see ignoreVCS()
@@ -586,7 +566,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return $this
      *
-     * @throws DirectoryNotFoundException if one of the directories does not exist
+     * @throws \InvalidArgumentException if one of the directories does not exist
      */
     public function in($dirs)
     {
@@ -598,7 +578,7 @@ class Finder implements \IteratorAggregate, \Countable
             } elseif ($glob = glob($dir, (\defined('GLOB_BRACE') ? GLOB_BRACE : 0) | GLOB_ONLYDIR)) {
                 $resolvedDirs = array_merge($resolvedDirs, array_map([$this, 'normalizeDir'], $glob));
             } else {
-                throw new DirectoryNotFoundException(sprintf('The "%s" directory does not exist.', $dir));
+                throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
             }
         }
 
@@ -703,14 +683,6 @@ class Finder implements \IteratorAggregate, \Countable
 
         if (static::IGNORE_DOT_FILES === (static::IGNORE_DOT_FILES & $this->ignore)) {
             $notPaths[] = '#(^|/)\..+(/|$)#';
-        }
-
-        if (static::IGNORE_VCS_IGNORED_FILES === (static::IGNORE_VCS_IGNORED_FILES & $this->ignore)) {
-            $gitignoreFilePath = sprintf('%s/.gitignore', $dir);
-            if (!is_readable($gitignoreFilePath)) {
-                throw new \RuntimeException(sprintf('The "ignoreVCSIgnored" option cannot be used by the Finder as the "%s" file is not readable.', $gitignoreFilePath));
-            }
-            $notPaths = array_merge($notPaths, [Gitignore::toRegex(file_get_contents($gitignoreFilePath))]);
         }
 
         $minDepth = 0;

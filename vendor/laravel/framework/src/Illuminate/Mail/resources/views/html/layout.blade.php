@@ -23,16 +23,16 @@
         }
     </style>
 
-    <table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <table class="wrapper" width="100%" cellpadding="0" cellspacing="0">
         <tr>
             <td align="center">
-                <table class="content" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <table class="content" width="100%" cellpadding="0" cellspacing="0">
                     {{ $header ?? '' }}
 
                     <!-- Email Body -->
                     <tr>
                         <td class="body" width="100%" cellpadding="0" cellspacing="0">
-                            <table class="inner-body" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation">
+                            <table class="inner-body" align="center" width="570" cellpadding="0" cellspacing="0">
                                 <!-- Body content -->
                                 <tr>
                                     <td class="content-cell">

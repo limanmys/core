@@ -4,21 +4,21 @@
 
 <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-    <li class="breadcrumb-item"><a href="/l/{{extension()->_id}}">{{extension()->name}} {{ __('Sunucuları') }}</a></li>
-    <li class="breadcrumb-item"><a href="/l/{{extension()->_id}}/{{server()->city}}">{{cities(server()->city)}}</a></li>
-<li class="breadcrumb-item"><a href='/l/{{extension()->_id}}/{{server()->city}}/{{server()->_id}}'>{{server()->name}}</a></li>
+    <li class="breadcrumb-item"><a href="/l/{{extension()->id}}">{{extension()->name}} {{ __('Sunucuları') }}</a></li>
+    <li class="breadcrumb-item"><a href="/l/{{extension()->id}}/{{server()->city}}">{{cities(server()->city)}}</a></li>
+<li class="breadcrumb-item"><a href='/l/{{extension()->id}}/{{server()->city}}/{{server()->id}}'>{{server()->name}}</a></li>
 
     <li class="breadcrumb-item active" aria-current="page">{{__("Eklenti Ayarları")}}</li>
 </ol>
 
 <button class="btn btn-primary" onclick="history.back()">{{__("Geri Dön")}}</button><br><br>
-@if($extension->database)
+@if($extension["database"])
 <form action="{{route('extension_server_settings',[
                         "extension_id" => request()->route('extension_id'),
                         "server_id" => request()->route('server_id')
                     ])}}" method="POST">
         @csrf
-        @foreach($extension->database as $item)
+        @foreach($extension["database"] as $item)
             @if($item["variable"] == "certificate")
                 <h5>{{$item["name"]}}</h5>
                 <textarea name="certificate" cols="30" rows="10" class="form-control"></textarea><br>
@@ -26,14 +26,14 @@
                 <h5>{{$item["name"]}}</h5>
                 <select class="form-control" name="{{$item["variable"]}}">
                     @foreach(extensions() as $extension)
-                        <option value="{{$extension->_id}}">{{$extension->name}}</option>
+                        <option value="{{$extension->id}}">{{$extension->name}}</option>
                     @endforeach
                 </select><br>
             @elseif($item["type"] == "server")
                 <h5>{{$item["name"]}}</h5>
                 <select class="form-control" name="{{$item["variable"]}}">
                     @foreach(servers() as $server)
-                        <option value="{{$server->_id}}">{{$server->name}}</option>
+                        <option value="{{$server->id}}">{{$server->name}}</option>
                     @endforeach
                 </select><br>    
             @else

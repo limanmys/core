@@ -21,7 +21,7 @@ class OneController extends Controller
         $server = Server::find($widget->server_id);
         request()->request->add(['server' => $server]);
         request()->request->add(['widget' => $widget]);
-        request()->request->add(['extension_id' => $extension->_id]);
+        request()->request->add(['extension_id' => $extension->id]);
         request()->request->add(['extension' => $extension]);
         $command = self::generateSandboxCommand($server, $extension, auth()->user()->settings, auth()->id(), "null", "null", $widget->widget_name);
         $output = shell_exec($command);
@@ -51,8 +51,8 @@ class OneController extends Controller
     {
         $extensions = [];
         foreach (extensions() as $extension) {
-            if($extension->widgets && array_key_exists($extension->_id,server()->extensions)){
-                $extensions[$extension->_id] = $extension->name;
+            if($extension->widgets && array_key_exists($extension->id,server()->extensions)){
+                $extensions[$extension->id] = $extension->name;
             }
         }
         return $extensions;
@@ -74,12 +74,12 @@ class OneController extends Controller
         $extension = str_replace('"', '*m*', json_encode($extensionObj->toArray()));
 
         if (
-            !array_key_exists($serverObj->_id, $user_settings) ||
-            !array_key_exists($extensionObj->_id, $user_settings[$serverObj->_id])
+            !array_key_exists($serverObj->id, $user_settings) ||
+            !array_key_exists($extensionObj->id, $user_settings[$serverObj->id])
         ) {
             $extensionDb = "";
         } else {
-            $extensionDb = str_replace('"', '*m*', json_encode($user_settings[$serverObj->_id][$extensionObj->_id]));
+            $extensionDb = str_replace('"', '*m*', json_encode($user_settings[$serverObj->id][$extensionObj->id]));
         }
 
         $outputsJson = str_replace('"', '*m*', json_encode($outputs));
@@ -93,20 +93,20 @@ class OneController extends Controller
         $request = str_replace('"', '*m*', json_encode($request));
 
         $apiRoute = route('extension_function_api', [
-            "extension_id" => $extensionObj->_id,
+            "extension_id" => $extensionObj->id,
             "function_name" => ""
         ]);
 
         $navigationRoute = route('extension_server_route', [
-            "server_id" => $serverObj->_id,
-            "extension_id" => $extensionObj->_id,
+            "server_id" => $serverObj->id,
+            "extension_id" => $extensionObj->id,
             "city" => $serverObj->city,
             "unique_code" => ""
         ]);
 
         $token = Token::create($user_id);
 
-        $command = "sudo runuser liman-" . $extensionObj->_id .
+        $command = "sudo runuser liman-" . $extensionObj->id .
             " -c '/usr/bin/php -d display_errors=on $combinerFile $functions "
             . strtolower($extensionObj->name) .
             " $viewName \"$server\" \"$extension\" \"$extensionDb\" \"$outputsJson\" \"$request\" \"$functionName\" \"$apiRoute\" \"$navigationRoute\" \"$token\"'";

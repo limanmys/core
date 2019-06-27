@@ -20,7 +20,7 @@ class PropertyFetch extends Expr
      * @param array                  $attributes Additional attributes
      */
     public function __construct(Expr $var, $name, array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->var = $var;
         $this->name = \is_string($name) ? new Identifier($name) : $name;
     }

@@ -23,7 +23,7 @@ use Throwable;
 /**
  * A TestSuite is a composite of Tests. It runs a collection of test cases.
  */
-class TestSuite implements IteratorAggregate, SelfDescribing, Test
+class TestSuite implements Test, SelfDescribing, IteratorAggregate
 {
     /**
      * Enable or disable the backup and restoration of the $GLOBALS array.

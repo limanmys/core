@@ -28,7 +28,7 @@ class RouteCollectionBuilderTest extends TestCase
         $resolver->expects($this->once())
             ->method('resolve')
             ->with('admin_routing.yml', 'yaml')
-            ->willReturn($resolvedLoader);
+            ->will($this->returnValue($resolvedLoader));
 
         $originalRoute = new Route('/foo/path');
         $expectedCollection = new RouteCollection();
@@ -39,12 +39,12 @@ class RouteCollectionBuilderTest extends TestCase
             ->expects($this->once())
             ->method('load')
             ->with('admin_routing.yml', 'yaml')
-            ->willReturn($expectedCollection);
+            ->will($this->returnValue($expectedCollection));
 
         $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $loader->expects($this->any())
             ->method('getResolver')
-            ->willReturn($resolver);
+            ->will($this->returnValue($resolver));
 
         // import the file!
         $routes = new RouteCollectionBuilder($loader);
@@ -107,11 +107,11 @@ class RouteCollectionBuilderTest extends TestCase
         // make this loader able to do the import - keeps mocking simple
         $loader->expects($this->any())
             ->method('supports')
-            ->willReturn(true);
+            ->will($this->returnValue(true));
         $loader
             ->expects($this->once())
             ->method('load')
-            ->willReturn($importedCollection);
+            ->will($this->returnValue($importedCollection));
 
         $routes = new RouteCollectionBuilder($loader);
 
@@ -296,11 +296,11 @@ class RouteCollectionBuilderTest extends TestCase
         // make this loader able to do the import - keeps mocking simple
         $loader->expects($this->any())
             ->method('supports')
-            ->willReturn(true);
+            ->will($this->returnValue(true));
         $loader
             ->expects($this->any())
             ->method('load')
-            ->willReturn($importedCollection);
+            ->will($this->returnValue($importedCollection));
         // import this from the /admin route builder
         $adminRoutes->import('admin.yml', '/imported');
 
@@ -347,11 +347,11 @@ class RouteCollectionBuilderTest extends TestCase
         $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $loader->expects($this->any())
             ->method('supports')
-            ->willReturn(true);
+            ->will($this->returnValue(true));
         $loader
             ->expects($this->any())
             ->method('load')
-            ->willReturn([$firstCollection, $secondCollection]);
+            ->will($this->returnValue([$firstCollection, $secondCollection]));
 
         $routeCollectionBuilder = new RouteCollectionBuilder($loader);
         $routeCollectionBuilder->import('/directory/recurse/*', '/other/', 'glob');

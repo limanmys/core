@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\Script
@@ -10,18 +10,10 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
  * @property-read mixed $id
  * @mixin Eloquent
  * @method static where(string $string, $id)
+ * @method static Builder|Server find($field)
  */
-class Script extends Eloquent
+class Script extends Model
 {
-    /**
-     * @var string
-     */
-    protected $collection = 'scripts';
-    /**
-     * @var string
-     */
-    protected $connection = 'mongodb';
-
     /**
      * @param $uploadedFile
      * @return Script|bool

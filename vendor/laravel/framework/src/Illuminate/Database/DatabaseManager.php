@@ -6,7 +6,6 @@ use PDO;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
 /**
@@ -69,7 +68,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get a database connection instance.
      *
-     * @param  string|null  $name
+     * @param  string  $name
      * @return \Illuminate\Database\Connection
      */
     public function connection($name = null)
@@ -152,8 +151,7 @@ class DatabaseManager implements ConnectionResolverInterface
             throw new InvalidArgumentException("Database [{$name}] not configured.");
         }
 
-        return (new ConfigurationUrlParser)
-                    ->parseConfiguration($config);
+        return $config;
     }
 
     /**
@@ -186,7 +184,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * Prepare the read / write mode for database connection instance.
      *
      * @param  \Illuminate\Database\Connection  $connection
-     * @param  string|null  $type
+     * @param  string  $type
      * @return \Illuminate\Database\Connection
      */
     protected function setPdoForType(Connection $connection, $type = null)
@@ -203,7 +201,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Disconnect from the given database and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  string  $name
      * @return void
      */
     public function purge($name = null)
@@ -218,7 +216,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Disconnect from the given database.
      *
-     * @param  string|null  $name
+     * @param  string  $name
      * @return void
      */
     public function disconnect($name = null)
@@ -231,7 +229,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Reconnect to the given database.
      *
-     * @param  string|null  $name
+     * @param  string  $name
      * @return \Illuminate\Database\Connection
      */
     public function reconnect($name = null)

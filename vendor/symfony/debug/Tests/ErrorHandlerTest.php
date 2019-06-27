@@ -234,7 +234,7 @@ class ErrorHandlerTest extends TestCase
             $logger
                 ->expects($this->once())
                 ->method('log')
-                ->willReturnCallback($warnArgCheck)
+                ->will($this->returnCallback($warnArgCheck))
             ;
 
             $handler = ErrorHandler::register();
@@ -262,7 +262,7 @@ class ErrorHandlerTest extends TestCase
             $logger
                 ->expects($this->once())
                 ->method('log')
-                ->willReturnCallback($logArgCheck)
+                ->will($this->returnCallback($logArgCheck))
             ;
 
             $handler = ErrorHandler::register();
@@ -318,7 +318,7 @@ class ErrorHandlerTest extends TestCase
         $logger
             ->expects($this->once())
             ->method('log')
-            ->willReturnCallback($logArgCheck)
+            ->will($this->returnCallback($logArgCheck))
         ;
 
         $handler = new ErrorHandler();
@@ -346,7 +346,7 @@ class ErrorHandlerTest extends TestCase
             $logger
                 ->expects($this->exactly(2))
                 ->method('log')
-                ->willReturnCallback($logArgCheck)
+                ->will($this->returnCallback($logArgCheck))
             ;
 
             $handler->setDefaultLogger($logger, E_ERROR);
@@ -462,7 +462,7 @@ class ErrorHandlerTest extends TestCase
             $logger
                 ->expects($this->once())
                 ->method('log')
-                ->willReturnCallback($logArgCheck)
+                ->will($this->returnCallback($logArgCheck))
             ;
 
             $handler->setDefaultLogger($logger, E_PARSE);

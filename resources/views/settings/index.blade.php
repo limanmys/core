@@ -20,7 +20,7 @@
             "Sunucu Adı" , "Email" , "*hidden*" ,
         ],
         "display" => [
-            "name" , "email", "_id:user_id" ,
+            "name" , "email", "id:user_id" ,
         ],
         "menu" => [
             "Parolayı Sıfırla" => [

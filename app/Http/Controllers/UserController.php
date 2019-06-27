@@ -13,7 +13,7 @@ class UserController extends Controller
 
     public function one()
     {
-        $user = User::where('_id',auth()->id())->first();
+        $user = User::where('id',auth()->id())->first();
         return view('users.one',[
             "user" => $user
         ]);
@@ -47,11 +47,7 @@ class UserController extends Controller
             'password' => Hash::make($password),
             'status' => (request('type') == "administrator") ? "1" : "0"
         ]);
-        $user->settings = [];
         $user->save();
-
-        // Create Permissions For User
-        Permission::new($user->_id);
 
         // Respond
         return respond("Kullanıcı Başarıyla Eklendi. Parola : " . $password,200);
@@ -63,7 +59,7 @@ class UserController extends Controller
         Permission::where('user_id', request('user_id'))->delete();
 
         // Delete User
-        User::where("_id", request('user_id'))->delete();
+        User::where("id", request('user_id'))->delete();
 
         // Respond
         return respond("Kullanıcı Silindi",200);
@@ -74,7 +70,7 @@ class UserController extends Controller
         // Generate Password
         $password = Str::random(8);
 
-        $user = User::find(request('user_id'))->update([
+        User::find(request('user_id'))->update([
             "password" => Hash::make($password)
         ]);
 
@@ -118,7 +114,7 @@ class UserController extends Controller
             return respond("Girilen veri geçerli değil.",201);
         }
 
-        $user = User::where("_id", request('user_id'))->first();
+        $user = User::where("id", request('user_id'))->first();
 
         $user->update([
             'name' => request('username'),

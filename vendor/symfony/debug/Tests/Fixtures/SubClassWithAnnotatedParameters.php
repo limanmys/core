@@ -21,12 +21,4 @@ class SubClassWithAnnotatedParameters extends ClassWithAnnotatedParameters imple
     public function whereAmI()
     {
     }
-
-    /**
-     * @param                      $defined
-     * @param Type\Does\Not\Matter $definedCallable
-     */
-    public function iAmHere()
-    {
-    }
 }

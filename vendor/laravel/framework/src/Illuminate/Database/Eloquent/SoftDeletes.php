@@ -2,11 +2,6 @@
 
 namespace Illuminate\Database\Eloquent;
 
-/**
- * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withTrashed()
- * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder onlyTrashed()
- * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withoutTrashed()
- */
 trait SoftDeletes
 {
     /**

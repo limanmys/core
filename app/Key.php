@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 
 /**
@@ -10,10 +10,8 @@ use Illuminate\Database\Query\Builder;
  * @package App
  * @method static Builder|Key where($field, $value)
  */
-class Key extends Eloquent
+class Key extends Model
 {
-    protected $collection = 'keys';
-    protected $connection = 'mongodb';
     protected $fillable = ['username' ,'server_id'];
 
 }

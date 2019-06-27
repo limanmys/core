@@ -57,13 +57,6 @@ class SplFileInfo extends \SplFileInfo
         return $this->relativePathname;
     }
 
-    public function getFilenameWithoutExtension(): string
-    {
-        $filename = $this->getFilename();
-
-        return \pathinfo($filename, PATHINFO_FILENAME);
-    }
-
     /**
      * Returns the contents of the file.
      *

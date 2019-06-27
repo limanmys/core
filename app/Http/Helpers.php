@@ -94,6 +94,7 @@ if (!function_exists('server')) {
     function server()
     {
         if(!request('server')){
+            dd(request()->all());
             abort(504,"Sunucu Bulunamadi");
         }
         return request('server');
@@ -116,7 +117,7 @@ if (!function_exists('servers')) {
      */
     function servers()
     {
-        return Server::getAll();
+        return auth()->user()->servers();
     }
 }
 
@@ -169,12 +170,7 @@ if (!function_exists('extensionDb')) {
      */
     function extensionDb($key)
     {
-        try{
-            return auth()->user()->settings[server()->_id][extension()->_id][$key];
-        }catch (Exception $exception){
-            return "";
-        }
-
+        return $key;
     }
 }
 
@@ -191,15 +187,15 @@ if (!function_exists('getObject')) {
         switch ($type) {
             case "Script":
             case "script":
-                return Script::where('_id', $id)->first();
+                return Script::find($id);
                 break;
             case "Extension":
             case "extension":
-                return Extension::where('_id', $id)->first();
+                return Extension::find($id);
                 break;
             case "Server":
             case "server":
-                return Server::where('_id', $id)->first();
+                return Server::find($id);
                 break;
             default:
                 return false;
@@ -235,7 +231,7 @@ if (!function_exists('serverKey')) {
      */
     function serverKey()
     {
-        return App\Key::where('server_id',server()->_id)->first();
+        return App\Key::where('server_id',server()->id)->first();
     }
 }
 

@@ -546,7 +546,11 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getReboundCallbacks($abstract)
     {
-        return $this->reboundCallbacks[$abstract] ?? [];
+        if (isset($this->reboundCallbacks[$abstract])) {
+            return $this->reboundCallbacks[$abstract];
+        }
+
+        return [];
     }
 
     /**
@@ -1118,7 +1122,11 @@ class Container implements ArrayAccess, ContainerContract
     {
         $abstract = $this->getAlias($abstract);
 
-        return $this->extenders[$abstract] ?? [];
+        if (isset($this->extenders[$abstract])) {
+            return $this->extenders[$abstract];
+        }
+
+        return [];
     }
 
     /**

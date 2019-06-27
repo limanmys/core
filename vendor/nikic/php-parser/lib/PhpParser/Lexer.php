@@ -16,13 +16,7 @@ class Lexer
     protected $tokenMap;
     protected $dropTokens;
 
-    private $attributeStartLineUsed;
-    private $attributeEndLineUsed;
-    private $attributeStartTokenPosUsed;
-    private $attributeEndTokenPosUsed;
-    private $attributeStartFilePosUsed;
-    private $attributeEndFilePosUsed;
-    private $attributeCommentsUsed;
+    protected $usedAttributes;
 
     /**
      * Creates a Lexer.
@@ -43,17 +37,12 @@ class Lexer
             [\T_WHITESPACE, \T_OPEN_TAG, \T_COMMENT, \T_DOC_COMMENT], 1
         );
 
-        $defaultAttributes = ['comments', 'startLine', 'endLine'];
-        $usedAttributes = array_fill_keys($options['usedAttributes'] ?? $defaultAttributes, true);
-
-        // Create individual boolean properties to make these checks faster.
-        $this->attributeStartLineUsed = isset($usedAttributes['startLine']);
-        $this->attributeEndLineUsed = isset($usedAttributes['endLine']);
-        $this->attributeStartTokenPosUsed = isset($usedAttributes['startTokenPos']);
-        $this->attributeEndTokenPosUsed = isset($usedAttributes['endTokenPos']);
-        $this->attributeStartFilePosUsed = isset($usedAttributes['startFilePos']);
-        $this->attributeEndFilePosUsed = isset($usedAttributes['endFilePos']);
-        $this->attributeCommentsUsed = isset($usedAttributes['comments']);
+        // the usedAttributes member is a map of the used attribute names to a dummy
+        // value (here "true")
+        $options += [
+            'usedAttributes' => ['comments', 'startLine', 'endLine'],
+        ];
+        $this->usedAttributes = array_fill_keys($options['usedAttributes'], true);
     }
 
     /**
@@ -241,13 +230,13 @@ class Lexer
                 $token = "\0";
             }
 
-            if ($this->attributeStartLineUsed) {
+            if (isset($this->usedAttributes['startLine'])) {
                 $startAttributes['startLine'] = $this->line;
             }
-            if ($this->attributeStartTokenPosUsed) {
+            if (isset($this->usedAttributes['startTokenPos'])) {
                 $startAttributes['startTokenPos'] = $this->pos;
             }
-            if ($this->attributeStartFilePosUsed) {
+            if (isset($this->usedAttributes['startFilePos'])) {
                 $startAttributes['startFilePos'] = $this->filePos;
             }
 
@@ -274,7 +263,7 @@ class Lexer
                 $this->filePos += \strlen($value);
             } else {
                 if (\T_COMMENT === $token[0] || \T_DOC_COMMENT === $token[0]) {
-                    if ($this->attributeCommentsUsed) {
+                    if (isset($this->usedAttributes['comments'])) {
                         $comment = \T_DOC_COMMENT === $token[0]
                             ? new Comment\Doc($token[1], $this->line, $this->filePos, $this->pos)
                             : new Comment($token[1], $this->line, $this->filePos, $this->pos);
@@ -287,13 +276,13 @@ class Lexer
                 continue;
             }
 
-            if ($this->attributeEndLineUsed) {
+            if (isset($this->usedAttributes['endLine'])) {
                 $endAttributes['endLine'] = $this->line;
             }
-            if ($this->attributeEndTokenPosUsed) {
+            if (isset($this->usedAttributes['endTokenPos'])) {
                 $endAttributes['endTokenPos'] = $this->pos;
             }
-            if ($this->attributeEndFilePosUsed) {
+            if (isset($this->usedAttributes['endFilePos'])) {
                 $endAttributes['endFilePos'] = $this->filePos - 1;
             }
 

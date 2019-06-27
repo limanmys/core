@@ -2,8 +2,10 @@
 
 namespace App;
 
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 /**
  * App\Permission
@@ -13,84 +15,53 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder|Permission newQuery()
  * @method static Builder|Permission query()
  * @method static where(string $string, $user_id)
- * @mixin Eloquent
+ * @mixin Model
  */
-class Permission extends Eloquent
+
+class Permission extends Model
 {
-    protected $collection = 'permissions';
-    protected $connection = 'mongodb';
-
-    public static function new($user_id)
-    {
-        // Simply create new permission table
-        $permissions = new Permission();
-        $permissions->user_id = $user_id;
-
-        // Create empty arrays to use it later.
-        $permissions->server = [];
-        $permissions->extension = [];
-        $permissions->script = [];
-        $permissions->function = [];
-
-        // Save Permissions
-        $permissions->save();
-
-        // Return new Permission object.
-        return $permissions;
-    }
+    protected $table = "permissions";
 
     public static function grant($user_id, $type, $id)
     {
-        // Retrieve Permissions
-        $permissions = Permission::where('user_id', $user_id)->first();
-
-        if($permissions->__get($type) != null){
-            $current = $permissions->__get($type);
-        }else{
-            $current = [];
+        $database = DB::table("permissions");
+        if($database->where([
+            $type => $id,
+            "user_id" => $user_id
+        ])->exists()){
+            return true;
         }
-        // Add Array
-        array_push($current, $id);
 
-        // Set Array
-        $permissions->__set($type, $current);
-        
-        // Save and Return Permissions
-        $permissions->save();
-
-        return $permissions;
+        return $database->insert([
+            "user_id" => $user_id,
+            $type => $id,
+            "created_at" =>  Carbon::now(),
+            "updated_at" => Carbon::now()
+        ]);
     }
 
     public static function revoke($user_id, $type, $id)
     {
-        // Retrieve Permissions
-        $permissions = Permission::where('user_id', $user_id)->first();
-
-        // Get Array
-        $current = $permissions->__get($type);
-        $old = $current;
-        // Search and Delete Id
-        unset($current[array_search($id, $current)]);
-
-        // Update Object
-        $permissions->__set($type, array_values($current));
-
-        // Save and return object.
-        $permissions->save();
-
-        return $permissions;
+        $database = DB::table("permissions");
+        if($database->where([
+            $type => $id,
+            "user_id" => $user_id
+        ])->exists()){
+            $database->where([
+                $type => $id,
+                "user_id" => $user_id
+            ])->delete();
+            return true;
+        }
+        return false;
     }
 
     public static function get($user_id, $type = null)
     {
-        // Retrieve Permissions
-        $permissions = Permission::where('user_id', $user_id)->first();
-
-        if ($type == null) {
-            return $permissions;
-        }
-
-        return $permissions->__get($type);
+        $database = DB::table("permissions");
+        return $database->where([
+            "user_id" => $user_id
+        ])->whereNotNull($type)->get();
     }
 
     public static function getUsersofType($id, $type)
@@ -108,12 +79,11 @@ class Permission extends Eloquent
             return true;
         }
 
-        $permissions = Permission::get($user_id, $type);
+        $database = DB::table("permissions");
 
-        if(!$permissions || !in_array($id, $permissions)){
-            return false;
-        }
-
-        return true;
+        return $database->where([
+            "user_id" => $user_id,
+            $type . "_id" => $id
+        ])->exists();
     }
 }

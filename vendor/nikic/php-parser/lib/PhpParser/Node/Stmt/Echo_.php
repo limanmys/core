@@ -16,7 +16,7 @@ class Echo_ extends Node\Stmt
      * @param array       $attributes Additional attributes
      */
     public function __construct(array $exprs, array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->exprs = $exprs;
     }
 

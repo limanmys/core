@@ -74,9 +74,9 @@
 
                 <ul class="sidebar-menu" data-widget="tree">
                     <!-- Sidebar Menu -->
-                    @if(auth()->user()->favorites && count(auth()->user()->favorites))
+                    @if(\Illuminate\Support\Facades\DB::table("user_favorites")->where(["user_id" => auth()->user()->id])->count())
                         <li class="header">{{__("Favori Sunucular")}}</li>
-                        @foreach(\App\Server::find(auth()->user()->favorites) as $favorite)
+                        @foreach(\App\Server::find(\Illuminate\Support\Facades\DB::table("user_favorites")->where(["user_id" => auth()->user()->id])->pluck("server_id")->toArray()) as $favorite)
                             <li class="treeview">
                                 <a href="#">
                                     <i class="fa fa-server "></i>
@@ -87,18 +87,18 @@
                                 </a>
                                 <ul class="treeview-menu">
                                     <li class="">
-                                        <a href="/sunucular/{{$favorite->_id}}">
+                                        <a href="/sunucular/{{$favorite->id}}">
                                             <i class="fa fa-info "></i>
                                             <span>{{__("Sunucu Detayları")}}</span>
                                         </a>
                                     </li>
 
-                                    @foreach(\App\Extension::find(array_keys($favorite->extensions)) as $extension)
-                                    @if(\App\Permission::can(auth()->user()->_id,'extension',$extension->_id) == false)
+                                    @foreach(\App\Extension::find($favorite->extensions()->pluck("id")->toArray()) as $extension)
+                                    @if(\App\Permission::can(auth()->user()->id,'extension',$extension->id) == false)
                                         @continue
                                     @endif
                                         <li class="">
-                                            <a href="/l/{{$extension->_id}}/{{$favorite->city}}/{{$favorite->_id}}">
+                                            <a href="/l/{{$extension->id}}/{{$favorite->city}}/{{$favorite->id}}">
                                                 <i class="fa fa-{{$extension->icon}} "></i>
                                                 <span>{{$extension->name}}</span>
                                             </a>
@@ -106,7 +106,7 @@
                                     @endforeach
                                     @if($favorite->type == "linux_ssh")
                                         <li class="">
-                                            <a onclick="terminal('{{$favorite->_id}}','{{$favorite->name}}')" href="#">
+                                            <a onclick="terminal('{{$favorite->id}}','{{$favorite->name}}')" href="#">
                                                 <i class="fa fa-info "></i>
                                                 <span>{{__("Terminal")}}</span>
                                             </a>
@@ -129,7 +129,7 @@
                     @endif
                     @foreach(extensions() as $extension)
                         <li class="">
-                            <a href="/l/{{$extension->_id}}">
+                            <a href="/l/{{$extension->id}}">
                                 <i class="fa fa-{{$extension->icon}} "></i>
                                 <span>{{__($extension->name)}}</span>
                             </a>

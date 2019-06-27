@@ -1,14 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
+    @php($extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true))
+
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
             <li class="breadcrumb-item" aria-current="page"><a
                         href="{{route('extensions_settings')}}">{{__("Eklenti Yönetimi")}}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ extension()->name }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ $extension["name"] }}</li>
         </ol>
     </nav>
+
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">{{__("Genel Ayarlar")}}</a></li>
@@ -23,17 +26,17 @@
             <div class="tab-pane active" id="tab_1">
                 <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button>
                 <h3>{{__("Eklenti Adı")}}</h3>
-                <input id="extensionName" type="text" class="form-control" value="{{extension()->name}}" disabled>
+                <input id="extensionName" type="text" class="form-control" value="{{$extension["name"]}}" disabled>
                 <h3>{{__("Yayınlayan")}}</h3>
-                <input type="text" name="name" class="form-control" value="{{extension()->publisher}}" disabled>
+                <input type="text" name="name" class="form-control" value="{{$extension["publisher"]}}" disabled>
                 <h3>{{__("Destek Email'i")}}</h3>
-                <input id="support" type="text" name="email" class="form-control" value="{{extension()->support}}">
+                <input id="support" type="text" name="email" class="form-control" value="{{$extension["support"]}}">
                 <h3>{{__("Logo (Font Awesome Ikon)")}}</h3>
-                <input id="icon" type="text" name="icon" class="form-control" value="{{extension()->icon}}">
+                <input id="icon" type="text" name="icon" class="form-control" value="{{$extension["icon"]}}">
                 <h3>{{__("Versiyon")}}</h3>
-                <input id="version" type="text" name="version" class="form-control" value="{{extension()->version}}">
+                <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}">
                 <h3>{{__("Servis")}}</h3>
-                <input id="service" type="text" name="service" class="form-control" value="{{extension()->service}}">
+                <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}">
             </div>
             <!-- /.tab-pane -->
             <div class="tab-pane" id="tab_2">
@@ -43,7 +46,7 @@
                     "text" => "Veri Ekle"
                 ])<br><br>
                 @include('l.table',[
-                    "value" => extension()->database,
+                    "value" => $extension["database"],
                     "title" => [
                         "Adı" , "Türü" , "Variable Adı", "" , "", ""
                     ],
@@ -114,7 +117,7 @@
                     "text" => "Sayfa Ekle"
                 ])<br><br>
                 @include('l.table',[
-                    "value" => extension()->views,
+                    "value" => $extension["views"],
                     "title" => [
                         "Sayfa Adı" , "Çalışacak Betik/Fonksiyon" , "", ""
                     ],
@@ -184,7 +187,7 @@
                     "text" => "Widget Ekle"
                 ])<br><br>
                 @include('l.table',[
-                    "value" => extension()->widgets,
+                    "value" => $extension["widgets"],
                     "title" => [
                         "Widget Adı" , "Türü" , "Çalışacak Betik/Fonksiyon" , "", "", ""
                     ],

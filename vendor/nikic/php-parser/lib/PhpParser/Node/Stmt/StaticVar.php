@@ -22,7 +22,7 @@ class StaticVar extends Node\Stmt
     public function __construct(
         Expr\Variable $var, Node\Expr $default = null, array $attributes = []
     ) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->var = $var;
         $this->default = $default;
     }

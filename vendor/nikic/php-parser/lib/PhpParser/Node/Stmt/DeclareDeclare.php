@@ -19,7 +19,7 @@ class DeclareDeclare extends Node\Stmt
      * @param array                  $attributes Additional attributes
      */
     public function __construct($key, Node\Expr $value, array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->key = \is_string($key) ? new Node\Identifier($key) : $key;
         $this->value = $value;
     }

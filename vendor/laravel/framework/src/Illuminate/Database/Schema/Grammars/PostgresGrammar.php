@@ -42,7 +42,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return "select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
+        return 'select * from information_schema.tables where table_schema = ? and table_name = ?';
     }
 
     /**
@@ -200,7 +200,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all tables.
      *
-     * @param  array  $tables
+     * @param  string  $tables
      * @return string
      */
     public function compileDropAllTables($tables)
@@ -211,23 +211,12 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all views.
      *
-     * @param  array  $views
+     * @param  string  $views
      * @return string
      */
     public function compileDropAllViews($views)
     {
         return 'drop view "'.implode('","', $views).'" cascade';
-    }
-
-    /**
-     * Compile the SQL needed to drop all types.
-     *
-     * @param array $types
-     * @return string
-     */
-    public function compileDropAllTypes($types)
-    {
-        return 'drop type "'.implode('","', $types).'" cascade';
     }
 
     /**
@@ -250,16 +239,6 @@ class PostgresGrammar extends Grammar
     public function compileGetAllViews($schema)
     {
         return "select viewname from pg_catalog.pg_views where schemaname = '{$schema}'";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all type names.
-     *
-     * @return string
-     */
-    public function compileGetAllTypes()
-    {
-        return 'select distinct pg_type.typname from pg_type inner join pg_enum on pg_enum.enumtypid = pg_type.oid';
     }
 
     /**

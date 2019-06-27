@@ -21,7 +21,7 @@ class ClassConstFetch extends Expr
      * @param array                   $attributes Additional attributes
      */
     public function __construct($class, $name, array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->class = $class;
         $this->name = \is_string($name) ? new Identifier($name) : $name;
     }

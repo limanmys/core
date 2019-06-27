@@ -4,18 +4,10 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection as BaseCollection;
 
 trait InteractsWithPivotTable
 {
-    /**
-     * The cached copy of the currently attached pivot models.
-     *
-     * @var Collection
-     */
-    private $currentlyAttached;
-
     /**
      * Toggles a model (or models) from the parent.
      *
@@ -96,8 +88,9 @@ trait InteractsWithPivotTable
         // First we need to attach any of the associated models that are not currently
         // in this joining table. We'll spin through the given IDs, checking to see
         // if they exist in the array of current ones, and if not we will insert.
-        $current = $this->getCurrentlyAttachedPivots()
-                        ->pluck($this->relatedPivotKey)->all();
+        $current = $this->newPivotQuery()->pluck(
+            $this->relatedPivotKey
+        )->all();
 
         $detach = array_diff($current, array_keys(
             $records = $this->formatRecordsList($this->parseIds($ids))
@@ -220,15 +213,8 @@ trait InteractsWithPivotTable
      */
     protected function updateExistingPivotUsingCustomClass($id, array $attributes, $touch)
     {
-        $updated = $this->getCurrentlyAttachedPivots()
-                    ->where($this->foreignPivotKey, $this->parent->{$this->parentKey})
-                    ->where($this->relatedPivotKey, $this->parseId($id))
-                    ->first()
-                    ->fill($attributes)
-                    ->isDirty();
-
-        $this->newPivot([
-            $this->foreignPivotKey => $this->parent->{$this->parentKey},
+        $updated = $this->newPivot([
+            $this->foreignPivotKey => $this->parent->getKey(),
             $this->relatedPivotKey => $this->parseId($id),
         ], true)->fill($attributes)->save();
 
@@ -460,26 +446,12 @@ trait InteractsWithPivotTable
 
         foreach ($this->parseIds($ids) as $id) {
             $results += $this->newPivot([
-                $this->foreignPivotKey => $this->parent->{$this->parentKey},
+                $this->foreignPivotKey => $this->parent->getKey(),
                 $this->relatedPivotKey => $id,
             ], true)->delete();
         }
 
         return $results;
-    }
-
-    /**
-     * Get the pivot models that are currently attached.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function getCurrentlyAttachedPivots()
-    {
-        return $this->currentlyAttached ?: $this->newPivotQuery()->get()->map(function ($record) {
-            $class = $this->using ? $this->using : Pivot::class;
-
-            return (new $class)->setRawAttributes((array) $record, true);
-        });
     }
 
     /**

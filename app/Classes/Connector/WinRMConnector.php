@@ -11,7 +11,7 @@ class WinRMConnector implements Connector
     {
         ($key = Key::where([
             "user_id" => $user_id,
-            "server_id" => $server->_id
+            "server_id" => $server->id
         ])->first()) || abort(504,"WinRM Anahtarınız yok.");
         $checkScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_validate.py '" . $server->ip_address . "' '" 
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->_id . "_cert.pem' '"

@@ -9,7 +9,7 @@ interface Encrypter
      *
      * @param  mixed  $value
      * @param  bool  $serialize
-     * @return string
+     * @return mixed
      *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
@@ -18,7 +18,7 @@ interface Encrypter
     /**
      * Decrypt the given value.
      *
-     * @param  string  $payload
+     * @param  mixed  $payload
      * @param  bool  $unserialize
      * @return mixed
      *

@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
-use Jenssegers\Mongodb\Auth\User as Authenticatable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\DB;
 
 /**
  * App\User
@@ -22,8 +23,6 @@ use Jenssegers\Mongodb\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     use Notifiable;
-    protected $collection = 'users';
-    protected $connection = 'mongodb';
     public $permissions = null;
     /**
      * The attributes that are mass assignable.
@@ -43,21 +42,21 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public function permissions(){
+//    public function permissions(){
+//
+//        // Check if this function called before in order to prevent more database calls.
+//        if($this->permissions == null){
+//
+//            // Retrieve user permissions and set it into the User object.
+//            $this->permissions = Permission::get($this->_id);
+//        }
+//
+//        // Return permissions just in case user don't want access object again.
+//        return $this->permissions;
+//    }
 
-        // Check if this function called before in order to prevent more database calls.
-        if($this->permissions == null){
-
-            // Retrieve user permissions and set it into the User object.
-            $this->permissions = Permission::get($this->_id);
-        }
-
-        // Return permissions just in case user don't want access object again.
-        return $this->permissions;
-    }
-
-    public function isAdmin(){
-
+    public function isAdmin()
+    {
         // Very simply check status, this function created for more human like code write experience.
         return $this->status == 1;
     }
@@ -79,5 +78,20 @@ class User extends Authenticatable
 
         // Lastly, check if user has permission for specific id of target.
         return in_array($id, $this->permissions->__get($target));
+    }
+
+    public function servers()
+    {
+        if(auth()->user()->isAdmin()){
+            return Server::all();
+        }
+
+        return Server::find(DB::table("permissions")->where("user_id",auth()->user()->id)
+            ->whereNotNull("server_id")->pluck("server_id")->toArray());
+    }
+
+    public function permissions()
+    {
+        return $this->belongsToMany("App\Permission");
     }
 }

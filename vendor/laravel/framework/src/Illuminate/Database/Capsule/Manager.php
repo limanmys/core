@@ -66,7 +66,7 @@ class Manager
     /**
      * Get a connection instance from the global manager.
      *
-     * @param  string|null  $connection
+     * @param  string  $connection
      * @return \Illuminate\Database\Connection
      */
     public static function connection($connection = null)
@@ -89,7 +89,7 @@ class Manager
     /**
      * Get a schema builder instance.
      *
-     * @param  string|null  $connection
+     * @param  string  $connection
      * @return \Illuminate\Database\Schema\Builder
      */
     public static function schema($connection = null)
@@ -100,7 +100,7 @@ class Manager
     /**
      * Get a registered connection instance.
      *
-     * @param  string|null  $name
+     * @param  string  $name
      * @return \Illuminate\Database\Connection
      */
     public function getConnection($name = null)

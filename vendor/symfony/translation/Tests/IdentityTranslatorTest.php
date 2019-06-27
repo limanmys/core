@@ -12,7 +12,7 @@
 namespace Symfony\Component\Translation\Tests;
 
 use Symfony\Component\Translation\IdentityTranslator;
-use Symfony\Contracts\Translation\Test\TranslatorTest;
+use Symfony\Contracts\Tests\Translation\TranslatorTest;
 
 class IdentityTranslatorTest extends TranslatorTest
 {

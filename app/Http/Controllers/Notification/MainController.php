@@ -23,7 +23,7 @@ class MainController extends Controller
     public function read(){
         $notification = Notification::where([
             "user_id" => auth()->id(),
-            "_id" => request('notification_id')
+            "id" => request('notification_id')
         ])->first();
         if(!$notification){
             return respond("Bildirim Bulunamadi",201);

@@ -98,7 +98,11 @@ class ListFailedCommand extends Command
     {
         preg_match('/"([^"]+)"/', $payload['data']['command'], $matches);
 
-        return $matches[1] ?? $payload['job'] ?? null;
+        if (isset($matches[1])) {
+            return $matches[1];
+        }
+
+        return $payload['job'] ?? null;
     }
 
     /**

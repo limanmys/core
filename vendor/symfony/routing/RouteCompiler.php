@@ -111,10 +111,9 @@ class RouteCompiler implements RouteCompilerInterface
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
-        preg_match_all('#\{(!)?(\w+)\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        preg_match_all('#\{\w+\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
         foreach ($matches as $match) {
-            $important = $match[1][1] >= 0;
-            $varName = $match[2][0];
+            $varName = substr($match[0][0], 1, -1);
             // get all static text preceding the current variable
             $precedingText = substr($pattern, $pos, $match[0][1] - $pos);
             $pos = $match[0][1] + \strlen($match[0][0]);
@@ -184,13 +183,7 @@ class RouteCompiler implements RouteCompilerInterface
                 $regexp = self::transformCapturingGroupsToNonCapturings($regexp);
             }
 
-            if ($important) {
-                $token = ['variable', $isSeparator ? $precedingChar : '', $regexp, $varName, false, true];
-            } else {
-                $token = ['variable', $isSeparator ? $precedingChar : '', $regexp, $varName];
-            }
-
-            $tokens[] = $token;
+            $tokens[] = ['variable', $isSeparator ? $precedingChar : '', $regexp, $varName];
             $variables[] = $varName;
         }
 
@@ -203,8 +196,7 @@ class RouteCompiler implements RouteCompilerInterface
         if (!$isHost) {
             for ($i = \count($tokens) - 1; $i >= 0; --$i) {
                 $token = $tokens[$i];
-                // variable is optional when it is not important and has a default value
-                if ('variable' === $token[0] && !($token[5] ?? false) && $route->hasDefault($token[3])) {
+                if ('variable' === $token[0] && $route->hasDefault($token[3])) {
                     $firstOptional = $i;
                 } else {
                     break;
@@ -224,7 +216,7 @@ class RouteCompiler implements RouteCompilerInterface
             $regexp .= 'u';
             for ($i = 0, $nbToken = \count($tokens); $i < $nbToken; ++$i) {
                 if ('variable' === $tokens[$i][0]) {
-                    $tokens[$i][4] = true;
+                    $tokens[$i][] = true;
                 }
             }
         }

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * @group legacy
+ * Test class for Event.
  */
 class EventTest extends TestCase
 {

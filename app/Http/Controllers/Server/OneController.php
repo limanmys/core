@@ -12,8 +12,10 @@ use App\Server;
 use App\ServerLog;
 use App\User;
 use App\Widget;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class OneController extends Controller
@@ -31,34 +33,27 @@ class OneController extends Controller
 
     public function remove()
     {
-        // Obtain Server Object
-        $server = Server::where('_id', request('server_id'))->first();
-
         // Check if authenticated user is owner or admin.
-        if ($server->user_id != auth()->id() && !auth()->user()->isAdmin()) {
+        if (server()->user_id != auth()->id() && !auth()->user()->isAdmin()) {
             // Throw error
             return respond("Yalnızca kendi sunucunuzu silebilirsiniz.", 202);
         }
 
-        if ($server->type == "windows_powershell") {
+        if (server()->type == "windows_powershell") {
             if (is_file(env('KEYS_PATH') . 'windows/' . auth()->id() . server()->id)) {
                 unlink(env('KEYS_PATH') . 'windows/' . auth()->id() . server()->id);
             }
 
-            Key::where('server_id', $server->_id)->delete();
+            Key::where('server_id', server()->id)->delete();
         }
 
         // If server has key, simply delete it.
-        if ($server->type == "linux_ssh") {
-            Key::where('server_id', $server->_id)->delete();
+        if (server()->type == "linux_ssh") {
+            Key::where('server_id', server()->id)->delete();
         }
 
-        Widget::where([
-            "server_id" => $server->_id
-        ])->delete();
-
         // Delete the Server Object.
-        $server->delete();
+        server()->delete();
 
         // Redirect user to servers home page.
         return respond(route('servers'), 300);
@@ -90,7 +85,7 @@ class OneController extends Controller
             return respond("Hostname değiştirme betiği bulunamadı.", 201);
         }
 
-        if (!Permission::can(auth()->id(), 'script', $script->_id)) {
+        if (!Permission::can(auth()->id(), 'script', $script->id)) {
             abort(504, "'" . $script->name . "' betiğini çalıştırmak için yetkiniz yok.");
         }
 
@@ -118,9 +113,9 @@ class OneController extends Controller
         }
 
         // Give User a permission to use this server.
-        $permissions = Permission::where('user_id', $user->_id)->first();
+        $permissions = Permission::where('user_id', $user->id)->first();
         $user_servers = (Array)$permissions->server;
-        array_push($user_servers, server()->_id);
+        array_push($user_servers, server()->id);
         $permissions->server = $user_servers;
 
         // Lastly, save all information.
@@ -128,8 +123,8 @@ class OneController extends Controller
 
         if (server()->type == "linux_ssh") {
             // Generate key for user.
-            $flag = Key::initWithKey(server()->key->username, server()->key->_id, server()->ip_address,
-                server()->port, auth()->id(), $user->_id);
+            $flag = Key::initWithKey(server()->key->username, server()->key->id, server()->ip_address,
+                server()->port, auth()->id(), $user->id);
 
             // Check if key initialized successfully.
             if (!$flag) {
@@ -140,10 +135,10 @@ class OneController extends Controller
             $key = new Key([
                 "name" => server()->key->name,
                 "username" => server()->key->username,
-                "server_id" => server()->_id
+                "server_id" => server()->id
             ]);
 
-            $key->user_id = $user->_id;
+            $key->user_id = $user->id;
 
             $key->save();
         }
@@ -188,7 +183,7 @@ class OneController extends Controller
                     ],
                     [
                         "name" => "username",
-                        "contents" => serverKey()->username
+                        "contents" => "liman"
                     ],
                     [
                         "name" => "_xsrf",
@@ -234,13 +229,14 @@ class OneController extends Controller
 
     public function enableExtension()
     {
-        // Retrieve extension object.
-        $extension = Extension::where('_id', \request('extension_id'))->first();
+        if(!auth()->user()->id == server()->user_id && !auth()->user()->isAdmin()){
+            return respond("Bu islemi yalnizca sunucu sahibi ya da bir yonetici yapabilir.");
+        }
+        DB::table("server_extensions")->insert([
+            "server_id" => server()->id,
+            "extension_id" => extension()->id
+        ]);
 
-        $extensions_array = server()->extensions;
-        $extensions_array[$extension->_id] = [];
-        server()->extensions = $extensions_array;
-        server()->save();
         return respond('Servis başarıyla eklendi.');
 
 //        if (array_key_exists("install", $extension->views)) {
@@ -273,14 +269,13 @@ class OneController extends Controller
 
     public function update()
     {
-        $server = Server::where('_id', request('server_id'))->first();
         Notification::new(
             __("Server Adı Güncellemesi"),
             "notify",
-            __(":old isimli sunucu adı :new olarak değiştirildi.", ["old" => $server->name, "new" => request('name')])
+            __(":old isimli sunucu adı :new olarak değiştirildi.", ["old" => server()->name, "new" => request('name')])
         );
 
-        $output = $server->update([
+        $output = server()->update([
             "name" => request('name'),
             "control_port" => request('control_port'),
             "city" => request('city')
@@ -306,10 +301,10 @@ class OneController extends Controller
 
         // Respond according to the flag.
         if ($flag == "1\n") {
-            ServerLog::new("Dosya Yükleme " . request('path'), "Sunucuya dosya yüklendi\n" . request('path') . " ", server()->_id, auth()->id());
+//            ServerLog::new("Dosya Yükleme " . request('path'), "Sunucuya dosya yüklendi\n" . request('path') . " ", server()->id, auth()->id());
             return respond("Dosya başarıyla yüklendi.");
         }
-        ServerLog::new("Dosya Yükleme " . request('path'), "Sunucuya dosya yüklenemedi\n" . request('path') . " ", server()->_id, auth()->id());
+//        ServerLog::new("Dosya Yükleme " . request('path'), "Sunucuya dosya yüklenemedi\n" . request('path') . " ", server()->id, auth()->id());
         return respond('Dosya yüklenemedi.', 201);
     }
 
@@ -329,7 +324,6 @@ class OneController extends Controller
     private function authorized()
     {
         return view('server.one_auth', [
-            "hostname" => server()->run("hostname"),
             "server" => server(),
             "installed_extensions" => $this->installedExtensions(),
             "available_extensions" => $this->availableExtensions(),
@@ -338,7 +332,7 @@ class OneController extends Controller
 
     private function unauthorized()
     {
-        return view('server.one', [
+        return view('server.one_auth', [
             "installed_extensions" => $this->installedExtensions(),
             "available_extensions" => $this->availableExtensions(),
             "server" => server()
@@ -347,35 +341,34 @@ class OneController extends Controller
 
     private function availableExtensions()
     {
-        if (auth()->user()->isAdmin()) {
-            return Extension::all()->whereNotIn('_id', array_keys(server()->extensions));
-        }
-        return Extension::find(Permission::get(auth()->id(), 'extension'))->whereNotIn('_id', array_keys(server()->extensions));
+        return Extension::getAll()->whereNotIn("id",DB::table("server_extensions")->where([
+            "server_id" => server()->id
+        ])->pluck("extension_id")->toArray());
     }
 
     private function installedExtensions()
     {
-        if (auth()->user()->isAdmin()) {
-            return Extension::find(array_keys(server()->extensions));
-        }
-        return Extension::find(Permission::get(auth()->id(), 'extension'))->whereIn('_id', array_keys(server()->extensions));
+        return server()->extensions();
     }
 
     public function favorite()
     {
-        $favorites = auth()->user()->favorites;
-        if (!$favorites) {
-            $favorites = [];
+        $current = DB::table("user_favorites")->where([
+            "user_id" => auth()->user()->id,
+            "server_id" => server()->id
+        ])->first();
+
+        if($current && request("action") != "true"){
+            DB::table("user_favorites")->where([
+                "user_id" => auth()->user()->id,
+                "server_id" => server()->id
+            ])->delete();
+        }else if(!$current){
+            DB::table("user_favorites")->insert([
+                "server_id" => server()->id,
+                "user_id" => auth()->user()->id,
+            ]);
         }
-        $favorites = array_unique($favorites);
-        if (request('action') == "true") {
-            array_push($favorites, server()->_id);
-        } else {
-            $key = array_search(server()->_id, $favorites);
-            unset($favorites[$key]);
-        }
-        auth()->user()->favorites = array_values($favorites);
-        auth()->user()->save();
 
         return respond("Düzenlendi.", 200);
     }
@@ -383,9 +376,12 @@ class OneController extends Controller
     public function stats()
     {
         if(server()->type == "linux_ssh"){
-            $disk = substr(server()->run('df -h | grep ^/dev ', false), 0, -1);
+            $disk = server()->run('df -h / | grep /',false);
+            preg_match("/(\d+)%/",$disk,$test);
+            $disk = $test[1];
             $ram = server()->run("free -m | awk '/Mem:/ { total=($6/$2)*100 } END { printf(\"%3.1f\", total) }'", false);
             $cpu = substr(server()->run("grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'", false), 0, -1);
+            $cpu = substr($cpu,0,5);
         }elseif (server()->type == "windows_powershell"){
             $cpu = substr(server()->run("Get-WmiObject win32_processor | Measure-Object -property LoadPercentage -Average | Select Average"),23,-3);
             $disk = round(floatval(server()->run("(Get-WmiObject -Class Win32_logicalDisk | ? {\\\$_.DriveType -eq '3'}).FreeSpace / (Get-WmiObject -Class Win32_logicalDisk | ? {\\\$_.DriveType -eq '3'}).Size * 100")),2);
@@ -400,7 +396,91 @@ class OneController extends Controller
         return [
             "disk" => $disk,
             "ram" => $ram,
-            "cpu" => $cpu
+            "cpu" => $cpu,
+            "time" => Carbon::now()->format("H:i:s")
         ];
+    }
+
+    public function serviceList()
+    {
+        if(server()->type == "linux_ssh"){
+            $raw = server()->run("systemctl list-units | grep service | awk '{print $1 \":\"$2\" \"$3\" \"$4\":\"$5\" \"$6\" \"$7\" \"$8\" \"$9\" \"$10}'",false);
+            $services = [];
+            foreach (explode("\n", $raw) as $package) {
+                if ($package == "") {
+                    continue;
+                }
+                $row = explode(":", trim($package));
+                try {
+                    array_push($services, [
+                        "name" => $row[0],
+                        "status" => $row[1],
+                        "description" => $row[2]
+                    ]);
+                } catch (Exception $exception) {
+                }
+            }
+        }elseif (server()->type == "windows_powershell"){
+            $rawServices = server()->run("(Get-WmiObject win32_service | select Name, DisplayName, State, StartMode) -replace '\s\s+',':'");
+            $services = [];
+            foreach (explode('}',$rawServices) as $service){
+                $row = explode(";",substr($service,2));
+                try{
+                    array_push($services,[
+                        "name" => trim(explode('=',$row[0])[1]),
+                        "displayName" => trim(explode('=',$row[1])[1]),
+                        "state" => trim(explode('=',$row[2])[1]),
+                        "startMode" => trim(explode('=',$row[3])[1])
+                    ]);
+                }catch (Exception $exception){
+                }
+            }
+        }else{
+            return respond("Bu sunucudaki servisleri goremezsiniz.",403);
+        }
+        return respond(view('l.table',[
+            "value" => [],
+            "title" => [
+                "Servis Adı" , "Durumu" , "Açıklaması"
+            ],
+            "display" => [
+                "name" , "status" , "description"
+            ],
+        ]));
+
+    }
+
+    public function packageList()
+    {
+        if(server()->type == "linux_ssh"){
+            $raw = server()->run("sudo apt list --installed 2>/dev/null | sed '1,1d'", false);
+            $packages = [];
+            foreach (explode("\n", $raw) as $package) {
+                if ($package == "") {
+                    continue;
+                }
+                $row = explode(" ", $package);
+                try {
+                    array_push($packages, [
+                        "name" => $row[0],
+                        "version" => $row[1],
+                        "type" => $row[2],
+                        "status" => $row[3]
+                    ]);
+                } catch (Exception $exception) {
+                }
+            }
+        }else{
+            return respond("Bu sunucudaki paketleri goremezsiniz.",403);
+        }
+        return respond(view('l.table',[
+            "value" => [$packages],
+            "title" => [
+                "Paket Adı" , "Versiyon" , "Tip" , "Durumu"
+            ],
+            "display" => [
+                "name" , "version", "type" , "status"
+            ],
+        ]));
     }
 }

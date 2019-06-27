@@ -4,9 +4,10 @@ namespace App;
 
 use App\Classes\Connector\SSHConnector;
 use App\Classes\Connector\WinRMConnector;
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class Server
@@ -14,16 +15,8 @@ use Illuminate\Database\Query\Builder;
  * @method static Builder|Server where($field, $value)
  * @method static Builder|Server find($field)
  */
-class Server extends Eloquent
+class Server extends Model
 {
-    /**
-     * @var string
-     */
-    protected $collection = 'servers';
-    /**
-     * @var string
-     */
-    protected $connection = 'mongodb';
     /**
      * @var array
      */
@@ -132,7 +125,18 @@ class Server extends Eloquent
         if(auth()->user()->isAdmin()){
             return Server::all();
         }
-        return Server::find(Permission::get(auth()->id(), 'server'));
+        return Server::find(Permission::whereNotNull("server_id")->pluck("server_id")->toArray());
+    }
+
+    public function extensions()
+    {
+        $extensions = Extension::find(DB::table("server_extensions")
+            ->where("server_id",$this->id)->pluck("extension_id")->toArray());
+        if(auth()->user()->isAdmin()){
+            return $extensions;
+        }
+        return $extensions->whereIn("id",DB::table("permissions")
+            ->whereNotNull("extension_id")->pluck("extension_id")->toArray());
     }
 
 }

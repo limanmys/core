@@ -65,10 +65,10 @@ class DiscoverEvents
      */
     protected static function classFromFile(SplFileInfo $file, $basePath)
     {
-        $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
+        $class = trim(str_replace($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
 
         return str_replace(
-            [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
+            [DIRECTORY_SEPARATOR, 'App\\'],
             ['\\', app()->getNamespace()],
             ucfirst(Str::replaceLast('.php', '', $class))
         );

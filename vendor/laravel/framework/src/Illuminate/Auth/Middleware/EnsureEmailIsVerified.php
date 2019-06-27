@@ -13,7 +13,7 @@ class EnsureEmailIsVerified
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string|null  $redirectToRoute
+     * @param  string  $redirectToRoute
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle($request, Closure $next, $redirectToRoute = null)

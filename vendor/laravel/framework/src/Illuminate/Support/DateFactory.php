@@ -134,6 +134,7 @@ class DateFactory
     /**
      * Use the default date class when generating dates.
      *
+     * @param  callable  $callable
      * @return void
      */
     public static function useDefault()

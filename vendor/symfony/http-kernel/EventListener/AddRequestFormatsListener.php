@@ -19,8 +19,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Adds configured formats to each request.
  *
  * @author Gildas Quemener <gildas.quemener@gmail.com>
- *
- * @final since Symfony 4.3
  */
 class AddRequestFormatsListener implements EventSubscriberInterface
 {
@@ -47,6 +45,6 @@ class AddRequestFormatsListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return [KernelEvents::REQUEST => ['onKernelRequest', 100]];
+        return [KernelEvents::REQUEST => ['onKernelRequest', 1]];
     }
 }

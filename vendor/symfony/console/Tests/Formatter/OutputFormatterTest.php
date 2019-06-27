@@ -228,7 +228,7 @@ class OutputFormatterTest extends TestCase
         );
     }
 
-    public function testFormatterHasStyles()
+    public function testNotDecoratedFormatter()
     {
         $formatter = new OutputFormatter(false);
 
@@ -236,35 +236,40 @@ class OutputFormatterTest extends TestCase
         $this->assertTrue($formatter->hasStyle('info'));
         $this->assertTrue($formatter->hasStyle('comment'));
         $this->assertTrue($formatter->hasStyle('question'));
-    }
 
-    /**
-     * @dataProvider provideDecoratedAndNonDecoratedOutput
-     */
-    public function testNotDecoratedFormatter(string $input, string $expectedNonDecoratedOutput, string $expectedDecoratedOutput, string $terminalEmulator = 'foo')
-    {
-        $prevTerminalEmulator = getenv('TERMINAL_EMULATOR');
-        putenv('TERMINAL_EMULATOR='.$terminalEmulator);
+        $this->assertEquals(
+            'some error', $formatter->format('<error>some error</error>')
+        );
+        $this->assertEquals(
+            'some info', $formatter->format('<info>some info</info>')
+        );
+        $this->assertEquals(
+            'some comment', $formatter->format('<comment>some comment</comment>')
+        );
+        $this->assertEquals(
+            'some question', $formatter->format('<question>some question</question>')
+        );
+        $this->assertEquals(
+            'some text with inline style', $formatter->format('<fg=red>some text with inline style</>')
+        );
 
-        try {
-            $this->assertEquals($expectedDecoratedOutput, (new OutputFormatter(true))->format($input));
-            $this->assertEquals($expectedNonDecoratedOutput, (new OutputFormatter(false))->format($input));
-        } finally {
-            putenv('TERMINAL_EMULATOR'.($prevTerminalEmulator ? "=$prevTerminalEmulator" : ''));
-        }
-    }
+        $formatter->setDecorated(true);
 
-    public function provideDecoratedAndNonDecoratedOutput()
-    {
-        return [
-            ['<error>some error</error>', 'some error', "\033[37;41msome error\033[39;49m"],
-            ['<info>some info</info>', 'some info', "\033[32msome info\033[39m"],
-            ['<comment>some comment</comment>', 'some comment', "\033[33msome comment\033[39m"],
-            ['<question>some question</question>', 'some question', "\033[30;46msome question\033[39;49m"],
-            ['<fg=red>some text with inline style</>', 'some text with inline style', "\033[31msome text with inline style\033[39m"],
-            ['<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', "\033]8;;idea://open/?file=/path/SomeFile.php&line=12\033\\some URL\033]8;;\033\\"],
-            ['<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', 'some URL', 'JetBrains-JediTerm'],
-        ];
+        $this->assertEquals(
+            "\033[37;41msome error\033[39;49m", $formatter->format('<error>some error</error>')
+        );
+        $this->assertEquals(
+            "\033[32msome info\033[39m", $formatter->format('<info>some info</info>')
+        );
+        $this->assertEquals(
+            "\033[33msome comment\033[39m", $formatter->format('<comment>some comment</comment>')
+        );
+        $this->assertEquals(
+            "\033[30;46msome question\033[39;49m", $formatter->format('<question>some question</question>')
+        );
+        $this->assertEquals(
+            "\033[31msome text with inline style\033[39m", $formatter->format('<fg=red>some text with inline style</>')
+        );
     }
 
     public function testContentWithLineBreaks()

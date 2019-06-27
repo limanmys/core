@@ -16,7 +16,7 @@ class PostDec extends Expr
      * @param array $attributes Additional attributes
      */
     public function __construct(Expr $var, array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->var = $var;
     }
 

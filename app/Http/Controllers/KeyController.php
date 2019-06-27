@@ -19,7 +19,7 @@ class KeyController extends Controller
         // Retrieve User servers that has permission.
         $servers = servers()->whereIn('type',['windows_powershell','linux_ssh']);
         foreach ($keys as $key){
-            $server = $servers->where('_id',$key->server_id)->first();
+            $server = $servers->where('id',$key->server_id)->first();
             $key->server_name = ($server) ? $server->name : __("Sunucu Silinmiş.");
         }
 
@@ -46,7 +46,7 @@ class KeyController extends Controller
 
         $key->save();
 
-        $server = Server::where('_id',request('server_id'))->first();
+        $server = Server::where('id',request('server_id'))->first();
         
         if(!$server){
             abort(504,"Sunucu Bulunamadi");
@@ -68,7 +68,6 @@ class KeyController extends Controller
             }
         }
 
-
         if($flag != "OK"){
             $key->delete();
             return respond($flag,201);
@@ -80,13 +79,9 @@ class KeyController extends Controller
 
     public function delete()
     {
-        $key = \App\Key::where('_id',request('key_id'))->first();
+        $key = Key::where('id',request('key_id'))->first();
         if(!$key){
             abort(504,"Anahtar Bulunamadi");
-        }
-
-        if(Server::where('_id',$key->server_id)->exists()){
-            $server = Server::where('_id',$key->server_id)->first();
         }
 
         $key->delete();

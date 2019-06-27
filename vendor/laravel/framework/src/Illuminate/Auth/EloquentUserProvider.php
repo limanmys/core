@@ -68,7 +68,7 @@ class EloquentUserProvider implements UserProvider
         )->first();
 
         if (! $retrievedModel) {
-            return;
+            return null;
         }
 
         $rememberToken = $retrievedModel->getRememberToken();

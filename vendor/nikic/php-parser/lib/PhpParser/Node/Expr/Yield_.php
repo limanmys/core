@@ -19,7 +19,7 @@ class Yield_ extends Expr
      * @param array     $attributes Additional attributes
      */
     public function __construct(Expr $value = null, Expr $key = null, array $attributes = []) {
-        $this->attributes = $attributes;
+        parent::__construct($attributes);
         $this->key = $key;
         $this->value = $value;
     }

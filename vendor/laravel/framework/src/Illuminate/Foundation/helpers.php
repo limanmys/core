@@ -108,7 +108,7 @@ if (! function_exists('app')) {
     /**
      * Get the available container instance.
      *
-     * @param  string|null  $abstract
+     * @param  string  $abstract
      * @param  array   $parameters
      * @return mixed|\Illuminate\Contracts\Foundation\Application
      */
@@ -140,7 +140,7 @@ if (! function_exists('asset')) {
      * Generate an asset path for the application.
      *
      * @param  string  $path
-     * @param  bool|null  $secure
+     * @param  bool    $secure
      * @return string
      */
     function asset($path, $secure = null)
@@ -266,7 +266,7 @@ if (! function_exists('config')) {
      *
      * If an array is passed as the key, we will assume you want to set an array of values.
      *
-     * @param  array|string|null  $key
+     * @param  array|string  $key
      * @param  mixed  $default
      * @return mixed|\Illuminate\Config\Repository
      */
@@ -301,11 +301,11 @@ if (! function_exists('cookie')) {
     /**
      * Create a new cookie instance.
      *
-     * @param  string|null  $name
-     * @param  string|null  $value
+     * @param  string  $name
+     * @param  string  $value
      * @param  int  $minutes
-     * @param  string|null  $path
-     * @param  string|null  $domain
+     * @param  string  $path
+     * @param  string  $domain
      * @param  bool  $secure
      * @param  bool  $httpOnly
      * @param  bool  $raw
@@ -524,7 +524,7 @@ if (! function_exists('logger')) {
     /**
      * Log a debug message to the logs.
      *
-     * @param  string|null  $message
+     * @param  string  $message
      * @param  array  $context
      * @return \Illuminate\Log\LogManager|null
      */
@@ -542,7 +542,7 @@ if (! function_exists('logs')) {
     /**
      * Get a log driver instance.
      *
-     * @param  string|null  $driver
+     * @param  string  $driver
      * @return \Illuminate\Log\LogManager|\Psr\Log\LoggerInterface
      */
     function logs($driver = null)
@@ -597,7 +597,7 @@ if (! function_exists('old')) {
     /**
      * Retrieve an old input item.
      *
-     * @param  string|null  $key
+     * @param  string  $key
      * @param  mixed   $default
      * @return mixed
      */
@@ -642,7 +642,7 @@ if (! function_exists('redirect')) {
      * @param  string|null  $to
      * @param  int     $status
      * @param  array   $headers
-     * @param  bool|null    $secure
+     * @param  bool    $secure
      * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
      */
     function redirect($to = null, $status = 302, $headers = [], $secure = null)
@@ -677,7 +677,7 @@ if (! function_exists('request')) {
     /**
      * Get an instance of the current request or an input item from the request.
      *
-     * @param  array|string|null  $key
+     * @param  array|string  $key
      * @param  mixed   $default
      * @return \Illuminate\Http\Request|string|array
      */
@@ -703,17 +703,14 @@ if (! function_exists('rescue')) {
      *
      * @param  callable  $callback
      * @param  mixed  $rescue
-     * @param  bool  $report
      * @return mixed
      */
-    function rescue(callable $callback, $rescue = null, $report = true)
+    function rescue(callable $callback, $rescue = null)
     {
         try {
             return $callback();
         } catch (Throwable $e) {
-            if ($report) {
-                report($e);
-            }
+            report($e);
 
             return value($rescue);
         }
@@ -816,7 +813,7 @@ if (! function_exists('session')) {
      *
      * If an array is passed as the key, we will assume you want to set an array of values.
      *
-     * @param  array|string|null  $key
+     * @param  array|string  $key
      * @param  mixed  $default
      * @return mixed|\Illuminate\Session\Store|\Illuminate\Session\SessionManager
      */
@@ -864,9 +861,9 @@ if (! function_exists('trans')) {
     /**
      * Translate the given message.
      *
-     * @param  string|null  $key
+     * @param  string  $key
      * @param  array   $replace
-     * @param  string|null  $locale
+     * @param  string  $locale
      * @return \Illuminate\Contracts\Translation\Translator|string|array|null
      */
     function trans($key = null, $replace = [], $locale = null)
@@ -886,7 +883,7 @@ if (! function_exists('trans_choice')) {
      * @param  string  $key
      * @param  int|array|\Countable  $number
      * @param  array   $replace
-     * @param  string|null  $locale
+     * @param  string  $locale
      * @return string
      */
     function trans_choice($key, $number, array $replace = [], $locale = null)
@@ -901,7 +898,7 @@ if (! function_exists('__')) {
      *
      * @param  string  $key
      * @param  array  $replace
-     * @param  string|null  $locale
+     * @param  string  $locale
      * @return string|array|null
      */
     function __($key, $replace = [], $locale = null)
@@ -916,7 +913,7 @@ if (! function_exists('url')) {
      *
      * @param  string  $path
      * @param  mixed   $parameters
-     * @param  bool|null    $secure
+     * @param  bool    $secure
      * @return \Illuminate\Contracts\Routing\UrlGenerator|string
      */
     function url($path = null, $parameters = [], $secure = null)
@@ -955,7 +952,7 @@ if (! function_exists('view')) {
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param  string|null  $view
+     * @param  string  $view
      * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
      * @param  array   $mergeData
      * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory

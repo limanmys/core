@@ -59,7 +59,7 @@ class CacheWarmerAggregateTest extends TestCase
         $warmer
             ->expects($this->once())
             ->method('isOptional')
-            ->willReturn(true);
+            ->will($this->returnValue(true));
         $warmer
             ->expects($this->never())
             ->method('warmUp');

@@ -403,16 +403,4 @@ trait Options
 
         return $settings;
     }
-
-    /**
-     * Show truthy properties on var_dump().
-     *
-     * @return array
-     */
-    public function __debugInfo()
-    {
-        return array_filter(get_object_vars($this), function ($var) {
-            return $var;
-        });
-    }
 }

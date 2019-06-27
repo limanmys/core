@@ -66,9 +66,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         if (null !== $this->logger) {
             $containerDeprecationLogs = $this->getContainerDeprecationLogs();
             $this->data = $this->computeErrorsCount($containerDeprecationLogs);
-            // get compiler logs later (only when they are needed) to improve performance
-            $this->data['compiler_logs'] = [];
-            $this->data['compiler_logs_filepath'] = $this->containerPathPrefix.'Compiler.log';
+            $this->data['compiler_logs'] = $this->getContainerCompilerLogs();
             $this->data['logs'] = $this->sanitizeLogs(array_merge($this->logger->getLogs($this->currentRequest), $containerDeprecationLogs));
             $this->data = $this->cloneVar($this->data);
         }
@@ -112,7 +110,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
     public function getCompilerLogs()
     {
-        return $this->cloneVar($this->getContainerCompilerLogs($this->data['compiler_logs_filepath'] ?? null));
+        return isset($this->data['compiler_logs']) ? $this->data['compiler_logs'] : [];
     }
 
     /**
@@ -149,14 +147,14 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return $logs;
     }
 
-    private function getContainerCompilerLogs(?string $compilerLogsFilepath = null): array
+    private function getContainerCompilerLogs()
     {
-        if (!file_exists($compilerLogsFilepath)) {
+        if (null === $this->containerPathPrefix || !file_exists($file = $this->containerPathPrefix.'Compiler.log')) {
             return [];
         }
 
         $logs = [];
-        foreach (file($compilerLogsFilepath, FILE_IGNORE_NEW_LINES) as $log) {
+        foreach (file($file, FILE_IGNORE_NEW_LINES) as $log) {
             $log = explode(': ', $log, 2);
             if (!isset($log[1]) || !preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)++$/', $log[0])) {
                 $log = ['Unknown Compiler Pass', implode(': ', $log)];

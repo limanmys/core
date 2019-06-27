@@ -12,14 +12,13 @@
         "target_id" => "add_server",
         "text" => "Sunucu Ekle"
     ])<br><br>
-
     @include('l.table',[
         "value" => servers(),
         "title" => [
             "Sunucu Adı" , "İp Adresi" , "*hidden*" , "Kontrol Portu", "*hidden*" ,"*hidden*"
         ],
         "display" => [
-            "name" , "ip_address", "type:type" , "control_port", "city:city", "_id:server_id"
+            "name" , "ip_address", "type:type" , "control_port", "city:city", "id:server_id"
         ],
         "menu" => [
             "Düzenle" => [
