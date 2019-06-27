@@ -189,6 +189,8 @@ function readNotifications(id) {
 let inputs =[];
 let modalData = [];
 
+
+
 function updateTable(extraVariableName = null){
     for(let i = 0;i< inputs.length ; i++){
         let element = inputs[i][0];

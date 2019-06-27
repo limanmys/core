@@ -1,53 +1,110 @@
 <?php
+
 namespace Jenssegers\Blade;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\Container as ContainerInterface;
+use Illuminate\Contracts\View\Factory as FactoryContract;
+use Illuminate\Contracts\View\View;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\View\Factory;
 use Illuminate\View\ViewServiceProvider;
 
-class Blade
+class Blade implements FactoryContract
 {
-
     /**
-     * Container instance.
-     *
      * @var Container
      */
     protected $container;
 
     /**
-     * Engine Resolver
-     *
-     * @var
+     * @var Factory
      */
-    protected $engineResolver;
+    private $factory;
 
     /**
-     * Constructor.
-     *
-     * @param array     $viewPaths
-     * @param string    $cachePath
-     * @param Container $container
+     * @var BladeCompiler
      */
-    public function __construct($viewPaths, $cachePath, ContainerInterface $container = null)
+    private $compiler;
+
+    public function __construct($viewPaths, string $cachePath, ContainerInterface $container = null)
     {
-        $this->viewPaths = $viewPaths;
-        $this->cachePath = $cachePath;
         $this->container = $container ?: new Container;
 
-        $this->setupContainer();
-
+        $this->setupContainer((array) $viewPaths, $cachePath);
         (new ViewServiceProvider($this->container))->register();
 
-        $this->engineResolver = $this->container->make('view.engine.resolver');
+        $this->factory = $this->container->get('view');
+        $this->compiler = $this->container->get('blade.compiler');
     }
 
-    /**
-     * Bind required instances for the service provider.
-     */
-    protected function setupContainer()
+    public function render(string $view, array $data = [], array $mergeData = []): string
+    {
+        return $this->make($view, $data, $mergeData)->render();
+    }
+
+    public function make($view, $data = [], $mergeData = []): View
+    {
+        return $this->factory->make($view, $data, $mergeData);
+    }
+
+    public function compiler(): BladeCompiler
+    {
+        return $this->compiler;
+    }
+
+    public function directive(string $name, callable $handler)
+    {
+        $this->compiler->directive($name, $handler);
+    }
+
+    public function exists($view): bool
+    {
+        return $this->factory->exists($view);
+    }
+
+    public function file($path, $data = [], $mergeData = []): View
+    {
+        return $this->factory->file($path, $data, $mergeData);
+    }
+
+    public function share($key, $value = null)
+    {
+        return $this->factory->shared($key, $value);
+    }
+
+    public function composer($views, $callback): array
+    {
+        return $this->factory->composer($views, $callback);
+    }
+
+    public function creator($views, $callback): array
+    {
+        return $this->factory->creator($views, $callback);
+    }
+
+    public function addNamespace($namespace, $hints): self
+    {
+        $this->factory->addNamespace($namespace, $hints);
+
+        return $this;
+    }
+
+    public function replaceNamespace($namespace, $hints): self
+    {
+        $this->factory->replaceNamespace($namespace, $hints);
+
+        return $this;
+    }
+
+    public function __call(string $method, array $params)
+    {
+        return call_user_func_array([$this->factory, $method], $params);
+    }
+
+    protected function setupContainer(array $viewPaths, string $cachePath)
     {
         $this->container->bindIf('files', function () {
             return new Filesystem;
@@ -57,50 +114,11 @@ class Blade
             return new Dispatcher;
         }, true);
 
-        $this->container->bindIf('config', function () {
+        $this->container->bindIf('config', function () use ($viewPaths, $cachePath) {
             return [
-                'view.paths'    => (array) $this->viewPaths,
-                'view.compiled' => $this->cachePath,
+                'view.paths' => $viewPaths,
+                'view.compiled' => $cachePath,
             ];
         }, true);
     }
-
-    /**
-     * Render shortcut.
-     *
-     * @param  string $view
-     * @param  array  $data
-     * @param  array  $mergeData
-     *
-     * @return string
-     */
-    public function render($view, $data = [], $mergeData = [])
-    {
-        return $this->container['view']->make($view, $data, $mergeData)->render();
-    }
-
-    /**
-     * Get the compiler
-     *
-     * @return mixed
-     */
-    public function compiler()
-    {
-        $bladeEngine = $this->engineResolver->resolve('blade');
-
-        return $bladeEngine->getCompiler();
-    }
-
-    /**
-     * Pass any method to the view factory instance.
-     *
-     * @param  string $method
-     * @param  array  $params
-     * @return mixed
-     */
-    public function __call($method, $params)
-    {
-        return call_user_func_array([$this->container['view'], $method], $params);
-    }
-
 }

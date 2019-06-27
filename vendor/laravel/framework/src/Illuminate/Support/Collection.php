@@ -36,8 +36,6 @@ use Illuminate\Contracts\Support\Arrayable;
  * @property-read HigherOrderCollectionProxy $sortByDesc
  * @property-read HigherOrderCollectionProxy $sum
  * @property-read HigherOrderCollectionProxy $unique
- *
- * Class Collection
  */
 class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
@@ -408,6 +406,64 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Retrieve duplicate items from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  bool  $strict
+     * @return static
+     */
+    public function duplicates($callback = null, $strict = false)
+    {
+        $items = $this->map($this->valueRetriever($callback));
+
+        $uniqueItems = $items->unique(null, $strict);
+
+        $compare = $this->duplicateComparator($strict);
+
+        $duplicates = new static;
+
+        foreach ($items as $key => $value) {
+            if ($uniqueItems->isNotEmpty() && $compare($value, $uniqueItems->first())) {
+                $uniqueItems->shift();
+            } else {
+                $duplicates[$key] = $value;
+            }
+        }
+
+        return $duplicates;
+    }
+
+    /**
+     * Retrieve duplicate items from the collection using strict comparison.
+     *
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public function duplicatesStrict($callback = null)
+    {
+        return $this->duplicates($callback, true);
+    }
+
+    /**
+     * Get the comparison function to detect duplicates.
+     *
+     * @param  bool  $strict
+     * @return \Closure
+     */
+    protected function duplicateComparator($strict)
+    {
+        if ($strict) {
+            return function ($a, $b) {
+                return $a === $b;
+            };
+        }
+
+        return function ($a, $b) {
+            return $a == $b;
+        };
+    }
+
+    /**
      * Execute a callback over each item.
      *
      * @param  callable  $callback
@@ -748,7 +804,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Get the first item from the collection.
+     * Get the first item from the collection passing the given truth test.
      *
      * @param  callable|null  $callback
      * @param  mixed  $default
@@ -1798,7 +1854,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get a value retrieving callback.
      *
-     * @param  string  $value
+     * @param  callable|string|null  $value
      * @return callable
      */
     protected function valueRetriever($value)

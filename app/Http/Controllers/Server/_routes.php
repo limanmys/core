@@ -67,4 +67,6 @@ Route::group(['middleware' => ['server']], function () {
     Route::post('/sunucu/servis/','Server\OneController@serviceList')->name('server_service_list');
 
     Route::post('/sunucu/paketler','Server\OneController@packageList')->name('server_package_list');
+
+    Route::post('/sunucu/yukselt','Server\OneController@upgradeServer')->name('server_upgrade');
 });

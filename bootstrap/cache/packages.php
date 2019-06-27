@@ -6,14 +6,6 @@
       0 => 'BeyondCode\\DumpServer\\DumpServerServiceProvider',
     ),
   ),
-  'jenssegers/mongodb' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Jenssegers\\Mongodb\\MongodbServiceProvider',
-      1 => 'Jenssegers\\Mongodb\\MongodbQueueServiceProvider',
-    ),
-  ),
   'laravel/passport' => 
   array (
     'providers' => 

@@ -20,7 +20,10 @@
 </body>
 <script>
     window.onload = function () {
-        Swal.close();
+        $(".nav.nav-tabs a").on('click',function () {
+            window.location.hash = $(this).attr("href");
+        });
+        activeTab();
         $('table').not('.notDataTable').DataTable({
             autoFill : true,
             bFilter: true,
@@ -39,6 +42,16 @@
         }, 3000);
         @endif
     };
+
+    function activeTab(){
+        let element = $('a[href="'+ window.location.hash +'"]');
+        if(element){
+            element.tab('show');
+            if(element.attr("onclick")){
+                element.click();
+            }
+        }
+    }
 
     function terminal(serverId, name) {
         let elm = $("#terminal");

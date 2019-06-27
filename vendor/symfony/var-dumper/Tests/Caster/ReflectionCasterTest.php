@@ -37,7 +37,7 @@ ReflectionClass {
 %A]
   constants: array:3 [
     "IS_IMPLICIT_ABSTRACT" => 16
-    "IS_EXPLICIT_ABSTRACT" => 32
+    "IS_EXPLICIT_ABSTRACT" => %d
     "IS_FINAL" => %d
   ]
   properties: array:%d [
@@ -70,10 +70,7 @@ EOTXT
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'
 Closure($x) {
-%Aparameters: {
-    $x: {}
-  }
-  use: {
+%Ause: {
     $a: 123
     $b: & 123
   }
@@ -117,7 +114,7 @@ EOTXT
     {
         $var = function &($a = 5) {};
 
-        $this->assertDumpEquals('Closure&($a = 5) { …6}', $var, Caster::EXCLUDE_VERBOSE);
+        $this->assertDumpEquals('Closure&($a = 5) { …5}', $var, Caster::EXCLUDE_VERBOSE);
     }
 
     public function testReflectionParameter()

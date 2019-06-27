@@ -14,7 +14,6 @@
         "ext-zip": "*",
         "guzzlehttp/guzzle": "~6.0",
         "jenssegers/blade": "^1.1",
-        "jenssegers/mongodb": "^3.4",
         "laravel/framework": "5.8.*",
         "laravel/passport": "^7.3",
         "laravel/tinker": "^1.0",

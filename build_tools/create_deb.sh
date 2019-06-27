@@ -27,6 +27,7 @@ systemctl enable liman-webssh
 systemctl start webssh
 systemctl restart nginx
 systemctl restart php7.3-fpm
+php /liman/server/artisan migrate
 """ > DEBIAN/postinst
 chmod 775 DEBIAN/postinst
 

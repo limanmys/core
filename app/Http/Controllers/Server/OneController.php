@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Server;
 
+use App\Classes\Connector\SSHConnector;
+use App\Classes\Connector\WinRMConnector;
 use App\Extension;
 use App\Http\Controllers\Controller;
 use App\Key;
@@ -26,9 +28,11 @@ class OneController extends Controller
             abort(504, "Sunucu Bulunamadı.");
         }
 
-        // Determine if request should be considered authorized or unauthorized.
-        return (server()->type == "linux_ssh" || server()->type == "windows_powershell")
-            ? $this->authorized() : $this->unauthorized();
+        return view('server.one', [
+            "server" => server(),
+            "installed_extensions" => $this->installedExtensions(),
+            "available_extensions" => $this->availableExtensions(),
+        ]);
     }
 
     public function remove()
@@ -321,23 +325,6 @@ class OneController extends Controller
         return response()->download('/tmp/' . $file, $file_name[count($file_name) - 1])->deleteFileAfterSend();
     }
 
-    private function authorized()
-    {
-        return view('server.one_auth', [
-            "server" => server(),
-            "installed_extensions" => $this->installedExtensions(),
-            "available_extensions" => $this->availableExtensions(),
-        ]);
-    }
-
-    private function unauthorized()
-    {
-        return view('server.one_auth', [
-            "installed_extensions" => $this->installedExtensions(),
-            "available_extensions" => $this->availableExtensions(),
-            "server" => server()
-        ]);
-    }
 
     private function availableExtensions()
     {
@@ -438,15 +425,15 @@ class OneController extends Controller
         }else{
             return respond("Bu sunucudaki servisleri goremezsiniz.",403);
         }
-        return respond(view('l.table',[
-            "value" => [],
+        return view('l.table',[
+            "value" => $services,
             "title" => [
                 "Servis Adı" , "Durumu" , "Açıklaması"
             ],
             "display" => [
                 "name" , "status" , "description"
             ],
-        ]));
+        ]);
 
     }
 
@@ -473,14 +460,63 @@ class OneController extends Controller
         }else{
             return respond("Bu sunucudaki paketleri goremezsiniz.",403);
         }
-        return respond(view('l.table',[
-            "value" => [$packages],
+        return view('l.table',[
+            "value" => $packages,
             "title" => [
                 "Paket Adı" , "Versiyon" , "Tip" , "Durumu"
             ],
             "display" => [
                 "name" , "version", "type" , "status"
             ],
-        ]));
+        ]);
+    }
+
+    public function upgradeServer()
+    {
+        if(server()->type == "linux_ssh" || server()->type == "windows_powershell"){
+            return respond("Bu Sunucuda yukseltme yapilamaz.",201);
+        }
+
+        $key = new Key([
+           "username" => "liman",
+            "user_id" => auth()->user()->id,
+            "server_id" => server()->id
+
+        ]);
+
+        $key->save();
+
+        // Init key with parameters.
+        if(server()->type == "linux"){
+            try{
+                $flag = SSHConnector::create(server(),request('username'),request('password'),auth()->id(),$key);
+            }catch (\Exception $exception){
+                $flag = "Sunucuya bağlanılamadı.";
+            }
+        }
+        if(server()->type == "windows"){
+            try{
+                $flag = WinRMConnector::create(server(),request('username'),request('password'),auth()->id(),$key);
+            }catch (\Exception $exception){
+                $flag = $exception->getMessage();
+            }
+        }
+
+        if($flag != "OK"){
+            $key->delete();
+            return respond($flag,201);
+        }
+
+        if(server()->type == "linux"){
+            server()->update([
+                "type" => "linux_ssh"
+            ]);
+        }else{
+            server()->update([
+                "type" => "windows_powershell"
+            ]);
+        }
+
+        return respond("Sunucu Başarıyla Yükseltildi.");
     }
 }
