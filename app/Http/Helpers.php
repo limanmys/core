@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 if (!function_exists('respond')) {
@@ -170,7 +171,15 @@ if (!function_exists('extensionDb')) {
      */
     function extensionDb($key)
     {
-        return $key;
+        $target = DB::table("user_settings")->where([
+            "user_id" => auth()->user()->id,
+            "extension_id" => extension()->id,
+            "name" => $key
+        ])->first();
+        if($target){
+            return $target->value;
+        }
+        return null;
     }
 }
 

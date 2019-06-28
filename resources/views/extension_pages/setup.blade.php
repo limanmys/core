@@ -18,6 +18,7 @@
                         "server_id" => request()->route('server_id')
                     ])}}" method="POST">
         @csrf
+
         @foreach($extension["database"] as $item)
             @if($item["variable"] == "certificate")
                 <h5>{{$item["name"]}}</h5>
