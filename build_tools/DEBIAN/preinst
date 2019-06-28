@@ -7,9 +7,8 @@ if not getent passwd liman > /dev/null 2>&1; then
     sudo mkdir /home/liman
 fi
 echo "Depolar Güncelleniyor..."
-sudo apt update
 echo "Sistemdeki Paketler Güncelleniyor..."
-sudo apt upgrade -y
+sudo apt update && sudo apt upgrade -y
 echo "Gerekli Paketler Kuruluyor"
 sudo apt -y install apt-transport-https ca-certificates dirmngr python3-pip unzip dnsutils nginx
 echo "Sertifikalar Ekleniyor"
