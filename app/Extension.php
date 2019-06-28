@@ -20,7 +20,7 @@ class Extension extends Model
      * @var array
      */
     protected $fillable = [
-        "name" , "version", "icon"
+        "name" , "version", "icon", "service"
     ];
 
     /**

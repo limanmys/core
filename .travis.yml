@@ -9,8 +9,11 @@ before_install:
   - mkdir -p liman
   - git clone --depth=50 --branch=master https://github.com/mertcelen/liman.git liman/server
   - git clone --depth=50 --branch=master https://github.com/mertcelen/liman-sandbox.git liman/sandbox
+  - git clone --depth=50 --branch=master https://github.com/mertcelen/liman-webssh.git liman/webssh
+  - composer install --no-dev -d liman/server
   - rm -rf liman/server/.git
   - rm -rf liman/sandbox/.git
+  - rm -rf liman/webssh/.git
   - mv create_deb.sh ../create_deb.sh
   - chmod +x ../create_deb.sh
   - git config --local user.name "mertcelen"
@@ -25,6 +28,5 @@ deploy:
   provider: releases
   api_key: ${GITHUB_TOKEN}
   file: /home/travis/build/mertcelen/liman/liman-`cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
-  skip_cleanup: true
   prerelease: true
   name: Liman Version `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`

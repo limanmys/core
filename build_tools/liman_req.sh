@@ -8,14 +8,13 @@ sudo chmod -R o= /liman /home/liman
 sudo chown -R liman:liman /liman /home/liman
 sudo apt update
 sudo apt upgrade -y
-sudo apt -y install git apt-transport-https ca-certificates dirmngr python3-pip unzip dnsutils
+sudo apt -y install apt-transport-https ca-certificates dirmngr python3-pip unzip dnsutils
 sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
 sudo apt update && sudo apt upgrade -y
 sudo apt install php7.3-fpm php7.3 php7.3-sqlite php7.3-ldap php7.3-mbstring php7.3-xml php7.3-zip php7.3-ssh2 -y
 sudo sed -i "s/www-data/liman/g" /etc/php/7.3/fpm/pool.d/www.conf
 sudo echo "TLS_REQCERT     never" | sudo tee --append /etc/ldap/ldap.conf
-sudo apt install nginx -y
 sudo sed -i "s/www-data/liman/g" /etc/nginx/nginx.conf
 sudo ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
 sudo touch /liman/database/liman.sqlite

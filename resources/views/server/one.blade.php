@@ -51,7 +51,7 @@
                 @if($installed_extensions->count() > 0)
                     <h4>{{__("Eklenti Durumları")}}</h4>
                     @foreach($installed_extensions as $extension)
-                        <button type="button" class="btn btn-outline-primary btn-lg"
+                        <button type="button" class="btn btn-secondary btn-lg status_{{$extension->id}}"
                                 style="cursor:default;"
                                 onclick="location.href = '{{route('extension_server',["extension_id" => $extension->id, "city" => $server->city, "server_id" => $server->id])}}'">
                             {{$extension->name}}
@@ -102,17 +102,18 @@
                 @if(auth()->user()->id == server()->user_id || auth()->user()->isAdmin())
                     <button class="btn btn-success" data-toggle="modal" data-target="#install_extension"><i
                                 class="fa fa-plus"></i></button>
-                    <button onclick="removePermission('script')" class="btn btn-danger"><i class="fa fa-minus"></i>
+                    <button disabled onclick="removeExtension()" class="btn btn-danger"><i class="fa fa-minus"></i>
                     </button><br><br>
                 @endif
                 @include('l.table',[
+                    "id" => "installed_extensions",
                     "value" => $installed_extensions,
                     "title" => [
                         "Eklenti Adı" , "Versiyon", "*hidden*"
                     ],
                     "display" => [
                         "name" , "version", "id:extension_id"
-                    ]
+                    ],
                 ])
                 <?php
                 $input_extensions = [];
@@ -266,7 +267,7 @@
                 @elseif(server()->type == "windows")
                     <p>{{__("Windows Sunucunuza WinRM anahtarı ekleyerek Liman üzerindeki ekstra özelliklere erişebilirsiniz.")}}</p>
                 @endif
-                <form id="edit_form" onsubmit="return request('{{route('server_upgrade')}}',this,reload)" target="#">
+                <form id="upgrade_form" onsubmit="return request('{{route('server_upgrade')}}',this,reload)" target="#">
                     <div class="modal-body" style="width: 100%">
                         <h5>{{__("Kullanıcı Adı")}}</h5>
                         <input type="text" name="username" placeholder="{{__("Kullanıcı Adı")}}" class="form-control " required=""
@@ -289,30 +290,6 @@
         "text" => "$server->name isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
         "next" => "redirect",
         "submit_text" => "Sunucuyu Sil"
-    ])
-
-    @include('l.modal',[
-        "id"=>"edit",
-        "title" => "Bilgileri Düzenle",
-        "url" => route('server_update'),
-        "next" => "reload",
-        "inputs" => [
-            "Sunucu Adı" => "name:text",
-            "Kontrol Portu" => "control_port:number",
-            "Şehir:city" => cities(),
-        ],
-        "submit_text" => "Düzenle"
-    ])
-
-    @include('l.modal',[
-        "id"=>"change_hostname",
-        "title" => "Hostname Değiştir",
-        "url" => route('server_hostname'),
-        "next" => "reload",
-        "inputs" => [
-            "Hostname" => "hostname:text",
-        ],
-        "submit_text" => "Değiştir"
     ])
 
     @include('l.modal',[
@@ -364,15 +341,15 @@
         ])
     @endif
     <script>
-        function checkStatus(service) {
+        function checkStatus(id) {
             let data = new FormData();
-            if (!service) {
+            if (!id) {
                 return false;
             }
-            data.append('service', service);
+            data.append('extension_id', id);
             request('{{route('server_check')}}', data, function (response) {
                 let json = JSON.parse(response);
-                let element = $(".status_" + service);
+                let element = $(".status_" + id);
                 element.removeClass('btn-secondary').addClass(json["message"]);
             });
         }
@@ -380,7 +357,7 @@
         @if($installed_extensions->count() > 0)
         @foreach($installed_extensions as $service)
         setInterval(function () {
-            checkStatus('{{$service->service}}');
+            checkStatus('{{$service->id}}');
         }, 3000);
 
         @endforeach
@@ -514,10 +491,16 @@
         function openTerminal() {
             let terminalFrame = $("#terminalFrame");
             if (terminalFrame.attr("src") === "") {
-                console.log("NEW");
                 terminalFrame.attr("src", "{{route('server_terminal',["server_id" => $server->id])}}");
             }
-            console.log("OLD");
         }
+        $(function () {
+            $("#installed_extensions table").DataTable({
+                bFilter: true,
+                "language": {
+                    url: "/turkce.json"
+                }
+            });
+        });
     </script>
 @endsection

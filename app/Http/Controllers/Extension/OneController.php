@@ -437,8 +437,11 @@ class OneController extends Controller
         return respond("Kaydedildi", 200);
     }
 
-    private function generateSandboxCommand($serverObj, $extensionObj, $user_settings, $user_id, $outputs, $viewName, $functionName)
+    private function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_id, $outputs, $viewName, $functionName)
     {
+        if(!$extension_id){
+            $extension_id = extension()->id;
+        }
         $functions = env('EXTENSIONS_PATH') . strtolower($extensionObj["name"]) . "/functions.php";
 
         $combinerFile = env('SANDBOX_PATH') . "index.php";
@@ -486,7 +489,7 @@ class OneController extends Controller
         $command = "sudo runuser liman-" . extension()->id .
             " -c '/usr/bin/php -d display_errors=on $combinerFile $functions "
             . strtolower(extension()->name) .
-            " $viewName \"$server\" \"$extension\" \"$extensionDb\" \"$outputsJson\" \"$request\" \"$functionName\" \"$apiRoute\" \"$navigationRoute\" \"$token\"'";
+            " $viewName \"$server\" \"$extension\" \"$extensionDb\" \"$outputsJson\" \"$request\" \"$functionName\" \"$apiRoute\" \"$navigationRoute\" \"$token\" \"$extension_id\"'";
 
         return $command;
     }

@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\DB;
  * @method static Builder|User newQuery()
  * @method static Builder|User query()
  * @method static Builder|User find($value)
- * @method static Builder|User where($value, $key)
  */
 class User extends Authenticatable
 {

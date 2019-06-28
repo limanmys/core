@@ -122,53 +122,16 @@ class SettingsController extends Controller
         return $arr;
     }
 
-    /**
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
-     */
-    public function addScriptToView()
-    {
-        $extension = Extension::find(request('extension_id'));
-        $temp = $extension->views;
-        if (array_key_exists(request('view'), $extension->views)) {
-            array_push($temp[request('view')], request('unique_code'));
-        } else {
-            $temp[request('view')] = [request('unique_code')];
-        }
-        $extension->views = $temp;
-        $extension->save();
-
-        system_log(7,"EXTENSION_VIEW_SCRIPTS_UPDATE",[
-            "extension_id" => extension()->id,
-        ]);
-
-        return response(__("Başarıyla Eklendi."), 200);
-    }
-
-    /**
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
-     */
-    public function removeScriptFromView()
-    {
-        $extension = Extension::find(request('extension_id'));
-        $temp = $extension->views;
-        if (array_key_exists(request('view'), $extension->views)) {
-            unset($temp[request('view')][array_search(request('unique_code'), $temp[request('view')])]);
-        } else {
-            return response(__("Sayfa Bulunamadı."), 404);
-        }
-        system_log(7,"EXTENSION_VIEW_SCRIPTS_REMOVE",[
-            "extension_id" => extension()->id,
-        ]);
-        return response(__("Başarıyla kaldırıldı."), 200);
-    }
-
     public function update()
     {
         $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
 
         if (request('type') == "general") {
             $params = request()->all();
-//            extension()->update($params);
+            extension()->update($params);
+            $extension["icon"] = request("icon");
+            $extension["service"] = request("service");
+            $extension["version"] = request("version");
         } else {
             $values = $extension[request('table')];
             foreach ($values as $key => $value) {

@@ -66,6 +66,8 @@ class OneController extends Controller
     public function serviceCheck()
     {
         // Check if requested service is running on server.
+        $extension = Extension::find(request('ip'))->first() or abort(504,"Eklenti Bulunamadi");
+
         $output = server()->isRunning(request('service'));
 
         // Return the button class name ~ color to update client.
@@ -518,5 +520,19 @@ class OneController extends Controller
         }
 
         return respond("Sunucu Başarıyla Yükseltildi.");
+    }
+
+    public function removeExtension()
+    {
+        if(server()->user_id != auth()->user()->id && !auth()->user()->isAdmin()){
+            return respond("Yalnızca sunucu sahibi ya da yönetici bir eklentiyi silebilir.",201);
+        }
+
+        DB::table("server_extensions")->where([
+            "server_id" => server()->id,
+            "extension_id" => extension()->id
+        ])->delete();
+
+        return respond("Eklenti Başarıyla Silindi");
     }
 }

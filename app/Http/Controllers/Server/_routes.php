@@ -30,7 +30,7 @@ Route::group(['middleware' => ['server']], function () {
     Route::get('/sunucular/{server_id}', 'Server\OneController@one')->name('server_one');
 
     // Server' Service Status Route
-    Route::post('/sunucu/kontrol', 'Server\OneController@serviceCheck')->name('server_check')->middleware('parameters:service,server_id');
+    Route::post('/sunucu/kontrol', 'Server\OneController@serviceCheck')->name('server_check');
 
     // Server Hostname Update
 
@@ -69,4 +69,6 @@ Route::group(['middleware' => ['server']], function () {
     Route::post('/sunucu/paketler','Server\OneController@packageList')->name('server_package_list');
 
     Route::post('/sunucu/yukselt','Server\OneController@upgradeServer')->name('server_upgrade');
+
+    Route::post('/sunucu/eklentiSil','Server\OneController@removeExtension')->name('server_extension_remove');
 });
