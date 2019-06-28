@@ -13,7 +13,7 @@ sudo mkdir -p /liman/keys/{windows,linux}
 if not getent passwd liman > /dev/null 2>&1; then
     echo "Liman Kullanıcısı Ekleniyor..."
     sudo useradd liman -m
-    echo "liman     ALL=(ALL:ALL) NOPASSWD:ALL" | sudo tee --append /etc/sudoers
+    echo "liman     ALL=\(ALL:ALL\) NOPASSWD:ALL" | sudo tee --append /etc/sudoers
     sudo mkdir /home/liman
 fi
 echo "Depolar Güncelleniyor..."
