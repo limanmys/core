@@ -52,7 +52,7 @@ sudo systemctl enable nginx
 sudo apt-get install python3-setuptools
 sudo runuser liman -c "pip3 install pypsrp paramiko tornado"
 """ > DEBIAN/preinst
-chmod 775 DEBIAN/pretinst
+chmod 775 DEBIAN/preinst
 
 
 echo """
