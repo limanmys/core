@@ -33,4 +33,5 @@ deploy:
   api_key: ${GITHUB_TOKEN}
   file: /home/travis/build/mertcelen/liman/liman-`cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
   prerelease: true
+  skip_cleanup: true
   name: Liman Version `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
