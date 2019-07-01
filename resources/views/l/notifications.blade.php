@@ -15,7 +15,7 @@
             <ul class="menu">
                 @foreach (notifications() as $notification)
                     <li>
-                        <a href="/bildirim/{{$notification->_id}}">
+                        <a href="/bildirim/{{$notification->id}}">
                             @switch($notification->type)
                                 @case('error')
                                 <span style="color: #f56954;width: 100%">

@@ -10,11 +10,19 @@ class MainController extends Controller
 {
     public function add()
     {
-        $widget = new Widget(request()->all());
-        $widget->widget_name = explode(':',request('widget_name'))[0];
-        $widget->title = explode(':',request('widget_name'))[1];
-        $widget->user_id = auth()->id();
-        $widget->type = explode(':',request('widget_name'))[2];
+        if(!auth()->user()->isAdmin && Widget::where("user_id",auth()->user()->id)->count > env("USER_WIDGET_COUNT")){
+            return respond("Widget kotanızı aştınız, yeni widget ekleyemezsiniz");
+        }
+        $widget = new Widget([
+            "name" => explode(':',request('widget_name'))[0],
+            "text" => explode(':',request('widget_name'))[2],
+            "title" => explode(':',request('widget_name'))[1],
+            "user_id" => auth()->user()->id,
+            "extension_id" => extension()->id,
+            "server_id" => server()->id,
+            "function" => explode(':',request('widget_name'))[0],
+            "type" => ""
+        ]);
         $widget->save();
         return respond('Widget Eklendi',200);
     }

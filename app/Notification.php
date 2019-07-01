@@ -36,4 +36,17 @@ class Notification extends Model
 
         return $notification;
     }
+    public static function send($title, $type, $message, $user_id, $server_id = null, $extension_id = null, $level = 0){
+        // Create a notification object and fill values.
+        $notification = new Notification();
+        $notification->user_id = $user_id;
+        $notification->title = $title;
+        $notification->type = $type;
+        $notification->message = $message;
+        $notification->server_id = $server_id;
+        $notification->extension_id = $extension_id;
+        $notification->level = $level;
+        $notification->read = false;
+        $notification->save();
+    }
 }

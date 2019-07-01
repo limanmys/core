@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Permission;
 
 use App\LimanRequest;
+use App\Notification;
 use App\User;
 use App\Http\Controllers\Controller;
 
@@ -73,7 +74,13 @@ class MainController extends Controller
         system_log(7,"REQUEST_UPDATE",[
             "action" => $request
         ]);
-
+        $text = request("status") == "1" ? "İşleniyor." : (request("status") == "2" ? "Tamamlandı" : "Reddedildi");
+        Notification::send(
+            __("Talebiniz güncellendi"),
+            "notify",
+            __("Talebiniz \":status\" olarak güncellendi.", ["status" => __($text)]),
+            $request->user_id
+        );
         if(request('status') == "4"){
             $request->delete();
             return respond("Talep Silindi",200);

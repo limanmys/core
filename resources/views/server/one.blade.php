@@ -51,7 +51,7 @@
                 @if($installed_extensions->count() > 0)
                     <h4>{{__("Eklenti Durumları")}}</h4>
                     @foreach($installed_extensions as $extension)
-                        <button type="button" class="btn btn-secondary btn-lg status_{{$extension->id}}"
+                        <button type="button" class="btn btn-primary btn-lg status_{{$extension->id}}"
                                 style="cursor:default;"
                                 onclick="location.href = '{{route('extension_server',["extension_id" => $extension->id, "city" => $server->city, "server_id" => $server->id])}}'">
                             {{$extension->name}}

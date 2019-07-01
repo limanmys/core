@@ -10,6 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 class Widget extends Model
 {
     protected $fillable = [
-      "title", "type", "server_id", "extension_id", "script_id", "widget_name", "display_type"
+      "name", "text", "title", "user_id", "extension_id", "server_id", "function", "type"
     ];
 }

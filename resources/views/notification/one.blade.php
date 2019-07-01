@@ -1,21 +1,21 @@
 @php($notification = \App\Notification::where([
             "user_id" => auth()->id(),
-            "_id" => request('notification_id')
+            "id" => request('notification_id')
         ])->first())
 
 @extends('layouts.app')
 
 @section('content')
-    <h3>{{$notification->title}}</h3>
-    @switch($notification->type)
+    <h3>{{$notification["title"]}}</h3>
+    @switch($notification["type"])
         @case('error')
         <div class="alert alert-danger" role="alert">
-            {{$notification->message}}
+            {{$notification["message"]}}
         </div>
         @break
         @default
         <div class="alert alert-success" role="alert">
-            {{$notification->message}}
+            {{$notification["message"]}}
         </div>
         @break
     @endswitch

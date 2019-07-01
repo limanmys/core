@@ -65,21 +65,18 @@ class OneController extends Controller
 
     public function serviceCheck()
     {
-        // Check if requested service is running on server.
-        $extension = Extension::find(request('ip'))->first() or abort(504,"Eklenti Bulunamadi");
-
-        $output = server()->isRunning(request('service'));
-
+        if(is_numeric(extension()->service)){
+            $flag = shell_exec("echo quit | timeout --signal=9 2 telnet " . server()->ip_address . " " . extension()->service . "  | grep \"Connected\"");
+        }else{
+            $flag = server()->isRunning(extension()->service);
+        }
         // Return the button class name ~ color to update client.
-        if ($output == "active\n") {
+        if ($flag) {
             return respond('btn-success');
-        } else if ($output === "inactive\n") {
-            return respond('btn-secondary');
         } else {
             return respond('btn-danger');
         }
     }
-
 
     public function hostname()
     {
