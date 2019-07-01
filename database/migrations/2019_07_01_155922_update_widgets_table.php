@@ -17,6 +17,9 @@ class UpdateWidgetsTable extends Migration
             $table->string("extension_id")->nullable();
             $table->string("server_id")->nullable();
             $table->string("function")->nullable();
+            $table->foreign("extension_id")->references("id")->on("extensions")->onDelete("cascade");
+            $table->foreign("server_id")->references("id")->on("servers")->onDelete("cascade");
+            $table->foreign("user_id")->references("id")->on("users")->onDelete("cascade");
             $table->string("text")->nullable();
         });
     }

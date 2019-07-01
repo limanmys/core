@@ -10,7 +10,7 @@ class MainController extends Controller
 {
     public function add()
     {
-        if(!auth()->user()->isAdmin && Widget::where("user_id",auth()->user()->id)->count > env("USER_WIDGET_COUNT")){
+        if(!auth()->user()->isAdmin() && Widget::where("user_id",auth()->user()->id)->count() > env("USER_WIDGET_COUNT")){
             return respond("Widget kotanızı aştınız, yeni widget ekleyemezsiniz");
         }
         $widget = new Widget([
