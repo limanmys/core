@@ -79,11 +79,13 @@ class Permission extends Model
             return true;
         }
 
+        if($type != "function"){
+            $type = $type . "_id";
+        }
         $database = DB::table("permissions");
-
         return $database->where([
             "user_id" => $user_id,
-            $type . "_id" => $id
+            $type => $id
         ])->exists();
     }
 }
