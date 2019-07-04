@@ -10,7 +10,7 @@ Artisan::command('administrator',function (){
     $password = Str::random();
 
     $user = User::where([
-        "name" => "administrator",
+        "name" => "Administrator",
         "email" => "administrator@liman.app"
     ])->first();
     if($user){

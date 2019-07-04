@@ -411,6 +411,9 @@ class OneController extends Controller
             $services = [];
             foreach (explode('}',$rawServices) as $service){
                 $row = explode(";",substr($service,2));
+                if($row[0] == ""){
+                    continue;
+                }
                 try{
                     array_push($services,[
                         "name" => trim(explode('=',$row[0])[1]),
@@ -427,10 +430,10 @@ class OneController extends Controller
         return view('l.table',[
             "value" => $services,
             "title" => [
-                "Servis Adı" , "Durumu" , "Açıklaması"
+                "Adı" , "Açıklama" , "Durumu" , "Başlatma"
             ],
             "display" => [
-                "name" , "status" , "description"
+                "name" , "displayName" , "state", "startMode"
             ],
         ]);
 
