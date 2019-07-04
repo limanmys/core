@@ -266,7 +266,7 @@
     <script>
         function editPage(element){
             let page = $(element).find("#name").html();
-            window.location.href = window.location.href + '/' + page;
+            location.href = location.protocol+'//'+location.host+location.pathname + "/" + page;
         }
 
         function updateExtension(type,tableId = null){
