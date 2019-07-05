@@ -64,37 +64,29 @@
                     <br><br>
                     <hr>
                     <h4>{{__("Kaynak Kullanımı")}}</h4>
-                    <table class="notDataTable">
-                        <thead>
-                        <tr>
-                            <td>{{__("Cpu Kullanımı")}}</td>
-                            <td>{{__("Disk Kullanımı")}}</td>
-                            <td>{{__("Ram Kullanımı")}}</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td style="padding-right: 50px">
-                                <span id="cpuText" style="text-align: center;font-weight: bold">
-                                    {{__("Yükleniyor...")}}
-                                </span><br>
-                                <canvas id="cpu" width="400px" height="200px" style="float:left"></canvas>
-                            </td>
-                            <td style="padding-right: 50px">
-                                <span id="diskText" style="text-align: center;font-weight: bold">
-                                    {{__("Yükleniyor...")}}
-                                </span><br>
-                                <canvas id="disk" width="400px" height="200px" style="float:left"></canvas>
-                            </td>
-                            <td style="padding-right: 50px">
-                                <span id="ramText" style="text-align: center;font-weight: bold">
-                                    {{__("Yükleniyor...")}}
-                                </span><br>
-                                <canvas id="ram" width="400px" height="200px" style="float:left;"></canvas>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <div class="row">
+                      <div class="col-md-4">
+                        <h5>{{__("Cpu Kullanımı")}}</h5>
+                        <span id="cpuText" style="text-align: center;font-weight: bold">
+                            {{__("Yükleniyor...")}}
+                        </span><br>
+                        <canvas id="cpu" width="400px" height="200px" style="float:left"></canvas>
+                      </div>
+                      <div class="col-md-4">
+                        <h5>{{__("Disk Kullanımı")}}</h5>
+                        <span id="diskText" style="text-align: center;font-weight: bold">
+                            {{__("Yükleniyor...")}}
+                        </span><br>
+                        <canvas id="disk" width="400px" height="200px" style="float:left"></canvas>
+                      </div>
+                      <div class="col-md-4">
+                        <h5>{{__("Ram Kullanımı")}}</h5>
+                        <span id="ramText" style="text-align: center;font-weight: bold">
+                            {{__("Yükleniyor...")}}
+                        </span><br>
+                        <canvas id="ram" width="400px" height="200px" style="float:left;"></canvas>
+                      </div>
+                    </div>
                     <hr>
                 @endif
             </div>
@@ -393,7 +385,7 @@
                 },
                 options: {
                     animation: false,
-                    responsive: false,
+                    responsive: true,
                     legend: false,
                     scales: {
                         yAxes: [{
