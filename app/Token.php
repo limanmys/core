@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
  */
 class Token extends Model
 {
+    use UsesUuid;
 
     protected $fillable = ['token', 'user_id'];
 

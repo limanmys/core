@@ -14,11 +14,11 @@ class CreateKeysTable extends Migration
     public function up()
     {
         Schema::create('keys', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string("user_id");
+            $table->uuid('id')->primary();
+            $table->uuid("user_id");
             $table->string("username");
             $table->foreign("user_id")->references("id")->on("users")->onDelete("cascade");
-            $table->string("server_id");
+            $table->uuid("server_id");
             $table->foreign("server_id")->references("id")->on("servers")->onDelete("cascade");
             $table->timestamps();
         });

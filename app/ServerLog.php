@@ -9,6 +9,8 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
  */
 class ServerLog extends Eloquent
 {
+    use UsesUuid;
+    
     protected $collection = 'server_log';
     protected $connection = 'mongodb';
     protected $fillable = ['command', 'server_id', 'user_id','output'];

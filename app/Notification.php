@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class Notification extends Model
 {
+    use UsesUuid;
     public static function new($title, $type, $message, $server_id = null, $extension_id = null, $level = 0){
 
         // Create a notification object and fill values.

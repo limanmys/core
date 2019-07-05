@@ -236,6 +236,7 @@ class OneController extends Controller
             return respond("Bu islemi yalnizca sunucu sahibi ya da bir yonetici yapabilir.");
         }
         DB::table("server_extensions")->insert([
+            "id" => Str::uuid(),
             "server_id" => server()->id,
             "extension_id" => extension()->id
         ]);
@@ -351,6 +352,7 @@ class OneController extends Controller
             ])->delete();
         }else if(!$current){
             DB::table("user_favorites")->insert([
+                "id" => Str::uuid(),
                 "server_id" => server()->id,
                 "user_id" => auth()->user()->id,
             ]);

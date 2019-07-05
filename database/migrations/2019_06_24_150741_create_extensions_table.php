@@ -14,10 +14,11 @@ class CreateExtensionsTable extends Migration
     public function up()
     {
         Schema::create('extensions', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string("name");
             $table->string("version");
             $table->string("icon")->default("");
+            $table->string("service")->nullable();
             $table->timestamps();
         });
     }

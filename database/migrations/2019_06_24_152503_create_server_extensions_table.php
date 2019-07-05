@@ -14,10 +14,10 @@ class CreateServerExtensionsTable extends Migration
     public function up()
     {
         Schema::create('server_extensions', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string("server_id");
+            $table->uuid('id')->primary();
+            $table->uuid("server_id");
             $table->foreign("server_id")->references("id")->on("servers")->onDelete("cascade")->nullable();
-            $table->string("extension_id");
+            $table->uuid("extension_id");
             $table->foreign("extension_id")->references("id")->on("extensions")->onDelete("cascade")->nullable();
             $table->timestamps();
         });

@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\DB;
  */
 class Server extends Model
 {
+    use UsesUuid;
+    
     /**
      * @var array
      */

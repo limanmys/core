@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
  */
 class Extension extends Model
 {
+    use UsesUuid;
     /**
      * @var array
      */

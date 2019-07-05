@@ -14,13 +14,13 @@ class CreateServersTable extends Migration
     public function up()
     {
         Schema::create('servers', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string("name")->unique();
             $table->string("type");
             $table->ipAddress("ip_address");
             $table->string("city");
             $table->string("control_port");
-            $table->string("user_id");
+            $table->uuid("user_id");
             $table->foreign("user_id")->references("id")->on("users")->onDelete("cascade");
             $table->timestamps();
         });

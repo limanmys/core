@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * App\Permission
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\DB;
 
 class Permission extends Model
 {
+    use UsesUuid;
+
     protected $table = "permissions";
 
     public static function grant($user_id, $type, $id)
@@ -33,6 +36,7 @@ class Permission extends Model
         }
 
         return $database->insert([
+            "id" => Str::uuid(),
             "user_id" => $user_id,
             $type => $id,
             "created_at" =>  Carbon::now(),

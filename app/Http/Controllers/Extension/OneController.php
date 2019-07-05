@@ -19,6 +19,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 
 /**
  * Class OneController
@@ -342,6 +343,7 @@ class OneController extends Controller
         foreach ($extension["database"] as $key) {
             if(request($key["variable"])){
                 DB::table("user_settings")->insert([
+                    "id" => Str::uuid(),
                     "server_id" => server()->id,
                     "extension_id" => extension()->id,
                     "user_id" => auth()->user()->id,

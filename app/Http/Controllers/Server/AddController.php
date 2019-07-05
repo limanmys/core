@@ -8,6 +8,7 @@ use App\Permission;
 use App\Script;
 use App\Server;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class AddController extends Controller
 {
@@ -92,6 +93,7 @@ class AddController extends Controller
                     $output = $this->server->runScript($script,"");
                     if($output == "YES\n"){
                         DB::table('server_extensions')->insert([
+                            "id" => Str::uuid(),
                             "server_id" => $this->server()->id,
                             "extension_id" => $extension->id
                         ]);
@@ -124,7 +126,7 @@ class AddController extends Controller
             $key->delete();
             return respond("WinRM Hatası",400);
         }
-        
+
         return $this->grantPermissions();
     }
 

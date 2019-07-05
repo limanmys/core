@@ -12,6 +12,7 @@ use Illuminate\Database\Query\Builder;
  */
 class Key extends Model
 {
+    use UsesUuid;
     protected $fillable = ['username' ,'server_id', 'user_id'];
 
 }

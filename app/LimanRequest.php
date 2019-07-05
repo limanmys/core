@@ -17,5 +17,5 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class LimanRequest extends Model
 {
-
+  use UsesUuid;
 }

@@ -14,12 +14,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Script extends Model
 {
+    use UsesUuid;
+
     /**
      * @param $uploadedFile
      * @return Script|bool
      */
     public static function readFromFile($uploadedFile){
-        
+
         // Read values from text file.
         $file = file_get_contents($uploadedFile);
 
@@ -48,7 +50,7 @@ class Script extends Model
      * @return mixed
      */
     public static function createFile(Script $script, ...$parameters){
-        
+
         // Save script in order to generate unique _id.
         $script->save();
 
