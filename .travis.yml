@@ -23,8 +23,9 @@ before_install:
   - git config --local user.name "mertcelen"
   - git config --local user.email "mcelen94@gmail.com"
   - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y.%m.%d-%s')}
-  - git tag $TRAVIS_TAG
   - sed -i "s/APP_VERSION=Development/APP_VERSION=$TRAVIS_TAG/g" liman/server/.env
+  - sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" liman/server/.env
+  - sed -i "s/APP_ENV=local/APP_ENV=production/g" liman/server/.env
 script:
   - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
   - mv `pwd`/../build_tools.deb `pwd`/../liman-`cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
@@ -32,6 +33,6 @@ deploy:
   provider: releases
   api_key: ${GITHUB_TOKEN}
   file: /home/travis/build/mertcelen/liman/liman-`cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
-  prerelease: true
+  draft: true
   skip_cleanup: true
   name: Liman Version `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
