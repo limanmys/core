@@ -125,7 +125,7 @@ class OneController extends Controller
 
         $token = Token::create($user_id);
 
-        $command = "sudo runuser liman-" . extension()->id .
+        $command = "sudo runuser " . clean_score(extension()->id) .
             " -c 'timeout 5 /usr/bin/php -d display_errors=on $combinerFile $functions "
             . strtolower(extension()->name) .
             " $viewName \"$server\" \"$extension\" \"$extensionDb\" \"$outputsJson\" \"$request\" \"$functionName\" \"$apiRoute\" \"$navigationRoute\" \"$token\" \"$extension_id\"'";

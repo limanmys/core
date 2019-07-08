@@ -340,5 +340,12 @@ if(!function_exists('cities')){
     }
 }
 
-
-
+if (!function_exists('clean_score')) {
+    /**
+     * @return array|Request|string
+     */
+    function clean_score($text)
+    {
+        return str_replace('-', '', $text);
+    }
+}

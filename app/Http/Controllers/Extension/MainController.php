@@ -159,8 +159,8 @@ class MainController extends Controller
         $new->save();
 
         // Add User if not exists
-        if ((intval(shell_exec("grep -c '^liman-: " . $new->id . "' /etc/passwd"))) ? false : true) {
-            shell_exec('sudo useradd -r -s /bin/sh liman-' . $new->id);
+        if ((intval(shell_exec("grep -c '^" . clean_score($new->id) . "' /etc/passwd"))) ? false : true) {
+            shell_exec('sudo useradd -r -s /bin/sh ' . clean_score($new->id));
         }
 
         $extension_folder = env('EXTENSIONS_PATH') . strtolower($json["name"]);
@@ -172,15 +172,15 @@ class MainController extends Controller
 
         shell_exec("sudo cp " . $path . '/db.json' . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
 
-        shell_exec('sudo chown liman-' . $new->id . ':liman ' . $extension_folder);
+        shell_exec('sudo chown ' . clean_score($new->id) . ':liman ' . $extension_folder);
         shell_exec('sudo chmod 770 ' . $extension_folder);
 
         shell_exec("sudo cp -r " . $path .  DIRECTORY_SEPARATOR . "views/* " . $extension_folder);
 
-        shell_exec("sudo chown -R liman-" . $new->id . ':liman "' . $extension_folder. '"');
+        shell_exec("sudo chown -R " . clean_score($new->id) . ':liman "' . $extension_folder. '"');
         shell_exec("sudo chmod -R 770 \"" . $extension_folder ."\"");
 
-        shell_exec("sudo chown liman:liman-". $new->id . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
+        shell_exec("sudo chown liman:". clean_score($new->id) . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
         shell_exec("sudo chmod 640 " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
 
         $files = new RecursiveIteratorIterator(
@@ -253,23 +253,23 @@ class MainController extends Controller
         file_put_contents($folder . DIRECTORY_SEPARATOR . "db.json",json_encode($json));
 
 
-        if ((intval(shell_exec("grep -c '^liman-: " . $ext->id . "' /etc/passwd"))) ? false : true) {
-            shell_exec('sudo useradd -r -s /bin/sh liman-' . $ext->id);
+        if ((intval(shell_exec("grep -c '^" . clean_score($ext->id) . "' /etc/passwd"))) ? false : true) {
+            shell_exec('sudo useradd -r -s /bin/sh ' . clean_score($ext->id));
         }
 
-        shell_exec('sudo chown liman-' . $ext->id . ':liman ' . $folder);
+        shell_exec('sudo chown ' . clean_score($ext->id) . ':liman ' . $folder);
         shell_exec('sudo chmod 770 ' . $folder);
 
         touch($folder . '/index.blade.php');
         touch($folder . '/functions.php');
 
-        shell_exec('sudo chown liman-' . $ext->id . ':liman "' . trim($folder) . '/index.blade.php"');
+        shell_exec('sudo chown ' . clean_score($ext->id) . ':liman "' . trim($folder) . '/index.blade.php"');
         shell_exec('sudo chmod 664 "' . trim($folder) . '/index.blade.php"');
 
-        shell_exec('sudo chown liman-' . $ext->id . ':liman "' . trim($folder) . '/functions.php"');
+        shell_exec('sudo chown ' . clean_score($ext->id) . ':liman "' . trim($folder) . '/functions.php"');
         shell_exec('sudo chmod 664 "' . trim($folder) . '/functions.php"');
 
-        shell_exec("sudo chown liman:liman-". $ext->id . " " . $folder . DIRECTORY_SEPARATOR . "db.json");
+        shell_exec("sudo chown liman:". clean_score($ext->id) . " " . $folder . DIRECTORY_SEPARATOR . "db.json");
         shell_exec("sudo chmod 640 " . $folder . DIRECTORY_SEPARATOR . "db.json");
 
         system_log(6,"EXTENSION_CREATE",[

@@ -393,10 +393,10 @@ class OneController extends Controller
 
         try{
             foreach (Script::where('extensions', 'like', strtolower(extension()->name))->get() as $script) {
-                shell_exec('rm ' . env('SCRIPTS_PATH') . $script->_id);
+                shell_exec('rm ' . env('SCRIPTS_PATH') . $script->id);
                 $script->delete();
             }
-            shell_exec('sudo userdel liman-' . extension()->_id);
+            shell_exec('sudo userdel ' . clean_score(extension()->id));
             extension()->delete();
         }catch (Exception $exception){
         }
@@ -488,7 +488,7 @@ class OneController extends Controller
 
         $token = Token::create($user_id);
 
-        $command = "sudo runuser liman-" . extension()->id .
+        $command = "sudo runuser " . clean_score(extension()->id) .
             " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $functions "
             . strtolower(extension()->name) .
             " $viewName \"$server\" \"$extension\" \"$extensionDb\" \"$outputsJson\" \"$request\" \"$functionName\" \"$apiRoute\" \"$navigationRoute\" \"$token\" \"$extension_id\"'";
