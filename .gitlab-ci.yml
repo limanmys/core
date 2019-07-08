@@ -5,7 +5,7 @@ cache:
     - vendor/
 
 before_script:
-  - apt install update && apt install wget
+  - apt update && apt install wget
   - wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
   - LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
   - apt update
