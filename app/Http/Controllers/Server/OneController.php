@@ -391,6 +391,7 @@ class OneController extends Controller
 
     public function serviceList()
     {
+        $table = "";
         if(server()->type == "linux_ssh"){
             $raw = server()->run("systemctl list-units | grep service | awk '{print $1 \":\"$2\" \"$3\" \"$4\":\"$5\" \"$6\" \"$7\" \"$8\" \"$9\" \"$10}'",false);
             $services = [];
@@ -408,6 +409,15 @@ class OneController extends Controller
                 } catch (Exception $exception) {
                 }
             }
+            $table = view('l.table',[
+                "value" => $services,
+                "title" => [
+                    "Adı" , "Açıklama" , "Durumu"
+                ],
+                "display" => [
+                    "name" , "description" , "status"
+                ],
+            ]);
         }elseif (server()->type == "windows_powershell"){
             $rawServices = server()->run("(Get-WmiObject win32_service | select Name, DisplayName, State, StartMode) -replace '\s\s+',':'");
             $services = [];
@@ -426,19 +436,19 @@ class OneController extends Controller
                 }catch (Exception $exception){
                 }
             }
+            $table = view('l.table',[
+                "value" => $services,
+                "title" => [
+                    "Adı" , "Açıklama" , "Durumu" , "Başlatma"
+                ],
+                "display" => [
+                    "name" , "displayName" , "state", "startMode"
+                ],
+            ]);
         }else{
             return respond("Bu sunucudaki servisleri goremezsiniz.",403);
         }
-        return view('l.table',[
-            "value" => $services,
-            "title" => [
-                "Adı" , "Açıklama" , "Durumu" , "Başlatma"
-            ],
-            "display" => [
-                "name" , "displayName" , "state", "startMode"
-            ],
-        ]);
-
+        return $table;
     }
 
     public function packageList()

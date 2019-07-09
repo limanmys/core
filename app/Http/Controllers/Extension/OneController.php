@@ -10,7 +10,6 @@ use App\Token;
 use App\Http\Controllers\Controller;
 use App\User;
 use Carbon\Carbon;
-use Exception;
 use function request;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
@@ -174,7 +173,15 @@ class OneController extends Controller
             "server_id" => server()->id,
             "target_name" => request('function_name')
         ]);
-        return shell_exec($command);
+        $output = shell_exec($command);
+        $code = 200;
+        try{
+            $json = json_decode($output,true);
+            if(array_key_exists("status",$json)){
+                $code = intval($json["status"]);
+            }
+        }catch (\Exception $exception){};
+        return response($output,$code);
     }
 
     public function internalExtensionApi()
