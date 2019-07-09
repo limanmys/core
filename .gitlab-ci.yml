@@ -10,9 +10,9 @@ before_script:
   - cd build_tools
   - mkdir -p liman
   - git config --global http.sslVerify false
-  - git clone --depth=50 --branch=master https://mert@gitlab.lab/liman/liman.git liman/server
-  - git clone --depth=50 --branch=master https://mert@gitlab.lab/liman/sandbox.git liman/sandbox
-  - git clone --depth=50 --branch=master https://mert@gitlab.lab/liman/webssh.git liman/webssh
+  - git clone --depth=50 --branch=master https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.lab/liman/liman.git liman/server
+  - git clone --depth=50 --branch=master https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.lab/liman/sandbox.git liman/sandbox
+  - git clone --depth=50 --branch=master https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.lab/liman/webssh.git liman/webssh
   - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
   - php -r "if (hash_file('sha384', 'composer-setup.php') === '48e3236262b34d30969dca3c37281b3b4bbe3221bda826ac6a9a62d6444cdb0dcd0615698a5cbe587c3f0fe57a54d8f5') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
   - php composer-setup.php
