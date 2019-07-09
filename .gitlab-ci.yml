@@ -27,6 +27,7 @@ job:
   stage: deploy
   script:
     - ls -la
+    - chmod -R 775 DEBIAN/
     - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
     - mv `pwd`/../build_tools.deb `pwd`/../liman-`cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
     - echo "Done!"
