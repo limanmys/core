@@ -5,10 +5,11 @@ cache:
     - vendor/
 
 before_script:
-  - php -v
+  - whoami
   - rm `pwd`/build_tools/liman_req.sh
   - cd build_tools
   - mkdir -p liman
+  - git config --global http.sslVerify false
   - git clone --depth=50 --branch=master https://gitlab.lab/liman/liman.git liman/server
   - git clone --depth=50 --branch=master https://gitlab.lab/liman/sandbox.git liman/sandbox
   - git clone --depth=50 --branch=master https://github.com/liman/webssh.git liman/webssh
