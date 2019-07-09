@@ -206,9 +206,11 @@
 
             <!-- Main content -->
             <section class="content">
-
-                @yield('content')
-
+              <div class="row">
+                <div class="col-md-12">
+                  @yield('content')
+                </div>
+              </div>
             </section>
         </div>
         <!-- /.content-wrapper -->
@@ -226,5 +228,3 @@
 @section('adminlte_js')
     <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>
 @stop
-
-
