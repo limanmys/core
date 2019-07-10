@@ -15,3 +15,5 @@ Route::post('/widget/update','Widgets\OneController@update')->name('widget_updat
 Route::post('/widget/extensions','Widgets\OneController@extensions')->name('widget_get_extensions');
 
 Route::post('/widget/list','Widgets\OneController@widgetList')->name('widget_list');
+
+Route::post('/widget/update_orders','Widgets\MainController@update_orders')->name('update_orders');

@@ -26,7 +26,7 @@ class HomeController extends Controller
     public function index()
     {
         system_log(7,"HOMEPAGE");
-        $widgets = Widget::where('user_id',auth()->id())->get();
+        $widgets = Widget::where('user_id',auth()->id())->orderBy('order')->get();
         foreach($widgets as $widget){
             $widget->server_name = Server::where('id',$widget->server_id)->first()->name;
         }
@@ -106,5 +106,5 @@ class HomeController extends Controller
         $req->save();
         return respond('Talebiniz başarıyla alındı.',200);
     }
-    
+
 }

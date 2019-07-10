@@ -1,6 +1,6 @@
 let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');
 
-function request(url, data, next) {
+function request(url, data, next, error) {
     let id = null;
 
     if (data instanceof FormData === false) {
@@ -21,7 +21,7 @@ function request(url, data, next) {
     }
 
     modalData = data;
-    
+
     let server_id = $('meta[name=server_id]').attr("content");
     let extension_id = $('meta[name=extension_id]').attr("content");
 
@@ -48,7 +48,7 @@ function request(url, data, next) {
                 return next(r.responseText);
             }
             let response = JSON.parse(r.responseText);
-            
+
             switch (r.status) {
                 case 200:
                     return next(r.responseText);
@@ -64,8 +64,12 @@ function request(url, data, next) {
                         showConfirmButton: false,
                     });
                     break;
+                default:
+                  if(error)
+                    return error(r.responseText);
+                  break;
             }
-            
+
         }
     };
     return false;

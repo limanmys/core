@@ -23,10 +23,11 @@ class OneController extends Controller
         foreach ($extensionData["database"] as $item){
             if(!DB::table("user_settings")->where([
                 "user_id" => auth()->user()->id,
+                "server_id" => $widget->server_id,
                 "extension_id" => $extension->id,
                 "name" => $item["variable"]
             ])->exists()){
-                return respond("Eklenti Ayarları Eksik");
+                return respond("Eklenti ayarları eksik. <a href='".url('ayarlar/'.$extension->id.'/'.$widget->server_id)."'>Ayarlara Git.</a>", 400);
             }
         }
         $server = Server::find($widget->server_id);
@@ -37,9 +38,14 @@ class OneController extends Controller
         $command = self::generateSandboxCommand($server, $extension, "", auth()->id(), "null", "null", $widget->function);
         $output = shell_exec($command);
         if(!$output){
-            return respond("Sunucuya Bağlanılamadı");
+            return respond("Sunucuya bağlanılamadı", 400);
+        }else{
+          if(!is_json($output)){
+            return respond("Geçersiz widget.", 400);
+          }
+          $output_json = json_decode($output, true);
         }
-        return respond($output);
+        return respond($output, isset($output_json['status']) ? $output_json['status'] : 200);
     }
 
     public function remove()

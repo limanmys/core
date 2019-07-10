@@ -212,7 +212,10 @@
                     "next" => "reload",
                     "inputs" => [
                         "Widget Adı" => "name:text",
-                        "Türü" => "type:text",
+                        "Türü:type" => [
+                          "Sayı" => "count_box",
+                          "Grafik" => "chart"
+                        ],
                         "table:widgets" => "table:hidden",
                         "Çalışacak Betik/Fonksiyon" => "target:text"
                     ],

@@ -21,7 +21,7 @@ class MainController extends Controller
             "extension_id" => extension()->id,
             "server_id" => server()->id,
             "function" => explode(':',request('widget_name'))[0],
-            "type" => ""
+            "type" => explode(':',request('widget_name'))[2]
         ]);
         $widget->save();
         return respond('Widget Eklendi',200);
@@ -36,5 +36,18 @@ class MainController extends Controller
         return view('widgets.settings',[
             "widgets" => $widgets
         ]);
+    }
+
+    public function update_orders()
+    {
+      if(!auth()->user()->isAdmin()){
+          return respond("Widget kotanızı aştınız, yeni widget ekleyemezsiniz");
+      }
+      foreach (json_decode(request('widgets')) as $widget) {
+        $data = Widget::find($widget->id);
+        $data->order = $widget->order;
+        $data->save();
+      }
+      return respond('Widgetlar güncellendi',200);
     }
 }
