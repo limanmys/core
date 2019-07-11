@@ -76,7 +76,9 @@ function request(url, data, next, error) {
 }
 
 function reload() {
+  setTimeout(function() {
     location.reload();
+  }, 1000);
 }
 
 function redirect(url) {

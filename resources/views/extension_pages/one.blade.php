@@ -212,6 +212,7 @@
                     "next" => "reload",
                     "inputs" => [
                         "Widget Adı" => "name:text",
+                        "İkon (FontAwesome)" => "icon:text",
                         "Türü:type" => [
                           "Sayı" => "count_box",
                           "Grafik" => "chart"
@@ -228,7 +229,11 @@
                     "next" => "updateTable",
                     "inputs" => [
                         "Widget Adı" => "name:text",
-                        "Türü" => "type:text",
+                        "İkon (FontAwesome)" => "icon:text",
+                        "Türü:type" => [
+                          "Sayı" => "count_box",
+                          "Grafik" => "chart"
+                        ],
                         "Çalışacak Betik/Fonksiyon" => "target:text",
                         "Widget Adı:a" => "name_old:hidden",
                         "table:widgets" => "table:hidden",

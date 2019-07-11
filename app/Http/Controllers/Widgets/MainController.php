@@ -15,7 +15,7 @@ class MainController extends Controller
         }
         $widget = new Widget([
             "name" => explode(':',request('widget_name'))[0],
-            "text" => explode(':',request('widget_name'))[2],
+            "text" => explode(':',request('widget_name'))[3],
             "title" => explode(':',request('widget_name'))[1],
             "user_id" => auth()->user()->id,
             "extension_id" => extension()->id,

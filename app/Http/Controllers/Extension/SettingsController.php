@@ -146,6 +146,7 @@ class SettingsController extends Controller
                             $values[$key]["target"] = request('target');
                             $values[$key]["type"] = request('type');
                             $values[$key]["name"] = request('name');
+                            $values[$key]["icon"] = request('icon');
                             break;
                         case "views":
                             rename(env(
@@ -189,6 +190,7 @@ class SettingsController extends Controller
                     "target" => request('target'),
                     "type" => request('type'),
                     "name" => request('name'),
+                    "icon" => request('icon'),
                 ]);
                 break;
             case "views":
