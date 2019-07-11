@@ -16,13 +16,13 @@
                     <div class="info-box overlay-wrapper" title="{{$widget->server_name . " " . __("Sunucusu")}} -> {{$widget->title}}">
                         <span class="info-box-icon bg-aqua" style="padding:20px; display: none;"><i class="fa fa-{{$widget->text}}"></i></span>
                         <div class="info-box-content" style="display: none;">
-                            <span class="info-box-text" id="{{$widget->id}}" title="{{$widget->title}}">{{$widget->title}}</span>
+                            <span class="info-box-text" id="{{$widget->id}}" title="{{__($widget->title)}}">{{__($widget->title)}}</span>
                             <span class="float-right limanWidget" id="{{$widget->id}}" style="font-size: 20px">{{__("Yükleniyor...")}}</span>
                             <span class="progress-description" title="{{$widget->server_name . " " . __("Sunucusu")}}">{{$widget->server_name . " " . __("Sunucusu")}}</span>
                         </div>
                         <div class="overlay" style="padding: 5px 10px;text-align: center;position: initial;">
                           <i class="fa fa-refresh fa-spin"></i>
-                          <span style="font-size: 1.2rem;">Yükleniyor</span>
+                          <span style="font-size: 1.2rem;">{{__("Yükleniyor")}}</span>
                         </div>
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                 <div class="col-md-6 limanCharts" id="{{$widget->id}}">
                   <div class="box box-primary" id="{{$widget->id}}Chart">
                     <div class="box-header with-border">
-                      <h3 class="box-title">{{$widget->server_name . " " . __("Sunucusu")}} {{$widget->title}}</h3>
+                      <h3 class="box-title">{{$widget->server_name . " " . __("Sunucusu")}} {{__($widget->title)}}</h3>
                       <div class="box-tools pull-right">
                         <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
                         </button>
@@ -68,12 +68,10 @@
                       id: $(el).attr('id'),
                       order:  $(el).index()
                     });
-                    let form = new FormData();
-                    form.append('widgets', JSON.stringify(data));
-                    request('{{route('update_orders')}}', form, function(response){
-                    });
                 });
-
+                let form = new FormData();
+                form.append('widgets', JSON.stringify(data));
+                request('{{route('update_orders')}}', form, function(response){});
             }
         });
         $(".sortable-widget").disableSelection();
@@ -126,8 +124,6 @@
         }
 
         function createChart(element, labels, data) {
-          console.log(labels);
-          console.log(data);
           $("#" + element + ' .overlay').remove();
           window[element + "Chart"] = new Chart($("#" + element+' .box-body canvas'), {
             type: 'line',

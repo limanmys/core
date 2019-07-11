@@ -16,7 +16,7 @@ class OneController extends Controller
     {
         $widget = Widget::find(\request('widget_id'));
         if(!$widget){
-            return respond("Widget Bulunamadı",201);
+            return respond(__("Widget Bulunamadı"),201);
         }
         $extension =  Extension::one($widget->extension_id);
         $extensionData = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension($widget->extension_id)->name) . DIRECTORY_SEPARATOR . "db.json"),true);
@@ -27,7 +27,7 @@ class OneController extends Controller
                 "extension_id" => $extension->id,
                 "name" => $item["variable"]
             ])->exists()){
-                return respond("Eklenti ayarları eksik. <a href='".url('ayarlar/'.$extension->id.'/'.$widget->server_id)."'>Ayarlara Git.</a>", 400);
+                return respond(__("Eklenti ayarları eksik.") . " <a href='".url('ayarlar/'.$extension->id.'/'.$widget->server_id)."'>".__("Ayarlara Git.")."</a>", 400);
             }
         }
         $server = Server::find($widget->server_id);
@@ -38,10 +38,10 @@ class OneController extends Controller
         $command = self::generateSandboxCommand($server, $extension, "", auth()->id(), "null", "null", $widget->function);
         $output = shell_exec($command);
         if(!$output){
-            return respond("Sunucuya bağlanılamadı", 400);
+            return respond(__("Sunucuya bağlanılamadı"), 400);
         }else{
           if(!is_json($output)){
-            return respond("Geçersiz widget.", 400);
+            return respond(__("Geçersiz widget."), 400);
           }
           $output_json = json_decode($output, true);
         }
@@ -52,7 +52,7 @@ class OneController extends Controller
     {
         $widget = Widget::find(\request('widget_id'));
         $widget->delete();
-        return respond("Başarıyla silindi");
+        return respond(__("Başarıyla silindi"));
     }
 
     public function update()
@@ -64,7 +64,7 @@ class OneController extends Controller
             "title" => \request('title'),
             "function_name" => \request('function_name')
         ]);
-        return respond("Başarıyla güncellendi.");
+        return respond(__("Başarıyla güncellendi."));
     }
 
     public function extensions()

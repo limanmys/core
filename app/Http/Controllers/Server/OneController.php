@@ -29,6 +29,7 @@ class OneController extends Controller
         }
 
         return view('server.one', [
+            "hostname" => server()->run("hostname"),
             "server" => server(),
             "installed_extensions" => $this->installedExtensions(),
             "available_extensions" => $this->availableExtensions(),

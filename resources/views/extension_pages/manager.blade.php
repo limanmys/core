@@ -15,7 +15,7 @@
     @include('l.modal-button',[
         "class" => "btn-secondary",
         "target_id" => "extensionExport",
-        "text" => "Indir"
+        "text" => "İndir"
     ])
     @include('l.modal-button',[
         "class" => "btn-info",
@@ -51,7 +51,7 @@
         ],
         "submit_text" => "Yükle"
     ])
-    <?php 
+    <?php
         $input_extensions = [];
         foreach(extensions() as $extension){
             $input_extensions[$extension->name] = $extension->id;

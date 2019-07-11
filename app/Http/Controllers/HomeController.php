@@ -40,7 +40,7 @@ class HomeController extends Controller
         $languages = ["tr","en"];
         if(request()->has('locale') && in_array(request('locale'),$languages)){
             \Session::put('locale', request('locale'));
-            return response('Alright',200);
+            return redirect()->back();
         }else{
             return response('Language not found',404);
         }

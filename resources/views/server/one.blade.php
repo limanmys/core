@@ -45,7 +45,7 @@
         <div class="tab-content">
             <div class="tab-pane active" id="usageTab">
                 @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
-                    <h4>Hostname : {{server()->run("hostname")}}</h4>
+                    <h4>Hostname : {{$hostname}}</h4>
                 @endif
                 <h4>{{__("İp Adresi : ") . server()->ip_address }}</h4>
                 @if($installed_extensions->count() > 0)

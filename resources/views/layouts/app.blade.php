@@ -31,6 +31,22 @@
                 <!-- Navbar Right Menu -->
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            {{__("Dil")}}
+                          </a>
+                          <ul class="dropdown-menu">
+                            <li>
+                              @if (session('locale') === "tr")
+                                <a href="javascript:void(0)" style="cursor: not-allowed;"><b>Türkçe</b></a>
+                                <a href="{{route('set_locale', ['locale' => 'en'])}}">English</a>
+                              @elseif (session('locale') === "en")
+                                <a href="{{route('set_locale', ['locale' => 'tr'])}}">Türkçe</a>
+                                <a href="javascript:void(0)" style="cursor: not-allowed;"><b>English</b></a>
+                              @endif
+                            </li>
+                          </ul>
+                        </li>
                         <li style="color:white;line-height: 50px">
                             {{__("Versiyon : ") . env('APP_VERSION')}}
                         </li>
@@ -49,8 +65,8 @@
                                 <!-- Menu Footer-->
                                 <li class="user-footer">
                                     <div>
-                                        {{__("Giriş Yapılan son ip adresi : ") . auth()->user()->last_login_ip}}
-                                        {{__("Giriş Tarihi : " . auth()->user()->last_login_at)}}<br><br>
+                                        {{__("Giriş Yapılan son ip adresi : ") . auth()->user()->last_login_ip}}</br>
+                                        {{__("Giriş Tarihi : ") . auth()->user()->last_login_at}}<br><br>
                                     </div>
                                     <div class="pull-left">
                                         <a href="{{route('my_profile')}}"
@@ -100,7 +116,7 @@
                                         <li class="">
                                             <a href="/l/{{$extension->id}}/{{$favorite->city}}/{{$favorite->id}}">
                                                 <i class="fa fa-{{$extension->icon}} "></i>
-                                                <span>{{$extension->name}}</span>
+                                                <span>{{__($extension->name)}}</span>
                                             </a>
                                         </li>
                                     @endforeach

@@ -21,6 +21,8 @@ class Language
 
             // If so, set that locale in to the app to use it later.
             app()->setLocale(session('locale'));
+        }else{
+          \Session::put('locale', app()->getLocale());
         }
 
         // Forward request to next target.

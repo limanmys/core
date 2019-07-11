@@ -21,7 +21,7 @@
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="{{explode(":", $input)[0]}}">
                 <label class="form-check-label h5">
-                    {{$name}}
+                    {{__($name)}}
                 </label>
             </div><br>
         @else
@@ -33,7 +33,7 @@
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="{{explode(":", $input)[0]}}">
                 <label class="form-check-label h5">
-                    {{$name}}
+                    {{__($name)}}
                 </label>
             </div><br>
         @else
@@ -55,16 +55,16 @@
             <div class="form-check">
                 <input class="form-control-input" type="checkbox" name="{{explode(":", $input)[0]}}">
                 <label class="form-control-label h5">
-                    {{$name}}
+                    {{__($name)}}
                 </label>
             </div><br>
         @else
             @if(substr(explode(":", $input)[0],0,2) != "d-")
-                <h5>{{$name}}</h5>
+                <h5>{{__($name)}}</h5>
                 <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}"
                        class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required>@if(explode(":", $input)[1] != "hidden")<br>@endif
             @else
-                <h5>{{$name}}</h5>
+                <h5>{{__($name)}}</h5>
                 <input type="{{explode(":", $input)[1]}}" name="{{substr(explode(":", $input)[0],2)}}" placeholder="{{__($name)}}"
                        class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif">@if(explode(":", $input)[1] != "hidden")<br>@endif
             @endif
