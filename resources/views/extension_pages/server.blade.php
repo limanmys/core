@@ -20,4 +20,9 @@
 <div class="card">
     <div class="card-body mainArea">{!!$view!!}</div>
 </div>
+<div class="row">
+  <div class="col-md-12">
+    İstek {{$timestamp}} saniyede tamamlandı.
+  </div>
+</div>
 @endsection

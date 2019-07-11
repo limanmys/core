@@ -123,7 +123,9 @@ class OneController extends Controller
         }
 
         $command = self::generateSandboxCommand(server(), $extension, "", auth()->id(), $outputs, $viewName, null);
+        $before = Carbon::now();
         $output = shell_exec($command);
+        $after = Carbon::now();
         system_log(7,"EXTENSION_RENDER_PAGE",[
             "extension_id" => extension()->id,
             "server_id" => server()->id,
@@ -132,7 +134,8 @@ class OneController extends Controller
         // Return all required parameters.
         return view('extension_pages.server', [
             "view" => $output,
-            "command" => $command
+            "command" => $command,
+            "timestamp" => $before->diffInMilliseconds($after) / 1000
         ]);
     }
 
