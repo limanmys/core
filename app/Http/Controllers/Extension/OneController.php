@@ -37,6 +37,7 @@ class OneController extends Controller
         foreach ($extension["database"] as $setting) {
             $database = DB::table("user_settings");
             if (!$database->where([
+                "user_id" => auth()->user()->id,
                 "server_id" => server()->id,
                 "extension_id" => extension()->id,
                 "name" => $setting["variable"]
@@ -133,6 +134,7 @@ class OneController extends Controller
         ]);
         // Return all required parameters.
         return view('extension_pages.server', [
+            "viewName" => $viewName,
             "view" => $output,
             "command" => $command,
             "timestamp" => $before->diffInMilliseconds($after) / 1000
@@ -184,7 +186,10 @@ class OneController extends Controller
                 $code = intval($json["status"]);
             }
         }catch (\Exception $exception){};
-        return response($output,$code);
+        if(is_json($output)){
+          return response()->json(json_decode($output), $code);
+        }
+        return response($output, $code);
     }
 
     public function internalExtensionApi()

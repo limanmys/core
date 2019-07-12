@@ -19,6 +19,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use View;
 
 class OneController extends Controller
 {
@@ -27,9 +28,10 @@ class OneController extends Controller
         if (!\server()) {
             abort(504, "Sunucu Bulunamadı.");
         }
-
+        if(server()->type == "linux_ssh" || server()->type == "windows_powershell"){
+          View::share('hostname', server()->run("hostname"));
+        }
         return view('server.one', [
-            "hostname" => server()->run("hostname"),
             "server" => server(),
             "installed_extensions" => $this->installedExtensions(),
             "available_extensions" => $this->availableExtensions(),

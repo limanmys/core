@@ -183,10 +183,14 @@ class MainController extends Controller
         shell_exec("sudo chown liman:". clean_score($new->id) . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
         shell_exec("sudo chmod 640 " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
 
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($path . '/scripts/'),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
+        if(is_dir($path . '/scripts/')){
+          $files = new RecursiveIteratorIterator(
+              new RecursiveDirectoryIterator($path . '/scripts/'),
+              RecursiveIteratorIterator::LEAVES_ONLY
+          );
+        }else {
+          $files = [];
+        }
 
         foreach ($files as $file) {
             // Skip directories (they would be added automatically)
