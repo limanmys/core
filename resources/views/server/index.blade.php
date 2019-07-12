@@ -58,7 +58,7 @@
                                     <h4>{{__("Sunucunuzun Portu")}}</h4>
                                     <h6>{{__("Sunucunuzun açık olup olmadığını algılamak için kontrol edilebilecek bir port girin.")}}</h6>
                                     <pre>{{__("SSH : 22\nWinRM : 5986\nActive Directory, Samba : 636")}}</pre>
-                                    <input type="number" name="port" class="form-control" placeholder="{{__("Sunucunuzun Hostname yada IP Adresini girin.")}}" required min="1">
+                                    <input id="serverControlPort" type="number" name="port" class="form-control" placeholder="{{__("Sunucunuzun Hostname yada IP Adresini girin.")}}" required min="1">
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn-primary">{{__("Bağlantıyı Kontrol Et")}}</button>
@@ -322,7 +322,7 @@
 
         function setSummary(){
             $("#tableServerHostname").html($("#serverHostName").val());
-            $("#tableServerPort").html($("#port").val());
+            $("#tableServerPort").html($("#serverControlPort").val());
             $("#tableOperatingSystem").html($("input[name=operating_system]:checked").attr('data-content'));
             $("#tableServerName").html($("#server_name").val());
             $("#tableServerCity").html($("#serverCity").val());
@@ -350,7 +350,7 @@
             let form = new FormData();
             form.append("name",$("#server_name").val());
             form.append("ip_address",$("#serverHostName").val());
-            form.append("control_port",$("#port").val());
+            form.append("control_port",$("#serverControlPort").val());
             form.append("city",$("#serverCity").val());
             form.append('type',$("input[name=operating_system]:checked").val());
             if($("#useKey").is(':checked') === true){
