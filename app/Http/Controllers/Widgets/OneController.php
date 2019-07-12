@@ -38,14 +38,12 @@ class OneController extends Controller
         $command = self::generateSandboxCommand($server, $extension, "", auth()->id(), "null", "null", $widget->function);
         $output = shell_exec($command);
         if(!$output){
-            return respond(__("Sunucuya bağlanılamadı"), 400);
+            return respond(__("Widget Hiçbir Veri Döndürmedi"), 400);
         }else{
-          if(!is_json($output)){
-            return respond(__("Geçersiz widget."), 400);
-          }
           $output_json = json_decode($output, true);
         }
-        return respond($output, isset($output_json['status']) ? $output_json['status'] : 200);
+        return respond(isset($output_json['message']) ? $output_json['message'] : __("Geçersiz widget.")
+            , isset($output_json['status']) ? $output_json['status'] : 200);
     }
 
     public function remove()
