@@ -185,7 +185,10 @@ class OneController extends Controller
                 $code = intval($json["status"]);
             }
         }catch (\Exception $exception){};
-        return response()->json(json_decode($output), $code);
+        if(is_json($output)){
+          return response()->json(json_decode($output), $code);
+        }
+        return response($output, $code);
     }
 
     public function internalExtensionApi()
