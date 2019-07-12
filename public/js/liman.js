@@ -56,7 +56,8 @@ function request(url, data, next, error) {
                     return next(r.responseText);
                     break;
                 case 201:
-                    return error(r.responseText);
+                    if(error)
+                      return error(r.responseText);
                     break;
                 case 300:
                     return window.location = response["message"];

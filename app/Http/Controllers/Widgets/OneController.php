@@ -39,11 +39,13 @@ class OneController extends Controller
         $output = shell_exec($command);
         if(!$output){
             return respond(__("Widget Hiçbir Veri Döndürmedi"), 400);
-        }else{
-          $output_json = json_decode($output, true);
         }
-        return respond(isset($output_json['message']) ? $output_json['message'] : __("Geçersiz widget.")
-            , isset($output_json['status']) ? $output_json['status'] : 200);
+        $output_json = json_decode($output, true);
+        if(!isset($output_json)){
+          return respond(__("Boş json nesnesi."), 400);
+        }
+        return respond(isset($output_json['message']) ? $output_json['message'] : $output_json,
+          isset($output_json['status']) ? $output_json['status'] : 200);
     }
 
     public function remove()

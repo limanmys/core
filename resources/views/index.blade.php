@@ -105,7 +105,7 @@
           intervals[element.attr('id')] = setInterval(function(){
             request('{{route('widget_one')}}', form, function(res){
                 let response =  JSON.parse(res);
-                let data =  JSON.parse(response.message);
+                let data =  response.message;
                 createChart(id+'Chart',data.labels, data.data);
             }, function(error) {
               let json = JSON.parse(error);

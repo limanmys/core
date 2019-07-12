@@ -22,7 +22,7 @@ if (!function_exists('respond')) {
     {
         if (request()->wantsJson()) {
             return response()->json([
-                "message" => __($message),
+                "message" => is_array($message) ? $message : __($message),
                 "status" => $status
             ], $status);
         } else {
