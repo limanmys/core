@@ -7,12 +7,17 @@ Route::view('/sunucular', 'server.index')->name('servers');
 
 // Add Server Route
 
-Route::post('/sunucu/ekle', 'Server\AddController@main')->name('server_add')->middleware('parameters:ip_address,control_port,type,city');
+Route::post('/sunucu/ekle', 'Server\AddController@main')->name('server_add')->middleware('parameters:name,ip_address,control_port,type,city');
 
 // Server Update Route
 
 Route::post('/sunucu/guncelle', 'Server\OneController@update')->name('server_update')->middleware('parameters:server_id,name,control_port,city');
 
+Route::post('/sunucu/erisimKontrolu','Server\MainController@checkAccess')->name('server_check_access')->middleware('parameters:hostname,port');
+
+Route::post('/sunucu/isimKontrol','Server\MainController@verifyName')->name('server_verify_name')->middleware('parameters:server_name');
+
+Route::post('/sunucu/anahtarKontrol','Server\MainController@verifyKey')->name('server_verify_key')->middleware('parameters:ip_address,username,password,port');
 
 // Remove Server Route
 

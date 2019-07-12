@@ -61,6 +61,17 @@ class WinRMConnector implements Connector
 
     }
 
+    public static function verify($ip_address, $username, $password, $port)
+    {
+        $command = "timeout 5 /usr/bin/python3 " . storage_path('winrm/winrm_verify.py' . " '"
+                . $ip_address . "' '" . $username . "' '" . $password . "'");
+        if(shell_exec($command) == "OK\n"){
+            return respond("Kullanıcı adı ve şifre doğrulandı.",200);
+        }else{
+            return respond("Bu Kullanıcı adı ve şifre ile bağlanılamadı.",201);
+        }
+    }
+
     public static function create(Server $server, $username, $password, $user_id, $key)
     {
         $beforeScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_cert.py before '" . $server->ip_address . "' '$username' '$password' '" 

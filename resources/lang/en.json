@@ -132,5 +132,16 @@
   "Sunucu Detayları": "Server Details",
   ":count bildiriminiz var.": ":count unread notification",
   " sunucusu terminali": " server's terminal",
-  "Dil": "Language"
+  "Dil": "Language",
+  "Bağlantı Bilgileri" : "Connection Information",
+  "Sunucunuzun Adresi" : "Server' Network Address",
+  "Sunucunuzun Portu" : "Server' Control Port",
+  "Sunucunuzun Hostname yada IP Adresini girin." : "Enter your server' hostname or ip address",
+  "Sunucunuzun açık olup olmadığını algılamak için kontrol edilebilecek bir port girin." : "Enter a port to determine if your server is open or closed.",
+  "Bağlantıyı Kontrol Et" : "Check Access",
+  "Liman Sistem Yönetimi'ne Hoşgeldiniz!" : "Welcome to the Liman MYS!",
+  "Kontrol Ediliyor..." : "Checking...",
+  "Onayla" : "Verify",
+  "İsim Onaylandı." : "Name Verified",
+  "Bu isimde zaten bir sunucu var." : "There's already a server with this name"
 }

@@ -16,5 +16,7 @@ interface Connector
 
     public function runScript($script,$parameters, $extra = null);
 
+    public static function verify($ip_address,$username,$password,$port);
+
     public static function create(\App\Server $server, $username, $password, $user_id,$key);
 }

@@ -37,7 +37,9 @@ function request(url, data, next, error) {
     }, 300);
     r.onreadystatechange = function () {
         if (r.readyState === 4) {
-            Swal.close();
+            if(!url.includes('bildirimler')){
+                Swal.close();
+            }
             if (id != null && (r.status !== 200 || r.status !== 300)) {
                 message(r.responseText);
             }
@@ -52,6 +54,9 @@ function request(url, data, next, error) {
             switch (r.status) {
                 case 200:
                     return next(r.responseText);
+                    break;
+                case 201:
+                    return error(r.responseText);
                     break;
                 case 300:
                     return window.location = response["message"];

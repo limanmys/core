@@ -30,7 +30,9 @@ class AddController extends Controller
         // Create object with parameters.
         $this->server = new Server();
         $this->server->fill(request()->all());
-//        $this->server = new Server(request()->all());
+        if(request('username') && request('password')){
+            $this->server->type = (($this->server->type == "windows") ? "windows_powershell" : "linux_ssh");
+        }
 
         $this->server->user_id = auth()->id();
 

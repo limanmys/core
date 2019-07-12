@@ -35,7 +35,7 @@ class SSHConnector implements Connector
             "server_id" => $server->id
         ])->first()) || abort(504,"SSH Anahtarınız yok.");
        try{
-           $ssh = new SSH2($server->ip_address, $server->control_port);
+           $ssh = new SSH2($server->ip_address, 22);
        }catch (\Exception $exception){
            abort(504,"Sunucuya Bağlanılamadı, " . $exception->getMessage());
        }
@@ -130,7 +130,7 @@ class SSHConnector implements Connector
      */
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
-        $sftp = new SFTP($this->server->ip_address, $this->server->control_port);
+        $sftp = new SFTP($this->server->ip_address, 22);
         $key = new RSA();
         $key->password = env("APP_KEY") . $this->user_id;
         $key->loadKey(file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $this->user_id));
@@ -140,6 +140,26 @@ class SSHConnector implements Connector
         return $sftp->put($remotePath, $localPath, SFTP::SOURCE_LOCAL_FILE);
     }
 
+    public static function verify($ip_address, $username, $password,$port)
+    {
+        try{
+            $ssh = new SSH2($ip_address, $port);
+        }catch (\Exception $exception){
+            return respond("Sunucuya bağlanılamadı",201);
+        }
+        $flag = false;
+        try{
+            $flag = $ssh->login($username,$password);
+        }catch (\Exception $exception){
+            return respond("Bu Kullanıcı adı ve şifre ile bağlanılamadı.",201);
+        }
+        if($flag){
+            return respond("Kullanıcı adı ve şifre doğrulandı.",200);
+        }else{
+            return respond("Bu Kullanıcı adı ve şifre ile bağlanılamadı.",201);
+        }
+    }
+
     /**
      * @param $localPath
      * @param $remotePath
@@ -147,7 +167,7 @@ class SSHConnector implements Connector
      */
     public function receiveFile($localPath, $remotePath)
     {
-        $sftp = new SFTP($this->server->ip_address, $this->server->control_port);
+        $sftp = new SFTP($this->server->ip_address, 22);
         $key = new RSA();
         $key->password = env("APP_KEY") . $this->user_id;
         $key->loadKey(file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $this->user_id));
@@ -179,7 +199,7 @@ class SSHConnector implements Connector
             $keys["publickey"] = file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $user_id . ".pub");
         }
         try{
-            $ssh = new SSH2($server->ip_address, $server->control_port);
+            $ssh = new SSH2($server->ip_address, 22);
         }catch (\Exception $exception){
             return __("Sunucuya bağlanılamadı");
         }
