@@ -351,7 +351,7 @@
             form.append("name",$("#server_name").val());
             form.append("ip_address",$("#serverHostName").val());
             form.append("control_port",$("#port").val());
-            form.append("city",$("serverCity").val());
+            form.append("city",$("#serverCity").val());
             form.append('type',$("input[name=operating_system]:checked").val());
             if($("#useKey").is(':checked') === true){
                 form.append('username',$("#keyUsername").val());
