@@ -6,7 +6,12 @@
     <li class="breadcrumb-item"><a href="/l/{{extension()->id}}">{{extension()->name}} {{ __('Sunucuları') }}</a>
     </li>
     <li class="breadcrumb-item"><a href="/l/{{extension()->id}}/{{request('city')}}">{{cities(request('city'))}}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{server()->name}}</li>
+    @if($viewName === "index")
+      <li class="breadcrumb-item active" aria-current="page">{{server()->name}} - {{extension()->name}}</li>
+    @else
+      <li class="breadcrumb-item"><a href="/l/{{extension()->id}}/{{request('city')}}/{{server()->id}}">{{server()->name}} - {{extension()->name}}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{__($viewName)}}</li>
+    @endif
 </ol>
 <div class="right" style="float:right;margin-top:-55px">
         <button class="btn btn-primary" onclick="location.href = '{{route('extension_server_settings_page',[

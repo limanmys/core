@@ -134,6 +134,7 @@ class OneController extends Controller
         ]);
         // Return all required parameters.
         return view('extension_pages.server', [
+            "viewName" => $viewName,
             "view" => $output,
             "command" => $command,
             "timestamp" => $before->diffInMilliseconds($after) / 1000
