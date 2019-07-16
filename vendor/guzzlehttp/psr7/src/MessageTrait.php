@@ -186,9 +186,9 @@ trait MessageTrait
     private function trimHeaderValues(array $values)
     {
         return array_map(function ($value) {
-            if (!is_string($value) && !is_numeric($value)) {
+            if (!is_scalar($value) && null !== $value) {
                 throw new \InvalidArgumentException(sprintf(
-                    'Header value must be a string or numeric but %s provided.',
+                    'Header value must be scalar or null but %s provided.',
                     is_object($value) ? get_class($value) : gettype($value)
                 ));
             }

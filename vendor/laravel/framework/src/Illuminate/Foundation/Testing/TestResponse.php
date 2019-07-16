@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Traits\Tappable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Foundation\Testing\Assert as PHPUnit;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -18,7 +19,7 @@ use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
  */
 class TestResponse
 {
-    use Macroable {
+    use Tappable, Macroable {
         __call as macroCall;
     }
 
@@ -1042,7 +1043,7 @@ class TestResponse
     /**
      * Dump the content from the response.
      *
-     * @return void
+     * @return $this
      */
     public function dump()
     {
@@ -1054,17 +1055,21 @@ class TestResponse
             $content = $json;
         }
 
-        dd($content);
+        dump($content);
+
+        return $this;
     }
 
     /**
      * Dump the headers from the response.
      *
-     * @return void
+     * @return $this
      */
     public function dumpHeaders()
     {
-        dd($this->headers->all());
+        dump($this->headers->all());
+
+        return $this;
     }
 
     /**
