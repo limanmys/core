@@ -27,4 +27,4 @@ job:
     - mv `pwd`/../build_tools.deb `pwd`/../liman-$VERSION.deb
   artifacts:
     paths:
-    - /builds/liman/liman/build_tools../liman-$VERSION.deb
+    - /builds/liman/liman/build_tools/liman-*.deb
