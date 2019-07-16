@@ -6,6 +6,7 @@ use App\Classes\Connector\SSHConnector;
 use App\Key;
 use App\Server;
 use App\Classes\Connector\WinRMConnector;
+use Illuminate\Support\Facades\DB;
 
 class KeyController extends Controller
 {
@@ -21,11 +22,23 @@ class KeyController extends Controller
         foreach ($keys as $key){
             $server = $servers->where('id',$key->server_id)->first();
             $key->server_name = ($server) ? $server->name : __("Sunucu Silinmiş.");
+            $key->city = ($server) ? $server->city : "";
+        }
+
+        $settings = DB::table('user_settings')->where('user_id',auth()->user()->id)->get();
+        $extensions = extensions();
+        foreach ($settings as $setting){
+            $server = $servers->find($setting->server_id);
+            $extension = $extensions->find($setting->extension_id);
+            $setting->server_name = ($server) ? $server->name : __("Sunucu Silinmiş.");
+            $setting->extension_name = ($extension) ? $extension->name : __("Eklenti Bulunamadı");
+
         }
 
         return view('keys.index',[
             "keys" => $keys,
-            "servers" => $servers
+            "servers" => objectToArray($servers,"name","id"),
+            "settings" => json_decode(json_encode($settings),true)
         ]);
     }
 

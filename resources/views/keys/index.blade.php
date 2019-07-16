@@ -7,27 +7,49 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Anahtarlar")}}</li>
         </ol>
     </nav>
-    @include('l.modal-button',[
-        "text" => "Anahtar Ekle",
-        "class" => "btn-success",
-        "target_id" => "add_key"
-    ])<br><br>
+    <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#keys" data-toggle="tab" aria-expanded="true">{{__("Anahtarlar")}}</a></li>
+            <li><a href="#settings" data-toggle="tab" aria-expanded="false">{{__("Eklenti Ayarları")}}</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="keys">
+                @include('l.modal-button',[
+                    "text" => "Anahtar Ekle",
+                    "class" => "btn-success",
+                    "target_id" => "add_key"
+                ])<br><br>
 
-    @include('l.table',[
-        "value" => $keys,
-        "title" => [
-            "Sunucu" , "Kullanıcı" , "*hidden*" , "*hidden*"
-        ],
-        "display" => [
-            "server_name" , "username", "id:key_id" , "server_id"
-        ],
-        "menu" => [
-            "Sil" => [
-                "target" => "delete",
-                "icon" => "fa-trash"
-            ]
-        ]
-    ])
+                @include('l.table',[
+                    "value" => $keys,
+                    "title" => [
+                        "Sunucu" , "Kullanıcı" , "*hidden*" , "*hidden*"
+                    ],
+                    "display" => [
+                        "server_name" , "username", "id:key_id" , "server_id:server_id"
+                    ],
+                    "menu" => [
+                        "Sil" => [
+                            "target" => "delete",
+                            "icon" => "fa-trash"
+                        ]
+                    ]
+                ])
+            </div>
+            <div class="tab-pane" id="settings">
+                @include('l.table',[
+                "value" => $settings,
+                    "title" => [
+                        "Ayar Adı" , "Sunucu" , "Eklenti" , "*hidden*"
+                    ],
+                    "display" => [
+                        "name" , "server_name", "extension_name" , "id:settings_id"
+                    ],
+                ])
+            </div>
+        </div>
+    </div>
+
 
     @include('l.modal',[
         "id"=>"add_key",
@@ -35,7 +57,7 @@
         "url" => route('key_add'),
         "next" => "reload",
         "inputs" => [
-            "Sunucu Seçin:server_id" => objectToArray($servers,"name","id"),
+            "Sunucu Seçin:server_id" => $servers,
             "Kullanıcı Adı" => "username:text",
             "Parola" => "password:password"
         ],
