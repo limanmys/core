@@ -10,6 +10,7 @@
     <button href="#tab_1" type="button" class="btn btn-success" data-toggle="modal" data-target="#add_server">{{__("Sunucu Ekle")}}</button><br><br>
     @include('l.table',[
         "value" => servers(),
+        "ajaxUrl" => route('servers_api'),
         "title" => [
             "Sunucu Adı" , "İp Adresi" , "*hidden*" , "Kontrol Portu", "*hidden*" ,"*hidden*"
         ],
@@ -247,7 +248,7 @@
                 $("#generalTab").css('color','red');
             });
         }
-        
+
         function checkKey(form) {
             let option = $("#useKey");
             if(option.is(':checked') === false){
@@ -328,7 +329,7 @@
             $("#tableServerCity").html($("#serverCity").val());
             $("#tableKey").html(($("#useKey").is(':checked') === true) ? $("#keyType").val() : "{{__("Anahtarsız")}}");
         }
-        
+
         function addServer() {
             if(!isNetworkOK || !isGeneralOK || !isKeyOK){
                 Swal.fire({

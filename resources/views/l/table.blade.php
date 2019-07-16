@@ -1,3 +1,16 @@
+@php
+  if(isset($ajaxUrl)){
+    $column_array = [];
+    foreach($display as $k=>$i){
+      if($title[$k]=="*hidden*")
+        continue;
+      $column_array[] = [
+        "title" => $title[$k],
+        "data" => count(explode(':',$i)) > 1 ? explode(':',$i)[0] : $i
+      ];
+    }
+  }
+@endphp
 @if(!isset($title) && !isset($value) && !isset($display))
     @php(__("Tablo Oluşturulamadı."))
 @else
@@ -6,42 +19,45 @@
     @else
         @php($rand = str_random(10))
     @endisset
-
-<table class="table table-striped table-hover nowrap @isset($noInitialize){{"notDataTable"}}@endisset" id="{{$rand}}" style="width: 100%">
-        <thead>
-        <tr>
-            <th scope="col">#</th>
-            @foreach($title as $i)
-                @if($i == "*hidden*")
-                    <th scope="col" hidden>{{ __($i) }}</th>
-                @else
-                    <th scope="col">{{ __($i) }}</th>
-                @endif
-            @endforeach
-        </tr>
-        </thead>
-        <tbody class="table-striped">
-        @foreach ($value as $k)
-            <tr class="tableRow" id="{{str_random(10)}}" @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this)" @endisset>
-                <td style="width: 10px">{{$loop->iteration}}</td>
-                @foreach($display as $item)
-                    @if(count(explode(':',$item)) > 1)
-                        @if(is_array($k))
-                            <td id="{{explode(':',$item)[1]}}" hidden>{{$k[explode(':',$item)[0]]}}</td>
-                        @else
-                            <td id="{{explode(':',$item)[1]}}" hidden>{{$k->__get(explode(':',$item)[0])}}</td>
-                        @endif
+<table @isset($ajaxUrl) ajax-url="{{$ajaxUrl}}" ajax-columns="{{json_encode($column_array)}}" @endisset class="table table-striped table-hover nowrap @isset($noInitialize){{"notDataTable"}}@endisset" id="{{$rand}}" style="width: 100%">
+        @if(!isset($ajaxUrl))
+          <thead>
+            <tr>
+                <th scope="col">#</th>
+                @foreach($title as $k => $i)
+                    @if($i == "*hidden*")
+                        <th scope="col" hidden>{{ __($i) }}</th>
                     @else
-                        @if(is_array($k))
-                            <td id="{{$item}}">{{$k[$item]}}</td>
-                        @else
-                            <td id="{{$item}}">{{$k->__get($item)}}</td>
-                        @endif
+                        <th scope="col">{{ __($i) }}</th>
                     @endif
                 @endforeach
             </tr>
-        @endforeach
-        </tbody>
+          </thead>
+        @endif
+        @if(!isset($ajaxUrl))
+          <tbody class="table-striped">
+            @foreach ($value as $k)
+                <tr class="tableRow" id="{{str_random(10)}}" @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this)" @endisset>
+                    <td style="width: 10px">{{$loop->iteration}}</td>
+                    @foreach($display as $item)
+                        @if(count(explode(':',$item)) > 1)
+                            @if(is_array($k))
+                                <td id="{{explode(':',$item)[1]}}" hidden>{{$k[explode(':',$item)[0]]}}</td>
+                            @else
+                                <td id="{{explode(':',$item)[1]}}" hidden>{{$k->__get(explode(':',$item)[0])}}</td>
+                            @endif
+                        @else
+                            @if(is_array($k))
+                                <td id="{{$item}}">{{$k[$item]}}</td>
+                            @else
+                                <td id="{{$item}}">{{$k->__get($item)}}</td>
+                            @endif
+                        @endif
+                    @endforeach
+                </tr>
+            @endforeach
+          </tbody>
+        @endif
     </table>
     @if(isset($menu))
         <script>

@@ -24,13 +24,40 @@
             window.location.hash = $(this).attr("href");
         });
         activeTab();
-        $('table').not('.notDataTable').DataTable({
-            autoFill : true,
-            bFilter: true,
-            destroy: true,
-            "language" : {
-                url : "{{asset('turkce.json')}}"
-            }
+        $('table').not('.notDataTable').each(function(item){
+          let options = {
+              autoFill : true,
+              bFilter: true,
+              destroy: true,
+              language: {
+                  url : "{{asset('turkce.json')}}"
+              }
+          };
+          if($(this).attr("ajax-url")){
+            options.ajax = {
+              beforeSend: function (request) {
+                let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');
+                request.setRequestHeader('X-CSRF-TOKEN', csrf);
+                request.setRequestHeader("Accept", "text/json");
+              },
+              data: function(d){
+                let server_id = $('meta[name=server_id]').attr("content");
+                let extension_id = $('meta[name=extension_id]').attr("content");
+
+                if(server_id != "")
+                  d.server_id = server_id;
+                if(extension_id != "")
+                  d.extension_id = extension_id;
+              },
+              type: "POST",
+              url: $(this).attr("ajax-url")
+            };
+            options.columns = JSON.parse($(this).attr("ajax-columns"));
+            options.processing = true;
+            options.serverSide = true;
+          }
+          console.log(options)
+          $(this).DataTable(options);
         });
         let title = $(".breadcrumb-item.active").html();
         if(title !== undefined){
