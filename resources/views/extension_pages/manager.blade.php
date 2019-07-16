@@ -93,7 +93,9 @@
 <script>
         function downloadFile(form){
             window.location.assign('/indir/eklenti/' + form.getElementsByTagName('select')[0].value);
-            // loading();
+            setTimeout(function(){
+              Swal.close();
+            }, 1000);
             return false;
         }
 
