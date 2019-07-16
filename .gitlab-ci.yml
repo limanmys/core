@@ -27,7 +27,7 @@ job:
     - cp ../build_tools.deb ../liman-$VERSION.deb
     - echo "file=@/builds/liman/liman/liman-$VERSION.deb"
     - echo "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION&initial_comment=`date`&pretty=1"
-    - curl -F "file=@/builds/liman/liman/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION&initial_comment=test&pretty=1"
+    - curl -F "file=@/builds/liman/liman/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION.deb&pretty=1"
   artifacts:
     name: liman_$CI_BUILD_ID
     paths:
