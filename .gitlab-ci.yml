@@ -33,4 +33,4 @@ job:
     - echo "Done!"
   artifacts:
     paths:
-    - `pwd`/../liman-`cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
+    - ./`pwd`/../liman-`cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
