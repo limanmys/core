@@ -25,7 +25,7 @@ job:
     - chmod -R 775 DEBIAN/
     - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
     - cp ../build_tools.deb ../liman-$VERSION.deb
-    - echo "/builds/liman/liman-$VERSION.deb"
+    - echo "/builds/liman/liman/liman-$VERSION.deb"
     - echo "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION&initial_comment=`date`&pretty=1"
     - curl -F 'file=@/builds/liman/liman-$VERSION.deb' 'https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION&initial_comment=test&pretty=1'
   artifacts:
