@@ -1,9 +1,5 @@
 image: gitlab.lab:4567/liman/docker:latest
 
-cache:
-  paths:
-    - vendor/
-
 before_script:
   - rm `pwd`/build_tools/liman_req.sh
   - cd build_tools
@@ -31,6 +27,9 @@ job:
     - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
     - mv `pwd`/../build_tools.deb `pwd`/../liman-`cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
     - echo "Done!"
+    - pwd
+    - echo $TRAVIS_TAG
+    - ls -l ../
   artifacts:
     paths:
     - ./`pwd`/../liman-`cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
