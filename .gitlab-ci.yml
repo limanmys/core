@@ -1,9 +1,5 @@
 image: gitlab.lab:4567/liman/docker:latest
 
-cache:
-  paths:
-    - vendor/
-
 before_script:
   - rm `pwd`/build_tools/liman_req.sh
   - cd build_tools
@@ -19,21 +15,20 @@ before_script:
   - rm -rf composer.phar composer-setup.php liman/server/.git liman/sandbox/.git liman/webssh/.git
   - mv create_deb.sh ../create_deb.sh
   - chmod +x ../create_deb.sh
-  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y.%m.%d-%s')}
-  - sed -i "s/APP_VERSION=Development/APP_VERSION=$TRAVIS_TAG/g" liman/server/.env
+  - export VERSION=$(date +'%Y.%m.%d-%s')
+  - sed -i "s/APP_VERSION=Development/APP_VERSION=$VERSION/g" liman/server/.env
   - sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" liman/server/.env
   - sed -i "s/APP_ENV=local/APP_ENV=production/g" liman/server/.env
 job:
   stage: deploy
   script:
-    - ls -la
     - chmod -R 775 DEBIAN/
     - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
-    - mv `pwd`/../build_tools.deb `pwd`/../liman-`cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
-    - echo "Done!"
-
-# Run our tests
-# If Xdebug was installed you can generate a coverage report and see code coverage metrics.
-#test:
-#  script:
-#    - vendor/bin/phpunit --configuration phpunit.xml --coverage-text --colors=never
+    - cp ../build_tools.deb ../liman-$VERSION.deb
+    - echo "file=@/builds/liman/liman/liman-$VERSION.deb"
+    - echo "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION&initial_comment=`date`&pretty=1"
+    - curl -F "file=@/builds/liman/liman/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION.deb&pretty=1"
+  artifacts:
+    name: liman_$CI_BUILD_ID
+    paths:
+    - /builds/liman/liman/build_tools.deb
