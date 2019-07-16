@@ -15,18 +15,16 @@ before_script:
   - rm -rf composer.phar composer-setup.php liman/server/.git liman/sandbox/.git liman/webssh/.git
   - mv create_deb.sh ../create_deb.sh
   - chmod +x ../create_deb.sh
-  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y.%m.%d-%s')}
-  - sed -i "s/APP_VERSION=Development/APP_VERSION=$TRAVIS_TAG/g" liman/server/.env
+  - export VERSION=$(date +'%Y.%m.%d-%s')
+  - sed -i "s/APP_VERSION=Development/APP_VERSION=$VERSION/g" liman/server/.env
   - sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" liman/server/.env
   - sed -i "s/APP_ENV=local/APP_ENV=production/g" liman/server/.env
 job:
   stage: deploy
   script:
-    - ls -la
     - chmod -R 775 DEBIAN/
     - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
-    - mv `pwd`/../build_tools.deb `pwd`/../liman-`cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`.deb
-    - echo "Done!"
+    - mv `pwd`/../build_tools.deb `pwd`/../liman-$VERSION.deb
   artifacts:
     paths:
-    - /builds/liman/liman/build_tools../liman-$TRAVIS_TAG.deb
+    - /builds/liman/liman/build_tools../liman-$VERSION.deb
