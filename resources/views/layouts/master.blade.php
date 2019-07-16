@@ -16,6 +16,7 @@
 <script src="{{asset('js/libraries.js')}}"></script>
 <script src="{{asset('/js/liman.js')}}"></script>
 <script src="{{asset('/js/jquery-ui.js')}}"></script>
+<script src="{{asset('/js/bootstrap-datepicker.min.js')}}"></script>
 
 @yield('body')
 </body>
