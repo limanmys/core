@@ -4,9 +4,6 @@
 // Servers Route
 
 Route::view('/sunucular', 'server.index')->name('servers');
-Route::post('/sunucular_api', function(){
-  return [ 'data' => servers()];
-})->name('servers_api');
 
 // Add Server Route
 
