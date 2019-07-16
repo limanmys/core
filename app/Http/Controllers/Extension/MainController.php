@@ -282,4 +282,14 @@ class MainController extends Controller
 
         return respond(route('extension_one', $ext->id), 300);
     }
+
+    public function updateExtOrders()
+    {
+      foreach (json_decode(request('data')) as $extension) {
+        $data = Extension::find($extension->id);
+        $data->order = $extension->order;
+        $data->save();
+      }
+      return respond('Sıralamalar güncellendi',200);
+    }
 }

@@ -23,6 +23,11 @@ class SettingsController extends Controller
         return view('extension_pages.manager');
     }
 
+    public function allServersApi()
+    {
+        return response()->json(extensions());
+    }
+
     // Extension Management Page
 
     /**

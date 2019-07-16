@@ -18,6 +18,8 @@ Route::view('/l/{extension_id}/{city}', 'extension_pages.city')->name('extension
 // Extensions List Route
 Route::get('/eklentiler', 'Extension\SettingsController@settings_all')->name('extensions_settings')->middleware('admin');
 
+Route::post('/eklentiler_api', 'Extension\SettingsController@allServersApi')->name('extensions_api');
+
 // Extension Details Route
 Route::get('/eklentiler/{extension_id}', 'Extension\SettingsController@settings_one')->name('extension_one');
 
@@ -49,6 +51,8 @@ Route::post('/yukle/eklenti/', 'Extension\MainController@upload')->name('extensi
 Route::post('/eklenti/sil', 'Extension\OneController@remove')->name('extension_remove')->middleware('admin');
 
 Route::post('/eklenti/yeni', 'Extension\MainController@newExtension')->name('extension_new')->middleware('admin');
+
+Route::post('/eklenti/update_ext_orders', 'Extension\MainController@updateExtOrders')->name('update_ext_orders')->middleware('admin');
 
 Route::get('/eklentiler/{extension_id}/{page_name}', 'Extension\OneController@page')->middleware('admin')->name('extension_page_edit_view');
 

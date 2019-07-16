@@ -26,6 +26,9 @@
 
     @include('l.table',[
         "value" => extensions(),
+        "sortable" => true,
+        "sortUpdateUrl" => route('update_ext_orders'),
+        "afterSortFunction" => 'location.reload',
         "title" => [
             "Eklenti Adı" , "Versiyon", "*hidden*"
         ],

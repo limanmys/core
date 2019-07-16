@@ -86,4 +86,11 @@ class Extension extends Model
             ->whereNotNull("extension_id")->pluck("extension_id")->toArray());
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope('extensions', function (\Illuminate\Database\Eloquent\Builder $builder) {
+            $builder->orderBy('order');
+        });
+    }
 }
