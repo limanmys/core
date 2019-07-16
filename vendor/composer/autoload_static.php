@@ -106,7 +106,6 @@ class ComposerStaticInitee6fe891edd9e472e52252f990973bff
         ),
         'J' => 
         array (
-            'Jenssegers\\Blade\\' => 17,
             'JakubOnderka\\PhpConsoleHighlighter\\' => 35,
             'JakubOnderka\\PhpConsoleColor\\' => 29,
         ),
@@ -317,10 +316,6 @@ class ComposerStaticInitee6fe891edd9e472e52252f990973bff
         'Laravel\\Tinker\\' => 
         array (
             0 => __DIR__ . '/..' . '/laravel/tinker/src',
-        ),
-        'Jenssegers\\Blade\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/jenssegers/blade/src',
         ),
         'JakubOnderka\\PhpConsoleHighlighter\\' => 
         array (
@@ -2047,7 +2042,6 @@ class ComposerStaticInitee6fe891edd9e472e52252f990973bff
         'JakubOnderka\\PhpConsoleColor\\ConsoleColor' => __DIR__ . '/..' . '/jakub-onderka/php-console-color/src/ConsoleColor.php',
         'JakubOnderka\\PhpConsoleColor\\InvalidStyleException' => __DIR__ . '/..' . '/jakub-onderka/php-console-color/src/InvalidStyleException.php',
         'JakubOnderka\\PhpConsoleHighlighter\\Highlighter' => __DIR__ . '/..' . '/jakub-onderka/php-console-highlighter/src/Highlighter.php',
-        'Jenssegers\\Blade\\Blade' => __DIR__ . '/..' . '/jenssegers/blade/src/Blade.php',
         'JsonException' => __DIR__ . '/..' . '/symfony/polyfill-php73/Resources/stubs/JsonException.php',
         'Laravel\\Tinker\\ClassAliasAutoloader' => __DIR__ . '/..' . '/laravel/tinker/src/ClassAliasAutoloader.php',
         'Laravel\\Tinker\\Console\\TinkerCommand' => __DIR__ . '/..' . '/laravel/tinker/src/Console/TinkerCommand.php',

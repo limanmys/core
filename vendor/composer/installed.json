@@ -900,56 +900,6 @@
         "description": "Highlight PHP code in terminal"
     },
     {
-        "name": "jenssegers/blade",
-        "version": "v1.2.1",
-        "version_normalized": "1.2.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/jenssegers/blade.git",
-            "reference": "8dc7d31201cc25542dc03d40974ff7b583ed4e94"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/jenssegers/blade/zipball/8dc7d31201cc25542dc03d40974ff7b583ed4e94",
-            "reference": "8dc7d31201cc25542dc03d40974ff7b583ed4e94",
-            "shasum": ""
-        },
-        "require": {
-            "illuminate/view": "^5.5",
-            "php": ">=7.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "^6.0|^7.0",
-            "satooshi/php-coveralls": "^1.0"
-        },
-        "time": "2019-06-06T08:42:05+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Jenssegers\\Blade\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Jens Segers",
-                "homepage": "https://jenssegers.com"
-            }
-        ],
-        "description": "The standalone version of Laravel's Blade templating engine for use outside of Laravel.",
-        "keywords": [
-            "blade",
-            "laravel",
-            "render",
-            "template",
-            "view"
-        ]
-    },
-    {
         "name": "laravel/framework",
         "version": "v5.8.28",
         "version_normalized": "5.8.28.0",
