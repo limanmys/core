@@ -49,7 +49,7 @@ Route::get('/', 'HomeController@index')->name('home');
 
 // SSH Key List Route
 
-Route::get('/anahtarlar', 'KeyController@index')->name('keys');
+Route::get('/kasa', 'KeyController@index')->name('keys');
 
 // SSH Key Add Route
 
@@ -92,6 +92,8 @@ Route::view('/profil','user.self')->name('my_profile');
 Route::post('/profil','UserController@selfUpdate')->name('profile_update');
 
 Route::post('/user/update','UserController@adminUpdate')->name('update_user')->middleware('admin');
+
+Route::post('/user/setting/delete','UserController@removeSetting')->name('user_setting_remove');
 });
 
 Route::post('/lmn/private/extensionApi','Extension\OneController@internalExtensionApi');

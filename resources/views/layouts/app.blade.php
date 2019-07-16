@@ -195,9 +195,9 @@
 
                     <li class="header">{{__("Ayarlar")}}</li>
                     <li class="">
-                        <a href="/anahtarlar">
+                        <a href="/kasa">
                             <i class="fa fa-key "></i>
-                            <span>{{__("Anahtarlar")}}</span>
+                            <span>{{__("Kasa")}}</span>
                         </a>
                     </li>
                     <li class="">

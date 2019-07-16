@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Permission;
 use App\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -123,5 +124,19 @@ class UserController extends Controller
         ]);
 
         return respond('Kullanıcı Güncellendi.',200);
+    }
+
+    public function removeSetting()
+    {
+        $flag = DB::table('user_settings')->where([
+            'user_id' => auth()->user()->id,
+            'id' => request('setting_id')
+        ])->delete();
+
+        if($flag){
+            return respond("Başarıyla silindi",200);
+        }else{
+            return respond("Başarıyla silinemedi",201);
+        }
     }
 }

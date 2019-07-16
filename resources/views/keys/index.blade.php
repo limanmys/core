@@ -43,8 +43,14 @@
                         "Ayar Adı" , "Sunucu" , "Eklenti" , "*hidden*"
                     ],
                     "display" => [
-                        "name" , "server_name", "extension_name" , "id:settings_id"
+                        "name" , "server_name", "extension_name" , "id:setting_id"
                     ],
+                    "menu" => [
+                        "Sil" => [
+                            "target" => "delete_settings",
+                            "icon" => "fa-trash"
+                        ]
+                    ]
                 ])
             </div>
         </div>
@@ -72,6 +78,18 @@
        "next" => "reload",
        "inputs" => [
            "Key Id:'null'" => "key_id:hidden"
+       ],
+       "submit_text" => "Sunucuyu Sil"
+   ])
+
+    @include('l.modal',[
+       "id"=>"delete_settings",
+       "title" =>"Ayarı Sil",
+       "url" => route('user_setting_remove'),
+       "text" => "Ayarı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+       "next" => "reload",
+       "inputs" => [
+           "Setting Id:'null'" => "setting_id:hidden"
        ],
        "submit_text" => "Sunucuyu Sil"
    ])
