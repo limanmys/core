@@ -94,7 +94,7 @@
                 @if(auth()->user()->id == server()->user_id || auth()->user()->isAdmin())
                     <button class="btn btn-success" data-toggle="modal" data-target="#install_extension"><i
                                 class="fa fa-plus"></i></button>
-                    <button disabled onclick="removeExtension()" class="btn btn-danger"><i class="fa fa-minus"></i>
+                    <button onclick="removeExtension()" class="btn btn-danger"><i class="fa fa-minus"></i>
                     </button><br><br>
                 @endif
                 @include('l.table',[
@@ -106,6 +106,7 @@
                     "display" => [
                         "name" , "version", "id:extension_id"
                     ],
+                    "noInitialize" => "true"
                 ])
                 <?php
                 $input_extensions = [];
@@ -486,9 +487,50 @@
                 terminalFrame.attr("src", "{{route('server_terminal',["server_id" => $server->id])}}");
             }
         }
+
+        function removeExtension() {
+          let data = [];
+          let table = $("#installed_extensions").DataTable();
+          table.rows( { selected: true } ).data().each(function(element){
+              data.push(element[3]);
+          });
+          if(data.length === 0){
+              Swal.fire({
+                  type: 'error',
+                  title: 'Lütfen önce seçim yapınız.'
+              });
+              return false;
+          }
+          Swal.fire({
+              position: 'center',
+              type: 'info',
+              title: '{{__("Siliniyor...")}}',
+              showConfirmButton: false,
+          });
+          let form = new FormData();
+          form.append('extensions',JSON.stringify(data));
+          request('{{route('server_extension_remove')}}', form, function (response) {
+              let json = JSON.parse(response);
+              Swal.fire({
+                  position: 'center',
+                  type: 'success',
+                  title: json["message"],
+                  showConfirmButton: false,
+                  timer: 2000
+              });
+              setTimeout(function () {
+                      location.reload();
+              },2000);
+          });
+          return false;
+        }
+
         $(function () {
-            $("#installed_extensions table").DataTable({
+            $("#installed_extensions").DataTable({
                 bFilter: true,
+                select: {
+                    style: 'multi'
+                },
                 "language": {
                     url: "/turkce.json"
                 }

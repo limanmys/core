@@ -141,16 +141,16 @@
                         </a>
                     </li>
                     @if(count(extensions()))
-                        <li class="header">{{__("Eklentiler")}}</li>
+                      <li class="header">{{__("Eklentiler")}}</li>
+                      @foreach(extensions() as $extension)
+                          <li class="ext_nav">
+                              <a href="/l/{{$extension->id}}">
+                                  <i class="fa fa-{{$extension->icon}} "></i>
+                                  <span>{{__($extension->name)}}</span>
+                              </a>
+                          </li>
+                      @endforeach
                     @endif
-                    @foreach(extensions() as $extension)
-                        <li class="">
-                            <a href="/l/{{$extension->id}}">
-                                <i class="fa fa-{{$extension->icon}} "></i>
-                                <span>{{__($extension->name)}}</span>
-                            </a>
-                        </li>
-                    @endforeach
 
                     @if(auth()->user()->isAdmin())
                         <li class="header">{{__("Yönetim Paneli")}}</li>
@@ -239,7 +239,6 @@
         "title" => ""
     ])
 @stop
-
 
 @section('adminlte_js')
     <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>

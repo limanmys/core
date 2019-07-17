@@ -542,12 +542,12 @@ class OneController extends Controller
         if(server()->user_id != auth()->user()->id && !auth()->user()->isAdmin()){
             return respond("Yalnızca sunucu sahibi ya da yönetici bir eklentiyi silebilir.",201);
         }
-
-        DB::table("server_extensions")->where([
-            "server_id" => server()->id,
-            "extension_id" => extension()->id
-        ])->delete();
-
-        return respond("Eklenti Başarıyla Silindi");
+        foreach (json_decode(request('extensions')) as $key => $value) {
+          DB::table("server_extensions")->where([
+              "server_id" => server()->id,
+              "extension_id" => $value
+          ])->delete();
+        }
+        return respond("Eklentiler Başarıyla Silindi");
     }
 }

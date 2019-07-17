@@ -10,6 +10,9 @@
 <table class="table table-striped table-hover nowrap @isset($noInitialize){{"notDataTable"}}@endisset" id="{{$rand}}" style="width: 100%">
         <thead>
         <tr>
+            @if(isset($sortable) && $sortable)
+              <th scope="col">Taşı</th>
+            @endif
             <th scope="col">#</th>
             @foreach($title as $i)
                 @if($i == "*hidden*")
@@ -22,8 +25,11 @@
         </thead>
         <tbody class="table-striped">
         @foreach ($value as $k)
-            <tr class="tableRow" id="{{str_random(10)}}" @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this)" @endisset>
-                <td style="width: 10px">{{$loop->iteration}}</td>
+            <tr class="tableRow" @if(isset($k->id)) data-id="{{$k->id}}" @endif id="{{str_random(10)}}" @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this)" @endisset>
+                @if(isset($sortable) && $sortable)
+                  <td style="width: 10px"><i class="fa fa-arrows"></i></td>
+                @endif
+                <td style="width: 10px" class="row-number">{{$loop->iteration}}</td>
                 @foreach($display as $item)
                     @if(count(explode(':',$item)) > 1)
                         @if(is_array($k))
@@ -45,6 +51,30 @@
     </table>
     @if(isset($menu))
         <script>
+
+            @if(isset($sortable) && $sortable)
+              $('#{{$rand}}').find('tbody').sortable({
+                  stop: function(event, ui) {
+                      let data = [];
+                      $('#{{$rand}}').find('tbody').find('tr').each(function(i, el){
+                          $(el).attr('data-order', $(el).index());
+                          $(el).find('.row-number').text($(el).index()+1);
+                          data.push({
+                            id: $(el).attr('data-id'),
+                            order:  $(el).index()
+                          });
+                      });
+                      @if(isset($sortUpdateUrl) && $sortUpdateUrl)
+                        let form = new FormData();
+                        form.append('data', JSON.stringify(data));
+                        request('{{$sortUpdateUrl}}', form, function(response){
+                          {{$afterSortFunction}}();
+                        });
+                      @endif
+                  }
+              });
+            @endif
+
             @isset($setCurrentVariable)
             var {{$setCurrentVariable}};
             @endisset
