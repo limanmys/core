@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property-read mixed $id
  * @mixin Eloquent
- * @method static where(string $string, $id)
  * @method static Builder|Server find($field)
  */
 class Script extends Model

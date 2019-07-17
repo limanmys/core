@@ -132,6 +132,7 @@ class SettingsController extends Controller
             $extension["icon"] = request("icon");
             $extension["service"] = request("service");
             $extension["version"] = request("version");
+            $extension["verification"] = request("verification");
         } else {
             $values = $extension[request('table')];
             foreach ($values as $key => $value) {
