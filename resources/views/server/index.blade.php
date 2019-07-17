@@ -247,7 +247,7 @@
                 $("#generalTab").css('color','red');
             });
         }
-        
+
         function checkKey(form) {
             let option = $("#useKey");
             if(option.is(':checked') === false){
@@ -304,6 +304,7 @@
                 $("#keyTab").css('color','green');
                 $("#summaryTab").click();
                 $("#keyDiv").fadeOut(0);
+                $('#keyDiv').find('input, select').prop('disabled', true);
             }
         }
 
@@ -328,7 +329,7 @@
             $("#tableServerCity").html($("#serverCity").val());
             $("#tableKey").html(($("#useKey").is(':checked') === true) ? $("#keyType").val() : "{{__("Anahtarsız")}}");
         }
-        
+
         function addServer() {
             if(!isNetworkOK || !isGeneralOK || !isKeyOK){
                 Swal.fire({
@@ -354,6 +355,7 @@
             form.append("city",$("#serverCity").val());
             form.append('type',$("input[name=operating_system]:checked").val());
             if($("#useKey").is(':checked') === true){
+              console.log("checked");
                 form.append('username',$("#keyUsername").val());
                 form.append('password',$("#keyPassword").val());
             }
