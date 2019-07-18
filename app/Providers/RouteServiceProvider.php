@@ -39,7 +39,9 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
-        //
+        if(env("EXTENSION_DEVELOPER_MODE")){
+            $this->mapExtensionDeveloperRoutes();
+        }
     }
 
     /**
@@ -69,5 +71,11 @@ class RouteServiceProvider extends ServiceProvider
              ->middleware('api')
              ->namespace($this->namespace)
              ->group(base_path('routes/api.php'));
+    }
+
+    protected function mapExtensionDeveloperRoutes()
+    {
+        Route::namespace($this->namespace)
+            ->group(base_path('routes/extension_developer.php'));
     }
 }

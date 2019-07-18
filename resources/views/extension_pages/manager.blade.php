@@ -12,16 +12,19 @@
         "target_id" => "extensionUpload",
         "text" => "Yükle"
     ])
-    @include('l.modal-button',[
+    @if(env("EXTENSION_DEVELOPER_MODE"))
+        @include('l.modal-button',[
         "class" => "btn-secondary",
         "target_id" => "extensionExport",
         "text" => "İndir"
     ])
-    @include('l.modal-button',[
-        "class" => "btn-info",
-        "target_id" => "newExtension",
-        "text" => "Yeni"
-    ])
+        @include('l.modal-button',[
+            "class" => "btn-info",
+            "target_id" => "newExtension",
+            "text" => "Yeni"
+        ])
+    @endif
+
     <br><br>
 
     @include('l.table',[
@@ -41,7 +44,7 @@
                 "icon" => "fa-trash"
             ]
         ],
-        "onclick" => "details"
+        "onclick" => env("EXTENSION_DEVELOPER_MODE") ? "details" : ""
     ])
 
     @include('l.modal',[
@@ -54,12 +57,14 @@
         ],
         "submit_text" => "Yükle"
     ])
+    @if(env("EXTENSION_DEVELOPER_MODE"))
     <?php
         $input_extensions = [];
         foreach(extensions() as $extension){
             $input_extensions[$extension->name] = $extension->id;
         }
     ?>
+
     @include('l.modal',[
         "id"=>"extensionExport",
         "onsubmit" => "downloadFile",
@@ -80,7 +85,7 @@
         ],
         "submit_text" => "Oluştur"
     ])
-
+@endif
     @include('l.modal',[
        "id"=>"delete",
        "title" =>"Eklentiyi Sil",
@@ -102,9 +107,11 @@
             return false;
         }
 
+        @if(env("EXTENSION_DEVELOPER_MODE"))
         function details(element){
             let extension_id = element.querySelector('#extension_id').innerHTML;
             window.location.href = "/eklentiler/" + extension_id
         }
+        @endif
 </script>
 @endsection
