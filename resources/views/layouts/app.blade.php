@@ -23,6 +23,10 @@
                     <span class="sr-only">{{__("Geri Dön")}}</span>
                 </a>
 
+                <a href="#" onclick="location.href = document.referrer" style="line-height: 50px;color: white;font-weight: bolder">
+                    <i class="fa fa-chevron-left"></i> Geri
+                </a>
+
                 <!-- Navbar Right Menu -->
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
