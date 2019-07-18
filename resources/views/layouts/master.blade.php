@@ -14,7 +14,7 @@
 </head>
 <body class="hold-transition @yield('body_class')">
   <div class="il-isimleri"></div>
-  
+
 <script src="{{asset('js/libraries.js')}}"></script>
 <script src="{{asset('/js/liman.js')}}"></script>
 <script src="{{asset('/js/jquery-ui.js')}}"></script>
@@ -66,7 +66,8 @@
             $("#terminal .modal-body iframe").attr('src', '');
         })
     }
-    $('input[type=password]').after('<span class="input-group-btn">'+
+    $('input[type=password]').wrap('<div class="input-group"></div>');
+    $('input[type=password]').before('<span class="input-group-btn">'+
       '<button class="btn btn-default reveal" type="button"><i class="fa fa-eye"></i></button>'+
     '</span>');
     $(".reveal").on('click',function() {
