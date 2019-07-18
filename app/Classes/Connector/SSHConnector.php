@@ -85,11 +85,16 @@ class SSHConnector implements Connector
      */
     public function runScript($script, $parameters, $extra = null)
     {
-        $localPath = env('SCRIPTS_PATH') . $script->id;
+        $scriptsPath = env('EXTENSIONS_PATH') . $script->extensions
+            . DIRECTORY_SEPARATOR . "scripts" . DIRECTORY_SEPARATOR . $script->unique_code . ".lmns";
+        if(!is_file($scriptsPath)){
+            abort("Betik bulunamadı" . $script->extensions
+                . DIRECTORY_SEPARATOR . "scripts" . DIRECTORY_SEPARATOR . $script->unique_code . ".lmns");
+        }
         $remotePath = '/tmp/' . $script->id;
-        $this->sendFile($localPath, $remotePath,0555);
+        $this->sendFile($scriptsPath, $remotePath,0555);
 
-        $localHash = md5_file($localPath);
+        $localHash = md5_file($scriptsPath);
         $remoteHash = explode(' ',substr($this->execute('md5sum ' . $remotePath,false),0 , -1))[0];
 
         if($localHash != $remoteHash){
