@@ -22,11 +22,6 @@
                    onclick="request('{{route('set_collapse')}}',new FormData(),null)">
                     <span class="sr-only">{{__("Geri Dön")}}</span>
                 </a>
-                <span style="line-height: 50px;color: white;font-weight: bolder">
-                    @if(auth()->user()->status == "1")
-                        {{__("Tam Yetkili Yönetici Hesabı İle Giriş Yaptınız.")}}
-                    @endif
-                </span>
 
                 <!-- Navbar Right Menu -->
                 <div class="navbar-custom-menu">
@@ -215,10 +210,17 @@
         @endauth
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
+          @if(auth()->user()->status == "1")
+            <div class="alert alert-warning" style="border-radius: 0px; margin-bottom: 0px; text-align: center; text-shadow: 3px 2px 3px rgba(255,255,255,.2); border: 0px;">
+              {{__("Tam yetkili yönetici hesabı ile giriş yaptınız, sisteme zarar verebilirsiniz.")}}
+            </div>
+          @endif
             <!-- Content Header (Page header) -->
-            <section class="content-header">
+            @if (trim($__env->yieldContent('content_header')))
+              <section class="content-header">
                 @yield('content_header')
-            </section>
+              </section>
+            @endif
 
             <!-- Main content -->
             <section class="content">
