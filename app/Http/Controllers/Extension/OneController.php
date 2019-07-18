@@ -355,21 +355,69 @@ class OneController extends Controller
     public function serverSettings()
     {
         $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
-        foreach ($extension["database"] as $key) {
-            if(request($key["variable"])){
-                DB::table("user_settings")->insert([
-                    "id" => Str::uuid(),
-                    "server_id" => server()->id,
+        //Check Verification Script
+        if(array_key_exists("verification",$extension) && $extension["verification"] != null && $extension["verification"] != ""){
+            //Check if it's a script or not.
+            $script = Script::where([
+                "extension_id" => extension()->id,
+                "unique_code" => $extension["verification"]
+            ]);
+            if($script->exists()){
+                // Set Up Variables
+                $parameters = "";
+                foreach ($extension["database"] as $key) {
+                    $parameters = $parameters . " '" . request($key["variable"]) . "'";
+                }
+                $output = server()->runScript($script,$parameters);
+            }else{
+                // Run Function
+                $extensionDb = [];
+                foreach ($extension["database"] as $key){
+                    $extensionDb[$key["variable"]] = request($key["variable"]);
+                }
+                $command = self::generateSandboxCommand(server(), $extension, extension()->id, auth()->id(), "", "null", $extension["verification"],$extensionDb);
+                $output = shell_exec($command);
+            }
+            $output = strtolower($output);
+            if($output != "ok" && $output != "ok\n"){
+                return redirect(route('extension_server_settings_page', [
                     "extension_id" => extension()->id,
-                    "user_id" => auth()->user()->id,
-                    "name" => $key["variable"],
-                    "value" => request($key["variable"]),
-                    "created_at" =>  Carbon::now(),
-                    "updated_at" => Carbon::now(),
+                    "server_id" => server()->id,
+                    "city" => server()->city
+                ]))->withErrors([
+                    "message" => __("Eklenti Ayarlarınız Doğrulanamadı.")
                 ]);
             }
         }
 
+        foreach ($extension["database"] as $key) {
+            $row = DB::table('user_settings')->where([
+                "user_id" => auth()->user()->id,
+                "extension_id" => extension()->id,
+                "server_id" => server()->id,
+                'name' => $key["variable"]
+            ]);
+            if(request($key["variable"])){
+                if($row->exists()){
+                    $row->update([
+                        "value" => request($key["variable"]),
+                        "updated_at" => Carbon::now(),
+                    ]);
+                }else{
+                    DB::table("user_settings")->insert([
+                        "id" => Str::uuid(),
+                        "server_id" => server()->id,
+                        "extension_id" => extension()->id,
+                        "user_id" => auth()->user()->id,
+                        "name" => $key["variable"],
+                        "value" => request($key["variable"]),
+                        "created_at" =>  Carbon::now(),
+                        "updated_at" => Carbon::now(),
+                    ]);
+                }
+
+            }
+        }
         system_log(7,"EXTENSION_SETTINGS_UPDATE",[
             "extension_id" => extension()->id,
             "server_id" => server()->id,
@@ -391,8 +439,22 @@ class OneController extends Controller
         system_log(7,"EXTENSION_SETTINGS_PAGE",[
             "extension_id" => extension()->id
         ]);
+        $similar = [];
+        foreach ($extension["database"] as $item){
+            if(strpos(strtolower($item["variable"]),"password")){
+                continue;
+            }
+            $obj = DB::table("user_settings")->where([
+                "user_id" => auth()->user()->id,
+                "name" => $item["variable"]
+            ])->first();
+            if($obj){
+                $similar[$item["variable"]] = $obj->value;
+            }
+        }
         return response()->view('extension_pages.setup', [
-            'extension' => $extension
+            'extension' => $extension,
+            'similar' => $similar
         ]);
     }
 
@@ -454,7 +516,7 @@ class OneController extends Controller
         return respond("Kaydedildi", 200);
     }
 
-    private function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_id, $outputs, $viewName, $functionName)
+    private function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_id, $outputs, $viewName, $functionName,$extensionDb = null)
     {
         if(!$extension_id){
             $extension_id = extension()->id;
@@ -467,14 +529,16 @@ class OneController extends Controller
 
         $extension = str_replace('"', '*m*', json_encode($extensionObj));
 
-        $settings = DB::table("user_settings")->where([
-            "user_id" => $user_id,
-            "server_id" => server()->id,
-            "extension_id" => extension()->id
-        ]);
-        $extensionDb = [];
-        foreach ($settings->get() as $setting){
-            $extensionDb[$setting->name] = $setting->value;
+        if($extensionDb == null){
+            $settings = DB::table("user_settings")->where([
+                "user_id" => $user_id,
+                "server_id" => server()->id,
+                "extension_id" => extension()->id
+            ]);
+            $extensionDb = [];
+            foreach ($settings->get() as $setting){
+                $extensionDb[$setting->name] = $setting->value;
+            }
         }
 
         $extensionDb = str_replace('"', '*m*', json_encode($extensionDb));

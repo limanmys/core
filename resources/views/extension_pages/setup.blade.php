@@ -12,13 +12,22 @@
 </ol>
 
 <button class="btn btn-primary" onclick="history.back()">{{__("Geri Dön")}}</button><br><br>
+@if(!empty($errors) && count($errors))
+    <div class="alert alert-danger" role="alert">
+        {{$errors->getBag('default')->first('message')}}
+    </div>
+@endif
+@if(count($similar))
+    <div class="alert alert-info" role="alert">
+        {{__("Önceki ayarlarınızdan sizin için birkaç veri eklendi.")}}
+    </div>
+@endif
 @if($extension["database"])
 <form action="{{route('extension_server_settings',[
                         "extension_id" => request()->route('extension_id'),
                         "server_id" => request()->route('server_id')
                     ])}}" method="POST">
         @csrf
-
         @foreach($extension["database"] as $item)
             @if($item["variable"] == "certificate")
                 <h5>{{$item["name"]}}</h5>
@@ -36,12 +45,19 @@
                     @foreach(servers() as $server)
                         <option value="{{$server->id}}">{{$server->name}}</option>
                     @endforeach
-                </select><br>    
+                </select><br>
             @else
                 <h5>{{__($item["name"])}}</h5>
                 <input class="form-control" type="{{$item["type"]}}"
                        name="{{$item["variable"]}}" placeholder="{{__($item["name"])}}"
-                       @if($item["type"] != "password") value="{{extensionDb($item["variable"])}}" @endif>
+                       @if($item["type"] != "password")
+                           @if(extensionDb($item["variable"]))
+                               value="{{extensionDb($item["variable"])}}"
+                           @elseif(array_key_exists($item["variable"],$similar))
+                               value="{{$similar[$item["variable"]]}}"
+                           @endif
+                       @endif
+                >
             @endif
 
         @endforeach

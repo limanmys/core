@@ -24,7 +24,6 @@
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="tab_1">
-                <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button>
                 <h3>{{__("Eklenti Adı")}}</h3>
                 <input id="extensionName" type="text" class="form-control" value="{{$extension["name"]}}" disabled>
                 <h3>{{__("Yayınlayan")}}</h3>
@@ -35,8 +34,11 @@
                 <input id="icon" type="text" name="icon" class="form-control" value="{{$extension["icon"]}}">
                 <h3>{{__("Versiyon")}}</h3>
                 <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}">
+                <h3>{{__("Ayar Doğrulama Fonksiyonu/Betiği")}}</h3>
+                <input id="verification" type="text" name="verification" class="form-control" value="{{array_key_exists("verification",$extension) ? $extension["verification"] : ""}}">
                 <h3>{{__("Servis Adı yada Kontrol Etmek için Port")}}</h3>
-                <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}">
+                <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}"><br>
+                <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button>
             </div>
             <!-- /.tab-pane -->
             <div class="tab-pane" id="tab_2">
@@ -291,7 +293,7 @@
             data.append('support',$("#support").val());
             data.append('version',$("#version").val());
             data.append('service',$("#service").val());
-
+            data.append('verification',$("#verification").val());
             request('{{route('extension_settings_update')}}',data,function(){
                 Swal.fire({
                     position: 'center',
