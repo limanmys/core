@@ -305,6 +305,18 @@ let sehirler = "{{$cities}}".split(",");
 sehirler.forEach(function(sehir) {
   $('[data-plakakodu="' + sehir + '"] path').css('fill','#1094F6');
 });
+
+$('g[data-plakakodu]').each(function(){
+  let vm = this;
+  $(this).mouseover(function(){
+    fillCity($(vm).attr('data-plakakodu'), true);
+  });
+
+  $(this).mouseleave(function(){
+    fillCity($(vm).attr('data-plakakodu'), false);
+  });
+});
+
 function fillCity(sehir,flag){
   if(flag){
     $('[data-plakakodu="' + sehir + '"] path').css('fill','#1094F6');
@@ -325,7 +337,6 @@ relative
 }
 
 .svg-turkiye-haritasi {
-  max-width: 1140px;
   margin: 0 auto;
   text-align: center;
 }
