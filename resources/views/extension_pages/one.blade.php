@@ -73,9 +73,9 @@
                     "url" => route('extension_settings_add'),
                     "next" => "reload",
                     "inputs" => [
-                        "Sayfa Adı" => "name:text",
-                        "Türü" => "type:text",
-                        "Variable Adı" => "variable:text",
+                        "Adı" => "name:text:Veri adı oluşturulan formlarda gösterilmek için kullanılır.",
+                        "Türü" => "type:text:Verinizin türü form elemanını belirler. Örneğin text, password vs.",
+                        "Variable Adı" => "variable:text:Eklenti içinden veriye bu isim ile erişirsiniz.",
                         "table:database" => "table:hidden"
                     ],
                     "submit_text" => "Veri Ekle"
