@@ -55,7 +55,6 @@ class OneController extends Controller
         $outputs = [];
 
         $viewName = (request('unique_code')) ? request('unique_code') : "index";
-
         $flag = false;
         foreach ($extension["views"] as $view){
             if($view["name"] == $viewName){
@@ -71,7 +70,7 @@ class OneController extends Controller
             abort(504,"Sayfa bulunamadı");
         }
 
-        if (!is_file(env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/" . $viewName . ".blade.php")) {
+        if (!is_file(env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/views/" . $viewName . ".blade.php")) {
             system_log(5,"EXTENSION_MISSING_PAGE",[
                 "extension_id" => extension()->id,
                 "page_name" => $viewName

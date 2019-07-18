@@ -165,17 +165,12 @@ class MainController extends Controller
 
         $extension_folder = env('EXTENSIONS_PATH') . strtolower($json["name"]);
 
-        // Create folder.
-        if (!is_dir($extension_folder)) {
-            mkdir($extension_folder);
-        }
+        shell_exec("sudo mkdir -p $extension_folder");
 
-        shell_exec("sudo cp " . $path . '/db.json' . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
+        shell_exec("sudo cp -r " . $path . "/* " . $extension_folder . DIRECTORY_SEPARATOR);
 
         shell_exec('sudo chown ' . clean_score($new->id) . ':liman ' . $extension_folder);
         shell_exec('sudo chmod 770 ' . $extension_folder);
-
-        shell_exec("sudo cp -r " . $path .  DIRECTORY_SEPARATOR . "views/* " . $extension_folder);
 
         shell_exec("sudo chown -R " . clean_score($new->id) . ':liman "' . $extension_folder. '"');
         shell_exec("sudo chmod -R 770 \"" . $extension_folder ."\"");
@@ -201,17 +196,14 @@ class MainController extends Controller
                 // Get real and relative path for current file
                 $filePath = $file->getRealPath();
 
-                $script = Script::readFromFile($filePath);
-                if ($script) {
-                    copy($filePath, env('SCRIPTS_PATH') . $script->id);
-                }
+                Script::readFromFile($filePath);
             }
         }
         system_log(3,"EXTENSION_UPLOAD_SUCCESS",[
             "extension_id" => $new->id
         ]);
 
-        return respond(route('extension_one', $new->id), 300);
+        return respond("Eklenti Başarıyla yüklendi.",200);
     }
 
 

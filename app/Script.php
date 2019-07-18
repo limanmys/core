@@ -48,13 +48,17 @@ class Script extends Model
      * @param mixed ...$parameters
      * @return mixed
      */
-    public static function createFile(Script $script, ...$parameters){
-
+    public static function createFile(Script $script, ...$parameters)
+    {
         // Save script in order to generate unique _id.
         $script->save();
 
+        $scriptsPath = env('EXTENSIONS_PATH') . $script->extensions
+            . DIRECTORY_SEPARATOR . "scripts";
+
         //Create File Writer
-        $file = fopen(env('SCRIPTS_PATH') . $script->_id, 'w');
+        shell_exec("sudo mkdir -p " . $scriptsPath);
+        $file = fopen($scriptsPath . "/" . $script->unique_code, 'w');
 
         // Simply slice the parameters of the function, ex: unique_code, company etc.
         $user_inputs = array_slice($parameters[0],0,-1);

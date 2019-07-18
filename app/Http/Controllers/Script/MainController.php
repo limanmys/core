@@ -33,8 +33,11 @@ class MainController extends Controller
         if(!request()->file('script')->isValid()){
             return respond("Dosya okunamadi",201);
         }
-
-        file_put_contents(env('SCRIPTS_PATH') . $script->id ,file_get_contents(request()->file('script')));
+        $scriptsPath = env('EXTENSIONS_PATH') . $script->extensions
+            . DIRECTORY_SEPARATOR . "scripts";
+        shell_exec("sudo mkdir -p " . $scriptsPath);
+        file_put_contents($scriptsPath . "/" . $script->unique_code  . ".lmns",
+            file_get_contents(request()->file('script')));
 
 //        Storage::putFileAs('scripts',request()->file('script'),$script->id);
         return respond('Betik eklendi.',200);
