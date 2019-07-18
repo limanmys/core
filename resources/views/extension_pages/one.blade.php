@@ -147,9 +147,9 @@
                     "url" => route('extension_settings_add'),
                     "next" => "reload",
                     "inputs" => [
-                        "Sayfa Adı" => "name:text",
+                        "Sayfa Adı" => "name:text:Sayfanızın adı.",
                         "table:views" => "table:hidden",
-                        "Çalışacak Betik/Fonksiyon" => "scripts:text"
+                        "Çalışacak Betik/Fonksiyon" => "scripts:text:Sayfanız çalışıtırılmadan önce çalışacak betik veya fonksiyon."
                     ],
                     "submit_text" => "Sayfa Ekle"
                 ])
@@ -213,14 +213,14 @@
                     "url" => route('extension_settings_add'),
                     "next" => "reload",
                     "inputs" => [
-                        "Widget Adı" => "name:text",
-                        "İkon (FontAwesome)" => "icon:text",
-                        "Türü:type" => [
+                        "Widget Adı" => "name:text:Widgetınızın adı.",
+                        "İkon (FontAwesome)" => "icon:text:Widgetınızın sol menüde görüntülenecek ikonu.",
+                        "Türü:type:Widget türü widgetın görünümünü belirler." => [
                           "Sayı" => "count_box",
                           "Grafik" => "chart"
                         ],
                         "table:widgets" => "table:hidden",
-                        "Çalışacak Betik/Fonksiyon" => "target:text"
+                        "Çalışacak Betik/Fonksiyon" => "target:text:Widget verilerinin hangi fonksiyon yada betikten getirileceğini belirler."
                     ],
                     "submit_text" => "Widget Ekle"
                 ])

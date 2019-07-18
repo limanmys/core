@@ -15,6 +15,9 @@
             @endforeach
         </select>
     @endif
+    @isset(explode(":", $name)[2])
+      <small>{{__(explode(":", $name)[2])}}</small></br>
+    @endisset
 @else
     @if(explode(":", $input)[1] == "hidden")
         @if(explode(":", $input)[1] == "checkbox")
