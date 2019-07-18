@@ -14,11 +14,13 @@
         <div class="box-body">
             <form onsubmit="return saveUser(this)">
                 <h3>{{__("Kullanıcı Adı")}}</h3>
-                <input type="text" class="form-control" name="name" value="{{auth()->user()->name}}">
+                <input type="text" class="form-control" name="name" value="{{auth()->user()->name}}" required minlength="6" maxlength="255" a>
                 <h3>{{__("Email Adresi")}}</h3>
-                <input type="text" class="form-control" value="{{auth()->user()->email}}" disabled>
+                <input type="text" class="form-control" value="{{auth()->user()->email}}" disabled required>
                 <h3>{{__("Parola")}}</h3>
-                <input type="password" class="form-control" name="password"><br>
+                <input type="password" class="form-control" name="password" required minlength="6" maxlength="32">
+                <h3>{{__("Parola Onayı")}}</h3>
+                <input type="password" class="form-control" name="password_confirmation" required minlength="6" maxlength="32"><br>
                 <button class="btn btn-success btn-lg" type="submit">{{__("Kaydet")}}</button>
             </form>
         </div>
@@ -45,15 +47,16 @@
                         setTimeout(function () {
                             location.reload();
                         },1600);
-                    }else{
-                        Swal.fire({
-                            position: 'center',
-                            type: 'error',
-                            title: json["message"],
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
                     }
+                },function (response) {
+                    let json = JSON.parse(response);
+                    Swal.fire({
+                        position: 'center',
+                        type: 'error',
+                        title: json["message"],
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
                 });
                 return false;
 

@@ -210,7 +210,7 @@
         @endauth
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
-          @if(auth()->user()->status == "1")
+          @if(auth()->check() && auth()->user()->status == "1")
             <div class="alert alert-warning" style="border-radius: 0px; margin-bottom: 0px; text-align: center; text-shadow: 3px 2px 3px rgba(255,255,255,.2); border: 0px;">
               {{__("Tam yetkili yönetici hesabı ile giriş yaptınız, sisteme zarar verebilirsiniz.")}}
             </div>
