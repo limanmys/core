@@ -9,6 +9,7 @@ use App\Script;
 use App\Server;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Notification;
 
 class AddController extends Controller
 {
@@ -42,7 +43,11 @@ class AddController extends Controller
         }
 
         $this->server->save();
-
+        Notification::new(
+            __("Yeni sunucu eklendi."),
+            "notify",
+            __(":server (:ip) isimli yeni bir sunucu eklendi.", ["server" => $this->server->name, "ip" => $this->server->ip_address])
+        );
         // Add Server to request object to use it later.
         request()->request->add(["server" => $this->server]);
 

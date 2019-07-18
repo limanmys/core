@@ -61,7 +61,11 @@ class OneController extends Controller
 
         // Delete the Server Object.
         server()->delete();
-
+        Notification::new(
+            __("Bir sunucu silindi."),
+            "notify",
+            __(":server (:ip) isimli sunucu silindi.", ["server" => server()->name, "ip" => server()->ip_address])
+        );
         // Redirect user to servers home page.
         return respond(route('servers'), 300);
     }
