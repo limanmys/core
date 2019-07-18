@@ -13,11 +13,11 @@ certPassword = sys.argv[4]
 source = sys.argv[5]
 destination = sys.argv[6]
 
-process = subprocess.Popen(("openssl rsa -in %s -out %s -passin pass:%s -passout pass:\"\"" % (keyPath, "temp.pem",certPassword)).split(),stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+process = subprocess.Popen(("openssl rsa -in %s -out %s -passin pass:%s -passout pass:\"\"" % (keyPath, "/tmp/temp.pem",certPassword)).split(),stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 poutput, perror = process.communicate()
 
 try:
-    client = Client(ip, auth="certificate", certificate_key_pem="./temp.pem", certificate_pem=certPath,
+    client = Client(ip, auth="certificate", certificate_key_pem="/tmp/temp.pem", certificate_pem=certPath,
                     cert_validation=False)
 
     client.copy(source, destination)
@@ -29,9 +29,9 @@ try:
     #if not source in output2:
 #        raise Exception
 except:
-    process = subprocess.Popen(("rm temp.pem").split(), stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    process = subprocess.Popen(("rm /tmp/temp.pem").split(), stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     poutput, perror = process.communicate()
     print("File could not be send")
 
-process = subprocess.Popen(("rm temp.pem").split(), stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+process = subprocess.Popen(("rm /tmp/temp.pem").split(), stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 poutput, perror = process.communicate()
