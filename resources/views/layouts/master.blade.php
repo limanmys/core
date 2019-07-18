@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="{{asset('/css/jquery-ui.css')}}">
 </head>
 <body class="hold-transition @yield('body_class')">
+  <div class="il-isimleri"></div>
+  
 <script src="{{asset('js/libraries.js')}}"></script>
 <script src="{{asset('/js/liman.js')}}"></script>
 <script src="{{asset('/js/jquery-ui.js')}}"></script>

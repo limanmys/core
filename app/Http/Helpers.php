@@ -332,7 +332,8 @@ if(!function_exists('cities')){
             "Karabük" => "78",
             "Kilis" => "79",
             "Osmaniye" => "80",
-            "Düzce" => "81"
+            "Düzce" => "81",
+            "Kuzey Kıbrıs" => "82"
         ];
         if($city){
             return array_search($city, $cities);
