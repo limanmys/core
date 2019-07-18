@@ -52,9 +52,9 @@
                        name="{{$item["variable"]}}" placeholder="{{__($item["name"])}}"
                        @if($item["type"] != "password")
                            @if(extensionDb($item["variable"]))
-                               value="{{extensionDb($item["variable"])}}"
+                               value="{{old($item["variable"], extensionDb($item["variable"]))}}"
                            @elseif(array_key_exists($item["variable"],$similar))
-                               value="{{$similar[$item["variable"]]}}"
+                               value="{{old($item["variable"], $similar[$item["variable"]])}}"
                            @endif
                        @endif
                 >

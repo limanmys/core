@@ -384,7 +384,7 @@ class OneController extends Controller
                     "extension_id" => extension()->id,
                     "server_id" => server()->id,
                     "city" => server()->city
-                ]))->withErrors([
+                ]))->withInput()->withErrors([
                     "message" => __("Eklenti Ayarlarınız Doğrulanamadı.")
                 ]);
             }
