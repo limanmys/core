@@ -39,7 +39,7 @@
         "id"=>"add_user",
         "title" => "Kullanıcı Ekle",
         "url" => route('user_add'),
-        "next" => "nothing",
+        "next" => "after_user_add",
         "selects" => [
             "Yönetici:administrator" => [
                 "-:administrator" => "type:hidden"
@@ -79,9 +79,17 @@
        "submit_text" => "Parolayı Sıfırla"
    ])
     <script>
-        function details(row) {
-            let user_id = row.querySelector('#user_id').innerHTML;
-            location.href = '/ayarlar/' + user_id;
-        }
+      function after_user_add(response) {
+        let json = JSON.parse(response);
+        Swal.fire({
+            position: 'center',
+            type: 'info',
+            title: json.message,
+        });
+      }
+      function details(row) {
+          let user_id = row.querySelector('#user_id').innerHTML;
+          location.href = '/ayarlar/' + user_id;
+      }
     </script>
 @endsection
