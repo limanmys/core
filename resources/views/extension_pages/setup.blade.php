@@ -58,6 +58,12 @@
                            @endif
                        @endif
                 >
+                @if($item["type"] == "password")
+                  <h5>{{__($item["name"])}} {{__('Tekrar')}}</h5>
+                  <input class="form-control" type="{{$item["type"]}}"
+                         name="{{$item["variable"]}}_confirmation" placeholder="{{__($item["name"])}} {{__('Tekrar')}}"
+                  >
+                @endif
             @endif
 
         @endforeach

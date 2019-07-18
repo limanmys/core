@@ -355,6 +355,17 @@ class OneController extends Controller
     public function serverSettings()
     {
         $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+        foreach ($extension["database"] as $key) {
+            if($key["type"] == "password" && request($key["variable"]) != request($key["variable"].'_confirmation') ){
+              return redirect(route('extension_server_settings_page', [
+                  "extension_id" => extension()->id,
+                  "server_id" => server()->id,
+                  "city" => server()->city
+              ]))->withInput()->withErrors([
+                  "message" => __("Parola alanları uyuşmuyor!")
+              ]);
+            }
+        }
         //Check Verification Script
         if(array_key_exists("verification",$extension) && $extension["verification"] != null && $extension["verification"] != ""){
             //Check if it's a script or not.
@@ -366,6 +377,15 @@ class OneController extends Controller
                 // Set Up Variables
                 $parameters = "";
                 foreach ($extension["database"] as $key) {
+                    if($key["type"] == "password" && request($key["variable"]) != request($key["variable"].'_confirmation') ){
+                      return redirect(route('extension_server_settings_page', [
+                          "extension_id" => extension()->id,
+                          "server_id" => server()->id,
+                          "city" => server()->city
+                      ]))->withInput()->withErrors([
+                          "message" => __("Parola alanları uyuşmuyor!")
+                      ]);
+                    }
                     $parameters = $parameters . " '" . request($key["variable"]) . "'";
                 }
                 $output = server()->runScript($script,$parameters);
