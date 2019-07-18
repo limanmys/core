@@ -996,16 +996,18 @@ class Builder
     /**
      * Add a "where null" clause to the query.
      *
-     * @param  string  $column
+     * @param  string|array  $columns
      * @param  string  $boolean
      * @param  bool    $not
      * @return $this
      */
-    public function whereNull($column, $boolean = 'and', $not = false)
+    public function whereNull($columns, $boolean = 'and', $not = false)
     {
         $type = $not ? 'NotNull' : 'Null';
 
-        $this->wheres[] = compact('type', 'column', 'boolean');
+        foreach (Arr::wrap($columns) as $column) {
+            $this->wheres[] = compact('type', 'column', 'boolean');
+        }
 
         return $this;
     }
@@ -1198,7 +1200,9 @@ class Builder
             $value = $value->format('d');
         }
 
-        $value = str_pad($value, 2, '0', STR_PAD_LEFT);
+        if (! $value instanceof Expression) {
+            $value = str_pad($value, 2, '0', STR_PAD_LEFT);
+        }
 
         return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
     }
@@ -1239,7 +1243,9 @@ class Builder
             $value = $value->format('m');
         }
 
-        $value = str_pad($value, 2, '0', STR_PAD_LEFT);
+        if (! $value instanceof Expression) {
+            $value = str_pad($value, 2, '0', STR_PAD_LEFT);
+        }
 
         return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
     }
