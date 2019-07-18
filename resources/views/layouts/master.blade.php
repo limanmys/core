@@ -71,7 +71,7 @@
       '<button class="btn btn-default reveal" type="button"><i class="fa fa-eye"></i></button>'+
     '</span>');
     $(".reveal").on('click',function() {
-        var $pwd = $(this).closest('span').prev();
+        var $pwd = $(this).closest('span').next();
         if ($pwd.attr('type') === 'password') {
             $(this).find('i').removeClass('fa-eye');
             $(this).find('i').addClass('fa-eye fa-eye-slash');
