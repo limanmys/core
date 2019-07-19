@@ -420,15 +420,6 @@ class OneController extends Controller
                 // Set Up Variables
                 $parameters = "";
                 foreach ($extension["database"] as $key) {
-                    if($key["type"] == "password" && request($key["variable"]) != request($key["variable"].'_confirmation') ){
-                      return redirect(route('extension_server_settings_page', [
-                          "extension_id" => extension()->id,
-                          "server_id" => server()->id,
-                          "city" => server()->city
-                      ]))->withInput()->withErrors([
-                          "message" => __("Parola alanları uyuşmuyor!")
-                      ]);
-                    }
                     $parameters = $parameters . " '" . request($key["variable"]) . "'";
                 }
                 $output = server()->runScript($script,$parameters);
