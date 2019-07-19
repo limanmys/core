@@ -73,6 +73,7 @@
                                 <h4>{{__("Şehir")}}</h4>
                                 <small>{{__("Sunucunuza bir şehir atayarak, eklentileri kullanırken Türkiye haritası üzerinde erişiminizi kolaylaştırabilirsiniz.")}}</small><br>
                                 <select name="server_city" id="serverCity" class="form-control" required>
+                                    <option value="">{{__('Şehir Seçiniz')}}</option>
                                     @foreach(cities() as $name=>$code)
                                         <option value="{{$code}}">{{$name}}</option>
                                     @endforeach

@@ -66,6 +66,7 @@
             $("#terminal .modal-body iframe").attr('src', '');
         })
     }
+    $('input[type=password]').attr('autocomplete','off');
     $('input[type=password]').wrap('<div class="input-group"></div>');
     $('input[type=password]').after('<span class="input-group-btn">'+
       '<button class="btn btn-default reveal" type="button"><i class="fa fa-eye"></i></button>'+

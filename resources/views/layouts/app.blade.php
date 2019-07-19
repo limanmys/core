@@ -24,7 +24,7 @@
                 </a>
 
                 <a href="#" onclick="history.back()" style="line-height: 50px;color: white;font-weight: bolder">
-                    <i class="fa fa-chevron-left"></i> Geri
+                    <i class="fa fa-chevron-left"></i> {{__('Geri')}}
                 </a>
 
                 <!-- Navbar Right Menu -->
