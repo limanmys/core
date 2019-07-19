@@ -93,10 +93,10 @@
                     "id" => "extensionFunctions",
                     "value" => $functions,
                     "title" => [
-                        "Fonksiyon Adı" , "Eklenti"
+                        "Fonksiyon Adı" , "Eklenti" , "*hidden*"
                     ],
                     "display" => [
-                        "name" , "extension_name"
+                        "name" , "extension_name", "db_name:db_name"
                     ],
                 ])
             </div>
@@ -200,7 +200,7 @@
             let data = [];
             let table = $('.functionsTable table').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
-                data.push(element[1]);
+                data.push(element[2]);
             });
             let form = new FormData();
             let extension_id = $("#extensionId :selected").val();
@@ -222,7 +222,7 @@
             let data = [];
             let table = $('#extensionFunctions').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
-                data.push(element[2] + "_" + element[1]);
+                data.push(element[3]);
             });
             let form = new FormData();
             form.append("functions",data);
