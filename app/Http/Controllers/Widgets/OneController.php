@@ -87,7 +87,7 @@ class OneController extends Controller
         if(!$extension_id){
             $extension_id = extension()->id;
         }
-        $functions = env('EXTENSIONS_PATH') . strtolower($extensionObj["name"]) . "/functions.php";
+        $functions = env('EXTENSIONS_PATH') . strtolower($extensionObj["name"]) . "/views/functions.php";
 
         $combinerFile = env('SANDBOX_PATH') . "index.php";
 
