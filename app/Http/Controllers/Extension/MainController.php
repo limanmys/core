@@ -49,64 +49,16 @@ class MainController extends Controller
         // Generate Extension Folder Path
         $path = env("EXTENSIONS_PATH") . strtolower(extension()->name);
 
-        // Initialize Zip Archive Object to use it later.
-        $zip = new ZipArchive;
+        $tempPath = "/tmp/" . Str::random() . ".zip";
 
-        // Random Temporary Folder
-        $exportedFile = '/tmp/' . Str::random();
-
-        // Create Zip
-        $zip->open($exportedFile . '.lmne', ZipArchive::CREATE | ZipArchive::OVERWRITE);
-
-        // Iterator to search all files in folder.
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($path),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        // Create Folder to put views in
-        $zip->addEmptyDir('views');
-
-        // Simply, go through files recursively and add them in to zip.
-        foreach ($files as $file) {
-
-            // Skip directories (they would be added automatically)
-            if (!$file->isDir()) {
-
-                // Get real and relative path for current file
-                $filePath = $file->getRealPath();
-                $relativePath = substr($filePath, strlen($path) + 1);
-
-                // Ignore If it's db.json file
-                if($relativePath == "db.json"){
-                    continue;
-                }
-
-                // Add current file to archive
-                $zip->addFile($filePath, 'views/' . $relativePath);
-            }
-        }
-
-        // Create Folder to put scripts in
-        $zip->addEmptyDir('scripts');
-
-        // Simply, go through scripts and add them in to zip.
-        foreach (extension()->scripts() as $script) {
-            $zip->addFile(env('SCRIPTS_PATH') . $script->id, 'scripts/' . $script->unique_code . '.lmns');
-        }
-
-        // Add file
-        $zip->addFile($path . DIRECTORY_SEPARATOR . "db.json", 'db.json');
-
-        // Close/Compress zip
-        $zip->close();
+        shell_exec("cd $path && zip -r $tempPath .");
 
         system_log(6,"EXTENSION_DOWNLOAD",[
             "extension_id" => extension()->id
         ]);
 
         // Return zip as download and delete it after sent.
-        return response()->download($exportedFile . '.lmne', extension()->name . "-" . extension()->version . ".lmne")->deleteFileAfterSend();
+        return response()->download($tempPath, extension()->name . "-" . extension()->version . ".lmne")->deleteFileAfterSend();
     }
 
     /**
