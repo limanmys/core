@@ -75,7 +75,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapExtensionDeveloperRoutes()
     {
-        Route::namespace($this->namespace)
+        Route::namespace($this->namespace)->middleware('web')
             ->group(base_path('routes/extension_developer.php'));
     }
 }

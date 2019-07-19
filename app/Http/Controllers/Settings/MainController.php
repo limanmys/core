@@ -47,10 +47,22 @@ class MainController extends Controller
         $functions = [];
 
         foreach ($permissions->whereNotNull("function")->get() as $item){
-            array_push($functions,[
-                "extension_name" => explode('_',$item->function)[0],
-                "name" => explode('_',$item->function)[1]
-            ]);
+            $functionsFile = env('EXTENSIONS_PATH') . strtolower(explode('_',$item->function)[0]) . "/views/functions.php";
+            $comments = $this->getComments($functionsFile);
+            foreach ($comments as $comment){
+                if(!array_key_exists("LimanName",$comment) || !array_key_exists("LimanPermission",$comment)
+                    || !array_key_exists("LimanFunction",$comment)){
+                    abort(504,"Eklenti Duzgun Yapilandirilmamis");
+                }
+                if(explode('_',$item->function)[1] == $comment["LimanFunction"]){
+                    array_push($functions,[
+                        "extension_name" => explode('_',$item->function)[0],
+                        "name" => $comment["LimanName"],
+                        "db_name" => $item->function
+                    ]);
+                    break;
+                }
+            }
         }
 
         return view('settings.one',[
@@ -111,38 +123,67 @@ class MainController extends Controller
     }
 
     public function getExtensionFunctions(){
-        $functionsFile = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/functions.php";
-        $allFunctions = [];
-        if (is_file($functionsFile)) {
-            $functionsFile = file_get_contents(env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/functions.php");
-            preg_match_all('/^\s*function (.*)(?=\()/m', $functionsFile, $results);
-            $allFunctions = [];
-            foreach ($results[1] as $result) {
-                array_push($allFunctions, [
-                    "name" => $result
-                ]);
-            }
-        }
-
+        $functionsFile = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/views/functions.php";
+        $comments = $this->getComments($functionsFile);
         $functions = [];
-        foreach($allFunctions as $function){
-            if(Permission::can(request('user_id'),"function",strtolower(extension()->name) . "_" . $function["name"])){
+
+        foreach ($comments as $comment){
+            if(!array_key_exists("LimanName",$comment) || !array_key_exists("LimanPermission",$comment)
+                || !array_key_exists("LimanFunction",$comment)){
+                abort(504,"Eklenti Duzgun Yapilandirilmamis");
+            }
+            if($comment["LimanPermission"] != "true"){
+                continue;
+            }
+            if(Permission::can(request('user_id'),"function",strtolower(extension()->name) . "_" . $comment["LimanFunction"])){
                 continue;
             }
             array_push($functions,[
-                "name" => $function["name"]
+                "name" => $comment["LimanFunction"],
+                "function" => $comment["LimanName"]
             ]);
         }
 
         return view('l.table',[
             "value" => $functions,
             "title" => [
-                "Fonksiyon Adı" ,
+                "Fonksiyon Adı" , "*hidden*"
             ],
             "display" => [
-                "name"
+                "function", "name:name"
             ]
         ]);
+    }
+
+    private function getComments($path)
+    {
+        $cleaner = [];
+        foreach ($this->getFileDocBlock($path) as $item){
+            $rows = explode("\n",$item);
+            $current = [];
+            foreach ($rows as $row){
+                if(strpos($row,"@Liman")){
+                    $toParse = substr($row,strpos($row,"@Liman"));
+                    $current[substr(explode(" ",$toParse)[0],1)]
+                        = substr($toParse,strlen(substr(explode(" ",$toParse)[0],0)) +1 );
+                }
+            }
+            array_push($cleaner,$current);
+        }
+        return $cleaner;
+    }
+
+    private function getFileDocBlock($file)
+    {
+        $docComments = array_filter(
+            token_get_all( file_get_contents( $file ) ), function($entry) {
+            return $entry[0] == T_DOC_COMMENT;
+        });
+        $clean = [];
+        foreach ($docComments as $item){
+            array_push($clean,$item[1]);
+        }
+        return $clean;
     }
 
     public function addFunctionPermissions(){

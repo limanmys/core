@@ -167,7 +167,20 @@ class OneController extends Controller
                 "extension_id" => extension()->id,
                 "target_name" => request('function_name')
             ]);
-            abort(403, request('function_name') . " için yetkiniz yok.");
+            $functionsFile = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/views/functions.php";
+            $comments = $this->getComments($functionsFile);
+            $text = "";
+            foreach ($comments as $comment){
+                if(!array_key_exists("LimanName",$comment) || !array_key_exists("LimanPermission",$comment)
+                    || !array_key_exists("LimanFunction",$comment)){
+                    abort(504,"Eklenti Duzgun Yapilandirilmamis");
+                }
+                if(request("function_name") == $comment["LimanFunction"]){
+                    $text = $comment["LimanName"];
+                    break;
+                }
+            }
+            abort(403, $text . " için yetkiniz yok.");
         }
 
         $command = self::generateSandboxCommand(server(), extension(), auth()->user()->settings, auth()->id(), "null", "null", request('function_name'));
@@ -189,6 +202,37 @@ class OneController extends Controller
           return response()->json(json_decode($output), $code);
         }
         return response($output, $code);
+    }
+
+    private function getComments($path)
+    {
+        $cleaner = [];
+        foreach ($this->getFileDocBlock($path) as $item){
+            $rows = explode("\n",$item);
+            $current = [];
+            foreach ($rows as $row){
+                if(strpos($row,"@Liman")){
+                    $toParse = substr($row,strpos($row,"@Liman"));
+                    $current[substr(explode(" ",$toParse)[0],1)]
+                        = substr($toParse,strlen(substr(explode(" ",$toParse)[0],0)) +1 );
+                }
+            }
+            array_push($cleaner,$current);
+        }
+        return $cleaner;
+    }
+
+    private function getFileDocBlock($file)
+    {
+        $docComments = array_filter(
+            token_get_all( file_get_contents( $file ) ), function($entry) {
+            return $entry[0] == T_DOC_COMMENT;
+        });
+        $clean = [];
+        foreach ($docComments as $item){
+            array_push($clean,$item[1]);
+        }
+        return $clean;
     }
 
     public function internalExtensionApi()
