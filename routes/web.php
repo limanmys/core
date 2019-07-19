@@ -103,3 +103,5 @@ Route::post('/lmn/private/runCommandApi','Extension\OneController@internalRunCom
 Route::post('/lmn/private/putFileApi','Extension\OneController@internalPutFileApi');
 
 Route::post('/lmn/private/getFileApi','Extension\OneController@internalGetFileApi');
+
+Route::get('/testing','UserController@test');

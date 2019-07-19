@@ -139,4 +139,35 @@ class UserController extends Controller
             return respond("Başarıyla silinemedi",201);
         }
     }
+
+    public function test()
+    {
+        $cleaner = [];
+        foreach ($this->getFileDocBlock("/liman/extensions/kullanıcılar/views/functions.php") as $item){
+            $rows = explode("\n",$item);
+            $current = [];
+            foreach ($rows as $row){
+                if(strpos($row,"@Liman")){
+                    $toParse = substr($row,strpos($row,"@Liman"));
+                    $current[substr(explode(" ",$toParse)[0],1)]
+                        = substr($toParse,strlen(substr(explode(" ",$toParse)[0],0)) +1 );
+                }
+            }
+            array_push($cleaner,$current);
+        }
+        dd($cleaner);
+    }
+
+    function getFileDocBlock($file)
+    {
+        $docComments = array_filter(
+            token_get_all( file_get_contents( $file ) ), function($entry) {
+            return $entry[0] == T_DOC_COMMENT;
+        });
+        $clean = [];
+        foreach ($docComments as $item){
+            array_push($clean,$item[1]);
+        }
+        return $clean;
+    }
 }
