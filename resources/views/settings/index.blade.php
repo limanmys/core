@@ -7,33 +7,48 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Ayarlar")}}</li>
         </ol>
     </nav>
-    @include('l.modal-button',[
-        "class" => "btn-success",
-        "target_id" => "add_user",
-        "text" => "Kullanıcı Ekle"
-    ])
-    <button class="btn btn-danger" onclick="location.href = '{{route('settings_server')}}'">{{__("Sunucu Ayarları")}}</button>
-    <br><br>
-    @include('l.table',[
-        "value" => \App\User::all(),
-        "title" => [
-            "Sunucu Adı" , "Email" , "*hidden*" ,
-        ],
-        "display" => [
-            "name" , "email", "id:user_id" ,
-        ],
-        "menu" => [
-            "Parolayı Sıfırla" => [
-                "target" => "passwordReset",
-                "icon" => "fa-lock"
-            ],
-            "Sil" => [
-                "target" => "delete",
-                "icon" => "fa-trash"
-            ]
-        ],
-        "onclick" => "details"
-    ])
+    <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#users" data-toggle="tab" aria-expanded="true">{{__("Kullanıcı Ayarları")}}</a></li>
+            <li><a href="#server" data-toggle="tab" aria-expanded="false">{{__("Sunucu Ayarları")}}</a></li>
+            <li><a href="#health" onclick="checkHealth()" data-toggle="tab" aria-expanded="false">{{__("Sağlık Durumu")}}</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="users">
+                @include('l.modal-button',[
+                    "class" => "btn-success",
+                    "target_id" => "add_user",
+                    "text" => "Kullanıcı Ekle"
+                ])<br><br>
+                @include('l.table',[
+                    "value" => \App\User::all(),
+                    "title" => [
+                        "Sunucu Adı" , "Email" , "*hidden*" ,
+                    ],
+                    "display" => [
+                        "name" , "email", "id:user_id" ,
+                    ],
+                    "menu" => [
+                        "Parolayı Sıfırla" => [
+                            "target" => "passwordReset",
+                            "icon" => "fa-lock"
+                        ],
+                        "Sil" => [
+                            "target" => "delete",
+                            "icon" => "fa-trash"
+                        ]
+                    ],
+                    "onclick" => "details"
+                ])
+            </div>
+            <div class="tab-pane" id="server">
+                <button class="btn btn-danger" onclick="location.href = '{{route('settings_server')}}'">{{__("Sunucu Ayarları")}}</button>
+            </div>
+            <div class="tab-pane" id="health">
+                <pre id="output"></pre>
+            </div>
+        </div>
+    </div>
 
     @include('l.modal',[
         "id"=>"add_user",
@@ -90,6 +105,32 @@
       function details(row) {
           let user_id = row.querySelector('#user_id').innerHTML;
           location.href = '/ayarlar/' + user_id;
+      }
+      
+      function checkHealth() {
+          Swal.fire({
+              position: 'center',
+              type: 'info',
+              title: '{{__("Okunuyor...")}}',
+              showConfirmButton: false,
+          });
+          request("{{route('health_check')}}",new FormData(),function (success) {
+              Swal.close();
+              let json = JSON.parse(success);
+              let box = $("#output");
+              box.html("");
+              console.log(json["message"]);
+              for (let i=0 ; i < json["message"].length; i++){
+                  let current = json["message"][i];
+                  box.append("<div class='alert alert-" + current["type"] +"' role='alert'>" +
+                      current["message"] +
+                      "</div>");
+              }
+
+          },function (error) {
+              Swal.close();
+            alert("hata");
+          });
       }
     </script>
 @endsection
