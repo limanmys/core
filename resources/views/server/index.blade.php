@@ -11,10 +11,10 @@
     @include('l.table',[
         "value" => servers(),
         "title" => [
-            "Sunucu Adı" , "İp Adresi" , "*hidden*" , "Kontrol Portu", "*hidden*" ,"*hidden*"
+            "Sunucu Adı" , "İp Adresi" , "*hidden*" , "Kontrol Portu", "Durumu", "*hidden*" ,"*hidden*"
         ],
         "display" => [
-            "name" , "ip_address", "type:type" , "control_port", "city:city", "id:server_id"
+            "name" , "ip_address", "type:type" , "control_port", "status", "city:city", "id:server_id"
         ],
         "menu" => [
             "Düzenle" => [
