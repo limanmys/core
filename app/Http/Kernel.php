@@ -13,6 +13,7 @@ class Kernel extends HttpKernel
         Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         // \App\Http\Middleware\TrustProxies::class,
+        \App\Http\Middleware\SessionTimeout::class,
     ];
 
     protected $middlewareGroups = [
