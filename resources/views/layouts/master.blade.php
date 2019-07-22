@@ -45,6 +45,17 @@
             checkNotifications();
         }, 3000);
         @endif
+
+        $('.ext_nav').slice({{env('NAV_EXTENSION_HIDE_COUNT')}}, $('.ext_nav').length).hide();
+        $('.ext_nav_more_less').click(function(){
+            if ($('.ext_nav').length == $('.ext_nav:visible').length) {
+                $('.ext_nav_more_less').find('span').text("{{__('...daha fazla')}}");
+                $('.ext_nav').slice({{env('NAV_EXTENSION_HIDE_COUNT')}}, $('.ext_nav').length).hide();
+            }else{
+                $('.ext_nav_more_less').find('span').text("{{__('daha az...')}}");
+                $('.ext_nav:hidden').show();
+            }
+        });
     };
 
     function activeTab(){

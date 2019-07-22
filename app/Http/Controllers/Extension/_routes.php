@@ -44,6 +44,8 @@ Route::post('/ayarlar/{extension_id}/{server_id}', 'Extension\OneController@serv
 // Extension Upload Page
 Route::post('/yukle/eklenti/', 'Extension\MainController@upload')->name('extension_upload');
 
+Route::post('/ayarlar/eklenti', 'Extension\SettingsController@saveSettings')->name('save_settings');
+
 // Extension Remove Page
 Route::post('/eklenti/sil', 'Extension\OneController@remove')->name('extension_remove')->middleware('admin');
 
