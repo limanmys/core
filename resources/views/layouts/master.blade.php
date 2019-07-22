@@ -66,22 +66,5 @@
             $("#terminal .modal-body iframe").attr('src', '');
         })
     }
-    $('input[type=password]').attr('autocomplete','off');
-    $('input[type=password]').wrap('<div class="input-group"></div>');
-    $('input[type=password]').after('<span class="input-group-btn">'+
-      '<button class="btn btn-default reveal" type="button"><i class="fa fa-eye"></i></button>'+
-    '</span>');
-    $(".reveal").on('click',function() {
-        var $pwd = $(this).closest('span').prev();
-        if ($pwd.attr('type') === 'password') {
-            $(this).find('i').removeClass('fa-eye');
-            $(this).find('i').addClass('fa-eye fa-eye-slash');
-            $pwd.attr('type', 'text');
-        } else {
-          $(this).find('i').removeClass('fa-eye fa-eye-slash');
-          $(this).find('i').addClass('fa-eye');
-            $pwd.attr('type', 'password');
-        }
-    });
 </script>
 </html>

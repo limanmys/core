@@ -13,12 +13,14 @@ find /liman -type d | grep -v /liman/extensions | while read line ; do chown lim
 php /liman/server/artisan migrate --force
 CONFFILE=/liman/liman.conf
 if [ -f "$CONFFILE" ]; then
-    rm -rf /liman/server/liman.conf
-    ln -s /liman/liman.conf /liman/server/liman.conf
+    rm -rf /liman/server/.env
+    ln -s /liman/liman.conf /liman/server/.env
 else
-    mv /liman/server/liman.conf /liman/liman.conf
-    ln -s /liman/liman.conf /liman/server/liman.conf
+    mv /liman/server/.env /liman/liman.conf
+    ln -s /liman/liman.conf /liman/server/.env
 fi
+chown liman /liman/liman.conf
+chown liman /liman/server/.env
 
 printf "\nKurulum Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
 echo "sudo runuser liman -c "php /liman/server/artisan administrator""
