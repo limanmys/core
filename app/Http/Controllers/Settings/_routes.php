@@ -19,3 +19,5 @@ Route::post('/ayar/eklenti/fonksiyonlar','Settings\MainController@getExtensionFu
 Route::post('/ayar/eklenti/fonksiyonlar/ekle','Settings\MainController@addFunctionPermissions')->middleware('admin')->name('extension_function_add');
 
 Route::post('/ayar/eklenti/fonksiyonlar/sil','Settings\MainController@removeFunctionPermissions')->middleware('admin')->name('extension_function_remove');
+
+Route::post('/ayarlar/saglik','Settings\MainController@health')->middleware('admin')->name('health_check');

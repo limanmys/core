@@ -357,3 +357,9 @@ if (!function_exists('is_json')) {
        return (json_last_error() == JSON_ERROR_NONE) ? ($return_data ? $data : TRUE) : FALSE;
   }
 }
+
+if (!function_exists('getPermissions')) {
+    function getPermissions($path){
+        return substr(sprintf("%o",fileperms($path)),-4);
+    }
+}

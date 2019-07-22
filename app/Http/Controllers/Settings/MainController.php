@@ -199,4 +199,41 @@ class MainController extends Controller
         }
         return respond(__("Başarılı"),200);
     }
+
+    public function health()
+    {
+        $allowed = [
+            "certs" => "0700",
+            "database" => "0700",
+            "extensions" => "0755",
+            "keys" => "0700",
+            "logs" => "0700",
+            "sandbox" => "0744",
+            "webssh" => "0700",
+            "liman.conf" => "0700",
+            "server" => "0700"
+        ];
+        $messages = [];
+
+        // Check Permissions
+        foreach ($allowed as $name=>$permission){
+            if(getPermissions('/liman/' . $name) != $permission){
+                array_push($messages,[
+                    "type" => "danger",
+                    "message" => "'/liman/$name' izni hatali (". getPermissions('/liman/' . $name) .")."
+                ]);
+            }
+        }
+
+        // Check Extra Files
+        $extra = array_diff(array_diff(scandir("/liman"),array('..','.')),array_keys($allowed));
+        foreach ($extra as $item){
+            array_push($messages,[
+                "type" => "warning",
+                "message" => "'/liman/$item' dosyasina izin verilmiyor."
+            ]);
+        }
+
+        return respond($messages,200);
+    }
 }
