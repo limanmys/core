@@ -25,19 +25,19 @@
         <div class="tab-content">
             <div class="tab-pane active" id="tab_1">
                 <h3>{{__("Eklenti Adı")}}</h3>
-                <input id="extensionName" type="text" class="form-control" value="{{$extension["name"]}}" disabled>
+                <input id="extensionName" type="text" class="form-control" value="{{$extension["name"]}}" disabled required>
                 <h3>{{__("Yayınlayan")}}</h3>
-                <input type="text" name="name" class="form-control" value="{{$extension["publisher"]}}" disabled>
+                <input type="text" name="name" class="form-control" value="{{$extension["publisher"]}}" disabled required>
                 <h3>{{__("Destek Email'i")}}</h3>
-                <input id="support" type="text" name="email" class="form-control" value="{{$extension["support"]}}">
+                <input id="support" type="text" name="email" class="form-control" value="{{$extension["support"]}}" required>
                 <h3>{{__("Logo (Font Awesome Ikon)")}}</h3>
-                <input id="icon" type="text" name="icon" class="form-control" value="{{$extension["icon"]}}">
+                <input id="icon" type="text" name="icon" class="form-control" value="{{$extension["icon"]}}" required>
                 <h3>{{__("Versiyon")}}</h3>
-                <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}">
+                <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}" required>
                 <h3>{{__("Ayar Doğrulama Fonksiyonu/Betiği")}}</h3>
-                <input id="verification" type="text" name="verification" class="form-control" value="{{array_key_exists("verification",$extension) ? $extension["verification"] : ""}}">
+                <input id="verification" type="text" name="verification" class="form-control" value="{{array_key_exists("verification",$extension) ? $extension["verification"] : ""}}" required>
                 <h3>{{__("Servis Adı yada Kontrol Etmek için Port")}}</h3>
-                <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}"><br>
+                <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}" required><br>
                 <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button>
             </div>
             <!-- /.tab-pane -->

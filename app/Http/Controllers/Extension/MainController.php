@@ -170,7 +170,8 @@ class MainController extends Controller
         $ext = new Extension([
             "name" => request("name"),
             "version" => "0.0.1",
-            "icon" => ""
+            "icon" => "",
+            "service" => "",
         ]);
         $ext->save();
 
@@ -192,30 +193,23 @@ class MainController extends Controller
             "icon" => ""
         ];
 
-        if (!is_dir($folder)) {
-            mkdir($folder);
-        }
+        shell_exec("mkdir " . $folder);
+        shell_exec("mkdir " . $folder . DIRECTORY_SEPARATOR . "views");
+        shell_exec("mkdir " . $folder . DIRECTORY_SEPARATOR . "scripts");
 
         touch($folder . DIRECTORY_SEPARATOR . "db.json");
 
         file_put_contents($folder . DIRECTORY_SEPARATOR . "db.json",json_encode($json));
 
-
         if ((intval(shell_exec("grep -c '^" . clean_score($ext->id) . "' /etc/passwd"))) ? false : true) {
             shell_exec('sudo useradd -r -s /bin/sh ' . clean_score($ext->id));
         }
 
-        shell_exec('sudo chown ' . clean_score($ext->id) . ':liman ' . $folder);
+        touch($folder . '/views/index.blade.php');
+        touch($folder . '/views/functions.php');
+
+        shell_exec('sudo chown -R ' . clean_score($ext->id) . ':liman ' . $folder);
         shell_exec('sudo chmod 770 ' . $folder);
-
-        touch($folder . '/index.blade.php');
-        touch($folder . '/functions.php');
-
-        shell_exec('sudo chown ' . clean_score($ext->id) . ':liman "' . trim($folder) . '/index.blade.php"');
-        shell_exec('sudo chmod 664 "' . trim($folder) . '/index.blade.php"');
-
-        shell_exec('sudo chown ' . clean_score($ext->id) . ':liman "' . trim($folder) . '/functions.php"');
-        shell_exec('sudo chmod 664 "' . trim($folder) . '/functions.php"');
 
         shell_exec("sudo chown liman:". clean_score($ext->id) . " " . $folder . DIRECTORY_SEPARATOR . "db.json");
         shell_exec("sudo chmod 640 " . $folder . DIRECTORY_SEPARATOR . "db.json");
