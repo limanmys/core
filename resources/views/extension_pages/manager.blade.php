@@ -112,7 +112,7 @@
    ])
 
 <script>
-        $('input[name=ext_count]').val('{{env('NAV_EXTENSION_HIDE_COUNT')}}');
+        $('input[name=ext_count]').val('{{env('NAV_EXTENSION_HIDE_COUNT', 10)}}');
         function downloadFile(form){
             window.location.assign('/indir/eklenti/' + form.getElementsByTagName('select')[0].value);
             setTimeout(function(){
