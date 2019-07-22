@@ -46,10 +46,10 @@
         "sortUpdateUrl" => route('update_ext_orders'),
         "afterSortFunction" => 'location.reload',
         "title" => [
-            "Eklenti Adı" , "Versiyon", "*hidden*"
+            "Eklenti Adı" , "Versiyon", "Son Güncelleme Tarihi", "*hidden*"
         ],
         "display" => [
-            "name" , "version", "id:extension_id"
+            "name" , "version", "updated_at", "id:extension_id"
         ],
         "menu" => [
             "Sil" => [

@@ -621,12 +621,17 @@ class OneController extends Controller
 
         $token = Token::create($user_id);
 
-        $permissions = Permission::where('user_id',auth()->user()->id)
-            ->where('function','like',strtolower(extension()->name). '%')->pluck('function')->toArray();
-        for($i = 0 ;$i< count($permissions); $i++){
-            $permissions[$i] = explode('_',$permissions[$i])[1];
+        if(!auth()->user()->isAdmin()){
+            $permissions = Permission::where('user_id',auth()->user()->id)
+                ->where('function','like',strtolower(extension()->name). '%')->pluck('function')->toArray();
+            for($i = 0 ;$i< count($permissions); $i++){
+                $permissions[$i] = explode('_',$permissions[$i])[1];
+            }
+            $permissions = str_replace('"', '*m*', json_encode($permissions));
+        }else{
+            $permissions = "admin";
         }
-        $permissions = str_replace('"', '*m*', json_encode($permissions));
+
         $command = "sudo runuser " . clean_score(extension()->id) .
             " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $functions "
             . strtolower(extension()->name) .

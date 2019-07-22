@@ -31,10 +31,10 @@
         @foreach($extension["database"] as $item)
             @if($item["variable"] == "certificate")
                 <h5>{{$item["name"]}}</h5>
-                <textarea name="certificate" cols="30" rows="10" class="form-control"></textarea><br>
+                <textarea name="certificate" cols="30" rows="10" class="form-control" required></textarea><br>
             @elseif($item["type"] == "extension")
                 <h5>{{$item["name"]}}</h5>
-                <select class="form-control" name="{{$item["variable"]}}">
+                <select class="form-control" name="{{$item["variable"]}}" required>
                     @foreach(extensions() as $extension)
                         <option value="{{$extension->id}}">{{$extension->name}}</option>
                     @endforeach
@@ -48,7 +48,7 @@
                 </select><br>
             @else
                 <h5>{{__($item["name"])}}</h5>
-                <input class="form-control" type="{{$item["type"]}}"
+                <input required class="form-control" type="{{$item["type"]}}"
                        name="{{$item["variable"]}}" placeholder="{{__($item["name"])}}"
                        @if($item["type"] != "password")
                            @if(extensionDb($item["variable"]))
@@ -60,7 +60,7 @@
                 >
                 @if($item["type"] == "password")
                   <h5>{{__($item["name"])}} {{__('Tekrar')}}</h5>
-                  <input class="form-control" type="{{$item["type"]}}"
+                  <input required class="form-control" type="{{$item["type"]}}"
                          name="{{$item["variable"]}}_confirmation" placeholder="{{__($item["name"])}} {{__('Tekrar')}}"
                   >
                 @endif

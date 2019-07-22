@@ -101,10 +101,10 @@
                     "id" => "installed_extensions",
                     "value" => $installed_extensions,
                     "title" => [
-                        "Eklenti Adı" , "Versiyon", "*hidden*"
+                        "Eklenti Adı" , "Versiyon", "Düzenlenme Tarihi", "*hidden*"
                     ],
                     "display" => [
-                        "name" , "version", "id:extension_id"
+                        "name" , "version", "updated_at","id:extension_id"
                     ],
                     "noInitialize" => "true"
                 ])

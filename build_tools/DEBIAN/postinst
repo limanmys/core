@@ -19,6 +19,8 @@ else
     mv /liman/server/.env /liman/liman.conf
     ln -s /liman/liman.conf /liman/server/.env
 fi
+chown liman /liman/liman.conf
+chown liman /liman/server/.env
 
 printf "\nKurulum Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
 echo "sudo runuser liman -c "php /liman/server/artisan administrator""
