@@ -23,9 +23,16 @@ class SettingsController extends Controller
         return view('extension_pages.manager');
     }
 
-    public function allServersApi()
+    public function saveSettings()
     {
-        return response()->json(extensions());
+        setEnv([
+            "NAV_EXTENSION_HIDE_COUNT" => request('ext_count')
+        ]);
+        if(intval(request('ext_count')) > 0){
+            return respond('Ayarlar başarıyla kaydedildi.');
+        }else{
+            return respond('Bu ayar minimum 1 olmalıdır.', 201);
+        }
     }
 
     // Extension Management Page

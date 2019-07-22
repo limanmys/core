@@ -7,6 +7,19 @@
             <li class="breadcrumb-item active" aria-current="page">{{ __('Eklenti Yönetimi') }}</li>
         </ol>
     </nav>
+    <div class="right" style="float:right;margin-top:-55px">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#extSettings"><i class="fa fa-cogs"></i></button>
+    </div>
+    @include('l.modal',[
+        "id"=>"extSettings",
+        "title" => "Ayarlar",
+        "url" => route('save_settings'),
+        "next" => "reload",
+        "inputs" => [
+            "Sol menüde kaç eklenti gözüksün?" => "ext_count:number",
+        ],
+        "submit_text" => "Kaydet"
+    ])
     @include('l.modal-button',[
         "class" => "btn-primary",
         "target_id" => "extensionUpload",
@@ -99,6 +112,7 @@
    ])
 
 <script>
+        $('input[name=ext_count]').val('{{env('NAV_EXTENSION_HIDE_COUNT')}}');
         function downloadFile(form){
             window.location.assign('/indir/eklenti/' + form.getElementsByTagName('select')[0].value);
             setTimeout(function(){
