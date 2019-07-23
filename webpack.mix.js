@@ -20,7 +20,7 @@ mix.combine([
     'resources/assets/js/bootstrap-datepicker.js',
     'resources/assets/js/jquery.dataTables.js',
     'resources/assets/js/dataTables.bootstrap.js',
-    'resources/assets/js/select.dataTables.js',
+    'resources/assets/js/datatables.js',
     'resources/assets/js/adminlte.js',
     'resources/assets/js/sweetalert2.min.js',
     'resources/assets/js/Chart.js',
