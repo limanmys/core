@@ -18,8 +18,6 @@ mix.combine([
     'resources/assets/js/jquery.contextMenu.js',
     'resources/assets/js/bootstrap.js',
     'resources/assets/js/bootstrap-datepicker.js',
-    'resources/assets/js/jquery.dataTables.js',
-    'resources/assets/js/dataTables.bootstrap.js',
     'resources/assets/js/datatables.js',
     'resources/assets/js/adminlte.js',
     'resources/assets/js/sweetalert2.min.js',
