@@ -23,8 +23,14 @@ class SessionTimeout {
 
     public function __construct(Store $session){
         $this->session        = $session;
-        $this->redirectUrl    = 'auth/login';
+        $this->redirectUrl    = route('login');
         $this->sessionLabel   = 'warning';
+        $this->lifetime       = config('session.lifetime');
+        $this->exclude       = [
+            'user_notifications',
+            'widget_one',
+            'server_check'
+        ];
     }
 
     /**
@@ -36,6 +42,10 @@ class SessionTimeout {
      */
     public function handle($request, Closure $next)
     {
+        if(!Auth::check()){
+            $this->session->forget('lastActivityTime');
+            return $next($request);
+        }
         if(! $this->session->has('lastActivityTime'))
         {
             $this->session->put('lastActivityTime', time());
@@ -44,12 +54,12 @@ class SessionTimeout {
         {
             $this->session->forget('lastActivityTime');
             Auth::logout();
-
-            return redirect($this->getRedirectUrl())->with([ $this->getSessionLabel() => 'You have been inactive for '. $this->timeout/60 .' minutes ago.']);
+            $this->session->flash($this->getSessionLabel(), __(':timeout dakika boyunca aktif olmadığınız için oturumunuz sonlandırıldı.', ['timeout' => $this->getTimeOut()/60]));
+            return respond($this->getRedirectUrl(), 300);
         }
-
-        $this->session->put('lastActivityTime',time());
-
+        if(!in_array($request->route()->getName(),$this->exclude)){
+            $this->session->put('lastActivityTime',time());
+        }
         return $next($request);
     }
 
@@ -59,7 +69,7 @@ class SessionTimeout {
      */
     private function getTimeOut()
     {
-        return  ($this->lifetime) ?: $this->timeout;
+        return  ($this->lifetime * 60) ?: $this->timeout;
     }
 
     /**

@@ -13,7 +13,6 @@ class Kernel extends HttpKernel
         Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         // \App\Http\Middleware\TrustProxies::class,
-        \App\Http\Middleware\SessionTimeout::class,
     ];
 
     protected $middlewareGroups = [
@@ -28,6 +27,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\SessionTimeout::class,
         ],
     ];
 

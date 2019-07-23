@@ -9,6 +9,11 @@
         </div>
         <!-- /.login-logo -->
         <div class="login-box-body">
+            @if(session('warning'))
+            <div class="alert alert-warning">
+                {{session('warning')}}
+            </div>
+            @endif
             <form action="{{ route('login')}}" method="post">
                 @csrf
                 <div class="form-group has-feedback {{ $errors->has('email') ? 'has-error' : '' }}">
