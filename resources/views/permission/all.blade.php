@@ -12,7 +12,8 @@
     "target_id" => "request",
     "text" => "Talep Oluştur"
 ])<br><br>
-    <h3>{{__("Talepleriniz")}}</h3>
+@include('l.errors')    
+<h3>{{__("Talepleriniz")}}</h3>
     @include('l.table',[
             "value" => $requests,
             "title" => [

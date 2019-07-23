@@ -9,16 +9,22 @@ class WinRMConnector implements Connector
 {
     public function __construct(Server $server, $user_id)
     {
-        ($key = Key::where([
+        if(!$key = Key::where([
             "user_id" => $user_id,
             "server_id" => $server->id
-        ])->first()) || abort(504,"WinRM Anahtarınız yok.");
+        ])->first()){
+            return redirect()->back()->withErrors([
+                "message" => __("WinRM Anahtarınız yok.")
+            ])->send();
+        }
         $checkScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_validate.py '" . $server->ip_address . "' '" 
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()). "'";
         $output = shell_exec($checkScript);
         if($output != "ok\n"){
-            abort(504,"Sertifikanız geçerli değil.");
+            return redirect()->back()->withErrors([
+                "message" => __("Sertifikanız geçerli değil.")
+            ])->send();
         }
         return true;
     }

@@ -22,6 +22,7 @@
             "server_id" => server()->id,
         ])}}'"><i class="fa fa-server"></i></button>
 </div>
+@include('l.errors')    
 <div class="card">
     <div class="card-body mainArea">{!!$view!!}</div>
 </div>

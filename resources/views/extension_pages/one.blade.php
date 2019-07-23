@@ -11,6 +11,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{ $extension["name"] }}</li>
         </ol>
     </nav>
+    @include('l.errors')    
 
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">

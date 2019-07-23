@@ -7,6 +7,8 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Anahtarlar")}}</li>
         </ol>
     </nav>
+    @include('l.errors')    
+
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#keys" data-toggle="tab" aria-expanded="true">{{__("Anahtarlar")}}</a></li>

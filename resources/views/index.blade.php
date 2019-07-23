@@ -8,6 +8,7 @@
           </ol>
       </nav>
     @endif
+    @include('l.errors')
     <section class="content sortable-widget">
         @if($widgets->count())
             @foreach($widgets as $widget)

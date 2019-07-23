@@ -7,6 +7,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Profilim")}}</li>
         </ol>
     </nav>
+    @include('l.errors')
     <div class="box box-solid box-primary" style="width:45%;min-height: 400px;min-width:300px;float:left;margin: 20px">
         <div class="box-header">
             <h3 class="box-title">{{__("Hesap Ayarları")}}</h3>

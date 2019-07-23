@@ -9,6 +9,7 @@
         </ol>
     </nav>
     <h4>{{__("Sunucu")}}</h4>
+    @include('l.errors')
     <form action="{{route('widget_add')}}" method="POST">
         <select class="form-control" onchange="getExtensions()" id="server_id" required name="server_id">
             @foreach(servers() as $server)

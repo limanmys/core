@@ -13,6 +13,7 @@
         "text" => "Yükle"
     ])<br><br>
 
+    @include('l.errors')    
     @include('l.modal',[
         "id"=>"scriptUpload",
         "title" => "Betik Yükle",

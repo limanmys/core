@@ -16,6 +16,7 @@
         @endif
         <h2 style="display: inline-block;">{{server()->name}}</h2>
     </div>
+    @include('l.errors')    
 
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">

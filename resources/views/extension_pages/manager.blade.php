@@ -7,6 +7,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{ __('Eklenti Yönetimi') }}</li>
         </ol>
     </nav>
+    @include('l.errors')    
     <div class="right" style="float:right;margin-top:-55px">
         <button class="btn btn-primary" data-toggle="modal" data-target="#extSettings"><i class="fa fa-cogs"></i></button>
     </div>

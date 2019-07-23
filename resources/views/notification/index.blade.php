@@ -5,6 +5,7 @@
 }))
 <button type="button" id="read_all" style="margin-bottom: 5px;" class="btn btn-default btn-flat">{{__('Tümünü Okundu Olarak İşaretle')}}</button>
 <button type="button" id="delete_read" style="margin-bottom: 5px;" class="btn btn-default btn-flat">{{__('Okunanları Sil')}}</button>
+@include('l.errors')    
 <ul class="timeline">
     @foreach ($notifications as $date => $items)
          <li class="time-label">

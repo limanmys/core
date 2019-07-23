@@ -9,6 +9,7 @@
         </ol>
     </nav>
     <h2>{{$user->name . __(" kullanıcısı ayarları")}}</h2>
+    @include('l.errors')
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">{{__("Genel Ayarlar")}}</a></li>

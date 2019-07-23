@@ -10,6 +10,7 @@
     <button class="btn btn-success" onclick="window.location.href = '{{route('widget_add_page')}}'">{{__("Widget Ekle")}}</button>
     <br><br>
 
+    @include('l.errors')
     @include('l.modal',[
         "id"=>"add_server",
         "title" => "Sunucu Ekle",

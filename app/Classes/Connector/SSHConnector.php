@@ -30,14 +30,20 @@ class SSHConnector implements Connector
      */
     public function __construct(\App\Server $server, $user_id)
     {
-        ($key = Key::where([
+        if(!$key = Key::where([
             "user_id" => $user_id,
             "server_id" => $server->id
-        ])->first()) || abort(504,"SSH Anahtarınız yok.");
+        ])->first()){
+            return redirect()->back()->withErrors([
+                "message" => __("SSH Anahtarınız yok.")
+            ])->send();
+        }
        try{
            $ssh = new SSH2($server->ip_address, 22);
        }catch (\Exception $exception){
-           abort(504,"Sunucuya Bağlanılamadı, " . $exception->getMessage());
+            return redirect()->back()->withErrors([
+                "message" => __("Sunucuya Bağlanılamadı, :error", ["error" => $exception->getMessage()])
+            ])->send();
        }
         $this->user_id = $user_id;
         $this->username = $key->username;
@@ -46,10 +52,14 @@ class SSHConnector implements Connector
         $rsa->loadKey(file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $user_id));
         try{
             if(!$ssh->login($key->username,$rsa)){
-                abort(504,"Anahtarınız ile giriş yapılamadı.");
+                return redirect()->back()->withErrors([
+                    "message" => __("Anahtarınız ile giriş yapılamadı.")
+                ])->send();
             }
         }catch (\Exception $exception){
-            abort(504,"Sunucuya Bağlanılamadı, " . $exception->getMessage());
+            return redirect()->back()->withErrors([
+                "message" => __("Sunucuya Bağlanılamadı, :error", ["error" => $exception->getMessage()])
+            ])->send();
         }
 
         $this->ssh = $ssh;

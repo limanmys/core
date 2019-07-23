@@ -10,7 +10,6 @@
 
     <li class="breadcrumb-item active" aria-current="page">{{__("Eklenti Ayarları")}}</li>
 </ol>
-
 <button class="btn btn-primary" onclick="history.back()">{{__("Geri Dön")}}</button><br><br>
 @if(!empty($errors) && count($errors))
     <div class="alert alert-danger" role="alert">

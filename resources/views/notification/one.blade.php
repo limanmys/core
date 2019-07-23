@@ -5,6 +5,7 @@
 
 @extends('layouts.app')
 @section('content')
+@include('l.errors')    
 <ul class="timeline">
     <li class="time-label">
         <span class="bg-green">
