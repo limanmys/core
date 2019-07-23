@@ -73,5 +73,16 @@
             $("#terminal .modal-body iframe").attr('src', '');
         })
     }
+
+
+    window.onbeforeunload = function () {
+        Swal.fire({
+            position: 'center',
+            type: 'info',
+            title: '{{__("Yükleniyor...")}}',
+            showConfirmButton: false,
+            allowOutsideClick : false,
+        });
+    };
 </script>
 </html>

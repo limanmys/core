@@ -31,6 +31,8 @@
                 @endif
                 <li class=""><a href="#filesTab" data-toggle="tab" aria-expanded="false">{{__("Dosya Transferi")}}</a>
                 </li>
+                <li class=""><a href="#updatesTab" data-toggle="tab" aria-expanded="false">{{__("Güncellemeler")}}</a>
+                </li>
             @endif
             @if(server()->type == "linux_ssh")
                 <li class=""><a href="#terminalTab" onclick="openTerminal()" data-toggle="tab"
@@ -142,6 +144,9 @@
             </div>
             @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
                 <div class="tab-pane" id="servicesTab">
+
+                </div>
+                <div class="tab-pane" id="updatesTab">
 
                 </div>
             @endif
