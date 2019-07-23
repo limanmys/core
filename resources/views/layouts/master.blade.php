@@ -6,19 +6,15 @@
     <title>{{__("Liman Sistem Yönetimi")}}</title>
 
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="{{asset('/css/liman.css')}}">
+    <link rel="stylesheet" href="{{mix('/css/liman.css')}}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="server_id" content="{{request('server_id') ? request('server_id') : ''}}">
     <meta name="extension_id" content="{{request('extension_id') ? request('extension_id') : ''}}">
-    <link rel="stylesheet" href="{{asset('/css/jquery-ui.css')}}">
 </head>
 <body class="hold-transition @yield('body_class')">
   <div class="il-isimleri"></div>
 
-<script src="{{asset('js/libraries.js')}}"></script>
-<script src="{{asset('/js/liman.js')}}"></script>
-<script src="{{asset('/js/jquery-ui.js')}}"></script>
-<script src="{{asset('/js/bootstrap-datepicker.min.js')}}"></script>
+<script src="{{mix('/js/liman.js')}}"></script>
 
 @yield('body')
 </body>
@@ -46,11 +42,11 @@
         }, 3000);
         @endif
 
-        $('.ext_nav').slice({{env('NAV_EXTENSION_HIDE_COUNT')}}, $('.ext_nav').length).hide();
+        $('.ext_nav').slice({{env('NAV_EXTENSION_HIDE_COUNT', 10)}}, $('.ext_nav').length).hide();
         $('.ext_nav_more_less').click(function(){
             if ($('.ext_nav').length == $('.ext_nav:visible').length) {
                 $('.ext_nav_more_less').find('span').text("{{__('...daha fazla')}}");
-                $('.ext_nav').slice({{env('NAV_EXTENSION_HIDE_COUNT')}}, $('.ext_nav').length).hide();
+                $('.ext_nav').slice({{env('NAV_EXTENSION_HIDE_COUNT', 10)}}, $('.ext_nav').length).hide();
             }else{
                 $('.ext_nav_more_less').find('span').text("{{__('daha az...')}}");
                 $('.ext_nav:hidden').show();

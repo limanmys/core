@@ -33,4 +33,5 @@
                 @endforeach
             </ul>
         </li>
+        <li class="footer"><a href="{{route('all_user_notifications')}}">{{__('Tümünü gör')}}</a></li>
     </ul>

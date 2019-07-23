@@ -137,14 +137,14 @@
                     @if(count(extensions()))
                       <li class="header">{{__("Eklentiler")}}</li>
                       @foreach(extensions() as $extension)
-                          <li class="ext_nav" @if($loop->iteration > env('NAV_EXTENSION_HIDE_COUNT')) style="display:none;"@endif>
+                          <li class="ext_nav" @if($loop->iteration > env('NAV_EXTENSION_HIDE_COUNT', 10)) style="display:none;"@endif>
                               <a href="/l/{{$extension->id}}">
                                   <i class="fa fa-{{$extension->icon}} "></i>
                                   <span>{{__($extension->name)}}</span>
                               </a>
                           </li>
                       @endforeach
-                      @if(count(extensions()) > env('NAV_EXTENSION_HIDE_COUNT'))
+                      @if(count(extensions()) > env('NAV_EXTENSION_HIDE_COUNT', 10))
                         <li class="ext_nav_more_less">
                             <a href="javascript:void(0)">
                                 <span>{{__('...daha fazla')}}</span>

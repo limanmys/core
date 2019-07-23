@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 
-class Server
+class ServerApi
 {
     public function handle($request, Closure $next)
     {
@@ -12,9 +12,7 @@ class Server
             . server()->ip_address . " " . server()->control_port . "  | grep \"Connected\"")){
             return $next($request);
         }else{
-            return redirect()->back()->withErrors([
-                "message" => __("Sunucuya erişim sağlanamadı!")
-            ]);
+            return respond("Sunucuya erişim sağlanamadı.",201);
         }
     }
 }
