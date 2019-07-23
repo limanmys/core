@@ -8,7 +8,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{cities(request('city'))}}</li>
         </ol>
     </nav>
-
+    @include('l.errors')
     @include('l.table',[
         "value" => extension()->servers(request('city')),
         "title" => [

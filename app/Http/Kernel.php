@@ -39,6 +39,7 @@ class Kernel extends HttpKernel
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'parameters' => Middleware\Parameters::class,
         'server' => Middleware\Server::class,
+        'server_api' => Middleware\ServerApi::class,
         'permissions' => Middleware\PermissionManager::class,
         'admin' => Middleware\Admin::class,
         'script_parameters' => Middleware\ScriptParameters::class,

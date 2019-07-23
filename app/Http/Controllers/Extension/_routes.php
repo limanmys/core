@@ -7,7 +7,7 @@ Route::get('/l/{extension_id}/{city}/{server_id}', 'Extension\OneController@rend
 Route::get('/l/{extension_id}/{city}/{server_id}/{unique_code}', 'Extension\OneController@renderView')->middleware(['server', 'script_parameters'])->name('extension_server_route');
 
 // Extension Management Route
-Route::post('/extension/run/{unique_code}', 'Extension\OneController@route')->name('extension_api')->middleware(['server', 'script_parameters']);
+Route::post('/extension/run/{unique_code}', 'Extension\OneController@route')->name('extension_api')->middleware(['server_api', 'script_parameters']);
 
 // Extension Page (City Select) Route
 Route::get('/l/{extension_id}', 'Extension\MainController@allServers')->name('extension_map');
@@ -33,7 +33,7 @@ Route::post('/eklentiler/betikler/ekle', 'Extension\SettingsController@addScript
 Route::post('/eklentiler/betikler/sil', 'Extension\SettingsController@removeScriptFromView')->name('extension_page_script_remove');
 
 // Extension Function Api
-Route::post('/eklenti/{extension_id}/{function_name}', 'Extension\OneController@runFunction')->name('extension_function_api')->middleware('server');
+Route::post('/eklenti/{extension_id}/{function_name}', 'Extension\OneController@runFunction')->name('extension_function_api')->middleware('server_api');
 
 // Extension Server Setting Page
 Route::get('/ayarlar/{extension_id}/{server_id}', 'Extension\OneController@serverSettingsPage')->name('extension_server_settings_page')->middleware('server');
