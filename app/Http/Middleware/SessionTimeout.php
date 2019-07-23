@@ -54,8 +54,13 @@ class SessionTimeout {
         {
             $this->session->forget('lastActivityTime');
             Auth::logout();
-            $this->session->flash($this->getSessionLabel(), __(':timeout dakika boyunca aktif olmadığınız için oturumunuz sonlandırıldı.', ['timeout' => $this->getTimeOut()/60]));
-            return respond($this->getRedirectUrl(), 300);
+            $message = __(':timeout dakika boyunca aktif olmadığınız için oturumunuz sonlandırıldı.', ['timeout' => $this->getTimeOut()/60]);
+            if($request->wantsJson()){
+                $this->session->flash($this->getSessionLabel(), $message);
+                return respond($this->getRedirectUrl(), 300);
+            }else{
+                return redirect($this->getRedirectUrl())->with([$this->getSessionLabel() => $message]);
+            }
         }
         if(!in_array($request->route()->getName(),$this->exclude)){
             $this->session->put('lastActivityTime',time());

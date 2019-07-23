@@ -37,13 +37,10 @@ function request(url, data, next, error) {
     }, 300);
     r.onreadystatechange = function () {
         if (r.readyState === 4) {
-            if (!r.responseURL.includes(url)) {
-                return window.location = r.responseURL;
-            }
             if(!url.includes('bildirimler') && !url.includes('kontrol')){
                 Swal.close();
             }
-            if (id != null && (r.status !== 200 || r.status !== 300 || r.status !== 302)) {
+            if (id != null && (r.status !== 200 || r.status !== 300)) {
                 message(r.responseText);
             }
             if( id != null){
