@@ -64,8 +64,6 @@ class SessionTimeout {
         }
         if(!in_array($request->route()->getName(),$this->exclude)){
             $this->session->put('lastActivityTime',time());
-        }else{
-            $this->session->reflash();
         }
         return $next($request);
     }
