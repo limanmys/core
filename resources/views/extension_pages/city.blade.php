@@ -4,7 +4,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-            <li class="breadcrumb-item"><a href="/l/{{extension()->id}}">{{extension()->name}} {{ __('Sunucuları') }}</a></li>
+            <li class="breadcrumb-item"><a href="/l/{{extension()->id}}">{{__(extension()->name)}} {{ __('Sunucuları') }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{cities(request('city'))}}</li>
         </ol>
     </nav>

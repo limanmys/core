@@ -143,5 +143,10 @@
   "Kontrol Ediliyor..." : "Checking...",
   "Onayla" : "Verify",
   "İsim Onaylandı." : "Name Verified",
-  "Bu isimde zaten bir sunucu var." : "There's already a server with this name"
+  "Bu isimde zaten bir sunucu var." : "There's already a server with this name",
+  "Kasa" : "Vault",
+  "Sunucuya erişim sağlanamadı." : "Couldn't connect to the server",
+  "Yükleniyor..." : "Loading...",
+  "Boş json nesnesi." : "Empty JSON Object.",
+  "Tam yetkili yönetici hesabı ile giriş yaptınız, sisteme zarar verebilirsiniz." : "You are logged in with a fully authorized administrator account, you can damage the system."
 }

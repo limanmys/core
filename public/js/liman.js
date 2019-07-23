@@ -154,16 +154,6 @@ function route(url) {
     window.location.href = window.location.href + "/" + url;
 }
 
-window.onbeforeunload = function () {
-    Swal.fire({
-        position: 'center',
-        type: 'info',
-        title: 'Yükleniyor...',
-        showConfirmButton: false,
-        allowOutsideClick : false,
-    });
-};
-
 $(".modal").on('show.bs.modal', function(modal) {
     $("#" + modal.target.id + " .alert").fadeOut(0);
 });

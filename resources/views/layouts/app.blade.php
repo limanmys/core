@@ -20,11 +20,6 @@
                 <!-- Sidebar toggle button-->
                 <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button"
                    onclick="request('{{route('set_collapse')}}',new FormData(),null)">
-                    <span class="sr-only">{{__("Geri Dön")}}</span>
-                </a>
-
-                <a href="#" onclick="history.back()" style="line-height: 50px;color: white;font-weight: bolder">
-                    <i class="fa fa-chevron-left"></i> {{__('Geri')}}
                 </a>
 
                 <!-- Navbar Right Menu -->
