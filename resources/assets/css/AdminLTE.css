@@ -4976,12 +4976,7 @@ table.text-center th {
   }
 }
 
-.dataTables_wrapper .row{
+.table-responsive > .dataTables_wrapper .row{
   margin-right: 0px;
   margin-left: 0px;
-}
-
-.table-responsive {
-  margin-right: -15px;
-  margin-left: -15px
 }
