@@ -258,7 +258,7 @@
             "selects" => $input_extensions,
             "inputs" => [
             ],
-            "submit_text" => "Değiştir"
+            "submit_text" => "Ekle"
         ])
     @endif
     <script>
