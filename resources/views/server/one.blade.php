@@ -420,7 +420,7 @@
           let data = [];
           let table = $("#installed_extensions").DataTable();
           table.rows( { selected: true } ).data().each(function(element){
-              data.push(element[3]);
+              data.push(element[4]);
           });
           if(data.length === 0){
               Swal.fire({
