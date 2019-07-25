@@ -210,7 +210,6 @@ class MainController extends Controller
             "logs" => "0700",
             "sandbox" => "0744",
             "webssh" => "0700",
-            "liman.conf" => "0700",
             "server" => "0700"
         ];
         $messages = [];

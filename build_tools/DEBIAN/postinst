@@ -11,16 +11,6 @@ systemctl restart nginx
 systemctl restart php7.3-fpm
 find /liman -type d | grep -v /liman/extensions | while read line ; do chown liman:liman $line; done
 php /liman/server/artisan migrate --force
-CONFFILE=/liman/liman.conf
-if [ -f "$CONFFILE" ]; then
-    rm -rf /liman/server/.env
-    ln -s /liman/liman.conf /liman/server/.env
-else
-    mv /liman/server/.env /liman/liman.conf
-    ln -s /liman/liman.conf /liman/server/.env
-fi
-chown liman /liman/liman.conf
-chown liman /liman/server/.env
 
 printf "\nKurulum Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
 echo "sudo runuser liman -c "php /liman/server/artisan administrator""
