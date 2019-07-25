@@ -84,5 +84,8 @@
             allowOutsideClick : false,
         });
     };
+    $(window).on('shown.bs.modal', function() {
+        $(".modal.in").find('div.alert').fadeOut();
+    });
 </script>
 </html>

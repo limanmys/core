@@ -4,6 +4,7 @@ namespace App\Classes\Connector;
 
 use App\Key;
 use App\Server;
+use Illuminate\Support\Facades\Log;
 
 class WinRMConnector implements Connector
 {
@@ -13,7 +14,7 @@ class WinRMConnector implements Connector
             "user_id" => $user_id,
             "server_id" => $server->id
         ])->first()) || abort(504,"WinRM Anahtarınız yok.");
-        $checkScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_validate.py '" . $server->ip_address . "' '" 
+        $checkScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_validate.py '" . $server->ip_address . "' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()). "'";
         $output = shell_exec($checkScript);
@@ -30,11 +31,12 @@ class WinRMConnector implements Connector
 
     public function execute($command)
     {
-        $executeScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_execute.py '" . server()->ip_address . "' '" 
+        $executeScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_execute.py '" . server()->ip_address . "' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'";
+        Log::debug($executeScript . " \"" . $command . "\"");
         return shell_exec($executeScript . " \"" . $command . "\"");
-;    }
+    }
 
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
@@ -43,16 +45,18 @@ class WinRMConnector implements Connector
             . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'" .
             " '$localPath' '$remotePath'";
         shell_exec($receiveFile);
+        Log::debug($receiveFile);
         return true;
     }
 
     public function receiveFile($localPath, $remotePath)
     {
-        $receiveFile = "/usr/bin/python3 /liman/server/storage/winrm/winrm_getfile.py '" . server()->ip_address . "' '" 
+        $receiveFile = "/usr/bin/python3 /liman/server/storage/winrm/winrm_getfile.py '" . server()->ip_address . "' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->id() . server()->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'" .
         " '$remotePath' '$localPath'";
         shell_exec($receiveFile);
+        Log::debug($receiveFile);
         return is_file($localPath);
     }
 
@@ -74,7 +78,7 @@ class WinRMConnector implements Connector
 
     public static function create(Server $server, $username, $password, $user_id, $key)
     {
-        $beforeScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_cert.py before '" . $server->ip_address . "' '$username' '$password' '" 
+        $beforeScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_cert.py before '" . $server->ip_address . "' '$username' '$password' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()). "'";
         $beforeOutput = shell_exec($beforeScript);
@@ -84,7 +88,7 @@ class WinRMConnector implements Connector
             abort(504,($beforeOutput) ? $beforeOutput : "Bir Hata Oluştu.");
         }
 
-    	$runScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_cert.py run '" . $server->ip_address . "' '$username' '$password' '" 
+    	$runScript = "/usr/bin/python3 /liman/server/storage/winrm/winrm_cert.py run '" . $server->ip_address . "' '$username' '$password' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->id()) . "'";
         $output = shell_exec($runScript);
