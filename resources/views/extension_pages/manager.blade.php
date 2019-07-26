@@ -28,10 +28,15 @@
     ])
     @if(env("EXTENSION_DEVELOPER_MODE"))
         @include('l.modal-button',[
-        "class" => "btn-secondary",
-        "target_id" => "extensionExport",
-        "text" => "İndir"
-    ])
+            "class" => "btn-secondary",
+            "target_id" => "extensionExport",
+            "text" => "İndir"
+        ])
+        @include('l.modal-button',[
+            "class" => "btn-secondary",
+            "target_id" => "extensionDebExport",
+            "text" => "Paketle"
+        ])
         @include('l.modal-button',[
             "class" => "btn-info",
             "target_id" => "newExtension",
@@ -91,6 +96,17 @@
     ])
 
     @include('l.modal',[
+        "id"=>"extensionDebExport",
+        "onsubmit" => "downloadDebFile",
+        "title" => "Deb Paketi İndir",
+        "next" => "",
+        "inputs" => [
+            "Eklenti Secin:extension_id" => $input_extensions
+        ],
+        "submit_text" => "Paketi İndir"
+    ])
+
+    @include('l.modal',[
         "id"=>"newExtension",
         "url" => route('extension_new'),
         "title" => "Yeni Eklenti Oluştur",
@@ -116,6 +132,14 @@
         $('input[name=ext_count]').val('{{env('NAV_EXTENSION_HIDE_COUNT', 10)}}');
         function downloadFile(form){
             window.location.assign('/indir/eklenti/' + form.getElementsByTagName('select')[0].value);
+            setTimeout(function(){
+              Swal.close();
+            }, 1000);
+            return false;
+        }
+
+        function downloadDebFile(form){
+            window.location.assign('/indir/eklenti_deb/' + form.getElementsByTagName('select')[0].value);
             setTimeout(function(){
               Swal.close();
             }, 1000);

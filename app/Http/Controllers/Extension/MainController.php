@@ -16,6 +16,9 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
+use App\Classes\Packager\Control\StandardFile;
+use App\Classes\Packager\Packager;
+
 /**
  * Class MainController
  * @package App\Http\Controllers\Extension
@@ -59,6 +62,36 @@ class MainController extends Controller
 
         // Return zip as download and delete it after sent.
         return response()->download($tempPath, extension()->name . "-" . extension()->version . ".lmne")->deleteFileAfterSend();
+    }
+
+    public function download_deb()
+    {
+        $path = env("EXTENSIONS_PATH") . strtolower(extension()->name);
+        $ext_info = json_decode(file_get_contents($path . '/db.json'));
+        $tempPath = "/tmp/" . Str::random();
+        $postInstallPath = "/tmp/" . Str::slug($ext_info->name) . "_postinst.sh";
+        shell_exec("sudo touch ".$postInstallPath);
+        shell_exec("sudo chmod 777 ".$postInstallPath);
+        shell_exec('sudo echo "sudo php /liman/server/artisan activate_extension '.strtolower(extension()->name).'" > '.$postInstallPath);
+        $packageName = $ext_info->name . "-" . $ext_info->version . ".deb";
+        $control = new StandardFile();
+        $control
+            ->setPackageName("liman-".Str::slug($ext_info->name))
+            ->setVersion($ext_info->version)
+            ->setMaintainer($ext_info->publisher, $ext_info->support)
+            ->setProvides("liman-".Str::slug($ext_info->name))
+            ->setDescription($ext_info->name);
+        $packager = new Packager();
+        $packager->setOutputPath($tempPath);
+        $packager->setControl($control);
+        $packager->mount(env("EXTENSIONS_PATH") . strtolower($ext_info->name), env("EXTENSIONS_PATH") . strtolower($ext_info->name));
+        $packager->setPostInstallScript($postInstallPath);
+        $packager->run();
+        shell_exec($packager->build($packageName));
+        system_log(6,"EXTENSION_DEB_DOWNLOAD",[
+            "extension_id" => extension()->id
+        ]);
+        return response()->download($packageName, $packageName)->deleteFileAfterSend();
     }
 
     /**

@@ -16,3 +16,5 @@ Route::post('/ayar/eklenti/yeni/sayfa', 'Extension\MainController@newExtensionPa
 
 // Extension Download Page
 Route::get('/indir/eklenti/{extension_id}', 'Extension\MainController@download')->name('extension_download');
+
+Route::get('/indir/eklenti_deb/{extension_id}', 'Extension\MainController@download_deb')->name('extension_deb_download');
