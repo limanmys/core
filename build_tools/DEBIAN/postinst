@@ -9,7 +9,7 @@ systemctl enable liman-webssh
 systemctl start webssh
 systemctl restart nginx
 systemctl restart php7.3-fpm
-find /liman -type d | grep -v /liman/extensions | while read line ; do chown liman:liman $line; done
+#find /liman -type d | grep -v /liman/extensions | while read line ; do chown liman:liman $line; done
 php /liman/server/artisan migrate --force
 
 printf "\nKurulum Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
