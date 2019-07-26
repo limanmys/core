@@ -88,6 +88,7 @@ class MainController extends Controller
         $packager->setPostInstallScript($postInstallPath);
         $packager->run();
         shell_exec($packager->build($packageName));
+        shell_exec("sudo rm ".$postInstallPath);
         system_log(6,"EXTENSION_DEB_DOWNLOAD",[
             "extension_id" => extension()->id
         ]);
