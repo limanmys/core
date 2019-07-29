@@ -158,7 +158,7 @@ class MainController extends Controller
         $extension_folder = env('EXTENSIONS_PATH') . strtolower($json["name"]);
         $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $new->id;
         file_put_contents($passPath,Str::random(32));
-        shell_exec("sudo chown liman:". $passPath);
+        shell_exec("sudo chown liman:" . clean_score($new->id) . " " . $passPath);
         shell_exec("sudo chmod 640 " . $passPath);
 
         shell_exec("sudo mkdir -p $extension_folder");
@@ -245,7 +245,7 @@ class MainController extends Controller
 
         $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $ext->id;
         file_put_contents($passPath,Str::random(32));
-        shell_exec("sudo chown liman:". $passPath);
+        shell_exec("sudo chown liman:" . clean_score($ext->id) . " " . $passPath);
         shell_exec("sudo chmod 640 " . $passPath);
 
         file_put_contents($folder . DIRECTORY_SEPARATOR . "db.json",json_encode($json));

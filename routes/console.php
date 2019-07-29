@@ -52,7 +52,7 @@ Artisan::command('activate_extension {extension_name}',function ($extension_name
         }
         $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $new->id;
         file_put_contents($passPath,Str::random(32));
-        shell_exec("sudo chown liman:". $passPath);
+        shell_exec("sudo chown liman:" . clean_score($new->id) . " " . $passPath);
         shell_exec("sudo chmod 640 " . $passPath);
 
         shell_exec('sudo chown ' . clean_score($new->id) . ':liman ' . $extension_folder);

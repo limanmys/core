@@ -458,13 +458,16 @@ class OneController extends Controller
                         "updated_at" => Carbon::now(),
                     ]);
                 }else{
+                    $encKey = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                    $encrypted = openssl_encrypt(Str::random(16) . base64_encode(request($key["variable"])),'aes-256-cfb8',$encKey,0,Str::random(16));
+
                     DB::table("user_settings")->insert([
                         "id" => Str::uuid(),
                         "server_id" => server()->id,
                         "extension_id" => extension()->id,
                         "user_id" => auth()->user()->id,
                         "name" => $key["variable"],
-                        "value" => request($key["variable"]),
+                        "value" => $encrypted,
                         "created_at" =>  Carbon::now(),
                         "updated_at" => Carbon::now(),
                     ]);
@@ -593,7 +596,10 @@ class OneController extends Controller
             ]);
             $extensionDb = [];
             foreach ($settings->get() as $setting){
-                $extensionDb[$setting->name] = $setting->value;
+                $key = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                $decrypted = openssl_decrypt($setting->value,'aes-256-cfb8',$key);
+                $stringToDecode = substr($decrypted,16);
+                $extensionDb[$setting->name] = base64_decode($stringToDecode);
             }
         }
 
