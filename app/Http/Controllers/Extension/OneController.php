@@ -528,6 +528,7 @@ class OneController extends Controller
                 $script->delete();
             }
             shell_exec('sudo userdel ' . clean_score(extension()->id));
+            shell_exec('rm ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id);
             extension()->delete();
         }catch (Exception $exception){
         }
