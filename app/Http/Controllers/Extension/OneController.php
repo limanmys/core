@@ -529,10 +529,11 @@ class OneController extends Controller
             }
             shell_exec('sudo userdel ' . clean_score(extension()->id));
             shell_exec('rm ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id);
+            $extension = extension();
             extension()->delete();
         }catch (Exception $exception){
         }
-
+        shell_exec('sudo dpkg --remove liman-' . Str::slug($extension->name));
         system_log(3,"EXTENSION_REMOVE");
         return respond('Eklenti Başarıyla Silindi');
     }

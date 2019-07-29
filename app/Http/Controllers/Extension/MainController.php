@@ -70,9 +70,13 @@ class MainController extends Controller
         $ext_info = json_decode(file_get_contents($path . '/db.json'));
         $tempPath = "/tmp/" . Str::random();
         $postInstallPath = "/tmp/" . Str::slug($ext_info->name) . "_postinst.sh";
+        $preRmPath = "/tmp/" . Str::slug($ext_info->name) . "_prerm.sh";
         shell_exec("sudo touch ".$postInstallPath);
+        shell_exec("sudo touch ".$preRmPath);
         shell_exec("sudo chmod 777 ".$postInstallPath);
-        shell_exec('sudo echo "sudo php /liman/server/artisan activate_extension '.strtolower(extension()->name).'" > '.$postInstallPath);
+        shell_exec("sudo chmod 777 ".$preRmPath);
+        shell_exec('sudo echo "sudo php '.env("SERVER_PATH").'artisan activate_extension '.strtolower(extension()->name).'" > '.$postInstallPath);
+        shell_exec('sudo echo "sudo php '.env("SERVER_PATH").'artisan remove_extension '.strtolower(extension()->name).'" > '.$preRmPath);
         $packageName = $ext_info->name . "-" . $ext_info->version . ".deb";
         $control = new StandardFile();
         $control
@@ -86,9 +90,11 @@ class MainController extends Controller
         $packager->setControl($control);
         $packager->mount(env("EXTENSIONS_PATH") . strtolower($ext_info->name), env("EXTENSIONS_PATH") . strtolower($ext_info->name));
         $packager->setPostInstallScript($postInstallPath);
+        $packager->setPreRemoveScript($preRmPath);
         $packager->run();
         shell_exec($packager->build($packageName));
         shell_exec("sudo rm ".$postInstallPath);
+        shell_exec("sudo rm -rf ".$tempPath);
         system_log(6,"EXTENSION_DEB_DOWNLOAD",[
             "extension_id" => extension()->id
         ]);

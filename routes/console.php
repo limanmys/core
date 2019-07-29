@@ -36,44 +36,60 @@ Artisan::command('administrator',function (){
 })->describe('Create administrator account to use');
 
 Artisan::command('activate_extension {extension_name}',function ($extension_name){
-    $extension_folder = env("EXTENSIONS_PATH").$extension_name;
-    $ext_info = json_decode(file_get_contents($extension_folder . '/db.json'));
-    $extension = Extension::where('name', $ext_info->name)->first();
-    if ($extension) {
-        $new = $extension;
-    } else {
-        $new = new Extension();
-    }
-    $new->fill((array)$ext_info);
-    $new->save();
-    if ((intval(shell_exec("grep -c '^" . clean_score($new->id) . "' /etc/passwd"))) ? false : true) {
-        shell_exec('sudo useradd -r -s /bin/sh ' . clean_score($new->id));
-    }
-    shell_exec('sudo chown ' . clean_score($new->id) . ':liman ' . $extension_folder);
-    shell_exec('sudo chmod 770 ' . $extension_folder);
-    shell_exec("sudo chown -R " . clean_score($new->id) . ':liman "' . $extension_folder. '"');
-    shell_exec("sudo chmod -R 770 \"" . $extension_folder ."\"");
-    shell_exec("sudo chown liman:". clean_score($new->id) . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
-    shell_exec("sudo chmod 640 " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
-    if(is_dir($extension_folder . '/scripts/')){
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($extension_folder . '/scripts/'),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
-    }else {
-        $files = [];
-    }
-    foreach ($files as $file) {
-        if (!$file->isDir()) {
-            if (substr($file->getFilename(), 0, 1) == "." || !Str::endsWith($file->getFilename(), ".lmns")) {
-                continue;
-            }
-            $filePath = $file->getRealPath();
-
-            Script::readFromFile($filePath);
+    try{
+        $extension_folder = env("EXTENSIONS_PATH").$extension_name;
+        $ext_info = json_decode(file_get_contents($extension_folder . '/db.json'));
+        $extension = Extension::where('name', $ext_info->name)->first();
+        if ($extension) {
+            $new = $extension;
+        } else {
+            $new = new Extension();
         }
-    }
-    system_log(3,"EXTENSION_ACTIVATION_SUCCESS",[
-        "extension_id" => $new->id
-    ]);
+        $new->fill((array)$ext_info);
+        $new->save();
+        if ((intval(shell_exec("grep -c '^" . clean_score($new->id) . "' /etc/passwd"))) ? false : true) {
+            shell_exec('sudo useradd -r -s /bin/sh ' . clean_score($new->id));
+        }
+        shell_exec('sudo chown ' . clean_score($new->id) . ':liman ' . $extension_folder);
+        shell_exec('sudo chmod 770 ' . $extension_folder);
+        shell_exec("sudo chown -R " . clean_score($new->id) . ':liman "' . $extension_folder. '"');
+        shell_exec("sudo chmod -R 770 \"" . $extension_folder ."\"");
+        shell_exec("sudo chown liman:". clean_score($new->id) . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
+        shell_exec("sudo chmod 640 " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
+        if(is_dir($extension_folder . '/scripts/')){
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($extension_folder . '/scripts/'),
+                RecursiveIteratorIterator::LEAVES_ONLY
+            );
+        }else {
+            $files = [];
+        }
+        foreach ($files as $file) {
+            if (!$file->isDir()) {
+                if (substr($file->getFilename(), 0, 1) == "." || !Str::endsWith($file->getFilename(), ".lmns")) {
+                    continue;
+                }
+                $filePath = $file->getRealPath();
+    
+                Script::readFromFile($filePath);
+            }
+        }
+        system_log(3,"EXTENSION_ACTIVATION_SUCCESS",[
+            "extension_id" => $new->id
+        ]);
+    }catch (Exception $exception){}
 })->describe('Activate an extension');
+
+Artisan::command('remove_extension {extension_name}',function ($extension_name){
+    $extension_folder = env("EXTENSIONS_PATH").$extension_name;
+    try{
+        $ext_info = json_decode(file_get_contents($extension_folder . '/db.json'));
+        foreach (Script::where('extensions', 'like', strtolower($ext_info->name))->get() as $script) {
+            shell_exec('rm ' . env('SCRIPTS_PATH') . $script->id);
+            $script->delete();
+        }
+        $extension = Extension::where('name', $ext_info->name)->first();
+        shell_exec('sudo userdel ' . clean_score($extension->id));
+        $extension->delete();
+    }catch (Exception $exception){}
+})->describe('Remove an extension');
