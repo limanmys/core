@@ -50,6 +50,11 @@ Artisan::command('activate_extension {extension_name}',function ($extension_name
         if ((intval(shell_exec("grep -c '^" . clean_score($new->id) . "' /etc/passwd"))) ? false : true) {
             shell_exec('sudo useradd -r -s /bin/sh ' . clean_score($new->id));
         }
+        $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $new->id;
+        file_put_contents($passPath,Str::random(32));
+        shell_exec("sudo chown liman:". $passPath);
+        shell_exec("sudo chmod 640 " . $passPath);
+
         shell_exec('sudo chown ' . clean_score($new->id) . ':liman ' . $extension_folder);
         shell_exec('sudo chmod 770 ' . $extension_folder);
         shell_exec("sudo chown -R " . clean_score($new->id) . ':liman "' . $extension_folder. '"');
@@ -89,6 +94,7 @@ Artisan::command('remove_extension {extension_name}',function ($extension_name){
             $script->delete();
         }
         $extension = Extension::where('name', $ext_info->name)->first();
+        shell_exec('rm ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . $extension->id);
         shell_exec('sudo userdel ' . clean_score($extension->id));
         $extension->delete();
     }catch (Exception $exception){}

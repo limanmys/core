@@ -12,9 +12,7 @@
 </ol>
 <button class="btn btn-primary" onclick="history.back()">{{__("Geri Dön")}}</button><br><br>
 @if(!empty($errors) && count($errors))
-    <div class="alert alert-danger" role="alert">
-        {{$errors->getBag('default')->first('message')}}
-    </div>
+    {!! $errors->getBag('default')->first('message') !!}
 @endif
 @if(count($similar))
     <div class="alert alert-info" role="alert">

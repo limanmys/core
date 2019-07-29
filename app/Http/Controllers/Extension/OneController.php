@@ -439,7 +439,7 @@ class OneController extends Controller
                     "server_id" => server()->id,
                     "city" => server()->city
                 ]))->withInput()->withErrors([
-                    "message" => __("Eklenti Ayarlarınız Doğrulanamadı.")
+                    "message" => $output
                 ]);
             }
         }
@@ -529,11 +529,11 @@ class OneController extends Controller
             }
             shell_exec('sudo userdel ' . clean_score(extension()->id));
             shell_exec('rm ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id);
-            $extension = extension();
+            shell_exec('sudo dpkg --remove liman-' . Str::slug(extension()->name));
             extension()->delete();
         }catch (Exception $exception){
         }
-        shell_exec('sudo dpkg --remove liman-' . Str::slug($extension->name));
+
         system_log(3,"EXTENSION_REMOVE");
         return respond('Eklenti Başarıyla Silindi');
     }
@@ -581,9 +581,9 @@ class OneController extends Controller
 
         $combinerFile = env('SANDBOX_PATH') . "index.php";
 
-        $server = str_replace('"', '*m*', json_encode($serverObj->toArray()));
+        $server = json_encode($serverObj->toArray());
 
-        $extension = str_replace('"', '*m*', json_encode($extensionObj));
+        $extension = json_encode($extensionObj);
 
         if($extensionDb == null){
             $settings = DB::table("user_settings")->where([
@@ -597,9 +597,9 @@ class OneController extends Controller
             }
         }
 
-        $extensionDb = str_replace('"', '*m*', json_encode($extensionDb));
+        $extensionDb = json_encode($extensionDb);
 
-        $outputsJson = str_replace('"', '*m*', json_encode($outputs));
+        $outputsJson = json_encode($outputs);
 
         $request = request()->all();
         unset($request["permissions"]);
@@ -607,7 +607,7 @@ class OneController extends Controller
         unset($request["server"]);
         unset($request["script"]);
         unset($request["server_id"]);
-        $request = str_replace('"', '*m*', json_encode($request));
+        $request = json_encode($request);
 
         $apiRoute = route('extension_function_api', [
             "extension_id" => extension()->id,
@@ -629,16 +629,19 @@ class OneController extends Controller
             for($i = 0 ;$i< count($permissions); $i++){
                 $permissions[$i] = explode('_',$permissions[$i])[1];
             }
-            $permissions = str_replace('"', '*m*', json_encode($permissions));
+            $permissions = json_encode($permissions);
         }else{
             $permissions = "admin";
         }
-
+        $array = [$functions,strtolower(extension()->name),
+            $viewName,$server,$extension,$extensionDb,$outputsJson,$request,$functionName,
+            $apiRoute,$navigationRoute,$token,$extension_id,$permissions];
+        $encrypted = openssl_encrypt(Str::random() . base64_encode(json_encode($array)),
+            'aes-256-cfb8',shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
+            0,Str::random());
+        $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
         $command = "sudo runuser " . clean_score(extension()->id) .
-            " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $functions "
-            . strtolower(extension()->name) .
-            " $viewName \"$server\" \"$extension\" \"$extensionDb\" \"$outputsJson\" \"$request\" \"$functionName\" \"$apiRoute\" \"$navigationRoute\" \"$token\" \"$extension_id\" \"$permissions\"'";
-
+            " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
         return $command;
     }
 }

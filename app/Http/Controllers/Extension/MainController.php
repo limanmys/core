@@ -156,7 +156,11 @@ class MainController extends Controller
         }
 
         $extension_folder = env('EXTENSIONS_PATH') . strtolower($json["name"]);
-        file_put_contents(env('KEYS_PATH') . DIRECTORY_SEPARATOR . $new->id,Str::random(32));
+        $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $new->id;
+        file_put_contents($passPath,Str::random(32));
+        shell_exec("sudo chown liman:". $passPath);
+        shell_exec("sudo chmod 640 " . $passPath);
+
         shell_exec("sudo mkdir -p $extension_folder");
 
         shell_exec("sudo cp -r " . $path . "/* " . $extension_folder . DIRECTORY_SEPARATOR);
@@ -238,7 +242,12 @@ class MainController extends Controller
         shell_exec("mkdir " . $folder . DIRECTORY_SEPARATOR . "scripts");
 
         touch($folder . DIRECTORY_SEPARATOR . "db.json");
-        file_put_contents(env('KEYS_PATH') . DIRECTORY_SEPARATOR . $ext->id,Str::random(32));
+
+        $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $ext->id;
+        file_put_contents($passPath,Str::random(32));
+        shell_exec("sudo chown liman:". $passPath);
+        shell_exec("sudo chmod 640 " . $passPath);
+
         file_put_contents($folder . DIRECTORY_SEPARATOR . "db.json",json_encode($json));
 
         if ((intval(shell_exec("grep -c '^" . clean_score($ext->id) . "' /etc/passwd"))) ? false : true) {
