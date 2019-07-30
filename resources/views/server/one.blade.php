@@ -260,6 +260,15 @@
             ],
             "submit_text" => "Ekle"
         ])
+    @else
+        <script>
+        $("button[data-target='#install_extension']").click(function(){
+            Swal.fire({
+                type: 'error',
+                title: '{{__('Bu sunucu zaten tüm eklentilere sahip.')}}'
+            });
+        });
+        </script>
     @endif
     <script>
         function checkStatus(id) {
@@ -415,8 +424,42 @@
                 terminalFrame.attr("src", "{{route('server_terminal',["server_id" => $server->id])}}");
             }
         }
+        function removeExtension(){
+            let data = [];
+            let table = $("#installed_extensions").DataTable();
+            table.rows( { selected: true } ).data().each(function(element){
+                data.push(element[4]);
+            });
+            if(data.length === 0){
+                Swal.fire({
+                    type: 'error',
+                    title: 'Lütfen önce seçim yapınız.'
+                });
+                return false;
+            }
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false,
+            });
 
-        function removeExtension() {
+            swalWithBootstrapButtons.fire({
+                title: '{{__('Emin misiniz?')}}',
+                text: '{{__('Bu işlem geri alınamayacaktır!')}}',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '{{__('Evet, yine de sil.')}}',
+                cancelButtonText: '{{__('İptal')}}',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    removeExtensionFunc();
+                }
+            });
+        }
+        function removeExtensionFunc() {
           let data = [];
           let table = $("#installed_extensions").DataTable();
           table.rows( { selected: true } ).data().each(function(element){
