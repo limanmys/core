@@ -1,4 +1,4 @@
-sudo mkdir -p /liman/{server,certs,logs,database,sandbox,keys,scripts,extensions}
+sudo mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions}
 sudo mkdir -p /liman/keys/{windows,linux}
 
 sudo useradd liman -m

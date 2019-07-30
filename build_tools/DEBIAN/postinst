@@ -3,14 +3,13 @@ chmod -R o+xr /liman/sandbox
 chmod o+x /liman/extensions
 
 mv /liman/server/nginx.conf /etc/nginx/sites-available/liman.conf
-mv /liman/webssh/liman-webssh.service /etc/systemd/system/liman-webssh.service
 
-systemctl enable liman-webssh
-systemctl start webssh
 systemctl restart nginx
 systemctl restart php7.3-fpm
-#find /liman -type d | grep -v /liman/extensions | while read line ; do chown liman:liman $line; done
 php /liman/server/artisan migrate --force
-
+chown -R liman:liman /liman/{server,database,certs,keys/windows,keys/linux,sandbox,logs}
+chmod 700 -R /liman/{server,database,certs,keys/windows,keys/linux,logs}
+chmod 755 -R /liman/sandbox
+chmod 755 /liman/keys
 printf "\nKurulum Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
 echo "sudo runuser liman -c \"php /liman/server/artisan administrator\""
