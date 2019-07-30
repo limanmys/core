@@ -178,7 +178,10 @@ if (!function_exists('extensionDb')) {
             "name" => $key
         ])->first();
         if($target){
-            return $target->value;
+            $key = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+            $decrypted = openssl_decrypt($target->value,'aes-256-cfb8',$key);
+            $stringToDecode = substr($decrypted,16);
+            return base64_decode($stringToDecode);
         }
         return null;
     }

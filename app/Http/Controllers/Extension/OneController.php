@@ -453,8 +453,10 @@ class OneController extends Controller
             ]);
             if(request($key["variable"])){
                 if($row->exists()){
+                    $encKey = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                    $encrypted = openssl_encrypt(Str::random(16) . base64_encode(request($key["variable"])),'aes-256-cfb8',$encKey,0,Str::random(16));
                     $row->update([
-                        "value" => request($key["variable"]),
+                        "value" => $encrypted,
                         "updated_at" => Carbon::now(),
                     ]);
                 }else{
@@ -503,12 +505,17 @@ class OneController extends Controller
             }
             $obj = DB::table("user_settings")->where([
                 "user_id" => auth()->user()->id,
-                "name" => $item["variable"]
+                "name" => $item["variable"],
+                "server_id" => server()->id
             ])->first();
             if($obj){
-                $similar[$item["variable"]] = $obj->value;
+                $key = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                $decrypted = openssl_decrypt($obj->value,'aes-256-cfb8',$key);
+                $stringToDecode = substr($decrypted,16);
+                $similar[$item["variable"]] = base64_decode($stringToDecode);
             }
         }
+
         return response()->view('extension_pages.setup', [
             'extension' => $extension,
             'similar' => $similar
