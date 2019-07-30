@@ -1,3 +1,4 @@
+#!/bin/bash
 chmod o+xr /liman/
 chmod -R o+xr /liman/sandbox
 chmod o+x /liman/extensions
