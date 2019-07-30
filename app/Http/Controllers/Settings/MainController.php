@@ -206,10 +206,9 @@ class MainController extends Controller
             "certs" => "0700",
             "database" => "0700",
             "extensions" => "0755",
-            "keys" => "0700",
+            "keys" => "0755",
             "logs" => "0700",
-            "sandbox" => "0744",
-            "webssh" => "0700",
+            "sandbox" => "0755",
             "server" => "0700"
         ];
         $messages = [];
@@ -232,7 +231,12 @@ class MainController extends Controller
                 "message" => "'/liman/$item' dosyasina izin verilmiyor."
             ]);
         }
-
+        if(empty($messages)){
+            array_push($messages,[
+                "type" => "success",
+                "message" => "Herşey Yolunda!"
+            ]);
+        }
         return respond($messages,200);
     }
 }

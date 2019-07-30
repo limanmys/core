@@ -439,7 +439,7 @@ class OneController extends Controller
                     "server_id" => server()->id,
                     "city" => server()->city
                 ]))->withInput()->withErrors([
-                    "message" => __("Eklenti Ayarlarınız Doğrulanamadı.")
+                    "message" => $output
                 ]);
             }
         }
@@ -453,18 +453,23 @@ class OneController extends Controller
             ]);
             if(request($key["variable"])){
                 if($row->exists()){
+                    $encKey = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                    $encrypted = openssl_encrypt(Str::random(16) . base64_encode(request($key["variable"])),'aes-256-cfb8',$encKey,0,Str::random(16));
                     $row->update([
-                        "value" => request($key["variable"]),
+                        "value" => $encrypted,
                         "updated_at" => Carbon::now(),
                     ]);
                 }else{
+                    $encKey = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                    $encrypted = openssl_encrypt(Str::random(16) . base64_encode(request($key["variable"])),'aes-256-cfb8',$encKey,0,Str::random(16));
+
                     DB::table("user_settings")->insert([
                         "id" => Str::uuid(),
                         "server_id" => server()->id,
                         "extension_id" => extension()->id,
                         "user_id" => auth()->user()->id,
                         "name" => $key["variable"],
-                        "value" => request($key["variable"]),
+                        "value" => $encrypted,
                         "created_at" =>  Carbon::now(),
                         "updated_at" => Carbon::now(),
                     ]);
@@ -500,12 +505,17 @@ class OneController extends Controller
             }
             $obj = DB::table("user_settings")->where([
                 "user_id" => auth()->user()->id,
-                "name" => $item["variable"]
+                "name" => $item["variable"],
+                "server_id" => server()->id
             ])->first();
             if($obj){
-                $similar[$item["variable"]] = $obj->value;
+                $key = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                $decrypted = openssl_decrypt($obj->value,'aes-256-cfb8',$key);
+                $stringToDecode = substr($decrypted,16);
+                $similar[$item["variable"]] = base64_decode($stringToDecode);
             }
         }
+
         return response()->view('extension_pages.setup', [
             'extension' => $extension,
             'similar' => $similar
@@ -528,11 +538,12 @@ class OneController extends Controller
                 $script->delete();
             }
             shell_exec('sudo userdel ' . clean_score(extension()->id));
-            $extension = extension();
+            shell_exec('rm ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id);
+            shell_exec('sudo dpkg --remove liman-' . Str::slug(extension()->name));
             extension()->delete();
         }catch (Exception $exception){
         }
-        shell_exec('sudo dpkg --remove liman-' . Str::slug($extension->name));
+
         system_log(3,"EXTENSION_REMOVE");
         return respond('Eklenti Başarıyla Silindi');
     }
@@ -580,9 +591,9 @@ class OneController extends Controller
 
         $combinerFile = env('SANDBOX_PATH') . "index.php";
 
-        $server = str_replace('"', '*m*', json_encode($serverObj->toArray()));
+        $server = json_encode($serverObj->toArray());
 
-        $extension = str_replace('"', '*m*', json_encode($extensionObj));
+        $extension = json_encode($extensionObj);
 
         if($extensionDb == null){
             $settings = DB::table("user_settings")->where([
@@ -592,13 +603,16 @@ class OneController extends Controller
             ]);
             $extensionDb = [];
             foreach ($settings->get() as $setting){
-                $extensionDb[$setting->name] = $setting->value;
+                $key = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                $decrypted = openssl_decrypt($setting->value,'aes-256-cfb8',$key);
+                $stringToDecode = substr($decrypted,16);
+                $extensionDb[$setting->name] = base64_decode($stringToDecode);
             }
         }
 
-        $extensionDb = str_replace('"', '*m*', json_encode($extensionDb));
+        $extensionDb = json_encode($extensionDb);
 
-        $outputsJson = str_replace('"', '*m*', json_encode($outputs));
+        $outputsJson = json_encode($outputs);
 
         $request = request()->all();
         unset($request["permissions"]);
@@ -606,7 +620,7 @@ class OneController extends Controller
         unset($request["server"]);
         unset($request["script"]);
         unset($request["server_id"]);
-        $request = str_replace('"', '*m*', json_encode($request));
+        $request = json_encode($request);
 
         $apiRoute = route('extension_function_api', [
             "extension_id" => extension()->id,
@@ -628,16 +642,19 @@ class OneController extends Controller
             for($i = 0 ;$i< count($permissions); $i++){
                 $permissions[$i] = explode('_',$permissions[$i])[1];
             }
-            $permissions = str_replace('"', '*m*', json_encode($permissions));
+            $permissions = json_encode($permissions);
         }else{
             $permissions = "admin";
         }
-
+        $array = [$functions,strtolower(extension()->name),
+            $viewName,$server,$extension,$extensionDb,$outputsJson,$request,$functionName,
+            $apiRoute,$navigationRoute,$token,$extension_id,$permissions];
+        $encrypted = openssl_encrypt(Str::random() . base64_encode(json_encode($array)),
+            'aes-256-cfb8',shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
+            0,Str::random());
+        $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
         $command = "sudo runuser " . clean_score(extension()->id) .
-            " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $functions "
-            . strtolower(extension()->name) .
-            " $viewName \"$server\" \"$extension\" \"$extensionDb\" \"$outputsJson\" \"$request\" \"$functionName\" \"$apiRoute\" \"$navigationRoute\" \"$token\" \"$extension_id\" \"$permissions\"'";
-
+            " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
         return $command;
     }
 }

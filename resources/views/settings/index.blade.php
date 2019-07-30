@@ -11,7 +11,7 @@
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#users" data-toggle="tab" aria-expanded="true">{{__("Kullanıcı Ayarları")}}</a></li>
-            <li><a href="#server" data-toggle="tab" aria-expanded="false">{{__("Sunucu Ayarları")}}</a></li>
+{{--            <li><a href="#server" data-toggle="tab" aria-expanded="false">{{__("Sunucu Ayarları")}}</a></li>--}}
             <li><a href="#health" onclick="checkHealth()" data-toggle="tab" aria-expanded="false">{{__("Sağlık Durumu")}}</a></li>
         </ul>
         <div class="tab-content">

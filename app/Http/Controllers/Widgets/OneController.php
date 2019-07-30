@@ -10,6 +10,7 @@ use App\Widget;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class OneController extends Controller
 {
@@ -83,7 +84,7 @@ class OneController extends Controller
         return $extension["widgets"];
     }
 
-    private function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_id, $outputs, $viewName, $functionName)
+    private function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_id, $outputs, $viewName, $functionName,$extensionDb = null)
     {
         if(!$extension_id){
             $extension_id = extension()->id;
@@ -92,23 +93,27 @@ class OneController extends Controller
 
         $combinerFile = env('SANDBOX_PATH') . "index.php";
 
-        $server = str_replace('"', '*m*', json_encode($serverObj->toArray()));
+        $server = json_encode($serverObj->toArray());
 
-        $extension = str_replace('"', '*m*', json_encode($extensionObj));
+        $extension = json_encode($extensionObj);
 
-        $settings = DB::table("user_settings")->where([
-            "user_id" => $user_id,
-            "server_id" => server()->id,
-            "extension_id" => extension()->id
-        ]);
-        $extensionDb = [];
-        foreach ($settings->get() as $setting){
-            $extensionDb[$setting->name] = $setting->value;
+        if($extensionDb == null){
+            $settings = DB::table("user_settings")->where([
+                "user_id" => $user_id,
+                "server_id" => server()->id,
+                "extension_id" => extension()->id
+            ]);
+            $extensionDb = [];
+            foreach ($settings->get() as $setting){
+                $key = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                $decrypted = openssl_decrypt(Str::random() . $setting->value,'aes-256-cfb8',$key);
+                $extensionDb[$setting->name] = substr($decrypted,16);
+            }
         }
 
-        $extensionDb = str_replace('"', '*m*', json_encode($extensionDb));
+        $extensionDb = json_encode($extensionDb);
 
-        $outputsJson = str_replace('"', '*m*', json_encode($outputs));
+        $outputsJson = json_encode($outputs);
 
         $request = request()->all();
         unset($request["permissions"]);
@@ -116,7 +121,7 @@ class OneController extends Controller
         unset($request["server"]);
         unset($request["script"]);
         unset($request["server_id"]);
-        $request = str_replace('"', '*m*', json_encode($request));
+        $request = json_encode($request);
 
         $apiRoute = route('extension_function_api', [
             "extension_id" => extension()->id,
@@ -130,24 +135,27 @@ class OneController extends Controller
             "unique_code" => ""
         ]);
 
+        $token = Token::create($user_id);
+
         if(!auth()->user()->isAdmin()){
             $permissions = Permission::where('user_id',auth()->user()->id)
                 ->where('function','like',strtolower(extension()->name). '%')->pluck('function')->toArray();
             for($i = 0 ;$i< count($permissions); $i++){
                 $permissions[$i] = explode('_',$permissions[$i])[1];
             }
-            $permissions = str_replace('"', '*m*', json_encode($permissions));
+            $permissions = json_encode($permissions);
         }else{
             $permissions = "admin";
         }
-        
-        $token = Token::create($user_id);
-
+        $array = [$functions,strtolower(extension()->name),
+            $viewName,$server,$extension,$extensionDb,$outputsJson,$request,$functionName,
+            $apiRoute,$navigationRoute,$token,$extension_id,$permissions];
+        $encrypted = openssl_encrypt(Str::random() . base64_encode(json_encode($array)),
+            'aes-256-cfb8',shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
+            0,Str::random());
+        $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
         $command = "sudo runuser " . clean_score(extension()->id) .
-            " -c 'timeout 5 /usr/bin/php -d display_errors=on $combinerFile $functions "
-            . strtolower(extension()->name) .
-            " $viewName \"$server\" \"$extension\" \"$extensionDb\" \"$outputsJson\" \"$request\" \"$functionName\" \"$apiRoute\" \"$navigationRoute\" \"$token\" \"$extension_id\" \"$permissions\"'";
-
+            " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
         return $command;
     }
 

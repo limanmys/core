@@ -30,14 +30,10 @@
                     <li class=""><a href="#packagesTab" onclick="getPackages()" data-toggle="tab"
                                     aria-expanded="false">{{__("Paketler")}}</a></li>
                 @endif
-                <li class=""><a href="#filesTab" data-toggle="tab" aria-expanded="false">{{__("Dosya Transferi")}}</a>
-                </li>
-                <li class=""><a href="#updatesTab" data-toggle="tab" aria-expanded="false">{{__("Güncellemeler")}}</a>
-                </li>
-            @endif
-            @if(server()->type == "linux_ssh")
-                <li class=""><a href="#terminalTab" onclick="openTerminal()" data-toggle="tab"
-                                aria-expanded="false">{{__("Terminal")}}</a></li>
+{{--                <li class=""><a href="#filesTab" data-toggle="tab" aria-expanded="false">{{__("Dosya Transferi")}}</a>--}}
+{{--                </li>--}}
+{{--                <li class=""><a href="#updatesTab" data-toggle="tab" aria-expanded="false">{{__("Güncellemeler")}}</a>--}}
+{{--                </li>--}}
             @endif
             <li class=""><a href="#settingsTab" data-toggle="tab" aria-expanded="false">{{__("Ayarlar")}}</a></li>
             @if(server()->type == "linux" || server()->type == "windows")
