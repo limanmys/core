@@ -37,8 +37,8 @@ class UpdateExtensionSettings extends Migration
             // If not, encrypt and update table value.
             $encrypted = openssl_encrypt(Str::random(16) . base64_encode($setting->value),
                 'aes-256-cfb8',$key,0,Str::random(16));
-            $setting->update([
-                "value" => base64_decode($encrypted)
+            DB::table('user_settings')->where('id',$setting->id)->update([
+                "value" => $encrypted
             ]);
         }
     }
