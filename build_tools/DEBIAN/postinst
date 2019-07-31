@@ -69,12 +69,11 @@ php /liman/server/artisan migrate --force
 
 # Set Permissions
 chown -R liman:liman /liman/{server,database,certs,keys/windows,keys/linux,sandbox,logs}
+chown
 chmod 700 -R /liman/{server,database,certs,keys/windows,keys/linux,logs}
 chmod 755 -R /liman/sandbox
-chmod 755 /liman
-chmod 755 /liman/extensions
-chmod 755 /liman/keys
-
+chown liman:liman /{liman,liman/extensions,liman/keys}
+chmod 755 /{liman,liman/extensions,liman/keys}
 #Finalize Installation
 printf "\nKurulum Başarıyla Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
 printf "sudo runuser liman -c \"php /liman/server/artisan administrator\"\n\n\n"
