@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Create Required Folders for Liman
 mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions}
 mkdir -p /liman/keys/{windows,linux}
 
@@ -39,30 +40,39 @@ else
     chmod 700 /liman/database/liman.sqlite
 fi
 
+# Update Php and Fpm to run as liman user.
 sed -i "s/www-data/liman/g" /etc/php/7.3/fpm/pool.d/www.conf
 sed -i "s/www-data/liman/g" /etc/nginx/nginx.conf
 
 # Ldap Setting
-if [ ! -z $(grep "TLS_REQCERT" "/etc/ldap/ldap.conf") ]; then 
-    echo "FOUND"; 
+if grep --quiet TLS_REQCERT /etc/ldap/ldap.conf; then
+    echo "LDAP settings are ok."; 
 else
     sudo echo "TLS_REQCERT     never" | sudo tee --append /etc/ldap/ldap.conf
 fi
 
-mv /liman/server/nginx.conf /etc/nginx/sites-available/liman.conf
-ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
+# Nginx Settings
+if [ -f "/etc/nginx/sites-available/liman.conf" ]; then
+    echo "Nginx settings found."
+else
+    mv /liman/server/nginx.conf /etc/nginx/sites-available/liman.conf
+    ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
+fi
 
+# Restart and enable services.
 systemctl restart nginx
 systemctl enable nginx
 systemctl restart php7.3-fpm
+
+# Run Database Migration
 php /liman/server/artisan migrate --force
+
+# Set Permissions
 chown -R liman:liman /liman/{server,database,certs,keys/windows,keys/linux,sandbox,logs}
 chmod 700 -R /liman/{server,database,certs,keys/windows,keys/linux,logs}
 chmod 755 -R /liman/sandbox
-chmod 755 /liman
-chmod 755 /liman/extensions
-chmod 755 /liman/keys
-systemctl restart nginx
-systemctl enable nginx
-printf "\nKurulum Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
-echo "sudo runuser liman -c \"php /liman/server/artisan administrator\""
+chmod 755 /{liman,liman/extensions,liman/keys}
+
+#Finalize Installation
+printf "\nKurulum Başarıyla Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
+printf "sudo runuser liman -c \"php /liman/server/artisan administrator\"\n\n\n"
