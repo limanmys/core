@@ -163,8 +163,8 @@ class SettingsController extends Controller
                             break;
                         case "views":
                             rename(env(
-                                'EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR . request('name_old') . '.blade.php',
-                                env('EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR . request('name') . '.blade.php');
+                                'EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR . "views" . DIRECTORY_SEPARATOR. request('name_old') . '.blade.php',
+                                env('EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR .  "views" . DIRECTORY_SEPARATOR .request('name') . '.blade.php');
                             $values[$key]["scripts"] = request('scripts');
                             $values[$key]["name"] = request('name');
                             break;
