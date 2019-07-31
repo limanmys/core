@@ -77,7 +77,7 @@ class WinRMConnector implements Connector
     {
         $path = "/liman/server/storage/winrm/winrm_verify";
         shell_exec("sudo chmod +x $path");
-        $command = "timeout 5 $path '". $ip_address . "' '" . $username . "' '" . $password . "'");
+        $command = "timeout 5 $path '". $ip_address . "' '" . $username . "' '" . $password . "'";
         if(shell_exec($command) == "OK\n"){
             return respond("Kullanıcı adı ve şifre doğrulandı.",200);
         }else{
