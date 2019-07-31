@@ -59,6 +59,7 @@ php /liman/server/artisan migrate --force
 chown -R liman:liman /liman/{server,database,certs,keys/windows,keys/linux,sandbox,logs}
 chmod 700 -R /liman/{server,database,certs,keys/windows,keys/linux,logs}
 chmod 755 -R /liman/sandbox
+chmod 777 /liman/extensions
 chmod 755 /liman/keys
 systemctl restart nginx
 systemctl enable nginx
