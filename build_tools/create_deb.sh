@@ -15,10 +15,11 @@ Version: $1
 Installed-Size: 29892
 Maintainer: Mert ÇELEN <mcelen@havelsan.com.tr>
 Section: admin
+Date : $1
 Architecture: amd64
 Priority: important
 Description: Liman System Manager
-Pre-Depends: apt-transport-https, ca-certificates, dirmngr, unzip, zip, dnsutils, nginx, php7.3-fpm, php7.3, php7.3-sqlite, php7.3-ldap, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-ssh2
+Depends: zip, unzip, dnsutils, nginx, php7.3-fpm, php7.3, php7.3-sqlite, php7.3-ldap, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-ssh2zip
 """ > DEBIAN/control
 
 cd ../
