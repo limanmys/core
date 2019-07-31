@@ -69,7 +69,6 @@ php /liman/server/artisan migrate --force
 
 # Set Permissions
 chown -R liman:liman /liman/{server,database,certs,keys/windows,keys/linux,sandbox,logs}
-chown
 chmod 700 -R /liman/{server,database,certs,keys/windows,keys/linux,logs}
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
