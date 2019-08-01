@@ -211,7 +211,7 @@ class SettingsController extends Controller
                     "scripts" => request('scripts'),
                     "name" => request('name'),
                 ]);
-                $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/' . request('name') . '.blade.php';
+                $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . request('name') . '.blade.php';
 
                 if(!is_file($file)){
                     touch($file);
