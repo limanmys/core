@@ -261,7 +261,7 @@
         $("button[data-target='#install_extension']").click(function(){
             Swal.fire({
                 type: 'error',
-                title: '{{__('Bu sunucu zaten tüm eklentilere sahip.')}}'
+                title: '{{__('Seçilebilir herhangi bir eklenti bulunmamaktadır!')}}'
             });
         });
         </script>
