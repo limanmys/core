@@ -94,6 +94,7 @@ class MainController extends Controller
         $packager->run();
         shell_exec($packager->build($packageName));
         shell_exec("sudo rm ".$postInstallPath);
+        shell_exec("sudo rm ".$preRmPath);
         shell_exec("sudo rm -rf ".$tempPath);
         system_log(6,"EXTENSION_DEB_DOWNLOAD",[
             "extension_id" => extension()->id
