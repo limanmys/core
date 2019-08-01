@@ -244,22 +244,22 @@ class MainController extends Controller
 
         touch($folder . DIRECTORY_SEPARATOR . "db.json");
 
-        $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $ext->id;
-        file_put_contents($passPath,Str::random(32));
-        shell_exec("sudo chown liman:" . clean_score($ext->id) . " " . $passPath);
-        shell_exec("sudo chmod 640 " . $passPath);
-
         file_put_contents($folder . DIRECTORY_SEPARATOR . "db.json",json_encode($json));
 
         if ((intval(shell_exec("grep -c '^" . clean_score($ext->id) . "' /etc/passwd"))) ? false : true) {
             shell_exec('sudo useradd -r -s /bin/sh ' . clean_score($ext->id));
         }
 
+        $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $ext->id;
+        file_put_contents($passPath,Str::random(32));
+        shell_exec("sudo chown liman:" . clean_score($ext->id) . " " . $passPath);
+        shell_exec("sudo chmod 640 " . $passPath);
+
         touch($folder . '/views/index.blade.php');
         touch($folder . '/views/functions.php');
 
         shell_exec('sudo chown -R ' . clean_score($ext->id) . ':liman ' . $folder);
-        shell_exec('sudo chmod 770 ' . $folder);
+        shell_exec('sudo chmod -R 770 ' . $folder);
 
         shell_exec("sudo chown liman:". clean_score($ext->id) . " " . $folder . DIRECTORY_SEPARATOR . "db.json");
         shell_exec("sudo chmod 640 " . $folder . DIRECTORY_SEPARATOR . "db.json");

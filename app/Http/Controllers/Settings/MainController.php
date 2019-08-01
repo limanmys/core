@@ -209,7 +209,9 @@ class MainController extends Controller
             "keys" => "0755",
             "logs" => "0700",
             "sandbox" => "0755",
-            "server" => "0700"
+            "server" => "0700",
+            "keys/linux" => "0700",
+            "keys/windows" => "0700"
         ];
         $messages = [];
 

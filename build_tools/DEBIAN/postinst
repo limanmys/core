@@ -1,16 +1,78 @@
 #!/bin/bash
-chmod o+xr /liman/
-chmod -R o+xr /liman/sandbox
-chmod o+x /liman/extensions
 
-mv /liman/server/nginx.conf /etc/nginx/sites-available/liman.conf
+# Create Required Folders for Liman
+mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions}
+mkdir -p /liman/keys/{windows,linux}
 
+# User Creation
+if getent passwd liman > /dev/null 2>&1; then
+    echo "Liman User Found."
+else
+    useradd liman -m
+    mkdir /home/liman
+    chmod -R o= /liman /home/liman
+    chown -R liman:liman /liman /home/liman
+    echo "liman     ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
+    echo "Liman User Created"
+fi
+
+# Certificate Creation
+if [ -f "/liman/certs/liman.crt" ]; then
+    echo "SSL Certificate Found."
+else
+    openssl req \
+        -new \
+        -newkey rsa:4096 \
+        -days 365 \
+        -nodes \
+        -x509 \
+        -subj "/C=TR/ST=Ankara/L=Merkez/O=Havelsan/CN=liman" \
+        -keyout /liman/certs/liman.key \
+        -out /liman/certs/liman.crt
+    echo "SSL Certificate Created"
+fi
+
+# Database Creation
+if [ -f "/liman/database/liman.sqlite" ]; then
+    echo "Database file found."
+else
+    touch /liman/database/liman.sqlite
+    chmod 700 /liman/database/liman.sqlite
+fi
+
+# Update Php and Fpm to run as liman user.
+sed -i "s/www-data/liman/g" /etc/php/7.3/fpm/pool.d/www.conf
+sed -i "s/www-data/liman/g" /etc/nginx/nginx.conf
+
+# Ldap Setting
+if grep --quiet TLS_REQCERT /etc/ldap/ldap.conf; then
+    echo "LDAP settings are ok."; 
+else
+    sudo echo "TLS_REQCERT     never" | sudo tee --append /etc/ldap/ldap.conf
+fi
+
+# Nginx Settings
+if [ -f "/etc/nginx/sites-available/liman.conf" ]; then
+    echo "Nginx settings found."
+else
+    mv /liman/server/nginx.conf /etc/nginx/sites-available/liman.conf
+    ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
+fi
+
+# Restart and enable services.
 systemctl restart nginx
+systemctl enable nginx
 systemctl restart php7.3-fpm
+
+# Run Database Migration
 php /liman/server/artisan migrate --force
+
+# Set Permissions
 chown -R liman:liman /liman/{server,database,certs,keys/windows,keys/linux,sandbox,logs}
 chmod 700 -R /liman/{server,database,certs,keys/windows,keys/linux,logs}
 chmod 755 -R /liman/sandbox
-chmod 755 /liman/keys
-printf "\nKurulum Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
-echo "sudo runuser liman -c \"php /liman/server/artisan administrator\""
+chown liman:liman /{liman,liman/extensions,liman/keys}
+chmod 755 /{liman,liman/extensions,liman/keys}
+#Finalize Installation
+printf "\nKurulum Başarıyla Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
+printf "sudo runuser liman -c \"php /liman/server/artisan administrator\"\n\n\n"
