@@ -59,7 +59,7 @@
                                     <h4>{{__("Sunucunuzun Portu")}}</h4>
                                     <h6>{{__("Sunucunuzun açık olup olmadığını algılamak için kontrol edilebilecek bir port girin.")}}</h6>
                                     <pre>{{__("SSH : 22\nWinRM : 5986\nActive Directory, Samba : 636")}}</pre>
-                                    <input id="serverControlPort" type="number" name="port" class="form-control" placeholder="{{__("Sunucunuzun Hostname yada IP Adresini girin.")}}" required min="1">
+                                    <input id="serverControlPort" type="number" name="port" class="form-control" placeholder="{{__("Kontrol Portu Girin (Yalnızca Sayı).")}}" required min="1">
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn-primary">{{__("Bağlantıyı Kontrol Et")}}</button>

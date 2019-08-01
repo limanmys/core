@@ -13,8 +13,7 @@ certPassword = sys.argv[4]
 source = sys.argv[5]
 destination = sys.argv[6]
 
-process = subprocess.Popen(("openssl rsa -in %s -out %s -passin pass:%s -passout pass:\"\"" % (keyPath, "/tmp/temp.pem",certPassword)).split(),stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-poutput, perror = process.communicate()
+os.system("openssl rsa -in %s -out %s -passin pass:%s -passout pass:\"\"" % (keyPath, "/tmp/temp.pem",certPassword))
 
 try:
     client = Client(ip, auth="certificate", certificate_key_pem="/tmp/temp.pem", certificate_pem=certPath,

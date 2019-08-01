@@ -239,25 +239,25 @@ class OneController extends Controller
     {
         if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
             system_log(5,"EXTENSION_INTERNAL_NO_PERMISSION",[
-                "extension_id" => extension()->_id,
+                "extension_id" => extension()->id,
             ]);
             abort(403, 'Not Allowed');
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
-        if (!Permission::can($token->user_id, 'server', $server->_id)) {
+        if (!Permission::can($token->user_id, 'server', $server->id)) {
             system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
-                "extension_id" => extension()->_id,
+                "extension_id" => extension()->id,
                 "server_id" => request('server_id')
             ]);
             return "Sunucu icin yetkiniz yok.";
         }
 
         $extension = Extension::find(request('extension_id')) or abort(404, 'Eklenti Bulunamadi');
-        if (!Permission::can($token->user_id, 'extension', $extension->_id)) {
+        if (!Permission::can($token->user_id, 'extension', $extension->id)) {
             system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
-                "extension_id" => extension()->_id,
+                "extension_id" => extension()->id,
                 "server_id" => request('server_id')
             ]);
             return "Eklenti icin yetkiniz yok.";
@@ -265,19 +265,19 @@ class OneController extends Controller
 
         if (!Permission::can($token->user_id, "function", strtolower(extension()->name) . "_" . strtolower(request('target')))) {
             system_log(7,"EXTENSION_NO_PERMISSION",[
-                "extension_id" => extension()->_id,
+                "extension_id" => extension()->id,
                 "target_name" => request('function_name')
             ]);
             return request('target') . " fonksiyonu için yetkiniz yok.";
         }
 
         $user = User::find($token->user_id);
-        $command = self::generateSandboxCommand($server, $extension, $user->settings, $user->_id, "null", "null", request('target'));
+        $command = self::generateSandboxCommand($server, $extension, $user->settings, $user->id, "null", "null", request('target'));
         $output = shell_exec($command);
 
         system_log(7,"EXTENSION_INTERNAL_RUN",[
-            "extension_id" => extension()->_id,
-            "server_id" => server()->_id,
+            "extension_id" => extension()->id,
+            "server_id" => server()->id,
             "target_name" => request('function_name')
         ]);
 
@@ -288,7 +288,7 @@ class OneController extends Controller
     {
         if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
             system_log(5,"EXTENSION_INTERNAL_NO_PERMISSION",[
-                "extension_id" => extension()->_id,
+                "extension_id" => extension()->id,
             ]);
             return 'Not Allowed';
         }
@@ -297,9 +297,9 @@ class OneController extends Controller
         auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
-        if (!Permission::can($token->user_id, 'server', $server->_id)) {
+        if (!Permission::can($token->user_id, 'server', $server->id)) {
             system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
-                "extension_id" => extension()->_id,
+                "extension_id" => extension()->id,
                 "server_id" => request('server_id')
             ]);
             return "Sunucu icin yetkiniz yok.";
@@ -307,7 +307,7 @@ class OneController extends Controller
 
         if ($server->type != "linux_ssh" && $server->type != "windows_powershell") {
             system_log(7,"EXTENSION_INTERNAL_RUN_COMMAND_FAILED",[
-                "extension_id" => extension()->_id,
+                "extension_id" => extension()->id,
                 "server_id" => request('server_id')
             ]);
             return "Bu sunucuda komut çalıştıramazsınız.";
@@ -317,8 +317,8 @@ class OneController extends Controller
         $output = $server->run(request('command'));
 
         system_log(7,"EXTENSION_INTERNAL_RUN_COMMAND",[
-            "extension_id" => extension()->_id,
-            "server_id" => server()->_id
+            "extension_id" => extension()->id,
+            "server_id" => server()->id
         ]);
 
         return $output;
@@ -328,7 +328,7 @@ class OneController extends Controller
     {
         if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
             system_log(5,"EXTENSION_INTERNAL_NO_PERMISSION",[
-                "extension_id" => extension()->_id,
+                "extension_id" => extension()->id,
             ]);
             return 'Not Allowed';
         }
@@ -340,8 +340,8 @@ class OneController extends Controller
 
         if ($server->type != "linux_ssh" && $server->type != "windows_powershell") {
             system_log(7,"EXTENSION_INTERNAL_RUN_COMMAND_FAILED",[
-                "extension_id" => extension()->_id,
-                "server_id" => server()->_id
+                "extension_id" => extension()->id,
+                "server_id" => server()->id
             ]);
             return "Bu sunucuda komut çalıştıramazsınız.";
         }
@@ -350,8 +350,8 @@ class OneController extends Controller
         $output = $server->putFile(request('localPath'), request('remotePath'));
 
         system_log(7,"EXTENSION_INTERNAL_SEND_FILE",[
-            "extension_id" => extension()->_id,
-            "server_id" => server()->_id,
+            "extension_id" => extension()->id,
+            "server_id" => server()->id,
             "file_name" => request('remotePath'),
         ]);
 
@@ -362,7 +362,7 @@ class OneController extends Controller
     {
         if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
             system_log(5,"EXTENSION_INTERNAL_NO_PERMISSION",[
-                "extension_id" => extension()->_id,
+                "extension_id" => extension()->id,
             ]);
             return 'Not Allowed';
         }
@@ -374,18 +374,20 @@ class OneController extends Controller
 
         if ($server->type != "linux_ssh" && $server->type != "windows_powershell") {
             system_log(7,"EXTENSION_INTERNAL_RUN_COMMAND_FAILED",[
-                "extension_id" => extension()->_id,
-                "server_id" => server()->_id
+                "extension_id" => extension()->id,
+                "server_id" => server()->id
             ]);
             return "Bu sunucuda komut çalıştıramazsınız.";
         }
 
         request()->request->add(['server' => $server]);
         $server->getFile(request('remotePath'), request('localPath'));
-
+        // Update Permissions
+        shell_exec("sudo chmod 770 " . request('localPath'));
+        shell_exec("sudo chown " . clean_score(extension()->id) . ":liman " . request('localPath'));
         system_log(7,"EXTENSION_INTERNAL_RECEIVE_FILE",[
-            "extension_id" => extension()->_id,
-            "server_id" => server()->_id,
+            "extension_id" => extension()->id,
+            "server_id" => server()->id,
             "file_name" => request('remotePath'),
         ]);
 
@@ -558,9 +560,9 @@ class OneController extends Controller
         } else {
             $fileName = request('page_name') . '.blade.php';
         }
-        $file = file_get_contents(env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/' . $fileName);
+        $file = file_get_contents(env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . $fileName);
         system_log(7,"EXTENSION_CODE_EDITOR",[
-            "extension_id" => extension()->_id,
+            "extension_id" => extension()->id,
             "file" => $fileName
         ]);
         return view('l.editor', [
@@ -573,10 +575,10 @@ class OneController extends Controller
      */
     public function updateCode()
     {
-        $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/' . request('page') . '.blade.php';
+        $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . request('page') . '.blade.php';
         file_put_contents($file, json_decode(request('code')));
         system_log(7,"EXTENSION_CODE_UPDATE",[
-            "extension_id" => extension()->_id,
+            "extension_id" => extension()->id,
             "file" => request('page')
         ]);
         return respond("Kaydedildi", 200);

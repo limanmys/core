@@ -160,8 +160,8 @@ def run():
         exit()
 
     ### Get pfx files
-    client.fetch("C:\\temp\\cert.pfx", "./cert.pfx")
-    if os.path.exists("./cert.pfx") == False:
+    client.fetch("C:\\temp\\cert.pfx", "/tmp/cert.pfx")
+    if os.path.exists("/tmp/cert.pfx") == False:
         print("Pfx file could not be get")
         exit()
 
@@ -209,16 +209,16 @@ def run():
         print("Certificate can not be added.")
 
     ### Create ssl certs
-    os.popen("openssl pkcs12 -in cert.pfx -clcerts -nokeys -out %s -passin pass:\"\"" % certPath)
+    os.popen("openssl pkcs12 -in /tmp/cert.pfx -clcerts -nokeys -out %s -passin pass:\"\"" % certPath)
     os.popen(
-        "openssl pkcs12 -in cert.pfx -clcerts -out %s -passin pass:\"\" -passout pass:%s" % (keyPath, certPassword))
+        "openssl pkcs12 -in /tmp/cert.pfx -clcerts -out %s -passin pass:\"\" -passout pass:%s" % (keyPath, certPassword))
 
     ## Clean unnecessary files
     try:
         output, streams, had_errors = client.execute_ps("Remove-Item -Path C:\\temp -Recurse")
         if had_errors:
             raise Exception()
-        os.popen("rm cert.pfx")
+        os.popen("rm /tmp/cert.pfx")
     except:
         print("C:\\temp file could not be removed")
         exit()
