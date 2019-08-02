@@ -184,7 +184,7 @@
                 @elseif(server()->type == "windows")
                     <p>{{__("Windows Sunucunuza WinRM anahtarı ekleyerek Liman üzerindeki ekstra özelliklere erişebilirsiniz.")}}</p>
                 @endif
-                <form id="upgrade_form" onsubmit="return request('{{route('server_upgrade')}}',this,reload)" target="#">
+                <form id="upgrade_form" onsubmit="return request('{{route('server_upgrade')}}',this,reload,errorSwal)" target="#">
                     <div class="modal-body" style="width: 100%">
                         <h5>{{__("Kullanıcı Adı")}}</h5>
                         <input type="text" name="username" placeholder="{{__("Kullanıcı Adı")}}" class="form-control " required=""
@@ -267,6 +267,15 @@
         </script>
     @endif
     <script>
+
+        function errorSwal(){
+            Swal.fire({
+                position: 'center',
+                type: 'error',
+                title: '{{__("Ayarlarınız doğrulanamadı!")}}',
+            });
+        }
+
         function checkStatus(id) {
             let data = new FormData();
             if (!id) {
