@@ -40,9 +40,6 @@ class MainController extends Controller
 
     public function update_orders()
     {
-      if(!auth()->user()->isAdmin()){
-          return respond("Widget kotanızı aştınız, yeni widget ekleyemezsiniz");
-      }
       foreach (json_decode(request('widgets')) as $widget) {
         $data = Widget::find($widget->id);
         $data->order = $widget->order;

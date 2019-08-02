@@ -22,10 +22,10 @@
                 "target" => "edit",
                 "icon" => "fa-edit"
             ],
-            "Yetki Ver" => [
+            /*"Yetki Ver" => [
                 "target" => "give_permission",
                 "icon" => "fa-unlock"
-            ],
+            ],*/
             "Sil" => [
                 "target" => "delete",
                 "icon" => "fa-trash"
@@ -402,7 +402,7 @@
         "submit_text" => "Düzenle"
     ])
 
-    @include('l.modal',[
+   {{-- @include('l.modal',[
         "id"=>"give_permission",
         "title" => "Kullanıcıya Yetki Ver",
         "url" => route('server_grant_permission'),
@@ -413,6 +413,6 @@
         ],
         "text" => "Güvenlik sebebiyle kullanıcı listesi sunulmamaktadır.",
         "submit_text" => "Yetkilendir"
-    ])
+    ]) --}}
 
 @endsection
