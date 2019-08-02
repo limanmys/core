@@ -106,11 +106,10 @@ class OneController extends Controller
             $extensionDb = [];
             foreach ($settings->get() as $setting){
                 $key = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
-                $decrypted = openssl_decrypt(Str::random() . $setting->value,'aes-256-cfb8',$key);
-                $extensionDb[$setting->name] = substr($decrypted,16);
+                $decrypted = openssl_decrypt($setting->value,'aes-256-cfb8',$key);
+                $extensionDb[$setting->name] = base64_decode(substr($decrypted,16));
             }
         }
-
         $extensionDb = json_encode($extensionDb);
 
         $outputsJson = json_encode($outputs);
