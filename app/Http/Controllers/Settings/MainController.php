@@ -202,43 +202,6 @@ class MainController extends Controller
 
     public function health()
     {
-        $allowed = [
-            "certs" => "0700",
-            "database" => "0700",
-            "extensions" => "0755",
-            "keys" => "0755",
-            "logs" => "0700",
-            "sandbox" => "0755",
-            "server" => "0700",
-            "keys/linux" => "0700",
-            "keys/windows" => "0700"
-        ];
-        $messages = [];
-
-        // Check Permissions
-        foreach ($allowed as $name=>$permission){
-            if(getPermissions('/liman/' . $name) != $permission){
-                array_push($messages,[
-                    "type" => "danger",
-                    "message" => "'/liman/$name' izni hatali (". getPermissions('/liman/' . $name) .")."
-                ]);
-            }
-        }
-
-        // Check Extra Files
-        $extra = array_diff(array_diff(scandir("/liman"),array('..','.')),array_keys($allowed));
-        foreach ($extra as $item){
-            array_push($messages,[
-                "type" => "warning",
-                "message" => "'/liman/$item' dosyasina izin verilmiyor."
-            ]);
-        }
-        if(empty($messages)){
-            array_push($messages,[
-                "type" => "success",
-                "message" => "Herşey Yolunda!"
-            ]);
-        }
-        return respond($messages,200);
+        return respond(checkHealth(),200);
     }
 }
