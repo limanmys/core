@@ -18,7 +18,7 @@ before_script:
   - sed -i "s/APP_VERSION=Development/APP_VERSION=$VERSION/g" liman/server/.env
   - sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" liman/server/.env
   - sed -i "s/APP_ENV=local/APP_ENV=production/g" liman/server/.env
-deb_creation:
+Deploy .deb Package:
   stage: deploy
   script:
     - chmod -R 775 DEBIAN/
