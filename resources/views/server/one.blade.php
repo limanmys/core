@@ -29,10 +29,14 @@
                 @if(server()->type == "linux_ssh")
                     <li class=""><a href="#packagesTab" onclick="getPackages()" data-toggle="tab"
                                     aria-expanded="false">{{__("Paketler")}}</a></li>
+                    <li class="">
+                        <a href="#updatesTab" onclick="getUpdates()" data-toggle="tab" aria-expanded="false">
+                            {{__("Güncellemeler")}}
+                            <small class="label pull-right bg-red updateCount" style="display:none;margin-left: 5px;margin-top: 2px;">3</small>
+                        </a>
+                    </li>
                 @endif
 {{--                <li class=""><a href="#filesTab" data-toggle="tab" aria-expanded="false">{{__("Dosya Transferi")}}</a>--}}
-{{--                </li>--}}
-{{--                <li class=""><a href="#updatesTab" data-toggle="tab" aria-expanded="false">{{__("Güncellemeler")}}</a>--}}
 {{--                </li>--}}
             @endif
             <li class=""><a href="#settingsTab" data-toggle="tab" aria-expanded="false">{{__("Ayarlar")}}</a></li>
@@ -143,8 +147,9 @@
                 <div class="tab-pane" id="servicesTab">
 
                 </div>
-                <div class="tab-pane" id="updatesTab">
-
+                <div class="tab-pane right" id="updatesTab">
+                    <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateAllPackages" onclick="updateAllPackages()">Tümünü Güncelle</button>
+                    <div id="updatesTabTable"></div>
                 </div>
             @endif
             @if(server()->type == "linux_ssh")
@@ -266,8 +271,21 @@
         });
         </script>
     @endif
-    <script>
 
+    @component('l.modal-component',[
+        "id" => "updateLogs",
+        "title" => "Güncelleme Günlüğü"
+    ])
+        <pre style='height: 500px; font-family: "Menlo", "DejaVu Sans Mono", "Liberation Mono", "Consolas", "Ubuntu Mono", "Courier New", "andale mono", "lucida console", monospace;'>
+            <code class="updateLogsBody"></code>
+        </pre>
+    @endcomponent
+    <script>
+        @if(server()->type == "linux_ssh") //|| server()->type == "windows_powershell")
+            if(location.hash !== "#updatesTab"){
+                getUpdates();
+            }
+        @endif
         function errorSwal(){
             Swal.fire({
                 position: 'center',
@@ -412,6 +430,93 @@
             request('{{route('server_service_list')}}', new FormData(), function (response) {
                 $("#servicesTab").html(response);
                 $("#servicesTab table").DataTable({
+                    bFilter: true,
+                    "language": {
+                        url: "/turkce.json"
+                    }
+                });
+                setTimeout(function () {
+                    Swal.close();
+                }, 1500);
+            })
+        }
+        let index = 0;
+        let packages = [];
+        function updateAllPackages(){
+            index = 0;
+            $('#updateLogs').find('.updateLogsBody').text("");
+            getUpdates(function(package_list){
+                let package_list_tmp = [];
+                package_list.forEach(function(package){
+                    let package_name = package.name.split('/')[0];
+                    package_list_tmp.push(package_name);
+                });
+                packages = package_list_tmp;
+                updatePackage();
+            });
+        }
+
+        function updateSinglePackage(row){
+            index = 0;
+            packages = [];
+            packages.push($(row).find("#name").text().split('/')[0]);
+            updatePackage();
+        }
+
+        function updatePackage(){
+            $('#updateLogs').modal('show');
+            let data = new FormData();
+            data.append("package_name", packages[index]);
+            $('#updateLogs').find('.updateLogsBody').append("\n"+packages[index]+" paketi kuruluyor. Lütfen bekleyin...");
+            request('{{route('server_update_package')}}', data, function (response) {
+                checkUpdate();
+            })
+        }
+
+        function checkUpdate(){
+            let data = new FormData();
+            data.append("package_name", packages[index]);
+            request('{{route('server_check_update')}}', data, function (response) {
+                response = JSON.parse(response);
+                $('#updateLogs').find('.updateLogsBody').append("\n"+response.message);
+                let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
+                scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
+                index++;
+                if(packages.length !== index){
+                    updatePackage();
+                }else{
+                    getUpdates();
+                    $('#updateLogs').find('.updateLogsBody').append("\n"+"Tüm güncellemeler kuruldu.");
+                }
+            }, function(){
+                setTimeout(function(){
+                    checkUpdate();
+                },5000);
+            });
+        }
+
+        function getUpdates(getList) {
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Okunuyor...")}}',
+                showConfirmButton: false,
+            });
+            request('{{route('server_update_list')}}', new FormData(), function (response) {
+                let updates = JSON.parse(response);
+                if(getList){
+                    getList(updates.list);
+                }
+                $('.updateCount').text(updates.count);
+                if(updates.count>0){
+                    $('.updateCount').show();
+                    $('.updateAllPackages').show();
+                }else{
+                    $('.updateCount').hide();
+                    $('.updateAllPackages').hide();
+                }
+                $("#updatesTabTable").html(updates.table);
+                $("#updatesTabTable table").DataTable({
                     bFilter: true,
                     "language": {
                         url: "/turkce.json"

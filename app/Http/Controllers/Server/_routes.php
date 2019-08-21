@@ -70,6 +70,12 @@ Route::group(['middleware' => ['server']], function () {
     Route::post('/sunucu/durum','Server\OneController@stats')->name('server_stats');
 
     Route::post('/sunucu/servis/','Server\OneController@serviceList')->name('server_service_list');
+    
+    Route::post('/sunucu/guncellemeler/','Server\OneController@updateList')->name('server_update_list');
+
+    Route::post('/sunucu/guncellemeler/paket_guncelle','Server\OneController@updatePackage')->name('server_update_package');
+
+    Route::post('/sunucu/guncellemeler/paket_kontrol','Server\OneController@checkUpdate')->name('server_check_update');
 
     Route::post('/sunucu/paketler','Server\OneController@packageList')->name('server_package_list');
 

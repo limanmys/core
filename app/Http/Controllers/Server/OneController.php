@@ -458,6 +458,84 @@ class OneController extends Controller
         return $table;
     }
 
+    public function updatePackage()
+    {
+        if(server()->type == "linux_ssh"){
+            $raw = server()->run('sudo apt-get -o Dpkg::Progress-Fancy="0" -o Dpkg::Use-Pty=0 --only-upgrade install '.request("package_name")." -y --fix-missing > /tmp/".request("package_name").".txt > /dev/null 2>&1 & echo $!");
+            \Session::put(server()->id.request("package_name"), trim($raw));
+        }elseif (server()->type == "windows_powershell"){
+            $raw = "";
+        }
+        return $raw;
+    }
+
+    public function checkUpdate()
+    {
+        if(server()->type == "linux_ssh"){
+            $pid = session(server()->id.request("package_name"));
+            $output = trim(server()->run('[ -d "/proc/'.$pid.'" ] && echo "YES" || echo "NO"'));
+            if($output === "NO"){
+                $output = server()->run('sudo apt list --upgradable 2>/dev/null | grep '.request("package_name"));
+                if(empty($output)){
+                    return respond(request("package_name")." paketi başarıyla kuruldu.");
+                }else{
+                    return respond(request("package_name")." paketi kurulamadı.");
+                }
+            }else{
+                return respond(request("package_name")." paketinin kurulum işlemi henüz bitmedi.", 400);
+            }
+        }elseif (server()->type == "windows_powershell"){
+            $output = "";
+        }
+        return $output;
+    }
+    
+    public function updateList()
+    {
+        if(server()->type == "linux_ssh"){
+            $updates = [];
+            $raw = server()->run("sudo apt-get -qq update 2> /dev/null > /dev/null; sudo apt list --upgradable 2>/dev/null | sed '1,1d'");
+            foreach (explode("\n", $raw) as $package) {
+                if ($package == "") {
+                    continue;
+                }
+                $row = explode(" ", $package, 4);
+                try {
+                    array_push($updates, [
+                        "name" => $row[0],
+                        "version" => $row[1],
+                        "type" => $row[2],
+                        "status" => $row[3]
+                    ]);
+                } catch (\Exception $exception) {}
+            }
+        }elseif (server()->type == "windows_powershell"){
+            
+        }else{
+            return respond("Bu sunucudaki güncellemeleri goremezsiniz.",403);
+        }
+        return [
+            "count" => count($updates),
+            "list"  => $updates,
+            "table" => view('l.table',[
+                    "id"    => "updateListTable",
+                    "value" => $updates,
+                    "title" => [
+                        "Paket Adı" , "Versiyon" , "Tip" , "Durumu"
+                    ],
+                    "display" => [
+                        "name" , "version", "type" , "status"
+                    ],
+                    "menu" => [
+                        "Güncelle" => [
+                            "target" => "updateSinglePackage",
+                            "icon" => "fa-refresh"
+                        ]
+                    ]
+                ])->render()
+        ];
+    }
+
     public function packageList()
     {
         if(server()->type == "linux_ssh"){
