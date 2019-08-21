@@ -23,10 +23,12 @@ Build:
     - chmod -R 775 DEBIAN/
     - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
     - cp ../build_tools.deb ../liman-$VERSION.deb
+    - echo $VERSION > version
   artifacts:
     name: liman_$CI_BUILD_ID
     paths:
-    - /builds/liman/liman/build_tools.deb
+    - export VERSION=$(cat version)
+    - /builds/liman/liman/liman-$VERSION.deb
 
 Deploy:
   stage: deploy
@@ -39,6 +41,7 @@ Release:
   stage: deploy
   script:
     - echo "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION&initial_comment=`date`&pretty=1"
+    - export VERSION=$(cat version)
     - curl -F "file=@/builds/liman/liman/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION.deb&pretty=1"
 
 
