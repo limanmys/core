@@ -40,7 +40,11 @@ Deploy:
 Release:
   stage: deploy
   script:
-    - echo "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION&initial_comment=`date`&pretty=1"
+    # - echo "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION&initial_comment=`date`&pretty=1"
     - export VERSION=$(cat version)
     - cp build_tools.deb liman-$VERSION.deb
-    - curl -F "file=@/builds/liman/liman/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION.deb&pretty=1"
+    # - curl -F "file=@/builds/liman/liman/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION.deb&pretty=1"
+    - curl -X POST -H 'Content-Type: application/json' --data '{"Name": "liman"}' http://depo.lab:8080/api/repos
+
+
+
