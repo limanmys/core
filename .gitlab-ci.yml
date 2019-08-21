@@ -27,15 +27,14 @@ Build:
   artifacts:
     name: liman_$CI_BUILD_ID
     paths:
-    - export VERSION=$(cat version)
-    - /builds/liman/liman/liman-$VERSION.deb
+    - /builds/liman/liman/version
+    - /builds/liman/liman/liman-$(cat version).deb
 
 Deploy:
   stage: deploy
   script:
-   - ls -la
-   - pwd
-   - curl -X POST -F "file=@/builds/liman/liman/build_tools.deb" http://depo.lab:8080/api/files/liman
+   - export VERSION=$(cat version)
+   - curl -X POST -F "file=@/builds/liman/liman/liman-$VERSION.deb" http://depo.lab:8080/api/files/liman
    
 Release:
   stage: deploy
@@ -43,10 +42,3 @@ Release:
     - echo "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION&initial_comment=`date`&pretty=1"
     - export VERSION=$(cat version)
     - curl -F "file=@/builds/liman/liman/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION.deb&pretty=1"
-
-
-
-
-
-
-
