@@ -18,8 +18,8 @@ before_script:
   - sed -i "s/APP_VERSION=Development/APP_VERSION=$VERSION/g" liman/server/.env
   - sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" liman/server/.env
   - sed -i "s/APP_ENV=local/APP_ENV=production/g" liman/server/.env
-Deploy .deb Package:
-  stage: deploy
+Build:
+  stage: build
   script:
     - chmod -R 775 DEBIAN/
     - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
@@ -31,3 +31,16 @@ Deploy .deb Package:
     name: liman_$CI_BUILD_ID
     paths:
     - /builds/liman/liman/build_tools.deb
+Deploy:
+  stage: deploy
+  script:
+   - curl -X POST -F "file=@/builds/liman/liman/liman-$VERSION.deb" http://depo.lab:8080/api/files/liman
+
+
+
+
+
+
+
+
+
