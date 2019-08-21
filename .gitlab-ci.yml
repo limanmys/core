@@ -1,33 +1,46 @@
 image: gitlab.lab:4567/liman/docker:latest
 
-before_script:
-  - rm `pwd`/build_tools/liman_req.sh
-  - cd build_tools
-  - mkdir -p liman
-  - git config --global http.sslVerify false
-  - git clone --depth=50 --branch=master https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.lab/liman/liman.git liman/server
-  - git clone --depth=50 --branch=master https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.lab/liman/sandbox.git liman/sandbox
-  - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-  - php -r "if (hash_file('sha384', 'composer-setup.php') === 'a5c698ffe4b8e849a443b120cd5ba38043260d5c4023dbf93e1558871f1f07f58274fc6f4c93bcfd858c6bd0775cd8d1') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-  - php composer-setup.php
-  - php7.3 composer.phar install --no-dev -d liman/server
-  - rm -rf composer.phar composer-setup.php liman/server/.git liman/sandbox/.git liman/webssh/.git
-  - mv create_deb.sh ../create_deb.sh
-  - chmod +x ../create_deb.sh
-  - export VERSION=$(date +'%Y.%m.%d-%s')
-  - sed -i "s/APP_VERSION=Development/APP_VERSION=$VERSION/g" liman/server/.env
-  - sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" liman/server/.env
-  - sed -i "s/APP_ENV=local/APP_ENV=production/g" liman/server/.env
-job:
-  stage: deploy
+Build:
+  stage: build
   script:
+    - rm `pwd`/build_tools/liman_req.sh
+    - cd build_tools
+    - mkdir -p liman
+    - git config --global http.sslVerify false
+    - git clone --depth=50 --branch=master https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.lab/liman/liman.git liman/server
+    - git clone --depth=50 --branch=master https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.lab/liman/sandbox.git liman/sandbox
+    - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    - php -r "if (hash_file('sha384', 'composer-setup.php') === 'a5c698ffe4b8e849a443b120cd5ba38043260d5c4023dbf93e1558871f1f07f58274fc6f4c93bcfd858c6bd0775cd8d1') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+    - php composer-setup.php
+    - php7.3 composer.phar install --no-dev -d liman/server
+    - rm -rf composer.phar composer-setup.php liman/server/.git liman/sandbox/.git liman/webssh/.git
+    - mv create_deb.sh ../create_deb.sh
+    - chmod +x ../create_deb.sh
+    - export VERSION=$(date +'%Y.%m.%d-%s')
+    - sed -i "s/APP_VERSION=Development/APP_VERSION=$VERSION/g" liman/server/.env
+    - sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" liman/server/.env
+    - sed -i "s/APP_ENV=local/APP_ENV=production/g" liman/server/.env
     - chmod -R 775 DEBIAN/
     - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
     - cp ../build_tools.deb ../liman-$VERSION.deb
-    - echo "file=@/builds/liman/liman/liman-$VERSION.deb"
-    - echo "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION&initial_comment=`date`&pretty=1"
-    - curl -F "file=@/builds/liman/liman/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION.deb&pretty=1"
+    - echo $VERSION > ../version
   artifacts:
     name: liman_$CI_BUILD_ID
     paths:
+    - /builds/liman/liman/version
     - /builds/liman/liman/build_tools.deb
+
+Deploy:
+  stage: deploy
+  script:
+   - export VERSION=$(cat version)
+   - cp build_tools.deb liman-$VERSION.deb
+   - curl -X POST -F "file=@/builds/liman/liman/liman-$VERSION.deb" http://depo.lab:8080/api/files/liman
+   
+Release:
+  stage: deploy
+  script:
+    - echo "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION&initial_comment=`date`&pretty=1"
+    - export VERSION=$(cat version)
+    - cp build_tools.deb liman-$VERSION.deb
+    - curl -F "file=@/builds/liman/liman/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION.deb&pretty=1"

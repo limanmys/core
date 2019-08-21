@@ -18,7 +18,7 @@ class KeyController extends Controller
         $keys = Key::where('user_id',auth()->id())->get();
 
         // Retrieve User servers that has permission.
-        $servers = servers()->whereIn('type',['windows_powershell','linux_ssh']);
+        $servers = servers();
         foreach ($keys as $key){
             $server = $servers->where('id',$key->server_id)->first();
             $key->server_name = ($server) ? $server->name : __("Sunucu Silinmiş.");

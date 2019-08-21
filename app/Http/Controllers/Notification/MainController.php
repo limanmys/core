@@ -12,14 +12,11 @@ class MainController extends Controller
     {
         $notifications = Notification::where([
             "user_id" => auth()->id()
-        ])->orderBy('read')->orderBy('created_at','desc')->get();
-        return response()
-            ->view('notification.index',
-                [
-                    "notifications" => $notifications
-                ]);
+        ])->orderBy('read')->orderBy('created_at', 'desc')->get();
+        return response()->view('notification.index', [
+            "notifications" => $notifications
+        ]);
     }
-
     public function delete()
     {
         $notification = Notification::where([
@@ -39,26 +36,28 @@ class MainController extends Controller
         return respond("Bildirimler silindi.");
     }
 
-    public function check(){
+    public function check()
+    {
         $notifications = Notification::where([
             "user_id" => auth()->id(),
             "read" => false
-        ])->orderBy('updated_at','desc')->take(5)->get();
+        ])->orderBy('updated_at', 'desc')->take(5)->get();
         return response()
             ->view('l.notifications',
                 [
                     "notifications" => $notifications
                 ])
-            ->header('Content-Type','html');
+            ->header('Content-Type', 'html');
     }
 
-    public function read(){
+    public function read()
+    {
         $notification = Notification::where([
             "user_id" => auth()->id(),
             "id" => request('notification_id')
         ])->first();
-        if(!$notification){
-            return respond("Bildirim Bulunamadi",201);
+        if (!$notification) {
+            return respond("Bildirim Bulunamadi", 201);
         }
         $notification->read = true;
         $notification->save();
@@ -72,7 +71,7 @@ class MainController extends Controller
         ])->update([
             "read" => true
         ]);
-        return respond("Hepsi Okundu",200);
+        return respond("Hepsi Okundu", 200);
     }
 
 }

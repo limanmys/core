@@ -2,8 +2,11 @@
 
 namespace App\Console;
 
+use App\Notification;
+use App\User;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\DB;
 
 class Kernel extends ConsoleKernel
 {
@@ -24,8 +27,28 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        // Delete Old Tokens every night
+        $schedule->call(function (){
+            DB::table('tokens')->truncate();
+        })->dailyAt("23:59")->name('Token Cleanup');
+
+        // Run Health Check every hour.
+        $schedule->call(function (){
+            $messages = checkHealth();
+            if($messages[0]["type"] != "success"){
+                $admins = User::where('status','1')->get();
+                foreach ($admins as $admin){
+                    $notification = new Notification();
+                    $notification->user_id = $admin->id;
+                    $notification->title = "Sağlık Sorunu Bulundu!";
+                    $notification->type = "error";
+                    $notification->message = "Detaylar için lütfen ayarlardan sağlık kontrolünü kontrol edin.";
+                    $notification->level = "";
+                    $notification->read = "0";
+                    $notification->save();
+                }
+            }
+        })->hourly()->name('Health Check');
     }
 
     /**

@@ -48,7 +48,15 @@ sed -i "s/www-data/liman/g" /etc/nginx/nginx.conf
 if grep --quiet TLS_REQCERT /etc/ldap/ldap.conf; then
     echo "LDAP settings are ok."; 
 else
-    sudo echo "TLS_REQCERT     never" | sudo tee --append /etc/ldap/ldap.conf
+    echo "TLS_REQCERT     never" >> /etc/ldap/ldap.conf
+fi
+
+# Crontab Setting
+if [ -f "/etc/cron.d/liman" ]; then
+    echo "Crontab already created.";
+else
+    mkdir "/etc/cron.d" 2>/dev/null
+    echo "* * * * * cd /liman/server && php artisan schedule:run >> /dev/null 2>&1" >> "/etc/cron.d/liman"
 fi
 
 # Nginx Settings
