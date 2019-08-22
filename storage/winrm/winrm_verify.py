@@ -10,7 +10,7 @@ userName = sys.argv[2]
 userPassword = sys.argv[3]
 
 if __name__ == "__main__":
-    client = Client(ip, username=userName, password=userPassword, cert_validation=False)
+    client = Client(ip, username=userName, password=userPassword, encryption="always", auth="ntlm", ssl=False, cert_validation=False)
     output, streams, had_errors = client.execute_ps("hostname")
     if output:
         print("OK")
