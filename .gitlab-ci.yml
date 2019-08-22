@@ -29,6 +29,7 @@ Build:
     paths:
     - /builds/liman/liman/version
     - /builds/liman/liman/build_tools.deb
+    - /builds/liman/liman/deploy.sh
 
 Deploy:
   stage: deploy
