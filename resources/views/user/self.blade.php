@@ -26,6 +26,14 @@
             </form>
         </div>
         <script>
+            $('input[type=password]').keyup(function(){
+                let password = $('input[name=password]').val();
+                let password_confirmation = $('input[name=password_confirmation]').val();
+                $('.no-match').remove();
+                if(password_confirmation!=="" && password !== password_confirmation){
+                    $('input[name=password_confirmation]').after('<span style="color: #dd4b39;" class="help-block no-match">Şifreler uyuşmuyor</span>');
+                }
+            });
             function saveUser(data) {
                 Swal.fire({
                     position: 'center',
