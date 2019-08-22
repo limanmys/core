@@ -12,7 +12,7 @@ class ServerApi
             . server()->ip_address . " " . server()->control_port . "  | grep \"Connected\"")){
             return $next($request);
         }else{
-            return respond("Sunucuya erişim sağlanamadı.",201);
+            return respond(server()->name."(".server()->ip_address.") isimli sunucuya erişim sağlanamadı.",201);
         }
     }
 }

@@ -13,7 +13,7 @@ class Server
             return $next($request);
         }else{
             return redirect()->back()->withErrors([
-                "message" => __("Sunucuya erişim sağlanamadı!")
+                "message" => server()->name."(".server()->ip_address.") ".__("isimli sunucuya erişim sağlanamadı!")
             ]);
         }
     }
