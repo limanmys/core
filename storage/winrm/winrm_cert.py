@@ -40,7 +40,7 @@ def before():
     # checkWritePermission(certPath)
 
     ### Check Connection
-    client = Client(ip, username=userName, password=userPassword, cert_validation=False)
+    client = Client(ip, username=userName, password=userPassword, encryption="always", auth="ntlm", ssl=False, cert_validation=False)
     try:
         output, streams, had_errors = client.execute_ps('ipconfig')
     except:
@@ -53,7 +53,7 @@ def before():
 
 
 def checkCert() :
-    client = Client(ip, username=userName, password=userPassword, cert_validation=False)
+    client = Client(ip, username=userName, password=userPassword, encryption="always", auth="ntlm", ssl=False, cert_validation=False)
     ### Check is certificate exist
     # output, streams, had_errors = client.execute_ps("Get-ChildItem -Recurse -Path WSMan:\localhost\ClientCertificate | Where-Object { $_.Value -eq \"administrator\"} ")
     output, streams, had_errors = client.execute_ps("""
@@ -63,7 +63,7 @@ def checkCert() :
 
 
 def checkTrustedRoot() :
-    client = Client(ip, username=userName, password=userPassword, cert_validation=False)
+    client = Client(ip, username=userName, password=userPassword, encryption="always", auth="ntlm", ssl=False, cert_validation=False)
     ### Check is user in trusted root cert authority
     output, streams, had_errors = client.execute_ps(
         "Get-ChildItem -Path cert:\LocalMachine\\root | Where-Object { $_.Subject -eq \"CN=%s\"}" % subject)
@@ -72,7 +72,7 @@ def checkTrustedRoot() :
     # print("User already exist in Trusted Root Certification Authorities.")
 
 def checkTrustedPeople() :
-    client = Client(ip, username=userName, password=userPassword, cert_validation=False)
+    client = Client(ip, username=userName, password=userPassword, encryption="always", auth="ntlm", ssl=False, cert_validation=False)
     ### Check is user in trusted people
     output, streams, had_errors = client.execute_ps(
         "Get-ChildItem -Path cert:\LocalMachine\\trustedPeople | Where-Object { $_.Subject -eq \"CN=%s\"}" % subject)
@@ -82,7 +82,7 @@ def checkTrustedPeople() :
 def run():
     before()
     ### Connection
-    client = Client(ip, username=userName, password=userPassword, cert_validation=False)
+    client = Client(ip, username=userName, password=userPassword, encryption="always", auth="ntlm", ssl=False, cert_validation=False)
     # output, streams, had_errors = client.execute_ps("""
     #     Get-ChildItem -Path cert:/LocalMachine/My | Where-Object { $_.Subject -eq "CN=%s" }""" % certPath.split(".")[0])
     # print()
