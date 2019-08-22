@@ -3,7 +3,6 @@ image: gitlab.lab:4567/liman/docker:latest
 Build:
   stage: build
   script:
-    - rm `pwd`/build_tools/liman_req.sh
     - mv `pwd`/build_tools/deploy.sh `pwd`/deploy.sh
     - cd build_tools
     - mkdir -p liman
