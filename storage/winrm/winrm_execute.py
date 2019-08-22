@@ -16,6 +16,7 @@ os.system("openssl rsa -in %s -out %s -passin pass:%s -passout pass:\"\"" % (key
 try:
     client = Client(ip, auth="certificate", certificate_key_pem="/tmp/temp.pem", certificate_pem=certPath,
                 cert_validation=False)
+    client.execute_ps("$PSDefaultParameterValues['*:Encoding'] = 'utf8'")
     output, streams, had_errors = client.execute_ps(command)
     if had_errors:
         raise Exception
