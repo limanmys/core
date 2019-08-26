@@ -473,6 +473,9 @@ class OneController extends Controller
     {
         if(server()->type == "linux_ssh"){
             $pid = session(server()->id.request("package_name"));
+            if(empty($pid)){
+                return respond(request("package_name")." paketi bir hata nedeniyle takip edilemiyor.");
+            }
             $output = trim(server()->run('[ -d "/proc/'.$pid.'" ] && echo "YES" || echo "NO"'));
             if($output === "NO"){
                 $output = server()->run('sudo apt list --upgradable 2>/dev/null | grep '.request("package_name"));
