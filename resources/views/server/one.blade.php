@@ -149,6 +149,7 @@
                 </div>
                 <div class="tab-pane right" id="updatesTab">
                     <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateAllPackages" onclick="updateAllPackages()">Tümünü Güncelle</button>
+                    <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateSelectedPackages" onclick="updateSelectedPackages()">Seçilenleri Güncelle</button>
                     <div id="updatesTabTable"></div>
                 </div>
             @endif
@@ -279,6 +280,12 @@
         <pre style='height: 500px; font-family: "Menlo", "DejaVu Sans Mono", "Liberation Mono", "Consolas", "Ubuntu Mono", "Courier New", "andale mono", "lucida console", monospace;'>
             <code class="updateLogsBody"></code>
         </pre>
+        <p class="progress-info"><p>
+        <div class="progress progress-sm active">
+            <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                <span class="sr-only progress-info"></span>
+            </div>
+        </div>
     @endcomponent
     <script>
         @if(server()->type == "linux_ssh") //|| server()->type == "windows_powershell")
@@ -456,6 +463,23 @@
             });
         }
 
+        function updateSelectedPackages(){
+            index = 0;
+            packages = [];
+            let table = $("#updatesTabTable table").DataTable();
+            table.rows( { selected: true } ).data().each(function(element){
+                packages.push(element[1].split('/')[0]);
+            });
+            if(packages.length === 0){
+                Swal.fire({
+                    type: 'error',
+                    title: 'Lütfen önce seçim yapınız.'
+                });
+                return false;
+            }
+            updatePackage();
+        }
+
         function updateSinglePackage(row){
             index = 0;
             packages = [];
@@ -464,6 +488,7 @@
         }
 
         function updatePackage(){
+            updateProgress();
             $('#updateLogs').modal('show');
             let data = new FormData();
             data.append("package_name", packages[index]);
@@ -471,6 +496,20 @@
             request('{{route('server_update_package')}}', data, function (response) {
                 checkUpdate();
             })
+        }
+
+        function updateProgress(){
+            $('#updateLogs').find('.progress-info').text(index+"/"+packages.length+" paket kuruluyor...");
+            let percent = (index/packages.length)*100;
+            $('div[role=progressbar]').attr('aria-valuenow', percent);
+            $('div[role=progressbar]').attr('style', 'width: '+percent+'%');
+            if(packages.length !== index){
+                $('div[role=progressbar]').closest('.progress').addClass('active');
+            }else{
+                $('div[role=progressbar]').closest('.progress').removeClass('active');
+                $('#updateLogs').find('.progress-info').text("Tüm paketler kuruldu.");
+            }
+
         }
 
         function checkUpdate(){
@@ -485,6 +524,7 @@
                 if(packages.length !== index){
                     updatePackage();
                 }else{
+                    updateProgress();
                     getUpdates();
                     $('#updateLogs').find('.updateLogsBody').append("\n"+"Tüm güncellemeler kuruldu.");
                 }
@@ -511,13 +551,18 @@
                 if(updates.count>0){
                     $('.updateCount').show();
                     $('.updateAllPackages').show();
+                    $('.updateSelectedPackages').show();
                 }else{
                     $('.updateCount').hide();
                     $('.updateAllPackages').hide();
+                    $('.updateSelectedPackages').hide();
                 }
                 $("#updatesTabTable").html(updates.table);
                 $("#updatesTabTable table").DataTable({
                     bFilter: true,
+                    select: {
+                        style: 'multi'
+                    },
                     "language": {
                         url: "/turkce.json"
                     }
