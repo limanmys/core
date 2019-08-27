@@ -95,7 +95,13 @@
                         @if(\Illuminate\Support\Facades\DB::table("user_favorites")->where(["user_id" => auth()->user()->id])->count())
                             <li class="header">{{__("Favori Sunucular")}}</li>
                             @foreach(\App\Server::find(\Illuminate\Support\Facades\DB::table("user_favorites")->where(["user_id" => auth()->user()->id])->pluck("server_id")->toArray()) as $favorite)
-                                <li class="treeview">
+                            <?php
+                            $flag = false;
+                                if(request('server_id') == $favorite->id){
+                                    $flag = true;
+                                }
+                            ?>
+                                <li class="treeview @if($flag) menu-open @endif">
                                     <a href="#">
                                         <i class="fa fa-server "></i>
                                         <span>{{$favorite->name}}</span>
@@ -103,7 +109,7 @@
                                             <i class="fa fa-angle-left pull-right"></i>
                                         </span>
                                     </a>
-                                    <ul class="treeview-menu">
+                                    <ul class="treeview-menu" @if($flag) style="display: block;" @endif>
                                         <li class="">
                                             <a href="/sunucular/{{$favorite->id}}">
                                                 <i class="fa fa-info "></i>
