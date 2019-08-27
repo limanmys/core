@@ -169,11 +169,6 @@
     <script>
         function after_user_add(response) {
             let json = JSON.parse(response);
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: json.message,
-            });
         }
 
         function details(row) {
