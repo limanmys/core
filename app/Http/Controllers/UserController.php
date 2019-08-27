@@ -81,7 +81,6 @@ class UserController extends Controller
     public function selfUpdate()
     {
         $flag = Validator::make(request()->all(), [
-            'name' => ['required', 'string', 'max:255','min:6'],
             'password' => ['required', 'string', 'min:6','max:32','confirmed'],
         ]);
 
