@@ -34,7 +34,7 @@ class Extension
             $notification->level = 3;
             $notification->save();
             return redirect()->back()->withErrors([
-                "message" => "Bu sunucu ilk defa ekliğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede bu sunucu ile eklentiye erişemezsiniz."
+                "message" => "Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede bu sunucu ile eklentiye erişemezsiniz."
             ]);
         }
         return $next($request);

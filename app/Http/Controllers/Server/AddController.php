@@ -164,7 +164,7 @@ class AddController extends Controller
                 $notification->message = $this->server->ip_address . ":" . $this->server->control_port . ":" . $this->server->id;
                 $notification->level = 3;
                 $notification->save();
-                return respond("Bu sunucu ilk defa ekliğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede sunucuya erişemezsiniz.",202);
+                return respond("Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede sunucuya erişemezsiniz.",202);
             }
         }
         return respond(route('server_one',$this->server->id),300);
