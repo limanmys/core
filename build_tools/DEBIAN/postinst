@@ -44,13 +44,6 @@ fi
 sed -i "s/www-data/liman/g" /etc/php/7.3/fpm/pool.d/www.conf
 sed -i "s/www-data/liman/g" /etc/nginx/nginx.conf
 
-# Ldap Setting
-if grep --quiet TLS_REQCERT /etc/ldap/ldap.conf; then
-    echo "LDAP settings are ok."; 
-else
-    echo "TLS_REQCERT     never" >> /etc/ldap/ldap.conf
-fi
-
 # Crontab Setting
 if [ -f "/etc/cron.d/liman" ]; then
     echo "Crontab already created.";
@@ -67,9 +60,40 @@ else
     ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
 fi
 
+# Fpm Optimizations
+# if grep --quiet LIMAN_OPTIMIZATIONS /etc/php/7.3/fpm/php-fpm.conf; then
+#     echo "Fpm settings already optimized."; 
+# else
+#     echo """
+#     ;LIMAN_OPTIMIZATIONS
+#     emergency_restart_threshold 10
+#     emergency_restart_interval 1m
+#     process_control_timeout 10s
+#     """ >> /etc/php/7.3/fpm/php-fpm.conf
+# fi
+
+# Nginx Auto Redirection
+if grep --quiet LIMAN_OPTIMIZATIONS /etc/nginx/sites-available/default; then
+    echo "Nginx https redirection already set up."; 
+else
+    echo """
+#LIMAN_OPTIMIZATIONS
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+    return 301 https://\$host\$request_uri;
+}
+    """ > /etc/nginx/sites-available/default
+fi
+
+#Increase Php-Fpm Memory
+sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php/7.3/fpm/php.ini
+
 # Restart and enable services.
 systemctl restart nginx
 systemctl enable nginx
+systemctl enable php7.3-fpm
 systemctl restart php7.3-fpm
 
 # Run Database Migration
@@ -81,6 +105,7 @@ chmod 700 -R /liman/{server,database,certs,keys/windows,keys/linux,logs}
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
+
 #Finalize Installation
 printf "\nKurulum Başarıyla Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
 printf "sudo runuser liman -c \"php /liman/server/artisan administrator\"\n\n\n"

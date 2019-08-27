@@ -16,3 +16,4 @@ composer.lock
 /storage/app/scripts/*
 /resources/views/extensions/*
 /vendor
+vendor/*
