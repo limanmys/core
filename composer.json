@@ -15,7 +15,6 @@
         "ext-zip": "*",
         "guzzlehttp/guzzle": "~6.0",
         "laravel/framework": "5.8.*",
-        "laravel/helpers": "^1.1",
         "phpseclib/phpseclib": "^2.0"
     },
     "require-dev": {
