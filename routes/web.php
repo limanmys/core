@@ -25,6 +25,10 @@ require_once(app_path('Http/Controllers/Script/_routes.php'));
 
 require_once(app_path('Http/Controllers/Server/_routes.php'));
 
+// Certificate Routes
+
+require_once(app_path('Http/Controllers/Certificate/_routes.php'));
+
 // Server Routes
 
 require_once(app_path('Http/Controllers/Settings/_routes.php'));

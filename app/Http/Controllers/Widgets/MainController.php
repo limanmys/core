@@ -13,6 +13,18 @@ class MainController extends Controller
         if(!auth()->user()->isAdmin() && Widget::where("user_id",auth()->user()->id)->count() > env("USER_WIDGET_COUNT")){
             return respond("Widget kotanızı aştınız, yeni widget ekleyemezsiniz");
         }
+        if(Widget::where([
+            "name" => explode(':',request('widget_name'))[0],
+            "text" => explode(':',request('widget_name'))[3],
+            "title" => explode(':',request('widget_name'))[1],
+            "user_id" => auth()->user()->id,
+            "extension_id" => extension()->id,
+            "server_id" => server()->id,
+            "function" => explode(':',request('widget_name'))[0],
+            "type" => explode(':',request('widget_name'))[2]
+        ])->exists()){
+            return respond("Bu sunucu için aynı widget daha önce zaten eklenmiş",201);
+        }
         $widget = new Widget([
             "name" => explode(':',request('widget_name'))[0],
             "text" => explode(':',request('widget_name'))[3],

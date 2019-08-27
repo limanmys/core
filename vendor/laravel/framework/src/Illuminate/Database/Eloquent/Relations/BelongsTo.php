@@ -194,17 +194,6 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Update the parent model on the relationship.
-     *
-     * @param  array  $attributes
-     * @return mixed
-     */
-    public function update(array $attributes)
-    {
-        return $this->getResults()->fill($attributes)->save();
-    }
-
-    /**
      * Associate the model instance to the given parent.
      *
      * @param  \Illuminate\Database\Eloquent\Model|int|string  $model
@@ -365,17 +354,6 @@ class BelongsTo extends Relation
      * @return string
      */
     public function getRelationName()
-    {
-        return $this->relationName;
-    }
-
-    /**
-     * Get the name of the relationship.
-     *
-     * @return string
-     * @deprecated The getRelationName() method should be used instead. Will be removed in Laravel 5.9.
-     */
-    public function getRelation()
     {
         return $this->relationName;
     }

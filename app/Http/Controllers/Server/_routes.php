@@ -27,6 +27,7 @@ Route::post('/sunucu/sil', 'Server\OneController@remove')->name('server_remove')
 
 Route::post('/sunucu/yetkial', 'Server\OneController@revoke')->name('server_revoke_permission')->middleware('parameters:user_id,server_id');
 
+
 Route::group(['middleware' => ['server']], function () {
 
 
@@ -70,7 +71,7 @@ Route::group(['middleware' => ['server']], function () {
     Route::post('/sunucu/durum','Server\OneController@stats')->name('server_stats');
 
     Route::post('/sunucu/servis/','Server\OneController@serviceList')->name('server_service_list');
-    
+
     Route::post('/sunucu/guncellemeler/','Server\OneController@updateList')->name('server_update_list');
 
     Route::post('/sunucu/guncellemeler/paket_guncelle','Server\OneController@updatePackage')->name('server_update_package');

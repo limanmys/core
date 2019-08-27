@@ -19,7 +19,7 @@ Date : $1
 Architecture: amd64
 Priority: important
 Description: Liman System Manager
-Depends: zip, unzip, dnsutils, nginx, php7.3-fpm, php7.3, php7.3-sqlite3, php7.3-ldap, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-ssh2
+Depends: zip, unzip, dnsutils, nginx, php7.3-fpm, php7.3, php7.3-sqlite3, php7.3-ldap, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-ssh2 php7.3-posix
 """ > DEBIAN/control
 
 cd ../

@@ -146,7 +146,11 @@ function search() {
 
 function checkNotifications() {
     request('/bildirimler', new FormData(), function (response) {
-        document.getElementById("notifications-menu").innerHTML = response;
+        let json = JSON.parse(response);
+        if(response["admin"] !== ""){
+            document.getElementById("adminNotifications").innerHTML = json["message"]["admin"];
+        }
+        document.getElementById("notifications-menu").innerHTML = json["message"]["user"];
     });
 }
 

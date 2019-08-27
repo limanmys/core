@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\AdminNotification;
 use App\Notification;
 use App\User;
 use Illuminate\Console\Scheduling\Schedule;
@@ -36,19 +37,28 @@ class Kernel extends ConsoleKernel
         $schedule->call(function (){
             $messages = checkHealth();
             if($messages[0]["type"] != "success"){
-                $admins = User::where('status','1')->get();
-                foreach ($admins as $admin){
-                    $notification = new Notification();
-                    $notification->user_id = $admin->id;
-                    $notification->title = "Sağlık Sorunu Bulundu!";
-                    $notification->type = "error";
-                    $notification->message = "Detaylar için lütfen ayarlardan sağlık kontrolünü kontrol edin.";
-                    $notification->level = "";
-                    $notification->read = "0";
-                    $notification->save();
-                }
+                $notification = new AdminNotification();
+                $notification->title = "Sağlık Problemi Bulundu!";
+                $notification->type = "health_problem";
+                $notification->message = "Detaylar için lütfen ayarlardan sağlık kontrolünü kontrol edin.";
+                $notification->level = 3;
+                $notification->save();
             }
         })->hourly()->name('Health Check');
+
+        //Check Package Update Every 30 Min
+        $schedule->call(function (){
+            $output = shell_exec("apt list --upgradable | grep 'liman'");
+            if(!strpos($output,"liman")){
+                return;
+            }
+            $notification = new AdminNotification();
+            $notification->title = "Liman Güncellemesi Mevcut!";
+            $notification->type = "liman_update";
+            $notification->message = ($output) ? $output : "";
+            $notification->level = 3;
+            $notification->save();
+        })->everyThirtyMinutes()->name('Update Check');
     }
 
     /**

@@ -7,6 +7,7 @@ use Exception;
 use ArrayAccess;
 use LogicException;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionParameter;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -355,6 +356,20 @@ class Container implements ArrayAccess, ContainerContract
     public function singleton($abstract, $concrete = null)
     {
         $this->bind($abstract, $concrete, true);
+    }
+
+    /**
+     * Register a shared binding if it hasn't already been registered.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @return void
+     */
+    public function singletonIf($abstract, $concrete = null)
+    {
+        if (! $this->bound($abstract)) {
+            $this->singleton($abstract, $concrete);
+        }
     }
 
     /**
@@ -753,9 +768,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function findInContextualBindings($abstract)
     {
-        if (isset($this->contextual[end($this->buildStack)][$abstract])) {
-            return $this->contextual[end($this->buildStack)][$abstract];
-        }
+        return $this->contextual[end($this->buildStack)][$abstract] ?? null;
     }
 
     /**
@@ -787,7 +800,11 @@ class Container implements ArrayAccess, ContainerContract
             return $concrete($this, $this->getLastParameterOverride());
         }
 
-        $reflector = new ReflectionClass($concrete);
+        try {
+            $reflector = new ReflectionClass($concrete);
+        } catch (ReflectionException $e) {
+            throw new BindingResolutionException("Target class [$concrete] does not exist.", 0, $e);
+        }
 
         // If the type is not instantiable, the developer is attempting to resolve
         // an abstract type such as an Interface or Abstract Class and there is
@@ -1183,7 +1200,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Set the globally available instance of the container.
+     * Get the globally available instance of the container.
      *
      * @return static
      */

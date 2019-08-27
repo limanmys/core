@@ -38,7 +38,10 @@
                 <h3>{{__("Ayar Doğrulama Fonksiyonu/Betiği")}}</h3>
                 <input id="verification" type="text" name="verification" class="form-control" value="{{array_key_exists("verification",$extension) ? $extension["verification"] : ""}}" required>
                 <h3>{{__("Servis Adı yada Kontrol Etmek için Port")}}</h3>
-                <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}" required><br>
+                <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}" required>
+                <h3>{{__("SSL Sertifikası Eklenecek Portlar")}}</h3>
+                <small>{{__("Birden fazla port yazmak için aralarında virgül bırakabilirsiniz.")}}</small>
+                <input id="sslPorts" type="text" name="service" class="form-control" value="{{array_key_exists("sslPorts",$extension) ? $extension["sslPorts"] : ""}}" required><br>
                 <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button>
             </div>
             <!-- /.tab-pane -->
@@ -294,6 +297,7 @@
             data.append('support',$("#support").val());
             data.append('version',$("#version").val());
             data.append('service',$("#service").val());
+            data.append('sslPorts',$("#sslPorts").val());
             data.append('verification',$("#verification").val());
             request('{{route('extension_settings_update')}}',data,function(){
                 Swal.fire({

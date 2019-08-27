@@ -195,6 +195,10 @@ trait HasAttributes
             if ($attributes[$key] && $this->isCustomDateTimeCast($value)) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
+
+            if ($attributes[$key] instanceof Arrayable) {
+                $attributes[$key] = $attributes[$key]->toArray();
+            }
         }
 
         return $attributes;
@@ -372,9 +376,7 @@ trait HasAttributes
      */
     protected function getAttributeFromArray($key)
     {
-        if (isset($this->attributes[$key])) {
-            return $this->attributes[$key];
-        }
+        return $this->attributes[$key] ?? null;
     }
 
     /**

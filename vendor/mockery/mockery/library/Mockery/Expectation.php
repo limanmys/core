@@ -32,7 +32,7 @@ class Expectation implements ExpectationInterface
     /**
      * Mock object to which this expectation belongs
      *
-     * @var \Mockery\MockInterface
+     * @var \Mockery\LegacyMockInterface
      */
     protected $_mock = null;
 
@@ -147,10 +147,10 @@ class Expectation implements ExpectationInterface
     /**
      * Constructor
      *
-     * @param \Mockery\MockInterface $mock
+     * @param \Mockery\LegacyMockInterface $mock
      * @param string $name
      */
-    public function __construct(\Mockery\MockInterface $mock, $name)
+    public function __construct(\Mockery\LegacyMockInterface $mock, $name)
     {
         $this->_mock = $mock;
         $this->_name = $name;
@@ -479,6 +479,24 @@ class Expectation implements ExpectationInterface
     {
         $this->_expectedArgs = [new AnyArgs()];
         return $this;
+    }
+
+    /**
+     * Expected arguments should partially match the real arguments
+     *
+     * @param mixed[] ...$expectedArgs
+     * @return self
+     */
+    public function withSomeOfArgs(...$expectedArgs)
+    {
+        return $this->withArgs(function (...$args) use ($expectedArgs) {
+            foreach ($expectedArgs as $expectedArg) {
+                if (!in_array($expectedArg, $args, true)) {
+                    return false;
+                }
+            }
+            return true;
+        });
     }
 
     /**
@@ -821,7 +839,7 @@ class Expectation implements ExpectationInterface
     /**
      * Return the parent mock of the expectation
      *
-     * @return \Mockery\MockInterface
+     * @return \Mockery\LegacyMockInterface|\Mockery\MockInterface
      */
     public function getMock()
     {

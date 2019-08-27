@@ -34,11 +34,12 @@ use DateTimeInterface;
 trait Difference
 {
     /**
+     * @codeCoverageIgnore
+     *
      * @param CarbonInterval $diff
      */
     protected static function fixNegativeMicroseconds(CarbonInterval $diff)
     {
-        // @codeCoverageIgnoreStart
         if ($diff->s !== 0 || $diff->i !== 0 || $diff->h !== 0 || $diff->d !== 0 || $diff->m !== 0 || $diff->y !== 0) {
             $diff->f = (round($diff->f * 1000000) + 1000000) / 1000000;
             $diff->s--;
@@ -73,7 +74,6 @@ trait Difference
 
         $diff->f *= -1;
         $diff->invert();
-        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -110,7 +110,22 @@ trait Difference
     }
 
     /**
-     * Get the difference as a CarbonInterval instance
+     * Get the difference as a DateInterval instance.
+     * Return relative interval (negative if
+     *
+     * @param \Carbon\CarbonInterface|\DateTimeInterface|string|null $date
+     * @param bool                                                   $absolute Get the absolute of the difference
+     *
+     * @return DateInterval
+     */
+    public function diff($date = null, $absolute = false)
+    {
+        return parent::diff($this->resolveCarbon($date), (bool) $absolute);
+    }
+
+    /**
+     * Get the difference as a CarbonInterval instance.
+     * Return absolute interval (always positive) unless you pass false to the second argument.
      *
      * @param \Carbon\CarbonInterface|\DateTimeInterface|string|null $date
      * @param bool                                                   $absolute Get the absolute of the difference
@@ -324,13 +339,13 @@ trait Difference
      */
     public function diffInSeconds($date = null, $absolute = true)
     {
-        $diff = $this->diff($this->resolveCarbon($date));
+        $diff = $this->diff($date);
 
         if ($diff->days === 0) {
             $diff = static::fixDiffInterval($diff, $absolute);
         }
 
-        $value = ((($diff->d * static::HOURS_PER_DAY) +
+        $value = (((($diff->m || $diff->y ? $diff->days : $diff->d) * static::HOURS_PER_DAY) +
             $diff->h) * static::MINUTES_PER_HOUR +
             $diff->i) * static::SECONDS_PER_MINUTE +
             $diff->s;
@@ -348,8 +363,8 @@ trait Difference
      */
     public function diffInMicroseconds($date = null, $absolute = true)
     {
-        $diff = $this->diff($this->resolveCarbon($date));
-        $value = (int) round((((($diff->d * static::HOURS_PER_DAY) +
+        $diff = $this->diff($date);
+        $value = (int) round(((((($diff->m || $diff->y ? $diff->days : $diff->d) * static::HOURS_PER_DAY) +
             $diff->h) * static::MINUTES_PER_HOUR +
             $diff->i) * static::SECONDS_PER_MINUTE +
             ($diff->f + $diff->s)) * static::MICROSECONDS_PER_SECOND);

@@ -20,7 +20,7 @@ use Illuminate\Contracts\Cache\Repository as CacheContract;
 /**
  * @mixin \Illuminate\Contracts\Cache\Store
  */
-class Repository implements CacheContract, ArrayAccess
+class Repository implements ArrayAccess, CacheContract
 {
     use InteractsWithTime;
     use Macroable {
@@ -205,7 +205,7 @@ class Repository implements CacheContract, ArrayAccess
         $seconds = $this->getSeconds($ttl);
 
         if ($seconds <= 0) {
-            return $this->delete($key);
+            return $this->forget($key);
         }
 
         $result = $this->store->put($this->itemKey($key), $value, $seconds);

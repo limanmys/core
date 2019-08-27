@@ -77,44 +77,56 @@
         let intervals = [];
         $(".limanWidget").each(function(){
             let element = $(this);
+            retrieveWidgets(element);
+            intervals[element.attr('id')] = setInterval(function(){
+                retrieveWidgets(element);
+            },{{env("WIDGET_REFRESH_TIME")}});
+        });
+        $('.limanCharts').each(function(){
+            let element = $(this);
+          retrieveCharts(element);
+          intervals[element.attr('id')] = setInterval(function(){
+                retrieveCharts(element);
+          },{{env('WIDGET_REFRESH_TIME')}});
+        });
+
+        function retrieveWidgets(element){
             let info_box = element.closest('.info-box');
             let form = new FormData();
             form.append('widget_id',element.attr('id'));
-            intervals[element.attr('id')] = setInterval(function(){
-              request('{{route('widget_one')}}', form, function(response){
-                  let json = JSON.parse(response);
-                  element.html(json["message"]);
-                  info_box.find('.info-box-icon').show();
-                  info_box.find('.info-box-content').show();
-                  info_box.find('.overlay').remove();
-              }, function(error) {
+            request('{{route('widget_one')}}', form, function(response){
+                let json = JSON.parse(response);
+                element.html(json["message"]);
+                info_box.find('.info-box-icon').show();
+                info_box.find('.info-box-content').show();
+                info_box.find('.overlay').remove();
+            }, function(error) {
                 let json = JSON.parse(error);
                 clearInterval(intervals[element.attr('id')]);
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
                 info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
-              });
-            },2000);
-        });
-        $('.limanCharts').each(function(){
-          let element = $(this);
-          let id = element.attr('id');
-          let form = new FormData();
-          form.append('widget_id', id);
-          intervals[element.attr('id')] = setInterval(function(){
+            });
+        }
+
+        function retrieveCharts(element){
+            let id = element.attr('id');
+            let form = new FormData();
+            let info_box = element.closest('.info-box');
+            form.append('widget_id', id);
             request('{{route('widget_one')}}', form, function(res){
                 let response =  JSON.parse(res);
                 let data =  response.message;
                 createChart(id+'Chart',data.labels, data.data);
             }, function(error) {
-              let json = JSON.parse(error);
-              clearInterval(intervals[element.attr('id')]);
-              info_box.find('.overlay i').remove();
-              info_box.find('.overlay span').remove();
-              info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
+                let json = JSON.parse(error);
+                clearInterval(intervals[element.attr('id')]);
+                info_box.find('.overlay i').remove();
+                info_box.find('.overlay span').remove();
+                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
             });
-          },2000);
-        });
+        }
+
         function strip(html)
         {
            var tmp = document.createElement("DIV");

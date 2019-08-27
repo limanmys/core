@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Permission;
 use Closure;
+use Illuminate\Support\Facades\Gate;
 
 class PermissionManager
 {
@@ -46,7 +47,6 @@ class PermissionManager
         if($value == null){
             return true;
         }
-
         return Permission::can(auth()->user()->id,$target,$value);
     }
 

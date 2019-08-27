@@ -1,13 +1,13 @@
 <?php
 
 // Extension' Server' Home Route
-Route::get('/l/{extension_id}/{city}/{server_id}', 'Extension\OneController@renderView')->name('extension_server')->middleware('server');
+Route::get('/l/{extension_id}/{city}/{server_id}', 'Extension\OneController@renderView')->name('extension_server')->middleware(['server','extension']);
 
 // Extension' Server' Any Route Handler
-Route::get('/l/{extension_id}/{city}/{server_id}/{unique_code}', 'Extension\OneController@renderView')->middleware(['server', 'script_parameters'])->name('extension_server_route');
+Route::get('/l/{extension_id}/{city}/{server_id}/{unique_code}', 'Extension\OneController@renderView')->middleware(['server', 'script_parameters','extension'])->name('extension_server_route');
 
 // Extension Management Route
-Route::post('/extension/run/{unique_code}', 'Extension\OneController@route')->name('extension_api')->middleware(['server_api', 'script_parameters']);
+Route::post('/extension/run/{unique_code}', 'Extension\OneController@route')->name('extension_api')->middleware(['server_api', 'script_parameters','extension']);
 
 // Extension Page (City Select) Route
 Route::get('/l/{extension_id}', 'Extension\MainController@allServers')->name('extension_map');
@@ -36,10 +36,10 @@ Route::post('/eklentiler/betikler/sil', 'Extension\SettingsController@removeScri
 Route::post('/eklenti/{extension_id}/{function_name}', 'Extension\OneController@runFunction')->name('extension_function_api')->middleware('server_api');
 
 // Extension Server Setting Page
-Route::get('/ayarlar/{extension_id}/{server_id}', 'Extension\OneController@serverSettingsPage')->name('extension_server_settings_page')->middleware('server');
+Route::get('/ayarlar/{extension_id}/{server_id}', 'Extension\OneController@serverSettingsPage')->name('extension_server_settings_page')->middleware(['server','extension']);
 
 // Extension Server Settings
-Route::post('/ayarlar/{extension_id}/{server_id}', 'Extension\OneController@serverSettings')->name('extension_server_settings')->middleware('server');
+Route::post('/ayarlar/{extension_id}/{server_id}', 'Extension\OneController@serverSettings')->name('extension_server_settings')->middleware(['server','extension']);
 
 // Extension Upload Page
 Route::post('/yukle/eklenti/', 'Extension\MainController@upload')->name('extension_upload');

@@ -23,23 +23,31 @@
  * - damlys
  * - Marek (marast78)
  * - Peter (UnrulyNatives)
+ * - Qrzysio
+ * - Jan (aso824)
  */
 return [
     'year' => ':count rok|:count lata|:count lat',
-    'y' => ':countr|:countl',
+    'a_year' => 'rok|:count lata|:count lat',
+    'y' => ':count r|:count l',
     'month' => ':count miesiąc|:count miesiące|:count miesięcy',
-    'm' => ':countmies',
+    'a_month' => 'miesiąc|:count miesiące|:count miesięcy',
+    'm' => ':count mies.',
     'week' => ':count tydzień|:count tygodnie|:count tygodni',
-    'w' => ':counttyg',
+    'a_week' => 'tydzień|:count tygodnie|:count tygodni',
+    'w' => ':count tyg.',
     'day' => ':count dzień|:count dni|:count dni',
-    'd' => ':countd',
+    'a_day' => 'dzień|:count dni|:count dni',
+    'd' => ':count d',
     'hour' => ':count godzina|:count godziny|:count godzin',
-    'h' => ':countg',
+    'a_hour' => 'godzina|:count godziny|:count godzin',
+    'h' => ':count godz.',
     'minute' => ':count minuta|:count minuty|:count minut',
-    'min' => ':countm',
+    'a_minute' => 'minuta|:count minuty|:count minut',
+    'min' => ':count min.',
     'second' => ':count sekunda|:count sekundy|:count sekund',
     'a_second' => '{1}kilka sekund|:count sekunda|:count sekundy|:count sekund',
-    's' => ':counts',
+    's' => ':count sek.',
     'ago' => ':time temu',
     'from_now' => 'za :time',
     'after' => ':time po',

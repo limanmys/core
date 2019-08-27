@@ -7,6 +7,7 @@ use Exception;
 use Throwable;
 use ReflectionClass;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Symfony\Component\Finder\Finder;
@@ -99,13 +100,10 @@ class Kernel implements KernelContract
     protected function defineConsoleSchedule()
     {
         $this->app->singleton(Schedule::class, function ($app) {
-            return (new Schedule($this->scheduleTimezone()))
-                    ->useCache($this->scheduleCache());
+            return tap(new Schedule($this->scheduleTimezone()), function ($schedule) {
+                $this->schedule($schedule->useCache($this->scheduleCache()));
+            });
         });
-
-        $schedule = $this->app->make(Schedule::class);
-
-        $this->schedule($schedule);
     }
 
     /**
@@ -115,7 +113,7 @@ class Kernel implements KernelContract
      */
     protected function scheduleCache()
     {
-        return $_ENV['SCHEDULE_CACHE_DRIVER'] ?? null;
+        return Env::get('SCHEDULE_CACHE_DRIVER');
     }
 
     /**

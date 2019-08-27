@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Notification;
 
+use App\AdminNotification;
 use App\Notification;
 use App\Http\Controllers\Controller;
 
@@ -16,6 +17,7 @@ class MainController extends Controller
         return response()->view('notification.index', [
             "notifications" => $notifications
         ]);
+
     }
     public function delete()
     {
@@ -41,13 +43,24 @@ class MainController extends Controller
         $notifications = Notification::where([
             "user_id" => auth()->id(),
             "read" => false
-        ])->orderBy('updated_at', 'desc')->take(5)->get();
-        return response()
-            ->view('l.notifications',
-                [
-                    "notifications" => $notifications
-                ])
-            ->header('Content-Type', 'html');
+        ])->orderBy('updated_at', 'desc')->get();
+        $adminNotifications = [];
+        if(auth()->user()->isAdmin()){
+            $adminNotifications = AdminNotification::where([
+                "read" => "false"
+            ])->orderBy('updated_at', 'desc')->get();
+        }
+        $adminNotifications = view('l.notifications',[
+            "notifications" => $adminNotifications,
+            "systemNotification" => true
+        ]);
+        $userNotifications = view('l.notifications', [
+            "notifications" => $notifications
+        ]);
+        return respond([
+            "user" => $userNotifications->render(),
+            "admin" => $adminNotifications->render()
+        ]);
     }
 
     public function read()

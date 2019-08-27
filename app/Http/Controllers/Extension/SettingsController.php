@@ -145,6 +145,7 @@ class SettingsController extends Controller
             $extension["service"] = request("service");
             $extension["version"] = request("version");
             $extension["verification"] = request("verification");
+            $extension["sslPorts"] = request("sslPorts");
         } else {
             $values = $extension[request('table')];
             foreach ($values as $key => $value) {

@@ -5,6 +5,7 @@ namespace Illuminate\Foundation;
 use Closure;
 use RuntimeException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -29,7 +30,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.8.29';
+    const VERSION = '6.0-dev';
 
     /**
      * The base path for the Laravel installation.
@@ -549,8 +550,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function runningInConsole()
     {
-        if (isset($_ENV['APP_RUNNING_IN_CONSOLE'])) {
-            return $_ENV['APP_RUNNING_IN_CONSOLE'] === 'true';
+        if (Env::get('APP_RUNNING_IN_CONSOLE') !== null) {
+            return Env::get('APP_RUNNING_IN_CONSOLE') === true;
         }
 
         return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
@@ -626,7 +627,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // If the application has already booted, we will call this boot method on
         // the provider class so it has an opportunity to do its boot logic and
         // will be ready for any usage by this developer's application logic.
-        if ($this->booted) {
+        if ($this->isBooted()) {
             $this->bootProvider($provider);
         }
 
@@ -708,7 +709,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function loadDeferredProvider($service)
     {
-        if (! isset($this->deferredServices[$service])) {
+        if (! $this->isDeferredService($service)) {
             return;
         }
 
@@ -740,7 +741,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this->register($instance = new $provider($this));
 
-        if (! $this->booted) {
+        if (! $this->isBooted()) {
             $this->booting(function () use ($instance) {
                 $this->bootProvider($instance);
             });
@@ -760,7 +761,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $abstract = $this->getAlias($abstract);
 
-        if (isset($this->deferredServices[$abstract]) && ! isset($this->instances[$abstract])) {
+        if ($this->isDeferredService($abstract) && ! isset($this->instances[$abstract])) {
             $this->loadDeferredProvider($abstract);
         }
 
@@ -777,7 +778,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function bound($abstract)
     {
-        return isset($this->deferredServices[$abstract]) || parent::bound($abstract);
+        return $this->isDeferredService($abstract) || parent::bound($abstract);
     }
 
     /**
@@ -797,7 +798,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function boot()
     {
-        if ($this->booted) {
+        if ($this->isBooted()) {
             return;
         }
 
@@ -893,7 +894,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedServicesPath()
     {
-        return $_ENV['APP_SERVICES_CACHE'] ?? $this->bootstrapPath().'/cache/services.php';
+        return Env::get('APP_SERVICES_CACHE', $this->bootstrapPath().'/cache/services.php');
     }
 
     /**
@@ -903,7 +904,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedPackagesPath()
     {
-        return $_ENV['APP_PACKAGES_CACHE'] ?? $this->bootstrapPath().'/cache/packages.php';
+        return Env::get('APP_PACKAGES_CACHE', $this->bootstrapPath().'/cache/packages.php');
     }
 
     /**
@@ -923,7 +924,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedConfigPath()
     {
-        return $_ENV['APP_CONFIG_CACHE'] ?? $this->bootstrapPath().'/cache/config.php';
+        return Env::get('APP_CONFIG_CACHE', $this->bootstrapPath().'/cache/config.php');
     }
 
     /**
@@ -943,7 +944,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedRoutesPath()
     {
-        return $_ENV['APP_ROUTES_CACHE'] ?? $this->bootstrapPath().'/cache/routes.php';
+        return Env::get('APP_ROUTES_CACHE', $this->bootstrapPath().'/cache/routes.php');
     }
 
     /**
@@ -963,7 +964,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedEventsPath()
     {
-        return $_ENV['APP_EVENTS_CACHE'] ?? $this->bootstrapPath().'/cache/events.php';
+        return Env::get('APP_EVENTS_CACHE', $this->bootstrapPath().'/cache/events.php');
     }
 
     /**
@@ -1128,16 +1129,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function registerCoreContainerAliases()
     {
         foreach ([
-            'app'                  => [self::class, \Illuminate\Contracts\Container\Container::class, \Illuminate\Contracts\Foundation\Application::class,  \Psr\Container\ContainerInterface::class],
+            'app'                  => [self::class, \Illuminate\Contracts\Container\Container::class, \Illuminate\Contracts\Foundation\Application::class, \Psr\Container\ContainerInterface::class],
             'auth'                 => [\Illuminate\Auth\AuthManager::class, \Illuminate\Contracts\Auth\Factory::class],
             'auth.driver'          => [\Illuminate\Contracts\Auth\Guard::class],
             'blade.compiler'       => [\Illuminate\View\Compilers\BladeCompiler::class],
             'cache'                => [\Illuminate\Cache\CacheManager::class, \Illuminate\Contracts\Cache\Factory::class],
-            'cache.store'          => [\Illuminate\Cache\Repository::class, \Illuminate\Contracts\Cache\Repository::class],
+            'cache.store'          => [\Illuminate\Cache\Repository::class, \Illuminate\Contracts\Cache\Repository::class, \Psr\SimpleCache\CacheInterface::class],
+            'cache.psr6'           => [\Symfony\Component\Cache\Adapter\Psr16Adapter::class, \Symfony\Component\Cache\Adapter\AdapterInterface::class, \Psr\Cache\CacheItemPoolInterface::class],
             'config'               => [\Illuminate\Config\Repository::class, \Illuminate\Contracts\Config\Repository::class],
             'cookie'               => [\Illuminate\Cookie\CookieJar::class, \Illuminate\Contracts\Cookie\Factory::class, \Illuminate\Contracts\Cookie\QueueingFactory::class],
             'encrypter'            => [\Illuminate\Encryption\Encrypter::class, \Illuminate\Contracts\Encryption\Encrypter::class],
-            'db'                   => [\Illuminate\Database\DatabaseManager::class],
+            'db'                   => [\Illuminate\Database\DatabaseManager::class, \Illuminate\Database\ConnectionResolverInterface::class],
             'db.connection'        => [\Illuminate\Database\Connection::class, \Illuminate\Database\ConnectionInterface::class],
             'events'               => [\Illuminate\Events\Dispatcher::class, \Illuminate\Contracts\Events\Dispatcher::class],
             'files'                => [\Illuminate\Filesystem\Filesystem::class],

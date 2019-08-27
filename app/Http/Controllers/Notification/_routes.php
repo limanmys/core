@@ -17,3 +17,7 @@ Route::post('/bildirim/oku','Notification\MainController@read')->name('notificat
 Route::post('/bildirimler/oku','Notification\MainController@readAll')->name('notifications_read');
 
 Route::view('/bildirim/{notification_id}','notification.one');
+
+Route::view('/sistemBildirimi/{notification_id}','notification.system')->name('system_notification')->middleware('admin');
+
+Route::post('/bildirim/adminOku','Notification\MainController@adminRead')->name('notification_admin_read')->middleware('admin');

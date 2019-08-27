@@ -62,6 +62,13 @@ class Command extends SymfonyCommand
     protected $description;
 
     /**
+     * The console command help text.
+     *
+     * @var string
+     */
+    protected $help;
+
+    /**
      * Indicates whether the command should be shown in the Artisan command list.
      *
      * @var bool
@@ -108,6 +115,8 @@ class Command extends SymfonyCommand
         // related properties of the command. If a signature wasn't used to build
         // the command we'll set the arguments and the options on this command.
         $this->setDescription($this->description);
+
+        $this->setHelp($this->help);
 
         $this->setHidden($this->isHidden());
 
@@ -186,33 +195,67 @@ class Command extends SymfonyCommand
     /**
      * Call another console command.
      *
-     * @param  string  $command
-     * @param  array   $arguments
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
+     * @param  array  $arguments
      * @return int
      */
     public function call($command, array $arguments = [])
     {
-        $arguments['command'] = $command;
-
-        return $this->getApplication()->find($command)->run(
-            $this->createInputFromArguments($arguments), $this->output
-        );
+        return $this->runCommand($command, $arguments, $this->output);
     }
 
     /**
      * Call another console command silently.
      *
-     * @param  string  $command
-     * @param  array   $arguments
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
+     * @param  array  $arguments
      * @return int
      */
     public function callSilent($command, array $arguments = [])
     {
+        return $this->runCommand($command, $arguments, new NullOutput);
+    }
+
+    /**
+     * Run the given the console command.
+     *
+     * @param  \Symfony\Component\Console\Command\Command|string $command
+     * @param  array  $arguments
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return int
+     */
+    protected function runCommand($command, array $arguments, OutputInterface $output)
+    {
         $arguments['command'] = $command;
 
-        return $this->getApplication()->find($command)->run(
-            $this->createInputFromArguments($arguments), new NullOutput
+        return $this->resolveCommand($command)->run(
+            $this->createInputFromArguments($arguments), $output
         );
+    }
+
+    /**
+     * Resolve the console command instance for the given command.
+     *
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
+     * @return \Symfony\Component\Console\Command\Command
+     */
+    protected function resolveCommand($command)
+    {
+        if (! class_exists($command)) {
+            return $this->getApplication()->find($command);
+        }
+
+        $command = new $command;
+
+        if ($command instanceof SymfonyCommand) {
+            $command->setApplication($this->getApplication());
+        }
+
+        if ($command instanceof self) {
+            $command->setLaravel($this->getLaravel());
+        }
+
+        return $command;
     }
 
     /**
@@ -348,11 +391,11 @@ class Command extends SymfonyCommand
      * Prompt the user for input with auto completion.
      *
      * @param  string  $question
-     * @param  array   $choices
+     * @param  array|callable  $choices
      * @param  string|null  $default
      * @return mixed
      */
-    public function anticipate($question, array $choices, $default = null)
+    public function anticipate($question, $choices, $default = null)
     {
         return $this->askWithCompletion($question, $choices, $default);
     }
@@ -361,15 +404,17 @@ class Command extends SymfonyCommand
      * Prompt the user for input with auto completion.
      *
      * @param  string  $question
-     * @param  array   $choices
+     * @param  array|callable $choices
      * @param  string|null  $default
      * @return mixed
      */
-    public function askWithCompletion($question, array $choices, $default = null)
+    public function askWithCompletion($question, $choices, $default = null)
     {
         $question = new Question($question, $default);
 
-        $question->setAutocompleterValues($choices);
+        is_callable($choices)
+            ? $question->setAutocompleterCallback($choices)
+            : $question->setAutocompleterValues($choices);
 
         return $this->output->askQuestion($question);
     }

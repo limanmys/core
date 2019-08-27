@@ -1,5 +1,6 @@
 <?php
 
+use App\AdminNotification;
 use App\Extension;
 use App\Notification;
 use App\Script;
@@ -46,6 +47,19 @@ if (!function_exists('notifications')) {
         ])->orderBy('updated_at', 'desc')->get();
     }
 }
+
+if (!function_exists('adminNotifications')) {
+    /**
+     * @return mixed
+     */
+    function adminNotifications()
+    {
+        return AdminNotification::where([
+            "read" => "false"
+        ])->orderBy('updated_at', 'desc')->get();
+    }
+}
+
 
 if (!function_exists('system_log')) {
 
@@ -355,10 +369,10 @@ if (!function_exists('clean_score')) {
     }
 }
 if (!function_exists('is_json')) {
-  function is_json($string,$return_data = false) {
+    function is_json($string,$return_data = false) {
         $data = json_decode($string);
-       return (json_last_error() == JSON_ERROR_NONE) ? ($return_data ? $data : TRUE) : FALSE;
-  }
+        return (json_last_error() == JSON_ERROR_NONE) ? ($return_data ? $data : TRUE) : FALSE;
+    }
 }
 
 if (!function_exists('getPermissions')) {
@@ -414,15 +428,38 @@ if (!function_exists('checkHealth')) {
         ];
         $messages = [];
 
-        // Check Permissions
+        // Check Permissions and Owners
         foreach ($allowed as $name=>$permission){
+            // Permission Check
+            $file = "/liman/" . $name;
+            if(!file_exists($file)){
+                array_push($messages,[
+                    "type" => "danger",
+                    "message" => "'/liman/$name' isimli sistem dosyası bulunamadı"
+                ]);
+                continue;
+            }
+
             if(getPermissions('/liman/' . $name) != $permission){
                 array_push($messages,[
                     "type" => "danger",
-                    "message" => "'/liman/$name' izni hatali (". getPermissions('/liman/' . $name) .")."
+                    "message" => "'/liman/$name' izni hatalı (". getPermissions('/liman/' . $name) .")."
+                ]);
+            }
+
+            // Owners Check
+            $owner = posix_getpwuid(fileowner($file))["name"];
+            $group = posix_getgrgid(filegroup($file))["name"];
+            if($owner != "liman" || $group != "liman"){
+                array_push($messages,[
+                    "type" => "danger",
+                    "message" => "'/liman/$name' dosyasının sahibi hatalı ($owner : $group)."
                 ]);
             }
         }
+
+
+
 
         // Check Extra Files
         $extra = array_diff(array_diff(scandir("/liman"),array('..','.')),array_keys($allowed));

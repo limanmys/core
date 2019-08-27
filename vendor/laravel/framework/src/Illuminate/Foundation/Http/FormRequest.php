@@ -112,7 +112,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      *
      * @return array
      */
-    protected function validationData()
+    public function validationData()
     {
         return $this->all();
     }
@@ -175,7 +175,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function failedAuthorization()
     {
-        throw new AuthorizationException('This action is unauthorized.');
+        throw new AuthorizationException;
     }
 
     /**

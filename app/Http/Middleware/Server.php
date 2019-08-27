@@ -8,6 +8,11 @@ class Server
 {
     public function handle($request, Closure $next)
     {
+        if(server()->enabled == false){
+            return redirect()->back()->withErrors([
+                "message" => server()->name."(".server()->ip_address.") ".__("isimli sunucu henüz onaylanmamış!")
+            ]);
+        }
         if(shell_exec("echo quit | timeout " . (intval(env('SERVER_CONNECTION_TIMEOUT')) / 1000). " telnet "
             . server()->ip_address . " " . server()->control_port . "  | grep \"Connected\"")){
             return $next($request);
@@ -16,5 +21,6 @@ class Server
                 "message" => server()->name."(".server()->ip_address.") ".__("isimli sunucuya erişim sağlanamadı!")
             ]);
         }
+
     }
 }

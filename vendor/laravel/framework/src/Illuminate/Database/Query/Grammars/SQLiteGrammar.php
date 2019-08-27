@@ -9,25 +9,6 @@ use Illuminate\Database\Query\Builder;
 class SQLiteGrammar extends Grammar
 {
     /**
-     * The components that make up a select clause.
-     *
-     * @var array
-     */
-    protected $selectComponents = [
-        'aggregate',
-        'columns',
-        'from',
-        'joins',
-        'wheres',
-        'groups',
-        'havings',
-        'orders',
-        'limit',
-        'offset',
-        'lock',
-    ];
-
-    /**
      * All of the available clause operators.
      *
      * @var array
@@ -39,37 +20,14 @@ class SQLiteGrammar extends Grammar
     ];
 
     /**
-     * Compile a select query into SQL.
+     * Wrap a union subquery in parentheses.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $sql
      * @return string
      */
-    public function compileSelect(Builder $query)
+    protected function wrapUnion($sql)
     {
-        if ($query->unions && $query->aggregate) {
-            return $this->compileUnionAggregate($query);
-        }
-
-        $sql = parent::compileSelect($query);
-
-        if ($query->unions) {
-            $sql = 'select * from ('.$sql.') '.$this->compileUnions($query);
-        }
-
-        return $sql;
-    }
-
-    /**
-     * Compile a single union statement.
-     *
-     * @param  array  $union
-     * @return string
-     */
-    protected function compileUnion(array $union)
-    {
-        $conjunction = $union['all'] ? ' union all ' : ' union ';
-
-        return $conjunction.'select * from ('.$union['query']->toSql().')';
+        return 'select * from ('.$sql.')';
     }
 
     /**
@@ -163,43 +121,67 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Compile an insert statement into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
-     * @return string
-     */
-    public function compileInsert(Builder $query, array $values)
-    {
-        $table = $this->wrapTable($query->from);
-
-        return empty($values)
-                ? "insert into {$table} DEFAULT VALUES"
-                : parent::compileInsert($query, $values);
-    }
-
-    /**
      * Compile an update statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
      * @return string
      */
-    public function compileUpdate(Builder $query, $values)
+    public function compileUpdate(Builder $query, array $values)
+    {
+        if (isset($query->joins) || isset($query->limit)) {
+            return $this->compileUpdateWithJoinsOrLimit($query, $values);
+        }
+
+        return parent::compileUpdate($query, $values);
+    }
+
+    /**
+     * Compile an insert ignore statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    public function compileInsertOrIgnore(Builder $query, array $values)
+    {
+        return Str::replaceFirst('insert', 'insert or ignore', $this->compileInsert($query, $values));
+    }
+
+    /**
+     * Compile the columns for an update statement.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    protected function compileUpdateColumns(Builder $query, array $values)
+    {
+        return collect($values)->map(function ($value, $key) {
+            $column = last(explode('.', $key));
+
+            return $this->wrap($column).' = '.$this->parameter($value);
+        })->implode(', ');
+    }
+
+    /**
+     * Compile an update statement with joins or limit into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    protected function compileUpdateWithJoinsOrLimit(Builder $query, array $values)
     {
         $table = $this->wrapTable($query->from);
 
-        $columns = collect($values)->map(function ($value, $key) use ($query) {
-            return $this->wrap(Str::after($key, $query->from.'.')).' = '.$this->parameter($value);
-        })->implode(', ');
+        $columns = $this->compileUpdateColumns($query, $values);
 
-        if (isset($query->joins) || isset($query->limit)) {
-            $selectSql = parent::compileSelect($query->select("{$query->from}.rowid"));
+        $alias = last(preg_split('/\s+as\s+/i', $query->from));
 
-            return "update {$table} set $columns where {$this->wrap('rowid')} in ({$selectSql})";
-        }
+        $selectSql = $this->compileSelect($query->select($alias.'.rowid'));
 
-        return trim("update {$table} set {$columns} {$this->compileWheres($query)}");
+        return "update {$table} set {$columns} where {$this->wrap('rowid')} in ({$selectSql})";
     }
 
     /**
@@ -211,10 +193,10 @@ class SQLiteGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        $cleanBindings = Arr::except($bindings, ['select', 'join']);
+        $cleanBindings = Arr::except($bindings, 'select');
 
         return array_values(
-            array_merge($values, $bindings['join'], Arr::flatten($cleanBindings))
+            array_merge($values, Arr::flatten($cleanBindings))
         );
     }
 
@@ -230,9 +212,7 @@ class SQLiteGrammar extends Grammar
             return $this->compileDeleteWithJoinsOrLimit($query);
         }
 
-        $wheres = is_array($query->wheres) ? $this->compileWheres($query) : '';
-
-        return trim("delete from {$this->wrapTable($query->from)} $wheres");
+        return parent::compileDelete($query);
     }
 
     /**
@@ -243,13 +223,13 @@ class SQLiteGrammar extends Grammar
      */
     protected function compileDeleteWithJoinsOrLimit(Builder $query)
     {
-        $segments = preg_split('/\s+as\s+/i', $query->from);
+        $table = $this->wrapTable($query->from);
 
-        $alias = $segments[1] ?? $segments[0];
+        $alias = last(preg_split('/\s+as\s+/i', $query->from));
 
-        $selectSql = parent::compileSelect($query->select($alias.'.rowid'));
+        $selectSql = $this->compileSelect($query->select($alias.'.rowid'));
 
-        return "delete from {$this->wrapTable($query->from)} where {$this->wrap('rowid')} in ({$selectSql})";
+        return "delete from {$table} where {$this->wrap('rowid')} in ({$selectSql})";
     }
 
     /**

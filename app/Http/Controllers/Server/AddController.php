@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Server;
 
+use App\AdminNotification;
+use App\Certificate;
+use App\Classes\Connector\WinRMConnector;
 use App\Http\Controllers\Controller;
 use App\Key;
 use App\Permission;
@@ -126,7 +129,7 @@ class AddController extends Controller
         $key->server_id = $this->server->id;
         $key->user_id = auth()->user()->id;
         $key->save();
-        $flag = \App\Classes\Connector\WinRMConnector::create($this->server,request('username'), request('password'),auth()->id(),$key);
+        $flag = WinRMConnector::create($this->server,request('username'), request('password'),auth()->id(),$key);
 
         if(!$flag){
             $this->server->delete();
@@ -144,6 +147,26 @@ class AddController extends Controller
         $permission->user_id = auth()->id();
         $permission->save();
 
+        // SSL Control
+        $possiblePorts = ["636","5986"];
+        if(in_array($this->server->control_port, $possiblePorts)){
+            $cert = Certificate::where([
+                'server_hostname' => $this->server->ip_address,
+                'origin' => $this->server->control_port
+            ])->first();
+            if(!$cert){
+                // Notify Admins
+                $this->server->enabled = false;
+                $this->server->save();
+                $notification = new AdminNotification();
+                $notification->title = "Yeni Sertifika Onayı";
+                $notification->type = "cert_request";
+                $notification->message = $this->server->ip_address . ":" . $this->server->control_port . ":" . $this->server->id;
+                $notification->level = 3;
+                $notification->save();
+                return respond("Bu sunucu ilk defa ekliğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede sunucuya erişemezsiniz.",202);
+            }
+        }
         return respond(route('server_one',$this->server->id),300);
     }
 }

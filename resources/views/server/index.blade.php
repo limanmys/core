@@ -8,24 +8,27 @@
         </ol>
     </nav>
     <button href="#tab_1" type="button" class="btn btn-success" data-toggle="modal" data-target="#add_server">{{__("Sunucu Ekle")}}</button><br><br>
-    @include('l.errors')    
+    @include('l.errors')
+    <?php
+    use Illuminate\Support\Facades\DB;
+    $servers = servers();
+    foreach ($servers as $server){
+        $server->extension_count = DB::table('server_extensions')->where('server_id',$server->id)->count();
+    }
+    ?>
     @include('l.table',[
-        "value" => servers(),
+        "value" => $servers,
         "title" => [
-            "Sunucu Adı" , "İp Adresi" , "*hidden*" , "Kontrol Portu", "Durumu", "*hidden*" ,"*hidden*"
+            "Sunucu Adı" , "İp Adresi" , "*hidden*" , "Kontrol Portu", "Eklenti Sayısı", "*hidden*" ,"*hidden*"
         ],
         "display" => [
-            "name" , "ip_address", "type:type" , "control_port", "status", "city:city", "id:server_id"
+            "name" , "ip_address", "type:type" , "control_port", "extension_count", "city:city", "id:server_id"
         ],
         "menu" => [
             "Düzenle" => [
                 "target" => "edit",
                 "icon" => "fa-edit"
             ],
-            /*"Yetki Ver" => [
-                "target" => "give_permission",
-                "icon" => "fa-unlock"
-            ],*/
             "Sil" => [
                 "target" => "delete",
                 "icon" => "fa-trash"
@@ -69,29 +72,29 @@
                         <div class="tab-pane" id="general">
                             <form onsubmit="return checkGeneral(this)">
                                 <div class="modal-body" style="margin-top: -20px">
-                                <h4>{{__("Sunucunuzun Adı")}}</h4>
-                                <input id="server_name" type="text" name="server_name" class="form-control" placeholder="{{__("Sunucunuzun Adı")}}" required><br>
-                                <h4>{{__("Şehir")}}</h4>
-                                <small>{{__("Sunucunuza bir şehir atayarak, eklentileri kullanırken Türkiye haritası üzerinde erişiminizi kolaylaştırabilirsiniz.")}}</small><br>
-                                <select name="server_city" id="serverCity" class="form-control" required>
-                                    <option value="">{{__('Şehir Seçiniz')}}</option>
-                                    @foreach(cities() as $name=>$code)
-                                        <option value="{{$code}}">{{$name}}</option>
-                                    @endforeach
-                                </select><br>
-                                <h4>{{__("Sunucunuzun İşletim Sistemi")}}</h4>
-                                <div class="form-group">
-                                    <div class="radio">
-                                        <label>
-                                            <input type="radio" name="operating_system" value="windows" data-content="{{__("Microsoft Windows")}}">
-                                            {{__("Microsoft Windows")}}
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="operating_system" value="linux" checked data-content="{{__("GNU/Linux")}}">
-                                            {{__("GNU/Linux")}}
-                                        </label>
+                                    <h4>{{__("Sunucunuzun Adı")}}</h4>
+                                    <input id="server_name" type="text" name="server_name" class="form-control" placeholder="{{__("Sunucunuzun Adı")}}" required><br>
+                                    <h4>{{__("Şehir")}}</h4>
+                                    <small>{{__("Sunucunuza bir şehir atayarak, eklentileri kullanırken Türkiye haritası üzerinde erişiminizi kolaylaştırabilirsiniz.")}}</small><br>
+                                    <select name="server_city" id="serverCity" class="form-control" required>
+                                        <option value="">{{__('Şehir Seçiniz')}}</option>
+                                        @foreach(cities() as $name=>$code)
+                                            <option value="{{$code}}">{{$name}}</option>
+                                        @endforeach
+                                    </select><br>
+                                    <h4>{{__("Sunucunuzun İşletim Sistemi")}}</h4>
+                                    <div class="form-group">
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="operating_system" value="windows" data-content="{{__("Microsoft Windows")}}">
+                                                {{__("Microsoft Windows")}}
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="operating_system" value="linux" checked data-content="{{__("GNU/Linux")}}">
+                                                {{__("GNU/Linux")}}
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn-primary">{{__("Ayarları Onayla")}}</button>
@@ -133,38 +136,38 @@
                             </form>
                         </div>
                         <div class="tab-pane" id="summary">
-                                <div class="modal-body">
-                                    <style>td{padding:15px;}</style>
-                                    <table class="notDataTable">
-                                        <tr>
-                                            <td>{{__("Sunucu Adı")}}</td>
-                                            <td id="tableServerName"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{{__("Şehir")}}</td>
-                                            <td id="tableServerCity"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{{__("İşletim Sistemi")}}</td>
-                                            <td id="tableOperatingSystem"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{{__("Sunucu Adresi")}}</td>
-                                            <td id="tableServerHostname"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{{__("Sunucu Portu")}}</td>
-                                            <td id="tableServerPort"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{{__("Anahtar")}}</td>
-                                            <td id="tableKey"></td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" onclick="addServer()" class="btn btn-success">{{__("Sunucuyu Ekle")}}</button>
-                                </div>
+                            <div class="modal-body">
+                                <style>td{padding:15px;}</style>
+                                <table class="notDataTable">
+                                    <tr>
+                                        <td>{{__("Sunucu Adı")}}</td>
+                                        <td id="tableServerName"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{__("Şehir")}}</td>
+                                        <td id="tableServerCity"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{__("İşletim Sistemi")}}</td>
+                                        <td id="tableOperatingSystem"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{__("Sunucu Adresi")}}</td>
+                                        <td id="tableServerHostname"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{__("Sunucu Portu")}}</td>
+                                        <td id="tableServerPort"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{__("Anahtar")}}</td>
+                                        <td id="tableKey"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" onclick="addServer()" class="btn btn-success">{{__("Sunucuyu Ekle")}}</button>
+                            </div>
                         </div>
 
                     </div>
@@ -357,20 +360,30 @@
             form.append("city",$("#serverCity").val());
             form.append('type',$("input[name=operating_system]:checked").val());
             if($("#useKey").is(':checked') === true){
-              console.log("checked");
+                console.log("checked");
                 form.append('username',$("#keyUsername").val());
                 form.append('password',$("#keyPassword").val());
             }
             request('{{route('server_add')}}',form,"",function (errors) {
                 let json = JSON.parse(errors);
-                Swal.fire({
-                    position: 'center',
-                    type: 'error',
-                    title: json["message"],
-                    showConfirmButton: false,
-                    allowOutsideClick : false,
-                    timer : 2000
-                });
+                if(json["status"] == "202"){
+                    Swal.fire({
+                        position: 'center',
+                        type: 'info',
+                        title: json["message"],
+                        showConfirmButton: true,
+                        allowOutsideClick : false,
+                    });
+                }else{
+                    Swal.fire({
+                        position: 'center',
+                        type: 'error',
+                        title: json["message"],
+                        showConfirmButton: false,
+                        allowOutsideClick : false,
+                        timer : 2000
+                    });
+                }
             });
         }
     </script>
@@ -401,18 +414,5 @@
         ],
         "submit_text" => "Düzenle"
     ])
-
-   {{-- @include('l.modal',[
-        "id"=>"give_permission",
-        "title" => "Kullanıcıya Yetki Ver",
-        "url" => route('server_grant_permission'),
-        "next" => "function(){return true;}",
-        "inputs" => [
-            "Kullanıcı Emaili" => "email:text",
-            "Sunucu Id:a" => "server_id:hidden"
-        ],
-        "text" => "Güvenlik sebebiyle kullanıcı listesi sunulmamaktadır.",
-        "submit_text" => "Yetkilendir"
-    ]) --}}
 
 @endsection

@@ -36,7 +36,7 @@ class MailMessage extends SimpleMessage implements Renderable
      *
      * @var string|null
      */
-    public $theme = 'default';
+    public $theme;
 
     /**
      * The "from" information for the message.
@@ -309,6 +309,12 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function render()
     {
+        if (isset($this->view)) {
+            return Container::getInstance()->make('mailer')->render(
+                $this->view, $this->data()
+            );
+        }
+
         return Container::getInstance()
             ->make(Markdown::class)
             ->render($this->markdown, $this->data());

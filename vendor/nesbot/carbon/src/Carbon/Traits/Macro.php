@@ -30,6 +30,8 @@ namespace Carbon\Traits;
  */
 trait Macro
 {
+    use Mixin;
+
     /**
      * The registered macros.
      *
@@ -94,53 +96,6 @@ trait Macro
         }
 
         static::$globalGenericMacros[$priority][] = $macro;
-    }
-
-    /**
-     * Mix another object into the class.
-     *
-     * @example
-     * ```
-     * Carbon::mixin(new class {
-     *   public function addMoon() {
-     *     return function () {
-     *       return $this->addDays(30);
-     *     };
-     *   }
-     *   public function subMoon() {
-     *     return function () {
-     *       return $this->subDays(30);
-     *     };
-     *   }
-     * });
-     * $fullMoon = Carbon::create('2018-12-22');
-     * $nextFullMoon = $fullMoon->addMoon();
-     * $blackMoon = Carbon::create('2019-01-06');
-     * $previousBlackMoon = $blackMoon->subMoon();
-     * echo "$nextFullMoon\n";
-     * echo "$previousBlackMoon\n";
-     * ```
-     *
-     * @param object $mixin
-     *
-     * @throws \ReflectionException
-     *
-     * @return void
-     */
-    public static function mixin($mixin)
-    {
-        $methods = (new \ReflectionClass($mixin))->getMethods(
-            \ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED
-        );
-
-        foreach ($methods as $method) {
-            if ($method->isConstructor() || $method->isDestructor()) {
-                continue;
-            }
-            $method->setAccessible(true);
-
-            static::macro($method->name, $method->invoke($mixin));
-        }
     }
 
     /**
