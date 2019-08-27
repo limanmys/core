@@ -49,6 +49,12 @@
             <div class="tab-pane active" id="usageTab">
                 @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
                     <h4>Hostname : {{$hostname}}</h4>
+                    @if(server()->type == "linux_ssh")
+                        <h4>{{server()->run("lsb_release -ds")}}</h4>
+                    @else
+                        <h4>{{__("Versiyon : " ) . server()->run("(Get-WmiObject Win32_OperatingSystem).Version")}}</h4>
+                        
+                    @endif
                 @endif
                 <h4>{{__("İp Adresi : ") . server()->ip_address }}</h4>
                 @if($installed_extensions->count() > 0)
