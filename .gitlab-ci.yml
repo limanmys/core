@@ -14,8 +14,6 @@ Build:
     - php composer-setup.php
     - php7.3 composer.phar clearcache
     - php7.3 composer.phar install --no-dev -d liman/server
-    - php7.3 liman/server/artisan config:cache
-    - php7.3 liman/server/artisan route:cache
     - rm -rf composer.phar composer-setup.php liman/server/.git liman/sandbox/.git liman/webssh/.git
     - mv create_deb.sh ../create_deb.sh
     - chmod +x ../create_deb.sh
