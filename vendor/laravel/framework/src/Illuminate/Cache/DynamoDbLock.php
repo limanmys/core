@@ -42,15 +42,13 @@ class DynamoDbLock extends Lock
     /**
      * Release the lock.
      *
-     * @return bool
+     * @return void
      */
     public function release()
     {
         if ($this->isOwnedByCurrentProcess()) {
-            return $this->dynamo->forget($this->name);
+            $this->dynamo->forget($this->name);
         }
-
-        return false;
     }
 
     /**

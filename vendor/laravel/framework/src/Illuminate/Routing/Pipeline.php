@@ -2,11 +2,13 @@
 
 namespace Illuminate\Routing;
 
+use Closure;
 use Exception;
+use Throwable;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 /**
  * This extended pipeline catches any exceptions that occur during each slice.
@@ -16,16 +18,46 @@ use Illuminate\Pipeline\Pipeline as BasePipeline;
 class Pipeline extends BasePipeline
 {
     /**
-     * Handles the value returned from each pipe before passing it to the next.
+     * Get the final piece of the Closure onion.
      *
-     * @param  mixed $carry
-     * @return mixed
+     * @param  \Closure  $destination
+     * @return \Closure
      */
-    protected function handleCarry($carry)
+    protected function prepareDestination(Closure $destination)
     {
-        return $carry instanceof Responsable
-            ? $carry->toResponse($this->getContainer()->make(Request::class))
-            : $carry;
+        return function ($passable) use ($destination) {
+            try {
+                return $destination($passable);
+            } catch (Exception $e) {
+                return $this->handleException($passable, $e);
+            } catch (Throwable $e) {
+                return $this->handleException($passable, new FatalThrowableError($e));
+            }
+        };
+    }
+
+    /**
+     * Get a Closure that represents a slice of the application onion.
+     *
+     * @return \Closure
+     */
+    protected function carry()
+    {
+        return function ($stack, $pipe) {
+            return function ($passable) use ($stack, $pipe) {
+                try {
+                    $slice = parent::carry();
+
+                    $callable = $slice($stack, $pipe);
+
+                    return $callable($passable);
+                } catch (Exception $e) {
+                    return $this->handleException($passable, $e);
+                } catch (Throwable $e) {
+                    return $this->handleException($passable, new FatalThrowableError($e));
+                }
+            };
+        };
     }
 
     /**

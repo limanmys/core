@@ -9,6 +9,25 @@ use Illuminate\Database\Query\Builder;
 class PostgresGrammar extends Grammar
 {
     /**
+     * The components that make up a select clause.
+     *
+     * @var array
+     */
+    protected $selectComponents = [
+        'aggregate',
+        'columns',
+        'from',
+        'joins',
+        'wheres',
+        'groups',
+        'havings',
+        'orders',
+        'limit',
+        'offset',
+        'lock',
+    ];
+
+    /**
      * All of the available clause operators.
      *
      * @var array
@@ -86,30 +105,37 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile the "select *" portion of the query.
+     * Compile a select query into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $columns
-     * @return string|null
+     * @return string
      */
-    protected function compileColumns(Builder $query, $columns)
+    public function compileSelect(Builder $query)
     {
-        // If the query is actually performing an aggregating select, we will let that
-        // compiler handle the building of the select clauses, as it will need some
-        // more syntax that is best handled by that function to keep things neat.
-        if (! is_null($query->aggregate)) {
-            return;
+        if ($query->unions && $query->aggregate) {
+            return $this->compileUnionAggregate($query);
         }
 
-        if (is_array($query->distinct)) {
-            $select = 'select distinct on ('.$this->columnize($query->distinct).') ';
-        } elseif ($query->distinct) {
-            $select = 'select distinct ';
-        } else {
-            $select = 'select ';
+        $sql = parent::compileSelect($query);
+
+        if ($query->unions) {
+            $sql = '('.$sql.') '.$this->compileUnions($query);
         }
 
-        return $select.$this->columnize($columns);
+        return $sql;
+    }
+
+    /**
+     * Compile a single union statement.
+     *
+     * @param  array  $union
+     * @return string
+     */
+    protected function compileUnion(array $union)
+    {
+        $conjunction = $union['all'] ? ' union all ' : ' union ';
+
+        return $conjunction.'('.$union['query']->toSql().')';
     }
 
     /**
@@ -158,6 +184,18 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function compileInsert(Builder $query, array $values)
+    {
+        $table = $this->wrapTable($query->from);
+
+        return empty($values)
+                ? "insert into {$table} DEFAULT VALUES"
+                : parent::compileInsert($query, $values);
+    }
+
+    /**
      * Compile an insert ignore statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -189,24 +227,34 @@ class PostgresGrammar extends Grammar
      * @param  array  $values
      * @return string
      */
-    public function compileUpdate(Builder $query, array $values)
+    public function compileUpdate(Builder $query, $values)
     {
-        if (isset($query->joins) || isset($query->limit)) {
-            return $this->compileUpdateWithJoinsOrLimit($query, $values);
-        }
+        $table = $this->wrapTable($query->from);
 
-        return parent::compileUpdate($query, $values);
+        // Each one of the columns in the update statements needs to be wrapped in the
+        // keyword identifiers, also a place-holder needs to be created for each of
+        // the values in the list of bindings so we can make the sets statements.
+        $columns = $this->compileUpdateColumns($query, $values);
+
+        $from = $this->compileUpdateFrom($query);
+
+        $where = $this->compileUpdateWheres($query);
+
+        return trim("update {$table} set {$columns}{$from} {$where}");
     }
 
     /**
-     * Compile the columns for an update statement.
+     * Compile the columns for the update statement.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
+     * @param  array   $values
      * @return string
      */
-    protected function compileUpdateColumns(Builder $query, array $values)
+    protected function compileUpdateColumns($query, $values)
     {
+        // When gathering the columns for an update statement, we'll wrap each of the
+        // columns and convert it to a parameter value. Then we will concatenate a
+        // list of the columns that can be added into this update query clauses.
         return collect($values)->map(function ($value, $key) {
             $column = last(explode('.', $key));
 
@@ -227,33 +275,87 @@ class PostgresGrammar extends Grammar
      */
     protected function compileJsonUpdateColumn($key, $value)
     {
-        $segments = explode('->', $key);
+        $parts = explode('->', $key);
 
-        $field = $this->wrap(array_shift($segments));
+        $field = $this->wrap(array_shift($parts));
 
-        $path = '\'{"'.implode('","', $segments).'"}\'';
+        $path = '\'{"'.implode('","', $parts).'"}\'';
 
         return "{$field} = jsonb_set({$field}::jsonb, {$path}, {$this->parameter($value)})";
     }
 
     /**
-     * Compile an update statement with joins or limit into SQL.
+     * Compile the "from" clause for an update with a join.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
+     * @return string|null
+     */
+    protected function compileUpdateFrom(Builder $query)
+    {
+        if (! isset($query->joins)) {
+            return '';
+        }
+
+        // When using Postgres, updates with joins list the joined tables in the from
+        // clause, which is different than other systems like MySQL. Here, we will
+        // compile out the tables that are joined and add them to a from clause.
+        $froms = collect($query->joins)->map(function ($join) {
+            return $this->wrapTable($join->table);
+        })->all();
+
+        if (count($froms) > 0) {
+            return ' from '.implode(', ', $froms);
+        }
+    }
+
+    /**
+     * Compile the additional where clauses for updates with joins.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
-    protected function compileUpdateWithJoinsOrLimit(Builder $query, array $values)
+    protected function compileUpdateWheres(Builder $query)
     {
-        $table = $this->wrapTable($query->from);
+        $baseWheres = $this->compileWheres($query);
 
-        $columns = $this->compileUpdateColumns($query, $values);
+        if (! isset($query->joins)) {
+            return $baseWheres;
+        }
 
-        $alias = last(preg_split('/\s+as\s+/i', $query->from));
+        // Once we compile the join constraints, we will either use them as the where
+        // clause or append them to the existing base where clauses. If we need to
+        // strip the leading boolean we will do so when using as the only where.
+        $joinWheres = $this->compileUpdateJoinWheres($query);
 
-        $selectSql = $this->compileSelect($query->select($alias.'.ctid'));
+        if (trim($baseWheres) == '') {
+            return 'where '.$this->removeLeadingBoolean($joinWheres);
+        }
 
-        return "update {$table} set {$columns} where {$this->wrap('ctid')} in ({$selectSql})";
+        return $baseWheres.' '.$joinWheres;
+    }
+
+    /**
+     * Compile the "join" clause where clauses for an update.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compileUpdateJoinWheres(Builder $query)
+    {
+        $joinWheres = [];
+
+        // Here we will just loop through all of the join constraints and compile them
+        // all out then implode them. This should give us "where" like syntax after
+        // everything has been built and then we will join it to the real wheres.
+        foreach ($query->joins as $join) {
+            foreach ($join->wheres as $where) {
+                $method = "where{$where['type']}";
+
+                $joinWheres[] = $where['boolean'].' '.$this->$method($query, $where);
+            }
+        }
+
+        return implode(' ', $joinWheres);
     }
 
     /**
@@ -266,15 +368,15 @@ class PostgresGrammar extends Grammar
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
         $values = collect($values)->map(function ($value, $column) {
-            return is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
+            return $this->isJsonSelector($column) && ! $this->isExpression($value)
                 ? json_encode($value)
                 : $value;
         })->all();
 
-        $cleanBindings = Arr::except($bindings, 'select');
+        $bindingsWithoutWhere = Arr::except($bindings, ['select', 'where']);
 
         return array_values(
-            array_merge($values, Arr::flatten($cleanBindings))
+            array_merge($values, $bindings['where'], Arr::flatten($bindingsWithoutWhere))
         );
     }
 
@@ -286,28 +388,44 @@ class PostgresGrammar extends Grammar
      */
     public function compileDelete(Builder $query)
     {
-        if (isset($query->joins) || isset($query->limit)) {
-            return $this->compileDeleteWithJoinsOrLimit($query);
-        }
+        $table = $this->wrapTable($query->from);
 
-        return parent::compileDelete($query);
+        return isset($query->joins)
+            ? $this->compileDeleteWithJoins($query, $table)
+            : parent::compileDelete($query);
     }
 
     /**
-     * Compile a delete statement with joins or limit into SQL.
+     * Compile a delete query that uses joins.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $table
      * @return string
      */
-    protected function compileDeleteWithJoinsOrLimit(Builder $query)
+    protected function compileDeleteWithJoins($query, $table)
     {
-        $table = $this->wrapTable($query->from);
+        $using = ' USING '.collect($query->joins)->map(function ($join) {
+            return $this->wrapTable($join->table);
+        })->implode(', ');
 
-        $alias = last(preg_split('/\s+as\s+/i', $query->from));
+        $where = $this->compileUpdateWheres($query);
 
-        $selectSql = $this->compileSelect($query->select($alias.'.ctid'));
+        return trim("delete from {$table}{$using} {$where}");
+    }
 
-        return "delete from {$table} where {$this->wrap('ctid')} in ({$selectSql})";
+    /**
+     * Prepare the bindings for a delete statement.
+     *
+     * @param  array  $bindings
+     * @return array
+     */
+    public function prepareBindingsForDelete(array $bindings)
+    {
+        $bindingsWithoutWhere = Arr::except($bindings, ['select', 'where']);
+
+        return array_values(
+            array_merge($bindings['where'], Arr::flatten($bindingsWithoutWhere))
+        );
     }
 
     /**

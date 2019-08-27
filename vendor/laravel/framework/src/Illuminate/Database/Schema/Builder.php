@@ -230,18 +230,6 @@ class Builder
     }
 
     /**
-     * Get all of the table names for the database.
-     *
-     * @return void
-     *
-     * @throws \LogicException
-     */
-    public function getAllTables()
-    {
-        throw new LogicException('This database driver does not support getting all tables.');
-    }
-
-    /**
      * Rename a table on the schema.
      *
      * @param  string  $from

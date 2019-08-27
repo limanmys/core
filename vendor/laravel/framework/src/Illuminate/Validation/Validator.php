@@ -655,19 +655,9 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
-        $invalid = array_intersect_key(
+        return array_intersect_key(
             $this->data, $this->attributesThatHaveMessages()
         );
-
-        $result = [];
-
-        $failed = Arr::only(Arr::dot($invalid), array_keys($this->failed()));
-
-        foreach ($failed as $key => $failure) {
-            Arr::set($result, $key, $failure);
-        }
-
-        return $result;
     }
 
     /**

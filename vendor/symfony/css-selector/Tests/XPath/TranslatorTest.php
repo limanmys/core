@@ -35,31 +35,25 @@ class TranslatorTest extends TestCase
         $this->assertEquals($xpath, $translator->cssToXPath($css, ''));
     }
 
-    /**
-     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
-     */
     public function testCssToXPathPseudoElement()
     {
+        $this->expectException('Symfony\Component\CssSelector\Exception\ExpressionErrorException');
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $translator->cssToXPath('e::first-line');
     }
 
-    /**
-     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
-     */
     public function testGetExtensionNotExistsExtension()
     {
+        $this->expectException('Symfony\Component\CssSelector\Exception\ExpressionErrorException');
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $translator->getExtension('fake');
     }
 
-    /**
-     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
-     */
     public function testAddCombinationNotExistsExtension()
     {
+        $this->expectException('Symfony\Component\CssSelector\Exception\ExpressionErrorException');
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $parser = new Parser();
@@ -68,11 +62,9 @@ class TranslatorTest extends TestCase
         $translator->addCombination('fake', $xpath, $combinedXpath);
     }
 
-    /**
-     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
-     */
     public function testAddFunctionNotExistsFunction()
     {
+        $this->expectException('Symfony\Component\CssSelector\Exception\ExpressionErrorException');
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
@@ -80,22 +72,18 @@ class TranslatorTest extends TestCase
         $translator->addFunction($xpath, $function);
     }
 
-    /**
-     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
-     */
     public function testAddPseudoClassNotExistsClass()
     {
+        $this->expectException('Symfony\Component\CssSelector\Exception\ExpressionErrorException');
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
         $translator->addPseudoClass($xpath, 'fake');
     }
 
-    /**
-     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
-     */
     public function testAddAttributeMatchingClassNotExistsClass()
     {
+        $this->expectException('Symfony\Component\CssSelector\Exception\ExpressionErrorException');
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();

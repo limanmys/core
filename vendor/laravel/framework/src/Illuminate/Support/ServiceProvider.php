@@ -15,6 +15,15 @@ abstract class ServiceProvider
     protected $app;
 
     /**
+     * Indicates if loading of the provider is deferred.
+     *
+     * @deprecated Implement the \Illuminate\Contracts\Support\DeferrableProvider interface instead. Will be removed in Laravel 6.0.
+     *
+     * @var bool
+     */
+    protected $defer = false;
+
+    /**
      * The paths that should be published.
      *
      * @var array
@@ -58,11 +67,9 @@ abstract class ServiceProvider
      */
     protected function mergeConfigFrom($path, $key)
     {
-        if (! $this->app->configurationIsCached()) {
-            $this->app['config']->set($key, array_merge(
-                require $path, $this->app['config']->get($key, [])
-            ));
-        }
+        $config = $this->app['config']->get($key, []);
+
+        $this->app['config']->set($key, array_merge(require $path, $config));
     }
 
     /**
@@ -301,6 +308,6 @@ abstract class ServiceProvider
      */
     public function isDeferred()
     {
-        return $this instanceof DeferrableProvider;
+        return $this->defer || $this instanceof DeferrableProvider;
     }
 }

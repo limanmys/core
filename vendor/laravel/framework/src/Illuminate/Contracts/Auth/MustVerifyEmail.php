@@ -24,11 +24,4 @@ interface MustVerifyEmail
      * @return void
      */
     public function sendEmailVerificationNotification();
-
-    /**
-     * Get the email address that should be used for verification.
-     *
-     * @return string
-     */
-    public function getEmailForVerification();
 }

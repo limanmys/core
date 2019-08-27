@@ -7,6 +7,13 @@ class NullStore extends TaggableStore
     use RetrievesMultipleKeys;
 
     /**
+     * The array of stored values.
+     *
+     * @var array
+     */
+    protected $storage = [];
+
+    /**
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
@@ -14,7 +21,6 @@ class NullStore extends TaggableStore
      */
     public function get($key)
     {
-        //
     }
 
     /**

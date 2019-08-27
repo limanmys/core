@@ -10,13 +10,12 @@ use Illuminate\Support\Str;
 use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\View\View as ViewContract;
 
-class View implements ArrayAccess, Htmlable, ViewContract
+class View implements ArrayAccess, ViewContract
 {
     use Macroable {
         __call as macroCall;
@@ -414,16 +413,6 @@ class View implements ArrayAccess, Htmlable, ViewContract
         }
 
         return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
-    }
-
-    /**
-     * Get content as a string of HTML.
-     *
-     * @return string
-     */
-    public function toHtml()
-    {
-        return $this->render();
     }
 
     /**

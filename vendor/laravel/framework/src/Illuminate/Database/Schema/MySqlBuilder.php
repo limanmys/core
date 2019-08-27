@@ -93,7 +93,7 @@ class MySqlBuilder extends Builder
      *
      * @return array
      */
-    public function getAllTables()
+    protected function getAllTables()
     {
         return $this->connection->select(
             $this->grammar->compileGetAllTables()

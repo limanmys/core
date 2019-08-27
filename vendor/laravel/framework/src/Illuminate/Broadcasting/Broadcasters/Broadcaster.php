@@ -261,7 +261,7 @@ abstract class Broadcaster implements BroadcasterContract
      * Normalize the given callback into a callable.
      *
      * @param  mixed  $callback
-     * @return \Closure|callable
+     * @return callable|\Closure
      */
     protected function normalizeChannelHandlerToCallable($callback)
     {

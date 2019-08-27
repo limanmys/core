@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Testing;
 
 use Mockery;
-use Throwable;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
@@ -231,7 +230,7 @@ abstract class TestCase extends BaseTestCase
         foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
             try {
                 call_user_func($callback);
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 if (! $this->callbackException) {
                     $this->callbackException = $e;
                 }

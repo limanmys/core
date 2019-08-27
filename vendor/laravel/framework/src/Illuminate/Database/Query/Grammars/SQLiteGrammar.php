@@ -9,6 +9,25 @@ use Illuminate\Database\Query\Builder;
 class SQLiteGrammar extends Grammar
 {
     /**
+     * The components that make up a select clause.
+     *
+     * @var array
+     */
+    protected $selectComponents = [
+        'aggregate',
+        'columns',
+        'from',
+        'joins',
+        'wheres',
+        'groups',
+        'havings',
+        'orders',
+        'limit',
+        'offset',
+        'lock',
+    ];
+
+    /**
      * All of the available clause operators.
      *
      * @var array
@@ -20,14 +39,37 @@ class SQLiteGrammar extends Grammar
     ];
 
     /**
-     * Wrap a union subquery in parentheses.
+     * Compile a select query into SQL.
      *
-     * @param  string  $sql
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
-    protected function wrapUnion($sql)
+    public function compileSelect(Builder $query)
     {
-        return 'select * from ('.$sql.')';
+        if ($query->unions && $query->aggregate) {
+            return $this->compileUnionAggregate($query);
+        }
+
+        $sql = parent::compileSelect($query);
+
+        if ($query->unions) {
+            $sql = 'select * from ('.$sql.') '.$this->compileUnions($query);
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Compile a single union statement.
+     *
+     * @param  array  $union
+     * @return string
+     */
+    protected function compileUnion(array $union)
+    {
+        $conjunction = $union['all'] ? ' union all ' : ' union ';
+
+        return $conjunction.'select * from ('.$union['query']->toSql().')';
     }
 
     /**
@@ -121,19 +163,19 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Compile an update statement into SQL.
+     * Compile an insert statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
      * @return string
      */
-    public function compileUpdate(Builder $query, array $values)
+    public function compileInsert(Builder $query, array $values)
     {
-        if (isset($query->joins) || isset($query->limit)) {
-            return $this->compileUpdateWithJoinsOrLimit($query, $values);
-        }
+        $table = $this->wrapTable($query->from);
 
-        return parent::compileUpdate($query, $values);
+        return empty($values)
+                ? "insert into {$table} DEFAULT VALUES"
+                : parent::compileInsert($query, $values);
     }
 
     /**
@@ -149,39 +191,43 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Compile the columns for an update statement.
+     * Compile an update statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
      * @return string
      */
-    protected function compileUpdateColumns(Builder $query, array $values)
+    public function compileUpdate(Builder $query, $values)
     {
-        return collect($values)->map(function ($value, $key) {
-            $column = last(explode('.', $key));
+        $table = $this->wrapTable($query->from);
 
-            return $this->wrap($column).' = '.$this->parameter($value);
+        $columns = collect($values)->map(function ($value, $key) {
+            return $this->wrap(Str::after($key, '.')).' = '.$this->parameter($value);
         })->implode(', ');
+
+        if (isset($query->joins) || isset($query->limit)) {
+            return $this->compileUpdateWithJoinsOrLimit($query, $columns);
+        }
+
+        return trim("update {$table} set {$columns} {$this->compileWheres($query)}");
     }
 
     /**
      * Compile an update statement with joins or limit into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
+     * @param  string  $columns
      * @return string
      */
-    protected function compileUpdateWithJoinsOrLimit(Builder $query, array $values)
+    protected function compileUpdateWithJoinsOrLimit(Builder $query, $columns)
     {
-        $table = $this->wrapTable($query->from);
+        $segments = preg_split('/\s+as\s+/i', $query->from);
 
-        $columns = $this->compileUpdateColumns($query, $values);
+        $alias = $segments[1] ?? $segments[0];
 
-        $alias = last(preg_split('/\s+as\s+/i', $query->from));
+        $selectSql = parent::compileSelect($query->select($alias.'.rowid'));
 
-        $selectSql = $this->compileSelect($query->select($alias.'.rowid'));
-
-        return "update {$table} set {$columns} where {$this->wrap('rowid')} in ({$selectSql})";
+        return "update {$this->wrapTable($query->from)} set {$columns} where {$this->wrap('rowid')} in ({$selectSql})";
     }
 
     /**
@@ -212,7 +258,9 @@ class SQLiteGrammar extends Grammar
             return $this->compileDeleteWithJoinsOrLimit($query);
         }
 
-        return parent::compileDelete($query);
+        $wheres = is_array($query->wheres) ? $this->compileWheres($query) : '';
+
+        return trim("delete from {$this->wrapTable($query->from)} $wheres");
     }
 
     /**
@@ -223,13 +271,13 @@ class SQLiteGrammar extends Grammar
      */
     protected function compileDeleteWithJoinsOrLimit(Builder $query)
     {
-        $table = $this->wrapTable($query->from);
+        $segments = preg_split('/\s+as\s+/i', $query->from);
 
-        $alias = last(preg_split('/\s+as\s+/i', $query->from));
+        $alias = $segments[1] ?? $segments[0];
 
-        $selectSql = $this->compileSelect($query->select($alias.'.rowid'));
+        $selectSql = parent::compileSelect($query->select($alias.'.rowid'));
 
-        return "delete from {$table} where {$this->wrap('rowid')} in ({$selectSql})";
+        return "delete from {$this->wrapTable($query->from)} where {$this->wrap('rowid')} in ({$selectSql})";
     }
 
     /**

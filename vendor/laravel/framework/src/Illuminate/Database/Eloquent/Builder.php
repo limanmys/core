@@ -214,7 +214,7 @@ class Builder
     /**
      * Add a basic where clause to the query.
      *
-     * @param  \Closure|string|array  $column
+     * @param  string|array|\Closure  $column
      * @param  mixed   $operator
      * @param  mixed   $value
      * @param  string  $boolean
@@ -636,15 +636,61 @@ class Builder
     }
 
     /**
-     * Get a lazy collection for the given query.
+     * Get a generator for the given query.
      *
-     * @return \Illuminate\Support\LazyCollection
+     * @return \Generator
      */
     public function cursor()
     {
-        return $this->applyScopes()->query->cursor()->map(function ($record) {
-            return $this->newModelInstance()->newFromBuilder($record);
-        });
+        foreach ($this->applyScopes()->query->cursor() as $record) {
+            yield $this->newModelInstance()->newFromBuilder($record);
+        }
+    }
+
+    /**
+     * Chunk the results of a query by comparing numeric IDs.
+     *
+     * @param  int  $count
+     * @param  callable  $callback
+     * @param  string|null  $column
+     * @param  string|null  $alias
+     * @return bool
+     */
+    public function chunkById($count, callable $callback, $column = null, $alias = null)
+    {
+        $column = is_null($column) ? $this->getModel()->getKeyName() : $column;
+
+        $alias = is_null($alias) ? $column : $alias;
+
+        $lastId = null;
+
+        do {
+            $clone = clone $this;
+
+            // We'll execute the query for the given page and get the results. If there are
+            // no results we can just break and return from here. When there are results
+            // we will call the callback with the current chunk of these results here.
+            $results = $clone->forPageAfterId($count, $lastId, $column)->get();
+
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
+            // On each chunk result set, we will pass them to the callback and then let the
+            // developer take care of everything within the callback, which allows us to
+            // keep the memory low for spinning through large result sets for working.
+            if ($callback($results) === false) {
+                return false;
+            }
+
+            $lastId = $results->last()->{$alias};
+
+            unset($results);
+        } while ($countResults == $count);
+
+        return true;
     }
 
     /**
@@ -875,14 +921,14 @@ class Builder
     /**
      * Call the given local model scopes.
      *
-     * @param  array|string  $scopes
+     * @param  array  $scopes
      * @return static|mixed
      */
-    public function scopes($scopes)
+    public function scopes(array $scopes)
     {
         $builder = $this;
 
-        foreach (Arr::wrap($scopes) as $scope => $parameters) {
+        foreach ($scopes as $scope => $parameters) {
             // If the scope key is an integer, then the scope was passed as the value and
             // the parameter list is empty, so we will format the scope name and these
             // parameters here. Then, we'll be ready to call the scope on the model.
@@ -1204,16 +1250,6 @@ class Builder
         $this->eagerLoad = $eagerLoad;
 
         return $this;
-    }
-
-    /**
-     * Get the default key name of the table.
-     *
-     * @return string
-     */
-    protected function defaultKeyName()
-    {
-        return $this->getModel()->getKeyName();
     }
 
     /**

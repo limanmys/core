@@ -652,16 +652,15 @@ class TestResponse
      * Assert that the response has the given JSON validation errors.
      *
      * @param  string|array  $errors
-     * @param  string  $responseKey
      * @return $this
      */
-    public function assertJsonValidationErrors($errors, $responseKey = 'errors')
+    public function assertJsonValidationErrors($errors)
     {
         $errors = Arr::wrap($errors);
 
         PHPUnit::assertNotEmpty($errors, 'No validation errors were provided.');
 
-        $jsonErrors = $this->json()[$responseKey] ?? [];
+        $jsonErrors = $this->json()['errors'] ?? [];
 
         $errorMessage = $jsonErrors
                 ? 'Response has the following JSON validation errors:'.
@@ -701,10 +700,9 @@ class TestResponse
      * Assert that the response has no JSON validation errors for the given keys.
      *
      * @param  string|array|null  $keys
-     * @param  string  $responseKey
      * @return $this
      */
-    public function assertJsonMissingValidationErrors($keys = null, $responseKey = 'errors')
+    public function assertJsonMissingValidationErrors($keys = null)
     {
         if ($this->getContent() === '') {
             PHPUnit::assertTrue(true);
@@ -714,13 +712,13 @@ class TestResponse
 
         $json = $this->json();
 
-        if (! array_key_exists($responseKey, $json)) {
-            PHPUnit::assertArrayNotHasKey($responseKey, $json);
+        if (! array_key_exists('errors', $json)) {
+            PHPUnit::assertArrayNotHasKey('errors', $json);
 
             return $this;
         }
 
-        $errors = $json[$responseKey];
+        $errors = $json['errors'];
 
         if (is_null($keys) && count($errors) > 0) {
             PHPUnit::fail(

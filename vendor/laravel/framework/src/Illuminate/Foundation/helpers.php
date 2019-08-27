@@ -131,7 +131,7 @@ if (! function_exists('app_path')) {
      */
     function app_path($path = '')
     {
-        return app()->path($path);
+        return app('path').($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 }
 
@@ -190,7 +190,7 @@ if (! function_exists('base_path')) {
      */
     function base_path($path = '')
     {
-        return app()->basePath($path);
+        return app()->basePath().($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 }
 
@@ -293,7 +293,7 @@ if (! function_exists('config_path')) {
      */
     function config_path($path = '')
     {
-        return app()->configPath($path);
+        return app()->make('path.config').($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 }
 
@@ -875,7 +875,7 @@ if (! function_exists('trans')) {
             return app('translator');
         }
 
-        return app('translator')->get($key, $replace, $locale);
+        return app('translator')->trans($key, $replace, $locale);
     }
 }
 
@@ -884,14 +884,14 @@ if (! function_exists('trans_choice')) {
      * Translates the given message based on a count.
      *
      * @param  string  $key
-     * @param  \Countable|int|array  $number
+     * @param  int|array|\Countable  $number
      * @param  array   $replace
      * @param  string|null  $locale
      * @return string
      */
     function trans_choice($key, $number, array $replace = [], $locale = null)
     {
-        return app('translator')->choice($key, $number, $replace, $locale);
+        return app('translator')->transChoice($key, $number, $replace, $locale);
     }
 }
 
@@ -899,14 +899,14 @@ if (! function_exists('__')) {
     /**
      * Translate the given message.
      *
-     * @param  string|null  $key
+     * @param  string  $key
      * @param  array  $replace
      * @param  string|null  $locale
-     * @return \Illuminate\Contracts\Translation\Translator|string|array|null
+     * @return string|array|null
      */
-    function __($key = null, $replace = [], $locale = null)
+    function __($key, $replace = [], $locale = null)
     {
-        return trans($key, $replace, $locale);
+        return app('translator')->getFromJson($key, $replace, $locale);
     }
 }
 

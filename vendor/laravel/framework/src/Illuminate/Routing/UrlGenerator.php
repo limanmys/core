@@ -398,7 +398,7 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @throws \Illuminate\Routing\Exceptions\UrlGenerationException
      */
-    public function toRoute($route, $parameters, $absolute)
+    protected function toRoute($route, $parameters, $absolute)
     {
         return $this->routeUrl()->to(
             $route, $this->formatParameters($parameters), $absolute

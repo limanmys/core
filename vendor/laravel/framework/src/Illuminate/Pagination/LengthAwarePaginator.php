@@ -7,11 +7,12 @@ use ArrayAccess;
 use JsonSerializable;
 use IteratorAggregate;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 
-class LengthAwarePaginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable, LengthAwarePaginatorContract
+class LengthAwarePaginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Jsonable, LengthAwarePaginatorContract
 {
     /**
      * The total number of items before slicing.
@@ -72,7 +73,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      *
      * @param  string|null  $view
      * @param  array  $data
-     * @return \Illuminate\Contracts\Support\Htmlable
+     * @return \Illuminate\Support\HtmlString
      */
     public function links($view = null, $data = [])
     {
@@ -84,14 +85,14 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      *
      * @param  string|null  $view
      * @param  array  $data
-     * @return \Illuminate\Contracts\Support\Htmlable
+     * @return \Illuminate\Support\HtmlString
      */
     public function render($view = null, $data = [])
     {
-        return static::viewFactory()->make($view ?: static::$defaultView, array_merge($data, [
+        return new HtmlString(static::viewFactory()->make($view ?: static::$defaultView, array_merge($data, [
             'paginator' => $this,
             'elements' => $this->elements(),
-        ]));
+        ]))->render());
     }
 
     /**
@@ -169,7 +170,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
             'last_page' => $this->lastPage(),
             'last_page_url' => $this->url($this->lastPage()),
             'next_page_url' => $this->nextPageUrl(),
-            'path' => $this->path(),
+            'path' => $this->path,
             'per_page' => $this->perPage(),
             'prev_page_url' => $this->previousPageUrl(),
             'to' => $this->lastItem(),

@@ -16,19 +16,15 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RouteTest extends TestCase
 {
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testInvalidRouteParameter()
     {
+        $this->expectException('BadMethodCallException');
         $route = new Route(['foo' => 'bar']);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testTryingToSetLocalesDirectly()
     {
+        $this->expectException('BadMethodCallException');
         $route = new Route(['locales' => ['nl' => 'bar']]);
     }
 

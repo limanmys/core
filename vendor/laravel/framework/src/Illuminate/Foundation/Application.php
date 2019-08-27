@@ -5,7 +5,6 @@ namespace Illuminate\Foundation;
 use Closure;
 use RuntimeException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -30,7 +29,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '6.0-dev';
+    const VERSION = '5.8.33';
 
     /**
      * The base path for the Laravel installation.
@@ -550,8 +549,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function runningInConsole()
     {
-        if (Env::get('APP_RUNNING_IN_CONSOLE') !== null) {
-            return Env::get('APP_RUNNING_IN_CONSOLE') === true;
+        if (isset($_ENV['APP_RUNNING_IN_CONSOLE'])) {
+            return $_ENV['APP_RUNNING_IN_CONSOLE'] === 'true';
         }
 
         return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
@@ -894,7 +893,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedServicesPath()
     {
-        return Env::get('APP_SERVICES_CACHE', $this->bootstrapPath().'/cache/services.php');
+        return $_ENV['APP_SERVICES_CACHE'] ?? $this->bootstrapPath().'/cache/services.php';
     }
 
     /**
@@ -904,7 +903,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedPackagesPath()
     {
-        return Env::get('APP_PACKAGES_CACHE', $this->bootstrapPath().'/cache/packages.php');
+        return $_ENV['APP_PACKAGES_CACHE'] ?? $this->bootstrapPath().'/cache/packages.php';
     }
 
     /**
@@ -924,7 +923,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedConfigPath()
     {
-        return Env::get('APP_CONFIG_CACHE', $this->bootstrapPath().'/cache/config.php');
+        return $_ENV['APP_CONFIG_CACHE'] ?? $this->bootstrapPath().'/cache/config.php';
     }
 
     /**
@@ -944,7 +943,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedRoutesPath()
     {
-        return Env::get('APP_ROUTES_CACHE', $this->bootstrapPath().'/cache/routes.php');
+        return $_ENV['APP_ROUTES_CACHE'] ?? $this->bootstrapPath().'/cache/routes.php';
     }
 
     /**
@@ -964,7 +963,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedEventsPath()
     {
-        return Env::get('APP_EVENTS_CACHE', $this->bootstrapPath().'/cache/events.php');
+        return $_ENV['APP_EVENTS_CACHE'] ?? $this->bootstrapPath().'/cache/events.php';
     }
 
     /**
@@ -1134,12 +1133,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'auth.driver'          => [\Illuminate\Contracts\Auth\Guard::class],
             'blade.compiler'       => [\Illuminate\View\Compilers\BladeCompiler::class],
             'cache'                => [\Illuminate\Cache\CacheManager::class, \Illuminate\Contracts\Cache\Factory::class],
-            'cache.store'          => [\Illuminate\Cache\Repository::class, \Illuminate\Contracts\Cache\Repository::class, \Psr\SimpleCache\CacheInterface::class],
-            'cache.psr6'           => [\Symfony\Component\Cache\Adapter\Psr16Adapter::class, \Symfony\Component\Cache\Adapter\AdapterInterface::class, \Psr\Cache\CacheItemPoolInterface::class],
+            'cache.store'          => [\Illuminate\Cache\Repository::class, \Illuminate\Contracts\Cache\Repository::class],
             'config'               => [\Illuminate\Config\Repository::class, \Illuminate\Contracts\Config\Repository::class],
             'cookie'               => [\Illuminate\Cookie\CookieJar::class, \Illuminate\Contracts\Cookie\Factory::class, \Illuminate\Contracts\Cookie\QueueingFactory::class],
             'encrypter'            => [\Illuminate\Encryption\Encrypter::class, \Illuminate\Contracts\Encryption\Encrypter::class],
-            'db'                   => [\Illuminate\Database\DatabaseManager::class, \Illuminate\Database\ConnectionResolverInterface::class],
+            'db'                   => [\Illuminate\Database\DatabaseManager::class],
             'db.connection'        => [\Illuminate\Database\Connection::class, \Illuminate\Database\ConnectionInterface::class],
             'events'               => [\Illuminate\Events\Dispatcher::class, \Illuminate\Contracts\Events\Dispatcher::class],
             'files'                => [\Illuminate\Filesystem\Filesystem::class],

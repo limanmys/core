@@ -17,10 +17,9 @@ interface Application extends Container
     /**
      * Get the base path of the Laravel installation.
      *
-     * @param  string  $path
      * @return string
      */
-    public function basePath($path = '');
+    public function basePath();
 
     /**
      * Get the path to the bootstrap directory.

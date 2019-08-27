@@ -235,7 +235,7 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Get the Redis connection instance.
      *
-     * @return \Illuminate\Redis\Connections\Connection
+     * @return \Predis\ClientInterface
      */
     public function connection()
     {

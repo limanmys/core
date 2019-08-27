@@ -920,11 +920,11 @@ class BelongsToMany extends Relation
     /**
      * Create an array of new instances of the related models.
      *
-     * @param  iterable  $records
+     * @param  array  $records
      * @param  array  $joinings
      * @return array
      */
-    public function createMany(iterable $records, array $joinings = [])
+    public function createMany(array $records, array $joinings = [])
     {
         $instances = [];
 

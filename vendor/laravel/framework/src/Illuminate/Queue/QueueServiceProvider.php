@@ -161,15 +161,8 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     protected function registerWorker()
     {
         $this->app->singleton('queue.worker', function () {
-            $isDownForMaintenance = function () {
-                return $this->app->isDownForMaintenance();
-            };
-
             return new Worker(
-                $this->app['queue'],
-                $this->app['events'],
-                $this->app[ExceptionHandler::class],
-                $isDownForMaintenance
+                $this->app['queue'], $this->app['events'], $this->app[ExceptionHandler::class]
             );
         });
     }
@@ -197,8 +190,8 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
             $config = $this->app['config']['queue.failed'];
 
             return isset($config['table'])
-                ? $this->databaseFailedJobProvider($config)
-                : new NullFailedJobProvider;
+                        ? $this->databaseFailedJobProvider($config)
+                        : new NullFailedJobProvider;
         });
     }
 

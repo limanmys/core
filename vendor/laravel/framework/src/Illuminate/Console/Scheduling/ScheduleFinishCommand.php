@@ -28,14 +28,33 @@ class ScheduleFinishCommand extends Command
     protected $hidden = true;
 
     /**
-     * Execute the console command.
+     * The schedule instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule $schedule
+     * @var \Illuminate\Console\Scheduling\Schedule
+     */
+    protected $schedule;
+
+    /**
+     * Create a new command instance.
+     *
+     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    public function handle(Schedule $schedule)
+    public function __construct(Schedule $schedule)
     {
-        collect($schedule->events())->filter(function ($value) {
+        $this->schedule = $schedule;
+
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
+    public function handle()
+    {
+        collect($this->schedule->events())->filter(function ($value) {
             return $value->mutexName() == $this->argument('id');
         })->each->callAfterCallbacks($this->laravel);
     }

@@ -35,7 +35,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     public function send($notifiables, $notification)
     {
         return (new NotificationSender(
-            $this, $this->container->make(Bus::class), $this->container->make(Dispatcher::class), $this->locale)
+            $this, $this->app->make(Bus::class), $this->app->make(Dispatcher::class), $this->locale)
         )->send($notifiables, $notification);
     }
 
@@ -50,7 +50,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     public function sendNow($notifiables, $notification, array $channels = null)
     {
         return (new NotificationSender(
-            $this, $this->container->make(Bus::class), $this->container->make(Dispatcher::class), $this->locale)
+            $this, $this->app->make(Bus::class), $this->app->make(Dispatcher::class), $this->locale)
         )->sendNow($notifiables, $notification, $channels);
     }
 
@@ -72,7 +72,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     protected function createDatabaseDriver()
     {
-        return $this->container->make(Channels\DatabaseChannel::class);
+        return $this->app->make(Channels\DatabaseChannel::class);
     }
 
     /**
@@ -82,7 +82,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     protected function createBroadcastDriver()
     {
-        return $this->container->make(Channels\BroadcastChannel::class);
+        return $this->app->make(Channels\BroadcastChannel::class);
     }
 
     /**
@@ -92,7 +92,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     protected function createMailDriver()
     {
-        return $this->container->make(Channels\MailChannel::class);
+        return $this->app->make(Channels\MailChannel::class);
     }
 
     /**
@@ -109,7 +109,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
             return parent::createDriver($driver);
         } catch (InvalidArgumentException $e) {
             if (class_exists($driver)) {
-                return $this->container->make($driver);
+                return $this->app->make($driver);
             }
 
             throw $e;

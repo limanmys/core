@@ -315,7 +315,7 @@ class MailFake implements Mailer, MailQueue
      * Queue a new e-mail message for sending after (n) seconds.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
+     * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
      * @param  string  $queue
      * @return mixed
      */
