@@ -128,15 +128,6 @@
                                                 </a>
                                             </li>
                                         @endforeach
-                                        @if($favorite->type == "linux_ssh")
-                                            <li class="">
-                                                <a onclick="terminal('{{$favorite->id}}','{{$favorite->name}}')"
-                                                   href="#">
-                                                    <i class="fa fa-info "></i>
-                                                    <span>{{__("Terminal")}}</span>
-                                                </a>
-                                            </li>
-                                        @endif
                                     </ul>
 
                                 </li>
