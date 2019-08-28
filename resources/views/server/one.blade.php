@@ -57,6 +57,7 @@
                     @endif
                 @endif
                 <h4>{{__("İp Adresi : ") . server()->ip_address }}</h4>
+                <h4>{{__("Şehir : ") . cities(server()->city) }}</h4>
                 @if($installed_extensions->count() > 0)
                     <h4>{{__("Eklenti Durumları")}}</h4>
                     @foreach($installed_extensions as $extension)
