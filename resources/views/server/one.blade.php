@@ -52,7 +52,7 @@
                     @if(server()->type == "linux_ssh")
                         <h4>{{server()->run("lsb_release -ds")}}</h4>
                     @else
-                        <h4>{{__("Versiyon : " ) . server()->run("(Get-WmiObject Win32_OperatingSystem).Version")}}</h4>
+                        <h4>{{__("Versiyon : " ) . explode("|",server()->run("(Get-WmiObject Win32_OperatingSystem).name"))[0]}}</h4>
                         
                     @endif
                 @endif
