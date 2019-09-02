@@ -19,6 +19,9 @@ class Extension
     {
         // Check Extension SSL ports to validate.
         $server = server();
+        if(empty(extension()->sslPorts)){
+            return $next($request);
+        }
         $ports = explode(',',extension()->sslPorts);
         foreach ($ports as $port){
             if(Certificate::where([
