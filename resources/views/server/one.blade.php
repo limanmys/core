@@ -10,9 +10,9 @@
     </nav>
     <div class="serverName" style="margin-top:-20px;">
         @if(\Illuminate\Support\Facades\DB::table("user_favorites")->where(["user_id" => auth()->user()->id,"server_id" => server()->id])->exists())
-            <button onclick="favorite('false')" class="btn btn-warning fa fa-star-o" style="margin-top:-15px"></button>
+            <button onclick="favorite('false')" class="btn btn-warning fa fa-star-o" style="margin-top:-15px" data-toggle="tooltip" title="Favorilerden Cikar"></button>
         @else
-            <button onclick="favorite('true')" class="btn btn-success fa fa-star" style="margin-top:-15px"></button>
+            <button onclick="favorite('true')" class="btn btn-success fa fa-star" style="margin-top:-15px" data-toggle="tooltip" title="Favorilere Ekle"></button>
         @endif
         <h2 style="display: inline-block;">{{server()->name}}</h2>
     </div>
@@ -165,9 +165,11 @@
 
                 </div>
             @endif
-            <div class="tab-pane" id="settingsTab">
-                <form id="edit_form" onsubmit="return request('{{route('server_update')}}',this,reload)" target="#">
-                    <div class="modal-body" style="width: 100%">
+            <div class="tab-pane" id="settingsTab" >
+            <table class="notDataTable" style="width: 900px;">
+            <tr>
+                    <td>
+                    <form id="edit_form" onsubmit="return request('{{route('server_update')}}',this,reload)" target="#">
                         <h5>{{__("Sunucu Adı")}}</h5>
                         <input type="text" name="name" placeholder="Sunucu Adı" class="form-control " required=""
                                value="{{server()->name}}"><br>
@@ -179,17 +181,22 @@
                             @foreach(cities() as $city=>$value)
                                 <option value="{{$value}}" @if($value == server()->city) selected @endif>{{$city}}</option>
                             @endforeach
-                        </select><br>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">{{__("Bilgileri Güncelle")}}</button>
-                    </div>
-                </form>
+                        </select>
+                    </td>
+                    <td style="width:300px;text-align:center;padding-left:60px">
+                        <button type="submit" class="btn btn-success btn-block">{{__("Bilgileri Güncelle")}}</button><br><br>
+                
                 @include('l.modal-button',[
-                    "class" => "btn-danger",
+                    "class" => "btn-danger btn-block",
                     "target_id" => "delete",
                         "text" => "Sunucuyu Sil"
                 ])
+                </form>
+                    </td>
+            </tr>
+            </table>
+                
+                    
             </div>
             <div class="tab-pane" id="extraTab">
                 @if(server()->type == "linux")
@@ -198,7 +205,6 @@
                     <p>{{__("Windows Sunucunuza WinRM anahtarı ekleyerek Liman üzerindeki ekstra özelliklere erişebilirsiniz.")}}</p>
                 @endif
                 <form id="upgrade_form" onsubmit="return request('{{route('server_upgrade')}}',this,reload,errorSwal)" target="#">
-                    <div class="modal-body" style="width: 100%">
                         <h5>{{__("Kullanıcı Adı")}}</h5>
                         <input type="text" name="username" placeholder="{{__("Kullanıcı Adı")}}" class="form-control " required=""
                                value=""><br>
@@ -206,7 +212,6 @@
                         <input type="password" name="password" placeholder="{{__("Parola")}}" class="form-control "
                                required="" value=""><br>
                         <button type="submit" class="btn btn-success">{{__("Yükselt")}}</button>
-                    </div>
                 </form>
             </div>
 
@@ -218,8 +223,18 @@
         "title" => "Sunucuyu Sil",
         "url" => route('server_remove'),
         "text" => "$server->name isimli sunucuyu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+        "type" => "danger",
         "next" => "redirect",
         "submit_text" => "Sunucuyu Sil"
+    ])
+
+    @include('l.modal',[
+        "id"=>"delete_extensions",
+        "title" => "Eklentileri Sil",
+        "text" => "Secili eklentileri silmek istediginize emin misiniz?",
+        "type" => "danger",
+        "onsubmit" => "removeExtensionFunc",
+        "submit_text" => "Eklentileri Sil"
     ])
 
     @include('l.modal',[
@@ -262,6 +277,7 @@
         @include('l.modal',[
             "id"=>"install_extension",
             "title" => "Eklenti Ekle",
+            "type" => "info",
             "url" => route('server_extension'),
             "next" => "reload",
             "selects" => $input_extensions,
@@ -594,32 +610,15 @@
             });
             if(data.length === 0){
                 Swal.fire({
-                    type: 'error',
-                    title: 'Lütfen önce seçim yapınız.'
-                });
+                  type: 'error',
+                  title: '{{__("Lütfen önce seçim yapınız.")}}',
+                  position: 'center',
+                  timer: 2000,
+                  showConfirmButton: false
+              });
                 return false;
-            }
-            const swalWithBootstrapButtons = Swal.mixin({
-                customClass: {
-                    confirmButton: 'btn btn-success',
-                    cancelButton: 'btn btn-danger'
-                },
-                buttonsStyling: false,
-            });
-
-            swalWithBootstrapButtons.fire({
-                title: '{{__('Emin misiniz?')}}',
-                text: '{{__('Bu işlem geri alınamayacaktır!')}}',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonText: '{{__('Evet, yine de sil.')}}',
-                cancelButtonText: '{{__('İptal')}}',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.value) {
-                    removeExtensionFunc();
-                }
-            });
+            };
+            $("#delete_extensions").modal('show');
         }
         function removeExtensionFunc() {
           let data = [];
@@ -630,7 +629,10 @@
           if(data.length === 0){
               Swal.fire({
                   type: 'error',
-                  title: 'Lütfen önce seçim yapınız.'
+                  title: '{{__("Lütfen önce seçim yapınız.")}}',
+                  position: 'center',
+                  timer: 2000,
+                  showConfirmButton: false
               });
               return false;
           }
@@ -638,7 +640,7 @@
               position: 'center',
               type: 'info',
               title: '{{__("Siliniyor...")}}',
-              showConfirmButton: false,
+              showConfirmButton: false
           });
           let form = new FormData();
           form.append('extensions',JSON.stringify(data));
