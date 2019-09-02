@@ -25,14 +25,23 @@
         ],
         "submit_text" => "Ekle"
     ])
-
+    <?php
+        foreach($widgets as $widget){
+            $server = \App\Server::find($widget->server_id);
+            if($server){
+                $widget->server_name = $server->name;
+            }else{
+                $widget->server_name = "Sunucu Silinmis";
+            }
+        }
+    ?>
     @include('l.table',[
         "value" => $widgets,
         "title" => [
-            "Sunucu" , "Başlık" , "*hidden*"
+            "Sunucu" , "Başlık" , "Sunucu Adi", "*hidden*"
         ],
         "display" => [
-            "server_name" , "title" ,"id:widget_id"
+            "server_name" , "title" ,"server_name", "id:widget_id"
         ],
         "menu" => [
             "Düzenle" => [
