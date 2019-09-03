@@ -75,22 +75,50 @@
         });
         $(".sortable-widget").disableSelection();
         let intervals = [];
+        let widgets = [];
+        let currentWidget = 0;
+
         $(".limanWidget").each(function(){
             let element = $(this);
-            retrieveWidgets(element);
-            intervals[element.attr('id')] = setInterval(function(){
-                retrieveWidgets(element);
-            },{{env("WIDGET_REFRESH_TIME")}});
+            widgets.push({
+              'element': element,
+              'type': 'countBox'
+            });
         });
         $('.limanCharts').each(function(){
             let element = $(this);
-          retrieveCharts(element);
-          intervals[element.attr('id')] = setInterval(function(){
-                retrieveCharts(element);
-          },{{env('WIDGET_REFRESH_TIME')}});
+            widgets.push({
+              'element': element,
+              'type': 'chart'
+            });
         });
+        startQueue()
+        setInterval(function(){
+            startQueue()
+        },{{env("WIDGET_REFRESH_TIME")}});
 
-        function retrieveWidgets(element){
+        function startQueue(){
+          currentWidget = 0;
+          if(widgets[currentWidget].type === 'countBox'){
+            retrieveWidgets(widgets[currentWidget].element, nextWidget)
+          }else if(widgets[currentWidget].type === 'chart'){
+            retrieveCharts(widgets[currentWidget].element, nextWidget)
+          }
+        }
+
+        function nextWidget(){
+          currentWidget++;
+          if(currentWidget === widgets.length){
+            return;
+          }
+          if(widgets[currentWidget].type === 'countBox'){
+            retrieveWidgets(widgets[currentWidget].element, nextWidget)
+          }else if(widgets[currentWidget].type === 'chart'){
+            retrieveCharts(widgets[currentWidget].element, nextWidget)
+          }
+        }
+
+        function retrieveWidgets(element, next){
             let info_box = element.closest('.info-box');
             let form = new FormData();
             form.append('widget_id',element.attr('id'));
@@ -100,16 +128,19 @@
                 info_box.find('.info-box-icon').show();
                 info_box.find('.info-box-content').show();
                 info_box.find('.overlay').remove();
+                if(next){
+                  next();
+                }
             }, function(error) {
                 let json = JSON.parse(error);
-                clearInterval(intervals[element.attr('id')]);
+                widgets.splice(currentWidget, 1);
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
                 info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
             });
         }
 
-        function retrieveCharts(element){
+        function retrieveCharts(element, next){
             let id = element.attr('id');
             let form = new FormData();
             let info_box = element.closest('.info-box');
@@ -118,9 +149,12 @@
                 let response =  JSON.parse(res);
                 let data =  response.message;
                 createChart(id+'Chart',data.labels, data.data);
+                if(next){
+                  next();
+                }
             }, function(error) {
                 let json = JSON.parse(error);
-                clearInterval(intervals[element.attr('id')]);
+                widgets.splice(currentWidget, 1);
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
                 info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
