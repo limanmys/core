@@ -4,6 +4,8 @@
 
 Route::get('/bildirimler','Notification\MainController@all')->name('all_user_notifications');
 
+Route::get('/bildirimlerSistem','Notification\MainController@allSystem')->name('all_system_notifications');
+
 Route::post('/bildirimler','Notification\MainController@check')->name('user_notifications');
 
 Route::post('/bildirim/sil','Notification\MainController@delete')->name('notification_delete');

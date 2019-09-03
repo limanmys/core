@@ -3,8 +3,13 @@
 @php($notifications = $notifications->groupBy(function ($date) {
     return \Carbon\Carbon::parse($date->created_at)->format("d.m.Y");
 }))
-<button type="button" id="read_all" style="margin-bottom: 5px;" class="btn btn-default btn-flat">{{__('Tümünü Okundu Olarak İşaretle')}}</button>
+@if($system)
+<button type="button" onclick="readSystemNotifications();reload();" style="margin-bottom: 5px;" class="btn btn-default btn-flat">{{__('Tümünü Okundu Olarak İşaretle')}}</button>
+@else
+<button type="button" onclick="readNotifications();reload();" style="margin-bottom: 5px;" class="btn btn-default btn-flat">{{__('Tümünü Okundu Olarak İşaretle')}}</button>
 <button type="button" id="delete_read" style="margin-bottom: 5px;" class="btn btn-default btn-flat">{{__('Okunanları Sil')}}</button>
+@endif
+
 @include('l.errors')    
 <ul class="timeline">
     @foreach ($notifications as $date => $items)
@@ -36,7 +41,9 @@
                         @if(!$item->read)
                             <a class="btn btn-primary btn-xs mark_read" notification-id="{{$item->id}}">{{__('Okundu Olarak İşaretle')}}</a>
                         @endif
+                        @if(!$system)
                         <a class="btn btn-danger btn-xs delete_not" notification-id="{{$item->id}}">{{__('Sil')}}</a>
+                        @endif
                     </div>
                 </div>
             </li>
