@@ -13,8 +13,8 @@
         "ext-xml": "*",
         "ext-posix" : "*",
         "ext-zip": "*",
-        "guzzlehttp/guzzle": "~6.0",
-        "laravel/framework": "5.8.*",
+        "laravel/framework": "6.0.*",
+        "laravel/helpers" : "*",
         "phpseclib/phpseclib": "^2.0"
     },
     "require-dev": {

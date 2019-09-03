@@ -148,9 +148,9 @@ function checkNotifications() {
     request('/bildirimler', new FormData(), function (response) {
         let json = JSON.parse(response);
         if(response["admin"] !== ""){
-            document.getElementById("adminNotifications").innerHTML = json["message"]["admin"];
+            renderNotifications(json["message"]["admin"],'admin','adminNotifications');
         }
-        document.getElementById("notifications-menu").innerHTML = json["message"]["user"];
+        renderNotifications(json["message"]["user"],'user','userNotifications');
     });
 }
 
@@ -237,4 +237,19 @@ function addToTable(){
     if(current_modal.length){
         current_modal.modal('hide');
     }
+}
+
+function renderNotifications(data,type,target){
+    let element = $("#" + target + " .menu");
+    element.html("");
+    //Set Count
+    $("#" + target + "Count" ).html(data.length);
+    data.forEach(notification => {
+        let errors = [
+            "error" , "health_problem", "liman_update"
+        ];
+        let color = (errors.includes(notification["error"])) ? "#f56954" : "#00a65a";
+        element.append("<li><a href='/bildirim/" + notification["id"] + "'>" + 
+                "<span style='color: " + color + ";width: 100%'>"+ notification["title"] + "</span></a></li>");
+    });
 }

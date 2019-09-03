@@ -15,8 +15,6 @@ use App\ServerLog;
 use App\User;
 use App\Widget;
 use Carbon\Carbon;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use View;
@@ -170,60 +168,6 @@ class OneController extends Controller
         return respond("Yetki başarıyla alındı.", 200);
     }
 
-    public function terminal()
-    {
-        $server = server();
-        $client = new Client([
-            'verify' => false,
-            'cookies' => true
-        ]);
-        try {
-            $response = $client->request('GET', 'https://localhost:4433');
-            preg_match_all('/(?<=<input type=\"hidden\" name=\"_xsrf\" value=\")(.*)(?=\")/', $response->getBody()->getContents(), $output_array);
-            $limanKey = Str::random();
-            $response = $client->request('POST', 'https://localhost:4433', [
-                "multipart" => [
-                    [
-                        "name" => "hostname",
-                        "contents" => $server->ip_address,
-                    ],
-                    [
-                        "name" => "port",
-                        "contents" => "$server->port"
-                    ],
-                    [
-                        "name" => "username",
-                        "contents" => "liman"
-                    ],
-                    [
-                        "name" => "_xsrf",
-                        "contents" => $output_array[0][0]
-                    ],
-                    [
-                        "name" => "password",
-                        "contents" => env('APP_KEY') . auth()->id()
-                    ],
-                    [
-                        "name" => "privatekey",
-                        "contents" => fopen(env('KEYS_PATH') . DIRECTORY_SEPARATOR . "linux" . DIRECTORY_SEPARATOR . auth()->id(), 'r')
-                    ],
-                    [
-                        "name" => "limanKey",
-                        "contents" => $limanKey
-                    ]
-                ],
-            ]);
-        } catch (GuzzleException $e) {
-            return respond('Web SSH Servisi Çalışmıyor.', 201);
-        }
-        // First, request page to get _xsrf value.
-
-        $json = json_decode($response->getBody()->getContents());
-        return response()->view('terminal.index', [
-            "id" => $json->id,
-            "limanKey" => $limanKey
-        ])->withCookie(cookie('_xsrf', $client->getConfig('cookies')->toArray()[0]["Value"]));
-    }
 
     public function service()
     {
