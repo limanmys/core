@@ -8,12 +8,9 @@
         <!-- Main Header -->
         @auth
             <header class="main-header">
-
                 <a href="/" class="logo">
-
                     <span class="logo-mini"><img src="/images/liman_logo_white.png" alt="logo" height="35px"
                                                  style="margin-top:5px"></span>
-
                     <span class="logo-lg"><img src="/images/liman_logo_white.png" alt="logo" height="35px"
                                                style="float: left;margin-top:5px"><b>Liman MYS</b></span>
                 </a>
@@ -53,13 +50,14 @@
                                 </li>
                         @endif
                         <!-- Notifications: style can be found in dropdown.less -->
-                            <li id="notifications-menu" class="dropdown notifications-menu">
+                            <li id="userNotifications" class="dropdown notifications-menu">
                                 @include('l.notifications',["notifications" => notifications()])
                             </li>
 
                             <!-- User Account: style can be found in dropdown.less -->
                             <li class="dropdown user user-menu">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-user"></i>
                                     <span class="hidden-xs">{{auth()->user()->name}}</span>
                                 </a>
 

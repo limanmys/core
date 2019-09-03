@@ -39,7 +39,7 @@
         @if(auth()->check())
         setInterval(function () {
             checkNotifications();
-        }, 3000);
+        }, 10000);
         @endif
 
         $('.ext_nav').slice({{env('NAV_EXTENSION_HIDE_COUNT', 10)}}, $('.ext_nav').length).hide();

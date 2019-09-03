@@ -50,16 +50,9 @@ class MainController extends Controller
                 "read" => "false"
             ])->orderBy('updated_at', 'desc')->get();
         }
-        $adminNotifications = view('l.notifications',[
-            "notifications" => $adminNotifications,
-            "systemNotification" => true
-        ]);
-        $userNotifications = view('l.notifications', [
-            "notifications" => $notifications
-        ]);
         return respond([
-            "user" => $userNotifications->render(),
-            "admin" => $adminNotifications->render()
+            "user" => $notifications,
+            "admin" => $adminNotifications
         ]);
     }
 
