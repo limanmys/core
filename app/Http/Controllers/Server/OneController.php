@@ -342,10 +342,9 @@ class OneController extends Controller
 
     public function serviceList()
     {
-        $table = "";
+        $services = [];
         if(server()->type == "linux_ssh"){
             $raw = server()->run("systemctl list-units | grep service | awk '{print $1 \":\"$2\" \"$3\" \"$4\":\"$5\" \"$6\" \"$7\" \"$8\" \"$9\" \"$10}'",false);
-            $services = [];
             foreach (explode("\n", $raw) as $package) {
                 if ($package == "") {
                     continue;
@@ -354,21 +353,12 @@ class OneController extends Controller
                 try {
                     array_push($services, [
                         "name" => $row[0],
-                        "status" => $row[1],
-                        "description" => $row[2]
+                        "description" => $row[2],
+                        "status" => $row[1]
                     ]);
                 } catch (Exception $exception) {
                 }
             }
-            $table = view('l.table',[
-                "value" => $services,
-                "title" => [
-                    "Adı" , "Açıklama" , "Durumu"
-                ],
-                "display" => [
-                    "name" , "description" , "status"
-                ],
-            ]);
         }elseif (server()->type == "windows_powershell"){
             $rawServices = server()->run("(Get-WmiObject win32_service | select Name, DisplayName, State, StartMode) -replace '\s\s+',':'");
             $services = [];
@@ -380,26 +370,16 @@ class OneController extends Controller
                 try{
                     array_push($services,[
                         "name" => trim(explode('=',$row[0])[1]),
-                        "displayName" => trim(explode('=',$row[1])[1]),
-                        "state" => trim(explode('=',$row[2])[1]),
-                        "startMode" => trim(explode('=',$row[3])[1])
+                        "description" => trim(explode('=',$row[1])[1]),
+                        "status" => trim(explode('=',$row[2])[1]),
                     ]);
                 }catch (Exception $exception){
                 }
             }
-            $table = view('l.table',[
-                "value" => $services,
-                "title" => [
-                    "Adı" , "Açıklama" , "Durumu" , "Başlatma"
-                ],
-                "display" => [
-                    "name" , "displayName" , "state", "startMode"
-                ],
-            ]);
         }else{
             return respond("Bu sunucudaki servisleri goremezsiniz.",403);
         }
-        return $table;
+        return respond($services);
     }
 
     public function getLogs()
@@ -595,5 +575,38 @@ class OneController extends Controller
           ])->delete();
         }
         return respond("Eklentiler Başarıyla Silindi");
+    }
+
+    public function startService()
+    {
+        if(server()->type == "linux_ssh"){
+            $command = "sudo systemctl start " . request('name');
+        }else{
+            $command = "Start-Service " . request("name");   
+        }
+        server()->run($command);
+        return respond("Servis Baslatildi",200);
+    }
+
+    public function stopService()
+    {
+        if(server()->type == "linux_ssh"){
+            $command = "sudo systemctl stop " . request('name');
+        }else{
+            $command = "Stop-Service " . request("name");   
+        }
+        server()->run($command);
+        return respond("Servis Durduruldu",200);
+    }
+
+    public function restartService()
+    {
+        if(server()->type == "linux_ssh"){
+            $command = "sudo systemctl restart " . request('name');
+        }else{
+            $command = "Restart-Service " . request("name");   
+        }
+        server()->run($command);
+        return respond("Servis Yeniden Baslatildi",200);
     }
 }

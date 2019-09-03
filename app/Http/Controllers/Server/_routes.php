@@ -85,4 +85,10 @@ Route::group(['middleware' => ['server']], function () {
     Route::post('/sunucu/yukselt','Server\OneController@upgradeServer')->name('server_upgrade');
 
     Route::post('/sunucu/eklentiSil','Server\OneController@removeExtension')->name('server_extension_remove');
+
+    Route::post('/sunucu/servis/baslat','Server\OneController@startService')->name('server_start_service');
+
+    Route::post('/sunucu/servis/durdur','Server\OneController@stopService')->name('server_stop_service');
+
+    Route::post('/sunucu/servis/yenidenBaslat','Server\OneController@restartService')->name('server_restart_service');
 });
