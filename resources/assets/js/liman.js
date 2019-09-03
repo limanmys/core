@@ -202,6 +202,13 @@ function readNotifications(id) {
     });
 }
 
+function readSystemNotifications(id) {
+    let data = new FormData();
+    request('/bildirim/adminOku', data, function () {
+        checkNotifications();
+    });
+}
+
 let inputs =[];
 let modalData = [];
 

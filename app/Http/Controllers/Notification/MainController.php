@@ -80,4 +80,13 @@ class MainController extends Controller
         return respond("Hepsi Okundu", 200);
     }
 
+    public function adminRead(){
+        AdminNotification::where([
+            "read" => "false"
+        ])->update([
+            "read" => "true"
+        ]);
+    return respond("Hepsi Okundu.",200);
+    }
+
 }
