@@ -46,8 +46,7 @@ class OneController extends Controller
         if(!isset($output_json)){
           return respond(__("Boş json nesnesi."), 400);
         }
-        return respond(isset($output_json['message']) ? $output_json['message'] : $output_json,
-          isset($output_json['status']) ? $output_json['status'] : 200);
+        return respond($output_json['message'], $output_json['status']);
     }
 
     public function remove()
