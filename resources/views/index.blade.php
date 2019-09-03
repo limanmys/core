@@ -99,6 +99,9 @@
 
         function startQueue(){
           currentWidget = 0;
+          if(currentWidget >= widgets.length || widgets.length === 0){
+            return;
+          }
           if(widgets[currentWidget].type === 'countBox'){
             retrieveWidgets(widgets[currentWidget].element, nextWidget)
           }else if(widgets[currentWidget].type === 'chart'){
@@ -108,7 +111,7 @@
 
         function nextWidget(){
           currentWidget++;
-          if(currentWidget === widgets.length){
+          if(currentWidget >= widgets.length || widgets.length === 0){
             return;
           }
           if(widgets[currentWidget].type === 'countBox'){
@@ -137,7 +140,10 @@
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
                 info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
-            });
+                if(next){
+                  next();
+                }
+              });
         }
 
         function retrieveCharts(element, next){
@@ -158,7 +164,10 @@
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
                 info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
-            });
+                if(next){
+                  next();
+                }
+              });
         }
 
         function strip(html)
