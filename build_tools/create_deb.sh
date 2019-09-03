@@ -13,7 +13,7 @@ chmod 775 DEBIAN/postinst
 echo """Package: Liman
 Version: $1
 Installed-Size: 29892
-Maintainer: Mert ÇELEN <mcelen@havelsan.com.tr>
+Maintainer: Mert CELEN <mcelen@havelsan.com.tr>
 Section: admin
 Date : $1
 Architecture: amd64

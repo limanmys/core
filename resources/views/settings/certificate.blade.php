@@ -10,6 +10,9 @@
     </nav>
     <h3>{{__("Sisteme Sertifika Ekleme")}}</h3>
     <small>{{__("Not : Eklediğiniz sertifika işletim sistemi tarafından güvenilecektir.")}}</small>
+    @if(request('server_id'))
+        <h5>{{server()->name . " " . __("sunucusu talebi.")}}</h5>
+    @endif
     <table class="notDataTable">
         <style>
             td{
