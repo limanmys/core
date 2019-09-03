@@ -2,17 +2,14 @@
 
 namespace App;
 
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static where(array $array)
  */
-class ServerLog extends Eloquent
+class ServerLog extends Model
 {
     use UsesUuid;
-    
-    protected $collection = 'server_log';
-    protected $connection = 'mongodb';
     protected $fillable = ['command', 'server_id', 'user_id','output'];
     public static $dont_log = [
         "hostname", "df -h" , "whoami", "sudo systemctl is-failed "
@@ -29,8 +26,8 @@ class ServerLog extends Eloquent
         }
         $log = new ServerLog([
            "command" => $command,
-            "user_id" => ($user_id == null) ? auth()->user()->_id : $user_id,
-            "server_id" => ($server_id == null) ? server()->_id : $server_id,
+            "user_id" => ($user_id == null) ? auth()->user()->id : $user_id,
+            "server_id" => ($server_id == null) ? server()->id : $server_id,
             "output" => $output
         ]);
         $log->save();
@@ -41,7 +38,7 @@ class ServerLog extends Eloquent
     {
         // First, Retrieve Logs.
         $logs = ServerLog::where([
-            "server_id" => ($server_id == null) ? server()->_id : $server_id
+            "server_id" => ($server_id == null) ? server()->id : $server_id
         ])->orderBy('updated_at', 'DESC')->get();
 
         // If it's not requested as readable, which means id's only without logic.
@@ -54,7 +51,7 @@ class ServerLog extends Eloquent
         $scripts = Script::all();
 
         foreach ($logs as $log){
-            $user = $users->where('_id', $log->user_id)->first();
+            $user = $users->where('id', $log->user_id)->first();
             if(!$user){
                 continue;
             }
