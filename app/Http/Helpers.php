@@ -109,8 +109,7 @@ if (!function_exists('server')) {
     function server()
     {
         if(!request('server')){
-            dd(request()->all());
-            abort(504,"Sunucu Bulunamadi");
+            abort(504,"Sunucu Bulunamadı");
         }
         return request('server');
     }

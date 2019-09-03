@@ -13,12 +13,12 @@
         @if($widgets->count())
             @foreach($widgets as $widget)
               @if($widget->type==="count_box" || $widget->type==="")
-                <div class="col-md-3 col-sm-4 col-xs-12" id="{{$widget->id}}">
+                <div class="col-md-3 col-sm-4 col-xs-12" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
                     <div class="info-box overlay-wrapper" title="{{$widget->server_name . " " . __("Sunucusu")}} -> {{$widget->title}}">
                         <span class="info-box-icon bg-aqua" style="padding:20px; display: none;"><i class="fa fa-{{$widget->text}}"></i></span>
                         <div class="info-box-content" style="display: none;">
-                            <span class="info-box-text" id="{{$widget->id}}" title="{{__($widget->title)}}">{{__($widget->title)}}</span>
-                            <span class="float-right limanWidget" id="{{$widget->id}}" style="font-size: 20px">{{__("Yükleniyor...")}}</span>
+                            <span class="info-box-text" id="{{$widget->id}}" title="{{__($widget->title)}}" data-server-id="{{$widget->server_id}}">{{__($widget->title)}}</span>
+                            <span class="float-right limanWidget" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}" style="font-size: 20px">{{__("Yükleniyor...")}}</span>
                             <span class="progress-description" title="{{$widget->server_name . " " . __("Sunucusu")}}">{{$widget->server_name . " " . __("Sunucusu")}}</span>
                         </div>
                         <div class="overlay" style="padding: 5px 10px;text-align: center;position: initial;">
@@ -28,7 +28,7 @@
                     </div>
                 </div>
               @elseif ($widget->type==="chart")
-                <div class="col-md-6 limanCharts" id="{{$widget->id}}">
+                <div class="col-md-6 limanCharts" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
                   <div class="box box-primary" id="{{$widget->id}}Chart">
                     <div class="box-header with-border">
                       <h3 class="box-title">{{$widget->server_name . " " . __("Sunucusu")}} {{__($widget->title)}}</h3>
@@ -125,6 +125,7 @@
             let info_box = element.closest('.info-box');
             let form = new FormData();
             form.append('widget_id',element.attr('id'));
+            form.append('server_id',element.attr('data-server-id'));
             request('{{route('widget_one')}}', form, function(response){
                 let json = JSON.parse(response);
                 element.html(json["message"]);
@@ -136,7 +137,6 @@
                 }
             }, function(error) {
                 let json = JSON.parse(error);
-                widgets.splice(currentWidget, 1);
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
                 info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
@@ -151,6 +151,7 @@
             let form = new FormData();
             let info_box = element.closest('.info-box');
             form.append('widget_id', id);
+            form.append('server_id',element.attr('server-id'));
             request('{{route('widget_one')}}', form, function(res){
                 let response =  JSON.parse(res);
                 let data =  response.message;
@@ -160,7 +161,6 @@
                 }
             }, function(error) {
                 let json = JSON.parse(error);
-                widgets.splice(currentWidget, 1);
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
                 info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');

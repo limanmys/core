@@ -6,7 +6,7 @@ Route::post('/widget/ekle','Widgets\MainController@add')->name('widget_add');
 
 Route::view('/widget/ekle','widgets.add')->name('widget_add_page');
 
-Route::post('/widget','Widgets\OneController@one')->name('widget_one');
+Route::post('/widget','Widgets\OneController@one')->name('widget_one')->middleware('server_api');
 
 Route::post('/widget/sil','Widgets\OneController@remove')->name('widget_remove');
 
