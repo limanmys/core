@@ -99,6 +99,9 @@
 
         function startQueue(){
           currentWidget = 0;
+          if(currentWidget >= widgets.length || widgets.length === 0){
+            return;
+          }
           if(widgets[currentWidget].type === 'countBox'){
             retrieveWidgets(widgets[currentWidget].element, nextWidget)
           }else if(widgets[currentWidget].type === 'chart'){
@@ -108,7 +111,7 @@
 
         function nextWidget(){
           currentWidget++;
-          if(currentWidget >= widgets.length){
+          if(currentWidget >= widgets.length || widgets.length === 0){
             return;
           }
           if(widgets[currentWidget].type === 'countBox'){
