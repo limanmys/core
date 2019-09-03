@@ -458,11 +458,25 @@ class OneController extends Controller
         return $table;
     }
 
+    public function getLogs()
+    {
+        return view('l.table',[
+            "value" => ServerLog::retrieve(true),
+            "title" => [
+                "Başlık" , "Açıklama" , "Kullanıcı"
+            ],
+            "display" => [
+                "command" , "output" , "username"
+            ],
+        ]);
+    }
+
     public function updatePackage()
     {
         if(server()->type == "linux_ssh"){
             $raw = server()->run('sudo apt-get -o Dpkg::Progress-Fancy="0" -o Dpkg::Use-Pty=0 --only-upgrade install '.request("package_name")." -y --fix-missing > /tmp/".request("package_name").".txt > /dev/null 2>&1 & echo $!");
             \Session::put(server()->id.request("package_name"), trim($raw));
+            ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi için güncelleme isteği gönderildi.', ['package_name' => request("package_name")]));
         }elseif (server()->type == "windows_powershell"){
             $raw = "";
         }
@@ -474,18 +488,21 @@ class OneController extends Controller
         if(server()->type == "linux_ssh"){
             $pid = session(server()->id.request("package_name"));
             if(empty($pid)){
-                return respond(request("package_name")." paketi bir hata nedeniyle takip edilemiyor.");
+                ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi bir hata nedeniyle takip edilemedi.', ['package_name' => request("package_name")]));
+                return respond(__(":package_name paketi bir hata nedeniyle takip edilemiyor.", ['package_name' => request("package_name")]));
             }
             $output = trim(server()->run('[ -d "/proc/'.$pid.'" ] && echo "YES" || echo "NO"'));
             if($output === "NO"){
                 $output = server()->run('sudo apt list --upgradable 2>/dev/null | grep '.request("package_name"));
                 if(empty($output)){
-                    return respond(request("package_name")." paketi başarıyla kuruldu.");
+                    ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi paketi başarıyla kuruldu.', ['package_name' => request("package_name")]));
+                    return respond(__(":package_name paketi başarıyla kuruldu.", ['package_name' => request("package_name")]));
                 }else{
-                    return respond(request("package_name")." paketi kurulamadı.");
+                    ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi kurulamadı.', ['package_name' => request("package_name")]));
+                    return respond(__(":package_name paketi kurulamadı.", ['package_name' => request("package_name")]));
                 }
             }else{
-                return respond(request("package_name")." paketinin kurulum işlemi henüz bitmedi.", 400);
+                return respond(__(":package_name paketinin kurulum işlemi henüz bitmedi.", ['package_name' => request("package_name")]), 400);
             }
         }elseif (server()->type == "windows_powershell"){
             $output = "";

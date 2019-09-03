@@ -39,6 +39,7 @@
 {{--                <li class=""><a href="#filesTab" data-toggle="tab" aria-expanded="false">{{__("Dosya Transferi")}}</a>--}}
 {{--                </li>--}}
             @endif
+            <li class=""><a href="#logsTab" onclick="getLogs()" data-toggle="tab" aria-expanded="false">{{__("Günlük Kayıtları")}}</a></li>
             <li class=""><a href="#settingsTab" data-toggle="tab" aria-expanded="false">{{__("Ayarlar")}}</a></li>
             @if(server()->type == "linux" || server()->type == "windows")
                 <li class=""><a href="#extraTab" data-toggle="tab" aria-expanded="false">{{__("Ek Özellikler")}}</a>
@@ -165,6 +166,9 @@
 
                 </div>
             @endif
+            <div class="tab-pane" id="logsTab">
+
+            </div>
             <div class="tab-pane" id="settingsTab" >
             <table class="notDataTable" style="width: 900px;">
             <tr>
@@ -436,6 +440,30 @@
             request('{{route('server_package_list')}}', new FormData(), function (response) {
                 $("#packagesTab").html(response);
                 $("#packagesTab table").DataTable({
+                    bFilter: true,
+                    select: {
+                        style: 'multi'
+                    },
+                    "language": {
+                        url: "/turkce.json"
+                    }
+                });
+                setTimeout(function () {
+                    Swal.close();
+                }, 1500);
+            })
+        }
+
+        function getLogs() {
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Okunuyor...")}}',
+                showConfirmButton: false,
+            });
+            request('{{route('server_get_logs')}}', new FormData(), function (response) {
+                $("#logsTab").html(response);
+                $("#logsTab table").DataTable({
                     bFilter: true,
                     select: {
                         style: 'multi'

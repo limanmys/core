@@ -78,6 +78,8 @@ Route::group(['middleware' => ['server']], function () {
 
     Route::post('/sunucu/guncellemeler/paket_kontrol','Server\OneController@checkUpdate')->name('server_check_update');
 
+    Route::post('/sunucu/gunluk_kayitlari','Server\OneController@getLogs')->name('server_get_logs');
+
     Route::post('/sunucu/paketler','Server\OneController@packageList')->name('server_package_list');
 
     Route::post('/sunucu/yukselt','Server\OneController@upgradeServer')->name('server_upgrade');
