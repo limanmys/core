@@ -27,21 +27,21 @@
     ])
     <?php
         foreach($widgets as $widget){
-            $server = \App\Server::find($widget->server_id);
-            if($server){
-                $widget->server_name = $server->name;
+            $extension = \App\Extension::find($widget->extension_id);
+            if($extension){
+                $widget->extension_name = $extension->name;
             }else{
-                $widget->server_name = "Sunucu Silinmis";
+                $widget->extension_name = "Eklenti Silinmis";
             }
         }
     ?>
     @include('l.table',[
         "value" => $widgets,
         "title" => [
-            "Sunucu" , "Başlık" , "Sunucu Adi", "*hidden*"
+            "Sunucu" , "Başlık" , "Eklenti", "*hidden*"
         ],
         "display" => [
-            "server_name" , "title" ,"server_name", "id:widget_id"
+            "server_name" , "title" ,"extension_name", "id:widget_id"
         ],
         "menu" => [
             "Düzenle" => [
