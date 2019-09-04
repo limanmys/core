@@ -98,7 +98,7 @@ systemctl restart php7.3-fpm
 
 # Run Database Migration
 php /liman/server/artisan migrate --force
-
+php /liman/server/artisan cache:clear
 # Set Permissions
 chown -R liman:liman /liman/{server,database,certs,keys/windows,keys/linux,sandbox,logs}
 chmod 700 -R /liman/{server,database,certs,keys/windows,keys/linux,logs}
