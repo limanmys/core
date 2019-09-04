@@ -398,7 +398,7 @@ class OneController extends Controller
     public function updatePackage()
     {
         if(server()->type == "linux_ssh"){
-            $raw = server()->run('sudo apt-get -o Dpkg::Progress-Fancy="0" -o Dpkg::Use-Pty=0 --only-upgrade install '.request("package_name")." -y --fix-missing > /tmp/".request("package_name").".txt > /dev/null 2>&1 & echo $!");
+            $raw = server()->run('DEBIAN_FRONTEND=noninteractive sudo apt-get -o Dpkg::Progress-Fancy="0" -o Dpkg::Use-Pty=0 --only-upgrade install '.request("package_name")." -y --fix-missing > /tmp/".request("package_name").".txt > /dev/null 2>&1 & echo $!");
             \Session::put(server()->id.request("package_name"), trim($raw));
             ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi için güncelleme isteği gönderildi.', ['package_name' => request("package_name")]));
         }elseif (server()->type == "windows_powershell"){
