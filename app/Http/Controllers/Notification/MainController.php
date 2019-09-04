@@ -15,7 +15,8 @@ class MainController extends Controller
             "user_id" => auth()->id()
         ])->orderBy('read')->orderBy('created_at', 'desc')->get();
         return response()->view('notification.index', [
-            "notifications" => $notifications
+            "notifications" => $notifications,
+            "system" => false
         ]);
 
     }
@@ -78,6 +79,25 @@ class MainController extends Controller
             "read" => true
         ]);
         return respond("Hepsi Okundu", 200);
+    }
+
+    public function adminRead()
+    {
+        AdminNotification::where([
+            "read" => "false"
+        ])->update([
+            "read" => "true"
+        ]);
+    return respond("Hepsi Okundu.",200);
+    }
+
+    public function allSystem()
+    {
+        $notifications = AdminNotification::orderBy('read')->orderBy('created_at', 'desc')->get();
+        return response()->view('notification.index', [
+            "notifications" => $notifications,
+            "system" => true
+        ]);
     }
 
 }

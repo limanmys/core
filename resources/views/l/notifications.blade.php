@@ -37,5 +37,5 @@
             @endforeach
         </ul>
     </li>
-    <li class="footer"><a href="{{isset($systemNotification) ? route('all_user_notifications') : route('all_user_notifications')}}">{{__('Tümünü gör')}}</a></li>
+    <li class="footer"><a href="{{isset($systemNotification) ? route('all_system_notifications') : route('all_user_notifications')}}">{{__('Tümünü gör')}}</a></li>
 </ul>

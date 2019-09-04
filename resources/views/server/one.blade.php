@@ -36,8 +36,6 @@
                         </a>
                     </li>
                 @endif
-{{--                <li class=""><a href="#filesTab" data-toggle="tab" aria-expanded="false">{{__("Dosya Transferi")}}</a>--}}
-{{--                </li>--}}
             @endif
             <li class=""><a href="#logsTab" onclick="getLogs()" data-toggle="tab" aria-expanded="false">{{__("Günlük Kayıtları")}}</a></li>
             <li class=""><a href="#settingsTab" data-toggle="tab" aria-expanded="false">{{__("Ayarlar")}}</a></li>
@@ -153,7 +151,31 @@
             </div>
             @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
                 <div class="tab-pane" id="servicesTab">
+                @include('l.table',[
+                    "id" => "servicesTable",
+                    "value" => [],
+                    "title" => [
+                        "Servis Adı" , "Aciklamasi" , "Durumu"
+                    ],
+                    "display" => [
+                        "name" , "description", "status"
+                    ],
+                    "menu" => [
+                        "Baslat" => [
+                            "target" => "startService",
+                            "icon" => "fa-play"
+                        ],
+                        "Durdur" => [
+                            "target" => "stopService",
+                            "icon" => "fa-stop"
+                        ],
+                        "Yeniden Baslat" => [
+                            "target" => "restartService",
+                            "icon" => "fa-refresh"
+                        ]
 
+                    ],
+                ])
                 </div>
                 <div class="tab-pane right" id="updatesTab">
                     <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateAllPackages" onclick="updateAllPackages()">Tümünü Güncelle</button>
@@ -239,6 +261,45 @@
         "type" => "danger",
         "onsubmit" => "removeExtensionFunc",
         "submit_text" => "Eklentileri Sil"
+    ])
+
+    @include('l.modal',[
+        "id"=>"startService",
+        "title" => "Servisi Baslat",
+        "text" => "Secili servisi baslatmak istediginize emin misiniz?",
+        "type" => "danger",
+        "next" => "reload",
+        "inputs" => [
+            "name:-" => "name:hidden",
+        ],
+        "url" => route('server_start_service'),
+        "submit_text" => "Servisi Baslat"
+    ])
+
+    @include('l.modal',[
+        "id"=>"stopService",
+        "title" => "Servisi Durdur",
+        "text" => "Secili servisi durdurmak istediginize emin misiniz?",
+        "type" => "danger",
+        "next" => "reload",
+        "inputs" => [
+            "name:-" => "name:hidden",
+        ],
+        "url" => route('server_stop_service'),
+        "submit_text" => "Servisi Durdur"
+    ])
+
+    @include('l.modal',[
+        "id"=>"restartService",
+        "title" => "Servisi Yeniden Baslat",
+        "text" => "Secili servisi yeniden baslatmak istediginize emin misiniz?",
+        "type" => "danger",
+        "next" => "reload",
+        "inputs" => [
+            "name:-" => "name:hidden",
+        ],
+        "url" => route('server_restart_service'),
+        "submit_text" => "Servisi Yeniden Baslat"
     ])
 
     @include('l.modal',[
@@ -486,12 +547,15 @@
                 showConfirmButton: false,
             });
             request('{{route('server_service_list')}}', new FormData(), function (response) {
-                $("#servicesTab").html(response);
-                $("#servicesTab table").DataTable({
-                    bFilter: true,
-                    "language": {
-                        url: "/turkce.json"
-                    }
+                let json = JSON.parse(response);
+                let table = $("#servicesTab table").DataTable();
+                table.rows().remove();
+                let counter = 1;
+                json["message"].forEach(element => {
+                    let row = table.row.add([
+                        counter++, element["name"], element["description"], element["status"]
+                    ]).draw(false).node();
+                    $(row).addClass('tableRow');
                 });
                 setTimeout(function () {
                     Swal.close();
@@ -699,5 +763,7 @@
                 }
             });
         });
+
+        
     </script>
 @endsection
