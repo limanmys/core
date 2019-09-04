@@ -41,8 +41,9 @@
                     <div class="box-body">
                       <canvas></canvas>
                     </div>
-                    <div class="overlay">
+                    <div class="overlay" style="padding: 5px 10px;text-align: center;position: initial;">
                       <i class="fa fa-refresh fa-spin"></i>
+                      <span style="font-size: 1.2rem;">{{__("Yükleniyor")}}</span>
                     </div>
                   </div>
                 </div>
@@ -149,9 +150,8 @@
         function retrieveCharts(element, next){
             let id = element.attr('id');
             let form = new FormData();
-            let info_box = element.closest('.info-box');
             form.append('widget_id', id);
-            form.append('server_id',element.attr('server-id'));
+            form.append('server_id',element.attr('data-server-id'));
             request('{{route('widget_one')}}', form, function(res){
                 let response =  JSON.parse(res);
                 let data =  response.message;
@@ -161,9 +161,9 @@
                 }
             }, function(error) {
                 let json = JSON.parse(error);
-                info_box.find('.overlay i').remove();
-                info_box.find('.overlay span').remove();
-                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
+                element.find('.overlay i').remove();
+                element.find('.overlay span').remove();
+                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
                 if(next){
                   next();
                 }
