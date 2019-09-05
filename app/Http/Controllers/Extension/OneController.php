@@ -536,7 +536,6 @@ class OneController extends Controller
 
         try{
             foreach (Script::where('extensions', 'like', strtolower(extension()->name))->get() as $script) {
-                shell_exec('rm ' . env('SCRIPTS_PATH') . $script->id);
                 $script->delete();
             }
             shell_exec('sudo userdel ' . clean_score(extension()->id));
