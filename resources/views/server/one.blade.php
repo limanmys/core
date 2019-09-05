@@ -415,9 +415,7 @@
             stats();
         }, 30000);
 
-        let ramChart, cpuChart, diskChart;
         stats();
-
         function updateChart(element, time, data) {
             // First, Update Text
             $("#" + element + "Text").html("%" + data);
@@ -429,6 +427,7 @@
         }
 
         function createChart(element, time, data) {
+            $("#" + element + "Text").html("%" + data[0]);
             window[element + "Chart"] = new Chart($("#" + element), {
                 type: 'line',
                 data: {
@@ -455,21 +454,25 @@
                 }
             })
         }
-
+        let firstStats = true;
         function stats() {
             let form = new FormData();
             form.append('server_id', '{{server()->id}}');
             request('{{route('server_stats')}}', form, function (response) {
                 data = JSON.parse(response);
-                updateChart("disk", data['time'], data['disk']);
-                updateChart("ram", data['time'], data['ram']);
-                updateChart("cpu", data['time'], data['cpu']);
+                console.log(firstStats);
+                if(firstStats){
+                    firstStats = false;
+                    createChart("ram", data['time'], [data['ram']]);
+                    createChart("cpu", data['time'], [data['cpu']]);
+                    createChart("disk", data['time'], [data['disk']]);
+                }else{
+                    updateChart("disk", data['time'], data['disk']);
+                    updateChart("ram", data['time'], data['ram']);
+                    updateChart("cpu", data['time'], data['cpu']);
+                }
             })
         }
-
-        createChart("ram", "{{\Carbon\Carbon::now()->format("H:i:s")}}", ["0"]);
-        createChart("cpu", "{{\Carbon\Carbon::now()->format("H:i:s")}}", ["0"]);
-        createChart("disk", "{{\Carbon\Carbon::now()->format("H:i:s")}}", ["0"]);
 
         function downloadFile(form) {
             window.location.assign('/sunucu/indir?path=' + form.getElementsByTagName('input')[0].value + '&server_id=' + form.getElementsByTagName('input')[1].value);

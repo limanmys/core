@@ -318,7 +318,7 @@ class OneController extends Controller
             $disk = server()->run('df -h / | grep /',false);
             preg_match("/(\d+)%/",$disk,$test);
             $disk = $test[1];
-            $ram = server()->run("free -m | awk '/Mem:/ { total=($6/$2)*100 } END { printf(\"%3.1f\", total) }'", false);
+            $ram = server()->run("free -t | awk 'NR == 2 {printf($3/$2*100)}'", false);
             $cpu = substr(server()->run("grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'", false), 0, -1);
             $cpu = substr($cpu,0,5);
         }elseif (server()->type == "windows_powershell"){
