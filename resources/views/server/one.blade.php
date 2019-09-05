@@ -458,19 +458,18 @@
         function stats() {
             let form = new FormData();
             form.append('server_id', '{{server()->id}}');
+            let time = "{{\Carbon\Carbon::now()->format("H:i:s")}}";
             request('{{route('server_stats')}}', form, function (response) {
                 data = JSON.parse(response);
-                console.log(firstStats);
                 if(firstStats){
                     firstStats = false;
-                    createChart("ram", data['time'], [data['ram']]);
-                    createChart("cpu", data['time'], [data['cpu']]);
-                    createChart("disk", data['time'], [data['disk']]);
-                }else{
-                    updateChart("disk", data['time'], data['disk']);
-                    updateChart("ram", data['time'], data['ram']);
-                    updateChart("cpu", data['time'], data['cpu']);
+                    createChart("ram", time, [data['ram']]);
+                    createChart("cpu", time, [data['cpu']]);
+                    createChart("disk", time, [data['disk']]);
                 }
+                updateChart("disk", data['time'], data['disk']);
+                updateChart("ram", data['time'], data['ram']);
+                updateChart("cpu", data['time'], data['cpu']);
             })
         }
 
