@@ -133,12 +133,12 @@ class Server extends Model
     public function extensions()
     {
         $extensions = Extension::find(DB::table("server_extensions")
-            ->where("server_id",$this->id)->pluck("extension_id")->reverse()->toArray());
+            ->where("server_id",$this->id)->pluck("extension_id")->toArray());
         if(auth()->user()->isAdmin()){
             return $extensions;
         }
         return $extensions->whereIn("id",DB::table("permissions")
-            ->whereNotNull("extension_id")->pluck("extension_id")->reverse()->toArray());
+            ->whereNotNull("extension_id")->pluck("extension_id")->toArray());
     }
 
 }

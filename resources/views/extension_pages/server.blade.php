@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<ol class="breadcrumb" style="margin-bottom:0px">
+<ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
     <li class="breadcrumb-item"><a href="/l/{{extension()->id}}">{{extension()->name}} {{ __('Sunucuları') }}</a>
     </li>
@@ -38,10 +38,11 @@
         @endforeach
         </ul>
     <div class="tab-content">
-        <div class="tab-pane active" id="current" style="display:flex">
+        <div class="tab-pane active" id="current" style="display:flow-root;height:100%;width:100%">
             {!!$view!!}
         </div>
     </div>
+</div>
 </div>
 
 
