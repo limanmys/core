@@ -4,7 +4,7 @@
 
 Route::get('/ayarlar', 'Settings\MainController@index')->name('settings')->middleware('admin');
 
-Route::get('/ayarlar/{user_id}','Settings\MainController@one')->name('settings_one')->middleware('admin');
+Route::get('/ayarlar/{user}','Settings\MainController@one')->name('settings_one')->middleware('admin');
 
 Route::post('/ayarlar/liste','Settings\MainController@getList')->name('settings_get_list')->middleware('admin');
 

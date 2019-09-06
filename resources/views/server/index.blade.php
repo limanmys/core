@@ -7,7 +7,9 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Sunucular")}}</li>
         </ol>
     </nav>
-    <button href="#tab_1" type="button" class="btn btn-success" data-toggle="modal" data-target="#add_server">{{__("Sunucu Ekle")}}</button><br><br>
+    @can('create','\App\Server')
+        <button href="#tab_1" type="button" class="btn btn-success" data-toggle="modal" data-target="#add_server">{{__("Sunucu Ekle")}}</button><br><br>
+    @endcan
     @include('l.errors')
     <?php
     use Illuminate\Support\Facades\DB;

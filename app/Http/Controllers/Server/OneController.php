@@ -319,7 +319,7 @@ class OneController extends Controller
             preg_match("/(\d+)%/",$disk,$test);
             $disk = $test[1];
             $ram = server()->run("free -m | awk '/Mem:/ { total=($6/$2)*100 } END { printf(\"%3.1f\", total) }'", false);
-            $cpu = substr(server()->run("grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'", false), 0, -1);
+            $cpu = substr(server()->run("top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\([0-9.]*\)%* id.*/\1/' | awk '{print 100 - $1\"%\"}'", false), 0, -1);
             $cpu = substr($cpu,0,5);
         }elseif (server()->type == "windows_powershell"){
             $cpu = substr(server()->run("Get-WmiObject win32_processor | Measure-Object -property LoadPercentage -Average | Select Average"),23,-3);

@@ -12,11 +12,12 @@
     <meta name="extension_id" content="{{request('extension_id') ? request('extension_id') : ''}}">
 </head>
 <body class="hold-transition @yield('body_class')">
-  <div class="il-isimleri"></div>
+<div class="il-isimleri"></div>
 
 <script src="{{mix('/js/liman.js')}}"></script>
 
 @yield('body')
+
 </body>
 <script>
     window.onload = function () {
@@ -53,39 +54,5 @@
             }
         });
     };
-
-    function activeTab(){
-        let element = $('a[href="'+ window.location.hash +'"]');
-        if(element){
-            element.tab('show');
-            if(element.attr("onclick")){
-                element.click();
-            }
-        }
-    }
-
-    function terminal(serverId, name) {
-        let elm = $("#terminal");
-        $("#terminal .modal-body iframe").attr('src', '/sunucu/terminal?server_id=' + serverId);
-        $("#terminal .modal-title").html(name + '{{__(" sunucusu terminali")}}');
-        elm.modal('show');
-        elm.on('hidden.bs.modal', function () {
-            $("#terminal .modal-body iframe").attr('src', '');
-        })
-    }
-
-
-    window.onbeforeunload = function () {
-        Swal.fire({
-            position: 'center',
-            type: 'info',
-            title: '{{__("Yükleniyor...")}}',
-            showConfirmButton: false,
-            allowOutsideClick : false,
-        });
-    };
-    $(window).on('shown.bs.modal', function() {
-        $(".modal.in").find('div.alert').fadeOut();
-    });
 </script>
 </html>

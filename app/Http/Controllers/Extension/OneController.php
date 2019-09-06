@@ -99,7 +99,7 @@ class OneController extends Controller
                         return respond("Eklenti için gerekli olan betik yüklü değil, lütfen yöneticinizle görüşün.", 404);
                     }
 
-                    if (!Permission::can(auth()->id(), 'script', $script->id)) {
+                    if (!Permission::can(auth()->id(), 'script','id', $script->id)) {
                         system_log(6,"EXTENSION_NO_PERMISSION",[
                             "extension_id" => extension()->id,
                             "target_name" => trim($unique_code)

@@ -33,11 +33,6 @@
             "text" => "İndir"
         ])
         @include('l.modal-button',[
-            "class" => "btn-secondary",
-            "target_id" => "extensionDebExport",
-            "text" => "Paketle"
-        ])
-        @include('l.modal-button',[
             "class" => "btn-info",
             "target_id" => "newExtension",
             "text" => "Yeni"
@@ -95,16 +90,6 @@
         "submit_text" => "İndir"
     ])
 
-    @include('l.modal',[
-        "id"=>"extensionDebExport",
-        "onsubmit" => "downloadDebFile",
-        "title" => "Deb Paketi İndir",
-        "next" => "",
-        "inputs" => [
-            "Eklenti Secin:extension_id" => $input_extensions
-        ],
-        "submit_text" => "Paketi İndir"
-    ])
 
     @include('l.modal',[
         "id"=>"newExtension",

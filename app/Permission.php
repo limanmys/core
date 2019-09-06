@@ -3,6 +3,7 @@
 namespace App;
 
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -23,73 +24,55 @@ class Permission extends Model
 {
     use UsesUuid;
 
-    protected $table = "permissions";
+    protected $table = "permissions";    
 
-    public static function grant($user_id, $type, $id)
+    protected $fillable = [
+        "user_id", "type", "key", "value", "extra"
+    ];
+
+    public static function can($user_id, $type, $key, $value ,$extra = null)
     {
-        $database = DB::table("permissions");
-        if($database->where([
-            $type => $id,
-            "user_id" => $user_id
-        ])->exists()){
+        $user = User::find($user_id);
+        // Verify if user is admin.
+        if($user->isAdmin()){
             return true;
         }
 
-        return $database->insert([
-            "id" => Str::uuid(),
+        return Permission::where([
             "user_id" => $user_id,
-            $type => $id,
-            "created_at" =>  Carbon::now(),
-            "updated_at" => Carbon::now()
-        ]);
-    }
-
-    public static function revoke($user_id, $type, $id)
-    {
-        $database = DB::table("permissions");
-        if($database->where([
-            $type => $id,
-            "user_id" => $user_id
-        ])->exists()){
-            $database->where([
-                $type => $id,
-                "user_id" => $user_id
-            ])->delete();
-            return true;
-        }
-        return false;
-    }
-
-    public static function get($user_id, $type = null)
-    {
-        $database = DB::table("permissions");
-        return $database->where([
-            "user_id" => $user_id
-        ])->whereNotNull($type)->get();
-    }
-
-    public static function getUsersofType($id, $type)
-    {
-        // Get User Id's as array
-        $users = Permission::where($type, 'like', $id)->pluck('user_id')->all();
-
-        // Retrieve objects using that array.
-        return User::findMany($users);
-    }
-
-    public static function can($user_id, $type, $id)
-    {
-        if(User::find($user_id)->isAdmin()){
-            return true;
-        }
-
-        if($type != "function"){
-            $type = $type . "_id";
-        }
-        $database = DB::table("permissions");
-        return $database->where([
-            "user_id" => $user_id,
-            $type => $id
+            "type" => $type,
+            "key" => $key,
+            "value" => $value,
+            "extra" => $extra
         ])->exists();
+    }
+
+    public static function grant($user_id, $type, $key, $value ,$extra = null)
+    {
+        $permission =  Permission::firstOrCreate([
+            "user_id" => $user_id,
+            "type" => $type,
+            "key" => $key,
+            "value" => $value,
+            "extra" => $extra
+        ]);
+
+        return $permission->save();
+    }
+
+    public static function revoke($user_id, $type, $key, $value ,$extra = null)
+    {
+        $permission = Permission::where([
+            "user_id" => $user_id,
+            "type" => $type,
+            "key" => $key,
+            "value" => $value,
+            "extra" => $extra
+        ])->first();
+        if($permission){
+            return $permission->delete();
+        }
+
+        return false;
     }
 }

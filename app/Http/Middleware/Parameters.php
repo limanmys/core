@@ -16,7 +16,6 @@ class Parameters
                 return respond("Eksik Parametre > $parameter", 403);
             }
         }
-
         // Forward request to next target.
         return $next($request);
     }

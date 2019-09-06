@@ -7,7 +7,6 @@ use App\Classes\Connector\WinRMConnector;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class Server
@@ -90,7 +89,7 @@ class Server extends Model
 
     /**
      * @param $service_name
-     * @return string
+     * @return bool
      */
     public function isRunning($service_name)
     {
@@ -132,13 +131,9 @@ class Server extends Model
 
     public function extensions()
     {
-        $extensions = Extension::find(DB::table("server_extensions")
-            ->where("server_id",$this->id)->pluck("extension_id")->toArray());
-        if(auth()->user()->isAdmin()){
-            return $extensions;
-        }
-        return $extensions->whereIn("id",DB::table("permissions")
-            ->whereNotNull("extension_id")->pluck("extension_id")->toArray());
+        return $this->belongsToMany('\App\Extension','server_extensions')->get()->filter(function($extension){
+            return Permission::can(user()->id,'extension','id',$extension->id);
+        });
     }
 
 }

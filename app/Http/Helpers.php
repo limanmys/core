@@ -177,6 +177,17 @@ if (!function_exists('extension')) {
     }
 }
 
+if (!function_exists('user')) {
+    /**
+     * @param null $id
+     * @return User
+     */
+    function user()
+    {
+        return auth()->user();
+    }
+}
+
 if (!function_exists('extensionDb')) {
     /**
      * @param $key

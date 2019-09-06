@@ -9,22 +9,23 @@
         "ext-json": "*",
         "ext-ldap": "*",
         "ext-openssl": "*",
+        "ext-posix": "*",
         "ext-ssh2": "*",
         "ext-xml": "*",
-        "ext-posix" : "*",
         "ext-zip": "*",
-        "laravel/framework": "6.0.*",
-        "laravel/helpers" : "*",
+        "doctrine/dbal": "^2.9",
+        "laravel/framework": "^6.0",
+        "laravel/helpers": "*",
         "phpseclib/phpseclib": "^2.0"
     },
     "require-dev": {
-        "beyondcode/laravel-dump-server": "^1.0",
-        "filp/whoops": "^2.0",
+        "facade/ignition": "^1.4",
         "fzaninotto/faker": "^1.4",
+        "laravel/telescope": "^2.1",
+        "laravel/tinker": "^1.0",
         "mockery/mockery": "^1.0",
-        "nunomaduro/collision": "^2.0",
-        "phpunit/phpunit": "^7.0",
-        "laravel/tinker": "^1.0"
+        "nunomaduro/collision": "^3.0",
+        "phpunit/phpunit": "^8.0"
     },
     "autoload": {
         "files": [

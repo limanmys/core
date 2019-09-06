@@ -12,16 +12,17 @@
     @include('l.errors')
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
-            <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">{{__("Genel Ayarlar")}}</a></li>
-            <li id="server_type"><a href="#tab_2" data-toggle="tab"
+            <li class="active"><a href="#general" data-toggle="tab" aria-expanded="true">{{__("Genel Ayarlar")}}</a></li>
+            <li id="server_type"><a href="#extension" data-toggle="tab"
                                     aria-expanded="false">{{__("Eklenti Yetkileri")}}</a></li>
-            <li id="server_type"><a href="#tab_3" data-toggle="tab" aria-expanded="false">{{__("Betik Yetkileri")}}</a>
+            <li id="server_type"><a href="#script" data-toggle="tab" aria-expanded="false">{{__("Betik Yetkileri")}}</a>
             </li>
-            <li class=""><a href="#tab_4" data-toggle="tab" aria-expanded="false">{{__("Sunucu Yetkileri")}}</a></li>
-            <li class=""><a href="#tab_5" data-toggle="tab" aria-expanded="false">{{__("Fonksiyon Yetkileri")}}</a></li>
+            <li class=""><a href="#server" data-toggle="tab" aria-expanded="false">{{__("Sunucu Yetkileri")}}</a></li>
+            <li class=""><a href="#function" data-toggle="tab" aria-expanded="false">{{__("Fonksiyon Yetkileri")}}</a></li>
+            <li class=""><a href="#liman" data-toggle="tab" aria-expanded="false">{{__("Liman Yetkileri")}}</a></li>
         </ul>
         <div class="tab-content">
-            <div class="tab-pane active" id="tab_1" style="height: 300px;">
+            <div class="tab-pane active" id="general" style="height: 300px;">
                 <form onsubmit="return updateUser(this);">
                     <div style="width: 300px;height: 300px;display: block;float: left;padding: 10px;">
                         <h4>{{__("Hesap Türü")}}</h4>
@@ -42,7 +43,7 @@
                 </form>
             </div>
 
-            <div class="tab-pane" id="tab_2">
+            <div class="tab-pane" id="extension">
                 <button onclick="getList('extension')" class="btn btn-success"><i class="fa fa-plus"></i></button>
                 <button onclick="removePermission('extension')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
                 @include('l.table',[
@@ -57,7 +58,7 @@
                     "noInitialize" => "true"
                 ])
             </div>
-            <div class="tab-pane" id="tab_3">
+            <div class="tab-pane" id="script">
                 <button onclick="getList('script')" class="btn btn-success"><i class="fa fa-plus"></i></button>
                 <button onclick="removePermission('script')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
                 @include('l.table',[
@@ -72,7 +73,7 @@
                     "noInitialize" => "true"
                 ])
             </div>
-            <div class="tab-pane" id="tab_4">
+            <div class="tab-pane" id="server">
                 <button onclick="getList('server')" class="btn btn-success"><i class="fa fa-plus"></i></button>
                 <button onclick="removePermission('server')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
                 @include('l.table',[
@@ -87,21 +88,35 @@
                     "noInitialize" => "true"
                 ])
             </div>
-            <div class="tab-pane" id="tab_5">
+            <div class="tab-pane" id="function">
                 <button class="btn btn-success" data-toggle="modal" data-target="#functionsModal"><i class="fa fa-plus"></i></button>
                 <button onclick="removeFunctions()" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
                 @include('l.table',[
                     "id" => "extensionFunctions",
-                    "value" => $functions,
+                    "value" => $user->permissions->where('type','function'),
                     "title" => [
                         "Fonksiyon Adı" , "Eklenti" , "*hidden*"
                     ],
                     "display" => [
-                        "name" , "extension_name", "db_name:db_name"
+                        "extra" , "value", "id:id"
                     ],
                 ])
             </div>
-                
+            <div class="tab-pane" id="liman">
+                <button onclick="getList('liman')" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                <button onclick="removePermission('liman')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
+                @include('l.table',[
+                    "id" => "liman_table",
+                    "value" => $user->permissions->where('type','liman'),
+                    "title" => [
+                        "Adı" , "*hidden*"
+                    ],
+                    "display" => [
+                        "name" , "id:id"
+                    ],
+                    "noInitialize" => "true"
+                ])
+            </div>
                 <div id="functionsModal" class="modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
