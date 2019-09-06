@@ -398,8 +398,8 @@ class OneController extends Controller
     public function updatePackage()
     {
         if(server()->type == "linux_ssh"){
-            $raw = server()->run('DEBIAN_FRONTEND=noninteractive sudo apt-get -o Dpkg::Progress-Fancy="0" -o Dpkg::Use-Pty=0 --only-upgrade install '.request("package_name")." -y --fix-missing > /tmp/".request("package_name").".txt > /dev/null 2>&1 & echo $!");
-            \Session::put(server()->id.request("package_name"), trim($raw));
+            $raw = server()->run('DEBIAN_FRONTEND=noninteractive sudo apt-get -o Dpkg::Progress-Fancy="0" -o Dpkg::Use-Pty=0 --only-upgrade install '.request("package_name")." -y --fix-missing 2>&1 | sudo tee -a /tmp/".request("package_name").".txt > /dev/null 2>&1 & echo $!");
+            \Session::put(server()->id.request("package_name"), intval(trim($raw)) + 1 );
             ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi için güncelleme isteği gönderildi.', ['package_name' => request("package_name")]));
         }elseif (server()->type == "windows_powershell"){
             $raw = "";
@@ -426,7 +426,12 @@ class OneController extends Controller
                     return respond(__(":package_name paketi kurulamadı.", ['package_name' => request("package_name")]));
                 }
             }else{
-                return respond(__(":package_name paketinin kurulum işlemi henüz bitmedi.", ['package_name' => request("package_name")]), 400);
+                $output = server()->run('sudo cat /tmp/'.request("package_name"). '.txt 2> /dev/null');
+                server()->run('sudo truncate -s 0 /tmp/'.request("package_name"). '.txt');
+                return respond([
+                    "status" => __(":package_name paketinin kurulum işlemi henüz bitmedi.", ['package_name' => request("package_name")]),
+                    "output" => $output
+                ], 400);
             }
         }elseif (server()->type == "windows_powershell"){
             $output = "";

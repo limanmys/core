@@ -609,7 +609,7 @@
             $('#updateLogs').modal('show');
             let data = new FormData();
             data.append("package_name", packages[index]);
-            $('#updateLogs').find('.updateLogsBody').append("\n"+packages[index]+" paketi kuruluyor. Lütfen bekleyin...");
+            $('#updateLogs').find('.updateLogsBody').append("\n"+packages[index]+" paketi kuruluyor. Lütfen bekleyin...<span id='"+packages[index]+"'></span>");
             request('{{route('server_update_package')}}', data, function (response) {
                 checkUpdate();
             })
@@ -645,7 +645,11 @@
                     getUpdates();
                     $('#updateLogs').find('.updateLogsBody').append("\n"+"Tüm güncellemeler kuruldu.");
                 }
-            }, function(){
+            }, function(response){
+                response = JSON.parse(response);
+                if(response.message.output){
+                    $('#updateLogs').find('.updateLogsBody').append("\n"+response.message.output);
+                }
                 setTimeout(function(){
                     checkUpdate();
                 },5000);
