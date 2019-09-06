@@ -21,6 +21,7 @@ Build:
     - sed -i "s/APP_VERSION=Development/APP_VERSION=$VERSION/g" liman/server/.env
     - sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" liman/server/.env
     - sed -i "s/APP_ENV=local/APP_ENV=production/g" liman/server/.env
+    - sed -i "s/EXTENSION_DEVELOPER_MODE=true/EXTENSION_DEVELOPER_MODE=false/g" liman/server/.env
     - chmod -R 775 DEBIAN/
     - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
     - cp ../build_tools.deb ../liman-$VERSION.deb
