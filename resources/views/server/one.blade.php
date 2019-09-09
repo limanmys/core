@@ -38,7 +38,8 @@
                 @endif
             @endif
             <li class=""><a href="#logsTab" onclick="getLogs()" data-toggle="tab" aria-expanded="false">{{__("Günlük Kayıtları")}}</a></li>
-            <li class=""><a href="#settingsTab" data-toggle="tab" aria-expanded="false">{{__("Ayarlar")}}</a></li>
+            <li class=""><a href="#settingsTab" data-toggle="tab" aria-expanded="false">{{__("Sunucu Ayarları")}}</a></li>
+            <li class=""><a href="#extensionSettings" data-toggle="tab" aria-expanded="false">{{__("Eklenti Ayarları")}}</a></li>
             @if(server()->type == "linux" || server()->type == "windows")
                 <li class=""><a href="#extraTab" data-toggle="tab" aria-expanded="false">{{__("Ek Özellikler")}}</a>
                 </li>
@@ -240,7 +241,23 @@
                         <button type="submit" class="btn btn-success">{{__("Yükselt")}}</button>
                 </form>
             </div>
-
+            <div class="tab-pane" id="extensionSettings">
+                @include('l.table',[
+                    "value" => [],
+                    "title" => [
+                        "Veri Adi" , "Eklenti" , "*hidden*"
+                    ],
+                    "display" => [
+                        "name" , "description", "id:id"
+                    ],
+                    "menu" => [
+                        "Sil" => [
+                            "target" => "startService",
+                            "icon" => "fa-play"
+                        ]
+                    ],
+                ])
+            </div>
         </div>
     </div>
 
