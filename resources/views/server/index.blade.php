@@ -235,7 +235,7 @@
                     title: json["message"],
                     showConfirmButton: false,
                     allowOutsideClick : false,
-                    timer: 2000
+                    timer: 500
                 });
                 isGeneralOK = true;
                 $("#generalTab").css('color','green');

@@ -27,7 +27,7 @@ class Permission extends Model
     protected $table = "permissions";    
 
     protected $fillable = [
-        "user_id", "type", "key", "value", "extra"
+        "user_id", "type", "key", "value", "extra", "blame"
     ];
 
     public static function can($user_id, $type, $key, $value ,$extra = null)
@@ -54,7 +54,8 @@ class Permission extends Model
             "type" => $type,
             "key" => $key,
             "value" => $value,
-            "extra" => $extra
+            "extra" => $extra,
+            "blame" => user()->id
         ]);
 
         return $permission->save();
