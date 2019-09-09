@@ -38,7 +38,8 @@
                 @endif
             @endif
             <li class=""><a href="#logsTab" onclick="getLogs()" data-toggle="tab" aria-expanded="false">{{__("Günlük Kayıtları")}}</a></li>
-            <li class=""><a href="#settingsTab" data-toggle="tab" aria-expanded="false">{{__("Ayarlar")}}</a></li>
+            <li class=""><a href="#settingsTab" data-toggle="tab" aria-expanded="false">{{__("Sunucu Ayarları")}}</a></li>
+            <li class=""><a href="#extensionSettings" data-toggle="tab" aria-expanded="false">{{__("Eklenti Ayarları")}}</a></li>
             @if(server()->type == "linux" || server()->type == "windows")
                 <li class=""><a href="#extraTab" data-toggle="tab" aria-expanded="false">{{__("Ek Özellikler")}}</a>
                 </li>
@@ -240,7 +241,23 @@
                         <button type="submit" class="btn btn-success">{{__("Yükselt")}}</button>
                 </form>
             </div>
-
+            <div class="tab-pane" id="extensionSettings">
+                @include('l.table',[
+                    "value" => [],
+                    "title" => [
+                        "Veri Adi" , "Eklenti" , "*hidden*"
+                    ],
+                    "display" => [
+                        "name" , "description", "id:id"
+                    ],
+                    "menu" => [
+                        "Sil" => [
+                            "target" => "startService",
+                            "icon" => "fa-play"
+                        ]
+                    ],
+                ])
+            </div>
         </div>
     </div>
 
@@ -415,9 +432,7 @@
             stats();
         }, 30000);
 
-        let ramChart, cpuChart, diskChart;
         stats();
-
         function updateChart(element, time, data) {
             // First, Update Text
             $("#" + element + "Text").html("%" + data);
@@ -429,6 +444,7 @@
         }
 
         function createChart(element, time, data) {
+            $("#" + element + "Text").html("%" + data[0]);
             window[element + "Chart"] = new Chart($("#" + element), {
                 type: 'line',
                 data: {
@@ -455,21 +471,24 @@
                 }
             })
         }
-
+        let firstStats = true;
         function stats() {
             let form = new FormData();
             form.append('server_id', '{{server()->id}}');
+            let time = "{{\Carbon\Carbon::now()->format("H:i:s")}}";
             request('{{route('server_stats')}}', form, function (response) {
                 data = JSON.parse(response);
+                if(firstStats){
+                    firstStats = false;
+                    createChart("ram", time, [data['ram']]);
+                    createChart("cpu", time, [data['cpu']]);
+                    createChart("disk", time, [data['disk']]);
+                }
                 updateChart("disk", data['time'], data['disk']);
                 updateChart("ram", data['time'], data['ram']);
                 updateChart("cpu", data['time'], data['cpu']);
             })
         }
-
-        createChart("ram", "{{\Carbon\Carbon::now()->format("H:i:s")}}", ["0"]);
-        createChart("cpu", "{{\Carbon\Carbon::now()->format("H:i:s")}}", ["0"]);
-        createChart("disk", "{{\Carbon\Carbon::now()->format("H:i:s")}}", ["0"]);
 
         function downloadFile(form) {
             window.location.assign('/sunucu/indir?path=' + form.getElementsByTagName('input')[0].value + '&server_id=' + form.getElementsByTagName('input')[1].value);
@@ -607,7 +626,7 @@
             $('#updateLogs').modal('show');
             let data = new FormData();
             data.append("package_name", packages[index]);
-            $('#updateLogs').find('.updateLogsBody').append("\n"+packages[index]+" paketi kuruluyor. Lütfen bekleyin...");
+            $('#updateLogs').find('.updateLogsBody').append("\n"+packages[index]+" paketi kuruluyor. Lütfen bekleyin...<span id='"+packages[index]+"'></span>");
             request('{{route('server_update_package')}}', data, function (response) {
                 checkUpdate();
             })
@@ -643,7 +662,11 @@
                     getUpdates();
                     $('#updateLogs').find('.updateLogsBody').append("\n"+"Tüm güncellemeler kuruldu.");
                 }
-            }, function(){
+            }, function(response){
+                response = JSON.parse(response);
+                if(response.message.output){
+                    $('#updateLogs').find('.updateLogsBody').append("\n"+response.message.output);
+                }
                 setTimeout(function(){
                     checkUpdate();
                 },5000);

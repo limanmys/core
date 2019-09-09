@@ -23,8 +23,28 @@
         ])}}'"><i class="fa fa-server"></i></button>
 </div>
 @include('l.errors')    
-<div class="card">
-    <div class="card-body mainArea">{!!$view!!}</div>
+<div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+        @foreach (server()->extensions() as $extension)
+            @if(request('extension_id') == $extension->id)
+                <li class="active"><a onclick="return" data-toggle="tab" aria-expanded="true">{{$extension->name}}</a></li>
+            @else
+                <li><a onclick="location.href = '{{route('extension_server',[
+                    'extension_id' => $extension->id,
+                    'city' => server()->city,
+                    'server_id' => server()->id
+                ])}}'" aria-expanded="false">{{$extension->name}}</a>
+            @endif
+        @endforeach
+        </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="current" style="display:flow-root;height:100%;width:100%">
+            {!!$view!!}
+        </div>
+    </div>
 </div>
-<br>İstek {{$timestamp}} saniyede tamamlandı.
+</div>
+
+
+<br>{{__("İstek")}} {{$timestamp}} {{__("saniyede tamamlandı.")}}
 @endsection

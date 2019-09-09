@@ -90,7 +90,6 @@ Artisan::command('remove_extension {extension_name}',function ($extension_name){
     try{
         $ext_info = json_decode(file_get_contents($extension_folder . '/db.json'));
         foreach (Script::where('extensions', 'like', strtolower($ext_info->name))->get() as $script) {
-            shell_exec('rm ' . env('SCRIPTS_PATH') . $script->id);
             $script->delete();
         }
         $extension = Extension::where('name', $ext_info->name)->first();

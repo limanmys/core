@@ -318,8 +318,8 @@ class OneController extends Controller
             $disk = server()->run('df -h / | grep /',false);
             preg_match("/(\d+)%/",$disk,$test);
             $disk = $test[1];
-            $ram = server()->run("free -m | awk '/Mem:/ { total=($6/$2)*100 } END { printf(\"%3.1f\", total) }'", false);
-            $cpu = substr(server()->run("top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\([0-9.]*\)%* id.*/\1/' | awk '{print 100 - $1\"%\"}'", false), 0, -1);
+            $ram = server()->run("free -t | awk 'NR == 2 {printf($3/$2*100)}'", false);
+            $cpu = substr(server()->run("grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'", false), 0, -1);
             $cpu = substr($cpu,0,5);
         }elseif (server()->type == "windows_powershell"){
             $cpu = substr(server()->run("Get-WmiObject win32_processor | Measure-Object -property LoadPercentage -Average | Select Average"),23,-3);
@@ -398,8 +398,8 @@ class OneController extends Controller
     public function updatePackage()
     {
         if(server()->type == "linux_ssh"){
-            $raw = server()->run('DEBIAN_FRONTEND=noninteractive sudo apt-get -o Dpkg::Progress-Fancy="0" -o Dpkg::Use-Pty=0 --only-upgrade install '.request("package_name")." -y --fix-missing > /tmp/".request("package_name").".txt > /dev/null 2>&1 & echo $!");
-            \Session::put(server()->id.request("package_name"), trim($raw));
+            $raw = server()->run('DEBIAN_FRONTEND=noninteractive sudo apt-get -o Dpkg::Progress-Fancy="0" -o Dpkg::Use-Pty=0 --only-upgrade install '.request("package_name")." -y --fix-missing 2>&1 | sudo tee -a /tmp/".request("package_name").".txt > /dev/null 2>&1 & echo $!");
+            \Session::put(server()->id.request("package_name"), intval(trim($raw)) + 1 );
             ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi için güncelleme isteği gönderildi.', ['package_name' => request("package_name")]));
         }elseif (server()->type == "windows_powershell"){
             $raw = "";
@@ -426,7 +426,12 @@ class OneController extends Controller
                     return respond(__(":package_name paketi kurulamadı.", ['package_name' => request("package_name")]));
                 }
             }else{
-                return respond(__(":package_name paketinin kurulum işlemi henüz bitmedi.", ['package_name' => request("package_name")]), 400);
+                $output = server()->run('sudo cat /tmp/'.request("package_name"). '.txt 2> /dev/null');
+                server()->run('sudo truncate -s 0 /tmp/'.request("package_name"). '.txt');
+                return respond([
+                    "status" => __(":package_name paketinin kurulum işlemi henüz bitmedi.", ['package_name' => request("package_name")]),
+                    "output" => $output
+                ], 400);
             }
         }elseif (server()->type == "windows_powershell"){
             $output = "";

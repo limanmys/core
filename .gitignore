@@ -17,3 +17,4 @@ composer.lock
 /resources/views/extensions/*
 /vendor
 vendor/*
+/public/sqlite.php

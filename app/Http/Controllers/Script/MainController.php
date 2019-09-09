@@ -75,14 +75,14 @@ class MainController extends Controller
         $script = Script::where('id', request('script_id'))->first();
 
         // Send file to the user then delete it.
-        return response()->download(env('SCRIPTS_PATH') . $script->id, $script->unique_code . '.lmns');
+        return response()->download(env('EXTENSIONS_PATH') . $script->extensions . DIRECTORY_SEPARATOR . "scripts" . DIRECTORY_SEPARATOR . $script->unique_code . '.lmns', $script->unique_code . '.lmns');
     }
 
     public function delete()
     {
         // Get Script
-        if(is_file(env('SCRIPTS_PATH') . script()->id)){
-            unlink(env('SCRIPTS_PATH') . script()->id);
+        if(is_file(env('EXTENSIONS_PATH') . script()->extensions . DIRECTORY_SEPARATOR . "scripts" . DIRECTORY_SEPARATOR . script()->unique_code . '.lmns')){
+            unlink(env('EXTENSIONS_PATH') . script()->extensions . DIRECTORY_SEPARATOR . "scripts" . DIRECTORY_SEPARATOR . script()->unique_code . '.lmns');
         }
         script()->delete();
         return respond("Betik başarıyla silindi",200);
