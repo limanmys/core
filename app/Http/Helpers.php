@@ -104,7 +104,7 @@ if (!function_exists('system_log')) {
 
 if (!function_exists('server')) {
     /**
-     * @return array|Request|string
+     * @return \App\Server
      */
     function server()
     {

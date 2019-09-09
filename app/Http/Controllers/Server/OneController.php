@@ -93,7 +93,7 @@ class OneController extends Controller
             return respond("Hostname değiştirme betiği bulunamadı.", 201);
         }
 
-        if (!Permission::can(auth()->id(), 'script', $script->id)) {
+        if (!Permission::can(auth()->id(), 'script', 'id',$script->id)) {
             abort(504, "'" . $script->name . "' betiğini çalıştırmak için yetkiniz yok.");
         }
 
@@ -163,7 +163,7 @@ class OneController extends Controller
         }
 
         // Find User
-        Permission::revoke(request('user_id'), 'server', server()->user_id);
+        Permission::revoke(request('user_id'), 'server','id', server()->user_id);
 
         return respond("Yetki başarıyla alındı.", 200);
     }
