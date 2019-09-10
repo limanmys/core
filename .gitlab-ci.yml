@@ -36,15 +36,6 @@ Build:
 Deploy:
   stage: deploy
   only: 
-   - development
-  script:
-   - export VERSION=$(cat version)
-   - cp build_tools.deb liman-$VERSION.deb
-   - bash deploy.sh $VERSION -dev
-
-Deploy:
-  stage: deploy
-  only: 
    - master
   script:
    - export VERSION=$(cat version)
