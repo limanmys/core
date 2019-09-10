@@ -47,7 +47,7 @@ class PermissionManager
         if($value == null){
             return true;
         }
-        return Permission::can(auth()->user()->id,$target,$value);
+        return Permission::can(auth()->user()->id,$target,'id',$value);
     }
 
     private function initializeObjects(){
