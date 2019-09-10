@@ -93,7 +93,7 @@ class OneController extends Controller
             return respond("Hostname değiştirme betiği bulunamadı.", 201);
         }
 
-        if (!Permission::can(auth()->id(), 'script', $script->id)) {
+        if (!Permission::can(auth()->id(), 'script', 'id',$script->id)) {
             abort(504, "'" . $script->name . "' betiğini çalıştırmak için yetkiniz yok.");
         }
 
@@ -163,7 +163,7 @@ class OneController extends Controller
         }
 
         // Find User
-        Permission::revoke(request('user_id'), 'server', server()->user_id);
+        Permission::revoke(request('user_id'), 'server','id', server()->user_id);
 
         return respond("Yetki başarıyla alındı.", 200);
     }
@@ -319,7 +319,7 @@ class OneController extends Controller
             preg_match("/(\d+)%/",$disk,$test);
             $disk = $test[1];
             $ram = server()->run("free -t | awk 'NR == 2 {printf($3/$2*100)}'", false);
-            $cpu = substr(server()->run("grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'", false), 0, -1);
+            $cpu = server()->run("echo $[100-$(vmstat 1 1|tail -1|awk '{print $15}')]", false);
             $cpu = substr($cpu,0,5);
         }elseif (server()->type == "windows_powershell"){
             $cpu = substr(server()->run("Get-WmiObject win32_processor | Measure-Object -property LoadPercentage -Average | Select Average"),23,-3);

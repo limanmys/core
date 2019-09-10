@@ -108,4 +108,4 @@ Route::post('/lmn/private/putFileApi','Extension\OneController@internalPutFileAp
 
 Route::post('/lmn/private/getFileApi','Extension\OneController@internalGetFileApi');
 
-Route::get('/testing','UserController@test');
+Route::get('/test','HomeController@test');

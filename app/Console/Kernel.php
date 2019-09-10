@@ -48,7 +48,7 @@ class Kernel extends ConsoleKernel
 
         //Check Package Update Every 30 Min
         $schedule->call(function (){
-            $output = shell_exec("apt list --upgradable | grep 'liman'");
+            $output = shell_exec("sudo apt update && apt list --upgradable | grep 'liman'");
             if(!strpos($output,"liman")){
                 return;
             }

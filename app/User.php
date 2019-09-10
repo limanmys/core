@@ -2,18 +2,14 @@
 
 namespace App;
 
+use App\Server;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Notifications\DatabaseNotification;
-use Illuminate\Notifications\DatabaseNotificationCollection;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\DB;
 
 /**
  * App\User
  *
  * @property-read mixed $id
- * @property-read DatabaseNotificationCollection|DatabaseNotification[] $notifications
  * @method static Builder|User newModelQuery()
  * @method static Builder|User newQuery()
  * @method static Builder|User query()
@@ -21,10 +17,8 @@ use Illuminate\Support\Facades\DB;
  */
 class User extends Authenticatable
 {
-    use Notifiable;
     use UsesUuid;
 
-    public $permissions = null;
     /**
      * The attributes that are mass assignable.
      *
@@ -43,56 +37,54 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-//    public function permissions(){
-//
-//        // Check if this function called before in order to prevent more database calls.
-//        if($this->permissions == null){
-//
-//            // Retrieve user permissions and set it into the User object.
-//            $this->permissions = Permission::get($this->_id);
-//        }
-//
-//        // Return permissions just in case user don't want access object again.
-//        return $this->permissions;
-//    }
-
     public function isAdmin()
     {
         // Very simply check status, this function created for more human like code write experience.
         return $this->status == 1;
     }
 
-    public function hasAccess($target,$id = null){
-
-        // Ignore everything if user is Admin.
-        if($this->isAdmin()){
-            return true;
-        }
-
-        // Call function just in case.
-        $this->permissions();
-
-        // Check if user has access to target at all.
-        if($this->permissions->__get($target) == null){
-            return false;
-        }
-
-        // Lastly, check if user has permission for specific id of target.
-        return in_array($id, $this->permissions->__get($target));
-    }
-
     public function servers()
     {
-        if(auth()->user()->isAdmin()){
-            return Server::all();
-        }
-
-        return Server::find(DB::table("permissions")->where("user_id",auth()->user()->id)
-            ->whereNotNull("server_id")->pluck("server_id")->toArray());
+        return Server::get()->filter(function($server){
+            return Permission::can(user()->id,'server','id',$server->id);
+        });
     }
 
     public function permissions()
     {
-        return $this->belongsToMany("App\Permission");
+        return $this->hasMany("App\Permission");
     }
+
+    public function widgets()
+    {
+        return $this->hasMany("\App\Widget");
+    }
+
+    public function tokens()
+    {
+        return $this->hasMany('\App\Token');
+    }
+
+    public function settings()
+    {
+        return $this->hasMany('\App\UserSettings');
+    }
+
+    public function keys()
+    {
+        return $this->hasMany('\App\Key');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany('\App\Notification');
+    }
+
+    public function favorites()
+    {
+        return $this->belongsToMany('\App\Server','user_favorites')->get()->filter(function($server){
+            return Permission::can(user()->id,'server','id',$server->id);
+        });
+    }
+
 }

@@ -85,7 +85,7 @@
             });
             let form = new FormData();
             form.append('certificate',$("#output").html());
-            form.append('hostname',$("#hostname").val());
+            form.append('server_hostname',$("#hostname").val());
             form.append('origin',$("#port").val());
             form.append('notification_id','{{request('notification_id')}}');
             form.append('server_id','{{request('server_id')}}');

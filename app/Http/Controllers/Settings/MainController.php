@@ -25,77 +25,77 @@ class MainController extends Controller
         ]);
     }
 
-    public function one()
+    public function one(User $user)
     {
-        $user = User::find(request('user_id'));
-
-        if(!$user){
-            abort(504,"Kullanıcı Bulunamadı.");
-        }
-
-        $permissions = Permission::where('user_id',request('user_id'));
-
-        $servers = Server::find($permissions->whereNotNull("server_id")->pluck("server_id")->toArray());
-
-        $permissions = Permission::where('user_id',request('user_id'));
-        $scripts = Script::find($permissions->whereNotNull("script_id")->pluck("script_id")->toArray());
-
-        $permissions = Permission::where('user_id',request('user_id'));
-        $extensions = Extension::find($permissions->whereNotNull("extension_id")->pluck("extension_id")->toArray());
-
-        $permissions = Permission::where('user_id',request('user_id'));
-        $functions = [];
-
-        foreach ($permissions->whereNotNull("function")->get() as $item){
-            $functionsFile = env('EXTENSIONS_PATH') . strtolower(explode('_',$item->function)[0]) . "/views/functions.php";
-            $comments = $this->getComments($functionsFile);
-            foreach ($comments as $comment){
-                if(!array_key_exists("LimanName",$comment) || !array_key_exists("LimanPermission",$comment)
-                    || !array_key_exists("LimanFunction",$comment)){
-                    abort(504,"Eklenti Duzgun Yapilandirilmamis");
-                }
-                if(explode('_',$item->function)[1] == $comment["LimanFunction"]){
-                    array_push($functions,[
-                        "extension_name" => explode('_',$item->function)[0],
-                        "name" => $comment["LimanName"],
-                        "db_name" => $item->function
-                    ]);
-                    break;
-                }
-            }
-        }
-
         return view('settings.one',[
             "user" => $user,
-            "servers" => $servers,
-            "extensions" => $extensions,
-            "scripts" => $scripts,
-            "functions" => $functions
+            "servers" => Server::find($user->permissions->where('type','server')->pluck('value')->toArray()),
+            "extensions" => Extension::find($user->permissions->where('type','extension')->pluck('value')->toArray()),
+            "scripts" => Script::find($user->permissions->where('type','script')->pluck('value')->toArray())
         ]);
+
+        // $servers = Server::find($permissions->whereNotNull("server_id")->pluck("server_id")->toArray());
+
+        // $permissions = Permission::where('user_id',request('user_id'));
+        // $scripts = Script::find($permissions->whereNotNull("script_id")->pluck("script_id")->toArray());
+
+        // $permissions = Permission::where('user_id',request('user_id'));
+        // $extensions = Extension::find($permissions->whereNotNull("extension_id")->pluck("extension_id")->toArray());
+
+        // $permissions = Permission::where('user_id',request('user_id'));
+        // $functions = [];
+
+        // foreach ($permissions->whereNotNull("function")->get() as $item){
+        //     $functionsFile = env('EXTENSIONS_PATH') . strtolower(explode('_',$item->function)[0]) . "/views/functions.php";
+        //     $comments = $this->getComments($functionsFile);
+        //     foreach ($comments as $comment){
+        //         if(!array_key_exists("LimanName",$comment) || !array_key_exists("LimanPermission",$comment)
+        //             || !array_key_exists("LimanFunction",$comment)){
+        //             abort(504,"Eklenti Duzgun Yapilandirilmamis");
+        //         }
+        //         if(explode('_',$item->function)[1] == $comment["LimanFunction"]){
+        //             array_push($functions,[
+        //                 "extension_name" => explode('_',$item->function)[0],
+        //                 "name" => $comment["LimanName"],
+        //                 "db_name" => $item->function
+        //             ]);
+        //             break;
+        //         }
+        //     }
+        // }
+
+        // return view('settings.one',[
+        //     "user" => user(),
+        //     "servers" => $servers,
+        //     "extensions" => $extensions,
+        //     "scripts" => $scripts,
+        //     "functions" => $functions
+        // ]);
     }
 
     public function getList()
     {
-        $permissions = Permission::where("user_id",request("user_id"));
+        $user = User::find(request('user_id'));
         $data = [];
         $title = [];
         $display = [];
         switch (request('type')){
             case "server":
-                $data = Server::whereNotIn('id',$permissions->whereNotNull("server_id")->pluck("server_id")->toArray())->get();
+                $data = Server::whereNotIn('id',$user->permissions->where('type','server')->pluck('value')->toArray())->get();
                 $title = ["*hidden*", "İsim" , "Türü", "İp Adresi"];
                 $display = ["id:id", "name" , "type", "ip_address"];
                 break;
             case "extension":
-                $data = Extension::whereNotIn('id',$permissions->whereNotNull("extension_id")->pluck("extension_id")->toArray())->get();
+                $data = Extension::whereNotIn('id',$user->permissions->where('type','extension')->pluck('value')->toArray())->get();
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
                 break;
             case "script":
-                $data = Script::whereNotIn('id',$permissions->whereNotNull("script_id")->pluck("script_id")->toArray())->get();
+                $data = Script::whereNotIn('id',$user->permissions->where('type','script')->pluck('value')->toArray())->get();
                 $title = ["*hidden*", "İsim" , "Eklenti"];
                 $display = [ "id:id", "name" , "extensions"];
                 break;
+            case "liman":
             default:
                 abort(504,"Tip Bulunamadı");
         }
@@ -109,7 +109,7 @@ class MainController extends Controller
     public function addList()
     {
         foreach(json_decode(request('ids'),true) as $id){
-            Permission::grant(request('user_id'),request('type') . "_id",$id);
+            Permission::grant(request('user_id'),request('type'),"id",$id);
         }
         return respond(__("Başarılı"),200);
     }
@@ -117,14 +117,19 @@ class MainController extends Controller
     public function removeFromList()
     {
         foreach(json_decode(request('ids'),true) as $id){
-            Permission::revoke(request('user_id'),request('type') . "_id",$id);
+            Permission::revoke(request('user_id'),request('type'),"id",$id);
         }
         return respond(__("Başarılı"),200);
     }
 
     public function getExtensionFunctions(){
         $functionsFile = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/views/functions.php";
-        $comments = $this->getComments($functionsFile);
+        if(is_file($functionsFile)){
+            $comments = $this->getComments($functionsFile);
+        }else{
+            $comments = [];
+        }
+        
         $functions = [];
 
         foreach ($comments as $comment){
@@ -135,7 +140,7 @@ class MainController extends Controller
             if($comment["LimanPermission"] != "true"){
                 continue;
             }
-            if(Permission::can(request('user_id'),"function",strtolower(extension()->name) . "_" . $comment["LimanFunction"])){
+            if(Permission::can(request('user_id'),"function","name",strtolower(extension()->name),$comment["LimanFunction"])){
                 continue;
             }
             array_push($functions,[
@@ -188,14 +193,14 @@ class MainController extends Controller
 
     public function addFunctionPermissions(){
         foreach(explode(",",request('functions')) as $function){
-             Permission::grant(request('user_id'),"function",strtolower(extension()->name) . "_" . $function);
+             Permission::grant(request('user_id'),"function","name",strtolower(extension()->name),$function);
         }
         return respond(__("Başarılı"),200);
     }
 
     public function removeFunctionPermissions(){
         foreach(explode(",",request('functions')) as $function){
-             Permission::revoke(request('user_id'),"function",$function);
+             Permission::find($function)->delete();
         }
         return respond(__("Başarılı"),200);
     }

@@ -14,32 +14,25 @@ class MainController extends Controller
 
     public function verifyCert()
     {
+        // Check If Certificate Already Added or not.
         if(Certificate::where([
             "server_hostname" => request('hostname'),
             "origin" => request('origin')
-        ])->get()->count()){
+        ])->exists()){
             return respond("Bu sunucu ve port için sertifika zaten eklenmiş.",201);
         }
+
         $file = "liman-" . request('hostname') . "_" . request('origin') . ".crt";
         $cert = request('certificate');
         $query = "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . $file;
-        $output = shell_exec($query);
-        Log::debug("RETRIEVE SSL CERT > " . $output);
-        $output2 = shell_exec("sudo update-ca-certificates");
-        Log::debug("ADD SSL CERT > " . $output2);
+        shell_exec($query);
+        shell_exec("sudo update-ca-certificates");
 
-        $cert = new Certificate();
-        $cert->server_hostname  = request("hostname");
-        $cert->origin = request("origin");
+        // Create Certificate Object.
+        $cert = new Certificate(request()->all());
         $cert->save();
 
-        Server::where([
-            'ip_address' => $cert->server_hostname,
-            "control_port" => $cert->origin
-        ])->update([
-            "enabled" => "1"
-        ]);
-
+        // Update Admin Notification
         $adminNotification = AdminNotification::where('id',request('notification_id'));
         if($adminNotification){
             $adminNotification->update([

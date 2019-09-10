@@ -104,7 +104,7 @@ if (!function_exists('system_log')) {
 
 if (!function_exists('server')) {
     /**
-     * @return array|Request|string
+     * @return \App\Server
      */
     function server()
     {
@@ -174,6 +174,17 @@ if (!function_exists('extension')) {
             $id = request('extension_id');
         }
         return Extension::one($id);
+    }
+}
+
+if (!function_exists('user')) {
+    /**
+     * @param null $id
+     * @return User
+     */
+    function user()
+    {
+        return auth()->user();
     }
 }
 

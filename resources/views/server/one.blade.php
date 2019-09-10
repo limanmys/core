@@ -243,12 +243,12 @@
             </div>
             <div class="tab-pane" id="extensionSettings">
                 @include('l.table',[
-                    "value" => [],
+                    "value" => user()->settings->where('server_id',server()->id),
                     "title" => [
-                        "Veri Adi" , "Eklenti" , "*hidden*"
+                        "Veri Adi" , "*hidden*"
                     ],
                     "display" => [
-                        "name" , "description", "id:id"
+                        "name" , "id:id"
                     ],
                     "menu" => [
                         "Sil" => [

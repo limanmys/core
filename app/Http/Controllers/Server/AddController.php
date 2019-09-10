@@ -23,6 +23,8 @@ class AddController extends Controller
 
     public function main()
     {
+        $this->authorize('create','\App\Server');
+
         // Check if name is already in use.
         if(Server::where([
             'user_id' => auth()->id(),
@@ -142,10 +144,7 @@ class AddController extends Controller
 
     private function grantPermissions()
     {
-        $permission = new Permission();
-        $permission->server_id = $this->server->id;
-        $permission->user_id = auth()->id();
-        $permission->save();
+        Permission::grant(user()->id,'server','id',$this->server->id);
 
         // SSL Control
         $possiblePorts = ["636","5986"];

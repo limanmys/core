@@ -37,9 +37,8 @@ class OneController extends Controller
         foreach ($extension["database"] as $setting) {
             $database = DB::table("user_settings");
             if (!$database->where([
-                "user_id" => auth()->user()->id,
+                "user_id" => user()->id,
                 "server_id" => server()->id,
-                "extension_id" => extension()->id,
                 "name" => $setting["variable"]
             ])->exists()) {
                 system_log(7,"EXTENSION_MISSING_SETTINGS",[
@@ -99,7 +98,7 @@ class OneController extends Controller
                         return respond("Eklenti için gerekli olan betik yüklü değil, lütfen yöneticinizle görüşün.", 404);
                     }
 
-                    if (!Permission::can(auth()->id(), 'script', $script->id)) {
+                    if (!Permission::can(auth()->id(), 'script','id', $script->id)) {
                         system_log(6,"EXTENSION_NO_PERMISSION",[
                             "extension_id" => extension()->id,
                             "target_name" => trim($unique_code)
@@ -148,7 +147,7 @@ class OneController extends Controller
         // Before Everything, check if it's a function or script.
         if (Script::where('unique_code', request('function_name'))->exists()) {
             $script = Script::where('unique_code', request('function_name'))->first();
-            if (!Permission::can(auth()->id(), 'script', $script->id)) {
+            if (!Permission::can(auth()->id(), 'script', 'id',$script->id)) {
                 system_log(7,"EXTENSION_NO_PERMISSION",[
                     "extension_id" => extension()->id,
                     "target_name" => $script->name
@@ -162,7 +161,7 @@ class OneController extends Controller
             }
             return respond(server()->runScript($script, $parameters));
         }
-        if (!Permission::can(auth()->id(), "function", strtolower(extension()->name) . "_" . request('function_name'))) {
+        if (!Permission::can(auth()->id(), "function", "name",strtolower(extension()->name) ,request('function_name'))) {
             system_log(7,"EXTENSION_NO_PERMISSION",[
                 "extension_id" => extension()->id,
                 "target_name" => request('function_name')
@@ -183,7 +182,7 @@ class OneController extends Controller
             abort(403, $text . " için yetkiniz yok.");
         }
 
-        $command = self::generateSandboxCommand(server(), extension(), auth()->user()->settings, auth()->id(), "null", "null", request('function_name'));
+        $command = self::generateSandboxCommand(server(), extension(), extension()->id,auth()->id(), "null", "null", request('function_name'));
 
         system_log(7,"EXTENSION_RUN",[
             "extension_id" => extension()->id,
@@ -246,7 +245,7 @@ class OneController extends Controller
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
-        if (!Permission::can($token->user_id, 'server', $server->id)) {
+        if (!Permission::can($token->user_id, 'server','id', $server->id)) {
             system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
                 "extension_id" => extension()->id,
                 "server_id" => request('server_id')
@@ -255,7 +254,7 @@ class OneController extends Controller
         }
 
         $extension = Extension::find(request('extension_id')) or abort(404, 'Eklenti Bulunamadi');
-        if (!Permission::can($token->user_id, 'extension', $extension->id)) {
+        if (!Permission::can($token->user_id, 'extension','id', $extension->id)) {
             system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
                 "extension_id" => extension()->id,
                 "server_id" => request('server_id')
@@ -263,7 +262,7 @@ class OneController extends Controller
             return "Eklenti icin yetkiniz yok.";
         }
 
-        if (!Permission::can($token->user_id, "function", strtolower(extension()->name) . "_" . strtolower(request('target')))) {
+        if (!Permission::can($token->user_id, "function", "name",strtolower(extension()->name) ,request('function_name'))) {
             system_log(7,"EXTENSION_NO_PERMISSION",[
                 "extension_id" => extension()->id,
                 "target_name" => request('function_name')
@@ -297,7 +296,7 @@ class OneController extends Controller
         auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
-        if (!Permission::can($token->user_id, 'server', $server->id)) {
+        if (!Permission::can($token->user_id, 'server','id', $server->id)) {
             system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
                 "extension_id" => extension()->id,
                 "server_id" => request('server_id')
@@ -448,28 +447,28 @@ class OneController extends Controller
 
         foreach ($extension["database"] as $key) {
             $row = DB::table('user_settings')->where([
-                "user_id" => auth()->user()->id,
+                "user_id" => user()->id,
                 "extension_id" => extension()->id,
                 "server_id" => server()->id,
                 'name' => $key["variable"]
             ]);
             if(request($key["variable"])){
                 if($row->exists()){
-                    $encKey = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                    $encKey = env('APP_KEY') . user()->id . extension()->id . server()->id;
                     $encrypted = openssl_encrypt(Str::random(16) . base64_encode(request($key["variable"])),'aes-256-cfb8',$encKey,0,Str::random(16));
                     $row->update([
                         "value" => $encrypted,
                         "updated_at" => Carbon::now(),
                     ]);
                 }else{
-                    $encKey = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                    $encKey = env('APP_KEY') . user()->id . extension()->id . server()->id;
                     $encrypted = openssl_encrypt(Str::random(16) . base64_encode(request($key["variable"])),'aes-256-cfb8',$encKey,0,Str::random(16));
 
                     DB::table("user_settings")->insert([
                         "id" => Str::uuid(),
                         "server_id" => server()->id,
                         "extension_id" => extension()->id,
-                        "user_id" => auth()->user()->id,
+                        "user_id" => user()->id,
                         "name" => $key["variable"],
                         "value" => $encrypted,
                         "created_at" =>  Carbon::now(),
@@ -506,12 +505,12 @@ class OneController extends Controller
                 continue;
             }
             $obj = DB::table("user_settings")->where([
-                "user_id" => auth()->user()->id,
+                "user_id" => user()->id,
                 "name" => $item["variable"],
                 "server_id" => server()->id
             ])->first();
             if($obj){
-                $key = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                $key = env('APP_KEY') . user()->id . extension()->id . server()->id;
                 $decrypted = openssl_decrypt($obj->value,'aes-256-cfb8',$key);
                 $stringToDecode = substr($decrypted,16);
                 $similar[$item["variable"]] = base64_decode($stringToDecode);
@@ -600,11 +599,10 @@ class OneController extends Controller
             $settings = DB::table("user_settings")->where([
                 "user_id" => $user_id,
                 "server_id" => server()->id,
-                "extension_id" => extension()->id
             ]);
             $extensionDb = [];
             foreach ($settings->get() as $setting){
-                $key = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+                $key = env('APP_KEY') . user()->id . extension()->id . server()->id;
                 $decrypted = openssl_decrypt($setting->value,'aes-256-cfb8',$key);
                 $stringToDecode = substr($decrypted,16);
                 $extensionDb[$setting->name] = base64_decode($stringToDecode);
@@ -637,8 +635,8 @@ class OneController extends Controller
 
         $token = Token::create($user_id);
 
-        if(!auth()->user()->isAdmin()){
-            $permissions = Permission::where('user_id',auth()->user()->id)
+        if(!user()->isAdmin()){
+            $permissions = Permission::where('user_id',user()->id)
                 ->where('function','like',strtolower(extension()->name). '%')->pluck('function')->toArray();
             for($i = 0 ;$i< count($permissions); $i++){
                 $permissions[$i] = explode('_',$permissions[$i])[1];

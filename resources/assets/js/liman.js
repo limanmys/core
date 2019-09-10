@@ -122,6 +122,7 @@ function toogleEdit(selector){
             }
         });
     }
+    
 })(jQuery);
 
 function debug(data) {
@@ -212,8 +213,6 @@ function readSystemNotifications(id) {
 let inputs =[];
 let modalData = [];
 
-
-
 function updateTable(extraVariableName = null){
     for(let i = 0;i< inputs.length ; i++){
         let element = inputs[i][0];
@@ -259,4 +258,14 @@ function renderNotifications(data,type,target){
         element.append("<li><a href='/bildirim/" + notification["id"] + "'>" + 
                 "<span style='color: " + color + ";width: 100%'>"+ notification["title"] + "</span></a></li>");
     });
+}
+
+function activeTab(){
+    let element = $('a[href="'+ window.location.hash +'"]');
+    if(element){
+        element.tab('show');
+        if(element.attr("onclick")){
+            element.click();
+        }
+    }
 }
