@@ -16,11 +16,24 @@ class UpdatePermissionsTable extends Migration
     {
         // Add New Rows to the Table.
         Schema::table('permissions',function (Blueprint $table){
-            $table->string('type')->nullable();
-            $table->string('key')->nullable();
-            $table->string('value')->nullable();
-            $table->string('extra')->nullable();
-            $table->string('blame')->nullable();
+            if(!Schema::hasColumn('permissions', 'type')){
+                $table->string('type')->nullable();
+            }
+            if(!Schema::hasColumn('permissions', 'key')){
+                $table->string('key')->nullable();
+            }
+
+            if(!Schema::hasColumn('permissions', 'value')){
+                $table->string('value')->nullable();
+            }
+
+            if(!Schema::hasColumn('permissions', 'extra')){
+                $table->string('extra')->nullable();
+            }
+
+            if(!Schema::hasColumn('permissions', 'blame')){
+                $table->string('blame')->nullable();
+            }
         });
 
         // Copy Existing Values to The Table
