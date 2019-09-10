@@ -11,7 +11,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{ $extension["name"] }}</li>
         </ol>
     </nav>
-    @include('l.errors')    
+    @include('l.errors')
 
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
@@ -264,17 +264,67 @@
                 ])
             </div>
             <div class="tab-pane" id="tab_4">
+                <button class="btn btn-success" data-toggle="modal" data-target="#addFunctionModal"><i class="fa fa-plus"></i></button><br><br>
                 @include('l.table',[
-                    "value" => $functions,
+                    "value" => array_key_exists("functions",$extension) ? $extension["functions"] : [],
                     "title" => [
-                        "Fonksiyon Adı" ,
+                        "Fonksiyon Adı" , "Ceviri Key'i", "Yetki Sistemi" ,"*hidden*"
                     ],
                     "display" => [
-                        "name"
+                        "name" , "description", "isActive", "name:old"
+                    ],
+                    "menu" => [
+                        "Ayarları Düzenle" => [
+                            "target" => "updateFunctionModal",
+                            "icon" => "fa-edit"
+                        ],
+                        "Sil" => [
+                            "target" => "removeFunctionModal",
+                            "icon" => "fa-trash"
+                        ]
                     ]
                 ])
+
+                @include('l.modal',[
+                    "id"=>"addFunctionModal",
+                    "title" => "Fonksiyon Ekle",
+                    "url" => route('extension_add_function'),
+                    "next" => "reload",
+                    "inputs" => [
+                        "Fonksiyon Adı" => "name:text",
+                        "Açıklama (Çeviri Key)" => "description:text",
+                        "Yetki Sistemine Dahil Et" => "isActive:checkbox",
+                    ],
+                    "submit_text" => "Fonksiyon Ekle"
+                ])
+
+                @include('l.modal',[
+                    "id"=>"updateFunctionModal",
+                    "title" => "Fonksiyon Duzenle",
+                    "url" => route('extension_update_function'),
+                    "next" => "reload",
+                    "inputs" => [
+                        "Fonksiyon Adı" => "name:text",
+                        "Açıklama (Çeviri Key)" => "description:text",
+                        "Yetki Sistemine Dahil Et" => "isActive:checkbox",
+                        "-:-" => "old:hidden"
+                    ],
+                    "submit_text" => "Fonksiyon Duzenle"
+                ])
+
+                @include('l.modal',[
+                    "id"=>"removeFunctionModal",
+                    "title" => "Fonksiyonu Sil",
+                    "url" => route('extension_remove_function'),
+                    "next" => "reload",
+                    "text" => "Fonksiyonu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+                    "inputs" => [
+                        "-:-" => "name:hidden"
+                    ],
+                    "submit_text" => "Fonksiyonu Sil"
+                ])
             </div>
-            <!-- /.tab-pane -->
+
         </div>
     </div>
     <script>

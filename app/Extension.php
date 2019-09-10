@@ -79,11 +79,7 @@ class Extension extends Model
      */
     public static function getAll($coloumns = [])
     {
-        if(auth()->user()->isAdmin()){
-            return Extension::all();
-        }
-        return Extension::find(DB::table("permissions")
-            ->whereNotNull("extension_id")->pluck("extension_id")->toArray());
+        return user()->extensions();
     }
 
     protected static function boot()

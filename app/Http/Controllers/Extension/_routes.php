@@ -42,7 +42,7 @@ Route::get('/ayarlar/{extension_id}/{server_id}', 'Extension\OneController@serve
 Route::post('/ayarlar/{extension_id}/{server_id}', 'Extension\OneController@serverSettings')->name('extension_server_settings')->middleware(['server','extension']);
 
 // Extension Upload Page
-Route::post('/yukle/eklenti/', 'Extension\MainController@upload')->name('extension_upload');
+Route::post('/yukle/eklenti/', 'Extension\MainController@upload')->name('extension_upload')->middleware('admin');
 
 Route::post('/ayarlar/eklenti', 'Extension\SettingsController@saveSettings')->name('save_settings');
 
@@ -50,3 +50,9 @@ Route::post('/ayarlar/eklenti', 'Extension\SettingsController@saveSettings')->na
 Route::post('/eklenti/sil', 'Extension\OneController@remove')->name('extension_remove')->middleware('admin');
 
 Route::post('/eklenti/update_ext_orders', 'Extension\MainController@updateExtOrders')->name('update_ext_orders')->middleware('admin');
+
+Route::post('/eklenti/fonksiyonEkle','Extension\SettingsController@addFunction')->name('extension_add_function')->middleware('admin');
+
+Route::post('/eklenti/fonksiyonDuzenle','Extension\SettingsController@updateFunction')->name('extension_update_function')->middleware('admin');
+
+Route::post('/eklenti/fonksiyonSil','Extension\SettingsController@removeFunction')->name('extension_remove_function')->middleware('admin');

@@ -122,73 +122,32 @@ class MainController extends Controller
         return respond(__("Başarılı"),200);
     }
 
-    public function getExtensionFunctions(){
-        $functionsFile = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/views/functions.php";
-        if(is_file($functionsFile)){
-            $comments = $this->getComments($functionsFile);
-        }else{
-            $comments = [];
+    public function getExtensionFunctions()
+    {
+        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+        $functions = array_key_exists("functions",$extension) ? $extension["functions"] : [];
+        $lang = session('locale');
+        $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/lang/" . $lang . ".json";
+
+        //Translate Items.
+        if(is_file($file)){
+            $json = json_decode(file_get_contents($file),true);
+            for($i = 0; $i < count($functions); $i++){
+                if(array_key_exists($functions[$i]["description"],$json)){
+                    $functions[$i]["description"] = $json[$functions[$i]["description"]];
+                }
+            }
         }
         
-        $functions = [];
-
-        foreach ($comments as $comment){
-            if(!array_key_exists("LimanName",$comment) || !array_key_exists("LimanPermission",$comment)
-                || !array_key_exists("LimanFunction",$comment)){
-                abort(504,"Eklenti Duzgun Yapilandirilmamis");
-            }
-            if($comment["LimanPermission"] != "true"){
-                continue;
-            }
-            if(Permission::can(request('user_id'),"function","name",strtolower(extension()->name),$comment["LimanFunction"])){
-                continue;
-            }
-            array_push($functions,[
-                "name" => $comment["LimanFunction"],
-                "function" => $comment["LimanName"]
-            ]);
-        }
-
         return view('l.table',[
             "value" => $functions,
             "title" => [
-                "Fonksiyon Adı" , "*hidden*"
+                "*hidden*" , "Aciklama"
             ],
             "display" => [
-                "function", "name:name"
+                "name:name", "description"
             ]
         ]);
-    }
-
-    private function getComments($path)
-    {
-        $cleaner = [];
-        foreach ($this->getFileDocBlock($path) as $item){
-            $rows = explode("\n",$item);
-            $current = [];
-            foreach ($rows as $row){
-                if(strpos($row,"@Liman")){
-                    $toParse = substr($row,strpos($row,"@Liman"));
-                    $current[substr(explode(" ",$toParse)[0],1)]
-                        = substr($toParse,strlen(substr(explode(" ",$toParse)[0],0)) +1 );
-                }
-            }
-            array_push($cleaner,$current);
-        }
-        return $cleaner;
-    }
-
-    private function getFileDocBlock($file)
-    {
-        $docComments = array_filter(
-            token_get_all( file_get_contents( $file ) ), function($entry) {
-            return $entry[0] == T_DOC_COMMENT;
-        });
-        $clean = [];
-        foreach ($docComments as $item){
-            array_push($clean,$item[1]);
-        }
-        return $clean;
     }
 
     public function addFunctionPermissions(){

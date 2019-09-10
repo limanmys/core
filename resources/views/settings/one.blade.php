@@ -216,7 +216,7 @@
             let data = [];
             let table = $('.functionsTable table').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
-                data.push(element[2]);
+                data.push(element[1]);
             });
             let form = new FormData();
             let extension_id = $("#extensionId :selected").val();

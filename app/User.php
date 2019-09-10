@@ -50,6 +50,13 @@ class User extends Authenticatable
         });
     }
 
+    public function extensions()
+    {
+        return Extension::get()->filter(function($extension){
+            return Permission::can(user()->id,'extension','id',$extension->id);
+        });
+    }
+
     public function permissions()
     {
         return $this->hasMany("App\Permission");

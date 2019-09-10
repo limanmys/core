@@ -166,20 +166,33 @@ class OneController extends Controller
                 "extension_id" => extension()->id,
                 "target_name" => request('function_name')
             ]);
-            $functionsFile = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/views/functions.php";
-            $comments = $this->getComments($functionsFile);
-            $text = "";
-            foreach ($comments as $comment){
-                if(!array_key_exists("LimanName",$comment) || !array_key_exists("LimanPermission",$comment)
-                    || !array_key_exists("LimanFunction",$comment)){
-                    abort(504,"Eklenti Duzgun Yapilandirilmamis");
-                }
-                if(request("function_name") == $comment["LimanFunction"]){
-                    $text = $comment["LimanName"];
+            $function = request("function_name");
+            $extensionJson = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+        
+            $functions = [];
+    
+            if(array_key_exists("functions",$extensionJson)){
+                $functions = $extensionJson["functions"];
+            }
+    
+            if(empty($functions)){
+                return respond("Eklenti icin bu ozellik yapilandirilmamis.",403);
+            }
+            $flag = false;
+            $isActive = "true";
+            for($i = 0 ; $i < count($functions); $i++){
+                if(request("function_name") == $functions[$i]["name"]){
+                    $flag = true;
+                    $isActive = $functions[$i]["isActive"];
                     break;
                 }
             }
-            abort(403, $text . " için yetkiniz yok.");
+            if(!$flag){
+                return respond("Eklenti icin bu ozellik yapilandirilmamis.",403);
+            }
+            if($isActive == "true" && !Permission::can(user()->id,"function","name",strtolower(extension()->name) , $function)){
+                abort(403, $function . " için yetkiniz yok.");
+            }
         }
 
         $command = self::generateSandboxCommand(server(), extension(), extension()->id,auth()->id(), "null", "null", request('function_name'));
@@ -201,37 +214,6 @@ class OneController extends Controller
           return response()->json(json_decode($output), $code);
         }
         return response($output, $code);
-    }
-
-    private function getComments($path)
-    {
-        $cleaner = [];
-        foreach ($this->getFileDocBlock($path) as $item){
-            $rows = explode("\n",$item);
-            $current = [];
-            foreach ($rows as $row){
-                if(strpos($row,"@Liman")){
-                    $toParse = substr($row,strpos($row,"@Liman"));
-                    $current[substr(explode(" ",$toParse)[0],1)]
-                        = substr($toParse,strlen(substr(explode(" ",$toParse)[0],0)) +1 );
-                }
-            }
-            array_push($cleaner,$current);
-        }
-        return $cleaner;
-    }
-
-    private function getFileDocBlock($file)
-    {
-        $docComments = array_filter(
-            token_get_all( file_get_contents( $file ) ), function($entry) {
-            return $entry[0] == T_DOC_COMMENT;
-        });
-        $clean = [];
-        foreach ($docComments as $item){
-            array_push($clean,$item[1]);
-        }
-        return $clean;
     }
 
     public function internalExtensionApi()
@@ -636,12 +618,16 @@ class OneController extends Controller
         $token = Token::create($user_id);
 
         if(!user()->isAdmin()){
-            $permissions = Permission::where('user_id',user()->id)
-                ->where('function','like',strtolower(extension()->name). '%')->pluck('function')->toArray();
-            for($i = 0 ;$i< count($permissions); $i++){
-                $permissions[$i] = explode('_',$permissions[$i])[1];
+            $extensionJson = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+            $permissions = [];
+            if(array_key_exists("functions",$extensionJson)){
+                foreach($extensionJson["functions"] as $item){
+                    if(Permission::can(user()->id,"function","name",strtolower(extension()->name),$item["name"]) || $item["isActive"] != "true"){
+                        array_push($permissions,$item["name"]);
+                    };
+                }
+                $permissions = json_encode($permissions);
             }
-            $permissions = json_encode($permissions);
         }else{
             $permissions = "admin";
         }

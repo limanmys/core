@@ -48,20 +48,6 @@ class SettingsController extends Controller
         // Retrieve scripts from database.
         $scripts = Script::where('extensions', 'like', extension()->name)->get();
 
-        $functionsFile = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/functions.php";
-        if (is_file($functionsFile)) {
-            $functionsFile = file_get_contents(env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/functions.php");
-            preg_match_all('/^\s*function (.*)(?=\()/m', $functionsFile, $results);
-            $functions = [];
-            foreach ($results[1] as $result) {
-                array_push($functions, [
-                    "name" => $result
-                ]);
-            }
-        } else {
-            $functions = [];
-        }
-
         system_log(7,"EXTENSION_SETTINGS_PAGE",[
             "extension_id" => extension()->_id,
         ]);
@@ -70,7 +56,6 @@ class SettingsController extends Controller
         return view('extension_pages.one', [
             "files" => $files,
             "scripts" => $scripts,
-            "functions" => $functions
         ]);
     }
 
@@ -259,6 +244,103 @@ class SettingsController extends Controller
         ]);
 
         return respond("Eklenti Silindi.", 200);
+    }
+
+    public function addFunction()
+    {
+        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+        
+        $functions = [];
+
+        if(array_key_exists("functions",$extension)){
+            $functions = $extension["functions"];
+        }
+
+        array_push($functions,[
+            "name" => request("name"),
+            "description" => request("description"),
+            "isActive" => request()->has("isActive") ? "true" : "false"
+        ]);
+
+        $extension["functions"] = $functions;
+
+        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension));
+
+        system_log(7,"EXTENSION_SETTINGS_ADD_FUNCTION",[
+            "extension_id" => extension()->id,
+            "function" => request('name')
+        ]);
+
+        return respond("Fonksiyon Eklendi.", 200);
+    }
+
+    public function updateFunction()
+    {
+        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+        
+        $functions = [];
+
+        if(array_key_exists("functions",$extension)){
+            $functions = $extension["functions"];
+        }
+
+        if(empty($functions)){
+            return respond("Bir Hata Olustu",201);
+        }
+
+        for($i = 0 ; $i < count($functions); $i++){
+            if(request("old") == $functions[$i]["name"]){
+                $functions[$i] = [
+                    "name" => request("name"),
+                    "description" => request("description"),
+                    "isActive" => request()->has("isActive") ? "true" : "false"
+                ];
+            }
+        }
+
+        $extension["functions"] = $functions;
+
+        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension));
+
+        system_log(7,"EXTENSION_SETTINGS_UPDATE_FUNCTION",[
+            "extension_id" => extension()->id,
+            "function" => request('name')
+        ]);
+
+        return respond("Fonksiyon Guncellendi.", 200);
+    }
+
+
+    public function removeFunction()
+    {
+        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+        
+        $functions = [];
+
+        if(array_key_exists("functions",$extension)){
+            $functions = $extension["functions"];
+        }
+
+        if(empty($functions)){
+            return respond("Bir Hata Olustu",201);
+        }
+
+        for($i = 0 ; $i < count($functions); $i++){
+            if(request("name") == $functions[$i]["name"]){
+                unset($functions[$i]);
+            }
+        }
+
+        $extension["functions"] = $functions;
+
+        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension));
+
+        system_log(7,"EXTENSION_SETTINGS_REMOVE_FUNCTION",[
+            "extension_id" => extension()->id,
+            "function" => request('name')
+        ]);
+
+        return respond("Fonksiyon Silindi.", 200);
     }
 
 }
