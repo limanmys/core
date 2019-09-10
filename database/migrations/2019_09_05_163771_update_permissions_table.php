@@ -56,23 +56,6 @@ class UpdatePermissionsTable extends Migration
 
             $permission->save();
         }
-
-        // Since SQLite doesnt support dropping multiple coloumns at once, we have to split process.
-        Schema::table('permissions',function (Blueprint $table){
-            $table->dropColumn('server_id');
-        });
-
-        Schema::table('permissions',function (Blueprint $table){
-            $table->dropColumn('extension_id');
-        });
-        
-        Schema::table('permissions',function (Blueprint $table){
-            $table->dropColumn('script_id');
-        });
-        
-        Schema::table('permissions',function (Blueprint $table){
-            $table->dropColumn('function');
-        });
     }
 
     /**

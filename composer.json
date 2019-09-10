@@ -13,7 +13,6 @@
         "ext-ssh2": "*",
         "ext-xml": "*",
         "ext-zip": "*",
-        "doctrine/dbal": "^2.9",
         "laravel/framework": "^6.0",
         "laravel/helpers": "*",
         "phpseclib/phpseclib": "^2.0"
