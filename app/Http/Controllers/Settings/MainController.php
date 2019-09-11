@@ -130,17 +130,25 @@ class MainController extends Controller
         $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/lang/" . $lang . ".json";
 
         //Translate Items.
+        $cleanFunctions = [];
         if(is_file($file)){
             $json = json_decode(file_get_contents($file),true);
             for($i = 0; $i < count($functions); $i++){
-                if(array_key_exists($functions[$i]["description"],$json)){
-                    $functions[$i]["description"] = $json[$functions[$i]["description"]];
+                if(array_key_exists("isActive",$functions[$i]) && $functions[$i]["isActive"] == "false"){
+                    continue;
                 }
+                $description = (array_key_exists($functions[$i]["description"],$json)) 
+                    ? $json[$functions[$i]["description"]] : $functions[$i]["description"];
+                array_push($cleanFunctions,[
+                    "name" => $functions[$i]["name"],
+                    "description" => $description
+                ]);
+                
             }
         }
         
         return view('l.table',[
-            "value" => $functions,
+            "value" => $cleanFunctions,
             "title" => [
                 "*hidden*" , "Aciklama"
             ],
