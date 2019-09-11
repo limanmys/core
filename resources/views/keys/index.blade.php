@@ -42,10 +42,10 @@
                 @include('l.table',[
                 "value" => $settings,
                     "title" => [
-                        "Ayar Adı" , "Sunucu" , "Eklenti" , "*hidden*"
+                        "Ayar Adı" , "Sunucu" , "*hidden*"
                     ],
                     "display" => [
-                        "name" , "server_name", "extension_name" , "id:setting_id"
+                        "name" , "server_name", "id:setting_id"
                     ],
                     "menu" => [
                         "Sil" => [

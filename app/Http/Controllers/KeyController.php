@@ -26,13 +26,10 @@ class KeyController extends Controller
         }
 
         $settings = DB::table('user_settings')->where('user_id',auth()->user()->id)->get();
-        $extensions = extensions();
+
         foreach ($settings as $setting){
             $server = $servers->find($setting->server_id);
-            $extension = $extensions->find($setting->extension_id);
             $setting->server_name = ($server) ? $server->name : __("Sunucu Silinmiş.");
-            $setting->extension_name = ($extension) ? $extension->name : __("Eklenti Bulunamadı");
-
         }
 
         return view('keys.index',[

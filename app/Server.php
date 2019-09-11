@@ -123,10 +123,9 @@ class Server extends Model
      */
     public static function getAll()
     {
-        if(auth()->user()->isAdmin()){
-            return Server::all();
-        }
-        return Server::find(Permission::whereNotNull("server_id")->where('user_id',auth()->user()->id)->pluck("server_id")->toArray());
+        return Server::get()->filter(function($server){
+            return Permission::can(user()->id,'server','id',$server->id);
+        });
     }
 
     public function extensions()

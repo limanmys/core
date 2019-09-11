@@ -624,8 +624,8 @@ class OneController extends Controller
                         array_push($permissions,$item["name"]);
                     };
                 }
-                $permissions = json_encode($permissions);
             }
+            $permissions = json_encode($permissions);
         }else{
             $permissions = "admin";
         }
