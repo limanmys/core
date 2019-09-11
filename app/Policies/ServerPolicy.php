@@ -42,7 +42,8 @@ class ServerPolicy
      */
     public function create(User $user)
     {
-        return Permission::can($user->id,'liman','serverCreate','true');
+        return true;
+        // return Permission::can($user->id,'liman','serverCreate','true');
     }
 
     /**
