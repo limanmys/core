@@ -101,7 +101,7 @@
                 </script>
             </div>
             <div class="tab-pane" id="update">
-                @php($updateOutput = shell_exec("sudo apt update && apt list --upgradable | grep 'liman'"))
+                @php($updateOutput = shell_exec("apt list --upgradable | grep 'liman'"))
                 @if($updateOutput)
                     <pre>{{$updateOutput}}</pre>
                 @else
