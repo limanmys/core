@@ -26,7 +26,6 @@ class OneController extends Controller
             if(!DB::table("user_settings")->where([
                 "user_id" => auth()->user()->id,
                 "server_id" => $widget->server_id,
-                "extension_id" => $extension->id,
                 "name" => $item["variable"]
             ])->exists()){
                 return respond(__("Eklenti ayarları eksik.") . " <a href='".url('ayarlar/'.$extension->id.'/'.$widget->server_id)."'>".__("Ayarlara Git.")."</a>", 400);
@@ -99,8 +98,7 @@ class OneController extends Controller
         if($extensionDb == null){
             $settings = DB::table("user_settings")->where([
                 "user_id" => $user_id,
-                "server_id" => server()->id,
-                "extension_id" => extension()->id
+                "server_id" => server()->id
             ]);
             $extensionDb = [];
             foreach ($settings->get() as $setting){

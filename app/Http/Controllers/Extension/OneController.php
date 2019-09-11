@@ -430,7 +430,6 @@ class OneController extends Controller
         foreach ($extension["database"] as $key) {
             $row = DB::table('user_settings')->where([
                 "user_id" => user()->id,
-                "extension_id" => extension()->id,
                 "server_id" => server()->id,
                 'name' => $key["variable"]
             ]);
@@ -449,7 +448,6 @@ class OneController extends Controller
                     DB::table("user_settings")->insert([
                         "id" => Str::uuid(),
                         "server_id" => server()->id,
-                        "extension_id" => extension()->id,
                         "user_id" => user()->id,
                         "name" => $key["variable"],
                         "value" => $encrypted,

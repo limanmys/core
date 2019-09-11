@@ -197,7 +197,6 @@ if (!function_exists('extensionDb')) {
     {
         $target = DB::table("user_settings")->where([
             "user_id" => auth()->user()->id,
-            "extension_id" => extension()->id,
             "server_id" => server()->id,
             "name" => $key
         ])->first();
