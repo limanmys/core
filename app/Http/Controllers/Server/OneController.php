@@ -413,24 +413,33 @@ class OneController extends Controller
             $pid = session(server()->id.request("package_name"));
             if(empty($pid)){
                 ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi bir hata nedeniyle takip edilemedi.', ['package_name' => request("package_name")]));
-                return respond(__(":package_name paketi bir hata nedeniyle takip edilemiyor.", ['package_name' => request("package_name")]));
+                return respond([
+                    "status" => __(":package_name paketi bir hata nedeniyle takip edilemiyor.", ['package_name' => request("package_name")]),
+                    "output" => ""
+                ]);
             }
             $output = trim(server()->run('[ -d "/proc/'.$pid.'" ] && echo "YES" || echo "NO"'));
+            $command_output = server()->run('sudo cat /tmp/'.request("package_name"). '.txt 2> /dev/null');
+            server()->run('sudo truncate -s 0 /tmp/'.request("package_name"). '.txt');
             if($output === "NO"){
                 $output = server()->run('sudo apt list --upgradable 2>/dev/null | grep '.request("package_name"));
                 if(empty($output)){
                     ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi paketi başarıyla kuruldu.', ['package_name' => request("package_name")]));
-                    return respond(__(":package_name paketi başarıyla kuruldu.", ['package_name' => request("package_name")]));
+                    return respond([
+                        "status" => __(":package_name paketi başarıyla kuruldu.", ['package_name' => request("package_name")]),
+                        "output" => trim($command_output)
+                    ]);
                 }else{
                     ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi kurulamadı.', ['package_name' => request("package_name")]));
-                    return respond(__(":package_name paketi kurulamadı.", ['package_name' => request("package_name")]));
+                    return respond([
+                        "status" => __(":package_name paketi kurulamadı.", ['package_name' => request("package_name")]),
+                        "output" => trim($command_output)
+                    ]);
                 }
             }else{
-                $output = server()->run('sudo cat /tmp/'.request("package_name"). '.txt 2> /dev/null');
-                server()->run('sudo truncate -s 0 /tmp/'.request("package_name"). '.txt');
                 return respond([
                     "status" => __(":package_name paketinin kurulum işlemi henüz bitmedi.", ['package_name' => request("package_name")]),
-                    "output" => $output
+                    "output" => trim($command_output),
                 ], 400);
             }
         }elseif (server()->type == "windows_powershell"){
