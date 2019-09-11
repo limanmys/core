@@ -13,7 +13,7 @@ class WinRMConnector implements Connector
         ($key = Key::where([
             "user_id" => $user_id,
             "server_id" => $server->id
-        ])->first()) || abort(504,"WinRM Anahtarınız yok.");
+        ])->first()) || abort(504,"Bu sunucu için WinRM anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.");
         $path = "/liman/server/storage/winrm/winrm_validate";
         shell_exec("sudo chmod +x $path");
         $checkScript = "$path '" . $server->ip_address . "' '"
