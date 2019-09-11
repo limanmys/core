@@ -376,6 +376,7 @@
                         showConfirmButton: true,
                         allowOutsideClick : false,
                     });
+                    $(".modal").modal('hide');
                 }else{
                     Swal.fire({
                         position: 'center',
