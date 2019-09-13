@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Stop Liman if exists.
+if [ -f "/liman/server/artisan" ]; then
+    php /liman/server/artisan down
+fi

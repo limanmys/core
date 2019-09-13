@@ -110,6 +110,9 @@ chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
 
+# Enable Liman
+php /liman/server/artisan up
+
 #Finalize Installation
 printf "\nKurulum Başarıyla Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
 printf "sudo runuser liman -c \"php /liman/server/artisan administrator\"\n\n\n"
