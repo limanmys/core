@@ -631,7 +631,7 @@ class OneController extends Controller
         }
         $array = [$functions,strtolower(extension()->name),
             $viewName,$server,$extension,$extensionDb,$outputsJson,$request,$functionName,
-            $apiRoute,$navigationRoute,$token,$extension_id,$permissions];
+            $apiRoute,$navigationRoute,$token,$extension_id,$permissions, session('locale')];
         $encrypted = openssl_encrypt(Str::random() . base64_encode(json_encode($array)),
             'aes-256-cfb8',shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
             0,Str::random());
