@@ -624,6 +624,8 @@
         function updatePackage(){
             updateProgress();
             $('#updateLogs').modal('show');
+            let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
+            scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
             let data = new FormData();
             data.append("package_name", packages[index]);
             $('#updateLogs').find('.updateLogsBody').append("\n"+packages[index]+" paketi kuruluyor. Lütfen bekleyin...<span id='"+packages[index]+"'></span>");
@@ -633,7 +635,7 @@
         }
 
         function updateProgress(){
-            $('#updateLogs').find('.progress-info').text(index+"/"+packages.length+" paket kuruluyor...");
+            $('#updateLogs').find('.progress-info').text(index+"/"+packages.length+" "+packages[index]+" paketi kuruluyor...");
             let percent = (index/packages.length)*100;
             $('div[role=progressbar]').attr('aria-valuenow', percent);
             $('div[role=progressbar]').attr('style', 'width: '+percent+'%');
@@ -641,7 +643,7 @@
                 $('div[role=progressbar]').closest('.progress').addClass('active');
             }else{
                 $('div[role=progressbar]').closest('.progress').removeClass('active');
-                $('#updateLogs').find('.progress-info').text("Tüm paketler kuruldu.");
+                $('#updateLogs').find('.progress-info').text("Tüm işlemler bitti.");
             }
 
         }
@@ -651,7 +653,12 @@
             data.append("package_name", packages[index]);
             request('{{route('server_check_update')}}', data, function (response) {
                 response = JSON.parse(response);
-                $('#updateLogs').find('.updateLogsBody').append("\n"+response.message);
+                if(response.message.output){
+                    $('#updateLogs').find('.updateLogsBody').append("\n"+response.message.output);
+                    let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
+                    scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
+                }
+                $('#updateLogs').find('.updateLogsBody').append("\n"+response.message.status);
                 let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
                 scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
                 index++;
@@ -660,12 +667,14 @@
                 }else{
                     updateProgress();
                     getUpdates();
-                    $('#updateLogs').find('.updateLogsBody').append("\n"+"Tüm güncellemeler kuruldu.");
+                    $('#updateLogs').find('.updateLogsBody').append("\n"+"Tüm işlemler bitti.");
                 }
             }, function(response){
                 response = JSON.parse(response);
                 if(response.message.output){
                     $('#updateLogs').find('.updateLogsBody').append("\n"+response.message.output);
+                    let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
+                    scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
                 }
                 setTimeout(function(){
                     checkUpdate();
