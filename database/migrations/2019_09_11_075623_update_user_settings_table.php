@@ -25,7 +25,7 @@ class UpdateUserSettingsTable extends Migration
         Schema::create('user_settings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid("server_id")->nullable();
-            $table->foreign("server_id")->references("id")->on("servers");
+            $table->foreign("server_id")->references("id")->on("servers")->onDelete("cascade");
             $table->uuid("user_id");
             $table->foreign("user_id")->references("id")->on("users")->onDelete("cascade");
             $table->string("name");
@@ -35,7 +35,9 @@ class UpdateUserSettingsTable extends Migration
 
         //Move Data.
         foreach($settings as $setting){
-
+            if(!array_key_exists("extension_id",$setting)){
+                continue;
+            }
             // Decrypt data since since we dont have extension_id anymore, we need to use another salt.
             $key = env('APP_KEY') . $setting->user_id . $setting->extension_id . $setting->server_id;
             $decrypted = openssl_decrypt($setting->value,'aes-256-cfb8',$key);
