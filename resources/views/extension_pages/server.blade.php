@@ -46,5 +46,5 @@
 </div>
 
 
-<br>{{__("İstek")}} {{$timestamp}} {{__("saniyede tamamlandı.")}}
+<br><span style="padding-left: 30px;">{{__("İstek")}} {{$timestamp}} {{__("saniyede tamamlandı.")}}</span>
 @endsection
