@@ -28,15 +28,6 @@
             autoFill : true,
             bFilter: true,
             destroy: true,
-            dom: 'Bfrtip',
-            buttons: [
-                {
-                    extend: 'pdfHtml5',
-                    text: '{{__("PDF\'e Aktar")}}',
-                    download : 'open',
-                    message : "Liman MYS tarafından {{Illuminate\Support\Carbon::now()}} tarihinde üretildi."
-                }
-            ],
             "language" : {
                 url : "{{asset('turkce.json')}}"
             }
