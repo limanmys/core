@@ -12,6 +12,7 @@ mix.styles([
     'resources/assets/css/jquery.dataTables.css',
     'resources/assets/css/select.dataTables.css',
     'resources/assets/css/sweetalert2.min.css',
+    'resources/assets/css/buttons.dataTables.min.css'
 ], 'public/css/liman.css').version();
 mix.combine([
     'resources/assets/js/jquery.js',
@@ -26,4 +27,9 @@ mix.combine([
     'resources/assets/js/Chart.js',
     'resources/assets/js/jstree.js',
     'resources/assets/js/liman.js',
+    'resources/assets/js/buttons.html5.min.js',
+    'resources/assets/js/dataTables.buttons.min.js',
+    'resources/assets/js/jszip.min.js',
+    'resources/assets/js/pdfmake.min.js',
+    'resources/assets/js/vfs_fonts.js'
 ], 'public/js/liman.js').version();

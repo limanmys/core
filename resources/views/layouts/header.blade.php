@@ -57,8 +57,8 @@
                                     <!-- Menu Footer-->
                                     <li class="user-footer">
                                         <div>
-                                            {{__("Giriş Yapılan son ip adresi : ") . user()->last_login_ip}}</br>
-                                            {{__("Giriş Tarihi : ") . user()->last_login_at}}<br><br>
+                                            {{__("Giriş Yapılan Son Ip : ") . user()->last_login_ip}}</br>
+                                            {{__("Son Giriş Tarihi : ") . user()->last_login_at}}<br><br>
                                         </div>
                                         <div class="pull-left">
                                             <a href="{{route('my_profile')}}"
