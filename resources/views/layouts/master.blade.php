@@ -32,6 +32,9 @@
                 url : "{{asset('turkce.json')}}"
             }
         });
+        $('.js-example-basic-multiple').select2({
+            width: 'resolve'
+        });
         let title = $(".breadcrumb-item.active").html();
         if(title !== undefined){
             document.title = title + " / Liman";

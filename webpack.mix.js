@@ -7,13 +7,13 @@ mix.styles([
     'resources/assets/css/sweetalert2.min.css',
     'resources/assets/css/buttons.dataTables.min.css',
     'resources/assets/css/AdminLTE.css',
-    // 'resources/assets/css/adminlte3.min.css',
     'resources/assets/css/jquery.contextMenu.css',
     'resources/assets/css/jquery-ui.css',
     'resources/assets/css/themes/*.css',
     'resources/assets/css/jstree.css',
     'resources/assets/css/bootstrap-datepicker.css',
     'resources/assets/css/bootstrap-timepicker.css',
+    'resources/assets/css/select2.min.css',
 ], 'public/css/liman.css').version();
 mix.combine([
     'resources/assets/js/jquery.js',
@@ -24,7 +24,7 @@ mix.combine([
     'resources/assets/js/bootstrap-timepicker.js',
     'resources/assets/js/datatables.js',
     'resources/assets/js/adminlte.js',
-    // 'resources/assets/js/adminlte3.min.js',
+    'resources/assets/js/select2.min.js',
     'resources/assets/js/sweetalert2.min.js',
     'resources/assets/js/Chart.js',
     'resources/assets/js/jstree.js',
