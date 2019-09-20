@@ -32,7 +32,7 @@
                 url : "{{asset('turkce.json')}}"
             }
         });
-        $('.js-example-basic-multiple').select2({
+        $('.js-example-basic-multiple,.js-example-basic-single').select2({
             width: 'resolve'
         });
         let title = $(".breadcrumb-item.active").html();
