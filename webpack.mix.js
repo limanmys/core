@@ -33,5 +33,6 @@ mix.combine([
     'resources/assets/js/dataTables.buttons.min.js',
     'resources/assets/js/jszip.min.js',
     'resources/assets/js/pdfmake.min.js',
-    'resources/assets/js/vfs_fonts.js'
+    'resources/assets/js/vfs_fonts.js',
+    'resources/assets/js/jquery.inputmask.min.js'
 ], 'public/js/liman.js').version();

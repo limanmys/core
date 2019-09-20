@@ -35,6 +35,7 @@
         $('.js-example-basic-multiple,.js-example-basic-single').select2({
             width: 'resolve'
         });
+        $(":input").inputmask();
         let title = $(".breadcrumb-item.active").html();
         if(title !== undefined){
             document.title = title + " / Liman";
