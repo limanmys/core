@@ -9,7 +9,9 @@ use Illuminate\Support\Str;
 
 Artisan::command('administrator',function (){
 
-    $password = Str::random();
+    // Generate Password
+    $pool = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$@%^&!$%^&');
+    $password = substr($pool,0,10);
 
     $user = User::where([
         "name" => "Administrator",

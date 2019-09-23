@@ -39,7 +39,8 @@ class UserController extends Controller
         }
 
         // Generate Password
-        $password = Str::random(8);
+        $pool = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$@%^&!$%^&');
+        $password = substr($pool,0,10);
 
         // Create And Fill User Data
         $user = User::create([
@@ -69,7 +70,8 @@ class UserController extends Controller
     public function passwordReset()
     {
         // Generate Password
-        $password = Str::random(8);
+        $pool = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$@%^&!$%^&');
+        $password = substr($pool,0,10);
 
         User::find(request('user_id'))->update([
             "password" => Hash::make($password)
@@ -80,14 +82,21 @@ class UserController extends Controller
 
     public function selfUpdate()
     {
+        if(!auth()->attempt([
+            "email" => user()->email,
+            "password" => request("old_password")
+        ])){
+            return respond("Eski Parolanız geçerli değil.",201);
+        }
         $flag = Validator::make(request()->all(), [
-            'password' => ['required', 'string', 'min:6','max:32','confirmed'],
+            'password' => ['required', 'string', 
+                'min:10','max:32','confirmed','regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/'],
         ]);
 
         try{
             $flag->validate();
         }catch (\Exception $exception){
-            return respond("Girilen veri geçerli değil.",201);
+            return respond("Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı ve özel karakter içermelidir.",201);
         }
 
         auth()->user()->update([

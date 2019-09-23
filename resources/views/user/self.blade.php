@@ -18,10 +18,12 @@
                 <input type="text" class="form-control" name="name" value="{{auth()->user()->name}}" required minlength="6" maxlength="255" a>
                 <h3>{{__("Email Adresi")}}</h3>
                 <input type="text" class="form-control" value="{{auth()->user()->email}}" disabled required>
+                <h3>{{__("Eski Parola")}}</h3>
+                <input type="password" class="form-control" name="old_password" required minlength="10" maxlength="32">
                 <h3>{{__("Parola")}}</h3>
-                <input type="password" class="form-control" name="password" required minlength="6" maxlength="32">
+                <input type="password" class="form-control" name="password" required minlength="10" maxlength="32">
                 <h3>{{__("Parola Onayı")}}</h3>
-                <input type="password" class="form-control" name="password_confirmation" required minlength="6" maxlength="32"><br>
+                <input type="password" class="form-control" name="password_confirmation" required minlength="10" maxlength="32"><br>
                 <button class="btn btn-success btn-lg" type="submit">{{__("Kaydet")}}</button>
             </form>
         </div>
