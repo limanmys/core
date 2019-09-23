@@ -5,8 +5,7 @@ namespace App\Http\Controllers\Script;
 use App\Extension;
 use App\Script;
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class MainController extends Controller
 {
@@ -25,7 +24,22 @@ class MainController extends Controller
     }
 
     public function upload(){
-        $script = Script::readFromFile(request()->file('script'));
+        $flag = Validator::make(request()->all(), [
+            'script' => 'required |  max:100000 | mimes:txt'
+        ]);
+
+        try{
+            $flag->validate();
+        }catch (\Exception $exception){
+            return respond("Lütfen geçerli bir betik giriniz.",201);
+        }
+
+        try{
+            $script = Script::readFromFile(request()->file('script'));
+        }catch(\Exception $exception){
+            return respond("Lütfen geçerli bir betik giriniz",201);
+        }
+        
         if(!$script){
             return respond('Betik zaten sistemde var.',201);
         }

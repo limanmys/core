@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * Class MainController
@@ -67,6 +68,16 @@ class MainController extends Controller
      */
     public function upload()
     {
+        $flag = Validator::make(request()->all(), [
+            'extension' => 'required |  max:100000 | mimes:zip'
+        ]);
+
+        try{
+            $flag->validate();
+        }catch (\Exception $exception){
+            return respond("Lütfen geçerli bir eklenti giriniz.",201);
+        }
+
         // Initialize Zip Archive Object to use it later.
         $zip = new ZipArchive;
 
