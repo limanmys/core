@@ -39,7 +39,7 @@
         document.getElementById('certificateUpload').addEventListener("change",function () {
             let reader = new FileReader();
             reader.addEventListener('load',function (e) {
-                $("#output").html(e.target.result).fadeIn(0);
+                $("#output").text(e.target.result).fadeIn(0);
                 $("#addButton").fadeIn(0);
             });
             reader.readAsBinaryString(this.files[0]);
@@ -58,7 +58,7 @@
             form.append('port',$("#port").val());
             request('{{route('certificate_request')}}',form,function (success) {
                 let json = JSON.parse(success);
-                $("#output").html(json["message"]).fadeIn(0);
+                $("#output").text(json["message"]).fadeIn(0);
                 Swal.close();
                 $("#addButton").fadeIn(0);
             },function (errors) {
@@ -84,7 +84,7 @@
                 allowOutsideClick : false,
             });
             let form = new FormData();
-            form.append('certificate',$("#output").html());
+            form.append('certificate',$("#output").text());
             form.append('server_hostname',$("#hostname").val());
             form.append('origin',$("#port").val());
             form.append('notification_id','{{request('notification_id')}}');

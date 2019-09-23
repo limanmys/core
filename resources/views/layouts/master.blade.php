@@ -36,7 +36,7 @@
             width: 'resolve'
         });
         $(":input").inputmask();
-        let title = $(".breadcrumb-item.active").html();
+        let title = $(".breadcrumb-item.active").text();
         if(title !== undefined){
             document.title = title + " / Liman";
         }

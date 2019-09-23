@@ -27,33 +27,33 @@
         function getExtensions(){
             let form = new FormData();
             let element = $("#extension_id");
-            element.html('');
+            element.text('');
             element.attr('disabled','true');
             form.append('server_id',$("#server_id").val());
             request('{{route('widget_get_extensions')}}',form,function(response){
                 let json = JSON.parse(response);
                 for(let k in json) {
-                    element.append('<option value="'+ k+ '">' + json[k] + '</option>');
+                    element.append('<option value="'+ k+ '">' + fixer(json[k]) + '</option>');
                 }
                 if(Object.keys(json).length > 0){
                     getWidgets();
                     element.removeAttr('disabled');
                 }else{
-                    $("#widget_name").html('').addAttr('disabled','');
+                    $("#widget_name").text('').addAttr('disabled','');
                 }
             });
         }
 
         function getWidgets(){
-            $("#widget_name").html('');
+            $("#widget_name").text('');
             let form = new FormData();
             form.append('extension_id',$("#extension_id").val());
             request('{{route('widget_list')}}',form,function(response){
                 let json = JSON.parse(response);
                 let element = $("#widget_name");
-                element.html('');
+                element.text('');
                 for(let k in json) {
-                    element.append('<option value="'+ json[k]["target"] + ':' + json[k]["name"] + ':' + json[k]["type"] + ':' + json[k]["icon"] +'">' + json[k]["name"] + '</option>');
+                    element.append('<option value="'+ fixer(json[k]["target"]) + ':' + fixer(json[k]["name"]) + ':' + fixer(json[k]["type"]) + ':' + fixer(json[k]["icon"]) +'">' + fixer(json[k]["name"]) + '</option>');
                 }
                 element.removeAttr('disabled');
             });

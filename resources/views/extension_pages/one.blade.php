@@ -329,7 +329,7 @@
     </div>
     <script>
         function editPage(element){
-            let page = $(element).find("#name").html();
+            let page = $(element).find("#name").text();
             location.href = location.protocol+'//'+location.host+location.pathname + "/" + page;
         }
 

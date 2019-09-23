@@ -435,7 +435,7 @@
         stats();
         function updateChart(element, time, data) {
             // First, Update Text
-            $("#" + element + "Text").html("%" + data);
+            $("#" + element + "Text").text("%" + data);
             window[element + "Chart"].data.labels.push(time);
             window[element + "Chart"].data.datasets.forEach((dataset) => {
                 dataset.data.push(data);
@@ -444,7 +444,7 @@
         }
 
         function createChart(element, time, data) {
-            $("#" + element + "Text").html("%" + data[0]);
+            $("#" + element + "Text").text("%" + data[0]);
             window[element + "Chart"] = new Chart($("#" + element), {
                 type: 'line',
                 data: {

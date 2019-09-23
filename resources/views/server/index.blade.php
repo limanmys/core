@@ -255,7 +255,7 @@
             });
         }
 
-        function checkKey(form) {
+        function checkKey(form) {            
             let option = $("#useKey");
             if(option.is(':checked') === false){
                 isKeyOK = true;
@@ -329,12 +329,12 @@
         }
 
         function setSummary(){
-            $("#tableServerHostname").html($("#serverHostName").val());
-            $("#tableServerPort").html($("#serverControlPort").val());
-            $("#tableOperatingSystem").html($("input[name=operating_system]:checked").attr('data-content'));
-            $("#tableServerName").html($("#server_name").val());
-            $("#tableServerCity").html($("#serverCity").val());
-            $("#tableKey").html(($("#useKey").is(':checked') === true) ? $("#keyType").val() : "{{__("Anahtarsız")}}");
+            $("#tableServerHostname").text($("#serverHostName").val());
+            $("#tableServerPort").text($("#serverControlPort").val());
+            $("#tableOperatingSystem").text($("input[name=operating_system]:checked").attr('data-content'));
+            $("#tableServerName").text($("#server_name").val());
+            $("#tableServerCity").text($("#serverCity").val());
+            $("#tableKey").text(($("#useKey").is(':checked') === true) ? $("#keyType").val() : "{{__("Anahtarsız")}}");
         }
 
         function addServer() {

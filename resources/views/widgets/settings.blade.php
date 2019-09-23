@@ -13,7 +13,7 @@
     @include('l.errors')
     @include('l.modal',[
         "id"=>"add_server",
-        "title" => "Sunucu Ekle",
+        "title" => "Widget Ekle",
         "url" => route('widget_add'),
         "next" => "addToTable",
         "inputs" => [

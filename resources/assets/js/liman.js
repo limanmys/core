@@ -50,7 +50,6 @@ function request(url, data, next, error) {
                 return next(r.responseText);
             }
             let response = JSON.parse(r.responseText);
-
             switch (r.status) {
                 case 200:
                     return next(r.responseText);
@@ -214,35 +213,11 @@ let inputs =[];
 let modalData = [];
 
 function updateTable(extraVariableName = null){
-    for(let i = 0;i< inputs.length ; i++){
-        let element = inputs[i][0];
-        if(!extraVariableName.startsWith('{')){
-            $(element).html(modalData.get(element.id + extraVariableName));
-        }else{
-            $(element).html(modalData.get(element.id));
-        }
-    }
-    let current_modal = $('.modal:visible');
-    if(current_modal.length){
-        current_modal.modal('hide');
-    }
+    reload();
 }
 
 function addToTable(){
-    let newRow = [];
-    let selector = $('table tr:eq(1) td');
-    if(selector.length === 0){
-        location.reload();
-    }
-    console.log(selector);
-    selector.each(function(){
-        newRow.push(modalData.get(this.id));
-    });
-    $('table').not('.notDataTable').DataTable().row.add(newRow).draw(true);
-    let current_modal = $('.modal:visible');
-    if(current_modal.length){
-        current_modal.modal('hide');
-    }
+    reload();
 }
 
 function renderNotifications(data,type,target){
@@ -268,4 +243,8 @@ function activeTab(){
             element.click();
         }
     }
+}
+
+function fixer(val){
+    return val.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }

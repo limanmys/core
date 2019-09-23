@@ -91,7 +91,7 @@
                     }
                     inputs =[];
                     $("#" + key + " input , #" + key + ' select').each(function (index, value) {
-                        let element_value = $("#" + options.$trigger[0].getAttribute("id") + " #" + value.getAttribute('name')).html();
+                        let element_value = $("#" + options.$trigger[0].getAttribute("id") + " #" + value.getAttribute('name')).text();
                         if(element_value){
                             inputs.push($("#" + options.$trigger[0].getAttribute("id") + " #" + value.getAttribute('name')));
                             $("#" + key + " select[name='" + value.getAttribute('name') + "']" + " , "
