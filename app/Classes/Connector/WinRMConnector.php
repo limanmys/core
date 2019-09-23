@@ -4,7 +4,6 @@ namespace App\Classes\Connector;
 
 use App\Key;
 use App\Server;
-use Illuminate\Support\Facades\Log;
 
 class WinRMConnector implements Connector
 {
@@ -20,7 +19,6 @@ class WinRMConnector implements Connector
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_prv.pem' '" . md5(env('APP_KEY') . $user_id). "'";
         $output = shell_exec($checkScript);
-        Log::debug($checkScript);
         if($output != "ok\n"){
             abort(504,"Sertifikanız geçerli değil.");
         }
@@ -39,7 +37,6 @@ class WinRMConnector implements Connector
         $executeScript = "$path '" . server()->ip_address . "' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->user()->id) . "'";
-        Log::debug($executeScript . " \"" . $command . "\"");
         return shell_exec($executeScript . " \"" . $command . "\"");
     }
 
@@ -52,7 +49,6 @@ class WinRMConnector implements Connector
             . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->user()->id) . "'" .
             " '$localPath' '$remotePath'";
         shell_exec($receiveFile);
-        Log::debug($receiveFile);
         return true;
     }
 
@@ -65,7 +61,6 @@ class WinRMConnector implements Connector
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->user()->id) . "'" .
         " '$remotePath' '$localPath'";
         shell_exec($receiveFile);
-        Log::debug($receiveFile);
         return is_file($localPath);
     }
 
@@ -94,7 +89,6 @@ class WinRMConnector implements Connector
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->user()->id). "'";
         $beforeOutput = shell_exec($beforeScript);
-        Log::debug($beforeScript);
         if($beforeOutput != "ok\n"){
             $key->delete();
             abort(504,($beforeOutput) ? $beforeOutput : "Bir Hata Oluştu.");
@@ -103,7 +97,6 @@ class WinRMConnector implements Connector
     	$runScript = "$path run '" . $server->ip_address . "' '$username' '$password' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->user()->id) . "'";
-        Log::debug($runScript);
         $output = shell_exec($runScript);
     	return "OK";
     }
