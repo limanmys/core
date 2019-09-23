@@ -11,7 +11,7 @@ class VerifyCsrfToken extends Middleware
      *
      * @var bool
      */
-    protected $addHttpCookie = true;
+    protected $addHttpCookie = false;
 
     /**
      * The URIs that should be excluded from CSRF verification.
