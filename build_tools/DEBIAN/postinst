@@ -52,13 +52,8 @@ else
     echo "* * * * * cd /liman/server && php artisan schedule:run >> /dev/null 2>&1" >> "/etc/cron.d/liman"
 fi
 
-# Nginx Settings
-if [ -f "/etc/nginx/sites-available/liman.conf" ]; then
-    echo "Nginx settings found."
-else
-    mv /liman/server/nginx.conf /etc/nginx/sites-available/liman.conf
-    ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
-fi
+mv /liman/server/nginx.conf /etc/nginx/sites-available/liman.conf
+ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
 
 # Fpm Optimizations
 # if grep --quiet LIMAN_OPTIMIZATIONS /etc/php/7.3/fpm/php-fpm.conf; then
