@@ -413,6 +413,7 @@
             "Sunucu Adı" => "name:text",
             "Kontrol Portu" => "control_port:number",
             "Sunucu Id:''" => "server_id:hidden",
+            "IP Adresi" => "ip_address:text",
             "Şehir:city" => cities(),
         ],
         "submit_text" => "Düzenle"
