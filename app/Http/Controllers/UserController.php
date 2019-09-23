@@ -47,7 +47,8 @@ class UserController extends Controller
             'name' => request('name'),
             'email' => request('email'),
             'password' => Hash::make($password),
-            'status' => (request('type') == "administrator") ? "1" : "0"
+            'status' => (request('type') == "administrator") ? "1" : "0",
+            'forceChange' => true
         ]);
         $user->save();
 
@@ -73,10 +74,11 @@ class UserController extends Controller
         $pool = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$@%^&!$%^&');
         $password = substr($pool,0,10);
 
-        User::find(request('user_id'))->update([
-            "password" => Hash::make($password)
+        $user = User::find(request('user_id'));
+        $user->update([
+            "password" => Hash::make($password),
+            "forceChange" => true
         ]);
-
         return respond("Yeni Parola : " . $password,200);
     }
 
@@ -146,5 +148,40 @@ class UserController extends Controller
         }else{
             return respond("Başarıyla silinemedi",201);
         }
+    }
+
+    public function forcePasswordChange()
+    {
+        if(!auth()->attempt([
+            "email" => user()->email,
+            "password" => request("old_password")
+        ])){
+            return redirect()->route('password_change')->withErrors([
+                "message" => "Eski Parolanız geçerli değil."
+            ]);
+        }
+        $flag = Validator::make(request()->all(), [
+            'password' => ['required', 'string', 
+                'min:10','max:32','confirmed','regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/'],
+        ]);
+
+        try{
+            $flag->validate();
+        }catch (\Exception $exception){
+            return redirect()->route('password_change')->withErrors([
+                "message" => "Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı ve özel karakter içermelidir."
+            ]);
+        }
+
+        auth()->user()->update([
+            'password' => Hash::make(request('password')),
+            'forceChange' => false
+         ]);
+ 
+         auth()->logout();
+         session()->flush();
+         return redirect()->route('login')->withErrors([
+            "message" => "Kullanıcı Başarıyla Güncellendi, lütfen tekrar giriş yapın."
+        ]);
     }
 }

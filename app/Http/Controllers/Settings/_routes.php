@@ -21,3 +21,7 @@ Route::post('/ayar/eklenti/fonksiyonlar/ekle','Settings\MainController@addFuncti
 Route::post('/ayar/eklenti/fonksiyonlar/sil','Settings\MainController@removeFunctionPermissions')->middleware('admin')->name('extension_function_remove');
 
 Route::post('/ayarlar/saglik','Settings\MainController@health')->middleware('admin')->name('health_check');
+
+Route::view('/sifreDegistir','user.password')->middleware('auth')->name('password_change');
+
+Route::post('/sifreDegistir','UserController@forcePasswordChange')->middleware('auth')->name('password_change_save');

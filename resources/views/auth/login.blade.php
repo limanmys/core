@@ -9,6 +9,11 @@
         </div>
         <!-- /.login-logo -->
         <div class="login-box-body">
+                @if ($errors->count() > 0 )
+                <div class="alert alert-danger">
+                    {{$errors->all()[0]}}
+                </div>
+            @endif
             @if(session('warning'))
             <div class="alert alert-warning">
                 {{session('warning')}}
