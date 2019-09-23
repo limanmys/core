@@ -2,21 +2,17 @@
 
 namespace App\Http\Controllers\Server;
 
-use App\AdminNotification;
-use App\Certificate;
 use App\Classes\Connector\SSHConnector;
 use App\Classes\Connector\WinRMConnector;
-use App\Notification;
 use App\Server;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Log;
 
 class MainController extends Controller
 {
     public function checkAccess()
     {
-        if(shell_exec("echo quit | timeout " . (intval(env('SERVER_CONNECTION_TIMEOUT')) / 1000). " telnet "
-            . request('hostname') . " " . request('port') . "  | grep \"Connected\"")){
+        $status = @fsockopen(request('hostname'),request('port'),$errno,$errstr,(intval(env('SERVER_CONNECTION_TIMEOUT')) / 1000));
+        if(is_resource($status)){
             return respond("Sunucuya başarıyla erişim sağlandı.",200);
         }else{
             return respond("Sunucuya erişim sağlanamadı.",201);

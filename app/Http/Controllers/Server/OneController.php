@@ -71,7 +71,8 @@ class OneController extends Controller
     public function serviceCheck()
     {
         if(is_numeric(extension()->service)){
-            $flag = shell_exec("echo quit | timeout --signal=9 2 telnet " . server()->ip_address . " " . extension()->service . "  | grep \"Connected\"");
+            $status = @fsockopen(server()->ip_address,extension()->service,$errno,$errstr,(intval(env('SERVER_CONNECTION_TIMEOUT')) / 1000));
+            $flag = is_resource($status);            
         }else{
             $flag = server()->isRunning(extension()->service);
         }

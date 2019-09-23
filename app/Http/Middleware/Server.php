@@ -21,14 +21,13 @@ class Server
             ]);
         }
         
-        if(shell_exec("echo quit | timeout " . (intval(env('SERVER_CONNECTION_TIMEOUT')) / 1000). " telnet "
-            . server()->ip_address . " " . server()->control_port . "  | grep \"Connected\"")){
+        $status = @fsockopen(server()->ip_address,server()->control_port,$errno,$errstr,(intval(env('SERVER_CONNECTION_TIMEOUT')) / 1000));
+        if(is_resource($status)){
             return $next($request);
         }else{
             return redirect()->back()->withErrors([
                 "message" => server()->name."(".server()->ip_address.") ".__("isimli sunucuya erişim sağlanamadı!")
             ]);
         }
-
     }
 }

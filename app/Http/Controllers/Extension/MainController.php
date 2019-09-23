@@ -167,6 +167,10 @@ class MainController extends Controller
     {
         $folder = env('EXTENSIONS_PATH') . strtolower(request('name'));
 
+        if(!preg_match("[A-Za-z ]",request("name"))){
+            return respond("Eklenti isminde yalnızca harflere izin verilmektedir.",201);
+        }
+
         if(Extension::where("name",request("name"))->exists()){
             return respond("Bu isimle zaten bir eklenti var.",201);
         }
