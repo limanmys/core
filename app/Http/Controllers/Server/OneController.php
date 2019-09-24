@@ -321,8 +321,8 @@ class OneController extends Controller
             preg_match("/(\d+)%/",$disk,$test);
             $disk = $test[1];
             $ram = server()->run("free -t | awk 'NR == 2 {printf($3/$2*100)}'", false);
-            $cpu = server()->run("echo $[100-$(vmstat 1 1|tail -1|awk '{print $15}')]", false);
-            $cpu = substr($cpu,0,5);
+            $cpu = server()->run("vmstat 1 1|tail -1|awk '{print $15}'", false);
+            $cpu = 100 - intval(substr($cpu,0,-1));
         }elseif (server()->type == "windows_powershell"){
             $cpu = substr(server()->run("Get-WmiObject win32_processor | Measure-Object -property LoadPercentage -Average | Select Average"),23,-3);
             $disk = round(floatval(server()->run("(1 - (Get-WmiObject -Class Win32_logicalDisk | ? {\\\$_.DriveType -eq '3'}).FreeSpace / (Get-WmiObject -Class Win32_logicalDisk | ? {\\\$_.DriveType -eq '3'}).Size) * 100")),2);
