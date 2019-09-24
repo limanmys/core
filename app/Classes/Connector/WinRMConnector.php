@@ -14,7 +14,7 @@ class WinRMConnector implements Connector
             "server_id" => $server->id
         ])->first()) || abort(504,"Bu sunucu için WinRM anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.");
         $path = "/liman/server/storage/winrm/winrm_validate";
-        shell_exec("sudo chmod +x $path");
+        shell_exec("sudo chmod u+x $path");
         $checkScript = "$path '" . $server->ip_address . "' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_prv.pem' '" . md5(env('APP_KEY') . $user_id). "'";
@@ -33,7 +33,7 @@ class WinRMConnector implements Connector
     public function execute($command)
     {
         $path = "/liman/server/storage/winrm/winrm_execute";
-        shell_exec("sudo chmod +x $path");
+        shell_exec("sudo chmod u+x $path");
         $executeScript = "$path '" . server()->ip_address . "' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->user()->id) . "'";
@@ -43,7 +43,7 @@ class WinRMConnector implements Connector
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
         $path = "/liman/server/storage/winrm/winrm_sendfile";
-        shell_exec("sudo chmod +x $path");
+        shell_exec("sudo chmod u+x $path");
         $receiveFile = "$path '" . server()->ip_address . "' '"
             . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_cert.pem' '"
             . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->user()->id) . "'" .
@@ -55,7 +55,7 @@ class WinRMConnector implements Connector
     public function receiveFile($localPath, $remotePath)
     {
         $path = "/liman/server/storage/winrm/winrm_getfile";
-        shell_exec("sudo chmod +x $path");
+        shell_exec("sudo chmod u+x $path");
         $receiveFile = "$path '" . server()->ip_address . "' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->user()->id) . "'" .
@@ -72,7 +72,7 @@ class WinRMConnector implements Connector
     public static function verify($ip_address, $username, $password, $port)
     {
         $path = "/liman/server/storage/winrm/winrm_verify";
-        shell_exec("sudo chmod +x $path");
+        shell_exec("sudo chmod u+x $path");
         $command = "timeout 5 $path '". $ip_address . "' '" . $username . "' '" . $password . "'";
         if(shell_exec($command) == "OK\n"){
             return respond("Kullanıcı adı ve şifre doğrulandı.",200);
@@ -84,7 +84,7 @@ class WinRMConnector implements Connector
     public static function create(Server $server, $username, $password, $user_id, $key)
     {
         $path = "/liman/server/storage/winrm/winrm_cert";
-        shell_exec("sudo chmod +x $path");
+        shell_exec("sudo chmod u+x $path");
         $beforeScript = "$path before '" . $server->ip_address . "' '$username' '$password' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_cert.pem' '"
         . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . $user_id . $server->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->user()->id). "'";
