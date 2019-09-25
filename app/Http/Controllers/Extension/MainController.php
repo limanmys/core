@@ -176,9 +176,10 @@ class MainController extends Controller
 
     public function newExtension()
     {
-        $folder = env('EXTENSIONS_PATH') . strtolower(request('name'));
-
-        if(!preg_match("[A-Za-z ]",request("name"))){
+        $name = trim(request('name'));
+        $folder = env('EXTENSIONS_PATH') . strtolower($name);
+        preg_match('/[A-Za-z ]+/',request("name"),$output);
+        if(empty($output) || $output[0] != $name){
             return respond("Eklenti isminde yalnızca harflere izin verilmektedir.",201);
         }
 
@@ -195,7 +196,7 @@ class MainController extends Controller
         $ext->save();
 
         $json = [
-            "name" => request('name'),
+            "name" => $name,
             "publisher" => auth()->user()->name,
             "version" => "0.0.1",
             "database" => [],
