@@ -25,7 +25,7 @@ class MainController extends Controller
 
     public function upload(){
         $flag = Validator::make(request()->all(), [
-            'script' => 'required |  max:100000 | mimes:txt'
+            'script' => 'required |  max:100000 | mimes:lmns,py'
         ]);
 
         try{
