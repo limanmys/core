@@ -43,6 +43,23 @@
             </div>
         </div>
         <div class="col-md-4">
+                <div class="box box-solid">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">{{__("Parmak İzleri")}}</h3>
+                  </div>
+                  <div class="box-body clearfix">
+                    <div class="form-group">
+                        <label>{{__("İstemci")}}</label>
+                        <input type="text" id="subjectKeyIdentifier" readonly class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>{{__("Otorite")}}</label>
+                        <input type="text" id="authorityKeyIdentifier" readonly class="form-control">
+                    </div>
+                  </div>
+                </div>
+            </div>
+        <div class="col-md-4">
             <div class="box box-solid">
               <div class="box-header with-border">
                 <h3 class="box-title">{{__("Geçerlilik Tarihi")}}</h3>
@@ -55,23 +72,6 @@
                 <div class="form-group">
                     <label>{{__("Bitiş Tarihi")}}</label>
                     <input type="text" id="validTo" readonly class="form-control">
-                </div>
-              </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="box box-solid">
-              <div class="box-header with-border">
-                <h3 class="box-title">{{__("Parmak İzleri")}}</h3>
-              </div>
-              <div class="box-body clearfix">
-                <div class="form-group">
-                    <label>{{__("subjectKeyIdentifier")}}</label>
-                    <input type="text" id="subjectKeyIdentifier" readonly class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>{{__("authorityKeyIdentifier")}}</label>
-                    <input type="text" id="authorityKeyIdentifier" readonly class="form-control">
                 </div>
               </div>
             </div>
