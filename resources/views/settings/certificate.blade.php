@@ -8,43 +8,89 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Sertifika Ekle")}}</li>
         </ol>
     </nav>
-    <h3>{{__("Sisteme Sertifika Ekleme")}}</h3>
-    <small>{{__("Not : Eklediğiniz sertifika işletim sistemi tarafından güvenilecektir.")}}</small>
+    <h3>{{__("Sisteme SSL Sertifikası Ekleme")}}</h3>
     @if(request('server_id'))
         <h5>{{server()->name . " " . __("sunucusu talebi.")}}</h5>
     @endif
     <table class="notDataTable">
-        <style>
-            td{
-                padding: 5px;
-            }
-        </style>
         <tr>
             <td>{{__("Hostname")}}</td>
             <td><input type="text" name="hostname" class="form-control" id="hostname" value="{{request('hostname')}}"></td>
-            <td><b>{{__("Otomatik")}}</b></td>
-            <td rowspan="2">{{__("veya")}}</td>
-            <td><b>{{__("Dosyadan Oku")}}</b></td>
         </tr>
         <tr>
             <td>{{__("Port")}}</td>
             <td><input type="number" name="port" class="form-control" aria-valuemin="1" aria-valuemax="65555" id="port" value="{{request('port')}}"></td>
             <td><button onclick="retrieveCertificate()" class="btn btn-success">{{__("Al")}}</button></td>
-            <td><input id="certificateUpload" type="file" class="form-control"></td>
         </tr>
     </table>
-    <pre id="output" style="display: none"></pre>
-    <button class="btn btn-success" onclick="verifyCertificate()" id="addButton" style="display:none;">{{__("Sertifikayı Onayla")}}</button>
+    <h3>{{__("Sertifika Bilgileri")}}</h3>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="box box-solid">
+              <div class="box-header with-border">
+                <h3 class="box-title">{{__("İmzalayan")}}</h3>
+              </div>
+              <div class="box-body clearfix">
+                <div class="form-group">
+                    <label>{{__("İstemci")}}</label>
+                    <input type="text" id="issuerCN" readonly class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>{{__("Otorite")}}</label>
+                    <input type="text" id="issuerDN" readonly class="form-control">
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="box box-solid">
+              <div class="box-header with-border">
+                <h3 class="box-title">{{__("Geçerlilik Tarihi")}}</h3>
+              </div>
+              <div class="box-body clearfix">
+                <div class="form-group">
+                    <label>{{__("Başlangıç Tarihi")}}</label>
+                    <input type="text" id="validFrom" readonly class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>{{__("Bitiş Tarihi")}}</label>
+                    <input type="text" id="validTo" readonly class="form-control">
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="box box-solid">
+              <div class="box-header with-border">
+                <h3 class="box-title">{{__("Parmak İzleri")}}</h3>
+              </div>
+              <div class="box-body clearfix">
+                <div class="form-group">
+                    <label>{{__("subjectKeyIdentifier")}}</label>
+                    <input type="text" id="subjectKeyIdentifier" readonly class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>{{__("authorityKeyIdentifier")}}</label>
+                    <input type="text" id="authorityKeyIdentifier" readonly class="form-control">
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="row">
+            <div class="col-md-4">
+                <div class="box box-solid">
+                <div class="box-header with-border">
+                    <h3 class="box-title">{{__("Sertifikayı Onayla")}}</h3>
+                </div>
+                <div class="box-body clearfix">
+                    <span>{{__("Not : Eklediğiniz sertifika işletim sistemi tarafından güvenilecektir.")}}</span><br><br>
+                    <button class="btn btn-success" onclick="verifyCertificate()" id="addButton" disabled>{{__("Sertifikayı Onayla")}}</button>
+                </div>
+            </div>
+      </div>
     <script>
-        document.getElementById('certificateUpload').addEventListener("change",function () {
-            let reader = new FileReader();
-            reader.addEventListener('load',function (e) {
-                $("#output").text(e.target.result).fadeIn(0);
-                $("#addButton").fadeIn(0);
-            });
-            reader.readAsBinaryString(this.files[0]);
-        });
-
+        let path = "";
         function retrieveCertificate() {
             Swal.fire({
                 position: 'center',
@@ -57,10 +103,15 @@
             form.append('hostname',$("#hostname").val());
             form.append('port',$("#port").val());
             request('{{route('certificate_request')}}',form,function (success) {
-                let json = JSON.parse(success);
-                $("#output").text(json["message"]).fadeIn(0);
-                Swal.close();
-                $("#addButton").fadeIn(0);
+                let json = JSON.parse(success)["message"];
+                $("#issuerCN").val(json["issuer"]["CN"]);
+                $("#issuerDN").val(json["issuer"]["DC"].reverse().join('.'));
+                $("#validFrom").val(json["validFrom_time_t"]);
+                $("#validTo").val(json["validTo_time_t"]);
+                $("#authorityKeyIdentifier").val(json["authorityKeyIdentifier"]);
+                $("#subjectKeyIdentifier").val(json["subjectKeyIdentifier"]);
+                $("#addButton").prop('disabled',false);
+                path = json["path"];
             },function (errors) {
                 let json = JSON.parse(errors);
                 Swal.fire({
@@ -84,7 +135,7 @@
                 allowOutsideClick : false,
             });
             let form = new FormData();
-            form.append('certificate',$("#output").text());
+            form.append('path',path);
             form.append('server_hostname',$("#hostname").val());
             form.append('origin',$("#port").val());
             form.append('notification_id','{{request('notification_id')}}');

@@ -109,10 +109,6 @@ class HomeController extends Controller
 
     public function test()
     {
-        foreach(user()->favorites() as $server){
-            dump($server);
-            dump($server->extensions());
-        }
     }
 
 }
