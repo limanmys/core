@@ -122,7 +122,18 @@
             }, 1000);
             return false;
         }
-
+        $("#extensionUpload input").on('change',function(){
+            if(this.files[0].size / 1024 / 1024 > 100){
+                $(this).val('');
+                Swal.fire({
+                    position: 'center',
+                    type: 'error',
+                    title: '{{__("Maksimum eklenti boyutunu (100MB) aştınız!")}}',
+                    showConfirmButton: false,
+                });
+            }
+        });
+        
         function downloadDebFile(form){
             window.location.assign('/indir/eklenti_deb/' + form.getElementsByTagName('select')[0].value);
             setTimeout(function(){
