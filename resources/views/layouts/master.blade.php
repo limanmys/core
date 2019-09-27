@@ -56,7 +56,7 @@
                 $('.ext_nav:hidden').show();
             }
         });
-        $('form, input, select').attr('autocomplete', 'liman')
+        $('form, input, select').attr('autocomplete', 'new-password');
     };
 </script>
 </html>
