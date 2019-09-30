@@ -104,8 +104,12 @@
             form.append('port',$("#port").val());
             request('{{route('certificate_request')}}',form,function (success) {
                 let json = JSON.parse(success)["message"];
-                $("#issuerCN").val(json["issuer"]["CN"]);
-                $("#issuerDN").val(json["issuer"]["DC"].reverse().join('.'));
+                if(json["issuer"]["DC"]){
+                    $("#issuerCN").val(json["issuer"]["CN"]);
+                }
+                if(json["issuer"]["DC"]){
+                    $("#issuerDN").val(json["issuer"]["DC"].reverse().join('.'));
+                }
                 $("#validFrom").val(json["validFrom_time_t"]);
                 $("#validTo").val(json["validTo_time_t"]);
                 $("#authorityKeyIdentifier").val(json["authorityKeyIdentifier"]);

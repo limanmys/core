@@ -80,8 +80,8 @@ class MainController extends Controller
         $cert = stream_context_get_params($read);
         $certinfo = openssl_x509_parse($cert['options']['ssl']['peer_certificate']);
         openssl_x509_export($cert["options"]["ssl"]["peer_certificate"],$publicKey);
-        $certinfo["subjectKeyIdentifier"] = $certinfo["extensions"]["subjectKeyIdentifier"];
-        $certinfo["authorityKeyIdentifier"] = substr($certinfo["extensions"]["authorityKeyIdentifier"],6);
+        $certinfo["subjectKeyIdentifier"] = array_key_exists("subjectKeyIdentifier",$certinfo["extensions"]) ? $certinfo["extensions"]["subjectKeyIdentifier"]: "";
+        $certinfo["authorityKeyIdentifier"] = array_key_exists("authorityKeyIdentifier",$certinfo["extensions"]) ? substr($certinfo["extensions"]["authorityKeyIdentifier"],6): "";
         $certinfo["validFrom_time_t"] = Carbon::createFromTimestamp($certinfo["validFrom_time_t"])->format('H:i d/m/Y');
         $certinfo["validTo_time_t"] = Carbon::createFromTimestamp($certinfo["validTo_time_t"])->format('H:i d/m/Y');
         unset($certinfo["extensions"]);
