@@ -56,7 +56,10 @@
                 $('.ext_nav:hidden').show();
             }
         });
-        $('form, input, select').attr('autocomplete', 'new-password');
+        $('form, input, select').attr('readonly', 'true');
+        $('form, input, select').focusin(function() {
+            this.removeAttribute('readonly');
+        });
     };
 </script>
 </html>
