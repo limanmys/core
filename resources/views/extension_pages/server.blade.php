@@ -26,15 +26,11 @@
 <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
         @foreach (server()->extensions() as $extension)
-            @if(request('extension_id') == $extension->id)
-                <li class="active"><a onclick="return" data-toggle="tab" aria-expanded="true">{{$extension->name}}</a></li>
-            @else
-                <li><a onclick="location.href = '{{route('extension_server',[
-                    'extension_id' => $extension->id,
-                    'city' => server()->city,
-                    'server_id' => server()->id
-                ])}}'" aria-expanded="false">{{$extension->name}}</a>
-            @endif
+            <li @if(request('extension_id') == $extension->id) class="active" @endif><a onclick="location.href = '{{route('extension_server',[
+                'extension_id' => $extension->id,
+                'city' => server()->city,
+                'server_id' => server()->id
+            ])}}'" aria-expanded="false">{{$extension->name}}</a>
         @endforeach
         </ul>
     <div class="tab-content">
