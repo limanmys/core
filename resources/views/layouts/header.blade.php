@@ -2,8 +2,8 @@
                 <a href="/" class="logo">
                     <span class="logo-mini"><img src="/images/liman_logo_white.png" alt="logo" height="35px"
                             style="margin-top:5px"></span>
-                    <span class="logo-lg"><img src="/images/liman_logo_white.png" alt="logo" height="35px"
-                            style="float: left;margin-top:5px"><b style="margin-left:-130px;">{{__("man")}}</b></span>
+                    <span class="logo-lg" style="text-align: initial;"><img src="/images/liman_logo_white.png" alt="logo" height="35px"
+                            style="float: left;margin-top:5px"><b style="margin-left:5px;">{{__("man")}}</b></span>
                 </a>
                 <!-- Header Navbar -->
                 <nav class="navbar navbar-static-top" role="navigation">
