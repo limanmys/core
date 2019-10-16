@@ -38,7 +38,7 @@ class LoginController extends Controller
     }
 
     public function attemptLogin(Request $request)
-    {
+    {   
         $flag =  $this->guard()->attempt(
             $this->credentials($request), $request->filled('remember')
         );
@@ -46,5 +46,17 @@ class LoginController extends Controller
             system_log(5,"LOGIN_FAILED");
         }
         return $flag;
+    }
+
+    protected function validateLogin(Request $request)
+    {
+        $request->request->add([
+            $this->username() => $request->liman_email_mert,
+            "password" => $request->liman_password_baran
+        ]);
+        $request->validate([
+            $this->username() => 'required|string',
+            'password' => 'required|string|min:10|max:32|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/',
+        ]);
     }
 }
