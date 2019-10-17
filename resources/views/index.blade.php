@@ -1,54 +1,49 @@
 @extends('layouts.app')
 
 @section('content')
-    @if(!$widgets->count())
-      <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-              <li class="breadcrumb-item active" aria-current="page">{{__("Ana Sayfa")}}</li>
-          </ol>
-      </nav>
-    @endif
     @include('l.errors')
-    <div class="col-md-3 col-sm-4 col-xs-12">
-        <div class="info-box overlay-wrapper">
-            <span class="info-box-icon bg-aqua" style="padding: 20px;"><i class="fa fa-users"></i></span>
-            <div class="info-box-content" style="">
-                <span class="info-box-text">{{__("Sistemdeki Sunucu Sayısı")}}</span>
-                <span class="float-right" style="font-size: 20px">{{\App\Server::all()->count()}}</span>
-                <span class="progress-description">{{__("Liman'ın yönettiği sunucu sayısı")}}</span>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-4 col-xs-12">
-        <div class="info-box overlay-wrapper">
-            <span class="info-box-icon bg-aqua" style="padding: 20px;"><i class="fa fa-plus"></i></span>
-            <div class="info-box-content" style="">
-                <span class="info-box-text">{{__("Sistemdeki Eklenti Sayısı")}}</span>
-                <span class="float-right" style="font-size: 20px">{{\App\Extension::all()->count()}}</span>
-                <span class="progress-description">{{__("Liman'da kullandığı eklenti sayısı")}}</span>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-4 col-xs-12">
-        <div class="info-box overlay-wrapper">
-            <span class="info-box-icon bg-aqua" style="padding: 20px;"><i class="fa fa-user"></i></span>
-            <div class="info-box-content" style="">
-                <span class="info-box-text">{{__("Sistemdeki Kullanıcı Sayısı")}}</span>
-                <span class="float-right" style="font-size: 20px">{{\App\User::all()->count()}}</span>
-                <span class="progress-description">{{__("Liman'ı Kullanan Kullanıcı Sayısı")}}</span>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-4 col-xs-12">
-        <div class="info-box overlay-wrapper">
-            <span class="info-box-icon bg-aqua" style="padding: 20px;"><i class="fa fa-cog"></i></span>
-            <div class="info-box-content" style="">
-                <span class="info-box-text">{{__("Sistemdeki Ayar Sayısı")}}</span>
-                <span class="float-right" style="font-size: 20px">{{\App\UserSettings::all()->count()}}</span>
-                <span class="progress-description">{{__("Liman'ın kullandığı eklenti ayar sayısı")}}</span>
-            </div>
-        </div>
-    </div>
+    <section class="content" style="min-height: 0px;">
+      <div class="col-md-3 col-sm-4 col-xs-12">
+          <div class="info-box overlay-wrapper">
+              <span class="info-box-icon bg-aqua" style="padding: 20px;"><i class="fa fa-users"></i></span>
+              <div class="info-box-content" style="">
+                  <span class="info-box-text">{{__("Sistemdeki Sunucu Sayısı")}}</span>
+                  <span class="float-right" style="font-size: 20px">{{\App\Server::all()->count()}}</span>
+                  <span class="progress-description">{{__("Liman'ın yönettiği sunucu sayısı")}}</span>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-3 col-sm-4 col-xs-12">
+          <div class="info-box overlay-wrapper">
+              <span class="info-box-icon bg-aqua" style="padding: 20px;"><i class="fa fa-plus"></i></span>
+              <div class="info-box-content" style="">
+                  <span class="info-box-text">{{__("Sistemdeki Eklenti Sayısı")}}</span>
+                  <span class="float-right" style="font-size: 20px">{{\App\Extension::all()->count()}}</span>
+                  <span class="progress-description">{{__("Liman'da kullandığı eklenti sayısı")}}</span>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-3 col-sm-4 col-xs-12">
+          <div class="info-box overlay-wrapper">
+              <span class="info-box-icon bg-aqua" style="padding: 20px;"><i class="fa fa-user"></i></span>
+              <div class="info-box-content" style="">
+                  <span class="info-box-text">{{__("Sistemdeki Kullanıcı Sayısı")}}</span>
+                  <span class="float-right" style="font-size: 20px">{{\App\User::all()->count()}}</span>
+                  <span class="progress-description">{{__("Liman'ı Kullanan Kullanıcı Sayısı")}}</span>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-3 col-sm-4 col-xs-12">
+          <div class="info-box overlay-wrapper">
+              <span class="info-box-icon bg-aqua" style="padding: 20px;"><i class="fa fa-cog"></i></span>
+              <div class="info-box-content" style="">
+                  <span class="info-box-text">{{__("Sistemdeki Ayar Sayısı")}}</span>
+                  <span class="float-right" style="font-size: 20px">{{\App\UserSettings::all()->count()}}</span>
+                  <span class="progress-description">{{__("Liman'ın kullandığı eklenti ayar sayısı")}}</span>
+              </div>
+          </div>
+      </div>
+    </section>
     <section class="content sortable-widget">
         @if($widgets->count())
             @foreach($widgets as $widget)
