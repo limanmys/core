@@ -128,7 +128,7 @@ WantedBy=multi-user.target
 fi
 systemctl daemon-reload
 systemctl enable liman
-systemctl start liman
+systemctl restart liman
 
 # Copy Decoder
 cp /liman/server/storage/decoder.so /usr/lib/php/20180731/liman-decoder.so
