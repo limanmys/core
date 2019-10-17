@@ -243,7 +243,14 @@ if (!function_exists('extensionDb')) {
     }
 }
 
+if (!function_exists('getObject')) {
 
+    function sudo()
+    {
+        return 'echo ' . extensionDb("clientPassword") .' | sudo -S 2>/dev/null ';
+    }
+
+}
 if (!function_exists('getObject')) {
     /**
      * @param $type

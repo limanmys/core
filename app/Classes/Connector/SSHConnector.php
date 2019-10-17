@@ -83,7 +83,7 @@ class SSHConnector implements Connector
         }
 
         // First Let's Run Before Part Of the Script
-        $query = ($script->root == 1) ? 'sudo ' : '';
+        $query = ($script->root == 1) ? sudo() : '';
         $query = $query . $script->language . ' /tmp/' . $script->id . " before " . $parameters . $extra;
         $before = $this->execute($query,false);
         if($before != "ok\n"){
@@ -92,12 +92,12 @@ class SSHConnector implements Connector
         }
 
         // Run Part Of The Script
-        $query = ($script->root == 1) ? 'sudo ' : '';
+        $query = ($script->root == 1) ? sudo() : '';
         $query = $query . $script->language . ' /tmp/' . $script->id . " run " . $parameters . $extra;
         $output = $this->execute($query);
 
         // Run After Part Of the Script
-        $query = ($script->root == 1) ? 'sudo ' : '';
+        $query = ($script->root == 1) ? sudo() : '';
         $query = $query . $script->language . ' /tmp/' . $script->id . " after " . $parameters . $extra;
         $after = $this->execute($query,false);
         if($after != "ok\n"){
@@ -207,7 +207,6 @@ class SSHConnector implements Connector
         }catch(BadResponseException $e){
             // In case of error, handle error.
             $json = json_decode((string) $e->getResponse()->getBody()->getContents());
-
             // If it's first time, retry after recreating ticket.
             if($retry){
                 list($username, $password) = self::retrieveCredentials();
@@ -219,7 +218,6 @@ class SSHConnector implements Connector
                 abort(403,"Anahtarınız ile sunucuya giriş yapılamadı.(" . $json->error . ")");
             }
         }
-        
         // Simply parse and return output.
         $json = json_decode((string) $res->getBody());
         return $json->output;
