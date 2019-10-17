@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Permission;
 use App\User;
+use App\UserSettings;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -98,7 +99,7 @@ class UserController extends Controller
         try{
             $flag->validate();
         }catch (\Exception $exception){
-            return respond("Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı ve özel karakter içermelidir.",201);
+            return respond("Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.",201);
         }
 
         auth()->user()->update([
@@ -146,7 +147,25 @@ class UserController extends Controller
         if($flag){
             return respond("Başarıyla silindi",200);
         }else{
-            return respond("Başarıyla silinemedi",201);
+            return respond("Silinemedi",201);
+        }
+    }
+
+    public function updateSetting()
+    {
+        $setting = UserSettings::where("id",request("setting_id"))->first();
+        if(!$setting){
+            return respond("Ayar bulunamadi",201);
+        }
+        $encKey = env('APP_KEY') . $setting->user_id . $setting->server_id;
+        $encrypted = openssl_encrypt(Str::random(16) . base64_encode(request('new_value')),'aes-256-cfb8',$encKey,0,Str::random(16));
+        $flag = $setting->update([
+            "value" => $encrypted
+        ]);
+        if($flag){
+            return respond("Başarıyla Güncellendi",200);
+        }else{
+            return respond("Güncellenemedi",201);
         }
     }
 
@@ -169,7 +188,7 @@ class UserController extends Controller
             $flag->validate();
         }catch (\Exception $exception){
             return redirect()->route('password_change')->withErrors([
-                "message" => "Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı ve özel karakter içermelidir."
+                "message" => "Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir."
             ]);
         }
 

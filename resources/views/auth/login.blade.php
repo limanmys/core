@@ -5,7 +5,7 @@
 @section('body')
     <div class="login-box">
         <div class="login-logo">
-            <a href="{{ route('login') }}"><b>Liman</b></a>
+            <a href="{{ route('login') }}"><b>Liman MYS</b></a>
         </div>
         <!-- /.login-logo -->
         <div class="login-box-body">
@@ -35,11 +35,6 @@
                     <input type="password" name="password" class="form-control"
                            placeholder="{{__("Parola")}}" required>
                     <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-                    @if ($errors->has('password'))
-                        <span class="help-block">
-                            <strong>{{__("Giriş Yapılamadı.")}}</strong>
-                        </span>
-                    @endif
                 </div>
                 <div class="row">
                     <div class="col-xs-7" style="margin-left:20px;margin-right: 8px;">

@@ -110,7 +110,7 @@
                                     <p>{{__("Liman üzerindeki sunucuların eklentileri servisler üzerinden kullanabileceğiniz gibi, bazı eklentileri sunucuya bağlantı kurmadan kullanamazsınız.")}}</p>
                                     <p>{{__("Bu sebeple, bir anahtar eklemek istiyorsanız öncelikle konuşma protokolünü seçin.")}}</p>
                                     <label>
-                                        <input id="useKey" type="checkbox" onchange="keySettingsChanged()">
+                                        <input id="useKey" type="checkbox" onchange="keySettingsChanged()" checked>
                                         {{__("Bir Anahtar Kullanmak İstiyorum")}}
                                     </label>
                                     <div id="keyDiv" style="display: none;">
@@ -314,7 +314,7 @@
                 $('#keyDiv').find('input, select').prop('disabled', true);
             }
         }
-
+        keySettingsChanged();
         function details(element) {
             let server_id = element.querySelector('#server_id').innerHTML;
             window.location.href = "/sunucular/" + server_id

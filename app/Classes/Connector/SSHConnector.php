@@ -2,11 +2,11 @@
 
 namespace App\Classes\Connector;
 
-use App\Key;
-use App\ServerLog;
 use phpseclib\Crypt\RSA;
 use phpseclib\Net\SFTP;
-use phpseclib\Net\SSH2;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+use App\UserSettings;
 
 /**
  * Class SSHConnector
@@ -23,6 +23,7 @@ class SSHConnector implements Connector
     protected $key;
     protected $user_id;
     protected $username;
+
     /**
      * SSHConnector constructor.
      * @param \App\Server $server
@@ -30,31 +31,13 @@ class SSHConnector implements Connector
      */
     public function __construct(\App\Server $server, $user_id)
     {
-        ($key = Key::where([
-            "user_id" => $user_id,
-            "server_id" => $server->id
-        ])->first()) || abort(504,"SSH Anahtarınız yok.");
-       try{
-           $ssh = new SSH2($server->ip_address, 22);
-       }catch (\Exception $exception){
-            abort(504,"Sunucuya Bağlanılamadı, " . $exception->getMessage());
-       }
-        $this->user_id = $user_id;
-        $this->username = $key->username;
-        $rsa = new RSA();
-        $rsa->password = env("APP_KEY") . $user_id;
-        $rsa->loadKey(file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $user_id));
-        try{
-            if(!$ssh->login($key->username,$rsa)){
-                abort(504,"Anahtarınız ile giriş yapılamadı.");
-            }
-        }catch (\Exception $exception){
-            abort(504,"Sunucuya Bağlanılamadı, " . $exception->getMessage());
+        $ip_address = str_replace(".", "_", $server->ip_address);
+        if (!session($ip_address)) {
+            list($username, $password) = self::retrieveCredentials();
+            self::init($username, $password, $server->ip_address);
         }
 
-        $this->ssh = $ssh;
-        $this->key = $key;
-        $this->server = $server;
+        return true;
     }
 
     /**
@@ -62,19 +45,17 @@ class SSHConnector implements Connector
      */
     public function __destruct()
     {
-        if($this->ssh){
-            $this->ssh->disconnect();
-        }
     }
 
 
     public function execute($command,$flag = true)
     {
-        $output = $this->ssh->exec($command);
-        if($flag){
-//            ServerLog::new($command,$output, $this->server->id,$this->user_id);
-        }
-        return $output;
+        // Make IP Session Safe
+        $ip_address = str_replace(".", "_", server()->ip_address);
+        return self::request('run',[
+            "token" => session($ip_address),
+            "command" => $command
+        ]);
     }
 
     /**
@@ -147,22 +128,11 @@ class SSHConnector implements Connector
 
     public static function verify($ip_address, $username, $password,$port)
     {
-        try{
-            $ssh = new SSH2($ip_address, $port);
-        }catch (\Exception $exception){
-            return respond("Sunucuya bağlanılamadı",201);
+        $token = self::init($username, $password, $ip_address);
+        if ($token) {
+            return respond("Kullanıcı adı ve şifre doğrulandı.", 200);
         }
-        $flag = false;
-        try{
-            $flag = $ssh->login($username,$password);
-        }catch (\Exception $exception){
-            return respond("Bu Kullanıcı adı ve şifre ile bağlanılamadı.",201);
-        }
-        if($flag){
-            return respond("Kullanıcı adı ve şifre doğrulandı.",200);
-        }else{
-            return respond("Bu Kullanıcı adı ve şifre ile bağlanılamadı.",201);
-        }
+        return respond("Bu Kullanıcı adı ve şifre ile bağlanılamadı.", 201);
     }
 
     /**
@@ -172,14 +142,14 @@ class SSHConnector implements Connector
      */
     public function receiveFile($localPath, $remotePath)
     {
-        $sftp = new SFTP($this->server->ip_address, 22);
-        $key = new RSA();
-        $key->password = env("APP_KEY") . $this->user_id;
-        $key->loadKey(file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $this->user_id));
-        if(!$sftp->login($this->username,$key)){
-            abort(504,"Anahtar Hatası");
-        }
-        return $sftp->get($remotePath, $localPath);
+        // $sftp = new SFTP($this->server->ip_address, 22);
+        // $key = new RSA();
+        // $key->password = env("APP_KEY") . $this->user_id;
+        // $key->loadKey(file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $this->user_id));
+        // if(!$sftp->login($this->username,$key)){
+        //     abort(504,"Anahtar Hatası");
+        // }
+        // return $sftp->get($remotePath, $localPath);
     }
 
     /**
@@ -192,65 +162,102 @@ class SSHConnector implements Connector
      */
     public static function create(\App\Server $server, $username, $password, $user_id,$key)
     {
-        if(!is_file(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $user_id)){
-            $rsa = new RSA();
-            $rsa->password = env("APP_KEY") . $user_id;
-            $rsa->comment = "liman";
-            $rsa->setPublicKeyFormat(RSA::PUBLIC_FORMAT_OPENSSH);
-            $keys = $rsa->createKey(4096);
-            file_put_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $user_id, $keys["privatekey"]);
-            file_put_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $user_id . ".pub", $keys["publickey"]);
-        }else{
-            $keys["publickey"] = file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $user_id . ".pub");
+        $token = self::init($username, $password, $server->ip_address);
+        if ($token) {
+            return "OK";
+        } else {
+            return "NO";
         }
+    }
+
+    public static function retrieveCredentials()
+    {
+        $username = UserSettings::where([
+            'user_id' => user()->id,
+            'server_id' => server()->id,
+            'name' => 'clientUsername'
+        ])->first();
+        $password = UserSettings::where([
+            'user_id' => user()->id,
+            'server_id' => server()->id,
+            'name' => 'clientPassword'
+        ])->first();
+
+        if (!$username || !$password) {
+            abort(504, "Bu sunucu için WinRM anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.");
+        }
+
+        $key = env('APP_KEY') . user()->id . server()->id;
+        $decrypted = openssl_decrypt($username["value"], 'aes-256-cfb8', $key);
+        $stringToDecode = substr($decrypted, 16);
+        $username = base64_decode($stringToDecode);
+
+        $key = env('APP_KEY') . user()->id . server()->id;
+        $decrypted = openssl_decrypt($password["value"], 'aes-256-cfb8', $key);
+        $stringToDecode = substr($decrypted, 16);
+        $password = base64_decode($stringToDecode);
+        return [$username, $password];
+    }
+
+    public static function request($url, $params,$retry = 3)
+    { 
+        // First, format ip adress.
+        $ip_address = str_replace(".", "_", server()->ip_address);
+        // If Session doesn't have token, create one.
+        if (!session($ip_address)) {
+            // Retrieve Credentials
+            list($username, $password) = self::retrieveCredentials();
+
+            // Execute Init
+            self::init($username, $password, server()->ip_address);
+        }
+        // Create Guzzle Object.
+        $client = new Client();
+        // Make Request.
         try{
-            $ssh = new SSH2($server->ip_address, 22);
-        }catch (\Exception $exception){
-            return __("Sunucuya bağlanılamadı");
-        }
+            $params["token"] = session($ip_address);
+            $res = $client->request('POST', env("LIMAN_CONNECTOR_SERVER"). '/' . $url, ["form_params" => $params]);
+        }catch(BadResponseException $e){
+            // In case of error, handle error.
+            $json = json_decode((string) $e->getResponse()->getBody()->getContents());
 
-        $flag = $ssh->login($username,$password);
-
-        if(!$flag){
-            return __("Bu Kullanıcı Adı ve Şifre ile Giriş Yapılamadı.");
-        }
-
-        $query = 'sudo -S <<< "' . $password. '"';
-
-        $ssh->exec($query . ' useradd -m liman');
-        $flag = $ssh->exec('[ -d "/home/liman" ] && echo "OK"');
-        if($flag != "OK\n"){
-            $ssh->exec($query . ' mkdir -p /home/liman');
-            $flag = $ssh->exec('[ -d "/home/liman" ] && echo "OK"');
-            if($flag != "OK\n"){
-                return __("Liman Kullanıcısı Eklenemedi.");
+            // If it's first time, retry after recreating ticket.
+            if($retry){
+                list($username, $password) = self::retrieveCredentials();
+                self::init($username, $password, server()->ip_address);
+                self::request($url,$params,$retry -1 );
+                return;
+            }else{
+                // If nothing works, abort.
+                abort(403,"Anahtarınız ile sunucuya giriş yapılamadı.(" . $json->error . ")");
             }
         }
+        
+        // Simply parse and return output.
+        $json = json_decode((string) $res->getBody());
+        return $json->output;
+    }
 
-        $ssh->exec($query . ' mkdir -p /home/liman/.ssh');
-        $flag = $ssh->exec('[ -d "/home/liman/.ssh" ] && echo "OK"');
-        if($flag != "OK\n"){
-            return __("Gerekli klasör oluşturulamadı.");
+    public static function init($username, $password, $hostname)
+    {
+        $client = new Client();
+        $res = $client->request('POST', env('LIMAN_CONNECTOR_SERVER') . '/new', [
+            'form_params' => [
+                "username" => $username,
+                "password" => $password,
+                "hostname" => $hostname,
+                "connection_type" => "ssh"
+            ],
+            'timeout' => 5
+        ]);
+        $json = json_decode((string) $res->getBody());
+        //Escape For . character in session.
+        $hostname = str_replace(".", "_", $hostname);
+        if (auth() && auth()->user()) {
+            session()->put([
+                $hostname => $json->token
+            ]);
         }
-
-        $ssh->exec($query . ' touch /home/liman/.ssh/authorized_keys');
-        $flag = $ssh->exec('[ -e "/home/liman/.ssh" ] && echo "OK"');
-        if($flag != "OK\n"){
-            return __("Gerekli dosya oluşturulamadı.");
-        }
-
-        $ssh->exec('sudo -S sh -c "echo \'' . $keys["publickey"] .'\' >> /home/liman/.ssh/authorized_keys " <<< "' . $password .'"');
-        $ssh->exec('sudo -S <<< "' . $password . '" passwd -l liman');
-        $ssh->exec('sudo -S sh -c "echo \'liman  ALL=(ALL:ALL) NOPASSWD:ALL\' >> /etc/sudoers " <<< "' . $password .'"');
-        $ssh->disconnect();
-
-        $key->username = "liman";
-        $key->save();
-        try{
-            new SSHConnector($server, $user_id);
-        }catch (\Exception $exception){
-            return __("Anahtar eklendi fakat giriş yapılamadı, lütfen yönetime bildiriniz.");
-        }
-        return "OK";
+        return $json->token;
     }
 }

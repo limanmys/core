@@ -21,10 +21,10 @@
                 <h3>{{__("Eski Parola")}}</h3>
                 <input type="password" class="form-control" name="old_password" required minlength="10" maxlength="32">
                 <h3>{{__("Parola")}}</h3>
-                <small>{{__("Parolanız minimum 10 karakter uzunluğunda olmalı ve en az 1 sayı ve özel karakter içermelidir.")}}</small>
+                <small>{{__("Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.")}}</small>
                 <input type="password" class="form-control" name="password" required minlength="10" maxlength="32">
                 <h3>{{__("Parola Onayı")}}</h3>
-                <small>{{__("Parolanız minimum 10 karakter uzunluğunda olmalı ve en az 1 sayı ve özel karakter içermelidir.")}}</small>
+                <small>{{__("Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.")}}</small>
                 <input type="password" class="form-control" name="password_confirmation" required minlength="10" maxlength="32"><br>
                 <button class="btn btn-success btn-lg" type="submit">{{__("Kaydet")}}</button>
             </form>

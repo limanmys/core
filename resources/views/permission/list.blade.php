@@ -7,7 +7,6 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Yetki Talepleri")}}</li>
         </ol>
     </nav>
-<button class="btn btn-success" onclick="history.back()">{{__("Geri Dön")}}</button><br><br>
 @include('l.errors')    
 @include('l.table',[
         "value" => $requests,

@@ -19,7 +19,6 @@
             </li>
             <li class=""><a href="#server" data-toggle="tab" aria-expanded="false">{{__("Sunucu Yetkileri")}}</a></li>
             <li class=""><a href="#function" data-toggle="tab" aria-expanded="false">{{__("Fonksiyon Yetkileri")}}</a></li>
-            <li class=""><a href="#liman" data-toggle="tab" aria-expanded="false">{{__("Liman Yetkileri")}}</a></li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="general" style="height: 300px;">

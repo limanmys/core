@@ -98,6 +98,8 @@ Route::post('/profil','UserController@selfUpdate')->name('profile_update');
 Route::post('/user/update','UserController@adminUpdate')->name('update_user')->middleware('admin');
 
 Route::post('/user/setting/delete','UserController@removeSetting')->name('user_setting_remove');
+
+Route::post('/user/setting/update','UserController@updateSetting')->name('user_setting_update');
 });
 
 Route::post('/lmn/private/extensionApi','Extension\OneController@internalExtensionApi');

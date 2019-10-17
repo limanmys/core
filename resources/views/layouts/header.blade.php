@@ -82,7 +82,9 @@
 
                     <ul class="sidebar-menu" data-widget="tree">
                         <!-- Sidebar Menu -->
+                        @if(count($USER_FAVORITES))
                         <li class="header">{{__("Favori Sunucular")}}</li>
+                        @endif
                         @foreach ($USER_FAVORITES as $server)
                             <li class="treeview @if(request('server_id') == $server->id) menu-open @endif">
                             <a href="#">

@@ -26,6 +26,9 @@
                     ])}}" method="POST">
         @csrf
         @foreach($extension["database"] as $item)
+            @if($item["variable"] == "clientUsername" || $item["variable"] == "clientPassword")
+                @continue
+            @endif
             @if($item["variable"] == "certificate")
                 <h5>{{$item["name"]}}</h5>
                 <textarea name="certificate" cols="30" rows="10" class="form-control" required></textarea><br>

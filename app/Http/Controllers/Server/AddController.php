@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Server;
 
 use App\AdminNotification;
 use App\Certificate;
+use App\Classes\Connector\SSHConnector;
 use App\Classes\Connector\WinRMConnector;
 use App\Http\Controllers\Controller;
 use App\Key;
@@ -13,6 +14,7 @@ use App\Server;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Notification;
+use App\UserSettings;
 
 class AddController extends Controller
 {
@@ -55,6 +57,23 @@ class AddController extends Controller
         );
         // Add Server to request object to use it later.
         request()->request->add(["server" => $this->server]);
+        $encKey = env('APP_KEY') . user()->id . server()->id;
+        $encryptedUsername = openssl_encrypt(Str::random(16) . base64_encode(request('username')),'aes-256-cfb8',$encKey,0,Str::random(16));
+        $encryptedPassword = openssl_encrypt(Str::random(16) . base64_encode(request('password')),'aes-256-cfb8',$encKey,0,Str::random(16));
+        $settings = new UserSettings([
+            "server_id" => $this->server->id,
+            "user_id" => user()->id,
+            "name" => "clientUsername",
+            "value" => $encryptedUsername
+        ]);
+        $settings->save();
+        $settings = new UserSettings([
+            "server_id" => $this->server->id,
+            "user_id" => user()->id,
+            "name" => "clientPassword",
+            "value" => $encryptedPassword
+        ]);
+        $settings->save();
 
         // Run required function for specific type.
         $next = null;
@@ -84,34 +103,11 @@ class AddController extends Controller
 
     private function linux_ssh()
     {
-        $key = new Key(request()->all());
+        $flag = SSHConnector::create($this->server,request('username'), request('password'),auth()->id(),null);
 
-        $key->server_id = $this->server->id;
-        $key->user_id = auth()->user()->id;
-        $key->save();
-
-        // Create Key
-        $flag = \App\Classes\Connector\SSHConnector::create($this->server,request('username'), request('password'),auth()->id(),$key);
         if(!$flag){
             $this->server->delete();
-            $key->delete();
             return respond("SSH Hatası",400);
-        }
-
-        foreach (extensions() as $extension){
-            $script = Script::where('unique_code',strtolower($extension->name) . "_discover")->first();
-            if($script){
-                try{
-                    $output = $this->server->runScript($script,"");
-                    if($output == "YES\n"){
-                        DB::table('server_extensions')->insert([
-                            "id" => Str::uuid(),
-                            "server_id" => $this->server()->id,
-                            "extension_id" => $extension->id
-                        ]);
-                    }
-                }catch (\Exception $exception){};
-            }
         }
 
         return $this->grantPermissions();
@@ -125,17 +121,12 @@ class AddController extends Controller
         return $this->grantPermissions();
     }
 
-    private function windows_powershell(){
-        $key = new Key(request()->all());
-
-        $key->server_id = $this->server->id;
-        $key->user_id = auth()->user()->id;
-        $key->save();
-        $flag = WinRMConnector::create($this->server,request('username'), request('password'),auth()->id(),$key);
+    private function windows_powershell()
+    {
+        $flag = WinRMConnector::create($this->server,request('username'), request('password'),auth()->id(),null);
 
         if(!$flag){
             $this->server->delete();
-            $key->delete();
             return respond("WinRM Hatası",400);
         }
 
@@ -163,7 +154,7 @@ class AddController extends Controller
                 $notification->message = $this->server->ip_address . ":" . $this->server->control_port . ":" . $this->server->id;
                 $notification->level = 3;
                 $notification->save();
-                return respond("Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede sunucuya erişemezsiniz.",202);
+                // return respond("Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede sunucuya erişemezsiniz.",202);
             }
         }
         return respond(route('server_one',$this->server->id),300);

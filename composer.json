@@ -13,8 +13,9 @@
         "ext-ssh2": "*",
         "ext-xml": "*",
         "ext-zip": "*",
+        "guzzlehttp/guzzle": "^6.3",
         "icewind/smb": "^3.1",
-        "laravel/framework": "^6.0",
+        "laravel/framework": "^6.2",
         "laravel/helpers": "*",
         "phpseclib/phpseclib": "^2.0"
     },

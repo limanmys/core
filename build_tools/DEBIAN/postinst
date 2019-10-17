@@ -94,6 +94,7 @@ systemctl restart php7.3-fpm
 # Run Database Migration
 php /liman/server/artisan migrate --force
 php /liman/server/artisan cache:clear
+php /liman/server/artisan view:clear
 
 # Clear Sandbox Cache
 rm -rf /tmp/liman
@@ -105,8 +106,33 @@ chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
 chmod 700 -R /liman/server/storage/winrm/
+
 # Enable Liman
 php /liman/server/artisan up
+
+# Create Systemd Service
+if [ -f "/etc/systemd/system/liman.service" ]; then
+    echo "Liman Connector Service Already Added.";
+else
+        echo """
+[Unit]
+Description=Liman Connector Service
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/liman/server/storage/connector
+
+[Install]
+WantedBy=multi-user.target
+    """ > /etc/systemd/system/liman.service
+fi
+systemctl daemon-reload
+systemctl enable liman
+systemctl start liman
 
 #Finalize Installation
 printf "\nKurulum Başarıyla Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"

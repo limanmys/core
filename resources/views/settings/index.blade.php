@@ -15,7 +15,6 @@
             <li><a href="#certificates" data-toggle="tab" aria-expanded="false">{{__("Sertifikalar")}}</a></li>
             <li><a href="#health" onclick="checkHealth()" data-toggle="tab"
                    aria-expanded="false">{{__("Sağlık Durumu")}}</a></li>
-            <li><a href="#servers" data-toggle="tab" aria-expanded="false">{{__("Sunucu Aktifleştirme")}}</a></li>
             <li><a href="#update" data-toggle="tab" aria-expanded="false">{{__("Güncelleme")}}</a></li>
         </ul>
         <div class="tab-content">
@@ -169,6 +168,7 @@
     <script>
         function after_user_add(response) {
             let json = JSON.parse(response);
+            $("#add_user button[type='submit']").attr("disabled","true")
         }
 
         function details(row) {
@@ -201,5 +201,9 @@
                 alert("hata");
             });
         }
+
+        $('#add_user').on('shown.bs.modal', function (e) {
+            $("#add_user button[type='submit']").removeAttr("disabled");
+          })
     </script>
 @endsection

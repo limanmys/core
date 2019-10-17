@@ -275,8 +275,6 @@ class OneController extends Controller
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
 
-        auth()->loginUsingId($token->user_id);
-
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
         if (!Permission::can($token->user_id, 'server','id', $server->id)) {
             system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
@@ -631,7 +629,7 @@ class OneController extends Controller
         }
         $array = [$functions,strtolower(extension()->name),
             $viewName,$server,$extension,$extensionDb,$outputsJson,$request,$functionName,
-            $apiRoute,$navigationRoute,$token,$extension_id,$permissions, session('locale')];
+            $apiRoute,$navigationRoute,$token,$extension_id,$permissions, session('locale'),$_COOKIE["liman_session"]];
         $encrypted = openssl_encrypt(Str::random() . base64_encode(json_encode($array)),
             'aes-256-cfb8',shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
             0,Str::random());

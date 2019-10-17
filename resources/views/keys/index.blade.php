@@ -4,41 +4,18 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{__("Anahtarlar")}}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{__("Kasa")}}</li>
         </ol>
     </nav>
-    @include('l.errors')    
+    @include('l.errors')
 
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
-            <li class="active"><a href="#keys" data-toggle="tab" aria-expanded="true">{{__("Anahtarlar")}}</a></li>
-            <li><a href="#settings" data-toggle="tab" aria-expanded="false">{{__("Eklenti Ayarları")}}</a></li>
+            <li class="active"><a href="#settings" data-toggle="tab" aria-expanded="false">{{__("Kasa")}}</a></li>
         </ul>
         <div class="tab-content">
-            <div class="tab-pane active" id="keys">
-                @include('l.modal-button',[
-                    "text" => "Anahtar Ekle",
-                    "class" => "btn-success",
-                    "target_id" => "add_key"
-                ])<br><br>
-
-                @include('l.table',[
-                    "value" => $keys,
-                    "title" => [
-                        "Sunucu" , "Kullanıcı" , "*hidden*" , "*hidden*"
-                    ],
-                    "display" => [
-                        "server_name" , "username", "id:key_id" , "server_id:server_id"
-                    ],
-                    "menu" => [
-                        "Sil" => [
-                            "target" => "delete",
-                            "icon" => "fa-trash"
-                        ]
-                    ]
-                ])
-            </div>
-            <div class="tab-pane" id="settings">
+            <div class="tab-pane active" id="settings">
+                <h4>{{__("Güvenliğiniz için varolan verileriniz gösterilmemektedir.")}}</h4>
                 @include('l.table',[
                 "value" => $settings,
                     "title" => [
@@ -48,6 +25,10 @@
                         "name" , "server_name", "id:setting_id"
                     ],
                     "menu" => [
+                        "Güncelle" => [
+                            "target" => "update_settings",
+                            "icon" => "fa-edit"
+                        ],
                         "Sil" => [
                             "target" => "delete_settings",
                             "icon" => "fa-trash"
@@ -60,29 +41,16 @@
 
 
     @include('l.modal',[
-        "id"=>"add_key",
-        "title" => "Anahtar Ekle",
-        "url" => route('key_add'),
+        "id"=>"update_settings",
+        "title" => "Ayarı Güncelle",
+        "url" => route('user_setting_update'),
         "next" => "reload",
         "inputs" => [
-            "Sunucu Seçin:server_id" => $servers,
-            "Kullanıcı Adı" => "username:text",
-            "Parola" => "password:password"
+            "Yeni Değer" => "new_value:password",
+            "-:-" => "setting_id:hidden",
         ],
         "submit_text" => "Ekle"
     ])
-
-    @include('l.modal',[
-       "id"=>"delete",
-       "title" =>"Anahtarı Sil",
-       "url" => route('key_delete'),
-       "text" => "Anahtarı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-       "next" => "reload",
-       "inputs" => [
-           "Key Id:'null'" => "key_id:hidden"
-       ],
-       "submit_text" => "Sunucuyu Sil"
-   ])
 
     @include('l.modal',[
        "id"=>"delete_settings",
