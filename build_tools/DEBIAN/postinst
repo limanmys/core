@@ -2,7 +2,6 @@
 
 # Create Required Folders for Liman
 mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions}
-mkdir -p /liman/keys/{windows,linux}
 
 # User Creation
 if getent passwd liman > /dev/null 2>&1; then
@@ -107,9 +106,6 @@ chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
 chmod 700 -R /liman/server/storage/winrm/
 
-# Enable Liman
-php /liman/server/artisan up
-
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman.service" ]; then
     echo "Liman Connector Service Already Added.";
@@ -133,6 +129,9 @@ fi
 systemctl daemon-reload
 systemctl enable liman
 systemctl start liman
+
+# Enable Liman
+php /liman/server/artisan up
 
 #Finalize Installation
 printf "\nKurulum Başarıyla Tamamlandı\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
