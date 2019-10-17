@@ -19,7 +19,7 @@
         <h4>{{__("Eklenti")}}</h4>
         <select class="form-control" id="extension_id" disabled onchange="getWidgets()" required name="extension_id"></select><br>
         <h4>{{__("Widget")}}</h4>
-        <select class="form-control" id="widget_name" disabled="" required name="widget_name"></select><br>
+        <select class="form-control" id="widget_name" disabled="" name="widget_name"></select><br>
         @csrf
         <button class="btn btn-success" type="submit">{{__("Widget Ekle")}}</button>
     </form>
