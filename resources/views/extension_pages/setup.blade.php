@@ -26,7 +26,7 @@
                     ])}}" method="POST">
         @csrf
         @foreach($extension["database"] as $item)
-            @if($item["variable"] == "clientUsername" || $item["variable"] == "clientPassword")
+            @if(($item["variable"] == "clientUsername" || $item["variable"] == "clientPassword") && extensionDb($item["variable"]))
                 @continue
             @endif
             @if($item["variable"] == "certificate")
