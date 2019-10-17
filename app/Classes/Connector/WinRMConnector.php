@@ -104,30 +104,30 @@ class WinRMConnector implements Connector
 
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
-        $path = "/liman/server/storage/winrm/winrm_sendfile";
-        shell_exec("sudo chmod u+x $path");
-        $receiveFile = "$path '" . server()->ip_address . "' '"
-            . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_cert.pem' '"
-            . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->user()->id) . "'" .
-            " '$localPath' '$remotePath'";
-        shell_exec($receiveFile);
-        return true;
+        // Make IP Session Safe
+        $ip_address = str_replace(".", "_", server()->ip_address);
+        return self::request('send',[
+            "token" => session($ip_address),
+            "local_path" => $localPath,
+            "remote_path" => $remotePath
+        ]);
     }
 
     public function receiveFile($localPath, $remotePath)
     {
-        $path = "/liman/server/storage/winrm/winrm_getfile";
-        shell_exec("sudo chmod u+x $path");
-        $receiveFile = "$path '" . server()->ip_address . "' '"
-            . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_cert.pem' '"
-            . env('KEYS_PATH') . "windows" . DIRECTORY_SEPARATOR . auth()->user()->id . server()->id . "_prv.pem' '" . md5(env('APP_KEY') . auth()->user()->id) . "'" .
-            " '$remotePath' '$localPath'";
-        shell_exec($receiveFile);
-        return is_file($localPath);
+        // Make IP Session Safe
+        $ip_address = str_replace(".", "_", server()->ip_address);
+        return self::request('get',[
+            "token" => session($ip_address),
+            "local_path" => $localPath,
+            "remote_path" => $remotePath
+        ]);
     }
 
     public function runScript($script, $parameters, $extra = null)
-    { }
+    {
+        
+    }
 
     public static function verify($ip_address, $username, $password, $port)
     {

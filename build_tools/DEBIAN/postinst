@@ -130,6 +130,16 @@ systemctl daemon-reload
 systemctl enable liman
 systemctl start liman
 
+# Copy Decoder
+cp /liman/server/storage/decoder.so /usr/lib/php/20180731/liman-decoder.so
+
+# Modify ini file to use decoder.
+if grep --quiet liman-decoder.so /etc/php/7.3/cli/php.ini; then
+    echo "Decoder already enabled"; 
+else
+    echo "extension=liman-decoder.so" >> /etc/php/7.3/cli/php.ini
+fi
+
 # Enable Liman
 php /liman/server/artisan up
 

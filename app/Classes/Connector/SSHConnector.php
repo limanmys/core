@@ -77,7 +77,7 @@ class SSHConnector implements Connector
 
         $localHash = md5_file($scriptsPath);
         $remoteHash = explode(' ',substr($this->execute('md5sum ' . $remotePath,false),0 , -1))[0];
-
+        
         if($localHash != $remoteHash){
             abort(504,"Betik gönderilemedi, internet kesintisi oluşmuş veya disk dolmuş olabilir.");
         }
@@ -108,22 +108,15 @@ class SSHConnector implements Connector
         return $output;
     }
 
-    /**
-     * @param $localPath
-     * @param $remotePath
-     * @param int $permissions
-     * @return bool
-     */
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
-        $sftp = new SFTP($this->server->ip_address, 22);
-        $key = new RSA();
-        $key->password = env("APP_KEY") . $this->user_id;
-        $key->loadKey(file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $this->user_id));
-        if(!$sftp->login($this->username,$key)){
-            abort(504,"Anahtar Hatası");
-        }
-        return $sftp->put($remotePath, $localPath, SFTP::SOURCE_LOCAL_FILE);
+        // Make IP Session Safe
+        $ip_address = str_replace(".", "_", server()->ip_address);
+        return self::request('send',[
+            "token" => session($ip_address),
+            "local_path" => $localPath,
+            "remote_path" => $remotePath
+        ]);
     }
 
     public static function verify($ip_address, $username, $password,$port)
@@ -135,21 +128,15 @@ class SSHConnector implements Connector
         return respond("Bu Kullanıcı adı ve şifre ile bağlanılamadı.", 201);
     }
 
-    /**
-     * @param $localPath
-     * @param $remotePath
-     * @return bool
-     */
     public function receiveFile($localPath, $remotePath)
     {
-        // $sftp = new SFTP($this->server->ip_address, 22);
-        // $key = new RSA();
-        // $key->password = env("APP_KEY") . $this->user_id;
-        // $key->loadKey(file_get_contents(env('KEYS_PATH') . 'linux' . DIRECTORY_SEPARATOR . $this->user_id));
-        // if(!$sftp->login($this->username,$key)){
-        //     abort(504,"Anahtar Hatası");
-        // }
-        // return $sftp->get($remotePath, $localPath);
+        // Make IP Session Safe
+        $ip_address = str_replace(".", "_", server()->ip_address);
+        return self::request('get',[
+            "token" => session($ip_address),
+            "local_path" => $localPath,
+            "remote_path" => $remotePath
+        ]);
     }
 
     /**
