@@ -10,7 +10,7 @@
     </nav>
     <h4>{{__("Sunucu")}}</h4>
     @include('l.errors')
-    <form action="{{route('widget_add')}}" method="POST">
+    <form action="{{route('widget_add')}}" onsubmit="return widget_control(this)" method="POST">
         <select class="form-control" onchange="getExtensions()" id="server_id" required name="server_id">
             @foreach(servers() as $server)
                 <option value="{{$server->id}}">{{$server->name}}</option>
@@ -57,6 +57,19 @@
                 }
                 element.removeAttr('disabled');
             });
+        }
+
+        function widget_control(element){
+            if(!$(element).find('select[name=widget_name]').val()){
+                Swal.fire({
+                    type: 'error',
+                    title: "{{_("Önce bir widget seçmelisiniz!")}}",
+                    timer : 2000,
+                    showConfirmButton: false
+                });
+                return false;
+            }
+            return true;
         }
 
         window.addEventListener('load', function () {
