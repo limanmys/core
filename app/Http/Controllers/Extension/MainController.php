@@ -69,7 +69,7 @@ class MainController extends Controller
     public function upload()
     {
         $flag = Validator::make(request()->all(), [
-            'extension' => 'required |  max:100 | mimes:zip'
+            'extension' => 'required |  max:100000 | mimes:zip'
         ]);
         try{
             $flag->validate();
