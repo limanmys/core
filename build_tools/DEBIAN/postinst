@@ -133,6 +133,10 @@ systemctl start liman
 # Copy Decoder
 cp /liman/server/storage/decoder.so /usr/lib/php/20180731/liman-decoder.so
 
+# Copy libphpcpp
+cp /liman/server/storage/libphpcpp.so.2.2.0 /usr/lib/libphpcpp.so.2.2.0
+ln -f -s /usr/lib/libphpcpp.so.2.2.0 /usr/lib/libphpcpp.so.2.2
+
 # Modify ini file to use decoder.
 if grep --quiet liman-decoder.so /etc/php/7.3/cli/php.ini; then
     echo "Decoder already enabled"; 
