@@ -184,7 +184,7 @@ class SSHConnector implements Connector
         ])->first();
 
         if (!$username || !$password) {
-            abort(504, "Bu sunucu için WinRM anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.");
+            abort(504, "Bu sunucu için SSH anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.");
         }
 
         $key = env('APP_KEY') . user()->id . server()->id;
