@@ -177,7 +177,8 @@ class MainController extends Controller
     {
         $name = trim(request('name'));
         $folder = env('EXTENSIONS_PATH') . strtolower($name);
-        preg_match('/[A-Za-z ]+/',request("name"),$output);
+        
+        preg_match('/[A-Za-z]+/',request("name"),$output);
         if(empty($output) || $output[0] != $name){
             return respond("Eklenti isminde yalnızca harflere izin verilmektedir.",201);
         }
@@ -185,7 +186,6 @@ class MainController extends Controller
         if(Extension::where("name",request("name"))->exists()){
             return respond("Bu isimle zaten bir eklenti var.",201);
         }
-
         $ext = new Extension([
             "name" => request("name"),
             "version" => "0.0.1",
