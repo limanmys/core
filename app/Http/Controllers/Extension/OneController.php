@@ -413,8 +413,7 @@ class OneController extends Controller
                 $command = self::generateSandboxCommand(server(), $extension, extension()->id, auth()->id(), "", "null", $extension["verification"],$extensionDb);
                 $output = shell_exec($command);
             }
-            $output = strtolower($output);
-            if($output != "ok" && $output != "ok\n"){
+            if(strtolower($output) != "ok" && strtolower($output) != "ok\n"){
                 return redirect(route('extension_server_settings_page', [
                     "extension_id" => extension()->id,
                     "server_id" => server()->id,

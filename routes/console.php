@@ -10,9 +10,10 @@ use Illuminate\Support\Str;
 Artisan::command('administrator',function (){
 
     // Generate Password
-    $pool = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$@%^&!$%^&');
-    $password = substr($pool,0,10);
-
+    do{
+        $pool = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$@%^&!$%^&');
+        $password = substr($pool,0,10);
+    }while(!preg_match("/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/", $password));
     $user = User::where([
         "name" => "Administrator",
         "email" => "administrator@liman.app"

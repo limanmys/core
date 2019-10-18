@@ -246,5 +246,7 @@ function activeTab(){
 }
 
 function fixer(val){
+    if(!val)
+        return val;
     return val.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
