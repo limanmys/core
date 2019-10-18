@@ -74,7 +74,6 @@ class OneController extends Controller
             $status = @fsockopen(server()->ip_address,extension()->service,$errno,$errstr,(intval(env('SERVER_CONNECTION_TIMEOUT')) / 1000));
             $flag = is_resource($status);            
         }else{
-            dd("qwe");
             $flag = server()->isRunning(extension()->service);
         }
         // Return the button class name ~ color to update client.

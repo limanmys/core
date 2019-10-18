@@ -132,6 +132,7 @@ systemctl restart liman
 
 # Copy Decoder
 cp /liman/server/storage/decoder.so /usr/lib/php/20180731/liman-decoder.so
+chmod 644 /usr/lib/php/20180731/liman-decoder.so
 
 # Copy libphpcpp
 cp /liman/server/storage/libphpcpp.so.2.2.0 /usr/lib/libphpcpp.so.2.2.0
