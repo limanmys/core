@@ -40,5 +40,5 @@ Deploy:
   script:
    - export VERSION=$(cat version)
    - cp build_tools.deb liman-$VERSION.deb
-   - curl -F "file=@$(pwd)/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-release&filename=liman-$VERSION.deb&pretty=1"
+   - curl -F "file=@$(pwd)/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION.deb&pretty=1"
    - bash deploy.sh $VERSION
