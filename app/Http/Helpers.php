@@ -234,7 +234,7 @@ if (!function_exists('extensionDb')) {
             "name" => $key
         ])->first();
         if ($target) {
-            $key = env('APP_KEY') . auth()->user()->id . extension()->id . server()->id;
+            $key = env('APP_KEY') . auth()->user()->id . server()->id;
             $decrypted = openssl_decrypt($target->value, 'aes-256-cfb8', $key);
             $stringToDecode = substr($decrypted, 16);
             return base64_decode($stringToDecode);
@@ -243,7 +243,7 @@ if (!function_exists('extensionDb')) {
     }
 }
 
-if (!function_exists('getObject')) {
+if (!function_exists('sudo')) {
 
     function sudo()
     {
