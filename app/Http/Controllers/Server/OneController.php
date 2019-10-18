@@ -175,7 +175,7 @@ class OneController extends Controller
         // Retrieve Service name from extension.
         $service = Extension::where('name', 'like', request('extension'))->first()->service;
 
-        $output = server()->run("sudo systemctl " . request('action') . ' ' . $service);
+        $output = server()->run(sudo()."systemctl " . request('action') . ' ' . $service);
         return [
             "result" => 200,
             "data" => $output
@@ -400,7 +400,7 @@ class OneController extends Controller
     public function updatePackage()
     {
         if(server()->type == "linux_ssh"){
-            $raw = server()->run('DEBIAN_FRONTEND=noninteractive sudo apt-get -o Dpkg::Progress-Fancy="0" -o Dpkg::Use-Pty=0 --only-upgrade install '.request("package_name")." -y --fix-missing 2>&1 | sudo tee -a /tmp/".request("package_name").".txt > /dev/null 2>&1 & echo $!");
+            $raw = server()->run('DEBIAN_FRONTEND=noninteractive '.sudo().'apt-get -o Dpkg::Progress-Fancy="0" -o Dpkg::Use-Pty=0 --only-upgrade install '.request("package_name")." -y --fix-missing 2>&1 | sudo tee -a /tmp/".request("package_name").".txt > /dev/null 2>&1 & echo $!");
             \Session::put(server()->id.request("package_name"), intval(trim($raw)) + 1 );
             ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi için güncelleme isteği gönderildi.', ['package_name' => request("package_name")]));
         }elseif (server()->type == "windows_powershell"){
@@ -421,10 +421,10 @@ class OneController extends Controller
                 ]);
             }
             $output = trim(server()->run('[ -d "/proc/'.$pid.'" ] && echo "YES" || echo "NO"'));
-            $command_output = server()->run('sudo cat /tmp/'.request("package_name"). '.txt 2> /dev/null');
-            server()->run('sudo truncate -s 0 /tmp/'.request("package_name"). '.txt');
+            $command_output = server()->run(sudo().'cat /tmp/'.request("package_name"). '.txt 2> /dev/null');
+            server()->run(sudo().'truncate -s 0 /tmp/'.request("package_name"). '.txt');
             if($output === "NO"){
-                $output = server()->run('sudo apt list --upgradable 2>/dev/null | grep '.request("package_name"));
+                $output = server()->run(sudo().'apt list --upgradable 2>/dev/null | grep '.request("package_name"));
                 if(empty($output)){
                     ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi paketi başarıyla kuruldu.', ['package_name' => request("package_name")]));
                     return respond([
@@ -454,7 +454,7 @@ class OneController extends Controller
     {
         if(server()->type == "linux_ssh"){
             $updates = [];
-            $raw = server()->run("sudo apt-get -qq update 2> /dev/null > /dev/null; sudo apt list --upgradable 2>/dev/null | sed '1,1d'");
+            $raw = server()->run(sudo()."apt-get -qq update 2> /dev/null > /dev/null; ".sudo()."apt list --upgradable 2>/dev/null | sed '1,1d'");
             foreach (explode("\n", $raw) as $package) {
                 if ($package == "") {
                     continue;
@@ -499,7 +499,7 @@ class OneController extends Controller
     public function packageList()
     {
         if(server()->type == "linux_ssh"){
-            $raw = server()->run("sudo apt list --installed 2>/dev/null | sed '1,1d'", false);
+            $raw = server()->run(sudo()."apt list --installed 2>/dev/null | sed '1,1d'", false);
             $packages = [];
             foreach (explode("\n", $raw) as $package) {
                 if ($package == "") {
@@ -596,7 +596,7 @@ class OneController extends Controller
     public function startService()
     {
         if(server()->type == "linux_ssh"){
-            $command = "sudo systemctl start " . request('name');
+            $command = sudo()."systemctl start " . request('name');
         }else{
             $command = "Start-Service " . request("name");   
         }
@@ -607,7 +607,7 @@ class OneController extends Controller
     public function stopService()
     {
         if(server()->type == "linux_ssh"){
-            $command = "sudo systemctl stop " . request('name');
+            $command = sudo()."systemctl stop " . request('name');
         }else{
             $command = "Stop-Service " . request("name");   
         }
@@ -618,7 +618,7 @@ class OneController extends Controller
     public function restartService()
     {
         if(server()->type == "linux_ssh"){
-            $command = "sudo systemctl restart " . request('name');
+            $command = sudo()."systemctl restart " . request('name');
         }else{
             $command = "Restart-Service " . request("name");   
         }
