@@ -80,6 +80,6 @@
        "inputs" => [
            "Widget Id:'null'" => "widget_id:hidden"
        ],
-       "submit_text" => "Sunucuyu Sil"
+       "submit_text" => "Widget'ı Sil"
     ])
 @endsection
