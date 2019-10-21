@@ -137,6 +137,7 @@ chmod 644 /usr/lib/php/20180731/liman-decoder.so
 # Copy libphpcpp
 cp /liman/server/storage/libphpcpp.so.2.2.0 /usr/lib/libphpcpp.so.2.2.0
 ln -f -s /usr/lib/libphpcpp.so.2.2.0 /usr/lib/libphpcpp.so.2.2
+chmod 644 /usr/lib/libphpcpp.so.2.2.0
 
 # Modify ini file to use decoder.
 if grep --quiet liman-decoder.so /etc/php/7.3/cli/php.ini; then
