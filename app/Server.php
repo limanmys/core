@@ -97,7 +97,7 @@ class Server extends Model
             return is_resource(@fsockopen($this->ip_address,$this->control_port,$errno, $errstr,env('SERVER_CONNECTION_TIMEOUT')));
         }
         // Check if services are alive or not.
-        $query = "sudo systemctl is-failed " . $service_name;
+        $query = sudo() . "systemctl is-failed " . $service_name;
 
         // Execute and return outputs.
         return ($this->connector()->execute($query,false) == "active\n") ? true : false;

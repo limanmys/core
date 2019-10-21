@@ -147,12 +147,6 @@
                             </a>
                         </li>
                         <li class="">
-                            <a href="/betikler">
-                                <i class="fa fa-subscript "></i>
-                                <span>{{__("Betikler")}}</span>
-                            </a>
-                        </li>
-                        <li class="">
                             <a href="/ayarlar">
                                 <i class="fa fa-cog "></i>
                                 <span>{{__("Ayarlar")}}</span>
