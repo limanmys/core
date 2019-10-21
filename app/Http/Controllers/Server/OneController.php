@@ -536,15 +536,6 @@ class OneController extends Controller
             return respond("Bu Sunucuda yukseltme yapilamaz.",201);
         }
 
-        $key = new Key([
-           "username" => "liman",
-            "user_id" => auth()->user()->id,
-            "server_id" => server()->id
-
-        ]);
-
-        $key->save();
-
         // Init key with parameters.
         if(server()->type == "linux"){
             try{
@@ -553,6 +544,7 @@ class OneController extends Controller
                 $flag = "Sunucuya bağlanılamadı.";
             }
         }
+
         if(server()->type == "windows"){
             try{
                 $flag = WinRMConnector::create(server(),request('username'),request('password'),auth()->id(),$key);
@@ -562,7 +554,6 @@ class OneController extends Controller
         }
 
         if($flag != "OK"){
-            $key->delete();
             return respond($flag,201);
         }
 
