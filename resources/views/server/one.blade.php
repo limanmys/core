@@ -16,7 +16,7 @@
         @endif
         <h2 style="display: inline-block;">{{server()->name}}</h2>
     </div>
-    @include('l.errors')    
+    @include('l.errors')
 
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
@@ -39,7 +39,6 @@
             @endif
             <li class=""><a href="#logsTab" onclick="getLogs()" data-toggle="tab" aria-expanded="false">{{__("Günlük Kayıtları")}}</a></li>
             <li class=""><a href="#settingsTab" data-toggle="tab" aria-expanded="false">{{__("Sunucu Ayarları")}}</a></li>
-            <li class=""><a href="#extensionSettings" data-toggle="tab" aria-expanded="false">{{__("Eklenti Ayarları")}}</a></li>
             @if(server()->type == "linux" || server()->type == "windows")
                 <li class=""><a href="#extraTab" data-toggle="tab" aria-expanded="false">{{__("Ek Özellikler")}}</a>
                 </li>
@@ -240,23 +239,6 @@
                                required="" value=""><br>
                         <button type="submit" class="btn btn-success">{{__("Yükselt")}}</button>
                 </form>
-            </div>
-            <div class="tab-pane" id="extensionSettings">
-                @include('l.table',[
-                    "value" => user()->settings->where('server_id',server()->id),
-                    "title" => [
-                        "Veri Adi" , "*hidden*"
-                    ],
-                    "display" => [
-                        "name" , "id:id"
-                    ],
-                    "menu" => [
-                        "Sil" => [
-                            "target" => "startService",
-                            "icon" => "fa-play"
-                        ]
-                    ],
-                ])
             </div>
         </div>
     </div>

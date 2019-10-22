@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Permission;
 use App\User;
 use App\UserSettings;
-use Illuminate\Support\Facades\DB;
+use App\Server;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -139,7 +139,27 @@ class UserController extends Controller
 
     public function removeSetting()
     {
-        $flag = DB::table('user_settings')->where([
+        $first = UserSettings::where([
+            'user_id' => user()->id,
+            'id' => request('setting_id')
+        ])->first();
+
+        if(!$first){
+            return respond("Ayar bulunamadi",201);
+        }
+        if($first->name == "clientUsername" || $first->name == "clientPassword"){
+            $server = Server::find($first->server_id);
+            
+            if($server){
+                $ip_address = str_replace(".", "_", $server->server_id);
+                if(session($ip_address)){
+                    session()->remove($ip_address);
+                }
+            }
+            
+        }
+
+        $flag = UserSettings::where([
             'user_id' => auth()->user()->id,
             'id' => request('setting_id')
         ])->delete();
@@ -157,6 +177,19 @@ class UserController extends Controller
         if(!$setting){
             return respond("Ayar bulunamadi",201);
         }
+
+        if($setting->name == "clientUsername" || $setting->name == "clientPassword"){
+            $server = Server::find($setting->server_id);
+            
+            if($server){
+                $ip_address = str_replace(".", "_", $server->server_id);
+                if(session($ip_address)){
+                    session()->remove($ip_address);
+                }
+            }
+            
+        }
+        
         $encKey = env('APP_KEY') . $setting->user_id . $setting->server_id;
         $encrypted = openssl_encrypt(Str::random(16) . base64_encode(request('new_value')),'aes-256-cfb8',$encKey,0,Str::random(16));
         $flag = $setting->update([
@@ -202,5 +235,64 @@ class UserController extends Controller
          return redirect()->route('login')->withErrors([
             "message" => "Kullanıcı Başarıyla Güncellendi, lütfen tekrar giriş yapın."
         ]);
+    }
+
+    public function userKeyList()
+    {
+        $settings = UserSettings::where("user_id",user()->id)->get();
+
+        // Retrieve User servers that has permission.
+        $servers = servers();
+        
+        foreach ($settings as $setting){
+            $server = $servers->find($setting->server_id);
+            if($setting->name == "clientUsername"){
+                $setting->name = __("Anahtar - Kullanıcı Adı");
+            }
+            if($setting->name == "clientPassword"){
+                $setting->name = __("Anahtar - Şifre");
+            }
+            $setting->server_name = ($server) ? $server->name : __("Sunucu Silinmiş.");
+        }
+
+        return view('keys.index',[
+            "servers" => objectToArray($servers,"name","id"),
+            "settings" => json_decode(json_encode($settings),true)
+        ]);
+    }
+
+    public function addKey()
+    {
+        UserSettings::where([
+            "server_id" => server()->id,
+            "user_id" => user()->id,
+            "name" => "clientUsername",
+        ])->delete();
+
+        UserSettings::where([
+            "server_id" => server()->id,
+            "user_id" => user()->id,
+            "name" => "clientPassword",
+        ])->delete();
+
+        $encKey = env('APP_KEY') . user()->id . server()->id;
+        $encryptedUsername = openssl_encrypt(Str::random(16) . base64_encode(request('username')),'aes-256-cfb8',$encKey,0,Str::random(16));
+        $encryptedPassword = openssl_encrypt(Str::random(16) . base64_encode(request('password')),'aes-256-cfb8',$encKey,0,Str::random(16));
+        $settings = new UserSettings([
+            "server_id" => server()->id,
+            "user_id" => user()->id,
+            "name" => "clientUsername",
+            "value" => $encryptedUsername
+        ]);
+        $settings->save();
+        $settings = new UserSettings([
+            "server_id" => server()->id,
+            "user_id" => user()->id,
+            "name" => "clientPassword",
+            "value" => $encryptedPassword
+        ]);
+        $settings->save();
+
+        return respond("Başarıyla eklendi.");
     }
 }

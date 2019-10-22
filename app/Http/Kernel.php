@@ -43,7 +43,6 @@ class Kernel extends HttpKernel
         'server_api' => Middleware\ServerApi::class,
         'permissions' => Middleware\PermissionManager::class,
         'admin' => Middleware\Admin::class,
-        'script_parameters' => Middleware\ScriptParameters::class,
         'guest' => Middleware\RedirectIfAuthenticated::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,

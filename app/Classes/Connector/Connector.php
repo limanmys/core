@@ -14,7 +14,7 @@ interface Connector
 
     public function receiveFile($localPath, $remotePath);
 
-    public function runScript($script,$parameters, $extra = null);
+    public function runScript($script,$parameters, $runAsRoot);
 
     public static function verify($ip_address,$username,$password,$port);
 

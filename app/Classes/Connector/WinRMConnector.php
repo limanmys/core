@@ -2,11 +2,11 @@
 
 namespace App\Classes\Connector;
 
-use App\Key;
 use App\Server;
 use App\UserSettings;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use Illuminate\Support\Str;
 
 class WinRMConnector implements Connector
 {
@@ -124,8 +124,23 @@ class WinRMConnector implements Connector
         ]);
     }
 
-    public function runScript($script, $parameters, $extra = null)
-    {
+    public function runScript($script, $parameters, $runAsRoot)
+    {       
+        // Find Remote Path
+        $remotePath = "\\Windows\\Temp\\". Str::random() . ".ps1";
+
+        $flag = $this->sendFile($script, $remotePath);
+
+        // Find Out Letter. DISABLED FOR NOW
+        // $letter = $this->execute("\$pwd.drive.name");
+
+        // $letter = substr($letter,0, -2);
+
+        $query = "C:\\" . $remotePath;
+
+        $output = $this->execute($query);
+
+        return $output;
         
     }
 
@@ -155,7 +170,8 @@ class WinRMConnector implements Connector
         $hostname = str_replace(".", "_", $hostname);
         if (auth() && auth()->user()) {
             session()->put([
-                $hostname => $json->token
+                $hostname => $json->token,
+                $hostname . "_ticket" => $json->ticket_path
             ]);
         }
         return $json->token;

@@ -64,15 +64,6 @@ class Extension extends Model
         });
     }
 
-
-    /**
-     * @param null $name
-     * @return Script[]|Collection
-     */
-    public static function scripts($name = null){
-        return Script::all()->where('extensions','like',strtolower(($name == null) ? extension()->name : $name));
-    }
-
     /**
      * @param array $coloumns
      * @return Extension|Extension[]|Collection|Builder

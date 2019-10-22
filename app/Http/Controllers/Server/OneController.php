@@ -6,14 +6,8 @@ use App\Classes\Connector\SSHConnector;
 use App\Classes\Connector\WinRMConnector;
 use App\Extension;
 use App\Http\Controllers\Controller;
-use App\Key;
 use App\Notification;
-use App\Permission;
-use App\Script;
-use App\Server;
 use App\ServerLog;
-use App\User;
-use App\Widget;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -44,19 +38,6 @@ class OneController extends Controller
             return respond("Yalnızca kendi sunucunuzu silebilirsiniz.", 202);
         }
 
-        if (server()->type == "windows_powershell") {
-            if (is_file(env('KEYS_PATH') . 'windows/' . auth()->id() . server()->id)) {
-                unlink(env('KEYS_PATH') . 'windows/' . auth()->id() . server()->id);
-            }
-
-            Key::where('server_id', server()->id)->delete();
-        }
-
-        // If server has key, simply delete it.
-        if (server()->type == "linux_ssh") {
-            Key::where('server_id', server()->id)->delete();
-        }
-
         // Delete the Server Object.
         server()->delete();
         Notification::new(
@@ -84,92 +65,6 @@ class OneController extends Controller
         }
     }
 
-    public function hostname()
-    {
-        // Obtain Script from Database
-        $script = Script::where('unique_code', 'server_set_hostname')->first();
-
-        // Check If Script Exists
-        if (!$script) {
-            return respond("Hostname değiştirme betiği bulunamadı.", 201);
-        }
-
-        if (!Permission::can(auth()->id(), 'script', 'id',$script->id)) {
-            abort(504, "'" . $script->name . "' betiğini çalıştırmak için yetkiniz yok.");
-        }
-
-        // Simply run that script on server.
-        $output = server()->runScript($script, "'" . \request('hostname') . "'");
-
-        // Forward request.
-        return respond("Hostname guncellendi", 200);
-    }
-
-    public function grant()
-    {
-
-        // Find user from email.
-        $user = User::where('email', request('email'))->first();
-
-        // If user not exists, cancel.
-        if ($user == null) {
-            return respond("Kullanıcı bulunamadı.", 404);
-        }
-
-        // If user somehow typed same email, warn user.
-        if ($user == auth()->user()) {
-            return respond("Bu email adresi size ait.", 201);
-        }
-
-        // Give User a permission to use this server.
-        $permissions = Permission::where('user_id', $user->id)->first();
-        $user_servers = (Array)$permissions->server;
-        array_push($user_servers, server()->id);
-        $permissions->server = $user_servers;
-
-        // Lastly, save all information.
-        $permissions->save();
-
-        if (server()->type == "linux_ssh") {
-            // Generate key for user.
-            $flag = Key::initWithKey(server()->key->username, server()->key->id, server()->ip_address,
-                server()->port, auth()->id(), $user->id);
-
-            // Check if key initialized successfully.
-            if (!$flag) {
-                return respond("SSH anahtar hatası, lütfen yönetinizle iletişime geçin.", 201);
-            }
-
-            // Built key object for user.
-            $key = new Key([
-                "name" => server()->key->name,
-                "username" => server()->key->username,
-                "server_id" => server()->id
-            ]);
-
-            $key->user_id = $user->id;
-
-            $key->save();
-        }
-
-        // Forward request.
-        return respond("Yetki başarıyla verildi.");
-    }
-
-    public function revoke()
-    {
-        // Check if user owns the server or admin. If not, abort.
-        if (server()->user_id != auth()->id() && !auth()->user()->isAdmin()) {
-            return respond("Bu işlem için yetkiniz yok.", 201);
-        }
-
-        // Find User
-        Permission::revoke(request('user_id'), 'server','id', server()->user_id);
-
-        return respond("Yetki başarıyla alındı.", 200);
-    }
-
-
     public function service()
     {
         // Retrieve Service name from extension.
@@ -194,34 +89,7 @@ class OneController extends Controller
         ]);
 
         return respond('Servis başarıyla eklendi.');
-
-//        if (array_key_exists("install", $extension->views)) {
-//            return respond("Kurulum betiği bulunamadığı için işlem iptal edildi.", 201);
-//        }
-//
-//        // Get Install script from extension.
-//        $script = Script::where('unique_code', $extension->views["install"])->first();
-//
-//        //Just a double check if script is not installed, warn user.
-//        if (!$script) {
-//            return respond("Kurulum betiği bulunamadığı için işlem iptal edildi.", 201);
-//        }
-//
-//        // Create a notification to inform user.
-//        $notification = Notification::new(
-//            __("Servis Yükleniyor."),
-//            "onhold",
-//            __(":server isimli sunucuda :new kuruluyor.", ["server" => server()->name, "new" => $extension->name])
-//        );
-//
-//        // Create and dispatch the job immediately.
-//        $job = new InstallService($script, server(), \request('domain') . " "
-//            . \request('interface'), auth()->id(), $notification, $extension);
-//        dispatch($job);
-//
-//        // Forward request and inform user.
-//        return respond("Kurulum talebi başarıyla alındı. Gelişmeleri bildirim üzerinden takip edebilirsiniz.");
-    }
+   }
 
     public function update()
     {
@@ -234,8 +102,7 @@ class OneController extends Controller
         $output = server()->update([
             "name" => request('name'),
             "control_port" => request('control_port'),
-            "city" => request('city'),
-            "ip_address" => request('ip_address')
+            "city" => request('city')
         ]);
         return [
             "result" => 200,

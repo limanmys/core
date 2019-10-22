@@ -4,10 +4,10 @@
 Route::get('/l/{extension_id}/{city}/{server_id}', 'Extension\OneController@renderView')->name('extension_server')->middleware(['server','extension']);
 
 // Extension' Server' Any Route Handler
-Route::get('/l/{extension_id}/{city}/{server_id}/{unique_code}', 'Extension\OneController@renderView')->middleware(['server', 'script_parameters','extension'])->name('extension_server_route');
+Route::get('/l/{extension_id}/{city}/{server_id}/{unique_code}', 'Extension\OneController@renderView')->middleware(['server', 'extension'])->name('extension_server_route');
 
 // Extension Management Route
-Route::post('/extension/run/{unique_code}', 'Extension\OneController@route')->name('extension_api')->middleware(['server_api', 'script_parameters','extension']);
+Route::post('/extension/run/{unique_code}', 'Extension\OneController@route')->name('extension_api')->middleware(['server_api', 'extension']);
 
 // Extension Page (City Select) Route
 Route::get('/l/{extension_id}', 'Extension\MainController@allServers')->name('extension_map');
@@ -22,15 +22,6 @@ Route::post('/eklentiler_api', 'Extension\SettingsController@allServersApi')->na
 
 // Extension Details Route
 Route::get('/eklentiler/{extension_id}', 'Extension\SettingsController@settings_one')->name('extension_one');
-
-// Extension View Scripts
-Route::post('/eklentiler/betikler', 'Extension\SettingsController@getScriptsOfView')->name('extension_page_scripts');
-
-// Extension View Script Add
-Route::post('/eklentiler/betikler/ekle', 'Extension\SettingsController@addScriptToView')->name('extension_page_script_add');
-
-// Extension View Script Remove
-Route::post('/eklentiler/betikler/sil', 'Extension\SettingsController@removeScriptFromView')->name('extension_page_script_remove');
 
 // Extension Function Api
 Route::post('/eklenti/{extension_id}/{function_name}', 'Extension\OneController@runFunction')->name('extension_function_api')->middleware('server_api');
