@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers\Extension;
 
-use App\Extension;
 use App\Http\Controllers\Controller;
-use App\Script;
-use Illuminate\Support\Str;
 
 /**
  * Class SettingsController
@@ -45,17 +42,13 @@ class SettingsController extends Controller
         // Go through all files and list them as tree style in array.
         $files = $this->tree(env('EXTENSIONS_PATH') . strtolower(extension()->name));
 
-        // Retrieve scripts from database.
-        $scripts = Script::where('extensions', 'like', extension()->name)->get();
-
         system_log(7,"EXTENSION_SETTINGS_PAGE",[
             "extension_id" => extension()->_id,
         ]);
 
         // Return view with required parameters.
         return view('extension_pages.one', [
-            "files" => $files,
-            "scripts" => $scripts,
+            "files" => $files
         ]);
     }
 
@@ -99,24 +92,6 @@ class SettingsController extends Controller
             }
         }
         return $files;
-    }
-
-    /**
-     * @return array
-     */
-    public function getScriptsOfView()
-    {
-        $extension = Extension::find(request('extension_id'));
-        if (array_key_exists(request('view'), $extension->views)) {
-            $arr = $extension->views[request('view')];
-        } else {
-            $arr = [];
-        }
-        system_log(7,"EXTENSION_VIEW_SCRIPTS",[
-            "extension_id" => extension()->id,
-        ]);
-
-        return $arr;
     }
 
     public function update()

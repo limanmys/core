@@ -8,12 +8,14 @@
         </ol>
     </nav>
     @include('l.errors')
+    
 
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#settings" data-toggle="tab" aria-expanded="false">{{__("Kasa")}}</a></li>
         </ul>
         <div class="tab-content">
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add_settings"><i class="fa fa-key "></i> {{__("Anahtar Ekle")}}</button>
             <div class="tab-pane active" id="settings">
                 <h4>{{__("Güvenliğiniz için varolan verileriniz gösterilmemektedir.")}}</h4>
                 @include('l.table',[
@@ -39,6 +41,19 @@
         </div>
     </div>
 
+
+    @include('l.modal',[
+        "id"=>"add_settings",
+        "title" => "Anahtar Ekle",
+        "url" => route('key_add'),
+        "next" => "reload",
+        "inputs" => [
+            "Sunucu:server_id" => objectToArray(servers(),"name", "id"),
+            "Kullanıcı Adı" => "username:text",
+            "Şifre" => "password:password",
+        ],
+        "submit_text" => "Ekle"
+    ])
 
     @include('l.modal',[
         "id"=>"update_settings",

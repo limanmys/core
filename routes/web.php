@@ -17,10 +17,6 @@ require_once(app_path('Http/Controllers/Notification/_routes.php'));
 
 require_once(app_path('Http/Controllers/Permission/_routes.php'));
 
-// Script Routes
-
-require_once(app_path('Http/Controllers/Script/_routes.php'));
-
 // Server Routes
 
 require_once(app_path('Http/Controllers/Server/_routes.php'));
@@ -51,15 +47,12 @@ Route::post('/collapse','HomeController@collapse')->name('set_collapse');
 
 Route::get('/', 'HomeController@index')->name('home');
 
-// SSH Key List Route
+// Vault Route
 
-Route::get('/kasa', 'KeyController@index')->name('keys');
+Route::get('/kasa', 'UserController@userKeyList')->name('keys');
 
-// SSH Key Add Route
-
-Route::post('/anahtar/ekle', 'KeyController@add')->name('key_add');
-
-Route::post('/anahtar/sil', 'KeyController@delete')->name('key_delete');
+// Add Key Route
+Route::post('/kasa/ekle', 'UserController@addKey')->name('key_add');
 
 // User Details Route
 
@@ -109,5 +102,7 @@ Route::post('/lmn/private/runCommandApi','Extension\OneController@internalRunCom
 Route::post('/lmn/private/putFileApi','Extension\OneController@internalPutFileApi');
 
 Route::post('/lmn/private/getFileApi','Extension\OneController@internalGetFileApi');
+
+Route::post('/lmn/private/runScriptApi','Extension\OneController@internalRunScriptApi');
 
 Route::get('/test','HomeController@test');

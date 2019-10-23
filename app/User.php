@@ -77,11 +77,6 @@ class User extends Authenticatable
         return $this->hasMany('\App\UserSettings');
     }
 
-    public function keys()
-    {
-        return $this->hasMany('\App\Key');
-    }
-
     public function notifications()
     {
         return $this->hasMany('\App\Notification');

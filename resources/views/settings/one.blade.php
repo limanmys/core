@@ -15,7 +15,6 @@
             <li class="active"><a href="#general" data-toggle="tab" aria-expanded="true">{{__("Genel Ayarlar")}}</a></li>
             <li id="server_type"><a href="#extension" data-toggle="tab"
                                     aria-expanded="false">{{__("Eklenti Yetkileri")}}</a></li>
-            <li id="server_type"><a href="#script" data-toggle="tab" aria-expanded="false">{{__("Betik Yetkileri")}}</a>
             </li>
             <li class=""><a href="#server" data-toggle="tab" aria-expanded="false">{{__("Sunucu Yetkileri")}}</a></li>
             <li class=""><a href="#function" data-toggle="tab" aria-expanded="false">{{__("Fonksiyon Yetkileri")}}</a></li>
@@ -48,21 +47,6 @@
                 @include('l.table',[
                     "id" => "extension_table",
                     "value" => $extensions,
-                    "title" => [
-                        "Adı" , "*hidden*"
-                    ],
-                    "display" => [
-                        "name" , "id:id"
-                    ],
-                    "noInitialize" => "true"
-                ])
-            </div>
-            <div class="tab-pane" id="script">
-                <button onclick="getList('script')" class="btn btn-success"><i class="fa fa-plus"></i></button>
-                <button onclick="removePermission('script')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
-                @include('l.table',[
-                    "id" => "script_table",
-                    "value" => $scripts,
                     "title" => [
                         "Adı" , "*hidden*"
                     ],
@@ -147,12 +131,6 @@
             "id" => "server_modal",
             "title" => "Sunucu Listesi",
             "submit_text" => "Seçili Sunuculara Yetki Ver",
-            "onsubmit" => "addData"
-        ])
-    @include('l.modal',[
-            "id" => "script_modal",
-            "title" => "Betik Listesi",
-            "submit_text" => "Seçili Betiklere Yetki Ver",
             "onsubmit" => "addData"
         ])
     @include('l.modal',[

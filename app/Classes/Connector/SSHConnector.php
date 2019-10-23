@@ -2,11 +2,10 @@
 
 namespace App\Classes\Connector;
 
-use phpseclib\Crypt\RSA;
-use phpseclib\Net\SFTP;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use App\UserSettings;
+use Illuminate\Support\Str;
 
 /**
  * Class SSHConnector
@@ -64,46 +63,17 @@ class SSHConnector implements Connector
      * @param null $extra
      * @return string
      */
-    public function runScript($script, $parameters, $extra = null)
+    public function runScript($script, $parameters, $runAsRoot)
     {
-        $scriptsPath = env('EXTENSIONS_PATH') . $script->extensions
-            . DIRECTORY_SEPARATOR . "scripts" . DIRECTORY_SEPARATOR . $script->unique_code . ".lmns";
-        if(!is_file($scriptsPath)){
-            abort("Betik bulunamadı" . $script->extensions
-                . DIRECTORY_SEPARATOR . "scripts" . DIRECTORY_SEPARATOR . $script->unique_code . ".lmns");
-        }
-        $remotePath = '/tmp/' . $script->id;
-        $this->sendFile($scriptsPath, $remotePath,0555);
+        $remotePath = "/tmp/" . Str::random();
 
-        $localHash = md5_file($scriptsPath);
-        $remoteHash = explode(' ',substr($this->execute('md5sum ' . $remotePath,false),0 , -1))[0];
-        
-        if($localHash != $remoteHash){
-            abort(504,"Betik gönderilemedi, internet kesintisi oluşmuş veya disk dolmuş olabilir.");
-        }
-
-        // First Let's Run Before Part Of the Script
-        $query = ($script->root == 1) ? sudo() : '';
-        $query = $query . $script->language . ' /tmp/' . $script->id . " before " . $parameters . $extra;
-        $before = $this->execute($query,false);
-        if($before != "ok\n"){
-//            ServerLog::new($query,$before, $this->server->id,$this->user_id);
-            abort(504, $before);
-        }
+        $this->sendFile($script, $remotePath);
+        $this->execute("chmod +x " . $remotePath);
 
         // Run Part Of The Script
-        $query = ($script->root == 1) ? sudo() : '';
-        $query = $query . $script->language . ' /tmp/' . $script->id . " run " . $parameters . $extra;
+        $query = ($runAsRoot == "yes") ? sudo() : '';
+        $query = $query . $remotePath . " " . $parameters . " 2>/dev/null";
         $output = $this->execute($query);
-
-        // Run After Part Of the Script
-        $query = ($script->root == 1) ? sudo() : '';
-        $query = $query . $script->language . ' /tmp/' . $script->id . " after " . $parameters . $extra;
-        $after = $this->execute($query,false);
-        if($after != "ok\n"){
-//            ServerLog::new($query,$after, $this->server->id,$this->user_id);
-            abort(504, $after);
-        }
 
         return $output;
     }
@@ -174,16 +144,7 @@ class SSHConnector implements Connector
             abort(504, "Bu sunucu için SSH anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.");
         }
 
-        $key = env('APP_KEY') . user()->id . server()->id;
-        $decrypted = openssl_decrypt($username["value"], 'aes-256-cfb8', $key);
-        $stringToDecode = substr($decrypted, 16);
-        $username = base64_decode($stringToDecode);
-
-        $key = env('APP_KEY') . user()->id . server()->id;
-        $decrypted = openssl_decrypt($password["value"], 'aes-256-cfb8', $key);
-        $stringToDecode = substr($decrypted, 16);
-        $password = base64_decode($stringToDecode);
-        return [$username, $password];
+        return [lDecrypt($username["value"]), lDecrypt($password["value"])];
     }
 
     public static function request($url, $params,$retry = 3)

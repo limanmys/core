@@ -131,10 +131,6 @@
                         "name" , "scripts", "name:name_old", "scripts:scripts_old"
                     ],
                     "menu" => [
-                        "Ayarları Düzenle" => [
-                            "target" => "edit_view",
-                            "icon" => "fa-edit"
-                        ],
                         "Kodu Düzenle" => [
                             "target" => "editPage",
                             "icon" => "fa-edit"
@@ -156,20 +152,6 @@
                         "Çalışacak Betik/Fonksiyon" => "scripts:text:Sayfanız çalışıtırılmadan önce çalışacak betik veya fonksiyon."
                     ],
                     "submit_text" => "Sayfa Ekle"
-                ])
-                @include('l.modal',[
-                    "id"=>"edit_view",
-                    "title" => "Sayfa Düzenle",
-                    "url" => route('extension_settings_update'),
-                    "next" => "updateTable",
-                    "inputs" => [
-                        "Sayfa Adı" => "name:text",
-                        "Çalışacak Betik/Fonksiyon" => "d-scripts:text",
-                        "Sayfa Adı:a" => "name_old:hidden",
-                        "table:views" => "table:hidden",
-                        "Çalışacak Betik/Fonksiyon:a" => "scripts_old:hidden"
-                    ],
-                    "submit_text" => "Sayfa Düzenle"
                 ])
                 @include('l.modal',[
                     "id"=>"remove_view",

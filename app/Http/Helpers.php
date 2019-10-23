@@ -3,7 +3,6 @@
 use App\AdminNotification;
 use App\Extension;
 use App\Notification;
-use App\Script;
 use App\Server;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
@@ -247,7 +246,7 @@ if (!function_exists('sudo')) {
 
     function sudo()
     {
-        return 'echo ' . extensionDb("clientPassword") .' | sudo -S 2>/dev/null ';
+        return 'echo ' . extensionDb("clientPassword") .' | sudo -S -p "" ';
     }
 
 }
@@ -261,10 +260,6 @@ if (!function_exists('getObject')) {
     {
         // Check for type
         switch ($type) {
-            case "Script":
-            case "script":
-                return Script::find($id);
-                break;
             case "Extension":
             case "extension":
                 return Extension::find($id);
@@ -524,5 +519,15 @@ if (!function_exists('checkHealth')) {
         }
 
         return $messages;
+    }
+}
+
+if (!function_exists('lDecrypt')) {
+    function lDecrypt($data)
+    {
+        $key = env('APP_KEY') . user()->id . server()->id;
+        $decrypted = openssl_decrypt($data, 'aes-256-cfb8', $key);
+        $stringToDecode = substr($decrypted, 16);
+        return base64_decode($stringToDecode);
     }
 }

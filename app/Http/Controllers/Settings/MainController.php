@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Settings;
 
 use App\Extension;
 use App\Permission;
-use App\Script;
 use App\Server;
 use App\User;
 use App\Http\Controllers\Controller;
@@ -30,47 +29,8 @@ class MainController extends Controller
         return view('settings.one',[
             "user" => $user,
             "servers" => Server::find($user->permissions->where('type','server')->pluck('value')->toArray()),
-            "extensions" => Extension::find($user->permissions->where('type','extension')->pluck('value')->toArray()),
-            "scripts" => Script::find($user->permissions->where('type','script')->pluck('value')->toArray())
+            "extensions" => Extension::find($user->permissions->where('type','extension')->pluck('value')->toArray())
         ]);
-
-        // $servers = Server::find($permissions->whereNotNull("server_id")->pluck("server_id")->toArray());
-
-        // $permissions = Permission::where('user_id',request('user_id'));
-        // $scripts = Script::find($permissions->whereNotNull("script_id")->pluck("script_id")->toArray());
-
-        // $permissions = Permission::where('user_id',request('user_id'));
-        // $extensions = Extension::find($permissions->whereNotNull("extension_id")->pluck("extension_id")->toArray());
-
-        // $permissions = Permission::where('user_id',request('user_id'));
-        // $functions = [];
-
-        // foreach ($permissions->whereNotNull("function")->get() as $item){
-        //     $functionsFile = env('EXTENSIONS_PATH') . strtolower(explode('_',$item->function)[0]) . "/views/functions.php";
-        //     $comments = $this->getComments($functionsFile);
-        //     foreach ($comments as $comment){
-        //         if(!array_key_exists("LimanName",$comment) || !array_key_exists("LimanPermission",$comment)
-        //             || !array_key_exists("LimanFunction",$comment)){
-        //             abort(504,"Eklenti Duzgun Yapilandirilmamis");
-        //         }
-        //         if(explode('_',$item->function)[1] == $comment["LimanFunction"]){
-        //             array_push($functions,[
-        //                 "extension_name" => explode('_',$item->function)[0],
-        //                 "name" => $comment["LimanName"],
-        //                 "db_name" => $item->function
-        //             ]);
-        //             break;
-        //         }
-        //     }
-        // }
-
-        // return view('settings.one',[
-        //     "user" => user(),
-        //     "servers" => $servers,
-        //     "extensions" => $extensions,
-        //     "scripts" => $scripts,
-        //     "functions" => $functions
-        // ]);
     }
 
     public function getList()
@@ -89,11 +49,6 @@ class MainController extends Controller
                 $data = Extension::whereNotIn('id',$user->permissions->where('type','extension')->pluck('value')->toArray())->get();
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
-                break;
-            case "script":
-                $data = Script::whereNotIn('id',$user->permissions->where('type','script')->pluck('value')->toArray())->get();
-                $title = ["*hidden*", "İsim" , "Eklenti"];
-                $display = [ "id:id", "name" , "extensions"];
                 break;
             case "liman":
             default:

@@ -48,7 +48,6 @@ class ServerLog extends Model
 
         // First, convert user_id's into the user names.
         $users = User::all();
-        $scripts = Script::all();
 
         foreach ($logs as $log){
             $user = $users->where('id', $log->user_id)->first();
@@ -56,14 +55,6 @@ class ServerLog extends Model
                 continue;
             }
             $log->username = $user->name;
-            if(strpos($log->command, "sudo /usr/bin/env python3 /tmp/") == 0){
-                if (preg_match('/\/tmp\/([a-zA-Z0-9_]*) /', $log->command, $script_id) == 1) {
-                    $script = $scripts->find($script_id[1]);
-                    if($script) {
-                        $log->command = $script->name . " (". substr($log->command, 56) .")";
-                    }
-                }
-            }
         }
         return $logs;
     }

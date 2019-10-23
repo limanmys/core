@@ -4,10 +4,7 @@ namespace App\Http\Controllers\Extension;
 
 use App\Extension;
 use App\Http\Controllers\Controller;
-use App\Script;
 use Exception;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use ZipArchive;
 use Illuminate\Contracts\View\Factory;
@@ -144,27 +141,6 @@ class MainController extends Controller
         shell_exec("sudo chown liman:". clean_score($new->id) . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
         shell_exec("sudo chmod 640 " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
 
-        if(is_dir($path . '/scripts/')){
-          $files = new RecursiveIteratorIterator(
-              new RecursiveDirectoryIterator($path . '/scripts/'),
-              RecursiveIteratorIterator::LEAVES_ONLY
-          );
-        }else {
-          $files = [];
-        }
-
-        foreach ($files as $file) {
-            // Skip directories (they would be added automatically)
-            if (!$file->isDir()) {
-                if (substr($file->getFilename(), 0, 1) == "." || !Str::endsWith($file->getFilename(), ".lmns")) {
-                    continue;
-                }
-                // Get real and relative path for current file
-                $filePath = $file->getRealPath();
-
-                Script::readFromFile($filePath);
-            }
-        }
         system_log(3,"EXTENSION_UPLOAD_SUCCESS",[
             "extension_id" => $new->id
         ]);
