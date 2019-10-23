@@ -12,9 +12,7 @@ class ServerApi
         if(is_resource($status)){
             return $next($request);
         }else{
-            return redirect()->back()->withErrors([
-                "message" => server()->name."(".server()->ip_address.") ".__("isimli sunucuya erişim sağlanamadı!")
-            ]);
+            return respond(server()->name."(".server()->ip_address.") isimli sunucuya erişim sağlanamadı.",201);
         }
     }
 }

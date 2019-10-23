@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use App\Token;
 
 if (!function_exists('respond')) {
     /**
@@ -249,6 +250,94 @@ if (!function_exists('sudo')) {
         return 'echo ' . extensionDb("clientPassword") .' | sudo -S -p "" ';
     }
 
+}
+if (!function_exists('generateSandboxCommand')) {
+
+function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_id, $outputs, $viewName, $functionName,$extensionDb = null)
+    {
+        if(!$extension_id){
+            $extension_id = extension()->id;
+        }
+        $functions = env('EXTENSIONS_PATH') . strtolower($extensionObj["name"]) . "/views/functions.php";
+
+        $combinerFile = env('SANDBOX_PATH') . "index.php";
+
+        $server = json_encode($serverObj->toArray());
+
+        $extension = json_encode($extensionObj);
+
+        if($extensionDb == null){
+            $settings = DB::table("user_settings")->where([
+                "user_id" => $user_id,
+                "server_id" => server()->id,
+            ]);
+            $extensionDb = [];
+            foreach ($settings->get() as $setting){
+                $key = env('APP_KEY') . user()->id . extension()->id . server()->id;
+                $decrypted = openssl_decrypt($setting->value,'aes-256-cfb8',$key);
+                $stringToDecode = substr($decrypted,16);
+                $extensionDb[$setting->name] = base64_decode($stringToDecode);
+            }
+        }
+
+        $extensionDb = json_encode($extensionDb);
+
+        $outputsJson = json_encode($outputs);
+
+        $request = request()->all();
+        unset($request["permissions"]);
+        unset($request["extension"]);
+        unset($request["server"]);
+        unset($request["script"]);
+        unset($request["server_id"]);
+        $request = json_encode($request);
+
+        $apiRoute = route('extension_function_api', [
+            "extension_id" => extension()->id,
+            "function_name" => ""
+        ]);
+
+        $navigationRoute = route('extension_server_route', [
+            "server_id" => $serverObj->id,
+            "extension_id" => extension()->id,
+            "city" => $serverObj->city,
+            "unique_code" => ""
+        ]);
+
+        $token = Token::create($user_id);
+
+        if(!user()->isAdmin()){
+            $extensionJson = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+            $permissions = [];
+            if(array_key_exists("functions",$extensionJson)){
+                foreach($extensionJson["functions"] as $item){
+                    if(Permission::can(user()->id,"function","name",strtolower(extension()->name),$item["name"]) || $item["isActive"] != "true"){
+                        array_push($permissions,$item["name"]);
+                    };
+                }
+            }
+            $permissions = json_encode($permissions);
+        }else{
+            $permissions = "admin";
+        }
+        $hostname = str_replace(".", "_", server()->ip_address);
+        $array = [$functions,strtolower(extension()->name),
+            $viewName,$server,$extension,$extensionDb,$outputsJson,$request,$functionName,
+            $apiRoute,$navigationRoute,$token,$extension_id,$permissions, session('locale'),$_COOKIE["liman_session"]];
+        $encrypted = openssl_encrypt(Str::random() . base64_encode(json_encode($array)),
+            'aes-256-cfb8',shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
+            0,Str::random());
+        $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
+        $ticketPath = session()->get($hostname . "_ticket");
+        
+        // Give Permissions to the extension.
+        // dd(shell_exec('getfacl -p "/tmp/krb5cc_2988" | grep "1e3846d1e5f8463eafc2ffcf530876d5" 2>/dev/null'));
+        // shell_exec("sudo setfacl -m u:" . clean_score(extension()->id) .":r " . $ticketPath);
+
+        $command = "sudo runuser " . clean_score(extension()->id) .
+            " -c 'export KRB5CCNAME=$ticketPath;timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
+        return $command;
+    }
 }
 if (!function_exists('getObject')) {
     /**
