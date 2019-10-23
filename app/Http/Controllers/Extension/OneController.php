@@ -623,7 +623,8 @@ class OneController extends Controller
         $ticketPath = session()->get($hostname . "_ticket");
         
         // Give Permissions to the extension.
-        shell_exec("sudo setfacl -m u:" . clean_score(extension()->id) .":r " . $ticketPath);
+        // dd(shell_exec('getfacl -p "/tmp/krb5cc_2988" | grep "1e3846d1e5f8463eafc2ffcf530876d5" 2>/dev/null'));
+        // shell_exec("sudo setfacl -m u:" . clean_score(extension()->id) .":r " . $ticketPath);
 
         $command = "sudo runuser " . clean_score(extension()->id) .
             " -c 'export KRB5CCNAME=$ticketPath;timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
