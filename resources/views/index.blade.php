@@ -161,16 +161,27 @@
             form.append('widget_id',element.attr('id'));
             form.append('server_id',element.attr('data-server-id'));
             request('{{route('widget_one')}}', form, function(response){
-                let json = JSON.parse(response);
-                element.html(json["message"]);
-                info_box.find('.info-box-icon').show();
-                info_box.find('.info-box-content').show();
-                info_box.find('.overlay').remove();
+                try {
+                  let json = JSON.parse(response);
+                  element.html(json["message"]);
+                  info_box.find('.info-box-icon').show();
+                  info_box.find('.info-box-content').show();
+                  info_box.find('.overlay').remove();
+                } catch(e) {
+                  info_box.find('.overlay i').remove();
+                  info_box.find('.overlay span').remove();
+                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+e.message+'</span>');
+                }
                 if(next){
                   next();
                 }
             }, function(error) {
-                let json = JSON.parse(error);
+                let json = {};
+                try{
+                  json = JSON.parse(error);
+                }catch(e){
+                  json = e;
+                }
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
                 info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
@@ -186,14 +197,25 @@
             form.append('widget_id', id);
             form.append('server_id',element.attr('data-server-id'));
             request('{{route('widget_one')}}', form, function(res){
-                let response =  JSON.parse(res);
-                let data =  response.message;
-                createChart(id+'Chart',data.labels, data.data);
+                try {
+                  let response =  JSON.parse(res);
+                  let data =  response.message;
+                  createChart(id+'Chart',data.labels, data.data);
+                } catch(e) {
+                  info_box.find('.overlay i').remove();
+                  info_box.find('.overlay span').remove();
+                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+e.message+'</span>');
+                }
                 if(next){
                   next();
                 }
             }, function(error) {
-                let json = JSON.parse(error);
+                let json = {};
+                try{
+                  json = JSON.parse(error);
+                }catch(e){
+                  json = e;
+                }
                 element.find('.overlay i').remove();
                 element.find('.overlay span').remove();
                 element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
