@@ -621,6 +621,10 @@ class OneController extends Controller
             0,Str::random());
         $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
         $ticketPath = session()->get($hostname . "_ticket");
+        
+        // Give Permissions to the extension.
+        shell_exec("sudo setfacl -m u:" . clean_score(extension()->id) .":r " . $ticketPath);
+
         $command = "sudo runuser " . clean_score(extension()->id) .
             " -c 'export KRB5CCNAME=$ticketPath;timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
         return $command;

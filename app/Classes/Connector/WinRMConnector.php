@@ -136,7 +136,7 @@ class WinRMConnector implements Connector
 
         // $letter = substr($letter,0, -2);
 
-        $query = "C:\\" . $remotePath;
+        $query = "C:\\" . $remotePath . " " . $parameters;
 
         $output = $this->execute($query);
 
