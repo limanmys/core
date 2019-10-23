@@ -176,7 +176,7 @@ class SSHConnector implements Connector
                 return;
             }else{
                 // If nothing works, abort.
-                abort(403,"Anahtarınız ile sunucuya giriş yapılamadı.(" . $json->error . ")");
+                abort(403,"Anahtarınız ile sunucuya giriş yapılamadı");
             }
         }
         // Simply parse and return output.

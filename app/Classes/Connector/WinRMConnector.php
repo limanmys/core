@@ -93,7 +93,7 @@ class WinRMConnector implements Connector
                 return self::request($url,$params,$retry -1 );
             }else{
                 // If nothing works, abort.
-                abort(403,"Anahtarınız ile sunucuya giriş yapılamadı.(" . $json->error . ")");
+                abort(403,"Anahtarınız ile sunucuya giriş yapılamadı.");
             }
         }
         
@@ -125,7 +125,7 @@ class WinRMConnector implements Connector
     }
 
     public function runScript($script, $parameters, $runAsRoot)
-    {       
+    {
         // Find Remote Path
         $remotePath = "\\Windows\\Temp\\". Str::random() . ".ps1";
 

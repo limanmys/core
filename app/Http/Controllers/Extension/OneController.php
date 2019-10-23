@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\User;
 use App\UserSettings;
 use Carbon\Carbon;
+use App\Token;
 use function request;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
