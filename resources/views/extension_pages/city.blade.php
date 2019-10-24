@@ -1,3 +1,16 @@
+<?php
+    $servers = extension()->servers(request('city'));
+    if($servers->count() == 1){
+        $url = route('extension_server',[
+            "extension_id" => extension()->id,
+            "city" => request('city'),
+            "server_id" => $servers[0]->id
+        ]);
+        header("Location: $url", true);
+        exit();
+    }
+?>
+
 @extends('layouts.app')
 
 @section('content')
@@ -10,7 +23,7 @@
     </nav>
     @include('l.errors')
     @include('l.table',[
-        "value" => extension()->servers(request('city')),
+        "value" => $servers,
         "title" => [
             "Sunucu Adı" , "İp Adresi" , "Sunucu Tipi" , "Kontrol Portu", "*hidden*" ,"*hidden*"
         ],

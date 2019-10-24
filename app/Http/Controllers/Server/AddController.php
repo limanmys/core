@@ -135,23 +135,33 @@ class AddController extends Controller
         Permission::grant(user()->id,'server','id',$this->server->id);
 
         // SSL Control
-        $possiblePorts = ["636","5986"];
-        if(in_array($this->server->control_port, $possiblePorts)){
+        if(in_array($this->server->control_port, knownPorts())){
             $cert = Certificate::where([
                 'server_hostname' => $this->server->ip_address,
                 'origin' => $this->server->control_port
             ])->first();
             if(!$cert){
-                // Notify Admins
-                $this->server->enabled = false;
-                $this->server->save();
-                $notification = new AdminNotification();
-                $notification->title = "Yeni Sertifika Onayı";
-                $notification->type = "cert_request";
-                $notification->message = $this->server->ip_address . ":" . $this->server->control_port . ":" . $this->server->id;
-                $notification->level = 3;
-                $notification->save();
-                // return respond("Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede sunucuya erişemezsiniz.",202);
+                list($flag, $message) = retrieveCertificate(request('ip_address'),request('control_port'));
+                if($flag){
+                    $flag2 = addCertificate(request('ip_address'),request('control_port'),$message["path"]);
+                    $notification = new AdminNotification();
+                    $notification->title = "Yeni Sertifika Eklendi";
+                    $notification->type = "new_cert";
+                    $notification->message = "Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.<br><br><a href='" . route('settings') . "#certificates'>Detaylar</a>";
+                    $notification->level = 3;
+                    $notification->save();
+                }
+                if(!$flag || !$flag2){
+                    $this->server->enabled = false;
+                    $this->server->save();
+                    $notification = new AdminNotification();
+                    $notification->title = "Yeni Sertifika Onayı";
+                    $notification->type = "cert_request";
+                    $notification->message = $this->server->ip_address . ":" . $this->server->control_port . ":" . $this->server->id;
+                    $notification->level = 3;
+                    $notification->save();
+                    return respond("Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede sunucuya erişemezsiniz.",202);
+                }
             }
         }
         return respond(route('server_one',$this->server->id),300);

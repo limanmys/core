@@ -11,3 +11,5 @@ Route::post('/sunucu/sertifikaSil','Certificate\MainController@removeCert')->nam
 
 // Retrieve Certificate
 Route::post('/ayarlar/sertifikaTalep','Certificate\MainController@requestCert')->name('certificate_request')->middleware('admin');
+
+Route::get('/ayarlar/sertifikaDetay','Certificate\MainController@one')->name('certificate_one')->middleware('admin');

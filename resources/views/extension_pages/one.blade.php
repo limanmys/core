@@ -125,10 +125,10 @@
                 @include('l.table',[
                     "value" => $extension["views"],
                     "title" => [
-                        "Sayfa Adı" , "Çalışacak Betik/Fonksiyon" , "", ""
+                        "Sayfa Adı" , "*hidden*", "*hidden*"
                     ],
                     "display" => [
-                        "name" , "scripts", "name:name_old", "scripts:scripts_old"
+                        "name" , "name:name_old", "scripts:scripts_old"
                     ],
                     "menu" => [
                         "Kodu Düzenle" => [
@@ -147,9 +147,8 @@
                     "url" => route('extension_settings_add'),
                     "next" => "reload",
                     "inputs" => [
-                        "Sayfa Adı" => "name:text:Sayfanızın adı.",
+                        "Sayfa Adı" => "name:text",
                         "table:views" => "table:hidden",
-                        "Çalışacak Betik/Fonksiyon" => "scripts:text:Sayfanız çalışıtırılmadan önce çalışacak betik veya fonksiyon."
                     ],
                     "submit_text" => "Sayfa Ekle"
                 ])
@@ -162,7 +161,6 @@
                     "inputs" => [
                         "Sayfa Adı:a" => "name:hidden",
                         "table:views" => "table:hidden",
-                        "Çalışacak Betik/Fonksiyon:a" => "scripts:hidden"
                     ],
                     "submit_text" => "Sayfa'yı Sil"
                 ])
@@ -177,7 +175,7 @@
                 @include('l.table',[
                     "value" => $extension["widgets"],
                     "title" => [
-                        "Widget Adı" , "Türü" , "Çalışacak Betik/Fonksiyon" , "", "", ""
+                        "Widget Adı" , "Türü" , "Çalışacak Fonksiyon" , "", "", ""
                     ],
                     "display" => [
                         "name" , "type", "target", "name:name_old", "type:type_old", "target:target_old"
@@ -206,7 +204,7 @@
                           "Grafik" => "chart"
                         ],
                         "table:widgets" => "table:hidden",
-                        "Çalışacak Betik/Fonksiyon" => "target:text:Widget verilerinin hangi fonksiyon yada betikten getirileceğini belirler."
+                        "Çalışacak Fonksiyon" => "target:text:Widget verilerinin hangi fonksiyon yada betikten getirileceğini belirler."
                     ],
                     "submit_text" => "Widget Ekle"
                 ])
@@ -222,11 +220,11 @@
                           "Sayı" => "count_box",
                           "Grafik" => "chart"
                         ],
-                        "Çalışacak Betik/Fonksiyon" => "target:text",
+                        "Çalışacak Fonksiyon" => "target:text",
                         "Widget Adı:a" => "name_old:hidden",
                         "table:widgets" => "table:hidden",
                         "Türü:a" => "type_old:hidden",
-                        "Çalışacak Betik/Fonksiyon:a" => "target_old:hidden"
+                        "Çalışacak Fonksiyon:a" => "target_old:hidden"
                     ],
                     "submit_text" => "Widget Düzenle"
                 ])
@@ -240,7 +238,7 @@
                         "Widget Adı:a" => "name:hidden",
                         "Türü:a" => "type:hidden",
                         "table:widgets" => "table:hidden",
-                        "Çalışacak Betik/Fonksiyon:a" => "target:hidden"
+                        "Çalışacak Fonksiyon:a" => "target:hidden"
                     ],
                     "submit_text" => "Widget'ı Sil"
                 ])

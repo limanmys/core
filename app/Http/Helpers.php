@@ -3,7 +3,9 @@
 use App\AdminNotification;
 use App\Extension;
 use App\Notification;
+use App\Permission;
 use App\Server;
+use App\Certificate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
@@ -50,6 +52,18 @@ if (!function_exists('notifications')) {
     }
 }
 
+if (!function_exists('knownPorts')) {
+    /**
+     * @return mixed
+     */
+    function knownPorts()
+    {
+        return $knownPorts = [
+            "5986" ,"636"
+        ];
+    }
+}
+
 if (!function_exists('retrieveCertificate')) {
     /**
      * @return mixed
@@ -81,6 +95,17 @@ if (!function_exists('retrieveCertificate')) {
     }
 }
 
+if (!function_exists('parseCertificate')) {
+    /**
+     * @return mixed
+     */
+    function parseCertificate($hostname, $port)
+    {
+        
+        return [true,$certinfo];
+    }
+}
+
 if (!function_exists('adminNotifications')) {
     /**
      * @return mixed
@@ -90,6 +115,27 @@ if (!function_exists('adminNotifications')) {
         return AdminNotification::where([
             "read" => "false"
         ])->orderBy('updated_at', 'desc')->get();
+    }
+}
+
+if (!function_exists('addCertificate')) {
+    /**
+     * @return mixed
+     */
+    function addCertificate($hostname,$port,$path)
+    {
+        $file = "liman-" . $hostname . "_" . $port . ".crt";
+        $cert = file_get_contents('/tmp/' . $path);
+        $query = "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . $file;
+        shell_exec($query);
+        shell_exec("sudo update-ca-certificates");
+
+        // Create Certificate Object.
+        $cert = new Certificate([
+            "server_hostname" => $hostname,
+            "origin" => $port
+        ]);
+        return $cert->save();
     }
 }
 
@@ -603,7 +649,7 @@ if (!function_exists('checkHealth')) {
         if (empty($messages)) {
             array_push($messages, [
                 "type" => "success",
-                "message" => "Herşey Yolunda!"
+                "message" => "Herşey Yolunda, sıkıntı yok!"
             ]);
         }
 

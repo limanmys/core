@@ -10,6 +10,11 @@ use App\Http\Controllers\Controller;
 class MainController extends Controller
 {
 
+    public function one()
+    {
+        
+    }
+
     public function verifyCert()
     {
         // Check If Certificate Already Added or not.
@@ -71,6 +76,5 @@ class MainController extends Controller
         }else{
             return respond($message,201);
         }
-        return respond($certinfo);
     }
 }

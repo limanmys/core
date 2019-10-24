@@ -33,6 +33,12 @@ class MainController extends Controller
         system_log(7,"EXTENSION_SERVERS_INDEX",[
             "extension_id" => extension()->id
         ]);
+        if(count($cities) == 1){
+            return redirect(route("extension_city",[
+                "extension_id" => extension()->id,
+                "city" => $cities[0]
+            ]));
+        }
         // Render View with Cities
         return view('extension_pages.index', [
             "cities" => implode(',', $cities)

@@ -35,7 +35,7 @@
                     </h3>
         
                     <div class="timeline-body">
-                        {{$item->message}}
+                        {!!$item->message!!}
                     </div>
                     <div class="timeline-footer">
                         @if(!$item->read)
