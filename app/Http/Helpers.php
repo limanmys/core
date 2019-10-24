@@ -3,6 +3,7 @@
 use App\AdminNotification;
 use App\Extension;
 use App\Notification;
+use App\Permission;
 use App\Server;
 use App\Certificate;
 use Illuminate\Database\Eloquent\Model;
