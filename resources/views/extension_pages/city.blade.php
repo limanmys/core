@@ -4,7 +4,7 @@
         $url = route('extension_server',[
             "extension_id" => extension()->id,
             "city" => request('city'),
-            "server_id" => $servers[0]->id
+            "server_id" => $servers->first()->id
         ]);
         header("Location: $url", true);
         exit();
