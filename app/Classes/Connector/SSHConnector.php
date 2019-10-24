@@ -187,15 +187,20 @@ class SSHConnector implements Connector
     public static function init($username, $password, $hostname)
     {
         $client = new Client();
-        $res = $client->request('POST', env('LIMAN_CONNECTOR_SERVER') . '/new', [
-            'form_params' => [
-                "username" => $username,
-                "password" => $password,
-                "hostname" => $hostname,
-                "connection_type" => "ssh"
-            ],
-            'timeout' => 5
-        ]);
+        try{
+            $res = $client->request('POST', env('LIMAN_CONNECTOR_SERVER') . '/new', [
+                'form_params' => [
+                    "username" => $username,
+                    "password" => $password,
+                    "hostname" => $hostname,
+                    "connection_type" => "winrm"
+                ],
+                'timeout' => 5
+            ]);
+        }catch(\Exception $e){
+            return null;
+        }
+        
         $json = json_decode((string) $res->getBody());
         //Escape For . character in session.
         $hostname = str_replace(".", "_", $hostname);
