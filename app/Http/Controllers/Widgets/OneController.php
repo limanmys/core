@@ -8,6 +8,7 @@ use App\Server;
 use App\Token;
 use App\Widget;
 use Illuminate\Http\Request;
+use App\UserSettings;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -23,7 +24,7 @@ class OneController extends Controller
         $extension =  Extension::one($widget->extension_id);
         $extensionData = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension($widget->extension_id)->name) . DIRECTORY_SEPARATOR . "db.json"),true);
         foreach ($extensionData["database"] as $item){
-            if(!DB::table("user_settings")->where([
+            if(!UserSettings::where([
                 "user_id" => auth()->user()->id,
                 "server_id" => $widget->server_id,
                 "name" => $item["variable"]
