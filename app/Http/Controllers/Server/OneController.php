@@ -102,6 +102,7 @@ class OneController extends Controller
         $output = server()->update([
             "name" => request('name'),
             "control_port" => request('control_port'),
+            "ip_address" => request('ip_address'),
             "city" => request('city')
         ]);
         return [
