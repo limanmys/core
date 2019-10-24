@@ -193,7 +193,7 @@ class SSHConnector implements Connector
                     "username" => $username,
                     "password" => $password,
                     "hostname" => $hostname,
-                    "connection_type" => "winrm"
+                    "connection_type" => "ssh"
                 ],
                 'timeout' => 5
             ]);
