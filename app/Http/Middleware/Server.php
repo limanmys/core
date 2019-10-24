@@ -9,10 +9,7 @@ class Server
 {
     public function handle($request, Closure $next)
     {
-        $knownPorts = [
-            "5986" ,"636"
-        ];
-        if(in_array(server()->control_port,$knownPorts) && !Certificate::where([
+        if(in_array(server()->control_port,knownPorts()) && !Certificate::where([
             'server_hostname' => server()->ip_address,
             'origin' => server()->control_port
         ])->exists()){
