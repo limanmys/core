@@ -13,7 +13,7 @@
       <li class="breadcrumb-item active" aria-current="page">{{__($viewName)}}</li>
     @endif
 </ol>
-<div class="right" style="float:right;margin-top:-55px">
+<div class="right" id="ext_menu" style="float:right;margin-top:-55px">
         <button class="btn btn-primary" onclick="location.href = '{{route('extension_server_settings_page',[
             "server_id" => server()->id,
             "extension_id" => extension()->id
