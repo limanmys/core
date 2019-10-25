@@ -202,6 +202,9 @@
                         <h5>{{__("Kontrol Portu")}}</h5>
                         <input type="number" name="control_port" placeholder="Kontrol Portu" class="form-control "
                                required="" value="{{server()->control_port}}"><br>
+                        <h5>{{__("Ip Adresi")}}</h5>
+                        <input type="text" name="ip_address" placeholder="Ip Adresi" class="form-control "
+                               required="" value="{{server()->ip_address}}"><br>
                         <h5>{{__("Şehir")}}</h5>
                         <select name="city" class="form-control" required="">
                             @foreach(cities() as $city=>$value)
