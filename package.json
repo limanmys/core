@@ -14,6 +14,8 @@
         "webpack-cli": "^3.3.7"
     },
     "dependencies": {
-        "cross-env": "^5.2.1"
+        "cross-env": "^5.2.1",
+        "laravel-echo": "^1.6.1",
+        "pusher-js": "^5.0.2"
     }
 }

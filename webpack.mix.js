@@ -14,6 +14,7 @@ mix.styles([
     'resources/assets/css/bootstrap-datepicker.css',
     'resources/assets/css/bootstrap-timepicker.css',
     'resources/assets/css/select2.min.css',
+    'resources/assets/css/toastr.min.css',
 ], 'public/css/liman.css').version();
 mix.combine([
     'resources/assets/js/jquery.js',
@@ -28,11 +29,14 @@ mix.combine([
     'resources/assets/js/sweetalert2.min.js',
     'resources/assets/js/Chart.js',
     'resources/assets/js/jstree.js',
-    'resources/assets/js/liman.js',
     'resources/assets/js/buttons.html5.min.js',
     'resources/assets/js/dataTables.buttons.min.js',
     'resources/assets/js/jszip.min.js',
     'resources/assets/js/pdfmake.min.js',
     'resources/assets/js/vfs_fonts.js',
-    'resources/assets/js/jquery.inputmask.min.js'
+    'resources/assets/js/jquery.inputmask.min.js',
+    'resources/assets/js/toastr.min.js',
+    'resources/assets/js/echo.common.js',
+    'resources/assets/js/pusher.min.js',
+    'resources/assets/js/liman.js',
 ], 'public/js/liman.js').version();

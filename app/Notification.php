@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use App\Notifications\NotificationSent;
+use App\User;
 
 /**
  * App\Notification
@@ -31,7 +33,9 @@ class Notification extends Model
         $notification->level = $level;
         $notification->read = false;
         $notification->save();
-
+        try {
+            auth()->user()->notify(new NotificationSent($notification));
+        } catch (\Exception $e){}
         // Before we return the notification, check if it's urgent. If so, send an email.
 
 
@@ -49,5 +53,8 @@ class Notification extends Model
         $notification->level = $level;
         $notification->read = false;
         $notification->save();
+        try {
+            User::find($user_id)->notify(new NotificationSent($notification));
+        } catch (\Exception $e){}
     }
 }

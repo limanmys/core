@@ -144,13 +144,13 @@ function search() {
     });
 }
 
-function checkNotifications() {
+function checkNotifications(exclude=null) {
     request('/bildirimler', new FormData(), function (response) {
         let json = JSON.parse(response);
         if(response["admin"] !== ""){
-            renderNotifications(json["message"]["admin"],'admin','adminNotifications');
+            renderNotifications(json["message"]["admin"],'admin','adminNotifications', exclude);
         }
-        renderNotifications(json["message"]["user"],'user','userNotifications');
+        renderNotifications(json["message"]["user"],'user','userNotifications', exclude);
     });
 }
 
@@ -220,7 +220,7 @@ function addToTable(){
     reload();
 }
 
-function renderNotifications(data,type,target){
+function renderNotifications(data,type,target, exclude){
     let element = $("#" + target + " .menu");
     element.html("");
     //Set Count
@@ -229,9 +229,26 @@ function renderNotifications(data,type,target){
         let errors = [
             "error" , "health_problem", "liman_update"
         ];
-        let color = (errors.includes(notification["error"])) ? "#f56954" : "#00a65a";
+        let color = (errors.includes(notification["type"])) ? "#f56954" : "#00a65a";
         element.append("<li><a href='/bildirim/" + notification["id"] + "'>" + 
                 "<span style='color: " + color + ";width: 100%'>"+ notification["title"] + "</span></a></li>");
+        let displayedNots = [];
+        if(localStorage.displayedNots){
+            displayedNots = JSON.parse(localStorage.displayedNots);
+        } 
+        if(notification.id == exclude){
+            return;
+        }
+        if(displayedNots.includes(notification.id)){
+            return;
+        }
+        if(errors.includes(notification.type)){
+            toastr.error(notification.message, notification.title, {timeOut: 5000})
+        }else{
+            toastr.success(notification.message, notification.title, {timeOut: 5000})
+        }
+        displayedNots.push(notification.id);
+        localStorage.displayedNots = JSON.stringify(displayedNots);
     });
 }
 
@@ -250,3 +267,14 @@ function fixer(val){
         return val;
     return val.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: 'liman-key',
+    wsHost: window.location.hostname,
+    wssPort: 443,
+    disableStats: true,
+    encrypted: true,
+    enabledTransports: ['ws', 'wss'],
+    disabledTransports: ['sockjs', 'xhr_polling', 'xhr_streaming']
+});

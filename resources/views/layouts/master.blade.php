@@ -13,8 +13,27 @@
 </head>
 <body class="hold-transition @yield('body_class')">
 <div class="il-isimleri"></div>
-
+<script>
+    var module = { };
+</script>
 <script src="{{mix('/js/liman.js')}}"></script>
+@if(auth()->check())
+<script>
+    Echo.private('App.User.{{auth()->user()->id}}')
+        .notification((notification) => {
+            let data = notification['\u0000*\u0000attributes'];
+            let errors = [
+                "error" , "health_problem", "liman_update"
+            ];
+            if(errors.includes(data.type)){
+                toastr.error(data.message, data.title, {timeOut: 5000})
+            }else{
+                toastr.success(data.message, data.title, {timeOut: 5000})
+            }
+            checkNotifications(data.id);
+        });
+</script>
+@endif
 @yield('body')
 
 </body>
@@ -41,9 +60,7 @@
             document.title = title + " / Liman";
         }
         @if(auth()->check())
-        setInterval(function () {
             checkNotifications();
-        }, 10000);
         @endif
 
         $('.ext_nav').slice({{env('NAV_EXTENSION_HIDE_COUNT', 10)}}, $('.ext_nav').length).hide();

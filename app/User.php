@@ -5,6 +5,7 @@ namespace App;
 use App\Server;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * App\User
@@ -17,7 +18,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class User extends Authenticatable
 {
-    use UsesUuid;
+    use UsesUuid, Notifiable;
 
     /**
      * The attributes that are mass assignable.

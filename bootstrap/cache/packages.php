@@ -1,4 +1,15 @@
 <?php return array (
+  'beyondcode/laravel-websockets' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'BeyondCode\\LaravelWebSockets\\WebSocketsServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'WebSocketRouter' => 'BeyondCode\\LaravelWebSockets\\Facades\\WebSocketRouter',
+    ),
+  ),
   'facade/ignition' => 
   array (
     'providers' => 

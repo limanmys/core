@@ -94,6 +94,7 @@ systemctl restart php7.3-fpm
 php /liman/server/artisan migrate --force
 php /liman/server/artisan cache:clear
 php /liman/server/artisan view:clear
+php /liman/server/artisan config:clear
 
 # Clear Sandbox Cache
 rm -rf /tmp/liman
@@ -129,6 +130,30 @@ fi
 systemctl daemon-reload
 systemctl enable liman
 systemctl restart liman
+
+# Create Socket Service
+if [ -f "/etc/systemd/system/liman-socket.service" ]; then
+    echo "Liman Socket Service Already Added.";
+else
+        echo """
+[Unit]
+Description=Liman Socket Service
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=liman
+ExecStart=/usr/bin/php /liman/server/artisan websockets:serve --host=127.0.0.1
+
+[Install]
+WantedBy=multi-user.target
+    """ > /etc/systemd/system/liman-socket.service
+fi
+systemctl daemon-reload
+systemctl enable liman-socket
+systemctl restart liman-socket
 
 # Copy Decoder
 cp /liman/server/storage/decoder.so /usr/lib/php/20180731/liman-decoder.so
