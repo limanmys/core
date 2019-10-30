@@ -12,7 +12,7 @@ class WinRMConnector implements Connector
 {
     public function __construct(Server $server, $user_id)
     {
-        $ip_address = str_replace(".", "_", $server->ip_address);
+        $ip_address = "cn_".str_replace(".", "_", $server->ip_address);
         if (!session($ip_address)) {
             list($username, $password) = self::retrieveCredentials();
             self::init($username, $password, $server->ip_address);
@@ -55,7 +55,7 @@ class WinRMConnector implements Connector
     public function execute($command)
     {
         // Make IP Session Safe
-        $ip_address = str_replace(".", "_", server()->ip_address);
+        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
         // Prepare Powershell Command
         $command = "powershell.exe -encodedCommand " . base64_encode(mb_convert_encoding("\$ProgressPreference = \"SilentlyContinue\"; " . $command,"UTF-16LE","UTF-8"));
         return self::request('run',[
@@ -67,7 +67,7 @@ class WinRMConnector implements Connector
     public static function request($url, $params,$retry = 3)
     { 
         // First, format ip adress.
-        $ip_address = str_replace(".", "_", server()->ip_address);
+        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
         // If Session doesn't have token, create one.
         if (!session($ip_address)) {
             // Retrieve Credentials
@@ -108,7 +108,7 @@ class WinRMConnector implements Connector
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
         // Make IP Session Safe
-        $ip_address = str_replace(".", "_", server()->ip_address);
+        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
         return self::request('send',[
             "token" => session($ip_address),
             "local_path" => $localPath,
@@ -119,7 +119,7 @@ class WinRMConnector implements Connector
     public function receiveFile($localPath, $remotePath)
     {
         // Make IP Session Safe
-        $ip_address = str_replace(".", "_", server()->ip_address);
+        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
         return self::request('get',[
             "token" => session($ip_address),
             "local_path" => $localPath,
@@ -175,7 +175,7 @@ class WinRMConnector implements Connector
         
         $json = json_decode((string) $res->getBody());
         //Escape For . character in session.
-        $hostname = str_replace(".", "_", $hostname);
+        $hostname = "cn_".str_replace(".", "_", $hostname);
         if (auth() && auth()->user()) {
             session()->put([
                 $hostname => $json->token,

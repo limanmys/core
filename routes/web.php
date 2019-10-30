@@ -51,6 +51,8 @@ Route::get('/', 'HomeController@index')->name('home');
 
 Route::get('/kasa', 'UserController@userKeyList')->name('keys');
 
+Route::post('/onbellek_temizle', 'UserController@cleanSessions')->name('clean_sessions');
+
 // Add Key Route
 Route::post('/kasa/ekle', 'UserController@addKey')->name('key_add');
 

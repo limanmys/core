@@ -16,6 +16,7 @@
         </ul>
         <div class="tab-content">
             <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add_settings"><i class="fa fa-key "></i> {{__("Anahtar Ekle")}}</button>
+            <button type="button" class="btn btn-secondary" onclick="cleanSessions()">{{__("Önbelleği Temizle")}}</button>
             <div class="tab-pane active" id="settings">
                 <h4>{{__("Güvenliğiniz için varolan verileriniz gösterilmemektedir.")}}</h4>
                 @include('l.table',[
@@ -78,4 +79,19 @@
        ],
        "submit_text" => "Sunucuyu Sil"
    ])
+
+   <script>
+        function cleanSessions(){
+            request('{{route('clean_sessions')}}', new FormData(), function(response){
+                Swal.fire({
+                    position: 'center',
+                    type: 'success',
+                    title: "{{__("Önbellek temizlendi!")}}",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                reload();
+            });
+        }
+   </script>
 @endsection

@@ -30,7 +30,7 @@ class SSHConnector implements Connector
      */
     public function __construct(\App\Server $server, $user_id)
     {
-        $ip_address = str_replace(".", "_", $server->ip_address);
+        $ip_address = "cn_".str_replace(".", "_", $server->ip_address);
         if (!session($ip_address)) {
             list($username, $password) = self::retrieveCredentials();
             self::init($username, $password, $server->ip_address);
@@ -50,7 +50,7 @@ class SSHConnector implements Connector
     public function execute($command,$flag = true)
     {
         // Make IP Session Safe
-        $ip_address = str_replace(".", "_", server()->ip_address);
+        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
         return self::request('run',[
             "token" => session($ip_address),
             "command" => $command
@@ -81,7 +81,7 @@ class SSHConnector implements Connector
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
         // Make IP Session Safe
-        $ip_address = str_replace(".", "_", server()->ip_address);
+        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
         return self::request('send',[
             "token" => session($ip_address),
             "local_path" => $localPath,
@@ -101,7 +101,7 @@ class SSHConnector implements Connector
     public function receiveFile($localPath, $remotePath)
     {
         // Make IP Session Safe
-        $ip_address = str_replace(".", "_", server()->ip_address);
+        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
         return self::request('get',[
             "token" => session($ip_address),
             "local_path" => $localPath,
@@ -150,7 +150,7 @@ class SSHConnector implements Connector
     public static function request($url, $params,$retry = 3)
     { 
         // First, format ip adress.
-        $ip_address = str_replace(".", "_", server()->ip_address);
+        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
         // If Session doesn't have token, create one.
         if (!session($ip_address)) {
             // Retrieve Credentials
@@ -203,7 +203,7 @@ class SSHConnector implements Connector
         
         $json = json_decode((string) $res->getBody());
         //Escape For . character in session.
-        $hostname = str_replace(".", "_", $hostname);
+        $hostname = "cn_".str_replace(".", "_", $hostname);
         if (auth() && auth()->user()) {
             session()->put([
                 $hostname => $json->token

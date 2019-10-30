@@ -151,7 +151,7 @@ class UserController extends Controller
             $server = Server::find($first->server_id);
             
             if($server){
-                $ip_address = str_replace(".", "_", $server->server_id);
+                $ip_address = "cn_".str_replace(".", "_", $server->server_id);
                 if(session($ip_address)){
                     session()->remove($ip_address);
                 }
@@ -182,7 +182,7 @@ class UserController extends Controller
             $server = Server::find($setting->server_id);
             
             if($server){
-                $ip_address = str_replace(".", "_", $server->server_id);
+                $ip_address = "cn_".str_replace(".", "_", $server->server_id);
                 if(session($ip_address)){
                     session()->remove($ip_address);
                 }
@@ -294,5 +294,15 @@ class UserController extends Controller
         $settings->save();
 
         return respond("Başarıyla eklendi.");
+    }
+
+    public function cleanSessions()
+    {
+        foreach(session()->all() as $key => $session){
+            if(strpos($key, "cn_") === 0){
+                session()->forget($key);
+            }
+        }
+        return respond("Önbellek temizlendi.");
     }
 }

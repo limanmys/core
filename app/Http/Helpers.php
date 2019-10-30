@@ -366,7 +366,7 @@ function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_
         }else{
             $permissions = "admin";
         }
-        $hostname = str_replace(".", "_", server()->ip_address);
+        $hostname = "cn_".str_replace(".", "_", server()->ip_address);
         $array = [$functions,strtolower(extension()->name),
             $viewName,$server,$extension,$extensionDb,$outputsJson,$request,$functionName,
             $apiRoute,$navigationRoute,$token,$extension_id,$permissions, session('locale'),$_COOKIE["liman_session"]];
@@ -381,7 +381,7 @@ function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_
         // shell_exec("sudo setfacl -m u:" . clean_score(extension()->id) .":r " . $ticketPath);
 
         $command = "sudo runuser " . clean_score(extension()->id) .
-            " -c 'export KRB5CCNAME=$ticketPath;timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
+            " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
         return $command;
     }
 }
