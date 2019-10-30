@@ -54,24 +54,27 @@ class AddController extends Controller
         );
         // Add Server to request object to use it later.
         request()->request->add(["server" => $this->server]);
-        $encKey = env('APP_KEY') . user()->id . server()->id;
-        $encryptedUsername = openssl_encrypt(Str::random(16) . base64_encode(request('username')),'aes-256-cfb8',$encKey,0,Str::random(16));
-        $encryptedPassword = openssl_encrypt(Str::random(16) . base64_encode(request('password')),'aes-256-cfb8',$encKey,0,Str::random(16));
-        $settings = new UserSettings([
-            "server_id" => $this->server->id,
-            "user_id" => user()->id,
-            "name" => "clientUsername",
-            "value" => $encryptedUsername
-        ]);
-        $settings->save();
-        $settings = new UserSettings([
-            "server_id" => $this->server->id,
-            "user_id" => user()->id,
-            "name" => "clientPassword",
-            "value" => $encryptedPassword
-        ]);
-        $settings->save();
 
+        if(server()->type == "windows_powershell" || server()->type == "linux_ssh"){
+            $encKey = env('APP_KEY') . user()->id . server()->id;
+            $encryptedUsername = openssl_encrypt(Str::random(16) . base64_encode(request('username')),'aes-256-cfb8',$encKey,0,Str::random(16));
+            $encryptedPassword = openssl_encrypt(Str::random(16) . base64_encode(request('password')),'aes-256-cfb8',$encKey,0,Str::random(16));
+            $settings = new UserSettings([
+                "server_id" => $this->server->id,
+                "user_id" => user()->id,
+                "name" => "clientUsername",
+                "value" => $encryptedUsername
+            ]);
+            $settings->save();
+            $settings = new UserSettings([
+                "server_id" => $this->server->id,
+                "user_id" => user()->id,
+                "name" => "clientPassword",
+                "value" => $encryptedPassword
+            ]);
+            $settings->save();
+        }
+        
         // Run required function for specific type.
         $next = null;
         switch ($this->server->type){
