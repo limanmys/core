@@ -243,10 +243,13 @@ function renderNotifications(data,type,target, exclude){
             return;
         }
         if(errors.includes(notification.type)){
-            toastr.error(notification.message, notification.title, {timeOut: 5000})
+            toastElement = toastr.error(notification.message, notification.title, {timeOut: 5000})
         }else{
-            toastr.success(notification.message, notification.title, {timeOut: 5000})
+            toastElement = toastr.success(notification.message, notification.title, {timeOut: 5000})
         }
+        $(toastElement).click(function(){
+            location.href = "/bildirim/" + notification.id
+        });
         displayedNots.push(notification.id);
         localStorage.displayedNots = JSON.stringify(displayedNots);
     });

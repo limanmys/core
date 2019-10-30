@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Notification;
 use App\AdminNotification;
 use App\Notification;
 use App\Http\Controllers\Controller;
+use App\Notifications\NotificationSent;
+use App\User;
 
 class MainController extends Controller
 {
@@ -78,6 +80,7 @@ class MainController extends Controller
         ])->update([
             "read" => true
         ]);
+        auth()->user()->notify(new NotificationSent([]));
         return respond("Hepsi Okundu", 200);
     }
 
@@ -88,7 +91,11 @@ class MainController extends Controller
         ])->update([
             "read" => "true"
         ]);
-    return respond("Hepsi Okundu.",200);
+        $adminUsers = User::where('status', 1)->get();
+        foreach($adminUsers as $user){
+            $user->notify(new NotificationSent([]));
+        }
+        return respond("Hepsi Okundu.",200);
     }
 
     public function allSystem()

@@ -6,6 +6,11 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
+use App\Notification;
+use App\AdminNotification;
+use App\Observers\NotificationObserver;
+use App\Observers\AdminNotificationObserver;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -19,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
             $view->with('USER_FAVORITES',user()->favorites());
         });
         Carbon::setLocale(app()->getLocale());
+        Notification::observe(NotificationObserver::class);
+        AdminNotification::observe(AdminNotificationObserver::class);
     }
 
     /**

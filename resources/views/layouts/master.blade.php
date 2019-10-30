@@ -22,15 +22,28 @@
     Echo.private('App.User.{{auth()->user()->id}}')
         .notification((notification) => {
             let data = notification['\u0000*\u0000attributes'];
-            let errors = [
-                "error" , "health_problem", "liman_update"
-            ];
-            if(errors.includes(data.type)){
-                toastr.error(data.message, data.title, {timeOut: 5000})
-            }else{
-                toastr.success(data.message, data.title, {timeOut: 5000})
+            checkNotifications(data ? data.id : null);
+            if(data){
+                let errors = [
+                    "error" , "health_problem", "liman_update"
+                ];
+                if(errors.includes(data.type)){
+                    toastElement = toastr.error(data.message, data.title, {timeOut: 5000});
+                }else{
+                    toastElement = toastr.success(data.message, data.title, {timeOut: 5000})
+                }
+                let displayedNots = [];
+
+                if(localStorage.displayedNots){
+                    displayedNots = JSON.parse(localStorage.displayedNots);
+                } 
+                displayedNots.push(notification.id);
+                localStorage.displayedNots = JSON.stringify(displayedNots);
+                
+                $(toastElement).click(function(){
+                    location.href = "/bildirim/" + data.id
+                });
             }
-            checkNotifications(data.id);
         });
 </script>
 @endif
