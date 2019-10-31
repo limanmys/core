@@ -31,6 +31,7 @@ class OneController extends Controller
      */
     public function renderView()
     {
+        // dd(session()->all());
         $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
         // Now that we have server, let's check if required parameters set for extension.
 
@@ -543,5 +544,15 @@ class OneController extends Controller
             "file" => request('page')
         ]);
         return respond("Kaydedildi", 200);
+    }
+
+    public function internalPutSessionApi()
+    {
+        if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
+            system_log(5,"EXTENSION_INTERNAL_NO_PERMISSION");
+            abort(403, 'Not Allowed');
+        }
+        $flag = session([request('session_key') => request('value')]);
+        return ($flag) ?  "true" : "false";
     }
 }

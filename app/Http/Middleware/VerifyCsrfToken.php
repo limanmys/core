@@ -23,6 +23,7 @@ class VerifyCsrfToken extends Middleware
         "/lmn/private/runCommandApi",
         "/lmn/private/putFileApi",
         "/lmn/private/getFileApi",
-        "/lmn/private/runScriptApi"
+        "/lmn/private/runScriptApi",
+        "/lmn/private/putSession"
     ];
 }

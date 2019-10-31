@@ -107,4 +107,6 @@ Route::post('/lmn/private/getFileApi','Extension\OneController@internalGetFileAp
 
 Route::post('/lmn/private/runScriptApi','Extension\OneController@internalRunScriptApi');
 
+Route::post('/lmn/private/putSession','Extension\OneController@internalPutSessionApi');
+
 Route::get('/test','HomeController@test');

@@ -366,20 +366,15 @@ function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_
         }else{
             $permissions = "admin";
         }
-        $hostname = "cn_".str_replace(".", "_", server()->ip_address);
+        $sessionData = json_encode(session()->all());
         $array = [$functions,strtolower(extension()->name),
             $viewName,$server,$extension,$extensionDb,$outputsJson,$request,$functionName,
-            $apiRoute,$navigationRoute,$token,$extension_id,$permissions, session('locale'),$_COOKIE["liman_session"]];
+            $apiRoute,$navigationRoute,$token,$extension_id,$permissions, session('locale'),$_COOKIE["liman_session"],$sessionData];
         $encrypted = openssl_encrypt(Str::random() . base64_encode(json_encode($array)),
             'aes-256-cfb8',shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
             0,Str::random());
         $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
-        $ticketPath = session()->get($hostname . "_ticket");
         
-        // Give Permissions to the extension.
-        // dd(shell_exec('getfacl -p "/tmp/krb5cc_2988" | grep "1e3846d1e5f8463eafc2ffcf530876d5" 2>/dev/null'));
-        // shell_exec("sudo setfacl -m u:" . clean_score(extension()->id) .":r " . $ticketPath);
-
         $command = "sudo runuser " . clean_score(extension()->id) .
             " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
         return $command;
