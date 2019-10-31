@@ -172,8 +172,7 @@ class SSHConnector implements Connector
             if($retry){
                 list($username, $password) = self::retrieveCredentials();
                 self::init($username, $password, server()->ip_address);
-                self::request($url,$params,$retry -1 );
-                return;
+                return self::request($url,$params,$retry -1 );
             }else{
                 // If nothing works, abort.
                 abort(403,"Anahtarınız ile sunucuya giriş yapılamadı");
