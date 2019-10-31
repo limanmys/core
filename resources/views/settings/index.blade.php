@@ -27,7 +27,7 @@
                 @include('l.table',[
                     "value" => \App\User::all(),
                     "title" => [
-                        "Sunucu Adı" , "Email" , "*hidden*" ,
+                        "Kullanıcı Adı" , "Email" , "*hidden*" ,
                     ],
                     "display" => [
                         "name" , "email", "id:user_id" ,
