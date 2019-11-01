@@ -145,7 +145,7 @@
        "title" =>"Kullanıcıyı Sil",
        "url" => route('user_remove'),
        "text" => "Kullanıcıyı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-       "next" => "reload",
+       "next" => "redirect",
        "inputs" => [
            "Kullanici Id:'null'" => "user_id:hidden"
        ],

@@ -66,7 +66,7 @@ class UserController extends Controller
         User::where("id", request('user_id'))->delete();
 
         // Respond
-        return respond("Kullanıcı Silindi",200);
+        return respond(route('settings'),300);
     }
 
     public function passwordReset()
