@@ -407,7 +407,7 @@ class OneController extends Controller
         // Init key with parameters.
         if(server()->type == "linux"){
             try{
-                $flag = SSHConnector::create(server(),request('username'),request('password'),auth()->id(),$key);
+                $flag = SSHConnector::create(server(),request('username'),request('password'),auth()->id(),null);
             }catch (\Exception $exception){
                 $flag = "Sunucuya bağlanılamadı.";
             }
@@ -415,7 +415,7 @@ class OneController extends Controller
 
         if(server()->type == "windows"){
             try{
-                $flag = WinRMConnector::create(server(),request('username'),request('password'),auth()->id(),$key);
+                $flag = WinRMConnector::create(server(),request('username'),request('password'),auth()->id(),null);
             }catch (\Exception $exception){
                 $flag = $exception->getMessage();
             }
