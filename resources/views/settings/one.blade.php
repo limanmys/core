@@ -195,6 +195,15 @@
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[1]);
             });
+            if(data.length == 0){
+                Swal.fire({
+                    type: 'error',
+                    title: 'Lütfen önce seçim yapınız.',
+                    timer : 2000,
+                    showConfirmButton: false,
+                });
+                return false;
+            }
             let form = new FormData();
             let extension_id = $("#extensionId :selected").val();
             form.append("extension_id",extension_id);
