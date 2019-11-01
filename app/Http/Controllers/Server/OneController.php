@@ -82,13 +82,17 @@ class OneController extends Controller
         if(!auth()->user()->id == server()->user_id && !auth()->user()->isAdmin()){
             return respond("Bu islemi yalnizca sunucu sahibi ya da bir yonetici yapabilir.");
         }
-        DB::table("server_extensions")->insert([
-            "id" => Str::uuid(),
+        $data = [
             "server_id" => server()->id,
             "extension_id" => extension()->id
-        ]);
-
-        return respond('Servis başarıyla eklendi.');
+        ];
+        if(DB::table("server_extensions")->where($data)->doesntExist()){
+            $data["id"] = Str::uuid();
+            DB::table("server_extensions")->insert($data);
+        }else{
+            return respond('Eklenti zaten mevcut!', 201);
+        }
+        return respond('Eklenti başarıyla eklendi.');
    }
 
     public function update()

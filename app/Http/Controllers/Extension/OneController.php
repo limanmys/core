@@ -82,6 +82,13 @@ class OneController extends Controller
         $before = Carbon::now();
         $output = shell_exec($command);
         $after = Carbon::now();
+
+        $sessions = \App\TmpSession::where('session_id', session()->getId())->get();
+        foreach($sessions as $session){
+            session()->put($session->key, $session->value);
+            $session->delete();
+        }
+        
         system_log(7,"EXTENSION_RENDER_PAGE",[
             "extension_id" => extension()->id,
             "server_id" => server()->id,
@@ -136,13 +143,20 @@ class OneController extends Controller
         }
 
         $command = generateSandboxCommand(server(), extension(), extension()->id,auth()->id(), "null", "null", request('function_name'));
-
+        
         system_log(7,"EXTENSION_RUN",[
             "extension_id" => extension()->id,
             "server_id" => server()->id,
             "target_name" => request('function_name')
         ]);
         $output = shell_exec($command);
+
+        $sessions = \App\TmpSession::where('session_id', session()->getId())->get();
+        foreach($sessions as $session){
+            session()->put($session->key, $session->value);
+            $session->delete();
+        }
+
         $code = 200;
         try{
             $json = json_decode($output,true);
@@ -195,6 +209,12 @@ class OneController extends Controller
         $user = User::find($token->user_id);
         $command = generateSandboxCommand($server, $extension, $user->settings, $user->id, "null", "null", request('target'));
         $output = shell_exec($command);
+
+        $sessions = \App\TmpSession::where('session_id', session()->getId())->get();
+        foreach($sessions as $session){
+            session()->put($session->key, $session->value);
+            $session->delete();
+        }
 
         system_log(7,"EXTENSION_INTERNAL_RUN",[
             "extension_id" => extension()->id,
@@ -404,6 +424,13 @@ class OneController extends Controller
                 }
                 $command = generateSandboxCommand(server(), $extension, extension()->id, auth()->id(), "", "null", $extension["verification"],$extensionDb);
                 $output = shell_exec($command);
+
+                $sessions = \App\TmpSession::where('session_id', session()->getId())->get();
+                foreach($sessions as $session){
+                    session()->put($session->key, $session->value);
+                    $session->delete();
+                }
+
             if(strtolower($output) != "ok" && strtolower($output) != "ok\n"){
                 return redirect(route('extension_server_settings_page', [
                     "extension_id" => extension()->id,
@@ -552,7 +579,11 @@ class OneController extends Controller
             system_log(5,"EXTENSION_INTERNAL_NO_PERMISSION");
             abort(403, 'Not Allowed');
         }
-        $flag = session([request('session_key') => request('value')]);
-        return ($flag) ?  "true" : "false";
+        \App\TmpSession::firstOrCreate([
+            "session_id" => session()->getId(),
+            "key" => request('session_key'),
+            "value" => request('value')
+        ]);
+        return "true";
     }
 }
