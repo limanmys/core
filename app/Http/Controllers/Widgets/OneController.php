@@ -37,8 +37,16 @@ class OneController extends Controller
         request()->request->add(['widget' => $widget]);
         request()->request->add(['extension_id' => $extension->id]);
         request()->request->add(['extension' => $extension]);
+
         $command = generateSandboxCommand($server, $extension, "", auth()->id(), "null", "null", $widget->function);
         $output = shell_exec($command);
+
+        $sessions = \App\TmpSession::where('session_id', session()->getId())->get();
+        foreach($sessions as $session){
+            session()->put($session->key, $session->value);
+            $session->delete();
+        }
+
         if(!$output){
             return respond(__("Widget Hiçbir Veri Döndürmedi"), 400);
         }
