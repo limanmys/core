@@ -110,3 +110,18 @@ Route::post('/lmn/private/runScriptApi','Extension\OneController@internalRunScri
 Route::post('/lmn/private/putSession','Extension\OneController@internalPutSessionApi');
 
 Route::get('/test','HomeController@test');
+
+Route::any('/upload/{any?}', function () {
+    $server = app('tus-server');
+    $extension_id = request("extension_id");
+    $extension = \App\Extension::find($extension_id);
+    if($extension){
+        $path = env('EXTENSIONS_PATH') . strtolower($extension->name);
+        if (!file_exists($path."/uploads")) {
+            mkdir($path."/uploads");
+        }
+        $server->setUploadDir($path."/uploads");
+    }
+    $response = $server->serve();
+    return $response->send();
+})->where('any', '.*');

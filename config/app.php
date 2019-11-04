@@ -178,6 +178,7 @@ return [
 //        Jenssegers\Mongodb\MongodbServiceProvider::class,
 //        Jenssegers\Mongodb\MongodbQueueServiceProvider::class,
 /*        Collective\Remote\RemoteServiceProvider::class,*/
+        App\Providers\TusServiceProvider::class,
     ],
 
     /*
