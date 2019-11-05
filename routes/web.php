@@ -124,7 +124,7 @@ Route::any('/upload/{any?}', function () {
     }
     $response = $server->serve();
     return $response->send();
-})->where('any', '.*');
+})->where('any', '.*')->middleware(['auth', 'permissions']);;
 
 Route::post('/upload_info', function(){
     request()->validate([
@@ -133,4 +133,4 @@ Route::post('/upload_info', function(){
     $key = request('key');
     $server = app('tus-server');
     return $server->getCache()->get($key);
-});
+})->middleware(['auth', 'permissions']);

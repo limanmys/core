@@ -4,8 +4,10 @@ function upload(option){
     }
     let server_id = $('meta[name=server_id]').attr("content");
     let extension_id = $('meta[name=extension_id]').attr("content");
+    let token = $('meta[name=csrf-token]').attr("content");
+
     var upload = new tus.Upload(option.file, {
-        endpoint: "/upload?extension_id="+extension_id,
+        endpoint: "/upload?extension_id="+extension_id + '&server_id=' + server_id + '&x-csrf-token=' + token,
         retryDelays: [0, 1000, 3000, 5000, 10000],
         overridePatchMethod: true,
         chunkSize: 1000 * 1000,
@@ -30,7 +32,8 @@ function upload(option){
         },
         headers: {
             "server_id": server_id,
-            "extension_id": extension_id
+            "extension_id": extension_id,
+            "x-csrf-token": token
         }
     });
     upload.start();
