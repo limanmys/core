@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('body_class', 'skin-blue sidebar-mini ' . ((\Session::has('collapse')) ? 'sidebar-collapse' : ''))
+@section('body_class', 'sidebar-mini ' . ((\Session::has('collapse')) ? 'sidebar-collapse' : ''))
 
 @section('body')
     <div class="wrapper">

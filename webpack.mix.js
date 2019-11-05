@@ -1,12 +1,13 @@
 const mix = require('laravel-mix');
 mix.styles([
-    'resources/assets/css/bootstrap.css',
     'resources/assets/css/font-awesome.css',
+    'resources/assets/css/bootstrap-tempus.css',
     'resources/assets/css/jquery.dataTables.css',
     'resources/assets/css/select.dataTables.css',
     'resources/assets/css/sweetalert2.min.css',
     'resources/assets/css/buttons.dataTables.min.css',
-    'resources/assets/css/AdminLTE.css',
+    'resources/assets/css/adminlte.css',
+    'resources/assets/css/OverlayScrollbars.css',
     'resources/assets/css/jquery.contextMenu.css',
     'resources/assets/css/jquery-ui.css',
     'resources/assets/css/themes/*.css',
@@ -19,9 +20,11 @@ mix.styles([
 mix.combine([
     'resources/assets/js/jquery.js',
     'resources/assets/js/jquery-ui.js',
+    'resources/assets/js/bootstrap.bundle.min.js',
     'resources/assets/js/tus.lib.js',
     'resources/assets/js/jquery.contextMenu.js',
-    'resources/assets/js/bootstrap.js',
+    'resources/assets/js/jquery.overlayScrollbars.js',
+    'resources/assets/js/bootstrap-tempus.js',
     'resources/assets/js/bootstrap-datepicker.js',
     'resources/assets/js/bootstrap-timepicker.js',
     'resources/assets/js/datatables.js',
