@@ -13,6 +13,7 @@ class Server
             'server_hostname' => server()->ip_address,
             'origin' => server()->control_port
         ])->exists()){
+            abort(504,server()->name."(".server()->ip_address.") ".__("isimli sunucu henüz onaylanmamış!"));
             return redirect()->back()->withErrors([
                 "message" => server()->name."(".server()->ip_address.") ".__("isimli sunucu henüz onaylanmamış!")
             ]);
@@ -21,6 +22,7 @@ class Server
         if(is_resource($status)){
             return $next($request);
         }else{
+            abort(504,server()->name."(".server()->ip_address.") ".__("isimli sunucuya erişim sağlanamadı!"));
             return redirect()->back()->withErrors([
                 "message" => server()->name."(".server()->ip_address.") ".__("isimli sunucuya erişim sağlanamadı!")
             ]);
