@@ -19,7 +19,7 @@ mix.styles([
 mix.combine([
     'resources/assets/js/jquery.js',
     'resources/assets/js/jquery-ui.js',
-    'resources/assets/js/tus.min.js',
+    'resources/assets/js/tus.lib.js',
     'resources/assets/js/jquery.contextMenu.js',
     'resources/assets/js/bootstrap.js',
     'resources/assets/js/bootstrap-datepicker.js',

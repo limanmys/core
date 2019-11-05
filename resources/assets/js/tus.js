@@ -16,6 +16,16 @@ function upload(option){
         onError: option.onError,
         onProgress: option.onProgress,
         onSuccess: function(){
+            let url_parts = upload.url.split('/');
+            let key = url_parts[url_parts.length - 1];
+            let data = new FormData();
+            data.append('key', key);
+            request('/upload_info', data,function(response){
+                try{
+                    json = JSON.parse(response);
+                    upload.info = json;
+                }catch(e){}
+            });
             option.onSuccess(upload);
         },
         headers: {

@@ -125,3 +125,12 @@ Route::any('/upload/{any?}', function () {
     $response = $server->serve();
     return $response->send();
 })->where('any', '.*');
+
+Route::post('/upload_info', function(){
+    request()->validate([
+        'key' => 'required'
+    ]);
+    $key = request('key');
+    $server = app('tus-server');
+    return $server->getCache()->get($key);
+});
