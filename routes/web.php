@@ -132,5 +132,8 @@ Route::post('/upload_info', function(){
     ]);
     $key = request('key');
     $server = app('tus-server');
-    return $server->getCache()->get($key);
+    $info = $server->getCache()->get($key);
+    $extension_path = explode("/uploads/", $info['file_path'], 2)[0];
+    $info['file_path'] = str_replace($extension_path, '', $info['file_path']);
+    return $info;
 })->middleware(['auth', 'permissions']);
