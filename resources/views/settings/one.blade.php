@@ -9,119 +9,128 @@
         </ol>
     </nav>
     <h2>{{$user->name . __(" kullanıcısı ayarları")}}</h2>
-    @include('l.errors')
-    <div class="nav-tabs-custom">
-        <ul class="nav nav-tabs">
-            <li class="active"><a href="#general" data-toggle="tab" aria-expanded="true">{{__("Genel Ayarlar")}}</a></li>
-            <li id="server_type"><a href="#extension" data-toggle="tab"
-                                    aria-expanded="false">{{__("Eklenti Yetkileri")}}</a></li>
-            </li>
-            <li class=""><a href="#server" data-toggle="tab" aria-expanded="false">{{__("Sunucu Yetkileri")}}</a></li>
-            <li class=""><a href="#function" data-toggle="tab" aria-expanded="false">{{__("Fonksiyon Yetkileri")}}</a></li>
-        </ul>
-        <div class="tab-content">
-            <div class="tab-pane active" id="general" style="height: 300px;">
-                <form onsubmit="return updateUser(this);">
-                    <div style="width: 300px;height: 300px;display: block;float: left;padding: 10px;">
-                        <h4>{{__("Hesap Türü")}}</h4>
-                        <select name="status" class="form-control">
-                            <option value="0" @if($user->status == "0") selected @endif>{{__("Kullanıcı")}}</option>
-                            <option value="1" @if($user->status == "1") selected @endif>{{__("Yönetici")}}</option>
-                        </select><br>
-                        <h4>{{__("Adı")}}</h4>
-                        <input class="form-control" type="text" value="{{$user->name}}" name="username"><br>
-                        <h4>{{__("Email Adresi")}}</h4>
-                        <input class="form-control" type="text" value="{{$user->email}}" name="email">
-                    </div>
-                    <div style="width: 300px;height: 300px;display: block;float: left;padding-top: 75px;margin-left:50px;">
-                        <button class="btn btn-danger btn-block" onclick="removeUser();return false;">{{__("Kullanıcıyı Sil")}}</button><br>
-                        <button class="btn btn-warning btn-block" onclick="resetPassword();return false;">{{__("Parola Sıfırla")}}</button><br>
-                        <button class="btn btn-success btn-block" type="submit">{{__("Değişiklikleri Kaydet")}}</button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="tab-pane" id="extension">
-                <button onclick="getList('extension')" class="btn btn-success"><i class="fa fa-plus"></i></button>
-                <button onclick="removePermission('extension')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
-                @include('l.table',[
-                    "id" => "extension_table",
-                    "value" => $extensions,
-                    "title" => [
-                        "Adı" , "*hidden*"
-                    ],
-                    "display" => [
-                        "name" , "id:id"
-                    ],
-                    "noInitialize" => "true"
-                ])
-            </div>
-            <div class="tab-pane" id="server">
-                <button onclick="getList('server')" class="btn btn-success"><i class="fa fa-plus"></i></button>
-                <button onclick="removePermission('server')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
-                @include('l.table',[
-                    "id" => "server_table",
-                    "value" => $servers,
-                    "title" => [
-                        "Adı" , "*hidden*"
-                    ],
-                    "display" => [
-                        "name" , "id:id"
-                    ],
-                    "noInitialize" => "true"
-                ])
-            </div>
-            <div class="tab-pane" id="function">
-                <button class="btn btn-success" data-toggle="modal" data-target="#functionsModal"><i class="fa fa-plus"></i></button>
-                <button onclick="removeFunctions()" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
-                @include('l.table',[
-                    "id" => "extensionFunctions",
-                    "value" => $user->permissions->where('type','function'),
-                    "title" => [
-                        "Fonksiyon Adı" , "Eklenti" , "*hidden*"
-                    ],
-                    "display" => [
-                        "extra" , "value", "id:id"
-                    ],
-                ])
-            </div>
-            <div class="tab-pane" id="liman">
-                <button onclick="getList('liman')" class="btn btn-success"><i class="fa fa-plus"></i></button>
-                <button onclick="removePermission('liman')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
-                @include('l.table',[
-                    "id" => "liman_table",
-                    "value" => $user->permissions->where('type','liman'),
-                    "title" => [
-                        "Adı" , "*hidden*"
-                    ],
-                    "display" => [
-                        "name" , "id:id"
-                    ],
-                    "noInitialize" => "true"
-                ])
-            </div>
-                <div id="functionsModal" class="modal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                        <div class="modal-header">
-                        <h3 class="modal-title">{{__("Fonksiyon Yetkileri")}}</h3>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </div>
-                            <div class="modal-body">
-                                    <h4>{{__("Lütfen Bir Eklenti Seçin")}}</h4>
-                                    <select id="extensionId" class="form-control" onchange="getFunctionList()">
-                                        <option selected disabled>{{__("...")}}</option>
-                                        @foreach(extensions() as $extension)
-                                            <option value="{{$extension->id}}">{{$extension->name}}</option>
-                                        @endforeach
-                                    </select><br>
-                                <div class="functionsTable"></div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-success" onclick="addFunctions()">{{__("Seçili Fonksiyonlara Yetki Ver")}}</button>
-                            </div>
+    <div class="card">
+        <div class="card-header p-2">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="pill" href="#general" role="tab" aria-selected="true">{{__("Genel Ayarlar")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#extension" role="tab" >{{__("Eklenti Yetkileri")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#server" role="tab">{{__("Sunucu Yetkileri")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#function" role="tab">{{__("Fonksiyon Yetkileri")}}</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            @include('l.errors')
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="general" role="tabpanel">
+                    <form onsubmit="return updateUser(this);">
+                        <div style="width: 300px;height: 300px;display: block;float: left;padding: 10px;">
+                            <h4>{{__("Hesap Türü")}}</h4>
+                            <select name="status" class="form-control">
+                                <option value="0" @if($user->status == "0") selected @endif>{{__("Kullanıcı")}}</option>
+                                <option value="1" @if($user->status == "1") selected @endif>{{__("Yönetici")}}</option>
+                            </select><br>
+                            <h4>{{__("Adı")}}</h4>
+                            <input class="form-control" type="text" value="{{$user->name}}" name="username"><br>
+                            <h4>{{__("Email Adresi")}}</h4>
+                            <input class="form-control" type="text" value="{{$user->email}}" name="email">
                         </div>
+                        <div style="width: 300px;height: 300px;display: block;float: left;padding-top: 75px;margin-left:50px;">
+                            <button class="btn btn-danger btn-block" onclick="removeUser();return false;">{{__("Kullanıcıyı Sil")}}</button><br>
+                            <button class="btn btn-warning btn-block" onclick="resetPassword();return false;">{{__("Parola Sıfırla")}}</button><br>
+                            <button class="btn btn-success btn-block" type="submit">{{__("Değişiklikleri Kaydet")}}</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="tab-pane fade show" id="extension" role="tabpanel">
+                    <button onclick="getList('extension')" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                    <button onclick="removePermission('extension')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
+                    @include('l.table',[
+                        "id" => "extension_table",
+                        "value" => $extensions,
+                        "title" => [
+                            "Adı" , "*hidden*"
+                        ],
+                        "display" => [
+                            "name" , "id:id"
+                        ],
+                        "noInitialize" => "true"
+                    ])
+                </div>
+                <div class="tab-pane fade show" id="server" role="tabpanel">
+                    <button onclick="getList('server')" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                    <button onclick="removePermission('server')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
+                    @include('l.table',[
+                        "id" => "server_table",
+                        "value" => $servers,
+                        "title" => [
+                            "Adı" , "*hidden*"
+                        ],
+                        "display" => [
+                            "name" , "id:id"
+                        ],
+                        "noInitialize" => "true"
+                    ])
+                </div>
+                <div class="tab-pane fade show" id="function" role="tabpanel">
+                    <button class="btn btn-success" data-toggle="modal" data-target="#functionsModal"><i class="fa fa-plus"></i></button>
+                    <button onclick="removeFunctions()" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
+                    @include('l.table',[
+                        "id" => "extensionFunctions",
+                        "value" => $user->permissions->where('type','function'),
+                        "title" => [
+                            "Fonksiyon Adı" , "Eklenti" , "*hidden*"
+                        ],
+                        "display" => [
+                            "extra" , "value", "id:id"
+                        ],
+                    ])
+                </div>
+                <div class="tab-pane fade show" id="liman" role="tabpanel">
+                    <button onclick="getList('liman')" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                    <button onclick="removePermission('liman')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
+                    @include('l.table',[
+                        "id" => "liman_table",
+                        "value" => $user->permissions->where('type','liman'),
+                        "title" => [
+                            "Adı" , "*hidden*"
+                        ],
+                        "display" => [
+                            "name" , "id:id"
+                        ],
+                        "noInitialize" => "true"
+                    ])
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="functionsModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">{{__("Fonksiyon Yetkileri")}}</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+                <div class="modal-body">
+                    <h4>{{__("Lütfen Bir Eklenti Seçin")}}</h4>
+                    <select id="extensionId" class="form-control" onchange="getFunctionList()">
+                        <option selected disabled>{{__("...")}}</option>
+                        @foreach(extensions() as $extension)
+                            <option value="{{$extension->id}}">{{$extension->name}}</option>
+                        @endforeach
+                    </select><br>
+                    <div class="functionsTable"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" onclick="addFunctions()">{{__("Seçili Fonksiyonlara Yetki Ver")}}</button>
                     </div>
                 </div>
             </div>

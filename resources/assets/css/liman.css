@@ -1,0 +1,13 @@
+.nav-tabs .nav-link {
+    border-radius: 0.25rem;
+}
+
+.nav-tabs .nav-link.active,
+.nav-tabs .show > .nav-link {
+    color: #ffffff;
+    background-color: #007bff;
+}
+
+.nav-tabs {
+    border-bottom: 0px;
+}

@@ -1,8 +1,10 @@
 const mix = require('laravel-mix');
 mix.styles([
     'resources/assets/css/font-awesome.css',
+    'resources/assets/css/font.css',
     'resources/assets/css/bootstrap-tempus.css',
     'resources/assets/css/jquery.dataTables.css',
+    'resources/assets/css/dataTables.bootstrap4.css',
     'resources/assets/css/select.dataTables.css',
     'resources/assets/css/sweetalert2.min.css',
     'resources/assets/css/buttons.dataTables.min.css',
@@ -16,6 +18,7 @@ mix.styles([
     'resources/assets/css/bootstrap-timepicker.css',
     'resources/assets/css/select2.min.css',
     'resources/assets/css/toastr.min.css',
+    'resources/assets/css/liman.css',
 ], 'public/css/liman.css').version();
 mix.combine([
     'resources/assets/js/jquery.js',
@@ -28,6 +31,7 @@ mix.combine([
     'resources/assets/js/bootstrap-datepicker.js',
     'resources/assets/js/bootstrap-timepicker.js',
     'resources/assets/js/datatables.js',
+    'resources/assets/js/dataTables.bootstrap4.js',
     'resources/assets/js/adminlte.js',
     'resources/assets/js/select2.min.js',
     'resources/assets/js/sweetalert2.min.js',

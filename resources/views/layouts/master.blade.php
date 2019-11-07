@@ -11,8 +11,8 @@
     <meta name="server_id" content="{{request('server_id') ? request('server_id') : ''}}">
     <meta name="extension_id" content="{{request('extension_id') ? request('extension_id') : ''}}">
 </head>
-<body class="hold-transition @yield('body_class')">
 <div class="il-isimleri"></div>
+<body class="hold-transition @yield('body_class')">
 <script>
     var module = { };
 </script>

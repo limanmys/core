@@ -61,17 +61,26 @@
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                    <div>
-                        {{__("Giriş Yapılan Son Ip : ") . user()->last_login_ip}}</br>
-                        {{__("Son Giriş Tarihi : ") . user()->last_login_at}}<br><br>
-                    </div>
-                    <div class="pull-left">
-                        <a href="{{route('my_profile')}}"
-                            class="btn btn-default btn-flat">{{__("Profil")}}</a>
-                    </div>
-                    <div class="pull-right">
-                        <a onclick="request('/cikis',new FormData(),null)"
-                            class="btn btn-default btn-flat">{{__("Çıkış Yap")}}</a>
+                    <div class="card card-widget widget-user-2" style="margin-bottom: 0px;">
+                        <div class="widget-user-header bg-warning">
+                          <h3 class="widget-user-username" style="margin-left: 0px;">{{user()->name}}</h3>
+                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Son Giriş Tarihi : ") . user()->last_login_at}}</h5>
+                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Giriş Yapılan Son Ip : ") . user()->last_login_ip}}</h5>
+                        </div>
+                        <div class="card-footer p-0">
+                          <ul class="nav flex-column">
+                            <li class="nav-item">
+                              <a href="{{route('my_profile')}}" class="nav-link">
+                                {{__("Profil")}}
+                              </a>
+                            </li>
+                            <li class="nav-item">
+                              <a onclick="request('/cikis',new FormData(),null)" class="nav-link">
+                                {{__("Çıkış Yap")}}
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
                     </div>
                 </div>
             </li>

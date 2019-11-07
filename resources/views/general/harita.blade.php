@@ -345,7 +345,7 @@ relative
   height: auto;
 }
 .il-isimleri {
-  position: relative;
+  position: fixed;
   z-index: 2;
   margin: 0;
   padding: 0;

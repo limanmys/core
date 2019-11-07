@@ -7,109 +7,119 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Ayarlar")}}</li>
         </ol>
     </nav>
-    @include('l.errors')
-    <div class="nav-tabs-custom">
-        <ul class="nav nav-tabs">
-            <li class="active"><a href="#users" data-toggle="tab" aria-expanded="true">{{__("Kullanıcı Ayarları")}}</a>
-            </li>
-            <li><a href="#certificates" data-toggle="tab" aria-expanded="false">{{__("Sertifikalar")}}</a></li>
-            <li><a href="#health" onclick="checkHealth()" data-toggle="tab"
-                   aria-expanded="false">{{__("Sağlık Durumu")}}</a></li>
-            <li><a href="#update" data-toggle="tab" aria-expanded="false">{{__("Güncelleme")}}</a></li>
-        </ul>
-        <div class="tab-content">
-            <div class="tab-pane active" id="users">
-                @include('l.modal-button',[
-                    "class" => "btn-success",
-                    "target_id" => "add_user",
-                    "text" => "Kullanıcı Ekle"
-                ])<br><br>
-                @include('l.table',[
-                    "value" => \App\User::all(),
-                    "title" => [
-                        "Kullanıcı Adı" , "Email" , "*hidden*" ,
-                    ],
-                    "display" => [
-                        "name" , "email", "id:user_id" ,
-                    ],
-                    "menu" => [
-                        "Parolayı Sıfırla" => [
-                            "target" => "passwordReset",
-                            "icon" => "fa-lock"
+    <div class="card">
+        <div class="card-header p-2">
+            <ul class="nav nav-tabs" role="tabpanel">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#users" aria-selected="true">{{__("Kullanıcı Ayarları")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#certificates" >{{__("Sertifikalar")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#health" onclick="checkHealth()">{{__("Sağlık Durumu")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#update">{{__("Güncelleme")}}</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            @include('l.errors')
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="users" role="tabpanel">
+                    @include('l.modal-button',[
+                        "class" => "btn-success",
+                        "target_id" => "add_user",
+                        "text" => "Kullanıcı Ekle"
+                    ])<br><br>
+                    @include('l.table',[
+                        "value" => \App\User::all(),
+                        "title" => [
+                            "Kullanıcı Adı" , "Email" , "*hidden*" ,
                         ],
-                        "Sil" => [
-                            "target" => "delete",
-                            "icon" => "fa-trash"
-                        ]
-                    ],
-                    "onclick" => "details"
-                ])
-            </div>
-            <div class="tab-pane" id="certificates">
-                <button class="btn btn-success" onclick="location.href = '{{route('certificate_add_page')}}'"><i
-                            class="fa fa-plus"></i> {{__("Sertifika Ekle")}}</button>
-                <br><br>
-                @include('l.table',[
-                    "value" => \App\Certificate::all(),
-                    "title" => [
-                        "Sunucu Adresi" , "Servis" , "*hidden*" ,
-                    ],
-                    "display" => [
-                        "server_hostname" , "origin", "id:certificate_id" ,
-                    ],
-                    "menu" => [
-                        "Sil" => [
-                            "target" => "deleteCertificate",
-                            "icon" => "fa-trash"
-                        ]
-                    ],
-                ])
-            </div>
-            <div class="tab-pane" id="health">
-                <pre id="output"></pre>
-            </div>
-            <div class="tab-pane" id="servers">
-                <?php
-                    $servers = servers();
-                    foreach ($servers as $server){
-                        $server->enabled = ($server->enabled) ? __("Aktif") : __("Pasif");
-                    }
-                ?>
-                <button class="btn btn-success" onclick="serverStatus(true)" disabled>{{__("Aktifleştir")}}</button>
-                <button class="btn btn-danger" onchange="serverStatus(false)" disabled>{{__("Pasifleştir")}}</button><br><br>
-                @include('l.table',[
-                    "value" => $servers,
-                    "title" => [
-                        "Sunucu Adı" , "İp Adresi" , "Durumu" , "*hidden*"
-                    ],
-                    "display" => [
-                        "name" , "ip_address", "enabled", "id:server_id"
-                    ],
-                    "noInitialize" => true
-                ])
-                <script>
-                    $("#servers table").DataTable({
-                        bFilter: true,
-                        select: {
-                            style: 'multi'
-                        },
-                        "language" : {
-                            url : "/turkce.json"
+                        "display" => [
+                            "name" , "email", "id:user_id" ,
+                        ],
+                        "menu" => [
+                            "Parolayı Sıfırla" => [
+                                "target" => "passwordReset",
+                                "icon" => "fa-lock"
+                            ],
+                            "Sil" => [
+                                "target" => "delete",
+                                "icon" => "fa-trash"
+                            ]
+                        ],
+                        "onclick" => "details"
+                    ])
+                </div>
+                <div class="tab-pane fade show" id="certificates" role="tabpanel">
+                    <button class="btn btn-success" onclick="location.href = '{{route('certificate_add_page')}}'"><i
+                        class="fa fa-plus"></i> {{__("Sertifika Ekle")}}</button>
+                    <br><br>
+                    @include('l.table',[
+                        "value" => \App\Certificate::all(),
+                        "title" => [
+                            "Sunucu Adresi" , "Servis" , "*hidden*" ,
+                        ],
+                        "display" => [
+                            "server_hostname" , "origin", "id:certificate_id" ,
+                        ],
+                        "menu" => [
+                            "Sil" => [
+                                "target" => "deleteCertificate",
+                                "icon" => "fa-trash"
+                            ]
+                        ],
+                    ])
+                </div>
+                <div class="tab-pane fade show" id="health" role="tabpanel">
+                    <pre id="output"></pre>
+                </div>
+                <div class="tab-pane fade show" id="servers" role="tabpanel">
+                    <?php
+                        $servers = servers();
+                        foreach ($servers as $server){
+                            $server->enabled = ($server->enabled) ? __("Aktif") : __("Pasif");
                         }
-                    });
-                </script>
-            </div>
-            <div class="tab-pane" id="update">
-                @php($updateOutput = shell_exec("apt list --upgradable | grep 'liman'"))
-                @if($updateOutput)
-                    <pre>{{$updateOutput}}</pre>
-                @else
-                    <pre>{{__("Liman Sürümünüz : " . env("APP_VERSION") . " güncel.")}}</pre>
-                @endif
+                    ?>
+                    <button class="btn btn-success" onclick="serverStatus(true)" disabled>{{__("Aktifleştir")}}</button>
+                    <button class="btn btn-danger" onchange="serverStatus(false)" disabled>{{__("Pasifleştir")}}</button><br><br>
+                    @include('l.table',[
+                        "value" => $servers,
+                        "title" => [
+                            "Sunucu Adı" , "İp Adresi" , "Durumu" , "*hidden*"
+                        ],
+                        "display" => [
+                            "name" , "ip_address", "enabled", "id:server_id"
+                        ],
+                        "noInitialize" => true
+                    ])
+                    <script>
+                        $("#servers table").DataTable({
+                            bFilter: true,
+                            select: {
+                                style: 'multi'
+                            },
+                            "language" : {
+                                url : "/turkce.json"
+                            }
+                        });
+                    </script>
+                </div>
+                <div class="tab-pane fade show" id="update" role="tabpanel">
+                    @php($updateOutput = shell_exec("apt list --upgradable | grep 'liman'"))
+                    @if($updateOutput)
+                        <pre>{{$updateOutput}}</pre>
+                    @else
+                        <pre>{{__("Liman Sürümünüz : " . env("APP_VERSION") . " güncel.")}}</pre>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
-
+    
     @include('l.modal',[
         "id"=>"add_user",
         "title" => "Kullanıcı Ekle",

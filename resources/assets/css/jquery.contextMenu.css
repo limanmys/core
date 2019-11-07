@@ -2,17 +2,17 @@
 /*!
  * jQuery contextMenu - Plugin for simple contextMenu handling
  *
- * Version: v2.7.0
+ * Version: v2.9.0
  *
  * Authors: Björn Brala (SWIS.nl), Rodney Rehm, Addy Osmani (patches for FF)
  * Web: http://swisnl.github.io/jQuery-contextMenu/
  *
- * Copyright (c) 2011-2018 SWIS BV and contributors
+ * Copyright (c) 2011-2019 SWIS BV and contributors
  *
  * Licensed under
  *   MIT License http://www.opensource.org/licenses/mit-license
  *
- * Date: 2018-07-12T09:06:55.859Z
+ * Date: 2019-10-13T13:09:56.297Z
  */
 @-webkit-keyframes cm-spin {
   0% {
@@ -54,8 +54,8 @@
   font-style: normal; 
   font-weight: normal;
 
-  src: url("font/context-menu-icons.eot?36hmp");
-  src: url("font/context-menu-icons.eot?36hmp#iefix") format("embedded-opentype"), url("font/context-menu-icons.woff2?36hmp") format("woff2"), url("font/context-menu-icons.woff?36hmp") format("woff"), url("font/context-menu-icons.ttf?36hmp") format("truetype");
+  src: url("font/context-menu-icons.eot?4f0ru");
+  src: url("font/context-menu-icons.eot?4f0ru#iefix") format("embedded-opentype"), url("font/context-menu-icons.woff2?4f0ru") format("woff2"), url("font/context-menu-icons.woff?4f0ru") format("woff"), url("font/context-menu-icons.ttf?4f0ru") format("truetype");
 }
 
 .context-menu-icon-add:before {
@@ -168,7 +168,7 @@
   left: .5em;
   color: #2980b9;
 }
-.context-menu-icon.context-menu-icon--fa5.context-menu-hover i, .context-menu-icon.context-menu-icon--fa5.context-menu-hover svg {
+.context-menu-icon.context-menu-icon--fa5.context-menu-hover > i, .context-menu-icon.context-menu-icon--fa5.context-menu-hover > svg {
   color: #fff;
 }
 .context-menu-icon.context-menu-icon--fa5.context-menu-disabled i, .context-menu-icon.context-menu-icon--fa5.context-menu-disabled svg {
