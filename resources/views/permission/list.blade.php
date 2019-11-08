@@ -36,7 +36,7 @@
                     ],
                     "Sil" => [
                         "target" => "deleteRequest",
-                        "icon" => "fa-trash"
+                        "icon" => " context-menu-icon-delete"
                     ]
                 ],
                 "onclick" => "userSettings"

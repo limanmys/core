@@ -55,7 +55,7 @@
                 "menu" => [
                     "Sil" => [
                         "target" => "delete",
-                        "icon" => "fa-trash"
+                        "icon" => " context-menu-icon-delete"
                     ]
                 ],
                 "onclick" => env("EXTENSION_DEVELOPER_MODE") ? "details" : ""

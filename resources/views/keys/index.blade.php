@@ -31,11 +31,11 @@
                     "menu" => [
                         "Güncelle" => [
                             "target" => "update_settings",
-                            "icon" => "fa-edit"
+                            "icon" => " context-menu-icon-edit"
                         ],
                         "Sil" => [
                             "target" => "delete_settings",
-                            "icon" => "fa-trash"
+                            "icon" => " context-menu-icon-delete"
                         ]
                     ]
                 ])

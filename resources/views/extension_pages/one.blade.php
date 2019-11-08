@@ -71,11 +71,11 @@
                             "menu" => [
                                 "Ayarları Düzenle" => [
                                     "target" => "edit_database",
-                                    "icon" => "fa-edit"
+                                    "icon" => "  context-menu-icon-edit"
                                 ],
                                 "Sil" => [
                                     "target" => "remove_database",
-                                    "icon" => "fa-trash"
+                                    "icon" => " context-menu-icon-delete"
                                 ]
                             ]
                         ])
@@ -142,11 +142,11 @@
                             "menu" => [
                                 "Kodu Düzenle" => [
                                     "target" => "editPage",
-                                    "icon" => "fa-edit"
+                                    "icon" => " context-menu-icon-edit"
                                 ],
                                 "Sil" => [
                                     "target" => "remove_view",
-                                    "icon" => "fa-trash"
+                                    "icon" => " context-menu-icon-delete"
                                 ]
                             ]
                         ])
@@ -191,11 +191,11 @@
                             "menu" => [
                                 "Düzenle" => [
                                     "target" => "edit_widget",
-                                    "icon" => "fa-edit"
+                                    "icon" => " context-menu-icon-edit"
                                 ],
                                 "Sil" => [
                                     "target" => "remove_widget",
-                                    "icon" => "fa-trash"
+                                    "icon" => " context-menu-icon-delete"
                                 ]
                             ]
                         ])
@@ -264,11 +264,11 @@
                             "menu" => [
                                 "Ayarları Düzenle" => [
                                     "target" => "updateFunctionModal",
-                                    "icon" => "fa-edit"
+                                    "icon" => " context-menu-icon-edit"
                                 ],
                                 "Sil" => [
                                     "target" => "removeFunctionModal",
-                                    "icon" => "fa-trash"
+                                    "icon" => " context-menu-icon-delete"
                                 ]
                             ]
                         ])

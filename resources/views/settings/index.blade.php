@@ -48,7 +48,7 @@
                             ],
                             "Sil" => [
                                 "target" => "delete",
-                                "icon" => "fa-trash"
+                                "icon" => " context-menu-icon-delete"
                             ]
                         ],
                         "onclick" => "details"
@@ -69,7 +69,7 @@
                         "menu" => [
                             "Sil" => [
                                 "target" => "deleteCertificate",
-                                "icon" => "fa-trash"
+                                "icon" => " context-menu-icon-delete"
                             ]
                         ],
                     ])

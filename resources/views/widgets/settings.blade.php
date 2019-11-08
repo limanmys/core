@@ -36,11 +36,11 @@
             "menu" => [
                 "Düzenle" => [
                     "target" => "edit",
-                    "icon" => "fa-edit"
+                    "icon" => " context-menu-icon-edit"
                 ],
                 "Sil" => [
                     "target" => "delete",
-                    "icon" => "fa-trash"
+                    "icon" => " context-menu-icon-delete"
                 ]
             ]
         ])
