@@ -5,7 +5,7 @@
     <div class="row" style="padding-top: 15px;">
       <div class="col-md-3 col-sm-4 col-xs-12">
           <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fa fa-users"></i></span>
+            <span class="info-box-icon bg-info"><i class="fas fa-users"></i></span>
             <div class="info-box-content">
               <span class="info-box-text">{{__("Limandaki Sunucu Sayısı")}}</span>
               <span class="info-box-number">{{\App\Server::all()->count()}}</span>
@@ -14,7 +14,7 @@
       </div>
       <div class="col-md-3 col-sm-4 col-xs-12">
           <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fa fa-plus"></i></span>
+            <span class="info-box-icon bg-info"><i class="fas fa-plus"></i></span>
             <div class="info-box-content">
               <span class="info-box-text">{{__("Limandaki Eklenti Sayısı")}}</span>
               <span class="info-box-number">{{\App\Extension::all()->count()}}</span>
@@ -23,7 +23,7 @@
       </div>
       <div class="col-md-3 col-sm-4 col-xs-12">
           <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fa fa-user"></i></span>
+            <span class="info-box-icon bg-info"><i class="fas fa-user"></i></span>
             <div class="info-box-content">
               <span class="info-box-text">{{__("Limandaki Kullanıcı Sayısı")}}</span>
               <span class="info-box-number">{{\App\User::all()->count()}}</span>
@@ -32,7 +32,7 @@
       </div>
       <div class="col-md-3 col-sm-4 col-xs-12">
           <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fa fa-cog"></i></span>
+            <span class="info-box-icon bg-info"><i class="fas fa-cog"></i></span>
             <div class="info-box-content">
               <span class="info-box-text">{{__("Limandaki Ayar Sayısı")}}</span>
               <span class="info-box-number">{{\App\UserSettings::all()->count()}}</span>
