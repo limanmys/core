@@ -1,6 +1,7 @@
 const mix = require('laravel-mix');
 mix.styles([
     'resources/assets/css/font-awesome.css',
+    'resources/assets/css/flag-icon.css',
     'resources/assets/css/font.css',
     'resources/assets/css/bootstrap-tempus.css',
     'resources/assets/css/jquery.dataTables.css',

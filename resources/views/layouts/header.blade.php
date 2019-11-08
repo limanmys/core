@@ -29,15 +29,17 @@
         <ul class="navbar-nav ml-auto">
           <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
-                {{__("Dil")}}
+              <i class="flag-icon flag-icon-@if (session('locale') === "tr")tr @elseif (session('locale') === "en")us @endif"></i>
             </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <div class="dropdown-menu dropdown-menu-right p-0">
                 @if (session('locale') === "tr")
-                <a class="dropdown-item" href="javascript:void(0)" style="cursor: not-allowed;"><b>Türkçe</b></a>
-                <a class="dropdown-item" href="{{route('set_locale', ['locale' => 'en'])}}">English</a>
+                  <a href="{{route('set_locale', ['locale' => 'en'])}}" class="dropdown-item active">
+                    <i class="flag-icon flag-icon-us mr-2"></i> English
+                  </a>
                 @elseif (session('locale') === "en")
-                <a class="dropdown-item" href="{{route('set_locale', ['locale' => 'tr'])}}">Türkçe</a>
-                <a class="dropdown-item" href="javascript:void(0)" style="cursor: not-allowed;"><b>English</b></a>
+                  <a href="{{route('set_locale', ['locale' => 'tr'])}}" class="dropdown-item active">
+                    <i class="flag-icon flag-icon-tr mr-2"></i> Türkçe
+                  </a>
                 @endif
             </div>
           </li>

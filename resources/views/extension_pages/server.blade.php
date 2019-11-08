@@ -32,7 +32,7 @@
                                 'extension_id' => $extension->id,
                                 'city' => server()->city,
                                 'server_id' => server()->id
-                            ])}}" role="tab">{{$extension->name}}</a>
+                            ])}}" role="tab">{{__($extension->name)}}</a>
                     </li>
                 @endforeach
             </ul>
