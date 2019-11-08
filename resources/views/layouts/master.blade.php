@@ -44,7 +44,20 @@
                     location.href = "/bildirim/" + data.id
                 });
             }
-        });
+    });
+    jQuery(function($) {
+      var path = window.location.href; // because the 'href' property of the DOM element is the absolute path
+      $('nav ul a').each(function() {
+        if (this.href === path) {
+          $(this).addClass('active');
+        }
+      });
+      $('.list-group a').each(function() {
+        if (this.href === path) {
+          $(this).addClass('active');
+        }
+      });
+    });
 </script>
 @endif
 @yield('body')

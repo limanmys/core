@@ -3,7 +3,7 @@
         <!-- Left navbar links -->
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+            <a class="nav-link" data-widget="pushmenu" href="#" onclick="request('{{route('set_collapse')}}',new FormData(),null)"><i class="fas fa-bars"></i></a>
           </li>
           {{-- <li class="nav-item d-none d-sm-inline-block">
             <a href="index3.html" class="nav-link">Home</a>
@@ -41,7 +41,7 @@
                 @endif
             </div>
           </li>
-          <li class="nav-item">
+          <li class="nav-item d-none d-sm-inline-block">
                 <span class="nav-link">
                     {{__("Versiyon : ") . env('APP_VERSION')}}
                 </span>
@@ -92,8 +92,8 @@
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="/" class="brand-link">
-          <img src="/images/liman_logo_white.png" alt="AdminLTE Logo" class="brand-image"
-               style="opacity: .8">
+          <img src="/images/liman_logo_white.png" alt="Liman Logo" class="brand-image"
+               style="opacity: .8;margin-left: 1.3rem;">
           <span class="brand-text font-weight-light">liman</span>
         </a>
     
@@ -109,7 +109,7 @@
                 @endif
                 @foreach ($USER_FAVORITES as $server)
                     <li class="nav-item has-treeview @if(request('server_id') == $server->id) menu-open @endif">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link @if(request('server_id') == $server->id) active @endif">
                         <i class="fa fa-server nav-icon"></i>
                         <p>
                             {{$server->name}}
@@ -125,7 +125,7 @@
                         </li>
                         @foreach ($server->extensions() as $extension)
                         <li class="nav-item">
-                            <a href="/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}" class="nav-link">
+                            <a href="/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
                                 <i class="fa fa-{{$extension->icon}} nav-icon"></i>
                                 <p>{{__($extension->name)}}</p>
                             </a>
@@ -144,7 +144,7 @@
                 <li class="nav-header">{{__("Eklentiler")}}</li>
                 @foreach(extensions() as $extension)
                     <li class="nav-item ext_nav" @if($loop->iteration > env('NAV_EXTENSION_HIDE_COUNT', 10))style="display:none;"@endif>
-                        <a href="/l/{{$extension->id}}" class="nav-link">
+                        <a href="/l/{{$extension->id}}" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
                             <i class="nav-icon fas fa-{{$extension->icon}}"></i>
                             <p>{{__($extension->name)}}</p>
                         </a>
