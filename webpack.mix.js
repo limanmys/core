@@ -16,7 +16,8 @@ mix.styles([
     'resources/assets/css/jstree.css',
     'resources/assets/css/bootstrap-datepicker.css',
     'resources/assets/css/bootstrap-timepicker.css',
-    'resources/assets/css/select2.min.css',
+    'resources/assets/css/select2.css',
+    'resources/assets/css/select2-bootstrap4.css',
     'resources/assets/css/toastr.min.css',
     'resources/assets/css/liman.css',
 ], 'public/css/liman.css').version();
@@ -33,7 +34,7 @@ mix.combine([
     'resources/assets/js/datatables.js',
     'resources/assets/js/dataTables.bootstrap4.js',
     'resources/assets/js/adminlte.js',
-    'resources/assets/js/select2.min.js',
+    'resources/assets/js/select2.full.js',
     'resources/assets/js/sweetalert2.min.js',
     'resources/assets/js/Chart.js',
     'resources/assets/js/jstree.js',

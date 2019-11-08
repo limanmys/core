@@ -281,3 +281,9 @@ window.Echo = new Echo({
     enabledTransports: ['ws', 'wss'],
     disabledTransports: ['sockjs', 'xhr_polling', 'xhr_streaming']
 });
+
+$(function () {
+    $('.select2').select2({
+        theme: 'bootstrap4'
+    })
+});

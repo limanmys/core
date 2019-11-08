@@ -46,7 +46,7 @@
           @if($widget->type==="count_box" || $widget->type==="")
             <div class="col-md-3 col-sm-4 col-xs-12" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
                 <div class="info-box" title="{{$widget->server_name . " " . __("Sunucusu")}} -> {{$widget->title}}">
-                  <span class="info-box-icon bg-info"><i class="fa fa-{{$widget->text}}"></i></span>
+                  <span class="info-box-icon bg-info"><i class="fas fa-{{$widget->text}}"></i></span>
                   <div class="info-box-content">
                     <span class="info-box-text">{{__($widget->title)}}</span>
                     <span class="info-box-number limanWidget" id="{{$widget->id}}" title="{{__($widget->title)}}" data-server-id="{{$widget->server_id}}">{{__('Yükleniyor..')}}</span>
