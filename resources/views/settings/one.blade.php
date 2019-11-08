@@ -40,7 +40,7 @@
                             <h4>{{__("Adı")}}</h4>
                             <input class="form-control" type="text" value="{{$user->name}}" name="username"><br>
                             <h4>{{__("Email Adresi")}}</h4>
-                            <input class="form-control" type="text" value="{{$user->email}}" name="email">
+                            <input class="form-control" type="email" value="{{$user->email}}" name="email">
                         </div>
                         <div style="width: 300px;height: 300px;display: block;float: left;padding-top: 75px;margin-left:50px;">
                             <button class="btn btn-danger btn-block" onclick="removeUser();return false;">{{__("Kullanıcıyı Sil")}}</button><br>

@@ -135,7 +135,7 @@
         ],
         "inputs" => [
             "Adı" => "name:text",
-            "E-mail Adresi" => "email:text",
+            "E-mail Adresi" => "email:email",
         ],
         "submit_text" => "Ekle"
     ])
