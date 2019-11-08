@@ -36,15 +36,15 @@
 
 @section('content')
     @include('l.errors')
-    <ul class="timeline">
-        <li class="time-label">
-        <span class="bg-green">
-            {{\Carbon\Carbon::parse($notification->created_at)->format("d.m.Y")}}
-        </span>
-        </li>
-        <li>
+    <div class="timeline">
+        <div class="time-label">
+            <span class="bg-green">
+                {{\Carbon\Carbon::parse($notification->created_at)->format("d.m.Y")}}
+            </span>
+        </div>
+        <div>
             <div class="timeline-item">
-                <span class="time"><i class="fa fa-clock-o"></i> {{\Carbon\Carbon::parse($notification->created_at)->format("h:i:s")}}</span>
+                <span class="time"><i class="fas fa-clock"></i> {{\Carbon\Carbon::parse($notification->created_at)->format("h:i:s")}}</span>
 
                 <h3 class="timeline-header">
                     @if(!$notification->read)<a href="javascript:void(0)">@endif
@@ -62,8 +62,8 @@
                     @endif
                 </div>
             </div>
-        </li>
-    </ul>
+        </div>
+    </div>
     <script>
         $('.mark_read').click(function () {
             let data = new FormData();

@@ -11,19 +11,19 @@
 @endif
 
 @include('l.errors')    
-<ul class="timeline">
+<div class="timeline">
     @foreach ($notifications as $date => $items)
-         <li class="time-label">
+         <div class="time-label">
             <span class="bg-green">
                 {{$date}}
             </span>
-        </li>
+        </div>
         @foreach ($items as $item)
-             <li>
+             <div>
                 @if($item->read)
-                    <i class="fa fa-bell-o @if($item->type=="error") bg-red @else bg-blue @endif"></i>
+                    <i class="far fa-bell @if($item->type=="error") bg-red @else bg-blue @endif"></i>
                 @else
-                    <i class="fa fa-bell @if($item->type=="error") bg-red @else bg-blue @endif"></i>
+                    <i class="fas fa-bell @if($item->type=="error") bg-red @else bg-blue @endif"></i>
                 @endif
                 <div class="timeline-item">
                     <span class="time"><i class="fa fa-clock-o"></i> {{\Carbon\Carbon::parse($item->created_at)->format("h:i:s")}}</span>
@@ -46,10 +46,10 @@
                         @endif
                     </div>
                 </div>
-            </li>
+            </div>
         @endforeach
     @endforeach
-</ul>
+</div>
 <script>
     $('#read_all').click(function(){
         let data = new FormData();

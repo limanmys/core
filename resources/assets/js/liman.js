@@ -168,13 +168,9 @@ window.onbeforeunload = function () {
     });
 };
 
-$(".modal").on('show.bs.modal', function(modal) {
-    $("#" + modal.target.id + " .alert").fadeOut(0);
-});
-
 function message(data) {
     let json = JSON.parse(data);
-    let modal = document.getElementsByClassName("modal fade in")[0];
+    let modal = document.getElementsByClassName("modal fade show")[0];
     if (!modal) {
         return;
     }
@@ -183,6 +179,8 @@ function message(data) {
     let color = "alert-info";
     switch (json["status"]) {
         case 200:
+            color = "alert-success";
+            break;
         case 300:
         case 301:
             color = "alert-success";
@@ -191,7 +189,7 @@ function message(data) {
             color = "alert-danger";
     }
     if(json["message"]){
-        selector.removeClass('alert-danger').removeClass('alert-success').addClass(color).html(json["message"]).fadeIn();
+        selector.removeClass('alert-danger').removeAttr('hidden').removeClass('alert-success').addClass(color).html(json["message"]).fadeIn();
     }
 }
 
@@ -230,7 +228,7 @@ function renderNotifications(data,type,target, exclude){
             "error" , "health_problem", "liman_update"
         ];
         let color = (errors.includes(notification["type"])) ? "#f56954" : "#00a65a";
-        element.append("<li><a href='/bildirim/" + notification["id"] + "'>" + 
+        element.append("<li><a class='dropdown-item' href='/bildirim/" + notification["id"] + "'>" + 
                 "<span style='color: " + color + ";width: 100%'>"+ notification["title"] + "</span></a></li>");
         let displayedNots = [];
         if(localStorage.displayedNots){
@@ -280,4 +278,14 @@ window.Echo = new Echo({
     encrypted: true,
     enabledTransports: ['ws', 'wss'],
     disabledTransports: ['sockjs', 'xhr_polling', 'xhr_streaming']
+});
+
+$(function () {
+    $('.select2').select2({
+        theme: 'bootstrap4'
+    });
+
+    $(".modal").on('show.bs.modal', function(modal) {
+        $("#" + modal.target.id + " .alert").fadeOut(0);
+    });
 });

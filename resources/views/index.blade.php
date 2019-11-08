@@ -2,90 +2,86 @@
 
 @section('content')
     @include('l.errors')
-    <section class="content" style="min-height: 0px;">
+    <div class="row" style="padding-top: 15px;">
       <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box overlay-wrapper">
-              <span class="info-box-icon bg-aqua" style="padding: 20px;"><i class="fa fa-users"></i></span>
-              <div class="info-box-content" style="">
-                  <span class="info-box-text">{{__("Sistemdeki Sunucu Sayısı")}}</span>
-                  <span class="float-right" style="font-size: 20px">{{\App\Server::all()->count()}}</span>
-                  <span class="progress-description">{{__("Liman'ın yönettiği sunucu sayısı")}}</span>
-              </div>
+          <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fas fa-users"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">{{__("Limandaki Sunucu Sayısı")}}</span>
+              <span class="info-box-number">{{\App\Server::all()->count()}}</span>
+            </div>
           </div>
       </div>
       <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box overlay-wrapper">
-              <span class="info-box-icon bg-aqua" style="padding: 20px;"><i class="fa fa-plus"></i></span>
-              <div class="info-box-content" style="">
-                  <span class="info-box-text">{{__("Sistemdeki Eklenti Sayısı")}}</span>
-                  <span class="float-right" style="font-size: 20px">{{\App\Extension::all()->count()}}</span>
-                  <span class="progress-description">{{__("Liman'da kullandığı eklenti sayısı")}}</span>
-              </div>
+          <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fas fa-plus"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">{{__("Limandaki Eklenti Sayısı")}}</span>
+              <span class="info-box-number">{{\App\Extension::all()->count()}}</span>
+            </div>
           </div>
       </div>
       <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box overlay-wrapper">
-              <span class="info-box-icon bg-aqua" style="padding: 20px;"><i class="fa fa-user"></i></span>
-              <div class="info-box-content" style="">
-                  <span class="info-box-text">{{__("Sistemdeki Kullanıcı Sayısı")}}</span>
-                  <span class="float-right" style="font-size: 20px">{{\App\User::all()->count()}}</span>
-                  <span class="progress-description">{{__("Liman'ı Kullanan Kullanıcı Sayısı")}}</span>
-              </div>
+          <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fas fa-user"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">{{__("Limandaki Kullanıcı Sayısı")}}</span>
+              <span class="info-box-number">{{\App\User::all()->count()}}</span>
+            </div>
           </div>
       </div>
       <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box overlay-wrapper">
-              <span class="info-box-icon bg-aqua" style="padding: 20px;"><i class="fa fa-cog"></i></span>
-              <div class="info-box-content" style="">
-                  <span class="info-box-text">{{__("Sistemdeki Ayar Sayısı")}}</span>
-                  <span class="float-right" style="font-size: 20px">{{\App\UserSettings::all()->count()}}</span>
-                  <span class="progress-description">{{__("Liman'ın kullandığı eklenti ayar sayısı")}}</span>
-              </div>
+          <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fas fa-cog"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">{{__("Limandaki Ayar Sayısı")}}</span>
+              <span class="info-box-number">{{\App\UserSettings::all()->count()}}</span>
+            </div>
           </div>
       </div>
-    </section>
-    <section class="content sortable-widget">
-        @if($widgets->count())
-            @foreach($widgets as $widget)
-              @if($widget->type==="count_box" || $widget->type==="")
-                <div class="col-md-3 col-sm-4 col-xs-12" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
-                    <div class="info-box overlay-wrapper" title="{{$widget->server_name . " " . __("Sunucusu")}} -> {{$widget->title}}">
-                        <span class="info-box-icon bg-aqua" style="padding:20px; display: none;"><i class="fa fa-{{$widget->text}}"></i></span>
-                        <div class="info-box-content" style="display: none;">
-                            <span class="info-box-text" id="{{$widget->id}}" title="{{__($widget->title)}}" data-server-id="{{$widget->server_id}}">{{__($widget->title)}}</span>
-                            <span class="float-right limanWidget" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}" style="font-size: 20px">{{__("Yükleniyor...")}}</span>
-                            <span class="progress-description" title="{{$widget->server_name . " " . __("Sunucusu")}}">{{$widget->server_name . " " . __("Sunucusu")}}</span>
-                        </div>
-                        <div class="overlay" style="padding: 5px 10px;text-align: center;position: initial;">
-                          <i class="fa fa-refresh fa-spin"></i>
-                          <span style="font-size: 1.2rem;">{{__("Yükleniyor")}}</span>
-                        </div>
-                    </div>
-                </div>
-              @elseif ($widget->type==="chart")
-                <div class="col-md-6 limanCharts" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
-                  <div class="box box-primary" id="{{$widget->id}}Chart">
-                    <div class="box-header with-border">
-                      <h3 class="box-title">{{$widget->server_name . " " . __("Sunucusu")}} {{__($widget->title)}}</h3>
-                      <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="row sortable-widget">
+      @if($widgets->count())
+        @foreach($widgets as $widget)
+          @if($widget->type==="count_box" || $widget->type==="")
+            <div class="col-md-3 col-sm-4 col-xs-12" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
+                <div class="info-box" title="{{$widget->server_name . " " . __("Sunucusu")}} -> {{$widget->title}}">
+                  <span class="info-box-icon bg-info"><i class="fas fa-{{$widget->text}}"></i></span>
+                  <div class="info-box-content">
+                    <span class="info-box-text">{{__($widget->title)}}</span>
+                    <span class="info-box-number limanWidget" id="{{$widget->id}}" title="{{__($widget->title)}}" data-server-id="{{$widget->server_id}}">{{__('Yükleniyor..')}}</span>
+                    <span class="progress-description" title="{{$widget->server_name . " " . __("Sunucusu")}}">{{$widget->server_name . " " . __("Sunucusu")}}</span>
+                  </div>
+                  <div class="overlay">
+                      <div class="spinner-border" role="status">
+                        <span class="sr-only">{{__("Yükleniyor")}}</span>
                       </div>
-                    </div>
-                    <div class="box-body">
-                      <canvas></canvas>
-                    </div>
-                    <div class="overlay" style="padding: 5px 10px;text-align: center;position: initial;">
-                      <i class="fa fa-refresh fa-spin"></i>
-                      <span style="font-size: 1.2rem;">{{__("Yükleniyor")}}</span>
-                    </div>
                   </div>
                 </div>
-              @endif
-            @endforeach
-        @endif
-    </section>
+            </div>
+          @elseif ($widget->type==="chart")
+            <div class="col-md-6 limanCharts" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
+                <div class="card" id="{{$widget->id}}Chart">
+                  <div class="card-header ui-sortable-handle" style="cursor: move;">
+                    <h3 class="card-title">
+                      <i class="fas fa-chart-pie mr-1"></i>
+                      {{$widget->server_name . " " . __("Sunucusu")}} {{__($widget->title)}}
+                    </h3>
+                  </div>
+                  <div class="card-body">
+                    <canvas class="chartjs-render-monitor"></canvas>
+                  </div>
+                  <div class="overlay">
+                      <div class="spinner-border" role="status">
+                        <span class="sr-only">{{__("Yükleniyor")}}</span>
+                      </div>
+                  </div>
+                </div>
+            </div>
+          @endif
+        @endforeach
+      @endif
+    </div>
     <style>
     .sortable-widget{
       cursor: default;
@@ -234,7 +230,7 @@
 
         function createChart(element, labels, data) {
           $("#" + element + ' .overlay').remove();
-          window[element + "Chart"] = new Chart($("#" + element+' .box-body canvas'), {
+          window[element + "Chart"] = new Chart($("#" + element+' .card-body canvas'), {
             type: 'line',
             data: {
               datasets: [{

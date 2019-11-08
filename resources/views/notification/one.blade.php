@@ -19,17 +19,17 @@ if(!$item){
 @extends('layouts.app')
 @section('content')
     @include('l.errors')
-    <ul class="timeline">
-        <li class="time-label">
-        <span class="bg-green">
-            {{\Carbon\Carbon::parse($item->created_at)->format("d.m.Y")}}
-        </span>
-        </li>
-        <li>
+    <div class="timeline">
+        <div class="time-label">
+            <span class="bg-green">
+                {{\Carbon\Carbon::parse($item->created_at)->format("d.m.Y")}}
+            </span>
+        </div>
+        <div>
             @if($item->read)
-                <i class="fa fa-bell-o @if($item->type=="error") bg-red @else bg-blue @endif"></i>
+                <i class="far fa-bell @if($item->type=="error") bg-red @else bg-blue @endif"></i>
             @else
-                <i class="fa fa-bell @if($item->type=="error") bg-red @else bg-blue @endif"></i>
+                <i class="fas fa-bell @if($item->type=="error") bg-red @else bg-blue @endif"></i>
             @endif
             <div class="timeline-item">
                 <span class="time"><i class="fa fa-clock-o"></i> {{\Carbon\Carbon::parse($item->created_at)->format("h:i:s")}}</span>
@@ -41,7 +41,7 @@ if(!$item){
                 </h3>
 
                 <div class="timeline-body">
-                    {{$item->message}}
+                    {!! $item->message !!}
                 </div>
                 <div class="timeline-footer">
                     @if(!$item->read)
@@ -51,8 +51,8 @@ if(!$item){
                     <a class="btn btn-danger btn-xs delete_not" notification-id="{{$item->id}}">{{__('Sil')}}</a>
                 </div>
             </div>
-        </li>
-    </ul>
+        </div>
+    </div>
     <script>
         $('.mark_read').click(function () {
             let data = new FormData();

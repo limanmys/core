@@ -21,18 +21,24 @@
             <li class="breadcrumb-item active" aria-current="page">{{cities(request('city'))}}</li>
         </ol>
     </nav>
-    @include('l.errors')
-    @include('l.table',[
-        "value" => $servers,
-        "title" => [
-            "Sunucu Adı" , "İp Adresi" , "Sunucu Tipi" , "Kontrol Portu", "*hidden*" ,"*hidden*"
-        ],
-        "display" => [
-            "name" , "ip_address", "type" , "control_port", "city:city", "id:server_id"
-        ],
-        "onclick" => "details"
-    ])
-
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{__(extension()->name)}} {{ __('Sunucuları') }}</h3>
+        </div>
+        <div class="card-body">
+            @include('l.errors')
+            @include('l.table',[
+                "value" => $servers,
+                "title" => [
+                    "Sunucu Adı" , "İp Adresi" , "Sunucu Tipi" , "Kontrol Portu", "*hidden*" ,"*hidden*"
+                ],
+                "display" => [
+                    "name" , "ip_address", "type" , "control_port", "city:city", "id:server_id"
+                ],
+                "onclick" => "details"
+            ])
+        </div>
+    </div>
     <script>
         function details(element) {
             let server_id = element.querySelector('#server_id').innerHTML;

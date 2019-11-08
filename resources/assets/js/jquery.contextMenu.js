@@ -1,17 +1,17 @@
 /**
- * jQuery contextMenu v2.7.0 - Plugin for simple contextMenu handling
+ * jQuery contextMenu v2.9.0 - Plugin for simple contextMenu handling
  *
- * Version: v2.7.0
+ * Version: v2.9.0
  *
  * Authors: Björn Brala (SWIS.nl), Rodney Rehm, Addy Osmani (patches for FF)
  * Web: http://swisnl.github.io/jQuery-contextMenu/
  *
- * Copyright (c) 2011-2018 SWIS BV and contributors
+ * Copyright (c) 2011-2019 SWIS BV and contributors
  *
  * Licensed under
  *   MIT License http://www.opensource.org/licenses/mit-license
  *
- * Date: 2018-07-12T09:06:55.786Z
+ * Date: 2019-10-13T13:09:56.900Z
  */
 
 // jscs:disable
@@ -239,6 +239,7 @@
             },
             // events
             events: {
+                preShow: $.noop,
                 show: $.noop,
                 hide: $.noop,
                 activated: $.noop
@@ -278,6 +279,11 @@
             // contextmenu show dispatcher
             contextmenu: function (e) {
                 var $this = $(this);
+
+                //Show browser context-menu when preShow returns false
+                if (e.data.events.preShow($this,e) === false) {
+                    return;
+                }
 
                 // disable actual context-menu if we are using the right mouse button as the trigger
                 if (e.data.trigger === 'right') {
@@ -1115,6 +1121,11 @@
                     'contextMenu': opt,
                     'contextMenuRoot': root
                 });
+                if(opt.dataAttr){
+                    $.each(opt.dataAttr, function (key, item) {
+                        opt.$menu.attr('data-' + opt.key, item);
+                    });
+                }
 
                 $.each(['callbacks', 'commands', 'inputs'], function (i, k) {
                     opt[k] = {};
@@ -1331,6 +1342,7 @@
                                 if (typeof(item.icon) === 'string' && (
                                     item.icon.substring(0, 4) === 'fab '
                                     || item.icon.substring(0, 4) === 'fas '
+                                    || item.icon.substring(0, 4) === 'fad '
                                     || item.icon.substring(0, 4) === 'far '
                                     || item.icon.substring(0, 4) === 'fal ')
                                 ) {
@@ -1578,7 +1590,7 @@
                     });
                 } else if(($menuOffset.top < winScrollTop) || ($menuOffset.top + menuHeight > winScrollTop + winHeight)){
                     $menu.css({
-                        'top': '0px'
+                        'top': winScrollTop + 'px'
                     });
                 }
             }

@@ -23,24 +23,27 @@
         ])}}'"><i class="fa fa-server"></i></button>
 </div>
 @include('l.errors')    
-<div class="nav-tabs-custom">
-        <ul class="nav nav-tabs">
-        @foreach (server()->extensions() as $extension)
-            <li @if(request('extension_id') == $extension->id) class="active" @endif><a onclick="location.href = '{{route('extension_server',[
-                'extension_id' => $extension->id,
-                'city' => server()->city,
-                'server_id' => server()->id
-            ])}}'" aria-expanded="false">{{$extension->name}}</a>
-        @endforeach
-        </ul>
-    <div class="tab-content">
-        <div class="tab-pane active" id="current" style="display:flow-root;height:100%;width:100%">
-            {!!$view!!}
+<div class="card">
+    <div class="card-header">
+            <ul class="nav nav-tabs" role="tablist">
+                @foreach (server()->extensions() as $extension)
+                    <li class="nav-item">
+                        <a class="nav-link @if(request('extension_id') == $extension->id) active @endif" href="{{route('extension_server',[
+                                'extension_id' => $extension->id,
+                                'city' => server()->city,
+                                'server_id' => server()->id
+                            ])}}" role="tab">{{__($extension->name)}}</a>
+                    </li>
+                @endforeach
+            </ul>
+    </div>
+    <div class="card-body">
+        <div class="tab-content">
+            <div class="tab-pane fade show active" role="tabpanel">
+                {!!$view!!}
+            </div>
         </div>
     </div>
 </div>
-</div>
-
-
 <br><span style="padding-left: 30px;">{{__("İstek")}} {{$timestamp}} {{__("saniyede tamamlandı.")}}</span>
 @endsection

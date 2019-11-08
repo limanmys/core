@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{__("Liman Sistem Yönetimi")}}</title>
 
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{mix('/css/liman.css')}}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="server_id" content="{{request('server_id') ? request('server_id') : ''}}">
     <meta name="extension_id" content="{{request('extension_id') ? request('extension_id') : ''}}">
 </head>
-<body class="hold-transition @yield('body_class')">
 <div class="il-isimleri"></div>
+<body class="hold-transition @yield('body_class')">
 <script>
     var module = { };
 </script>
@@ -44,7 +44,20 @@
                     location.href = "/bildirim/" + data.id
                 });
             }
-        });
+    });
+    jQuery(function($) {
+      var path = window.location.href; // because the 'href' property of the DOM element is the absolute path
+      $('nav ul a').each(function() {
+        if (this.href === path) {
+          $(this).addClass('active');
+        }
+      });
+      $('.list-group a').each(function() {
+        if (this.href === path) {
+          $(this).addClass('active');
+        }
+      });
+    });
 </script>
 @endif
 @yield('body')

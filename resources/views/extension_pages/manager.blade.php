@@ -1,16 +1,68 @@
 @extends('layouts.app')
 
 @section('content')
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ __('Eklenti Yönetimi') }}</li>
-        </ol>
+    <nav class="row">
+        <div class="col-sm-6">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ __('Eklenti Yönetimi') }}</li>
+            </ol>
+        </div>
+        <div class="col-sm-6">
+            <div class="float-sm-right">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#extSettings"><i class="fa fa-cogs"></i></button>
+            </div>
+        </div>
     </nav>
-    @include('l.errors')    
-    <div class="right" style="float:right;margin-top:-55px">
-        <button class="btn btn-primary" data-toggle="modal" data-target="#extSettings"><i class="fa fa-cogs"></i></button>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{__("Eklentiler")}}</h3>
+        </div>
+        <div class="card-body">
+            @include('l.errors')    
+
+            @include('l.modal-button',[
+                "class" => "btn-primary",
+                "target_id" => "extensionUpload",
+                "text" => "Yükle"
+            ])
+            @if(env("EXTENSION_DEVELOPER_MODE"))
+                @include('l.modal-button',[
+                    "class" => "btn-secondary",
+                    "target_id" => "extensionExport",
+                    "text" => "İndir"
+                ])
+                @include('l.modal-button',[
+                    "class" => "btn-info",
+                    "target_id" => "newExtension",
+                    "text" => "Yeni"
+                ])
+            @endif
+        
+            <br><br>
+        
+            @include('l.table',[
+                "value" => extensions(),
+                "sortable" => true,
+                "sortUpdateUrl" => route('update_ext_orders'),
+                "afterSortFunction" => 'location.reload',
+                "title" => [
+                    "Eklenti Adı" , "Versiyon", "Son Güncelleme Tarihi", "*hidden*"
+                ],
+                "display" => [
+                    "name" , "version", "updated_at", "id:extension_id"
+                ],
+                "menu" => [
+                    "Sil" => [
+                        "target" => "delete",
+                        "icon" => " context-menu-icon-delete"
+                    ]
+                ],
+                "onclick" => env("EXTENSION_DEVELOPER_MODE") ? "details" : ""
+            ])
+        </div>
     </div>
+
     @include('l.modal',[
         "id"=>"extSettings",
         "title" => "Ayarlar",
@@ -20,45 +72,6 @@
             "Sol menüde kaç eklenti gözüksün?" => "ext_count:number",
         ],
         "submit_text" => "Kaydet"
-    ])
-    @include('l.modal-button',[
-        "class" => "btn-primary",
-        "target_id" => "extensionUpload",
-        "text" => "Yükle"
-    ])
-    @if(env("EXTENSION_DEVELOPER_MODE"))
-        @include('l.modal-button',[
-            "class" => "btn-secondary",
-            "target_id" => "extensionExport",
-            "text" => "İndir"
-        ])
-        @include('l.modal-button',[
-            "class" => "btn-info",
-            "target_id" => "newExtension",
-            "text" => "Yeni"
-        ])
-    @endif
-
-    <br><br>
-
-    @include('l.table',[
-        "value" => extensions(),
-        "sortable" => true,
-        "sortUpdateUrl" => route('update_ext_orders'),
-        "afterSortFunction" => 'location.reload',
-        "title" => [
-            "Eklenti Adı" , "Versiyon", "Son Güncelleme Tarihi", "*hidden*"
-        ],
-        "display" => [
-            "name" , "version", "updated_at", "id:extension_id"
-        ],
-        "menu" => [
-            "Sil" => [
-                "target" => "delete",
-                "icon" => "fa-trash"
-            ]
-        ],
-        "onclick" => env("EXTENSION_DEVELOPER_MODE") ? "details" : ""
     ])
 
     @include('l.modal',[

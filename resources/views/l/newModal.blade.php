@@ -1,4 +1,28 @@
 <div class="modal fade" id="{{ isset($id) ? $id : "" }}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{ isset($title) ? $title : "" }}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            @isset($onsubmit)
+                <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return {{$onsubmit}}(this)" target="#">
+            @else
+                <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return @isset($url)request('{{$url}}',this,@isset($next){{$next}}@endisset)"@endisset target="#">
+            @endif
+                <div class="modal-body">
+                        {{ $slot }}
+                </div>
+                <div class="modal-footer justify-content-between">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="{{ isset($id) ? $id : "" }}">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">

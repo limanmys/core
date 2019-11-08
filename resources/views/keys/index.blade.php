@@ -8,17 +8,18 @@
         </ol>
     </nav>
     @include('l.errors')
-    
-
-    <div class="nav-tabs-custom">
-        <ul class="nav nav-tabs">
-            <li class="active"><a href="#settings" data-toggle="tab" aria-expanded="false">{{__("Kasa")}}</a></li>
-        </ul>
-        <div class="tab-content">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{__("Kasa")}}</h3>
+        </div>
+        <div class="card-body">
             <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add_settings"><i class="fa fa-key "></i> {{__("Anahtar Ekle")}}</button>
             <button type="button" class="btn btn-secondary" onclick="cleanSessions()">{{__("Önbelleği Temizle")}}</button>
-            <div class="tab-pane active" id="settings">
-                <h4>{{__("Güvenliğiniz için varolan verileriniz gösterilmemektedir.")}}</h4>
+            <div class="tab-pane active" id="settings" style="margin-top: 15px;">
+                <div class="alert alert-info alert-dismissible">
+                    <h5><i class="icon fas fa-info"></i> {{ __('Bilgilendirme!') }}</h5>
+                    {{__("Güvenliğiniz için varolan verileriniz gösterilmemektedir.")}}
+                </div>
                 @include('l.table',[
                 "value" => $settings,
                     "title" => [
@@ -30,11 +31,11 @@
                     "menu" => [
                         "Güncelle" => [
                             "target" => "update_settings",
-                            "icon" => "fa-edit"
+                            "icon" => " context-menu-icon-edit"
                         ],
                         "Sil" => [
                             "target" => "delete_settings",
-                            "icon" => "fa-trash"
+                            "icon" => " context-menu-icon-delete"
                         ]
                     ]
                 ])
@@ -42,8 +43,7 @@
         </div>
     </div>
 
-
-    @include('l.modal',[
+@include('l.modal',[
         "id"=>"add_settings",
         "title" => "Anahtar Ekle",
         "url" => route('key_add'),

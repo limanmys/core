@@ -7,7 +7,7 @@
         @php($rand = str_random(10))
     @endisset
 
-<table class="table table-striped table-hover nowrap @isset($noInitialize){{"notDataTable"}}@endisset" id="{{$rand}}" style="width: 100%">
+<table class="table table-bordered table-striped @isset($noInitialize){{"notDataTable"}}@endisset" id="{{$rand}}" style="width: 100%">
         <thead>
         <tr>
             @if(isset($sortable) && $sortable)
@@ -23,11 +23,11 @@
             @endforeach
         </tr>
         </thead>
-        <tbody class="table-striped">
+        <tbody>
         @foreach ($value as $k)
             <tr class="tableRow" @if(isset($k->id)) data-id="{{$k->id}}" @endif id="{{str_random(10)}}" @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this)" @endisset>
                 @if(isset($sortable) && $sortable)
-                  <td style="width: 10px"><i class="fa fa-arrows"></i></td>
+                  <td style="width: 10px; text-align: center;"><i class="fas fa-arrows-alt"></i></td>
                 @endif
                 <td style="width: 10px" class="row-number">{{$loop->iteration}}</td>
                 @foreach($display as $item)
