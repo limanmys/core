@@ -52,6 +52,11 @@
                     <span class="info-box-number limanWidget" id="{{$widget->id}}" title="{{__($widget->title)}}" data-server-id="{{$widget->server_id}}">{{__('Yükleniyor..')}}</span>
                     <span class="progress-description" title="{{$widget->server_name . " " . __("Sunucusu")}}">{{$widget->server_name . " " . __("Sunucusu")}}</span>
                   </div>
+                  <div class="overlay">
+                      <div class="spinner-border" role="status">
+                        <span class="sr-only">{{__("Yükleniyor")}}</span>
+                      </div>
+                  </div>
                 </div>
             </div>
           @elseif ($widget->type==="chart")
@@ -67,8 +72,9 @@
                     <canvas class="chartjs-render-monitor"></canvas>
                   </div>
                   <div class="overlay">
-                    <i class="fas fa-2x fa-sync-alt"></i><br>
-                    {{-- <span style="font-size: 1.2rem;">{{__("Yükleniyor")}}</span> --}}
+                      <div class="spinner-border" role="status">
+                        <span class="sr-only">{{__("Yükleniyor")}}</span>
+                      </div>
                   </div>
                 </div>
             </div>
