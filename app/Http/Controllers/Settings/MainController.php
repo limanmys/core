@@ -33,6 +33,30 @@ class MainController extends Controller
         ]);
     }
 
+    public function getUserList()
+    {
+        return view('l.table',[
+            "value" => \App\User::all(),
+            "title" => [
+                "Kullanıcı Adı" , "Email" , "*hidden*" ,
+            ],
+            "display" => [
+                "name" , "email", "id:user_id" ,
+            ],
+            "menu" => [
+                "Parolayı Sıfırla" => [
+                    "target" => "passwordReset",
+                    "icon" => "fa-lock"
+                ],
+                "Sil" => [
+                    "target" => "delete",
+                    "icon" => " context-menu-icon-delete"
+                ]
+            ],
+            "onclick" => "details"
+        ]);
+    }
+
     public function getList()
     {
         $user = User::find(request('user_id'));

@@ -33,26 +33,28 @@
                         "target_id" => "add_user",
                         "text" => "Kullanıcı Ekle"
                     ])<br><br>
-                    @include('l.table',[
-                        "value" => \App\User::all(),
-                        "title" => [
-                            "Kullanıcı Adı" , "Email" , "*hidden*" ,
-                        ],
-                        "display" => [
-                            "name" , "email", "id:user_id" ,
-                        ],
-                        "menu" => [
-                            "Parolayı Sıfırla" => [
-                                "target" => "passwordReset",
-                                "icon" => "fa-lock"
+                    <div id="usersTable">
+                        @include('l.table',[
+                            "value" => \App\User::all(),
+                            "title" => [
+                                "Kullanıcı Adı" , "Email" , "*hidden*" ,
                             ],
-                            "Sil" => [
-                                "target" => "delete",
-                                "icon" => " context-menu-icon-delete"
-                            ]
-                        ],
-                        "onclick" => "details"
-                    ])
+                            "display" => [
+                                "name" , "email", "id:user_id" ,
+                            ],
+                            "menu" => [
+                                "Parolayı Sıfırla" => [
+                                    "target" => "passwordReset",
+                                    "icon" => "fa-lock"
+                                ],
+                                "Sil" => [
+                                    "target" => "delete",
+                                    "icon" => " context-menu-icon-delete"
+                                ]
+                            ],
+                            "onclick" => "details"
+                        ])
+                    </div>
                 </div>
                 <div class="tab-pane fade show" id="certificates" role="tabpanel">
                     <button class="btn btn-success" onclick="location.href = '{{route('certificate_add_page')}}'"><i
@@ -179,6 +181,22 @@
         function after_user_add(response) {
             let json = JSON.parse(response);
             $("#add_user button[type='submit']").attr("disabled","true")
+            getUserList();
+        }
+
+        function getUserList(){
+            request('{{route('get_user_list_admin')}}', new FormData(), function (response) {
+                $("#usersTable").html(response);
+                $('#usersTable table').DataTable({
+                    bFilter: true,
+                    select: {
+                        style: 'multi'
+                    },
+                    "language" : {
+                        url : "/turkce.json"
+                    }
+                });
+            });
         }
 
         function details(row) {
