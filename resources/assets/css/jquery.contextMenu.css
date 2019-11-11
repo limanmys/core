@@ -138,7 +138,7 @@
   font-family: 'Font Awesome 5 Free';
   font-size: 1em;
   font-style: normal;
-  font-weight: normal;
+  font-weight: 900;
   line-height: 1;
   color: #2980b9;
   text-align: center;
@@ -204,6 +204,10 @@
       -ms-user-select: none;
           user-select: none; 
   background-color: #fff;
+}
+
+.context-menu-item > span{
+  font-weight: normal;
 }
 
 .context-menu-separator {

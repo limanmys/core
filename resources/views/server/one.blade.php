@@ -217,7 +217,7 @@
                                         ],
                                         "Yeniden Baslat" => [
                                             "target" => "restartService",
-                                            "icon" => "fa-refresh"
+                                            "icon" => "fa-sync-alt"
                                         ]
                 
                                     ],
