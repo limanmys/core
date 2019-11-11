@@ -29,12 +29,16 @@
         <ul class="navbar-nav ml-auto">
           <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
-              <i class="flag-icon flag-icon-@if (session('locale') === "tr")tr @elseif (session('locale') === "en")us @endif"></i>
+              @if (session('locale') === "tr")
+                <i class="flag-icon flag-icon-tr"></i>
+              @else
+                EN
+              @endif
             </a>
             <div class="dropdown-menu dropdown-menu-right p-0">
                 @if (session('locale') === "tr")
                   <a href="{{route('set_locale', ['locale' => 'en'])}}" class="dropdown-item active">
-                    <i class="flag-icon flag-icon-us mr-2"></i> English
+                    EN English
                   </a>
                 @elseif (session('locale') === "en")
                   <a href="{{route('set_locale', ['locale' => 'tr'])}}" class="dropdown-item active">
