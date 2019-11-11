@@ -25,6 +25,7 @@ mix.styles([
 mix.combine([
     'resources/assets/js/jquery.js',
     'resources/assets/js/jquery-ui.js',
+    'resources/assets/js/split.min.js',
     'resources/assets/js/bootstrap.bundle.min.js',
     'resources/assets/js/tus.lib.js',
     'resources/assets/js/jquery.contextMenu.js',
