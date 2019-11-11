@@ -7,7 +7,8 @@
         @php($rand = str_random(10))
     @endisset
 
-<table class="table table-bordered table-striped @isset($noInitialize){{"notDataTable"}}@endisset" id="{{$rand}}" style="width: 100%">
+<div class="table-responsive">
+    <table class="table table-bordered table-striped @isset($noInitialize){{"notDataTable"}}@endisset" id="{{$rand}}" style="width: 100%">
         <thead>
         <tr>
             @if(isset($sortable) && $sortable)
@@ -49,6 +50,7 @@
         @endforeach
         </tbody>
     </table>
+</div>
     @if(isset($menu))
         <script>
 
