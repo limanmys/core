@@ -39,7 +39,6 @@
     "inputs" => [
         "Talep Tipi:type" => [
             "Sunucu" => "server",
-            "Betik" => "script",
             "Eklenti" => "extension",
             "Diğer" => "other"
         ],
