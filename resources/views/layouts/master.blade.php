@@ -19,6 +19,7 @@
 <script src="{{mix('/js/liman.js')}}"></script>
 @if(auth()->check())
 <script>
+    toastr.options.closeButton = true;
     Echo.private('App.User.{{auth()->user()->id}}')
         .notification((notification) => {
             let data = notification['\u0000*\u0000attributes'];
