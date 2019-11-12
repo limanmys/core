@@ -155,14 +155,14 @@
                             <p>{{__($extension->name)}}</p>
                         </a>
                     </li>
-                    @if(count(extensions()) > env('NAV_EXTENSION_HIDE_COUNT', 10))
-                    <li class="nav-item ext_nav_more_less">
-                        <a href="javascript:void(0)" class="nav-link">
-                            <p>{{__('...daha fazla')}}</p>
-                        </a>
-                    </li>
-                    @endif
                 @endforeach
+                @if(count(extensions()) > env('NAV_EXTENSION_HIDE_COUNT', 10))
+                <li class="nav-item ext_nav_more_less">
+                    <a href="javascript:void(0)" class="nav-link">
+                        <p>{{__('...daha fazla')}}</p>
+                    </a>
+                </li>
+                @endif
               @endif
               @if(auth()->user()->isAdmin())
                 <li class="nav-header">{{__("Yönetim Paneli")}}</li>
