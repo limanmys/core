@@ -97,11 +97,13 @@ class OneController extends Controller
 
     public function update()
     {
-        Notification::new(
-            __("Server Adı Güncellemesi"),
-            "notify",
-            __(":old isimli sunucu adı :new olarak değiştirildi.", ["old" => server()->name, "new" => request('name')])
-        );
+        if(server()->name !== request('name') ){
+            Notification::new(
+                __("Server Adı Güncellemesi"),
+                "notify",
+                __(":old isimli sunucu adı :new olarak değiştirildi.", ["old" => server()->name, "new" => request('name')])
+            );
+        }
 
         $output = server()->update([
             "name" => request('name'),
