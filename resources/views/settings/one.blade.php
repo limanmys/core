@@ -111,28 +111,30 @@
             </div>
         </div>
     </div>
-    <div id="functionsModal" class="modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="functionsModal">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">{{__("Fonksiyon Yetkileri")}}</h3>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                </div>
-                <div class="modal-body">
-                    <h4>{{__("Lütfen Bir Eklenti Seçin")}}</h4>
-                    <select id="extensionId" class="form-control" onchange="getFunctionList()">
-                        <option selected disabled>{{__("...")}}</option>
-                        @foreach(extensions() as $extension)
-                            <option value="{{$extension->id}}">{{$extension->name}}</option>
-                        @endforeach
-                    </select><br>
-                    <div class="functionsTable"></div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success" onclick="addFunctions()">{{__("Seçili Fonksiyonlara Yetki Ver")}}</button>
-                    </div>
-                </div>
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    {{__("Fonksiyon Yetkileri")}}
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4>{{__("Lütfen Bir Eklenti Seçin")}}</h4>
+                <select id="extensionId" class="form-control" onchange="getFunctionList()">
+                    <option selected disabled>{{__("...")}}</option>
+                    @foreach(extensions() as $extension)
+                        <option value="{{$extension->id}}">{{$extension->name}}</option>
+                    @endforeach
+                </select><br>
+                <div class="functionsTable"></div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-success" onclick="addFunctions()">{{__("Seçili Fonksiyonlara Yetki Ver")}}</button>
+            </div>
             </div>
         </div>
     </div>
