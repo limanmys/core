@@ -27,6 +27,7 @@ mix.combine([
     'resources/assets/js/jquery-ui.js',
     'resources/assets/js/split.min.js',
     'resources/assets/js/bootstrap.bundle.min.js',
+    'resources/assets/js/bs-custom-file-input.js',
     'resources/assets/js/tus.lib.js',
     'resources/assets/js/jquery.contextMenu.js',
     'resources/assets/js/jquery.overlayScrollbars.js',
