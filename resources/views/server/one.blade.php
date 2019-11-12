@@ -551,9 +551,6 @@
                 $("#packagesTab").html(response);
                 $("#packagesTab table").DataTable({
                     bFilter: true,
-                    select: {
-                        style: 'multi'
-                    },
                     "language": {
                         url: "/turkce.json"
                     }
