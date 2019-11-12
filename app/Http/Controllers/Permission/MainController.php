@@ -20,7 +20,20 @@ class MainController extends Controller
                 $request->user_name = $user->name;
                 $request->user_id = $user->id;
             }
-
+            switch ($request->type){
+                case "server":
+                    $request->type = __("Sunucu");
+                    break;
+                case "extension":
+                    $request->type = __("Eklenti");
+                    break;
+                case "other":
+                    $request->type = __("Diğer");
+                    break;
+                default:
+                    $request->type = __("Bilinmeyen.");
+                    break; 
+            }
             switch ($request->status){
                 case "0":
                     $request->status = __("Talep Alındı");
