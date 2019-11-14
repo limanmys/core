@@ -43,7 +43,7 @@
                                 <label>{{$item["name"]}}</label>
                                 <select class="form-control" name="{{$item["variable"]}}" required>
                                     @foreach(extensions() as $extension)
-                                        <option value="{{$extension->id}}">{{$extension->name}}</option>
+                                        <option value="{{$extension->id}}" @if($extension->id == old($item["variable"], extensionDb($item["variable"]))) selected @endif >{{$extension->name}}</option>
                                     @endforeach
                                 </select>
                             </div>                    
@@ -52,7 +52,7 @@
                                 <label>{{$item["name"]}}</label>
                                 <select class="form-control" name="{{$item["variable"]}}">
                                     @foreach(servers() as $server)
-                                        <option value="{{$server->id}}">{{$server->name}}</option>
+                                        <option value="{{$server->id}}" @if($server->id == old($item["variable"], extensionDb($item["variable"]))) selected @endif>{{$server->name}}</option>
                                     @endforeach
                                 </select>
                             </div>                    
