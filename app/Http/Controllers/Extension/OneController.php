@@ -207,9 +207,9 @@ class OneController extends Controller
         }
 
         $user = User::find($token->user_id);
-        $command = generateSandboxCommand($server, $extension, $user->settings, $user->id, "null", "null", request('target'));
+        $command = generateSandboxCommand(server(), extension(), extension()->id, auth()->id(), "null", "null", request('target'));
         $output = shell_exec($command);
-
+        
         $sessions = \App\TmpSession::where('session_id', session()->getId())->get();
         foreach($sessions as $session){
             session()->put($session->key, $session->value);

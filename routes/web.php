@@ -97,17 +97,17 @@ Route::post('/user/setting/delete','UserController@removeSetting')->name('user_s
 Route::post('/user/setting/update','UserController@updateSetting')->name('user_setting_update');
 });
 
-Route::post('/lmn/private/extensionApi','Extension\OneController@internalExtensionApi');
+Route::post('/lmn/private/extensionApi','Extension\OneController@internalExtensionApi')->middleware(['auth', 'permissions']);
 
-Route::post('/lmn/private/runCommandApi','Extension\OneController@internalRunCommandApi');
+Route::post('/lmn/private/runCommandApi','Extension\OneController@internalRunCommandApi')->middleware(['auth', 'permissions']);
 
-Route::post('/lmn/private/putFileApi','Extension\OneController@internalPutFileApi');
+Route::post('/lmn/private/putFileApi','Extension\OneController@internalPutFileApi')->middleware(['auth', 'permissions']);
 
-Route::post('/lmn/private/getFileApi','Extension\OneController@internalGetFileApi');
+Route::post('/lmn/private/getFileApi','Extension\OneController@internalGetFileApi')->middleware(['auth', 'permissions']);
 
-Route::post('/lmn/private/runScriptApi','Extension\OneController@internalRunScriptApi');
+Route::post('/lmn/private/runScriptApi','Extension\OneController@internalRunScriptApi')->middleware(['auth', 'permissions']);
 
-Route::post('/lmn/private/putSession','Extension\OneController@internalPutSessionApi');
+Route::post('/lmn/private/putSession','Extension\OneController@internalPutSessionApi')->middleware(['auth', 'permissions']);
 
 Route::get('/test','HomeController@test');
 
@@ -124,7 +124,7 @@ Route::any('/upload/{any?}', function () {
     }
     $response = $server->serve();
     return $response->send();
-})->where('any', '.*')->middleware(['auth', 'permissions']);;
+})->where('any', '.*')->middleware(['auth', 'permissions']);
 
 Route::post('/upload_info', function(){
     request()->validate([
