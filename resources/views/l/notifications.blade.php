@@ -10,24 +10,26 @@
     <span class="dropdown-item dropdown-header" onclick="@if(!isset($systemNotification)) readNotifications() @else readSystemNotifications() @endif">
         {{__('Tümünü Okundu Olarak İşaretle')}}
     </span>
-    @foreach ($notifications as $notification)
-    <div class="dropdown-divider"></div>
-        @switch($notification->type)
-            @case('error')
-            @case('health_problem')
-            @case('liman_update')
-            <a href="/bildirim/{{$notification->id}}" class="dropdown-item" style="color: #f56954;width: 100%">
-                {{$notification->title}}
-            </a>
-            @break
-            @default
-            <a href="/bildirim/{{$notification->id}}" class="dropdown-item" style="color: #00a65a;width: 100%">
-                {{$notification->title}}
-            </a>
-            @break
-        @endswitch
-    </a>
-    @endforeach
+    <div class="menu">
+        @foreach ($notifications as $notification)
+        <div class="dropdown-divider"></div>
+            @switch($notification->type)
+                @case('error')
+                @case('health_problem')
+                @case('liman_update')
+                <a href="/bildirim/{{$notification->id}}" class="dropdown-item" style="color: #f56954;width: 100%">
+                    {{$notification->title}}
+                </a>
+                @break
+                @default
+                <a href="/bildirim/{{$notification->id}}" class="dropdown-item" style="color: #00a65a;width: 100%">
+                    {{$notification->title}}
+                </a>
+                @break
+            @endswitch
+        </a>
+        @endforeach
+    </div>
     <div class="dropdown-divider"></div>
     <a class="dropdown-item dropdown-footer" href="{{isset($systemNotification) ? route('all_system_notifications') : route('all_user_notifications')}}">{{__('Tümünü gör')}}</a>
 </div>

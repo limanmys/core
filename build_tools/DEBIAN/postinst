@@ -48,7 +48,8 @@ if [ -f "/etc/cron.d/liman" ]; then
     echo "Crontab already created.";
 else
     mkdir "/etc/cron.d" 2>/dev/null
-    echo "* * * * * cd /liman/server && php artisan schedule:run >> /dev/null 2>&1" >> "/etc/cron.d/liman"
+    echo "* * * * * root cd /liman/server && php artisan schedule:run >> /dev/null 2>&1" >> "/etc/cron.d/liman"
+    systemctl restart cron
 fi
 
 mv /liman/server/nginx.conf /etc/nginx/sites-available/liman.conf

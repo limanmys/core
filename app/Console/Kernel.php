@@ -55,7 +55,7 @@ class Kernel extends ConsoleKernel
             $notification = new AdminNotification();
             $notification->title = "Liman Güncellemesi Mevcut!";
             $notification->type = "liman_update";
-            $notification->message = ($output) ? $output : "";
+            $notification->message = "Yeni bir liman sürümü mevcut ayrıntılı bilgi için tıklayınız.";
             $notification->level = 3;
             $notification->save();
         })->everyThirtyMinutes()->name('Update Check');

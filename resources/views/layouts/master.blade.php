@@ -23,7 +23,6 @@
     Echo.private('App.User.{{auth()->user()->id}}')
         .notification((notification) => {
             let data = notification['\u0000*\u0000attributes'];
-            checkNotifications(data ? data.id : null);
             if(data){
                 let errors = [
                     "error" , "health_problem", "liman_update"
@@ -45,6 +44,7 @@
                     location.href = "/bildirim/" + data.id
                 });
             }
+            checkNotifications(data ? data.id : null);
     });
     jQuery(function($) {
       var path = window.location.href; // because the 'href' property of the DOM element is the absolute path

@@ -228,8 +228,8 @@ function renderNotifications(data,type,target, exclude){
             "error" , "health_problem", "liman_update"
         ];
         let color = (errors.includes(notification["type"])) ? "#f56954" : "#00a65a";
-        element.append("<li><a class='dropdown-item' href='/bildirim/" + notification["id"] + "'>" + 
-                "<span style='color: " + color + ";width: 100%'>"+ notification["title"] + "</span></a></li>");
+        element.append("<div class='dropdown-divider'></div><a class='dropdown-item' href='/bildirim/" + notification["id"] + "'>" + 
+                "<span style='color: " + color + ";width: 100%'>"+ notification["title"] + "</span></a>");
         let displayedNots = [];
         if(localStorage.displayedNots){
             displayedNots = JSON.parse(localStorage.displayedNots);
