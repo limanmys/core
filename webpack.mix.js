@@ -4,7 +4,6 @@ mix.styles([
     'resources/assets/css/flag-icon.css',
     'resources/assets/css/font.css',
     'resources/assets/css/bootstrap-tempus.css',
-    'resources/assets/css/jquery.dataTables.css',
     'resources/assets/css/dataTables.bootstrap4.css',
     'resources/assets/css/select.dataTables.css',
     'resources/assets/css/sweetalert2.min.css',

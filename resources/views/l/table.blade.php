@@ -8,7 +8,7 @@
     @endisset
 
 <div class="table-responsive">
-    <table class="table table-bordered table-striped @isset($noInitialize){{"notDataTable"}}@endisset" id="{{$rand}}" style="width: 100%">
+    <table class="table table-bordered table-hover dataTable @isset($noInitialize){{"notDataTable"}}@endisset" id="{{$rand}}" style="width: 100%">
         <thead>
         <tr>
             @if(isset($sortable) && $sortable)
