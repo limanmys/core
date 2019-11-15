@@ -363,7 +363,7 @@ class OneController extends Controller
                     "menu" => [
                         "Güncelle" => [
                             "target" => "updateSinglePackage",
-                            "icon" => "fa-refresh"
+                            "icon" => "fa-sync"
                         ]
                     ]
                 ])->render()
