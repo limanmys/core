@@ -132,7 +132,7 @@
                         @foreach ($server->extensions() as $extension)
                         <li class="nav-item">
                             <a href="/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
-                                <i class="fa fa-{{$extension->icon}} nav-icon"></i>
+                                <i class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-'.$extension->icon}}"></i>
                                 <p>{{__($extension->name)}}</p>
                             </a>
                         </li>
