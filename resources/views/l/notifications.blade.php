@@ -10,7 +10,7 @@
     <span class="dropdown-item dropdown-header" onclick="@if(!isset($systemNotification)) readNotifications() @else readSystemNotifications() @endif">
         {{__('Tümünü Okundu Olarak İşaretle')}}
     </span>
-    <div class="menu">
+    <div class="menu" style="max-height: 245px; overflow: scroll; overflow-x: hidden;">
         @foreach ($notifications as $notification)
         <div class="dropdown-divider"></div>
             @switch($notification->type)
