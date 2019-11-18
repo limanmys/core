@@ -49,7 +49,7 @@
           </li>
           <li class="nav-item d-none d-sm-inline-block">
                 <span class="nav-link">
-                    {{__("Versiyon : ") . env('APP_VERSION')}}
+                    {{__("Versiyon: ") . env('APP_VERSION')}}
                 </span>
           </li>
           <!-- Notifications Dropdown Menu -->
@@ -63,7 +63,7 @@
           <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#">
                     <i class="fa fa-user"></i>
-                    <span class="hidden-xs">{{user()->name}}</span>
+                    <span class="d-none d-sm-inline-block">{{user()->name}}</span>
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
