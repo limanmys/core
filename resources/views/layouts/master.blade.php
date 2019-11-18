@@ -37,7 +37,7 @@
                 if(localStorage.displayedNots){
                     displayedNots = JSON.parse(localStorage.displayedNots);
                 } 
-                displayedNots.push(notification.id);
+                displayedNots.push(data.id);
                 localStorage.displayedNots = JSON.stringify(displayedNots);
                 
                 $(toastElement).click(function(){
