@@ -166,7 +166,7 @@
                 } catch(e) {
                   info_box.find('.overlay i').remove();
                   info_box.find('.overlay span').remove();
-                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+e.message+'</span>');
+                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red;"></i><span>'+e.message+'</span>');
                 }
                 if(next){
                   next();
@@ -178,9 +178,10 @@
                 }catch(e){
                   json = e;
                 }
+                info_box.find('.overlay .spinner-border').remove();
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
-                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
+                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span>'+json.message+'</span>');
                 if(next){
                   next();
                 }
@@ -200,7 +201,7 @@
                 } catch(e) {
                   info_box.find('.overlay i').remove();
                   info_box.find('.overlay span').remove();
-                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+e.message+'</span>');
+                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red;"></i><span>'+e.message+'</span>');
                 }
                 if(next){
                   next();
@@ -212,9 +213,10 @@
                 }catch(e){
                   json = e;
                 }
+                element.find('.overlay .spinner-border').remove();
                 element.find('.overlay i').remove();
                 element.find('.overlay span').remove();
-                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span style="font-size: 1.2rem;">'+json.message+'</span>');
+                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span>'+json.message+'</span>');
                 if(next){
                   next();
                 }
