@@ -52,7 +52,7 @@
                     <span class="info-box-number limanWidget" id="{{$widget->id}}" title="{{__($widget->title)}}" data-server-id="{{$widget->server_id}}">{{__('Yükleniyor..')}}</span>
                     <span class="progress-description" title="{{$widget->server_name . " " . __("Sunucusu")}}">{{$widget->server_name . " " . __("Sunucusu")}}</span>
                   </div>
-                  <div class="overlay">
+                  <div class="overlay" style="background: rgba(255,255,255,.9);">
                       <div class="spinner-border" role="status">
                         <span class="sr-only">{{__("Yükleniyor")}}</span>
                       </div>
@@ -71,7 +71,7 @@
                   <div class="card-body">
                     <canvas class="chartjs-render-monitor"></canvas>
                   </div>
-                  <div class="overlay">
+                  <div class="overlay" style="background: rgba(255,255,255,.9);">
                       <div class="spinner-border" role="status">
                         <span class="sr-only">{{__("Yükleniyor")}}</span>
                       </div>
@@ -166,7 +166,7 @@
                 } catch(e) {
                   info_box.find('.overlay i').remove();
                   info_box.find('.overlay span').remove();
-                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red;"></i><span>'+e.message+'</span>');
+                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+e.message+'</span>');
                 }
                 if(next){
                   next();
@@ -181,7 +181,7 @@
                 info_box.find('.overlay .spinner-border').remove();
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
-                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span>'+json.message+'</span>');
+                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+json.message+'</span>');
                 if(next){
                   next();
                 }
@@ -201,7 +201,7 @@
                 } catch(e) {
                   info_box.find('.overlay i').remove();
                   info_box.find('.overlay span').remove();
-                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red;"></i><span>'+e.message+'</span>');
+                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+e.message+'</span>');
                 }
                 if(next){
                   next();
@@ -216,7 +216,7 @@
                 element.find('.overlay .spinner-border').remove();
                 element.find('.overlay i').remove();
                 element.find('.overlay span').remove();
-                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red;"></i><span>'+json.message+'</span>');
+                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+json.message+'</span>');
                 if(next){
                   next();
                 }
