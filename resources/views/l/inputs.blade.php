@@ -57,6 +57,11 @@
             <input name="{{explode(":", $input)[0]}}" type="file" class="custom-file-input @if(isset($random,$id)){{$random}} {{$id}}@endif">
             <label class="custom-file-label">{{__($name)}}</label>
         </div>
+        <style>
+            .custom-file-label::after{
+                content: "{{ __('Gözat') }}"
+            }
+        </style>
     @else
         @if(explode(":", $input)[1] == "checkbox")
             <div class="form-check">
