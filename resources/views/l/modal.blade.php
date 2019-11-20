@@ -20,20 +20,22 @@
                 <div class="modal-body">
                     <div id="{{$id}}_alert" class="alert" role="alert" hidden></div>
                     @if(isset($selects) && is_array($selects))
-                        <h5>{{__("Tipi")}}</h5>
-                        <select class="form-control" required onchange="cs_{{$id}}(this.value)">
-                            @foreach ($selects as $key => $select)
-                                <option value="{{explode(":",$key)[1]}}">{{__(explode(":",$key)[0])}}</option>
-                            @endforeach
-                            @foreach ($selects as $key => $select)
-                                @include('l.inputs',[
-                                        "inputs" => $select,
-                                        "disabled" => "true",
-                                        "id" => explode(":",$key)[1],
-                                        "random" => $id
-                                ])
-                            @endforeach
-                        </select><br>
+                        <div class="form-group">
+                            <label>{{__("Tipi")}}</label>
+                            <select class="form-control" required onchange="cs_{{$id}}(this.value)">
+                                @foreach ($selects as $key => $select)
+                                    <option value="{{explode(":",$key)[1]}}">{{__(explode(":",$key)[0])}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @foreach ($selects as $key => $select)
+                        @include('l.inputs',[
+                                    "inputs" => $select,
+                                    "disabled" => "true",
+                                    "id" => explode(":",$key)[1],
+                                    "random" => $id
+                            ])
+                        @endforeach
                     @endif
                     @isset($inputs)
                         @include('l.inputs',$inputs)
