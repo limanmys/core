@@ -37,6 +37,7 @@ class Kernel extends ConsoleKernel
         $schedule->call(function (){
             $messages = checkHealth();
             if($messages[0]["type"] != "success"){
+                AdminNotification::where('type', 'health_problem')->delete();
                 $notification = new AdminNotification();
                 $notification->title = "Sağlık Problemi Bulundu!";
                 $notification->type = "health_problem";
@@ -52,6 +53,7 @@ class Kernel extends ConsoleKernel
             if(!strpos($output,"liman")){
                 return;
             }
+            AdminNotification::where('type', 'liman_update')->delete();
             $notification = new AdminNotification();
             $notification->title = "Liman Güncellemesi Mevcut!";
             $notification->type = "liman_update";
