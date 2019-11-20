@@ -596,6 +596,19 @@ class OneController extends Controller
         }else{
             abort(404);
         }
-        
+    }
+
+    public function internalAddProxyConfig()
+    {
+        if(!is_dir(env("KEYS_PATH") . "vnc")){
+            mkdir(env("KEYS_PATH") . "vnc",0700);
+        }
+        $writer = fopen(env("KEYS_PATH") . "vnc/config","a+");
+        $hostname = request('hostname');
+        $port = request('port');
+        $token = Str::uuid();
+        $token = str_replace("-","",$token);
+        fwrite($writer,$token . ": $hostname:$port" . "\n");
+        return $token;
     }
 }

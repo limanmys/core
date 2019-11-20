@@ -165,6 +165,12 @@ cp /liman/server/storage/libphpcpp.so.2.2.0 /usr/lib/libphpcpp.so.2.2.0
 ln -f -s /usr/lib/libphpcpp.so.2.2.0 /usr/lib/libphpcpp.so.2.2
 chmod 644 /usr/lib/libphpcpp.so.2.2.0
 
+# Prepare Folders for vnc
+rm -rf /liman/keys/vnc
+mkdir /liman/keys/vnc
+chmod 700 /liman/keys/vnc
+touch /liman/keys/vnc/config
+
 # Modify ini file to use decoder.
 if grep --quiet liman-decoder.so /etc/php/7.3/cli/php.ini; then
     echo "Decoder already enabled"; 

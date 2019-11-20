@@ -109,7 +109,7 @@ Route::post('/lmn/private/runScriptApi','Extension\OneController@internalRunScri
 
 Route::post('/lmn/private/putSession','Extension\OneController@internalPutSessionApi')->middleware(['auth', 'permissions']);
 
-Route::get('/test','HomeController@test');
+Route::post('/lmn/private/reverseProxyRequest','Extension\OneController@internalAddProxyConfig')->middleware(['auth', 'permissions']);
 
 Route::any('/upload/{any?}', function () {
     $server = app('tus-server');
