@@ -47,3 +47,5 @@ Route::post('/eklenti/fonksiyonEkle','Extension\SettingsController@addFunction')
 Route::post('/eklenti/fonksiyonDuzenle','Extension\SettingsController@updateFunction')->name('extension_update_function')->middleware('admin');
 
 Route::post('/eklenti/fonksiyonSil','Extension\SettingsController@removeFunction')->name('extension_remove_function')->middleware('admin');
+
+Route::get('/eklenti/{extension_id}/public/{path}','Extension\OneController@publicFolder')->name('extension_public_folder');

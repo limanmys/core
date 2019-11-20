@@ -587,4 +587,10 @@ class OneController extends Controller
         ]);
         return "true";
     }
+
+    public function publicFolder()
+    {
+        $path = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/public/" . request('path');
+        return response()->download($path);
+    }
 }
