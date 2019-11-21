@@ -22,7 +22,7 @@
             "server_id" => server()->id,
         ])}}'"><i class="fa fa-server"></i></button>
 </div>
-@include('l.errors')    
+@include('errors')    
 <div class="card">
     <div class="card-header">
             <ul class="nav nav-tabs" role="tablist">

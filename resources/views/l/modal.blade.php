@@ -29,7 +29,7 @@
                             </select>
                         </div>
                         @foreach ($selects as $key => $select)
-                        @include('l.inputs',[
+                        @include('inputs',[
                                     "inputs" => $select,
                                     "disabled" => "true",
                                     "id" => explode(":",$key)[1],
@@ -38,7 +38,7 @@
                         @endforeach
                     @endif
                     @isset($inputs)
-                        @include('l.inputs',$inputs)
+                        @include('inputs',$inputs)
                     @endisset
                     @isset($text)
                         {{__($text)}}

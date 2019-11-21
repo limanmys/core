@@ -25,16 +25,16 @@
             </ul>
         </div>
         <div class="card-body">
-            @include('l.errors')
+            @include('errors')
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="users" role="tabpanel">
-                    @include('l.modal-button',[
+                    @include('modal-button',[
                         "class" => "btn-success",
                         "target_id" => "add_user",
                         "text" => "Kullanıcı Ekle"
                     ])<br><br>
                     <div id="usersTable">
-                        @include('l.table',[
+                        @include('table',[
                             "value" => \App\User::all(),
                             "title" => [
                                 "Kullanıcı Adı" , "Email" , "*hidden*" ,
@@ -60,7 +60,7 @@
                     <button class="btn btn-success" onclick="location.href = '{{route('certificate_add_page')}}'"><i
                         class="fa fa-plus"></i> {{__("Sertifika Ekle")}}</button>
                     <br><br>
-                    @include('l.table',[
+                    @include('table',[
                         "value" => \App\Certificate::all(),
                         "title" => [
                             "Sunucu Adresi" , "Servis" , "*hidden*" ,
@@ -88,7 +88,7 @@
                     ?>
                     <button class="btn btn-success" onclick="serverStatus(true)" disabled>{{__("Aktifleştir")}}</button>
                     <button class="btn btn-danger" onchange="serverStatus(false)" disabled>{{__("Pasifleştir")}}</button><br><br>
-                    @include('l.table',[
+                    @include('table',[
                         "value" => $servers,
                         "title" => [
                             "Sunucu Adı" , "İp Adresi" , "Durumu" , "*hidden*"
@@ -122,7 +122,7 @@
         </div>
     </div>
     
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"add_user",
         "title" => "Kullanıcı Ekle",
         "url" => route('user_add'),
@@ -142,7 +142,7 @@
         "submit_text" => "Ekle"
     ])
 
-    @include('l.modal',[
+    @include('modal',[
        "id"=>"delete",
        "title" =>"Kullanıcıyı Sil",
        "url" => route('user_remove'),
@@ -154,7 +154,7 @@
        "submit_text" => "Kullanıcıyı Sil"
    ])
 
-    @include('l.modal',[
+    @include('modal',[
            "id"=>"deleteCertificate",
            "title" =>"Sertifikayı Sil",
            "url" => route('remove_certificate'),
@@ -166,7 +166,7 @@
            "submit_text" => "Sertifikayı Sil"
        ])
 
-    @include('l.modal',[
+    @include('modal',[
        "id"=>"passwordReset",
        "title" =>"Parolayı Sıfırla",
        "url" => route('user_password_reset'),

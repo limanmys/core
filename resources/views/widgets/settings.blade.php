@@ -14,7 +14,7 @@
     <div class="card-body">
         <button class="btn btn-success" onclick="window.location.href = '{{route('widget_add_page')}}'">{{__("Widget Ekle")}}</button>
         <br><br>
-        @include('l.errors')
+        @include('errors')
         <?php
             foreach($widgets as $widget){
                 $extension = \App\Extension::find($widget->extension_id);
@@ -25,7 +25,7 @@
                 }
             }
         ?>
-        @include('l.table',[
+        @include('table',[
             "value" => $widgets,
             "title" => [
                 "Sunucu" , "Başlık" , "Eklenti", "*hidden*"
@@ -47,7 +47,7 @@
     </div>
 </div>
 
-@include('l.modal',[
+@include('modal',[
     "id"=>"add_server",
     "title" => "Widget Ekle",
     "url" => route('widget_add'),
@@ -62,7 +62,7 @@
     "submit_text" => "Ekle"
 ])
 
-@include('l.modal',[
+@include('modal',[
     "id"=>"edit",
     "title" => "Widget Düzenle",
     "url" => route('widget_update'),
@@ -78,7 +78,7 @@
     "submit_text" => "Düzenle"
 ])
 
-@include('l.modal',[
+@include('modal',[
     "id"=>"delete",
     "title" =>"Widget'ı Sil",
     "url" => route('widget_remove'),

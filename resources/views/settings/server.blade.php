@@ -8,7 +8,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Sunucu Ayarları")}}</li>
         </ol>
     </nav>
-    @include('l.errors')
+    @include('errors')
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">{{__("Genel Ayarlar")}}</a></li>

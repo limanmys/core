@@ -19,20 +19,20 @@
             <h3 class="card-title">{{__("Eklentiler")}}</h3>
         </div>
         <div class="card-body">
-            @include('l.errors')    
+            @include('errors')    
 
-            @include('l.modal-button',[
+            @include('modal-button',[
                 "class" => "btn-primary",
                 "target_id" => "extensionUpload",
                 "text" => "Yükle"
             ])
             @if(env("EXTENSION_DEVELOPER_MODE"))
-                @include('l.modal-button',[
+                @include('modal-button',[
                     "class" => "btn-secondary",
                     "target_id" => "extensionExport",
                     "text" => "İndir"
                 ])
-                @include('l.modal-button',[
+                @include('modal-button',[
                     "class" => "btn-info",
                     "target_id" => "newExtension",
                     "text" => "Yeni"
@@ -41,7 +41,7 @@
         
             <br><br>
         
-            @include('l.table',[
+            @include('table',[
                 "value" => extensions(),
                 "sortable" => true,
                 "sortUpdateUrl" => route('update_ext_orders'),
@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"extSettings",
         "title" => "Ayarlar",
         "url" => route('save_settings'),
@@ -74,7 +74,7 @@
         "submit_text" => "Kaydet"
     ])
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"extensionUpload",
         "title" => "Eklenti Yükle",
         "url" => route('extension_upload'),
@@ -92,7 +92,7 @@
         }
     ?>
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"extensionExport",
         "onsubmit" => "downloadFile",
         "title" => "Eklenti İndir",
@@ -104,7 +104,7 @@
     ])
 
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"newExtension",
         "url" => route('extension_new'),
         "title" => "Yeni Eklenti Oluştur",
@@ -114,7 +114,7 @@
         "submit_text" => "Oluştur"
     ])
 @endif
-    @include('l.modal',[
+    @include('modal',[
        "id"=>"delete",
        "title" =>"Eklentiyi Sil",
        "url" => route('extension_remove'),

@@ -28,7 +28,7 @@
                     <br>
                     @endisset
                     @foreach ($data as $key=>$value)
-                        @include('l.attribute',[
+                        @include('attribute',[
                             "title" => $key,
                             "id" => $value,
                             "class" => $rand

@@ -11,7 +11,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{ $extension["name"] }}</li>
         </ol>
     </nav>
-    @include('l.errors')
+    @include('errors')
     <div class="card">
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
@@ -55,12 +55,12 @@
                         <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button>
                     </div>
                     <div class="tab-pane fade show" id="tab_2" role="tabpanel">
-                        @include('l.modal-button',[
+                        @include('modal-button',[
                             "class" => "btn-success btn-sm",
                             "target_id" => "add_database",
                             "text" => "Veri Ekle"
                         ])<br><br>
-                        @include('l.table',[
+                        @include('table',[
                             "value" => $extension["database"],
                             "title" => [
                                 "Adı" , "Türü" , "Variable Adı", "*hidden*" , "*hidden*", "*hidden*"
@@ -80,7 +80,7 @@
                             ]
                         ])
             
-                        @include('l.modal',[
+                        @include('modal',[
                             "id"=>"add_database",
                             "title" => "Veri Ekle",
                             "url" => route('extension_settings_add'),
@@ -94,7 +94,7 @@
                             "submit_text" => "Veri Ekle"
                         ])
             
-                        @include('l.modal',[
+                        @include('modal',[
                             "id"=>"edit_database",
                             "title" => "Veri Düzenle",
                             "url" => route('extension_settings_update'),
@@ -110,7 +110,7 @@
                             ],
                             "submit_text" => "Veri Düzenle"
                         ])
-                        @include('l.modal',[
+                        @include('modal',[
                             "id"=>"remove_database",
                             "title" => "Veri'yi Sil",
                             "url" => route('extension_settings_remove'),
@@ -126,12 +126,12 @@
                         ])
                     </div>
                     <div class="tab-pane fade show" id="tab_2_2" role="tabpanel">
-                        @include('l.modal-button',[
+                        @include('modal-button',[
                             "class" => "btn-success btn-sm",
                             "target_id" => "add_view",
                             "text" => "Sayfa Ekle"
                         ])<br><br>
-                        @include('l.table',[
+                        @include('table',[
                             "value" => $extension["views"],
                             "title" => [
                                 "Sayfa Adı" , "*hidden*", "*hidden*"
@@ -150,7 +150,7 @@
                                 ]
                             ]
                         ])
-                        @include('l.modal',[
+                        @include('modal',[
                             "id"=>"add_view",
                             "title" => "Sayfa Ekle",
                             "url" => route('extension_settings_add'),
@@ -161,7 +161,7 @@
                             ],
                             "submit_text" => "Sayfa Ekle"
                         ])
-                        @include('l.modal',[
+                        @include('modal',[
                             "id"=>"remove_view",
                             "title" => "Sayfa'yı Sil",
                             "url" => route('extension_settings_remove'),
@@ -175,12 +175,12 @@
                         ])
                     </div>
                     <div class="tab-pane fade show" id="tab_3" role="tabpanel">
-                        @include('l.modal-button',[
+                        @include('modal-button',[
                             "class" => "btn-success btn-sm",
                             "target_id" => "add_widget",
                             "text" => "Widget Ekle"
                         ])<br><br>
-                        @include('l.table',[
+                        @include('table',[
                             "value" => $extension["widgets"],
                             "title" => [
                                 "Widget Adı" , "Türü" , "Çalışacak Fonksiyon" , "*hidden*", "*hidden*", "*hidden*"
@@ -199,7 +199,7 @@
                                 ]
                             ]
                         ])
-                        @include('l.modal',[
+                        @include('modal',[
                             "id"=>"add_widget",
                             "title" => "Widget Ekle",
                             "url" => route('extension_settings_add'),
@@ -216,7 +216,7 @@
                             ],
                             "submit_text" => "Widget Ekle"
                         ])
-                        @include('l.modal',[
+                        @include('modal',[
                             "id"=>"edit_widget",
                             "title" => "Widget Düzenle",
                             "url" => route('extension_settings_update'),
@@ -236,7 +236,7 @@
                             ],
                             "submit_text" => "Widget Düzenle"
                         ])
-                        @include('l.modal',[
+                        @include('modal',[
                             "id"=>"remove_widget",
                             "title" => "Widget'ı Sil",
                             "url" => route('extension_settings_remove'),
@@ -253,7 +253,7 @@
                     </div>
                     <div class="tab-pane fade show" id="tab_4" role="tabpanel">
                         <button class="btn btn-success" data-toggle="modal" data-target="#addFunctionModal"><i class="fa fa-plus"></i></button><br><br>
-                        @include('l.table',[
+                        @include('table',[
                             "value" => array_key_exists("functions",$extension) ? $extension["functions"] : [],
                             "title" => [
                                 "Fonksiyon Adı" , "Çeviri Key'i", "Yetki Sistemi" ,"*hidden*"
@@ -273,7 +273,7 @@
                             ]
                         ])
             
-                        @include('l.modal',[
+                        @include('modal',[
                             "id"=>"addFunctionModal",
                             "title" => "Fonksiyon Ekle",
                             "url" => route('extension_add_function'),
@@ -286,7 +286,7 @@
                             "submit_text" => "Fonksiyon Ekle"
                         ])
             
-                        @include('l.modal',[
+                        @include('modal',[
                             "id"=>"updateFunctionModal",
                             "title" => "Fonksiyon Duzenle",
                             "url" => route('extension_update_function'),
@@ -300,7 +300,7 @@
                             "submit_text" => "Fonksiyon Duzenle"
                         ])
             
-                        @include('l.modal',[
+                        @include('modal',[
                             "id"=>"removeFunctionModal",
                             "title" => "Fonksiyonu Sil",
                             "url" => route('extension_remove_function'),

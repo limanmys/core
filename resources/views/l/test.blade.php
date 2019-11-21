@@ -1,6 +1,6 @@
 @foreach($data as $key=>$d)
 @if(strpos($key,"dc") !== false || strpos($key,"DC") !== false)
-    @include('l.test',[
+    @include('test',[
         "data" => $d
     ])
     @continue
@@ -8,7 +8,7 @@
 @if(!empty($d))
     <details>
         <summary value="{{$key}}">{{explode("=",$key)[1]}}</summary>
-        @include('l.test',[
+        @include('test',[
             "data" => $d
         ])
     </details>

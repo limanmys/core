@@ -7,7 +7,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Kasa")}}</li>
         </ol>
     </nav>
-    @include('l.errors')
+    @include('errors')
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">{{__("Kasa")}}</h3>
@@ -20,7 +20,7 @@
                     <h5><i class="icon fas fa-info"></i> {{ __('Bilgilendirme!') }}</h5>
                     {{__("Güvenliğiniz için varolan verileriniz gösterilmemektedir.")}}
                 </div>
-                @include('l.table',[
+                @include('table',[
                 "value" => $settings,
                     "title" => [
                         "Ayar Adı" , "Sunucu" , "*hidden*"
@@ -43,7 +43,7 @@
         </div>
     </div>
 
-@include('l.modal',[
+@include('modal',[
         "id"=>"add_settings",
         "title" => "Anahtar Ekle",
         "url" => route('key_add'),
@@ -56,7 +56,7 @@
         "submit_text" => "Ekle"
     ])
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"update_settings",
         "title" => "Ayarı Güncelle",
         "url" => route('user_setting_update'),
@@ -68,7 +68,7 @@
         "submit_text" => "Ekle"
     ])
 
-    @include('l.modal',[
+    @include('modal',[
        "id"=>"delete_settings",
        "title" =>"Ayarı Sil",
        "url" => route('user_setting_remove'),

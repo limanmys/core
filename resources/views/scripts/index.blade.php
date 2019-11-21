@@ -7,14 +7,14 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Betikler")}}</li>
         </ol>
     </nav>
-    @include('l.modal-button',[
+    @include('modal-button',[
         "class" => "btn-primary",
         "target_id" => "scriptUpload",
         "text" => "Yükle"
     ])<br><br>
 
-    @include('l.errors')    
-    @include('l.modal',[
+    @include('errors')    
+    @include('modal',[
         "id"=>"scriptUpload",
         "title" => "Betik Yükle",
         "url" => route('script_upload'),
@@ -25,7 +25,7 @@
         "submit_text" => "Yükle"
     ])
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"scriptExport",
         "onsubmit" => "downloadFile",
         "title" => "Betik İndir",
@@ -36,7 +36,7 @@
         "submit_text" => "İndir"
     ])
 
-    @include('l.table',[
+    @include('table',[
         "value" => $scripts,
         "title" => [
             "Betik Adı" , "Açıklama" , "Tipi" , "Kodu", "*hidden*", "Son Güncelleme"
@@ -56,7 +56,7 @@
         ]
     ])
 
-    @include('l.modal',[
+    @include('modal',[
        "id"=>"delete",
        "title" =>"Betiği Sil",
        "url" => route('script_delete'),

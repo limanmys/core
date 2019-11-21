@@ -26,8 +26,8 @@
             <h3 class="card-title">{{__(extension()->name)}} {{ __('Sunucuları') }}</h3>
         </div>
         <div class="card-body">
-            @include('l.errors')
-            @include('l.table',[
+            @include('errors')
+            @include('table',[
                 "value" => $servers,
                 "title" => [
                     "Sunucu Adı" , "İp Adresi" , "Sunucu Tipi" , "Kontrol Portu", "*hidden*" ,"*hidden*"

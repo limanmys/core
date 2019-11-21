@@ -13,7 +13,7 @@
         <h3 class="card-title">{{__("Widget Ekle")}}</h3>
     </div>
     <div class="card-body">
-        @include('l.errors')
+        @include('errors')
         <form action="{{route('widget_add')}}" onsubmit="return widget_control(this)" method="POST">
             <h4>{{__("Sunucu")}}</h4>
             <select class="form-control" onchange="getExtensions()" id="server_id" required name="server_id">

@@ -13,13 +13,13 @@
         <h3 class="card-title">{{__("Talepleriniz")}}</h3>
     </div>
     <div class="card-body">
-        @include('l.errors')    
-        @include('l.modal-button',[
+        @include('errors')    
+        @include('modal-button',[
             "class" => "btn-success",
             "target_id" => "request",
             "text" => "Talep Oluştur"
         ])<br><br>
-        @include('l.table',[
+        @include('table',[
             "value" => $requests,
             "title" => [
                 "Açıklama" , "Durumu", "Son Guncelleme", "*hidden*"
@@ -31,7 +31,7 @@
     </div>
 </div>
 
-@include('l.modal',[
+@include('modal',[
     "id"=>"request",
     "title" => "Talep Oluştur",
     "url" => route('request_send'),

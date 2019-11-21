@@ -12,8 +12,8 @@
         <h3 class="card-title">{{__("Yetki Talepleri")}}</h3>
     </div>
     <div class="card-body">
-        @include('l.errors')    
-        @include('l.table',[
+        @include('errors')    
+        @include('table',[
                 "value" => $requests,
                 "title" => [
                     "Tipi" , "Kullanıcı Adı" , "Not" , "Önem Derecesi", "Durumu", "*hidden*", "*hidden*"

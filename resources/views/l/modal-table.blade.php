@@ -12,7 +12,7 @@
                 </button>
             </div>
             <div class="modal-body" style="width:100%; height:auto;padding:10px;">
-                @include('l.table',$table)
+                @include('table',$table)
             </div>
             <div class="modal-footer justify-content-between">
                 @isset($footer)

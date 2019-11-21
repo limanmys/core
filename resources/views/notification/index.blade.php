@@ -12,7 +12,7 @@
             <button type="button" id="delete_read" style="margin-bottom: 5px;" class="btn btn-default btn-flat">{{__('Okunanları Sil')}}</button>
         @endif
         
-        @include('l.errors')    
+        @include('errors')    
         <div class="timeline">
             @foreach ($notifications as $date => $items)
                  <div class="time-label">

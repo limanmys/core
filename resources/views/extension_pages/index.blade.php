@@ -7,6 +7,6 @@
             <li class="breadcrumb-item active" aria-current="page">{{__(extension()->name)}} {{ __('Sunucuları') }}</li>
         </ol>
     </nav>
-    @include('l.errors')
+    @include('errors')
     @include('general.harita')
 @endsection

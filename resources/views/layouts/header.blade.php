@@ -54,11 +54,11 @@
           </li>
           <!-- Notifications Dropdown Menu -->
           <li id="adminNotifications" class="nav-item dropdown">
-            @include('l.notifications',["notifications" => adminNotifications(),"id" =>
+            @include('notifications',["notifications" => adminNotifications(),"id" =>
             "adminNotifications","systemNotification" => true])
           </li>
           <li id="userNotifications" class="nav-item dropdown">
-            @include('l.notifications',["notifications" => notifications()])
+            @include('notifications',["notifications" => notifications()])
           </li>
           <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#">

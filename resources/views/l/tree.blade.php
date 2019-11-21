@@ -14,7 +14,7 @@
         ],
         'core': {
             'data': [
-                @include("l.folder",["files" => $data])
+                @include("folder",["files" => $data])
             ],
             "check_callback": true
         },

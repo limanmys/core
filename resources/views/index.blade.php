@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    @include('l.errors')
+    @include('errors')
     <div class="row" style="padding-top: 15px;">
       <div class="col-md-3 col-sm-4 col-xs-12">
           <div class="info-box">

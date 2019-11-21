@@ -27,7 +27,7 @@
             </ul>
         </div>
         <div class="card-body">
-            @include('l.errors')
+            @include('errors')
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="general" role="tabpanel">
                     <form onsubmit="return updateUser(this);">
@@ -52,7 +52,7 @@
                 <div class="tab-pane fade show" id="extension" role="tabpanel">
                     <button onclick="getList('extension')" class="btn btn-success"><i class="fa fa-plus"></i></button>
                     <button onclick="removePermission('extension')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
-                    @include('l.table',[
+                    @include('table',[
                         "id" => "extension_table",
                         "value" => $extensions,
                         "title" => [
@@ -67,7 +67,7 @@
                 <div class="tab-pane fade show" id="server" role="tabpanel">
                     <button onclick="getList('server')" class="btn btn-success"><i class="fa fa-plus"></i></button>
                     <button onclick="removePermission('server')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
-                    @include('l.table',[
+                    @include('table',[
                         "id" => "server_table",
                         "value" => $servers,
                         "title" => [
@@ -82,7 +82,7 @@
                 <div class="tab-pane fade show" id="function" role="tabpanel">
                     <button class="btn btn-success" data-toggle="modal" data-target="#functionsModal"><i class="fa fa-plus"></i></button>
                     <button onclick="removeFunctions()" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
-                    @include('l.table',[
+                    @include('table',[
                         "id" => "extensionFunctions",
                         "value" => $user->permissions->where('type','function'),
                         "title" => [
@@ -96,7 +96,7 @@
                 <div class="tab-pane fade show" id="liman" role="tabpanel">
                     <button onclick="getList('liman')" class="btn btn-success"><i class="fa fa-plus"></i></button>
                     <button onclick="removePermission('liman')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
-                    @include('l.table',[
+                    @include('table',[
                         "id" => "liman_table",
                         "value" => $user->permissions->where('type','liman'),
                         "title" => [
@@ -138,20 +138,20 @@
             </div>
         </div>
     </div>
-    @include('l.modal',[
+    @include('modal',[
             "id" => "server_modal",
             "title" => "Sunucu Listesi",
             "submit_text" => "Seçili Sunuculara Yetki Ver",
             "onsubmit" => "addData"
         ])
-    @include('l.modal',[
+    @include('modal',[
             "id" => "extension_modal",
             "title" => "Eklenti Listesi",
             "submit_text" => "Seçili Eklentilere Yetki Ver",
             "onsubmit" => "addData"
         ])
 
-    @include('l.modal',[
+    @include('modal',[
        "id"=>"removeUser",
        "title" =>"Kullanıcıyı Sil",
        "url" => route('user_remove'),
@@ -163,7 +163,7 @@
        "submit_text" => "Kullanıcıyı Sil"
    ])
 
-    @include('l.modal',[
+    @include('modal',[
        "id"=>"resetPassword",
        "title" =>"Parolayı Sıfırla",
        "url" => route('user_password_reset'),

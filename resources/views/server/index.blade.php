@@ -15,7 +15,7 @@
             @can('create','\App\Server')
                 <button href="#tab_1" type="button" class="btn btn-success" data-toggle="modal" data-target="#add_server">{{__("Sunucu Ekle")}}</button><br><br>
             @endcan
-            @include('l.errors')
+            @include('errors')
             <?php
             use Illuminate\Support\Facades\DB;
             $servers = servers();
@@ -23,7 +23,7 @@
                 $server->extension_count = DB::table('server_extensions')->where('server_id',$server->id)->count();
             }
             ?>
-            @include('l.table',[
+            @include('table',[
                 "value" => $servers,
                 "title" => [
                     "Sunucu Adı" , "İp Adresi" , "*hidden*" , "Kontrol Portu", "Eklenti Sayısı", "*hidden*" ,"*hidden*"
@@ -400,7 +400,7 @@
     </script>
 
 
-    @include('l.modal',[
+    @include('modal',[
        "id"=>"delete",
        "title" =>"Sunucuyu Sil",
        "url" => route('server_remove'),
@@ -412,7 +412,7 @@
        "submit_text" => "Sunucuyu Sil"
    ])
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"edit",
         "title" => "Sunucuyu Düzenle",
         "url" => route('server_update'),

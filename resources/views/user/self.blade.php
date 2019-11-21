@@ -7,7 +7,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Profilim")}}</li>
         </ol>
     </nav>
-    @include('l.errors')
+    @include('errors')
     <div class="row">
         <div class="col-md-3">
             <div class="card card-primary card-outline">

@@ -37,7 +37,7 @@
 @section('content')
     <div class="row">
         <div class="col-md-12">
-            @include('l.errors')
+            @include('errors')
             <div class="timeline">
                 <div class="time-label">
                     <span class="bg-green">

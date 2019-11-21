@@ -20,7 +20,7 @@
             <h5>{{server()->name}}</h5>
         </div>
     </div>
-    @include('l.errors')
+    @include('errors')
 
     <div class="row">
         <div class="col-md-3">
@@ -155,7 +155,7 @@
                                 <button onclick="removeExtension()" class="btn btn-danger"><i class="fa fa-minus"></i>
                                 </button><br><br>
                             @endif
-                            @include('l.table',[
+                            @include('table',[
                                 "id" => "installed_extensions",
                                 "value" => $installed_extensions,
                                 "title" => [
@@ -184,12 +184,12 @@
                             <iframe id="terminalFrame" src="" style="width: 100%;height: 600px;background: black"></iframe>
                         </div>
                         <div class="tab-pane fade show" id="filesTab" role="tabpanel">
-                            @include('l.modal-button',[
+                            @include('modal-button',[
                                 "class" => "btn-primary fa fa-upload",
                                 "target_id" => "file_upload",
                                 "text" => "Yükle"
                             ])
-                            @include('l.modal-button',[
+                            @include('modal-button',[
                                 "class" => "btn-primary fa fa-download",
                                 "target_id" => "file_download",
                                 "text" => "İndir"
@@ -197,7 +197,7 @@
                         </div>
                         @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
                             <div class="tab-pane fade show" id="servicesTab" role="tabpanel">
-                                @include('l.table',[
+                                @include('table',[
                                     "id" => "servicesTable",
                                     "value" => [],
                                     "title" => [
@@ -260,7 +260,7 @@
                                     </td>
                                     <td style="width:300px;text-align:center;padding-left:60px">
                                         <button type="submit" class="btn btn-success btn-block">{{__("Bilgileri Güncelle")}}</button><br><br>
-                                        @include('l.modal-button',[
+                                        @include('modal-button',[
                                             "class" => "btn-danger btn-block",
                                             "target_id" => "delete",
                                                 "text" => "Sunucuyu Sil"
@@ -291,7 +291,7 @@
             </div>
         </div>
     </div>
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"delete",
         "title" => "Sunucuyu Sil",
         "url" => route('server_remove'),
@@ -301,7 +301,7 @@
         "submit_text" => "Sunucuyu Sil"
     ])
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"delete_extensions",
         "title" => "Eklentileri Sil",
         "text" => "Secili eklentileri silmek istediginize emin misiniz?",
@@ -310,7 +310,7 @@
         "submit_text" => "Eklentileri Sil"
     ])
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"startService",
         "title" => "Servisi Baslat",
         "text" => "Secili servisi baslatmak istediginize emin misiniz?",
@@ -323,7 +323,7 @@
         "submit_text" => "Servisi Baslat"
     ])
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"stopService",
         "title" => "Servisi Durdur",
         "text" => "Secili servisi durdurmak istediginize emin misiniz?",
@@ -336,7 +336,7 @@
         "submit_text" => "Servisi Durdur"
     ])
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"restartService",
         "title" => "Servisi Yeniden Baslat",
         "text" => "Secili servisi yeniden baslatmak istediginize emin misiniz?",
@@ -349,7 +349,7 @@
         "submit_text" => "Servisi Yeniden Baslat"
     ])
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"file_upload",
         "title" => "Dosya Yükle",
         "url" => route('server_upload'),
@@ -361,7 +361,7 @@
         "submit_text" => "Yükle"
     ])
 
-    @include('l.modal',[
+    @include('modal',[
         "id"=>"file_download",
         "onsubmit" => "downloadFile",
         "title" => "Dosya İndir",
@@ -371,7 +371,7 @@
         ],
         "submit_text" => "İndir"
     ])
-    @include('l.modal-table',[
+    @include('modal-table',[
         "id" => "log_table",
         "title" => "Sunucu Logları",
         "table" => [
@@ -386,7 +386,7 @@
         ]
     ])
     @if(count($input_extensions))
-        @include('l.modal',[
+        @include('modal',[
             "id"=>"install_extension",
             "title" => "Eklenti Ekle",
             "type" => "info",
@@ -408,7 +408,7 @@
         </script>
     @endif
 
-    @component('l.modal-component',[
+    @component('modal-component',[
         "id" => "updateLogs",
         "title" => "Güncelleme Günlüğü"
     ])
