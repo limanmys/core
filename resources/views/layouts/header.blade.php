@@ -101,7 +101,7 @@
           <img src="/images/liman_logo_white.png" alt="Liman Logo" class="brand-image"
                style="opacity: .8;margin-left: 1.3rem;">
           <span class="brand-text font-weight-light">liman</span>
-          <span class="right badge badge-success" style="margin-left: 5px;">BETA</span>
+          <span class="right badge badge-success">BETA</span>
         </a>
     
         <!-- Sidebar -->
