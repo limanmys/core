@@ -590,9 +590,16 @@ class OneController extends Controller
 
     public function publicFolder()
     {
-        $path = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/public/" . base64_decode(request('path'));
-        if(is_file($path)){
-            return response()->download($path);
+        $basePath = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/public/";
+
+        $targetPath = $basePath . base64_decode(request('path'));
+        
+        if(realpath($targetPath) != $targetPath){
+            abort(404);
+        }
+
+        if(is_file($targetPath)){
+            return response()->download($targetPath);
         }else{
             abort(404);
         }
