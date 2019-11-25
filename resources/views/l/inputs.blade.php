@@ -15,10 +15,13 @@
                 @endforeach
             </select>
         @endif
-        @isset(explode(":", $name)[2])
-        <small class="form-text text-muted">{{__(explode(":", $name)[2])}}</small></br>
+        @isset(explode(":", $name,3)[2])
+        <small class="form-text text-muted">{{__(explode(":", $name,3)[2])}}</small>
         @endisset
     @else
+        @php
+            $placeholder = isset(explode(":", $input,3)[2]) ? explode(":", $input,3)[2] : explode(":", $input)[0];
+        @endphp
         @if(explode(":", $input)[1] == "hidden")
             @if(explode(":", $input)[1] == "checkbox")
                 <div class="form-check">
@@ -26,7 +29,7 @@
                     <label for="{{explode(":", $input)[0]}}" class="form-check-label">{{__($name)}}</label>
                 </div>
             @else
-                <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}"
+                <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($placeholder)}}"
                     class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required value="{{explode(":",$name)[1]}}">@if(explode(":", $input)[1] != "hidden")@endif
             @endif
         @elseif(isset($disabled))
@@ -37,7 +40,7 @@
                 </div>
             @else
                 <label class="@if(isset($random,$id)){{$random}} {{$id}}@endif" style="padding-top: 15px;">{{__(explode(":",$name)[0])}}</label>
-                <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}"
+                <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($placeholder)}}"
                     class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required disabled hidden style="margin-top:15px">
             @endif
         @elseif(explode(":", $input)[1] == "textarea")
@@ -67,17 +70,17 @@
             @else
                 @if(substr(explode(":", $input)[0],0,2) != "d-")
                     <label>{{__($name)}}</label>
-                    <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($name)}}"
+                    <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($placeholder)}}"
                         class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required>@if(explode(":", $input)[1] != "hidden")@endif
                 @else
                     <label>{{__($name)}}</label>
-                    <input type="{{explode(":", $input)[1]}}" name="{{substr(explode(":", $input)[0],2)}}" placeholder="{{__($name)}}"
+                    <input type="{{explode(":", $input)[1]}}" name="{{substr(explode(":", $input)[0],2)}}" placeholder="{{__($placeholder)}}"
                         class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif">@if(explode(":", $input)[1] != "hidden")@endif
                 @endif
             @endif
         @endif
-        @isset(explode(":", $input)[2])
-        <small class="form-text text-muted">{{__(explode(":", $input)[2])}}</small></br>
+        @isset(explode(":", $input,3)[2])
+        <small class="form-text text-muted">{{__(explode(":", $input,3)[2])}}</small>
         @endisset
     @endif
 </div>
