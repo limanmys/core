@@ -30,10 +30,10 @@ class SSHConnector implements Connector
      */
     public function __construct(\App\Server $server, $user_id)
     {
-        $ip_address = "cn_".str_replace(".", "_", $server->ip_address);
-        if (!session($ip_address)) {
+        $server_id = "cn_".str_replace(".", "_", $server->id);
+        if (!session($server_id)) {
             list($username, $password) = self::retrieveCredentials();
-            self::init($username, $password, $server->ip_address);
+            self::init($username, $password, $server->id);
         }
 
         return true;
@@ -49,10 +49,8 @@ class SSHConnector implements Connector
 
     public function execute($command,$flag = true)
     {
-        // Make IP Session Safe
-        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
         return self::request('run',[
-            "token" => session($ip_address),
+            "token" => "cn_". server()->id,
             "command" => $command
         ]);
     }
@@ -81,9 +79,9 @@ class SSHConnector implements Connector
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
         // Make IP Session Safe
-        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
+        $server_id = "cn_".str_replace(".", "_", server()->id);
         return self::request('send',[
-            "token" => session($ip_address),
+            "token" => session($server_id),
             "local_path" => $localPath,
             "remote_path" => $remotePath
         ]);
@@ -91,7 +89,7 @@ class SSHConnector implements Connector
 
     public static function verify($ip_address, $username, $password,$port)
     {
-        $token = self::init($username, $password, $ip_address);
+        $token = self::init($username, $password, $ip_address,false);
         if ($token) {
             return respond("Kullanıcı adı ve şifre doğrulandı.", 200);
         }
@@ -101,9 +99,9 @@ class SSHConnector implements Connector
     public function receiveFile($localPath, $remotePath)
     {
         // Make IP Session Safe
-        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
+        $server_id = "cn_".str_replace(".", "_", server()->id);
         return self::request('get',[
-            "token" => session($ip_address),
+            "token" => session($server_id),
             "local_path" => $localPath,
             "remote_path" => $remotePath
         ]);
@@ -150,9 +148,9 @@ class SSHConnector implements Connector
     public static function request($url, $params,$retry = 3)
     { 
         // First, format ip adress.
-        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
+        $server_id = "cn_". server()->id;
         // If Session doesn't have token, create one.
-        if (!session($ip_address)) {
+        if (!session($server_id)) {
             // Retrieve Credentials
             list($username, $password) = self::retrieveCredentials();
 
@@ -163,7 +161,7 @@ class SSHConnector implements Connector
         $client = new Client();
         // Make Request.
         try{
-            $params["token"] = session($ip_address);
+            $params["token"] = session($server_id);
             $res = $client->request('POST', env("LIMAN_CONNECTOR_SERVER"). '/' . $url, ["form_params" => $params]);
         }catch(BadResponseException $e){
             // In case of error, handle error.
@@ -183,7 +181,7 @@ class SSHConnector implements Connector
         return $json->output;
     }
 
-    public static function init($username, $password, $hostname)
+    public static function init($username, $password, $hostname,$putSession = true)
     {
         $client = new Client();
         try{
@@ -202,12 +200,15 @@ class SSHConnector implements Connector
         
         $json = json_decode((string) $res->getBody());
         //Escape For . character in session.
-        $hostname = "cn_".str_replace(".", "_", $hostname);
-        if (auth() && auth()->user()) {
-            session()->put([
-                $hostname => $json->token
-            ]);
+        if($putSession){
+            $server_id = "cn_".str_replace(".", "_", server()->id);
+            if (auth() && auth()->user()) {
+                session()->put([
+                    $server_id => $json->token
+                ]);
+            }
         }
+        
         return $json->token;
     }
 }

@@ -12,10 +12,10 @@ class WinRMConnector implements Connector
 {
     public function __construct(Server $server, $user_id)
     {
-        $ip_address = "cn_".str_replace(".", "_", $server->ip_address);
-        if (!session($ip_address)) {
+        $server_id = "cn_".str_replace(".", "_", $server->id);
+        if (!session($server_id)) {
             list($username, $password) = self::retrieveCredentials();
-            self::init($username, $password, $server->ip_address);
+            self::init($username, $password, $server->id);
         }
         return true;
     }
@@ -54,12 +54,10 @@ class WinRMConnector implements Connector
 
     public function execute($command)
     {
-        // Make IP Session Safe
-        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
         // Prepare Powershell Command
         $command = "powershell.exe -encodedCommand " . base64_encode(mb_convert_encoding("\$ProgressPreference = \"SilentlyContinue\"; " . $command,"UTF-16LE","UTF-8"));
         return self::request('run',[
-            "token" => session($ip_address),
+            "token" => "cn_". server()->id,
             "command" => $command
         ]);
     }
@@ -67,9 +65,9 @@ class WinRMConnector implements Connector
     public static function request($url, $params,$retry = 3)
     { 
         // First, format ip adress.
-        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
+        $server_id = "cn_". server()->id;
         // If Session doesn't have token, create one.
-        if (!session($ip_address)) {
+        if (!session($server_id)) {
             // Retrieve Credentials
             list($username, $password) = self::retrieveCredentials();
 
@@ -80,7 +78,7 @@ class WinRMConnector implements Connector
         $client = new Client();
         // Make Request.
         try{
-            $params["token"] = session($ip_address);
+            $params["token"] = session($server_id);
             $res = $client->request('POST', env("LIMAN_CONNECTOR_SERVER"). '/' . $url, [
                 "form_params" => $params,
                 'timeout' => 5
@@ -107,10 +105,9 @@ class WinRMConnector implements Connector
 
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
-        // Make IP Session Safe
-        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
+        $server_id = "cn_".str_replace(".", "_", server()->id);
         return self::request('send',[
-            "token" => session($ip_address),
+            "token" => session($server_id),
             "local_path" => $localPath,
             "remote_path" => $remotePath
         ]);
@@ -118,10 +115,9 @@ class WinRMConnector implements Connector
 
     public function receiveFile($localPath, $remotePath)
     {
-        // Make IP Session Safe
-        $ip_address = "cn_".str_replace(".", "_", server()->ip_address);
+        $server_id = "cn_".str_replace(".", "_", server()->id);
         return self::request('get',[
-            "token" => session($ip_address),
+            "token" => session($server_id),
             "local_path" => $localPath,
             "remote_path" => $remotePath
         ]);
@@ -149,14 +145,14 @@ class WinRMConnector implements Connector
 
     public static function verify($ip_address, $username, $password, $port)
     {
-        $token = self::init($username, $password, $ip_address);
+        $token = self::init($username, $password, $ip_address,false);
         if ($token) {
             return respond("Kullanıcı adı ve şifre doğrulandı.", 200);
         }
         return respond("Bu Kullanıcı adı ve şifre ile bağlanılamadı.", 201);
     }
 
-    public static function init($username, $password, $hostname)
+    public static function init($username, $password, $hostname,$putSession = true)
     {
         $client = new Client();
         try{
@@ -174,14 +170,15 @@ class WinRMConnector implements Connector
         }
         
         $json = json_decode((string) $res->getBody());
-        //Escape For . character in session.
-        $hostname = "cn_".str_replace(".", "_", $hostname);
-        if (auth() && auth()->user()) {
-            session()->put([
-                $hostname => $json->token,
-                $hostname . "_ticket" => $json->ticket_path
-            ]);
+        if($putSession){
+            $server_id = "cn_".str_replace(".", "_", server()->id);
+            if (auth() && auth()->user()) {
+                session()->put([
+                    $server_id => $json->token
+                ]);
+            }
         }
+        
         return $json->token;
     }
 
