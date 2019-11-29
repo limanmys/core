@@ -58,6 +58,10 @@
           $(this).addClass('active');
         }
       });
+      console.log(localStorage.nightMode);
+      if(localStorage.nightMode == "on"){
+          $('body').addClass('skin-dark');
+      }
     });
 </script>
 @endif

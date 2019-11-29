@@ -9,6 +9,7 @@ mix.styles([
     'resources/assets/css/sweetalert2.min.css',
     'resources/assets/css/buttons.dataTables.min.css',
     'resources/assets/css/adminlte.css',
+    'resources/assets/css/dark-mode.css',
     'resources/assets/css/jquery.contextMenu.css',
     'resources/assets/css/jquery-ui.css',
     'resources/assets/css/jstree.css',
