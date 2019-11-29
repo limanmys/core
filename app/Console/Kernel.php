@@ -46,11 +46,11 @@ class Kernel extends ConsoleKernel
                 $notification->save();
             }
         })->hourly()->name('Health Check');
-
         //Check Package Update Every 30 Min
+
         $schedule->call(function (){
             shell_exec("sudo apt update");
-            $output = shell_exec("apt list --upgradable | grep 'liman'");
+            $output = shell_exec("apt list --upgradable");
             if(!strpos($output,"liman")){
                 return;
             }
