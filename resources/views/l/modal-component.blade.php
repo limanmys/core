@@ -19,7 +19,6 @@
             @isset($footer)
                 <button class="btn {{$footer["class"]}}" onclick="{{$footer["onclick"]}}">{{$footer["text"]}}</button>
             @endisset
-            <button type="button" class="btn btn-default" data-dismiss="modal">{{__('Kapat')}}</button>
         </div>
         </div>
     </div>
