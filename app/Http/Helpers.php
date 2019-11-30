@@ -293,7 +293,7 @@ if (!function_exists('sudo')) {
 
     function sudo()
     {
-        $pass64 = base64_encode(extensionDb("clientPassword"));
+        $pass64 = base64_encode(extensionDb("clientPassword")."\n");
         return 'echo ' . $pass64 .' | base64 -d | sudo -S -p "" ';
     }
 
