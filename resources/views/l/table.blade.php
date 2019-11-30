@@ -84,7 +84,7 @@
             var {{$setCurrentVariable}};
             @endisset
             $.contextMenu({
-                selector: '#{{$rand}} .tableRow',
+                selector: '#{{$rand}} tbody tr',
                 callback: function (key, options) {
                     @isset($setCurrentVariable)
                     {{$setCurrentVariable}} = options.$trigger[0].getAttribute("id");
