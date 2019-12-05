@@ -15,7 +15,7 @@
                 <div class="modal-body">
                         {{ $slot }}
                 </div>
-                <div class="modal-footer justify-content-between">
+                <div class="modal-footer justify-content-right">
                 </div>
             </form>
         </div>
