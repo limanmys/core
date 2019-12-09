@@ -294,7 +294,7 @@ if (!function_exists('sudo')) {
     function sudo()
     {
         $pass64 = base64_encode(extensionDb("clientPassword")."\n");
-        return 'echo ' . $pass64 .' | base64 -d | sudo -S -p "" id 2>/dev/null 1>/dev/null; sudo ';
+        return 'echo ' . $pass64 .' | base64 -d | sudo -S -p " " id 2>/dev/null 1>/dev/null; sudo ';
     }
 
 }
