@@ -3,7 +3,7 @@
 @section('body_class', 'sidebar-mini ' . ((\Session::has('collapse')) ? 'sidebar-collapse' : ''))
 
 @section('body')
-<div class="winter-is-coming">
+{{-- <div class="winter-is-coming">
 
     <div class="snow snow--near"></div>
     <div class="snow snow--near snow--alt"></div>
@@ -13,7 +13,7 @@
 
     <div class="snow snow--far"></div>
     <div class="snow snow--far snow--alt"></div>
-</div>
+</div> --}}
     <div class="wrapper">
         @auth
             @include('layouts.header')
