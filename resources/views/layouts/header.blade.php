@@ -47,11 +47,6 @@
                 @endif
             </div>
           </li>
-          <li class="nav-item d-none d-sm-inline-block">
-                <span class="nav-link">
-                    {{__("Versiyon: ") . env('APP_VERSION')}}
-                </span>
-          </li>
           <!-- Notifications Dropdown Menu -->
           <li id="adminNotifications" class="nav-item dropdown">
             @include('notifications',["notifications" => adminNotifications(),"id" =>
@@ -72,6 +67,7 @@
                           <h3 class="widget-user-username" style="margin-left: 0px;">{{user()->name}}</h3>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Son Giriş Tarihi : ") . user()->last_login_at}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Giriş Yapılan Son Ip : ") . user()->last_login_ip}}</h5>
+                          {{__("Versiyon: ") . env('APP_VERSION')}}
                         </div>
                         <div class="card-footer p-0">
                           <ul class="nav flex-column">
