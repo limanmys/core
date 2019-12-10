@@ -13,6 +13,7 @@
         "ext-ssh2": "*",
         "ext-xml": "*",
         "ext-zip": "*",
+        "adldap2/adldap2-laravel": "^6.0",
         "ankitpokhrel/tus-php": "^1.0",
         "beyondcode/laravel-websockets": "^1.3",
         "guzzlehttp/guzzle": "^6.3",

@@ -22,30 +22,20 @@
                 <form action="{{ route('login')}}" method="post">
                     @csrf
                     <div class="input-group mb-3">
-                        <input type="email" name="liman_email_mert" class="form-control {{ $errors->has('liman_email_mert') ? 'is-invalid' : '' }}" placeholder="{{__("Email Adresi")}}" value="{{ old('liman_email_mert') }}" required>
+                        <input type="text" name="liman_email_mert" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" placeholder="{{__("Email Adresi ve Ldap Kullanıcı Adı")}}" value="{{ old('liman_email_mert') }}" required>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
                             </div>
                         </div>
-                        @if ($errors->has('liman_email_mert'))
-                            <span class="help-block">
-                                <strong>{{__("Giriş Yapılamadı.")}}</strong>
-                            </span>
-                        @endif
                     </div>
                     <div class="input-group mb-3">
-                        <input type="password" name="liman_password_baran" class="form-control {{ $errors->has('liman_password_baran') ? 'is-invalid' : '' }}" placeholder="Password">
+                        <input type="password" name="liman_password_baran" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" placeholder="Password">
                         <div class="input-group-append">
                             <div class="input-group-text">
                             <span class="fas fa-lock"></span>
                             </div>
                         </div>
-                        @if ($errors->has('liman_password_baran'))
-                            <span class="help-block">
-                                <strong>{{__("Giriş Yapılamadı.")}}</strong>
-                            </span>
-                        @endif
                     </div>
                     <div class="row">
                         <div class="col-8">
