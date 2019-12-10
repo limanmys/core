@@ -155,4 +155,12 @@ class MainController extends Controller
     {
         return respond(checkHealth(),200);
     }
+
+    public function saveLDAPConf()
+    {
+        setEnv([
+            "LDAP_HOSTS" => request('ldapAddress')
+        ]);
+        return respond(__("Kaydedildi!"),200);
+    }
 }

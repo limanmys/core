@@ -20,6 +20,8 @@ Route::post('/ayar/eklenti/fonksiyonlar/ekle','Settings\MainController@addFuncti
 
 Route::post('/ayar/eklenti/fonksiyonlar/sil','Settings\MainController@removeFunctionPermissions')->middleware('admin')->name('extension_function_remove');
 
+Route::post('/ayar/ldap','Settings\MainController@saveLDAPConf')->middleware('admin')->name('save_ldap_conf');
+
 Route::post('/ayarlar/saglik','Settings\MainController@health')->middleware('admin')->name('health_check');
 
 Route::post('/kullaniciGetir','Settings\MainController@getUserList')->middleware('admin')->name('get_user_list_admin');

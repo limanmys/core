@@ -22,6 +22,9 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#update">{{__("Güncelleme")}}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#ldapIntegration">{{__("LDAP Entegrasyonu")}}</a>
+                </li>
             </ul>
         </div>
         <div class="card-body">
@@ -117,6 +120,13 @@
                     @else
                         <pre>{{__("Liman Sürümünüz : " . env("APP_VERSION") . " güncel.")}}</pre>
                     @endif
+                </div>
+                <div class="tab-pane fade show" id="ldapIntegration" role="tabpanel">
+                    <div class="form-group">
+                        <label>{{ __('Ldap Sunucu Adresi') }}</label>
+                        <input type="text" value="{{ env('LDAP_HOSTS', "") }}" name="ldapAddress" class="form-control" placeholder="{{ __('IP Adresi Girin') }}">
+                    </div>
+                    <button type="button" onclick="saveLDAPConf()" class="btn btn-primary">{{ __('Kaydet') }}</button>
                 </div>
             </div>
         </div>
@@ -227,6 +237,34 @@
             }, function (error) {
                 Swal.close();
                 alert("hata");
+            });
+        }
+
+        function saveLDAPConf(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Kaydediliyor...")}}',
+                showConfirmButton: false,
+            });
+            let data = new FormData();
+            data.append('ldapAddress', $('input[name=ldapAddress]').val());
+            request("{{route("save_ldap_conf")}}", data, function(res) {
+                let response = JSON.parse(res);
+                Swal.close();
+                Swal.fire({
+                    position: 'center',
+                    type: 'success',
+                    title: response.message,
+                });
+                reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         }
 
