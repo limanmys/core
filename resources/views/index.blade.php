@@ -233,7 +233,7 @@
         function createChart(element, labels, data) {
           $("#" + element + ' .overlay').remove();
           window[element + "Chart"] = new Chart($("#" + element+' .card-body canvas'), {
-            type: 'line',
+            type: 'bar',
             data: {
               datasets: [{
                 data: data,
