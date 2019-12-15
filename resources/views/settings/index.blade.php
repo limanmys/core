@@ -124,7 +124,7 @@
                 <div class="tab-pane fade show" id="ldapIntegration" role="tabpanel">
                     <div class="form-group">
                         <label>{{ __('Ldap Sunucu Adresi') }}</label>
-                        <input type="text" value="{{ env('LDAP_HOSTS', "") }}" name="ldapAddress" class="form-control" placeholder="{{ __('IP Adresi Girin') }}">
+                        <input type="text" value="{{ env('LDAP_HOST', "") }}" name="ldapAddress" class="form-control" placeholder="{{ __('IP Adresi Girin') }}">
                     </div>
                     <button type="button" onclick="saveLDAPConf()" class="btn btn-primary">{{ __('Kaydet') }}</button>
                 </div>

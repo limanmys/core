@@ -45,30 +45,39 @@ class LoginController extends Controller
         $flag =  $this->guard()->attempt(
             $this->credentials($request), $request->filled('remember')
         );
-        if(!$flag && env('LDAP_HOSTS', false)){
+        if(!$flag && config('ldap.ldap_host', false)){
             $this->setBaseDn();
-            $locateUsers = config('ldap_auth.identifiers.ldap.locate_users_by', 'samaccountname');
-            $guidColumn = config('ldap_auth.identifiers.database.guid_column', 'objectguid');
-            $domain = config('app.domain');
+            $guidColumn = config('ldap.ldap_guid_column', 'objectguid');
+            $base_dn = config('ldap.ldap_base_dn');
+            $domain = config('ldap.ldap_domain');
             $credientials = (object) $this->credentials($request);
-            $flag = Adldap::auth()->attempt($credientials->email."@".$domain, $credientials->password, true);
+            try{
+                $ldapConnection = ldap_connect("ldap://" . config('ldap.ldap_host'), 389);
+                ldap_set_option($ldapConnection, LDAP_OPT_PROTOCOL_VERSION, 3);
+                ldap_set_option($ldapConnection, LDAP_OPT_X_TLS_REQUIRE_CERT, LDAP_OPT_X_TLS_NEVER);
+                ldap_set_option($ldapConnection, LDAP_OPT_REFERRALS,0);
+                $flag = ldap_bind($ldapConnection, $credientials->email."@".$domain, $credientials->password);
+            }catch(\Exception $ex){
+                return false;
+            }
             if($flag){
-                $ldapUser = Adldap::search()
-                    ->select(['objectguid', '*'])
-                    ->where($locateUsers, '=', $credientials->email)
-                    ->first();
-                $user = \App\User::where($guidColumn, $ldapUser->getConvertedGuid())->first();
+                $sr = ldap_search($ldapConnection, $base_dn, '(&(objectClass=user)(sAMAccountName='.$credientials->email.'))', ['objectguid', 'samaccountname']);
+                $ldapUser = ldap_get_entries($ldapConnection, $sr);
+                if(!$ldapUser[0]['objectguid'][0]){
+                    return false;
+                }
+                $user = \App\User::where($guidColumn, bin2hex($ldapUser[0]['objectguid'][0]))->first();
                 if(!$user){
                     $user = User::create([
-                        "name" => $ldapUser->cn[0],
-                        "email" => $ldapUser->userprincipalname[0] ? $ldapUser->userprincipalname[0] : $ldapUser->cn[0],
+                        "name" => $credientials->email,
+                        "email" => $credientials->email."@".$domain,
                         "password" => Hash::make(str_random("16")),
-                        $guidColumn => $ldapUser->getConvertedGuid()
+                        $guidColumn => bin2hex($ldapUser[0]['objectguid'][0]),
                     ]);
                 }else{
                     $user->update([
-                        "name" => $ldapUser->cn[0],
-                        "email" => $ldapUser->userprincipalname[0] ? $ldapUser->userprincipalname[0] : $ldapUser->cn[0]
+                        "name" => $credientials->email,
+                        "email" => $credientials->email."@".$domain,
                     ]);
                 }
                 $this->guard()->login($user, true);
@@ -82,16 +91,19 @@ class LoginController extends Controller
 
     private function setBaseDn()
     {
-        $connection = ldap_connect(config('ldap.connections.default.settings.hosts')[0],389);
-        ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3);
-        ldap_bind($connection);
-        $outputs = ldap_read($connection,'','objectclass=*');
-        $entries = ldap_get_entries($connection,$outputs)[0];
-        config(['ldap.connections.default.settings.base_dn' => $entries["rootdomainnamingcontext"][0]]);
-
-        $domain = str_replace("dc=","",strtolower($entries["rootdomainnamingcontext"][0]));
-        $domain = str_replace(",", ".", $domain);
-        config(['app.domain' => $domain]);
+        if(!config('ldap.ldap_domain', false)){
+            $connection = ldap_connect(config('ldap.ldap_host'),389);
+            ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+            ldap_bind($connection);
+            $outputs = ldap_read($connection,'','objectclass=*');
+            $entries = ldap_get_entries($connection,$outputs)[0];
+            $domain = str_replace("dc=","",strtolower($entries["rootdomainnamingcontext"][0]));
+            $domain = str_replace(",", ".", $domain);
+            setEnv([
+                "LDAP_BASE_DN" => $entries["rootdomainnamingcontext"][0],
+                "LDAP_DOMAIN" => $domain
+            ]);
+        }
     }
 
     protected function validateLogin(Request $request)

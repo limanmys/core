@@ -159,7 +159,7 @@ class MainController extends Controller
     public function saveLDAPConf()
     {
         setEnv([
-            "LDAP_HOSTS" => request('ldapAddress')
+            "LDAP_HOST" => request('ldapAddress')
         ]);
         return respond(__("Kaydedildi!"),200);
     }
