@@ -20,7 +20,7 @@
         @endisset
     @else
         @php
-            $placeholder = isset(explode(":", $input,3)[2]) ? explode(":", $input,3)[2] : explode(":", $input)[0];
+            $placeholder = isset(explode(":", $input,3)[2]) ? explode(":", $input,3)[2] : "";
         @endphp
         @if(explode(":", $input)[1] == "hidden")
             @if(explode(":", $input)[1] == "checkbox")
