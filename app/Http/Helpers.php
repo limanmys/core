@@ -72,14 +72,26 @@ if (!function_exists('retrieveCertificate')) {
     {
         $get = stream_context_create(array("ssl" => array(
             "capture_peer_cert" => TRUE,
-            "allow_self_signed" => TRUE, "verify_peer" => FALSE, "verify_peer_name" => FALSE
+            "allow_self_signed" => TRUE, "verify_peer" => FALSE, "verify_peer_name" => FALSE,
         )));
+        $flag = false;
         try {
             $read = stream_socket_client("ssl://" .
                 $hostname . ":" . $port, $errno, $errstr, intval(env('SERVER_CONNECTION_TIMEOUT')), STREAM_CLIENT_CONNECT, $get);
-        } catch (\Exception $exception) {
-            return [false,"Sertifika Alınamadı" . $exception->getMessage() ];
+            $flag = true;
+        } catch (\Exception $exception) {           
         }
+        
+        if(!$flag){
+            try {
+                $read = stream_socket_client("tlsv1.1://" .
+                    $hostname . ":" . $port, $errno, $errstr, intval(env('SERVER_CONNECTION_TIMEOUT')), STREAM_CLIENT_CONNECT, $get);
+                $flag = true;
+            } catch (\Exception $exception) {  
+                return [false,"Sertifika alınamıyor!"];         
+            }
+        }
+
         $cert = stream_context_get_params($read);
         $certinfo = openssl_x509_parse($cert['options']['ssl']['peer_certificate']);
         openssl_x509_export($cert["options"]["ssl"]["peer_certificate"],$publicKey);
@@ -340,15 +352,13 @@ function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_
         $request = json_encode($request);
 
         $apiRoute = route('extension_function_api', [
-            "extension_id" => extension()->id,
-            "function_name" => ""
+            "extension_id" => extension()->id
         ]);
 
         $navigationRoute = route('extension_server_route', [
             "server_id" => $serverObj->id,
             "extension_id" => extension()->id,
-            "city" => $serverObj->city,
-            "unique_code" => ""
+            "city" => $serverObj->city
         ]);
 
         $token = Token::create($user_id);

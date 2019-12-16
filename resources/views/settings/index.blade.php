@@ -72,6 +72,10 @@
                             "server_hostname" , "origin", "id:certificate_id" ,
                         ],
                         "menu" => [
+                            "Güncelle" => [
+                                "target" => "updateCertificate",
+                                "icon" => " context-menu-icon-update"
+                            ],
                             "Sil" => [
                                 "target" => "deleteCertificate",
                                 "icon" => " context-menu-icon-delete"
@@ -165,16 +169,28 @@
    ])
 
     @include('modal',[
-           "id"=>"deleteCertificate",
-           "title" =>"Sertifikayı Sil",
-           "url" => route('remove_certificate'),
-           "text" => "Sertifikayı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+           "id"=>"updateCertificate",
+           "title" =>"Sertifikayı Güncelle",
+           "url" => route('update_certificate'),
+           "text" => "Sertifikayı güncellemek istediğinize emin misiniz?",
            "next" => "reload",
            "inputs" => [
                "Kullanici Id:'null'" => "certificate_id:hidden"
            ],
-           "submit_text" => "Sertifikayı Sil"
+           "submit_text" => "Sertifikayı Güncelle"
        ])
+
+    @include('modal',[
+        "id"=>"deleteCertificate",
+        "title" =>"Sertifikayı Sil",
+        "url" => route('remove_certificate'),
+        "text" => "Sertifikayı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+        "next" => "reload",
+        "inputs" => [
+            "Kullanici Id:'null'" => "certificate_id:hidden"
+        ],
+        "submit_text" => "Sertifikayı Sil"
+    ])
 
     @include('modal',[
        "id"=>"passwordReset",

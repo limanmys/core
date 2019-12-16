@@ -77,4 +77,25 @@ class MainController extends Controller
             return respond($message,201);
         }
     }
+
+    public function updateCert()
+    {
+        $certificate = Certificate::where('id',request('certificate_id'))->first();
+        if(!$certificate){
+            return respond("Sertifika bulunamadı",201);
+        }
+        list($flag, $message) = retrieveCertificate($certificate->server_hostname,$certificate->origin);
+        if(!$flag){
+            return respond($message,201);
+        }
+        $file = "liman-" . $certificate->server_hostname . "_" . $certificate->origin . ".crt";
+        shell_exec('sudo rm /usr/local/share/ca-certificates/ ' . $file);
+        shell_exec("sudo update-ca-certificates");
+        $cert = file_get_contents('/tmp/' . $message["path"]);
+        $query = "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . $file;
+        $output = shell_exec($query);
+        $certificate->save();
+        shell_exec("sudo update-ca-certificates");
+        return respond("Sertifika Başarıyla Güncellendi!");
+    }
 }
