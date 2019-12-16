@@ -27,7 +27,7 @@ class Permission extends Model
     protected $table = "permissions";    
 
     protected $fillable = [
-        "user_id", "type", "key", "value", "extra", "blame"
+        "morph_id", "morph_type", "type", "key", "value", "extra", "blame"
     ];
 
     public static function can($user_id, $type, $key, $value ,$extra = null)
@@ -38,19 +38,23 @@ class Permission extends Model
             return true;
         }
 
-        return Permission::where([
-            "user_id" => $user_id,
-            "type" => $type,
-            "key" => $key,
-            "value" => $value,
-            "extra" => $extra
-        ])->exists();
+        $ids = $user->roles->pluck('role_id')->toArray();
+        array_push($ids, $user_id);
+
+        return Permission::whereIn('morph_id', $ids)
+            ->where([
+                "type" => $type,
+                "key" => $key,
+                "value" => $value,
+                "extra" => $extra
+            ])->exists();
     }
 
-    public static function grant($user_id, $type, $key, $value ,$extra = null)
+    public static function grant($morph_id, $type, $key, $value ,$extra = null, $morph_type="users")
     {
         $permission =  Permission::firstOrCreate([
-            "user_id" => $user_id,
+            "morph_id" => $morph_id,
+            "morph_type" => $morph_type,
             "type" => $type,
             "key" => $key,
             "value" => $value,
@@ -61,10 +65,10 @@ class Permission extends Model
         return $permission->save();
     }
 
-    public static function revoke($user_id, $type, $key, $value ,$extra = null)
+    public static function revoke($morph_id, $type, $key, $value ,$extra = null)
     {
         $permission = Permission::where([
-            "user_id" => $user_id,
+            "morph_id" => $morph_id,
             "type" => $type,
             "key" => $key,
             "value" => $value,
@@ -75,5 +79,10 @@ class Permission extends Model
         }
 
         return false;
+    }
+
+    public function morph()
+    {
+        return $this->morphTo();
     }
 }

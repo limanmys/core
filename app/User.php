@@ -58,11 +58,6 @@ class User extends Authenticatable
         });
     }
 
-    public function permissions()
-    {
-        return $this->hasMany("App\Permission");
-    }
-
     public function widgets()
     {
         return $this->hasMany("\App\Widget");
@@ -90,4 +85,13 @@ class User extends Authenticatable
         });
     }
 
+    public function permissions()
+    {
+        return $this->morphMany('App\Permission', 'morph');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany('App\Role', "role_users");
+    }
 }

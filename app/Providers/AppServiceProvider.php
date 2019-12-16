@@ -10,6 +10,7 @@ use App\Notification;
 use App\AdminNotification;
 use App\Observers\NotificationObserver;
 use App\Observers\AdminNotificationObserver;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,12 @@ class AppServiceProvider extends ServiceProvider
         Carbon::setLocale(app()->getLocale());
         Notification::observe(NotificationObserver::class);
         AdminNotification::observe(AdminNotificationObserver::class);
+
+
+        Relation::morphMap([
+            'users' => 'App\User',
+            'roles' => 'App\Role',
+        ]);
     }
 
     /**
