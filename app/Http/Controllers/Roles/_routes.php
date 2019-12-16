@@ -10,6 +10,10 @@ Route::get('/rol/{role}','Roles\RoleController@one')->name('role_one')->middlewa
 
 Route::post('/rol/kullanici_ekle','Roles\RoleController@addRoleUsers')->name('add_role_users')->middleware('admin');
 
+Route::post('/rol/rol_ekle','Roles\RoleController@addRolesToUser')->name('add_roles_to_user')->middleware('admin');
+
+Route::post('/rol/rol_sil','Roles\RoleController@removeRolesToUser')->name('remove_roles_to_user')->middleware('admin');
+
 Route::post('/rol/kullanici_sil','Roles\RoleController@removeRoleUsers')->name('remove_role_users')->middleware('admin');
 
 Route::post('/rol/yetki_listesi','Roles\RoleController@getList')->name('role_permission_list')->middleware('admin');

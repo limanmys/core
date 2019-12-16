@@ -16,6 +16,9 @@
                     <a class="nav-link active" data-toggle="pill" href="#general" role="tab" aria-selected="true">{{__("Genel Ayarlar")}}</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#user_roles" role="tab" aria-selected="true">{{__("Rol Grupları")}}</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#extension" role="tab" >{{__("Eklenti Yetkileri")}}</a>
                 </li>
                 <li class="nav-item">
@@ -48,6 +51,27 @@
                             <button class="btn btn-success btn-block" type="submit">{{__("Değişiklikleri Kaydet")}}</button>
                         </div>
                     </form>
+                </div>
+                <div class="tab-pane fade show" id="user_roles" role="tabpanel">
+                    <button onclick="getList('role')" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                    <button onclick="removeRole()" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
+                    @include('table',[
+                        "id" => "role_table",
+                        "value" => $user->roles,
+                        "title" => [
+                            "Adı" , "*hidden*"
+                        ],
+                        "display" => [
+                            "name" , "id:role_id"
+                        ],
+                        "menu" => [
+                            "Görüntüle" => [
+                                "target" => "roleDetails",
+                                "icon" => "fa-arrow-right"
+                            ]
+                        ],
+                        "noInitialize" => "true"
+                    ])
                 </div>
                 <div class="tab-pane fade show" id="extension" role="tabpanel">
                     <button onclick="getList('extension')" class="btn btn-success"><i class="fa fa-plus"></i></button>
@@ -138,6 +162,12 @@
             </div>
         </div>
     </div>
+    @include('modal',[
+        "id" => "role_modal",
+        "title" => "Rol Grubu Listesi",
+        "submit_text" => "Seçili Grupları Ekle",
+        "onsubmit" => "addRole"
+    ])
     @include('modal',[
             "id" => "server_modal",
             "title" => "Sunucu Listesi",
@@ -290,7 +320,48 @@
                 $("#" + type + "_modal").modal('show');
             })
         }
-        
+        function removeRole(element){
+            let data = [];
+            let table = $("#role_table").DataTable();
+            table.rows( { selected: true } ).data().each(function(element){
+                data.push(element[2]);
+            });
+
+            if(data === []){
+                Swal.fire({
+                    type: 'error',
+                    title: 'Lütfen önce seçim yapınız.',
+                    timer : 2000
+                });
+                return false;
+            }
+
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Siliniyor...")}}',
+                showConfirmButton: false,
+            });
+
+            let form = new FormData();
+            form.append('ids',JSON.stringify(data));
+            form.append('user_id','{{$user->id}}');
+
+            request('{{route('remove_roles_to_user')}}', form, function (response) {
+                let json = JSON.parse(response);
+                Swal.fire({
+                        position: 'center',
+                        type: 'success',
+                        title: json["message"],
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    setTimeout(function () {
+                        location.reload();
+                },2000);
+            });
+            return false;
+        }
         function removePermission(element){
             let data = [];
             let table = $("#" + element + "_table").DataTable();
@@ -365,6 +436,37 @@
             return false;
         }
 
+        function addRole(modalElement) {
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Ekleniyor...")}}',
+                showConfirmButton: false,
+            });
+            let data = [];
+            let table = $(modalElement).find('table').DataTable();
+            table.rows( { selected: true } ).data().each(function(element){
+                data.push(element[1]);
+            });
+            let form = new FormData();
+            form.append('ids',JSON.stringify(data));
+            form.append('user_id','{{$user->id}}');
+            request('{{route('add_roles_to_user')}}', form, function (response) {
+                let json = JSON.parse(response);
+                Swal.fire({
+                        position: 'center',
+                        type: 'success',
+                        title: json["message"],
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    setTimeout(function () {
+                        location.reload();
+                    },2000);
+            });
+            return false;
+        }
+
         $('table').DataTable({
             bFilter: true,
             select: {
@@ -383,6 +485,11 @@
         function removeUser(){
             $("#removeUser [name='user_id']").val('{{$user->id}}');
             $("#removeUser").modal('show');
+        }
+
+        function roleDetails(row){
+            let role_id = row.querySelector('#role_id').innerHTML;
+            location.href = '/rol/' + role_id;
         }
     </script>
 @endsection

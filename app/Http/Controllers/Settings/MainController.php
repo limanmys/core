@@ -6,6 +6,7 @@ use App\Extension;
 use App\Permission;
 use App\Server;
 use App\User;
+use App\Role;
 use App\Http\Controllers\Controller;
 
 class MainController extends Controller
@@ -71,6 +72,11 @@ class MainController extends Controller
                 break;
             case "extension":
                 $data = Extension::whereNotIn('id',$user->permissions->where('type','extension')->pluck('value')->toArray())->get();
+                $title = ["*hidden*", "İsim"];
+                $display = ["id:id", "name"];
+                break;
+            case "role":
+                $data = Role::whereNotIn('id',$user->roles->pluck('id')->toArray())->get();
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
                 break;

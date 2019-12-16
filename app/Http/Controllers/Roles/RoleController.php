@@ -83,6 +83,26 @@ class RoleController extends Controller
         return respond(__("Grup üyeleri başarıyla eklendi."),200);
     }
 
+    public function addRolesToUser()
+    {
+        foreach(json_decode(request('ids')) as $role){
+            RoleUser::firstOrCreate([
+                "user_id" => request('user_id'),
+                "role_id" => $role
+            ]);
+        }
+        return respond(__("Rol grupları kullanıcıya başarıyla eklendi."),200);
+    }
+
+    public function removeRolesToUser()
+    {
+        RoleUser::whereIn("role_id", json_decode(request('ids')))
+        ->where([
+            "user_id" => request('user_id')
+        ])->delete();
+        return respond(__("Rol grupları başarıyla silindi."),200);
+    }
+
     public function removeRoleUsers()
     {
         RoleUser::whereIn("user_id", json_decode(request('users')))
