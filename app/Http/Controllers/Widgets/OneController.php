@@ -52,7 +52,7 @@ class OneController extends Controller
         }
         $output_json = json_decode($output, true);
         if(!isset($output_json)){
-          return respond(__("Boş json nesnesi."), 400);
+          return respond(__("Bilinmeyen bir hata oluştu."), 400);
         }
         return respond($output_json['message'], $output_json['status']);
     }
