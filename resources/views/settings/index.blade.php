@@ -14,6 +14,9 @@
                     <a class="nav-link active" data-toggle="tab" href="#users" aria-selected="true">{{__("Kullanıcı Ayarları")}}</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#roles" onclick="getRoleList()" aria-selected="true">{{__("Rol Grupları")}}</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#certificates" >{{__("Sertifikalar")}}</a>
                 </li>
                 <li class="nav-item">
@@ -57,6 +60,16 @@
                             ],
                             "onclick" => "details"
                         ])
+                    </div>
+                </div>
+                <div class="tab-pane fade show" id="roles" role="tabpanel">
+                    @include('modal-button',[
+                        "class" => "btn-success",
+                        "target_id" => "add_role",
+                        "text" => "Rol Grubu Ekle"
+                    ])<br><br>
+                    <div id="rolesTable">
+                        
                     </div>
                 </div>
                 <div class="tab-pane fade show" id="certificates" role="tabpanel">
@@ -157,6 +170,17 @@
     ])
 
     @include('modal',[
+        "id"=>"add_role",
+        "title" => "Rol Grubu Ekle",
+        "url" => route('role_add'),
+        "next" => "getRoleList",
+        "inputs" => [
+            "Adı" => "name:text"
+        ],
+        "submit_text" => "Ekle"
+    ])
+
+    @include('modal',[
        "id"=>"delete",
        "title" =>"Kullanıcıyı Sil",
        "url" => route('user_remove'),
@@ -167,6 +191,18 @@
        ],
        "submit_text" => "Kullanıcıyı Sil"
    ])
+
+    @include('modal',[
+        "id"=>"deleteRole",
+        "title" =>"Rol Grubunu Sil",
+        "url" => route('role_remove'),
+        "text" => "Rol grubunu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+        "next" => "getRoleList",
+        "inputs" => [
+            "Rol Id:'null'" => "role_id:hidden"
+        ],
+        "submit_text" => "Rol Grubunu Sil"
+    ])
 
     @include('modal',[
            "id"=>"updateCertificate",
@@ -204,6 +240,7 @@
        "submit_text" => "Parolayı Sıfırla"
    ])
     <script>
+
         function after_user_add(response) {
             let json = JSON.parse(response);
             $("#add_user button[type='submit']").attr("disabled","true")
@@ -211,6 +248,7 @@
         }
 
         function getUserList(){
+            $('.modal').modal('hide');
             request('{{route('get_user_list_admin')}}', new FormData(), function (response) {
                 $("#usersTable").html(response);
                 $('#usersTable table').DataTable({
@@ -223,6 +261,24 @@
                     }
                 });
             });
+        }
+
+        function getRoleList(){
+            $('.modal').modal('hide');
+            request('{{route('role_list')}}', new FormData(), function (response) {
+                $("#rolesTable").html(response);
+                $('#rolesTable table').DataTable({
+                    bFilter: true,
+                    "language" : {
+                        url : "/turkce.json"
+                    }
+                });
+            });
+        }
+
+        function roleDetails(row){
+            let role_id = row.querySelector('#role_id').innerHTML;
+            location.href = '/rol/' + role_id;
         }
 
         function details(row) {

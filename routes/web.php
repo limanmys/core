@@ -33,6 +33,10 @@ require_once(app_path('Http/Controllers/Settings/_routes.php'));
 
 require_once(app_path('Http/Controllers/Widgets/_routes.php'));
 
+// Role Routes
+
+require_once(app_path('Http/Controllers/Roles/_routes.php'));
+
 // Change the language
 Route::get('/locale', 'HomeController@setLocale')->name('set_locale');
 

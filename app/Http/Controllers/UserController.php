@@ -62,7 +62,7 @@ class UserController extends Controller
     public function remove()
     {
         // Delete Permissions
-        Permission::where('user_id', request('user_id'))->delete();
+        Permission::where('morph_id', request('user_id'))->delete();
 
         // Delete User
         User::where("id", request('user_id'))->delete();

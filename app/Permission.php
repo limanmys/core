@@ -38,7 +38,7 @@ class Permission extends Model
             return true;
         }
 
-        $ids = $user->roles->pluck('role_id')->toArray();
+        $ids = $user->roles->pluck('id')->toArray();
         array_push($ids, $user_id);
 
         return Permission::whereIn('morph_id', $ids)

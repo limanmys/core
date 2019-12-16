@@ -16,4 +16,9 @@ class Role extends Model
     {
         return $this->morphMany('App\Permission', 'morph');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany('App\User', "role_users");
+    }
 }
