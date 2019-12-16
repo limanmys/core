@@ -137,7 +137,7 @@
   "Kasa" : "Vault",
   "Sunucuya erişim sağlanamadı." : "Couldn't connect to the server",
   "Yükleniyor..." : "Loading...",
-  "Boş json nesnesi." : "Empty JSON Object.",
+  "Bilinmeyen bir hata oluştu." : "Unknown error.",
   "Tam yetkili yönetici hesabı ile giriş yaptınız, sisteme zarar verebilirsiniz." : "You are logged in with a fully authorized administrator account, you can damage the system.",
   "...daha fazla": "...more",
   "daha az...": "less...",

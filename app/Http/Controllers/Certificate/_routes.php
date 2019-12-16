@@ -9,6 +9,9 @@ Route::post('/sunucu/sertifikaOnayi','Certificate\MainController@verifyCert')->n
 // Delete Certificate
 Route::post('/sunucu/sertifikaSil','Certificate\MainController@removeCert')->name('remove_certificate')->middleware('admin');
 
+// Update Certificate
+Route::post('/sunucu/sertifikaGuncelle','Certificate\MainController@updateCert')->name('update_certificate')->middleware('admin');
+
 // Retrieve Certificate
 Route::post('/ayarlar/sertifikaTalep','Certificate\MainController@requestCert')->name('certificate_request')->middleware('admin');
 
