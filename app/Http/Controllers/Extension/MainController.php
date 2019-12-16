@@ -200,7 +200,7 @@ class MainController extends Controller
 
         touch($folder . DIRECTORY_SEPARATOR . "db.json");
 
-        file_put_contents($folder . DIRECTORY_SEPARATOR . "db.json",json_encode($json));
+        file_put_contents($folder . DIRECTORY_SEPARATOR . "db.json",json_encode($json, JSON_PRETTY_PRINT));
 
         if ((intval(shell_exec("grep -c '^" . clean_score($ext->id) . "' /etc/passwd"))) ? false : true) {
             shell_exec('sudo useradd -r -s /bin/sh ' . clean_score($ext->id));

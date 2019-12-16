@@ -136,7 +136,7 @@ class SettingsController extends Controller
             $extension[request("table")] = $values;
         }
 
-        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension));
+        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
 
         system_log(7,"EXTENSION_SETTINGS_UPDATE",[
             "extension_id" => extension()->_id,
