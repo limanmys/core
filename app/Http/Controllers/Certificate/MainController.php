@@ -90,12 +90,12 @@ class MainController extends Controller
         }
         $file = "liman-" . $certificate->server_hostname . "_" . $certificate->origin . ".crt";
         shell_exec('sudo rm /usr/local/share/ca-certificates/ ' . $file);
-        shell_exec("sudo update-ca-certificates");
+        shell_exec("sudo update-ca-certificates -f");
         $cert = file_get_contents('/tmp/' . $message["path"]);
         $query = "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . $file;
         $output = shell_exec($query);
         $certificate->save();
-        shell_exec("sudo update-ca-certificates");
+        shell_exec("sudo update-ca-certificates -f");
         return respond("Sertifika Başarıyla Güncellendi!");
     }
 }
