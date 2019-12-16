@@ -61,18 +61,18 @@ class LoginController extends Controller
                 return false;
             }
             if($flag){
-                $sr = ldap_search($ldapConnection, $base_dn, '(&(objectClass=user)(sAMAccountName='.$credientials->email.'))', ['objectguid', 'samaccountname']);
+                $sr = ldap_search($ldapConnection, $base_dn, '(&(objectClass=user)(sAMAccountName='.$credientials->email.'))', [$guidColumn, 'samaccountname']);
                 $ldapUser = ldap_get_entries($ldapConnection, $sr);
-                if(!$ldapUser[0]['objectguid'][0]){
+                if(!$ldapUser[0][$guidColumn][0]){
                     return false;
                 }
-                $user = \App\User::where($guidColumn, bin2hex($ldapUser[0]['objectguid'][0]))->first();
+                $user = \App\User::where($guidColumn, bin2hex($ldapUser[0][$guidColumn][0]))->first();
                 if(!$user){
                     $user = User::create([
                         "name" => $credientials->email,
                         "email" => $credientials->email."@".$domain,
                         "password" => Hash::make(str_random("16")),
-                        $guidColumn => bin2hex($ldapUser[0]['objectguid'][0]),
+                        $guidColumn => bin2hex($ldapUser[0][$guidColumn][0]),
                     ]);
                 }else{
                     $user->update([
