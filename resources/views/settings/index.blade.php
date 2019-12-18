@@ -144,6 +144,10 @@
                         <input type="text" value="{{ env('LDAP_HOST', "") }}" name="ldapAddress" class="form-control" placeholder="{{ __('IP Adresi Girin') }}">
                     </div>
                     <button type="button" onclick="saveLDAPConf()" class="btn btn-primary">{{ __('Kaydet') }}</button>
+                    @if(config('ldap.ldap_host', false))
+                        <h5 class="mt-4 mb-2">{{ __('Domain Grup ve Rol Grup Eşleştirmeleri') }}</h5>
+                        
+                    @endif
                 </div>
             </div>
         </div>

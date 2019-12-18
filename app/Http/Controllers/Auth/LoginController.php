@@ -8,6 +8,8 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use App\User;
+use App\RoleMapping;
+use App\RoleUser;
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -61,24 +63,39 @@ class LoginController extends Controller
                 return false;
             }
             if($flag){
-                $sr = ldap_search($ldapConnection, $base_dn, '(&(objectClass=user)(sAMAccountName='.$credientials->email.'))', [$guidColumn, 'samaccountname']);
+                $sr = ldap_search($ldapConnection, $base_dn, '(&(objectClass=user)(sAMAccountName='.$credientials->email.'))', [$guidColumn, 'samaccountname', 'memberof']);
                 $ldapUser = ldap_get_entries($ldapConnection, $sr);
                 if(!$ldapUser[0][$guidColumn][0]){
                     return false;
                 }
-                $user = \App\User::where($guidColumn, bin2hex($ldapUser[0][$guidColumn][0]))->first();
+                $user = User::where($guidColumn, bin2hex($ldapUser[0][$guidColumn][0]))->first();
                 if(!$user){
                     $user = User::create([
                         "name" => $credientials->email,
                         "email" => $credientials->email."@".$domain,
                         "password" => Hash::make(str_random("16")),
                         $guidColumn => bin2hex($ldapUser[0][$guidColumn][0]),
+                        "auth_type" => "ldap"
                     ]);
                 }else{
                     $user->update([
                         "name" => $credientials->email,
                         "email" => $credientials->email."@".$domain,
+                        "auth_type" => "ldap"
                     ]);
+                }
+                RoleUser::where('type', 'ldap')->delete();
+                if($ldapUser[0]["memberof"]['count']){
+                    unset($ldapUser[0]["memberof"]['count']);
+                    foreach($ldapUser[0]["memberof"] as $row){
+                        RoleMapping::where('group_id', md5($row))->get()->map(function($item) use ($user){
+                            RoleUser::firstOrCreate([
+                                "user_id" => $user->id,
+                                "role_id" => $item->role_id,
+                                "type" => "ldap"
+                            ]);
+                        });
+                    }
                 }
                 $this->guard()->login($user, true);
                 return true;
