@@ -25,3 +25,5 @@ Route::post('/rol/yetki_listesi/sil','Roles\RoleController@removeFromList')->nam
 Route::post('/rol/yetki_listesi/fonksiyon_ekle','Roles\RoleController@addFunctionPermissions')->name('add_role_function')->middleware('admin');
 
 Route::post('/rol/yetki_listesi/fonksiyon_sil','Roles\RoleController@removeFunctionPermissions')->name('remove_role_function')->middleware('admin');
+
+Route::post('/rol/domain_gruplari','Roles\RoleMappingController@fetchDomainGroups')->name('fetch_domain_groups')->middleware('admin');

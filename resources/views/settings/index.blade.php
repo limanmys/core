@@ -146,7 +146,29 @@
                     <button type="button" onclick="saveLDAPConf()" class="btn btn-primary">{{ __('Kaydet') }}</button>
                     @if(config('ldap.ldap_host', false))
                         <h5 class="mt-4 mb-2">{{ __('Domain Grup ve Rol Grup Eşleştirmeleri') }}</h5>
-                        
+                        @include('modal-button',[
+                            "class" => "btn-success mb-2",
+                            "target_id" => "addMapping",
+                            "text" => "Ekle"
+                        ])
+                        @include('table',[
+                            "value" => \App\RoleMapping::all()->map(function($item){
+                                $item->role_name = $item->role->name;
+                                return $item;
+                            }),
+                            "title" => [
+                                "Domain Grubu" , "Rol Grubu" , "*hidden*" ,
+                            ],
+                            "display" => [
+                                "dn" , "role_name", "id:id" ,
+                            ],
+                            "menu" => [
+                                "Sil" => [
+                                    "target" => "deleteCertificate",
+                                    "icon" => " context-menu-icon-delete"
+                                ]
+                            ],
+                        ])
                     @endif
                 </div>
             </div>
@@ -157,7 +179,7 @@
         "id"=>"add_user",
         "title" => "Kullanıcı Ekle",
         "url" => route('user_add'),
-        "next" => "after_user_add",
+        "next" => "afterUserAdd",
         "selects" => [
             "Yönetici:administrator" => [
                 "-:administrator" => "type:hidden"
@@ -243,9 +265,111 @@
        ],
        "submit_text" => "Parolayı Sıfırla"
    ])
-    <script>
 
-        function after_user_add(response) {
+    @component('modal-component',[
+        "id" => "addMapping",
+        "title" => "Domain Grup ve Rol Grup Eşleştirmesi",
+        "footer" => [
+            "class" => "btn-success",
+            "onclick" => "changeOU()",
+            "text" => "Ekle"
+        ],
+    ])
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>{{ __('Domain Grubu (DN)') }}</label>
+                <div class="input-group">
+                    <select class="form-control select2" name="dn" data-placeholder="{{ __('DN Yazınız') }}" data-tags="true">
+                    </select>
+                    <span class="input-group-append">
+                        <button type="button" onclick="fetchDomainGroups()" class="btn btn-primary">{{ __('LDAP\'tan Getir') }}</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>{{ __('Rol Grubu') }}</label>
+                <select class="form-control select2" required>
+                    @foreach (\App\Role::all() as $role)
+                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+
+    @endcomponent
+
+    @component('modal-component',[
+        "id" => "ldapAuth",
+        "title" => "Ldap İle Giriş Yap",
+        "notSized" => true,
+        "modalDialogClasses" => "modal-dialog-centered modal-sm",
+        "footer" => [
+            "class" => "btn-success",
+            "onclick" => "ldapLogin()",
+            "text" => "Giriş Yap"
+        ],
+    ])
+
+    <div class="form-group">
+        <label for="ldapUsername">{{ __('Kullanıcı Adı') }}</label>
+        <input type="text" name="ldapUsername" class="form-control" id="ldapUsername" placeholder="{{ __('Kullanıcı Adı') }}">
+    </div>
+
+    <div class="form-group">
+        <label for="ldapPassword">{{ __('Şifre') }}</label>
+        <input type="password" name="ldapPassword" class="form-control" id="ldapPassword" placeholder="{{ __('Şifre') }}">
+    </div>
+
+    @endcomponent
+    <script>
+        
+        var ldapAuthNext = null;
+
+        function ldapAuth(next){
+            ldapAuthNext = next;
+            $('#ldapAuth').modal('show');
+        }
+
+        function ldapLogin(){
+            let ldapUsername = $('#ldapAuth').find('input[name=ldapUsername]').val();
+            let ldapPassword = $('#ldapAuth').find('input[name=ldapPassword]').val();
+            if(ldapAuthNext)
+                ldapAuthNext(ldapUsername, ldapPassword);
+            $('#ldapAuth').find('input[name=ldapUsername]').val("");
+            $('#ldapAuth').find('input[name=ldapPassword]').val("");
+            $('#ldapAuth').modal('hide');
+        }
+
+        function fetchDomainGroups(){
+            ldapAuth(function(ldapUsername, ldapPassword){
+                let data =  new FormData();
+                data.append('ldapUsername', ldapUsername);
+                data.append('ldapPassword', ldapPassword);
+                request('{{route('fetch_domain_groups')}}', data, function (response) {
+                    let json = JSON.parse(response);
+                    var str = "";
+                    json.message.forEach(function(item){
+                        str += "<option value='" + item.id + "'>" + item.dn + "</option>";
+                    });
+                    $('#addMapping').find('select[name=dn]').html(str);
+                    $('#addMapping').find('select[name=dn]').change();
+                }, function(response){
+                    let error = JSON.parse(response);
+                    Swal.fire({
+                        type: 'error',
+                        title: error.message,
+                        timer : 2000
+                    });
+                });
+            });
+        }
+
+        function afterUserAdd(response) {
             let json = JSON.parse(response);
             $("#add_user button[type='submit']").attr("disabled","true")
             getUserList();

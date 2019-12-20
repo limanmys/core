@@ -9,7 +9,7 @@ class RoleMapping extends Model
     use UsesUuid;
 
     protected $fillable = [
-        "role_id", "group_id"
+        "role_id", "group_id", "dn"
     ];
 
     public function role()

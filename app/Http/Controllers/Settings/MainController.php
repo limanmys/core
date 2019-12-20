@@ -8,6 +8,8 @@ use App\Server;
 use App\User;
 use App\Role;
 use App\Http\Controllers\Controller;
+use App\AdminNotification;
+use App\Certificate;
 
 class MainController extends Controller
 {
@@ -164,11 +166,32 @@ class MainController extends Controller
 
     public function saveLDAPConf()
     {
+        $cert = Certificate::where([
+            'server_hostname' => request('ldapAddress'),
+            'origin' => 636
+        ])->first();
+        if(!$cert){
+            list($flag, $message) = retrieveCertificate(request('ldapAddress'),636);
+            if($flag){
+                $flag2 = addCertificate(request('ldapAddress'),636,$message["path"]);
+                $notification = new AdminNotification();
+                $notification->title = "Yeni Sertifika Eklendi";
+                $notification->type = "new_cert";
+                $notification->message = "Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.<br><br><a href='" . route('settings') . "#certificates'>Detaylar</a>";
+                $notification->level = 3;
+                $notification->save();
+            }
+        }
+        $old_host = env("LDAP_HOST", "");
         setEnv([
-            "LDAP_HOST" => request('ldapAddress'),
-            "LDAP_BASE_DN" => "",
-            "LDAP_DOMAIN" => ""
+            "LDAP_HOST" => request('ldapAddress')
         ]);
+        if(!setBaseDn()){
+            setEnv([
+                "LDAP_HOST" => $old_host
+            ]);
+            return respond('Sunucuya bağlanırken bir hata oluştu!', 201);
+        }
         return respond(__("Kaydedildi!"),200);
     }
 }
