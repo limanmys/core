@@ -1,16 +1,4 @@
 <?php return array (
-  'adldap2/adldap2-laravel' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Adldap\\Laravel\\AdldapServiceProvider',
-      1 => 'Adldap\\Laravel\\AdldapAuthServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'Adldap' => 'Adldap\\Laravel\\Facades\\Adldap',
-    ),
-  ),
   'beyondcode/laravel-websockets' => 
   array (
     'providers' => 

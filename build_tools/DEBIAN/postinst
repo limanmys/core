@@ -128,9 +128,32 @@ ExecStart=/liman/server/storage/connector
 WantedBy=multi-user.target
     """ > /etc/systemd/system/liman.service
 fi
+
+# Create Systemd Service
+if [ -f "/etc/systemd/system/liman-vnc.service" ]; then
+    echo "Liman Connector Service Already Added.";
+else
+        echo """
+[Unit]
+Description=Liman VNC Service
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=liman
+ExecStart=/usr/bin/websockify --web=/usr/share/novnc 6080 --cert=/liman/certs/liman.crt --key=/liman/certs/liman.key --token-plugin TokenFile --token-source /liman/keys/vnc/config
+[Install]
+WantedBy=multi-user.target
+    """ > /etc/systemd/system/liman-vnc.service
+fi
+
 systemctl daemon-reload
 systemctl enable liman
+systemctl enable liman-vnc
 systemctl restart liman
+systemctl restart liman-vnc
 
 # Create Socket Service
 if [ -f "/etc/systemd/system/liman-socket.service" ]; then
@@ -170,6 +193,8 @@ rm -rf /liman/keys/vnc
 mkdir /liman/keys/vnc
 chmod 700 /liman/keys/vnc
 touch /liman/keys/vnc/config
+chown liman:liman /liman/keys/vnc /liman/keys/vnc/config
+chmod 700 /liman/keys/vnc/config
 
 # Modify ini file to use decoder.
 if grep --quiet liman-decoder.so /etc/php/7.3/cli/php.ini; then
