@@ -264,6 +264,7 @@ class OneController extends Controller
         ]);
 
         ServerLog::new(request('command'),$output);
+        system_log(6,server()->id . ":" . request('command'));
         return $output;
     }
 
