@@ -322,7 +322,7 @@ class OneController extends Controller
             $updates = [];
             $raw = server()->run(sudo()."apt-get -qq update 2> /dev/null > /dev/null; ".sudo()."apt list --upgradable 2>/dev/null | sed '1,1d'");
             foreach (explode("\n", $raw) as $package) {
-                if ($package == "") {
+                if ($package == "" || strpos($package, 'List') !== false) {
                     continue;
                 }
                 $row = explode(" ", $package, 4);
