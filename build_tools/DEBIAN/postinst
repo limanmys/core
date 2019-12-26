@@ -149,12 +149,14 @@ WantedBy=multi-user.target
     """ > /etc/systemd/system/liman-vnc.service
 fi
 
+sed -i "s/upload_max_filesize.*/upload_max_filesize = 50M/g" /etc/php/7.3/fpm/php.ini
+
 systemctl daemon-reload
 systemctl enable liman
 systemctl enable liman-vnc
 systemctl restart liman
 systemctl restart liman-vnc
-
+systemctl reload php7.3-fpm.service
 # Create Socket Service
 if [ -f "/etc/systemd/system/liman-socket.service" ]; then
     echo "Liman Socket Service Already Added.";
