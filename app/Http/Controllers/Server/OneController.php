@@ -274,8 +274,8 @@ class OneController extends Controller
     public function updatePackage()
     {
         if(server()->type == "linux_ssh"){
-            $raw = server()->run('DEBIAN_FRONTEND=noninteractive '.sudo().'apt-get -o Dpkg::Progress-Fancy="0" -o Dpkg::Use-Pty=0 --only-upgrade install '.request("package_name")." -y --fix-missing 2>&1 | sudo tee -a /tmp/".request("package_name").".txt > /dev/null 2>&1 & echo $!");
-            \Session::put(server()->id.request("package_name"), intval(trim($raw)) + 1 );
+            $package = request("package_name");
+            $raw = server()->run(sudo()."bash -c 'DEBIAN_FRONTEND=noninteractive apt install $package -qqy >/tmp/$package.txt 2>&1 & disown && echo \$!'");
             ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi için güncelleme isteği gönderildi.', ['package_name' => request("package_name")]));
         }elseif (server()->type == "windows_powershell"){
             $raw = "";
@@ -286,18 +286,10 @@ class OneController extends Controller
     public function checkUpdate()
     {
         if(server()->type == "linux_ssh"){
-            $pid = session(server()->id.request("package_name"));
-            if(empty($pid)){
-                ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi bir hata nedeniyle takip edilemedi.', ['package_name' => request("package_name")]));
-                return respond([
-                    "status" => __(":package_name paketi bir hata nedeniyle takip edilemiyor.", ['package_name' => request("package_name")]),
-                    "output" => ""
-                ]);
-            }
-            $output = trim(server()->run('[ -d "/proc/'.$pid.'" ] && echo "YES" || echo "NO"'));
+            $output = trim(server()->run("ps aux | grep \"apt\|dpkg\" | grep -v grep 2>/dev/null 1>/dev/null && echo '1' || echo '0'"));
             $command_output = server()->run(sudo().'cat /tmp/'.request("package_name"). '.txt 2> /dev/null');
             server()->run(sudo().'truncate -s 0 /tmp/'.request("package_name"). '.txt');
-            if($output === "NO"){
+            if($output === "0"){
                 $output = server()->run(sudo().'apt list --upgradable 2>/dev/null | grep '.request("package_name"));
                 if(empty($output)){
                     ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi paketi başarıyla kuruldu.', ['package_name' => request("package_name")]));
