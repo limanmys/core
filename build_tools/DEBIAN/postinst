@@ -97,6 +97,9 @@ php /liman/server/artisan cache:clear
 php /liman/server/artisan view:clear
 php /liman/server/artisan config:clear
 
+# Create ChangeLog
+git log -30 --pretty=format:"%s%x09%ad" > /liman/server/storage/changelog
+
 # Clear Sandbox Cache
 rm -rf /tmp/liman
 
@@ -197,6 +200,7 @@ chmod 700 /liman/keys/vnc
 touch /liman/keys/vnc/config
 chown liman:liman /liman/keys/vnc /liman/keys/vnc/config
 chmod 700 /liman/keys/vnc/config
+
 
 # Modify ini file to use decoder.
 if grep --quiet liman-decoder.so /etc/php/7.3/cli/php.ini; then

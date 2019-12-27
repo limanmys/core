@@ -28,6 +28,9 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#ldapIntegration">{{__("LDAP Entegrasyonu")}}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#changeLog">{{__("Son Değişiklikler")}}</a>
+                </li>
             </ul>
         </div>
         <div class="card-body">
@@ -144,6 +147,13 @@
                         <input type="text" value="{{ env('LDAP_HOST', "") }}" name="ldapAddress" class="form-control" placeholder="{{ __('IP Adresi Girin') }}">
                     </div>
                     <button type="button" onclick="saveLDAPConf()" class="btn btn-primary">{{ __('Kaydet') }}</button>
+                </div>
+                <div class="tab-pane fade show" id="changeLog" role="tabpanel">
+                    <ul>
+                        @foreach (explode("\n",$changelog) as $line)
+                        <li>{{$line}}</li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
         </div>

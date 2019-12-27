@@ -20,8 +20,10 @@ class MainController extends Controller
 
     public function index()
     {
+        $changelog = is_file(storage_path('changelog')) ? file_get_contents(storage_path('changelog')) : "";
         return view('settings.index',[
             "users" => User::all(),
+            "changelog" => $changelog
         ]);
     }
 
