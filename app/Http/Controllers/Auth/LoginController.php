@@ -61,7 +61,7 @@ class LoginController extends Controller
                 return false;
             }
             if($flag){
-                $sr = ldap_search($ldapConnection, $base_dn, '(&(objectClass=user)(sAMAccountName='.$credientials->email.'))', [$guidColumn, 'samaccountname']);
+                $sr = ldap_search($ldapConnection, $base_dn, '(&(objectClass=user)(sAMAccountName='.ldap_escape($credientials->email).'))', [$guidColumn, 'samaccountname']);
                 $ldapUser = ldap_get_entries($ldapConnection, $sr);
                 if(!$ldapUser[0][$guidColumn][0]){
                     return false;
