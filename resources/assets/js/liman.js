@@ -256,10 +256,7 @@ function renderNotifications(data,type,target, exclude){
 function activeTab(){
     let element = $('a[href="'+ window.location.hash +'"]');
     if(element){
-        element.tab('show');
-        if(element.attr("onclick")){
-            element.click();
-        }
+        element.click();
     }
 }
 
