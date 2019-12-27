@@ -16,6 +16,7 @@ Build:
     - rm -rf composer.phar composer-setup.php liman/server/.git liman/sandbox/.git liman/webssh/.git
     - mv create_deb.sh ../create_deb.sh
     - chmod +x ../create_deb.sh
+    - git log -30 --pretty=format:"%s%x09%ad" > liman/server/storage/changelog
     - export VERSION=$(date +'%Y.%m.%d-%s')
     - sed -i "s/APP_VERSION=Development/APP_VERSION=$VERSION/g" liman/server/.env
     - sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" liman/server/.env
