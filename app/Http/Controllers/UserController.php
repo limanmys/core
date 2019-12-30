@@ -236,9 +236,7 @@ class UserController extends Controller
  
          auth()->logout();
          session()->flush();
-         return redirect()->route('login')->withErrors([
-            "message" => "Kullanıcı Başarıyla Güncellendi, lütfen tekrar giriş yapın."
-        ]);
+         return redirect()->route('login')->with('status', "Kullanıcı Başarıyla Güncellendi, lütfen tekrar giriş yapın.");
     }
 
     public function userKeyList()
