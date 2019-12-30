@@ -572,9 +572,6 @@
                 $("#logsTab").html(response);
                 $("#logsTab table").DataTable({
                     bFilter: true,
-                    select: {
-                        style: 'multi'
-                    },
                     "language": {
                         url: "/turkce.json"
                     }
@@ -737,8 +734,17 @@
                     select: {
                         style: 'multi'
                     },
-                    "language": {
-                        url: "/turkce.json"
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    language: {
+                        url : "/turkce.json",
+                        buttons: {
+                            selectAll: "{{ __('Tümünü Seç') }}",
+                            selectNone: "{{ __('Tümünü Kaldır') }}"
+                        }
                     }
                 });
                 setTimeout(function () {
@@ -817,8 +823,17 @@
                 select: {
                     style: 'multi'
                 },
-                "language": {
-                    url: "/turkce.json"
+                dom: 'Blfrtip',
+                buttons: [
+                    'selectAll',
+                    'selectNone'
+                ],
+                language: {
+                    url : "/turkce.json",
+                    buttons: {
+                        selectAll: "{{ __('Tümünü Seç') }}",
+                        selectNone: "{{ __('Tümünü Kaldır') }}"
+                    }
                 }
             });
         });

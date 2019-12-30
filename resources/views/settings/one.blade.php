@@ -213,14 +213,23 @@
             request('{{route('extension_function_list')}}', form, function (response) {
                 $(".functionsTable").html(response);
                 $('.functionsTable table').DataTable({
-                bFilter: true,
-                select: {
-                    style: 'multi'
-                },
-                "language" : {
-                    url : "/turkce.json"
-                }
-            });
+                    bFilter: true,
+                    select: {
+                        style: 'multi'
+                    },
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    language: {
+                        url : "/turkce.json",
+                        buttons: {
+                            selectAll: "{{ __('Tümünü Seç') }}",
+                            selectNone: "{{ __('Tümünü Kaldır') }}"
+                        }
+                    }
+                });
             });
         }
 
@@ -313,8 +322,17 @@
                     select: {
                         style: 'multi'
                     },
-                    "language": {
-                        url: "{{asset('turkce.json')}}"
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    language: {
+                        url : "/turkce.json",
+                        buttons: {
+                            selectAll: "{{ __('Tümünü Seç') }}",
+                            selectNone: "{{ __('Tümünü Kaldır') }}"
+                        }
                     }
                 });
                 $("#" + type + "_modal").modal('show');
@@ -472,8 +490,17 @@
             select: {
                 style: 'multi'
             },
-            "language" : {
-                url : "{{asset('turkce.json')}}"
+            dom: 'Blfrtip',
+            buttons: [
+                'selectAll',
+                'selectNone'
+            ],
+            language: {
+                url : "/turkce.json",
+                buttons: {
+                    selectAll: "{{ __('Tümünü Seç') }}",
+                    selectNone: "{{ __('Tümünü Kaldır') }}"
+                }
             }
         });
 

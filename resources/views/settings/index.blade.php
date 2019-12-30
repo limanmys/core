@@ -127,8 +127,17 @@
                             select: {
                                 style: 'multi'
                             },
-                            "language" : {
-                                url : "/turkce.json"
+                            dom: 'Blfrtip',
+                            buttons: [
+                                'selectAll',
+                                'selectNone'
+                            ],
+                            language: {
+                                url : "/turkce.json",
+                                buttons: {
+                                    selectAll: "{{ __('Tümünü Seç') }}",
+                                    selectNone: "{{ __('Tümünü Kaldır') }}"
+                                }
                             }
                         });
                     </script>
@@ -266,8 +275,17 @@
                     select: {
                         style: 'multi'
                     },
-                    "language" : {
-                        url : "/turkce.json"
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    language: {
+                        url : "/turkce.json",
+                        buttons: {
+                            selectAll: "{{ __('Tümünü Seç') }}",
+                            selectNone: "{{ __('Tümünü Kaldır') }}"
+                        }
                     }
                 });
             });
