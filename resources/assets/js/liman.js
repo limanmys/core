@@ -225,7 +225,7 @@ function renderNotifications(data,type,target, exclude){
     $("#" + target + "Count" ).html(data.length);
     data.forEach(notification => {
         let errors = [
-            "error" , "health_problem", "liman_update"
+            "error" , "health_problem"
         ];
         let color = (errors.includes(notification["type"])) ? "#f56954" : "#00a65a";
         element.append("<div class='dropdown-divider'></div><a class='dropdown-item' href='/bildirim/" + notification["id"] + "'>" + 
@@ -242,6 +242,8 @@ function renderNotifications(data,type,target, exclude){
         }
         if(errors.includes(notification.type)){
             toastElement = toastr.error(notification.message, notification.title, {timeOut: 5000})
+        }else if(notification.type == "liman_update"){
+            toastElement = toastr.warning(notification.message, notification.title, {timeOut: 5000})
         }else{
             toastElement = toastr.success(notification.message, notification.title, {timeOut: 5000})
         }
