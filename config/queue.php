@@ -79,7 +79,7 @@ return [
     */
 
     'failed' => [
-        'database' => 'mongodb',
+        'database' => 'sqlite',
         'table'    => 'failed_jobs',
     ],
 

@@ -324,7 +324,7 @@ function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_
         $server = json_encode($serverObj->toArray());
 
         $extension = json_encode($extensionObj);
-
+        
         if($extensionDb == null){
             $settings = DB::table("user_settings")->where([
                 "user_id" => $user_id,
