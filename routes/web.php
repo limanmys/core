@@ -115,6 +115,8 @@ Route::post('/lmn/private/putSession','Extension\OneController@internalPutSessio
 
 Route::post('/lmn/private/reverseProxyRequest','Extension\OneController@internalAddProxyConfig')->middleware(['auth', 'permissions']);
 
+Route::post('/lmn/private/dispatchJob','Extension\OneController@internalAddJob')->middleware(['auth', 'permissions']);
+
 Route::any('/upload/{any?}', function () {
     $server = app('tus-server');
     $extension_id = request("extension_id");

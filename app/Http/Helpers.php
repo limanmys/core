@@ -352,12 +352,12 @@ function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_
         $request = json_encode($request);
 
         $apiRoute = route('extension_function_api', [
-            "extension_id" => extension()->id
+            "extension_id" => $extension_id
         ]);
 
         $navigationRoute = route('extension_server_route', [
             "server_id" => $serverObj->id,
-            "extension_id" => extension()->id,
+            "extension_id" => $extension_id,
             "city" => $serverObj->city
         ]);
 

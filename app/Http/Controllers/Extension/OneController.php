@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
 use App\ServerLog;
+use App\Jobs\ExtensionJob;
 
 /**
  * Class OneController
@@ -170,6 +171,72 @@ class OneController extends Controller
           return response()->json(json_decode($output), $code);
         }
         return response($output, $code);
+    }
+
+    public function internalAddJob()
+    {
+        if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
+            system_log(5,"EXTENSION_INTERNAL_NO_PERMISSION",[
+                "extension_id" => extension()->id,
+            ]);
+            abort(403, 'Not Allowed');
+        }
+        $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+
+        $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
+        if (!Permission::can($token->user_id, 'server','id', $server->id)) {
+            system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
+                "extension_id" => extension()->id,
+                "server_id" => request('server_id')
+            ]);
+            return "Sunucu icin yetkiniz yok.";
+        }
+
+        $extension = Extension::find(request('extension_id')) or abort(404, 'Eklenti Bulunamadi');
+        if (!Permission::can($token->user_id, 'extension','id', $extension->id)) {
+            system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
+                "extension_id" => extension()->id,
+                "server_id" => request('server_id')
+            ]);
+            return "Eklenti için yetkiniz yok.";
+        }
+        
+        ExtensionJob::dispatch($server,$extension,user(),request('function_name'),request('parameters'))->onQueue('extension_queue');
+
+        return "ok";
+    } 
+
+    public function internalJobsList()
+    {
+        if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
+            system_log(5,"EXTENSION_INTERNAL_NO_PERMISSION",[
+                "extension_id" => extension()->id,
+            ]);
+            abort(403, 'Not Allowed');
+        }
+        $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+
+        $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
+        if (!Permission::can($token->user_id, 'server','id', $server->id)) {
+            system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
+                "extension_id" => extension()->id,
+                "server_id" => request('server_id')
+            ]);
+            return "Sunucu icin yetkiniz yok.";
+        }
+
+        $extension = Extension::find(request('extension_id')) or abort(404, 'Eklenti Bulunamadi');
+        if (!Permission::can($token->user_id, 'extension','id', $extension->id)) {
+            system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
+                "extension_id" => extension()->id,
+                "server_id" => request('server_id')
+            ]);
+            return "Eklenti icin yetkiniz yok.";
+        }
+
+        $job = (new ExtensionJob($server,$extension,user(),request('function_name')));
+        $id = dispatch($job);
+        return $id;
     }
 
     public function internalExtensionApi()
