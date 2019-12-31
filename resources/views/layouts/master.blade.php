@@ -25,10 +25,12 @@
             let data = notification['\u0000*\u0000attributes'];
             if(data){
                 let errors = [
-                    "error" , "health_problem", "liman_update"
+                    "error" , "health_problem"
                 ];
                 if(errors.includes(data.type)){
                     toastElement = toastr.error(data.message, data.title, {timeOut: 5000});
+                }else if(data.type == "liman_update"){
+                    toastElement = toastr.warning(data.message, data.title, {timeOut: 5000})
                 }else{
                     toastElement = toastr.success(data.message, data.title, {timeOut: 5000})
                 }
