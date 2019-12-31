@@ -1227,7 +1227,7 @@ function encodeMetadata(metadata) {
   var encoded = [];
 
   for (var key in metadata) {
-    encoded.push(key + " " + _jsBase.Base64.encode(metadata[key]));
+    encoded.push(key + " " + _jsBase.Base64.encode(metadata[key] ? metadata[key] : 'application/zip'));
   }
 
   return encoded.join(",");
