@@ -10,20 +10,22 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use App\Token;
 use Illuminate\Support\Str;
+use App\JobHistory;
 
 class ExtensionJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    public $extension,$server,$user,$function,$parameters,$request,$session,$cookie;
+    
+    public $extension,$server,$user,$function,$parameters,$request,$session,$cookie,$history;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($server,$extension,$user,$function,$parameters)
+    public function __construct($history,$server,$extension,$user,$function,$parameters)
     {
+        $this->history = $history;
         $this->extension = $extension;
         $this->server = $server;
         $this->user = $user;
@@ -48,7 +50,6 @@ class ExtensionJob implements ShouldQueue
         $this->request = $request;
         $command = self::sandbox($this->server, $this->extension, $this->extension->id,$this->user->id, "null", "null", $this->function);
         $output = shell_exec($command);
-        echo $output . "\n";
         system_log(7,"EXTENSION_BACKGROUND_RUN",[
             "extension_id" => $this->extension->id,
             "server_id" => $this->server->id,
@@ -63,8 +64,12 @@ class ExtensionJob implements ShouldQueue
             }
         }catch (\Exception $exception){};
         if(strval($code) == "200" && $json["message"] != ""){
+            $this->history->status = 1;
+            $this->history->save();
             return true;
         }else{
+            $this->history->status = 2;
+            $this->history->save();
             return false;
         }
     }

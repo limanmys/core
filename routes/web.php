@@ -117,6 +117,8 @@ Route::post('/lmn/private/reverseProxyRequest','Extension\OneController@internal
 
 Route::post('/lmn/private/dispatchJob','Extension\OneController@internalAddJob')->middleware(['auth', 'permissions']);
 
+Route::post('/lmn/private/getJobList','Extension\OneController@internalJobsList')->middleware(['auth', 'permissions']);
+
 Route::any('/upload/{any?}', function () {
     $server = app('tus-server');
     $extension_id = request("extension_id");

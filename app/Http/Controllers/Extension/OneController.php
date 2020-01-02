@@ -21,6 +21,8 @@ use Illuminate\View\View;
 use Illuminate\Support\Str;
 use App\ServerLog;
 use App\Jobs\ExtensionJob;
+use App\JobHistory;
+use Illuminate\Contracts\Bus\Dispatcher;
 
 /**
  * Class OneController
@@ -200,9 +202,24 @@ class OneController extends Controller
             ]);
             return "Eklenti için yetkiniz yok.";
         }
-        
-        ExtensionJob::dispatch($server,$extension,user(),request('function_name'),request('parameters'))->onQueue('extension_queue');
 
+        $history = new JobHistory([
+            "status" => "0",
+            "user_id" => user()->id,
+            "server_id" => $server->id,
+            "extension_id" => $extension->id,
+            "job" => request('function_name')
+        ]);
+
+        $history->save();
+
+        $job = (new ExtensionJob($history,$server,$extension,user(),request('function_name'),request('parameters')))->onQueue('extension_queue');
+        
+        $job_id = app(Dispatcher::class)->dispatch($job);
+
+        $history->job_id = $job_id;
+        $history->save();
+        
         return "ok";
     } 
 
@@ -233,10 +250,25 @@ class OneController extends Controller
             ]);
             return "Eklenti icin yetkiniz yok.";
         }
+        
+        $all = JobHistory::where([
+            "user_id" => user()->id,
+            "extension_id" => $extension->id,
+            "server_id" => $server->id,
+            "job" => request('function_name'),
+            "status" => 0
+        ])->get('status');
 
-        $job = (new ExtensionJob($server,$extension,user(),request('function_name')));
-        $id = dispatch($job);
-        return $id;
+        $holdCount = $all->where('status',0)->count();
+        $successCount = $all->where('status',0)->count();
+        $failCount = $all->where('status',0)->count();
+
+        return json_encode([
+            "hold" => $holdCount,
+            "success" => $successCount,
+            "fail" => $failCount,
+            "total" => $all->count()
+        ]);
     }
 
     public function internalExtensionApi()
