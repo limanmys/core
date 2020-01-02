@@ -115,6 +115,7 @@ class SettingsController extends Controller
                             $values[$key]["variable"] = request('variable');
                             $values[$key]["type"] = request('type');
                             $values[$key]["name"] = request('name');
+                            $values[$key]["required"] = request('required') ? true : false;
                             break;
                         case "widgets":
                             $values[$key]["target"] = request('target');
@@ -157,6 +158,7 @@ class SettingsController extends Controller
                     "variable" => request('variable'),
                     "type" => request('type'),
                     "name" => request('name'),
+                    "required" => request('required') ? true : false,
                 ]);
                 break;
             case "widgets":
@@ -182,7 +184,7 @@ class SettingsController extends Controller
         }
         $extension[request('table')] = $values;
 
-        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension));
+        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
 
         system_log(7,"EXTENSION_SETTINGS_ADD",[
             "extension_id" => extension()->id,
@@ -211,7 +213,7 @@ class SettingsController extends Controller
         }
         $extension[request('table')] = $values;
 
-        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension));
+        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
 
         system_log(7,"EXTENSION_SETTINGS_REMOVE",[
             "extension_id" => extension()->id,
@@ -239,7 +241,7 @@ class SettingsController extends Controller
 
         $extension["functions"] = $functions;
 
-        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension));
+        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
 
         system_log(7,"EXTENSION_SETTINGS_ADD_FUNCTION",[
             "extension_id" => extension()->id,
@@ -275,7 +277,7 @@ class SettingsController extends Controller
 
         $extension["functions"] = $functions;
 
-        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension));
+        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
 
         system_log(7,"EXTENSION_SETTINGS_UPDATE_FUNCTION",[
             "extension_id" => extension()->id,
@@ -308,7 +310,7 @@ class SettingsController extends Controller
 
         $extension["functions"] = $functions;
 
-        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension));
+        file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
 
         system_log(7,"EXTENSION_SETTINGS_REMOVE_FUNCTION",[
             "extension_id" => extension()->id,

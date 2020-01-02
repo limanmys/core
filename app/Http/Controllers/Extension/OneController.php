@@ -41,7 +41,7 @@ class OneController extends Controller
 
         foreach ($extension["database"] as $setting) {
             $database = DB::table("user_settings");
-            if($setting["type"] === "server" || $setting["type"] === "extension") continue;
+            if(isset($setting["required"]) && $setting["required"] === false) continue;
             if (!$database->where([
                 "user_id" => user()->id,
                 "server_id" => server()->id,
