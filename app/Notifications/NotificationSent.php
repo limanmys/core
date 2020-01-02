@@ -8,10 +8,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 
-class NotificationSent extends Notification implements ShouldQueue
+class NotificationSent extends Notification
 {
-    use Queueable;
-
     private $notification;
 
     /**
@@ -43,7 +41,8 @@ class NotificationSent extends Notification implements ShouldQueue
      */
     public function toBroadcast($notifiable)
     {
-        return new BroadcastMessage((array) $this->notification);
+        return (new BroadcastMessage((array) $this->notification))
+            ->onConnection('sync');
     }
 
     /**
