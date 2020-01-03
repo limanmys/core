@@ -255,8 +255,7 @@ class OneController extends Controller
             "user_id" => user()->id,
             "extension_id" => $extension->id,
             "server_id" => $server->id,
-            "job" => request('function_name'),
-            "status" => 0
+            "job" => request('function_name')
         ])->get('status');
 
         $holdCount = $all->where('status',0)->count();
