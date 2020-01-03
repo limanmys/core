@@ -260,8 +260,8 @@ class OneController extends Controller
         ])->get('status');
 
         $holdCount = $all->where('status',0)->count();
-        $successCount = $all->where('status',0)->count();
-        $failCount = $all->where('status',0)->count();
+        $successCount = $all->where('status',1)->count();
+        $failCount = $all->where('status',2)->count();
 
         return json_encode([
             "hold" => $holdCount,
