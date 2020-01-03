@@ -82,6 +82,27 @@ server {
     """ > /etc/nginx/sites-available/default
 fi
 
+#Supervisor Configuration
+if [ -f "/etc/supervisor/conf.d/liman-extension-worker.conf" ]; then
+    echo "Supervisor already created.";
+else
+        echo """
+#LIMAN_OPTIMIZATIONS
+[program:liman-extension-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=extension_queue
+autostart=true
+autorestart=true
+user=liman
+numprocs=8
+redirect_stderr=true
+stdout_logfile=/liman/logs/extension_queue.log
+    """ > /etc/supervisor/conf.d/liman-extension-worker.conf
+    supervisorctl reread
+    supervisorctl update
+fi
+supervisorctl start liman-extension-worker
+
 #Increase Php-Fpm Memory
 sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php/7.3/fpm/php.ini
 
