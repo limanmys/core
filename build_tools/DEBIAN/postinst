@@ -122,12 +122,11 @@ php /liman/server/artisan config:clear
 rm -rf /tmp/liman
 
 # Set Permissions
-chown -R liman:liman /liman/{server,database,certs,keys/windows,keys/linux,sandbox,logs}
-chmod 700 -R /liman/{server,database,certs,keys/windows,keys/linux,logs}
+chown -R liman:liman /liman/{server,database,certs,sandbox,logs}
+chmod 700 -R /liman/{server,database,certs,logs}
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
-chmod 700 -R /liman/server/storage/winrm/
 
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman.service" ]; then
