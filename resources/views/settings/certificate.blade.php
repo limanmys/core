@@ -123,6 +123,7 @@
                 $("#subjectKeyIdentifier").val(json["subjectKeyIdentifier"]);
                 $("#addButton").prop('disabled',false);
                 path = json["path"];
+                Swal.close();
             },function (errors) {
                 let json = JSON.parse(errors);
                 Swal.fire({
