@@ -102,6 +102,12 @@
                                         <small class="badge bg-danger updateCount" style="display:none;margin-left: 5px;">0</small>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" href="#usersTab" role="tab">{{__("Yerel Kullanıcılar")}}</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" href="#groupsTab" role="tab">{{__("Yerel Gruplar")}}</a>
+                                </li>
                             @endif
                         @endif
                         <li class="nav-item">
@@ -232,6 +238,14 @@
                         @if(server()->type == "linux_ssh")
                             <div class="tab-pane fade show" id="packagesTab" role="tabpanel">
                                 
+                            </div>
+
+                            <div class="tab-pane fade show" id="usersTab" role="tabpanel">
+                                <pre>{{server()->run("cut -d: -f1,3 /etc/passwd | egrep ':[0-9]{4}$' | cut -d: -f1")}}</pre>
+                            </div>
+
+                            <div class="tab-pane fade show" id="groupsTab" role="tabpanel">
+                                <pre>{{server()->run("getent group | cut -d ':' -f1")}}</pre>
                             </div>
                         @endif
                         <div class="tab-pane fade show" id="logsTab" role="tabpanel">
