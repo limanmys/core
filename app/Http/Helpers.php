@@ -672,3 +672,25 @@ if (!function_exists('lDecrypt')) {
         return base64_decode($stringToDecode);
     }
 }
+if (!function_exists('setBaseDn')) {
+
+    function setBaseDn($ldap_host=null)
+    {
+        $ldap_host = $ldap_host ? $ldap_host : config('ldap.ldap_host');
+        $flag = false;
+        $connection = ldap_connect($ldap_host,389);
+        ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+        $flag = ldap_bind($connection);
+        $outputs = ldap_read($connection,'','objectclass=*');
+        $entries = ldap_get_entries($connection,$outputs)[0];
+        $domain = str_replace("dc=","",strtolower($entries["rootdomainnamingcontext"][0]));
+        $domain = str_replace(",", ".", $domain);
+        setEnv([
+            "LDAP_BASE_DN" => $entries["rootdomainnamingcontext"][0],
+            "LDAP_DOMAIN" => $domain
+        ]);
+        return $flag;
+    }
+
+}
+

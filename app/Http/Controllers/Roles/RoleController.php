@@ -8,6 +8,7 @@ use App\Role;
 use App\RoleUser;
 use App\Permission;
 use App\Extension;
+use App\RoleMapping;
 use App\Server;
 use Illuminate\Support\Facades\Validator;
 
@@ -66,6 +67,8 @@ class RoleController extends Controller
         Permission::where('morph_id', request('role_id'))->delete();
 
         RoleUser::where("role_id", request('role_id'))->delete();
+
+        RoleMapping::where("role_id", request('role_id'))->delete();
 
         Role::where("id", request('role_id'))->delete();
 

@@ -156,6 +156,32 @@
                         <input type="text" value="{{ env('LDAP_HOST', "") }}" name="ldapAddress" class="form-control" placeholder="{{ __('IP Adresi Girin') }}">
                     </div>
                     <button type="button" onclick="saveLDAPConf()" class="btn btn-primary">{{ __('Kaydet') }}</button>
+                    @if(config('ldap.ldap_host', false))
+                        <h5 class="mt-4 mb-2">{{ __('Domain Grup ve Rol Grup Eşleştirmeleri') }}</h5>
+                        @include('modal-button',[
+                            "class" => "btn-success mb-2",
+                            "target_id" => "addRoleMapping",
+                            "text" => "Ekle"
+                        ])
+                        @include('table',[
+                            "value" => \App\RoleMapping::all()->map(function($item){
+                                $item->role_name = $item->role->name;
+                                return $item;
+                            }),
+                            "title" => [
+                                "Domain Grubu" , "Rol Grubu" , "*hidden*" ,
+                            ],
+                            "display" => [
+                                "dn" , "role_name", "id:role_mapping_id" ,
+                            ],
+                            "menu" => [
+                                "Sil" => [
+                                    "target" => "deleteRoleMapping",
+                                    "icon" => " context-menu-icon-delete"
+                                ]
+                            ],
+                        ])
+                    @endif
                 </div>
                 <div class="tab-pane fade show" id="changeLog" role="tabpanel">
                     <ul>
@@ -172,7 +198,7 @@
         "id"=>"add_user",
         "title" => "Kullanıcı Ekle",
         "url" => route('user_add'),
-        "next" => "after_user_add",
+        "next" => "afterUserAdd",
         "selects" => [
             "Yönetici:administrator" => [
                 "-:administrator" => "type:hidden"
@@ -258,9 +284,152 @@
        ],
        "submit_text" => "Parolayı Sıfırla"
    ])
-    <script>
 
-        function after_user_add(response) {
+    @component('modal-component',[
+        "id" => "addRoleMapping",
+        "title" => "Domain Grup ve Rol Grup Eşleştirmesi",
+        "footer" => [
+            "class" => "btn-success",
+            "onclick" => "addRoleMapping()",
+            "text" => "Ekle"
+        ],
+    ])
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>{{ __('Domain Grubu (DN)') }}</label>
+                <div class="input-group">
+                    <select class="form-control select2" name="dn" data-placeholder="{{ __('DN Yazınız') }}" data-tags="true">
+                    </select>
+                    <span class="input-group-append">
+                        <button type="button" onclick="fetchDomainGroups()" class="btn btn-primary">{{ __('LDAP\'tan Getir') }}</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>{{ __('Rol Grubu') }}</label>
+                <select name="role_id" class="form-control select2" required>
+                    @foreach (\App\Role::all() as $role)
+                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+
+    @endcomponent
+
+    @include('modal',[
+        "id"=>"deleteRoleMapping",
+        "title" =>"Eşleştirmeyi Sil",
+        "url" => route('delete_role_mapping'),
+        "text" => "Eşleştirmeyi silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+        "next" => "reload",
+        "inputs" => [
+            "Role Mapping Id:'null'" => "role_mapping_id:hidden"
+        ],
+        "submit_text" => "Sertifikayı Sil"
+    ])
+
+    @component('modal-component',[
+        "id" => "ldapAuth",
+        "title" => "Ldap İle Giriş Yap",
+        "notSized" => true,
+        "modalDialogClasses" => "modal-dialog-centered modal-sm",
+        "footer" => [
+            "class" => "btn-success",
+            "onclick" => "ldapLogin()",
+            "text" => "Giriş Yap"
+        ],
+    ])
+
+    <div class="form-group">
+        <label for="ldapUsername">{{ __('Kullanıcı Adı') }}</label>
+        <input type="text" name="ldapUsername" class="form-control" id="ldapUsername" placeholder="{{ __('Kullanıcı Adı') }}">
+    </div>
+
+    <div class="form-group">
+        <label for="ldapPassword">{{ __('Şifre') }}</label>
+        <input type="password" name="ldapPassword" class="form-control" id="ldapPassword" placeholder="{{ __('Şifre') }}">
+    </div>
+
+    @endcomponent
+    <script>
+        
+        var ldapAuthNext = null;
+
+        function ldapAuth(next){
+            ldapAuthNext = next;
+            $('#ldapAuth').modal('show');
+        }
+
+        function ldapLogin(){
+            let ldapUsername = $('#ldapAuth').find('input[name=ldapUsername]').val();
+            let ldapPassword = $('#ldapAuth').find('input[name=ldapPassword]').val();
+            if(ldapAuthNext)
+                ldapAuthNext(ldapUsername, ldapPassword);
+            $('#ldapAuth').find('input[name=ldapUsername]').val("");
+            $('#ldapAuth').find('input[name=ldapPassword]').val("");
+            $('#ldapAuth').modal('hide');
+        }
+
+        function fetchDomainGroups(){
+            ldapAuth(function(ldapUsername, ldapPassword){
+                let data =  new FormData();
+                data.append('ldapUsername', ldapUsername);
+                data.append('ldapPassword', ldapPassword);
+                request('{{route('fetch_domain_groups')}}', data, function (response) {
+                    let json = JSON.parse(response);
+                    var str = "";
+                    json.message.forEach(function(item){
+                        str += "<option value='" + item.id + "'>" + item.dn + "</option>";
+                    });
+                    $('#addRoleMapping').find('select[name=dn]').html(str);
+                    $('#addRoleMapping').find('select[name=dn]').change();
+                }, function(response){
+                    let error = JSON.parse(response);
+                    Swal.fire({
+                        type: 'error',
+                        title: error.message,
+                        timer : 2000
+                    });
+                });
+            });
+        }
+
+        function addRoleMapping(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Kaydediliyor...")}}',
+                showConfirmButton: false,
+            });
+            let data = new FormData();
+            data.append('dn', $('#addRoleMapping').find('select[name=dn]').val());
+            data.append('role_id', $('#addRoleMapping').find('select[name=role_id]').val());
+            request("{{route("add_role_mapping")}}", data, function(res) {
+                let response = JSON.parse(res);
+                Swal.close();
+                Swal.fire({
+                    position: 'center',
+                    type: 'success',
+                    title: response.message,
+                });
+                reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
+            });
+        }
+
+        function afterUserAdd(response) {
             let json = JSON.parse(response);
             $("#add_user button[type='submit']").attr("disabled","true")
             getUserList();
