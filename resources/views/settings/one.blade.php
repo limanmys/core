@@ -40,14 +40,18 @@
                                 <option value="0" @if($user->status == "0") selected @endif>{{__("Kullanıcı")}}</option>
                                 <option value="1" @if($user->status == "1") selected @endif>{{__("Yönetici")}}</option>
                             </select><br>
-                            <h4>{{__("Adı")}}</h4>
-                            <input class="form-control" type="text" value="{{$user->name}}" name="username"><br>
+                            @if ($user->auth_type !== "ldap")
+                                <h4>{{__("Adı")}}</h4>
+                                <input class="form-control" type="text" value="{{$user->name}}" name="username"><br>
+                            @endif
                             <h4>{{__("Email Adresi")}}</h4>
                             <input class="form-control" type="email" value="{{$user->email}}" name="email">
                         </div>
                         <div style="width: 300px;height: 300px;display: block;float: left;padding-top: 75px;margin-left:50px;">
                             <button class="btn btn-danger btn-block" onclick="removeUser();return false;">{{__("Kullanıcıyı Sil")}}</button><br>
-                            <button class="btn btn-warning btn-block" onclick="resetPassword();return false;">{{__("Parola Sıfırla")}}</button><br>
+                            @if ($user->auth_type !== "ldap")
+                                <button class="btn btn-warning btn-block" onclick="resetPassword();return false;">{{__("Parola Sıfırla")}}</button><br>
+                            @endif
                             <button class="btn btn-success btn-block" type="submit">{{__("Değişiklikleri Kaydet")}}</button>
                         </div>
                     </form>
@@ -230,6 +234,13 @@
                         }
                     }
                 });
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         }
 
@@ -261,6 +272,13 @@
             form.append("user_id",'{{$user->id}}');
             request('{{route("extension_function_add")}}',form,function(){
                 location.reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         }
 
@@ -291,6 +309,13 @@
                 setTimeout(function () {
                     location.reload();
                 },2000);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         }
 
@@ -306,6 +331,13 @@
             request('{{route('update_user')}}',form,function () {
                 Swal.close();
                 location.reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
             return false;
         }
@@ -336,6 +368,13 @@
                     }
                 });
                 $("#" + type + "_modal").modal('show');
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             })
         }
         function removeRole(element){
@@ -377,6 +416,13 @@
                     setTimeout(function () {
                         location.reload();
                 },2000);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
             return false;
         }
@@ -418,6 +464,13 @@
                     setTimeout(function () {
                         location.reload();
                 },2000);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
             return false;
         }
@@ -450,6 +503,13 @@
                     setTimeout(function () {
                         location.reload();
                     },2000);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
             return false;
         }
@@ -481,6 +541,13 @@
                     setTimeout(function () {
                         location.reload();
                     },2000);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
             return false;
         }
