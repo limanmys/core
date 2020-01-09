@@ -37,7 +37,7 @@ function request(url, data, next, error) {
     }, 300);
     r.onreadystatechange = function () {
         if (r.readyState === 4) {
-            if(!url.includes('bildirimler') && !url.includes('kontrol')){
+            if((!url.includes('bildirimler') && !url.includes('kontrol') && id != null)){
                 Swal.close();
             }
             if (id != null && (r.status !== 200 || r.status !== 300)) {
@@ -225,7 +225,7 @@ function renderNotifications(data,type,target, exclude){
     $("#" + target + "Count" ).html(data.length);
     data.forEach(notification => {
         let errors = [
-            "error" , "health_problem", "liman_update"
+            "error" , "health_problem"
         ];
         let color = (errors.includes(notification["type"])) ? "#f56954" : "#00a65a";
         element.append("<div class='dropdown-divider'></div><a class='dropdown-item' href='/bildirim/" + notification["id"] + "'>" + 
@@ -242,6 +242,8 @@ function renderNotifications(data,type,target, exclude){
         }
         if(errors.includes(notification.type)){
             toastElement = toastr.error(notification.message, notification.title, {timeOut: 5000})
+        }else if(notification.type == "liman_update"){
+            toastElement = toastr.warning(notification.message, notification.title, {timeOut: 5000})
         }else{
             toastElement = toastr.success(notification.message, notification.title, {timeOut: 5000})
         }
@@ -256,10 +258,7 @@ function renderNotifications(data,type,target, exclude){
 function activeTab(){
     let element = $('a[href="'+ window.location.hash +'"]');
     if(element){
-        element.tab('show');
-        if(element.attr("onclick")){
-            element.click();
-        }
+        element.click();
     }
 }
 
@@ -289,4 +288,10 @@ $(function () {
     $(".modal").on('show.bs.modal', function(modal) {
         $("#" + modal.target.id + " .alert").fadeOut(0);
     });
+
+
+    $(".dropdown-menu").on('click', 'a.dropdown-item', function(){
+        $(this).closest('.dropdown').find('.dropdown-toggle').html($(this).text() + '<span class="caret"></span>');
+    });
+
 });

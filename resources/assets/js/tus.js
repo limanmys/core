@@ -26,9 +26,9 @@ function upload(option){
                 try{
                     json = JSON.parse(response);
                     upload.info = json;
+                    option.onSuccess(upload);
                 }catch(e){}
             });
-            option.onSuccess(upload);
         },
         headers: {
             "server_id": server_id,

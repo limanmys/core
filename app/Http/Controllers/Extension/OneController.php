@@ -19,6 +19,10 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
+use App\ServerLog;
+use App\Jobs\ExtensionJob;
+use App\JobHistory;
+use Illuminate\Contracts\Bus\Dispatcher;
 
 /**
  * Class OneController
@@ -37,7 +41,7 @@ class OneController extends Controller
 
         foreach ($extension["database"] as $setting) {
             $database = DB::table("user_settings");
-            if($setting["type"] === "server" || $setting["type"] === "extension") continue;
+            if(isset($setting["required"]) && $setting["required"] === false) continue;
             if (!$database->where([
                 "user_id" => user()->id,
                 "server_id" => server()->id,
@@ -171,6 +175,101 @@ class OneController extends Controller
         return response($output, $code);
     }
 
+    public function internalAddJob()
+    {
+        if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
+            system_log(5,"EXTENSION_INTERNAL_NO_PERMISSION",[
+                "extension_id" => extension()->id,
+            ]);
+            abort(403, 'Not Allowed');
+        }
+        $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+
+        $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
+        if (!Permission::can($token->user_id, 'server','id', $server->id)) {
+            system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
+                "extension_id" => extension()->id,
+                "server_id" => request('server_id')
+            ]);
+            return "Sunucu icin yetkiniz yok.";
+        }
+
+        $extension = Extension::find(request('extension_id')) or abort(404, 'Eklenti Bulunamadi');
+        if (!Permission::can($token->user_id, 'extension','id', $extension->id)) {
+            system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
+                "extension_id" => extension()->id,
+                "server_id" => request('server_id')
+            ]);
+            return "Eklenti için yetkiniz yok.";
+        }
+
+        $history = new JobHistory([
+            "status" => "0",
+            "user_id" => user()->id,
+            "server_id" => $server->id,
+            "extension_id" => $extension->id,
+            "job" => request('function_name')
+        ]);
+
+        $history->save();
+
+        $job = (new ExtensionJob($history,$server,$extension,user(),request('function_name'),request('parameters')))->onQueue('extension_queue');
+        
+        $job_id = app(Dispatcher::class)->dispatch($job);
+
+        $history->job_id = $job_id;
+        $history->save();
+        
+        return "ok";
+    } 
+
+    public function internalJobsList()
+    {
+        if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
+            system_log(5,"EXTENSION_INTERNAL_NO_PERMISSION",[
+                "extension_id" => extension()->id,
+            ]);
+            abort(403, 'Not Allowed');
+        }
+        $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+
+        $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
+        if (!Permission::can($token->user_id, 'server','id', $server->id)) {
+            system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
+                "extension_id" => extension()->id,
+                "server_id" => request('server_id')
+            ]);
+            return "Sunucu icin yetkiniz yok.";
+        }
+
+        $extension = Extension::find(request('extension_id')) or abort(404, 'Eklenti Bulunamadi');
+        if (!Permission::can($token->user_id, 'extension','id', $extension->id)) {
+            system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
+                "extension_id" => extension()->id,
+                "server_id" => request('server_id')
+            ]);
+            return "Eklenti icin yetkiniz yok.";
+        }
+        
+        $all = JobHistory::where([
+            "user_id" => user()->id,
+            "extension_id" => $extension->id,
+            "server_id" => $server->id,
+            "job" => request('function_name')
+        ])->get('status');
+
+        $holdCount = $all->where('status',0)->count();
+        $successCount = $all->where('status',1)->count();
+        $failCount = $all->where('status',2)->count();
+
+        return json_encode([
+            "hold" => $holdCount,
+            "success" => $successCount,
+            "fail" => $failCount,
+            "total" => $all->count()
+        ]);
+    }
+
     public function internalExtensionApi()
     {
         if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
@@ -262,6 +361,8 @@ class OneController extends Controller
             "server_id" => server()->id
         ]);
 
+        ServerLog::new(request('command'),$output);
+        system_log(6,server()->id . ":" . request('command'));
         return $output;
     }
 

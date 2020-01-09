@@ -82,6 +82,27 @@ server {
     """ > /etc/nginx/sites-available/default
 fi
 
+#Supervisor Configuration
+if [ -f "/etc/supervisor/conf.d/liman-extension-worker.conf" ]; then
+    echo "Supervisor already created.";
+else
+        echo """
+#LIMAN_OPTIMIZATIONS
+[program:liman-extension-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=extension_queue
+autostart=true
+autorestart=true
+user=liman
+numprocs=8
+redirect_stderr=true
+stdout_logfile=/liman/logs/extension_queue.log
+    """ > /etc/supervisor/conf.d/liman-extension-worker.conf
+    supervisorctl reread
+    supervisorctl update
+fi
+supervisorctl start liman-extension-worker
+
 #Increase Php-Fpm Memory
 sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php/7.3/fpm/php.ini
 
@@ -101,12 +122,11 @@ php /liman/server/artisan config:clear
 rm -rf /tmp/liman
 
 # Set Permissions
-chown -R liman:liman /liman/{server,database,certs,keys/windows,keys/linux,sandbox,logs}
-chmod 700 -R /liman/{server,database,certs,keys/windows,keys/linux,logs}
+chown -R liman:liman /liman/{server,database,certs,sandbox,logs}
+chmod 700 -R /liman/{server,database,certs,logs}
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
-chmod 700 -R /liman/server/storage/winrm/
 
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman.service" ]; then
@@ -128,10 +148,35 @@ ExecStart=/liman/server/storage/connector
 WantedBy=multi-user.target
     """ > /etc/systemd/system/liman.service
 fi
+
+# Create Systemd Service
+if [ -f "/etc/systemd/system/liman-vnc.service" ]; then
+    echo "Liman Connector Service Already Added.";
+else
+        echo """
+[Unit]
+Description=Liman VNC Service
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=liman
+ExecStart=/usr/bin/websockify --web=/usr/share/novnc 6080 --cert=/liman/certs/liman.crt --key=/liman/certs/liman.key --token-plugin TokenFile --token-source /liman/keys/vnc/config
+[Install]
+WantedBy=multi-user.target
+    """ > /etc/systemd/system/liman-vnc.service
+fi
+
+sed -i "s/upload_max_filesize.*/upload_max_filesize = 50M/g" /etc/php/7.3/fpm/php.ini
+
 systemctl daemon-reload
 systemctl enable liman
+systemctl enable liman-vnc
 systemctl restart liman
-
+systemctl restart liman-vnc
+systemctl reload php7.3-fpm.service
 # Create Socket Service
 if [ -f "/etc/systemd/system/liman-socket.service" ]; then
     echo "Liman Socket Service Already Added.";
@@ -170,6 +215,9 @@ rm -rf /liman/keys/vnc
 mkdir /liman/keys/vnc
 chmod 700 /liman/keys/vnc
 touch /liman/keys/vnc/config
+chown liman:liman /liman/keys/vnc /liman/keys/vnc/config
+chmod 700 /liman/keys/vnc/config
+
 
 # Modify ini file to use decoder.
 if grep --quiet liman-decoder.so /etc/php/7.3/cli/php.ini; then

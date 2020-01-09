@@ -100,7 +100,7 @@
                         if(element_value){
                             inputs.push($("#" + options.$trigger[0].getAttribute("id") + " #" + value.getAttribute('name')));
                             $("#" + key + " select[name='" + value.getAttribute('name') + "']" + " , "
-                                + "#" + key + " input[name='" + value.getAttribute('name') + "']").val(element_value);
+                                + "#" + key + " input[name='" + value.getAttribute('name') + "']").val(element_value).prop('checked', true);
                         }
                     });
                     target.modal('show');

@@ -426,6 +426,7 @@
         @if(server()->type == "linux_ssh") //|| server()->type == "windows_powershell")
             if(location.hash !== "#updatesTab"){
                 getUpdates();
+                Swal.close();
             }
         @endif
         function errorSwal(){
@@ -548,6 +549,7 @@
                 showConfirmButton: false,
             });
             request('{{route('server_package_list')}}', new FormData(), function (response) {
+                Swal.close();
                 $("#packagesTab").html(response);
                 $("#packagesTab table").DataTable({
                     bFilter: true,
@@ -572,9 +574,6 @@
                 $("#logsTab").html(response);
                 $("#logsTab table").DataTable({
                     bFilter: true,
-                    select: {
-                        style: 'multi'
-                    },
                     "language": {
                         url: "/turkce.json"
                     }
@@ -737,8 +736,17 @@
                     select: {
                         style: 'multi'
                     },
-                    "language": {
-                        url: "/turkce.json"
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    language: {
+                        url : "/turkce.json",
+                        buttons: {
+                            selectAll: "{{ __('Tümünü Seç') }}",
+                            selectNone: "{{ __('Tümünü Kaldır') }}"
+                        }
                     }
                 });
                 setTimeout(function () {
@@ -817,8 +825,17 @@
                 select: {
                     style: 'multi'
                 },
-                "language": {
-                    url: "/turkce.json"
+                dom: 'Blfrtip',
+                buttons: [
+                    'selectAll',
+                    'selectNone'
+                ],
+                language: {
+                    url : "/turkce.json",
+                    buttons: {
+                        selectAll: "{{ __('Tümünü Seç') }}",
+                        selectNone: "{{ __('Tümünü Kaldır') }}"
+                    }
                 }
             });
         });

@@ -11,19 +11,9 @@ class ServerLog extends Model
 {
     use UsesUuid;
     protected $fillable = ['command', 'server_id', 'user_id','output'];
-    public static $dont_log = [
-        "hostname", "df -h" , "whoami", "sudo systemctl is-failed "
-    ];
+
     public static function new($command, $output, $server_id = null,$user_id = null)
     {
-        foreach (self::$dont_log as $check){
-            if(strpos($command, $check)){
-                return false;
-            }
-        }
-        if(in_array($command, self::$dont_log)){
-            return false;
-        }
         $log = new ServerLog([
            "command" => $command,
             "user_id" => ($user_id == null) ? auth()->user()->id : $user_id,

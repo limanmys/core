@@ -35,10 +35,10 @@ return [
         ],
 
         'database' => [
-            'driver' => 'sync',
-            'table'  => 'jobs',
-            'queue'  => 'default',
-            'expire' => 60,
+            'driver' => 'database',
+            'table' => 'jobs',
+            'queue' => 'default',
+            'retry_after' => 90,
         ],
 
         'beanstalkd' => [
@@ -79,7 +79,7 @@ return [
     */
 
     'failed' => [
-        'database' => 'mongodb',
+        'database' => 'sqlite',
         'table'    => 'failed_jobs',
     ],
 

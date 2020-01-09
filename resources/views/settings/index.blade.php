@@ -28,6 +28,9 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#ldapIntegration">{{__("LDAP Entegrasyonu")}}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#changeLog">{{__("Son Değişiklikler")}}</a>
+                </li>
             </ul>
         </div>
         <div class="card-body">
@@ -124,8 +127,17 @@
                             select: {
                                 style: 'multi'
                             },
-                            "language" : {
-                                url : "/turkce.json"
+                            dom: 'Blfrtip',
+                            buttons: [
+                                'selectAll',
+                                'selectNone'
+                            ],
+                            language: {
+                                url : "/turkce.json",
+                                buttons: {
+                                    selectAll: "{{ __('Tümünü Seç') }}",
+                                    selectNone: "{{ __('Tümünü Kaldır') }}"
+                                }
                             }
                         });
                     </script>
@@ -170,6 +182,13 @@
                             ],
                         ])
                     @endif
+                </div>
+                <div class="tab-pane fade show" id="changeLog" role="tabpanel">
+                    <ul>
+                        @foreach (explode("\n",$changelog) as $line)
+                        <li>{{$line}}</li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
         </div>
@@ -425,8 +444,17 @@
                     select: {
                         style: 'multi'
                     },
-                    "language" : {
-                        url : "/turkce.json"
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    language: {
+                        url : "/turkce.json",
+                        buttons: {
+                            selectAll: "{{ __('Tümünü Seç') }}",
+                            selectNone: "{{ __('Tümünü Kaldır') }}"
+                        }
                     }
                 });
             });

@@ -19,6 +19,11 @@
                         {{session('warning')}}
                     </div>
                 @endif
+                @if (session('status'))
+                    <div class="alert alert-success">
+                        {{ session('status') }}
+                    </div>
+                @endif
                 <form action="{{ route('login')}}" method="post">
                     @csrf
                     <div class="input-group mb-3">

@@ -61,12 +61,15 @@
                             "text" => "Veri Ekle"
                         ])<br><br>
                         @include('table',[
-                            "value" => $extension["database"],
+                            "value" => collect($extension["database"])->map(function($item){
+                                $item['required'] = isset($item['required']) && $item['required'] ? 'on' : '';
+                                return $item;
+                            }),
                             "title" => [
-                                "Adı" , "Türü" , "Variable Adı", "*hidden*" , "*hidden*", "*hidden*"
+                                "Adı" , "Türü" , "Variable Adı", "*hidden*" , "*hidden*", "*hidden*", "*hidden*"
                             ],
                             "display" => [
-                                "name" , "type", "variable", "variable:variable_old", "type:type_old", "name:name_old"
+                                "name" , "type", "variable", "variable:variable_old", "type:type_old", "name:name_old", "required:required"
                             ],
                             "menu" => [
                                 "Ayarları Düzenle" => [
@@ -89,6 +92,7 @@
                                 "Adı" => "name:text:Veri adı oluşturulan formlarda gösterilmek için kullanılır.",
                                 "Türü" => "type:text:Verinizin türü form elemanını belirler. Örneğin text, password vs.",
                                 "Variable Adı" => "variable:text:Eklenti içinden veriye bu isim ile erişirsiniz.",
+                                "Zorunlu Alan" => "required:checkbox",
                                 "table:database" => "table:hidden"
                             ],
                             "submit_text" => "Veri Ekle"
@@ -106,6 +110,7 @@
                                 "Sayfa Adı:a" => "name_old:hidden",
                                 "Türü:a" => "type_old:hidden",
                                 "Variable Adı:a" => "variable_old:hidden",
+                                "Zorunlu Alan" => "required:checkbox",
                                 "table:database" => "table:hidden"
                             ],
                             "submit_text" => "Veri Düzenle"

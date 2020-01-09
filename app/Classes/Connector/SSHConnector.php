@@ -70,7 +70,7 @@ class SSHConnector implements Connector
 
         // Run Part Of The Script
         $query = ($runAsRoot == "yes") ? sudo() : '';
-        $query = $query . $remotePath . " " . $parameters . " 2>/dev/null";
+        $query = $query . $remotePath . " " . $parameters . " 2>&1";
         $output = $this->execute($query);
 
         return $output;

@@ -36,12 +36,12 @@
                         @if($item["variable"] == "certificate")
                             <div class="form-group">
                                 <label>{{$item["name"]}}</label>
-                                <textarea name="certificate" cols="30" rows="10" class="form-control" required></textarea><br>
+                                <textarea name="certificate" cols="30" rows="10" class="form-control" @if(!isset($item["required"]) || $item["required"] === true) required @endif></textarea><br>
                             </div>                    
                         @elseif($item["type"] == "extension")
                             <div class="form-group">
                                 <label>{{$item["name"]}}</label>
-                                <select class="form-control" name="{{$item["variable"]}}" required>
+                                <select class="form-control" name="{{$item["variable"]}}" @if(!isset($item["required"]) || $item["required"] === true) required @endif>
                                     @foreach(extensions() as $extension)
                                         <option value="{{$extension->id}}" @if($extension->id == old($item["variable"], extensionDb($item["variable"]))) selected @endif >{{$extension->name}}</option>
                                     @endforeach
@@ -50,7 +50,7 @@
                         @elseif($item["type"] == "server")
                             <div class="form-group">
                                 <label>{{$item["name"]}}</label>
-                                <select class="form-control" name="{{$item["variable"]}}">
+                                <select class="form-control" name="{{$item["variable"]}}" @if(!isset($item["required"]) || $item["required"] === true) required @endif>
                                     @foreach(servers() as $server)
                                         <option value="{{$server->id}}" @if($server->id == old($item["variable"], extensionDb($item["variable"]))) selected @endif>{{$server->name}}</option>
                                     @endforeach
@@ -59,7 +59,7 @@
                         @else
                             <div class="form-group">
                                 <label>{{__($item["name"])}}</label>
-                                <input required class="form-control" type="{{$item["type"]}}"
+                                <input @if(!isset($item["required"]) || $item["required"] === true) required @endif class="form-control" type="{{$item["type"]}}"
                                     name="{{$item["variable"]}}" placeholder="{{__($item["name"])}}"
                                     @if($item["type"] != "password")
                                         @if(extensionDb($item["variable"]))
@@ -73,7 +73,7 @@
                             @if($item["type"] == "password")
                             <div class="form-group">
                                 <label>{{__($item["name"])}} {{__('Tekrar')}}</label>
-                                <input required class="form-control" type="{{$item["type"]}}"
+                                <input @if(!isset($item["required"]) || $item["required"] === true) required @endif class="form-control" type="{{$item["type"]}}"
                                         name="{{$item["variable"]}}_confirmation" placeholder="{{__($item["name"])}} {{__('Tekrar')}}"
                                 >
                             </div>                    

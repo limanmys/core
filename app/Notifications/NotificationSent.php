@@ -10,8 +10,6 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class NotificationSent extends Notification
 {
-    use Queueable;
-
     private $notification;
 
     /**
@@ -43,7 +41,8 @@ class NotificationSent extends Notification
      */
     public function toBroadcast($notifiable)
     {
-        return new BroadcastMessage((array) $this->notification);
+        return (new BroadcastMessage((array) $this->notification))
+            ->onConnection('sync');
     }
 
     /**
