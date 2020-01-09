@@ -188,7 +188,8 @@ class MainController extends Controller
             return respond('Sunucuya bağlanırken bir hata oluştu!', 201);
         }
         setEnv([
-            "LDAP_HOST" => request('ldapAddress')
+            "LDAP_HOST" => request('ldapAddress'),
+            "LDAP_GUID_COLUMN" => request('ldapObjectGUID'),
         ]);
         return respond(__("Kaydedildi!"),200);
     }

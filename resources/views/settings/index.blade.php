@@ -155,6 +155,11 @@
                         <label>{{ __('Ldap Sunucu Adresi') }}</label>
                         <input type="text" value="{{ env('LDAP_HOST', "") }}" name="ldapAddress" class="form-control" placeholder="{{ __('IP Adresi Girin') }}">
                     </div>
+                    <div class="form-group">
+                        <label>{{ __('Ldap Object GUID Alanı') }}</label>
+                        <input type="text" value="{{ config('ldap.ldap_guid_column', 'objectguid') }}" name="ldapObjectGUID" class="form-control" placeholder="{{ __('LDAP şemanızdaki objectguid alanının adını yazın.') }}">
+                        <small>{{ __('LDAP şemanızdaki objectguid alanının adını yazın.') }}</small>
+                    </div>
                     <button type="button" onclick="saveLDAPConf()" class="btn btn-primary">{{ __('Kaydet') }}</button>
                     @if(config('ldap.ldap_host', false))
                         <h5 class="mt-4 mb-2">{{ __('Domain Grup ve Rol Grup Eşleştirmeleri') }}</h5>
@@ -532,6 +537,7 @@
             });
             let data = new FormData();
             data.append('ldapAddress', $('input[name=ldapAddress]').val());
+            data.append('ldapObjectGUID', $('input[name=ldapObjectGUID]').val());
             request("{{route("save_ldap_conf")}}", data, function(res) {
                 let response = JSON.parse(res);
                 Swal.close();
