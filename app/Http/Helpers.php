@@ -314,6 +314,7 @@ if (!function_exists('generateSandboxCommand')) {
 
 function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_id, $outputs, $viewName, $functionName,$extensionDb = null)
     {
+        $serverObj->run("id");
         if(!$extension_id){
             $extension_id = extension()->id;
         }
