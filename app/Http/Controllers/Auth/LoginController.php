@@ -69,7 +69,7 @@ class LoginController extends Controller
             if($flag){
                 $sr = ldap_search($ldapConnection, $base_dn, '(&(objectClass=user)(sAMAccountName='.$credientials->email.'))', [$guidColumn, 'samaccountname', 'memberof']);
                 $ldapUser = ldap_get_entries($ldapConnection, $sr);
-                if(!$ldapUser[0][$guidColumn][0]){
+                if(!isset($ldapUser[0][$guidColumn])){
                     return false;
                 }
                 $user = User::where($guidColumn, bin2hex($ldapUser[0][$guidColumn][0]))->first();
