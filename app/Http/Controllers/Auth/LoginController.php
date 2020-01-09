@@ -76,7 +76,7 @@ class LoginController extends Controller
                         "name" => $credientials->email,
                         "email" => $credientials->email."@".$domain,
                         "password" => Hash::make(str_random("16")),
-                        $guidColumn => bin2hex($ldapUser[0][$guidColumn][0]),
+                        "objectguid" => bin2hex($ldapUser[0][$guidColumn][0]),
                         "auth_type" => "ldap"
                     ]);
                 }else{
