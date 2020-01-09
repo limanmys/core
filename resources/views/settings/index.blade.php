@@ -351,15 +351,18 @@
         ],
     ])
 
-    <div class="form-group">
-        <label for="ldapUsername">{{ __('Kullanıcı Adı') }}</label>
-        <input type="text" name="ldapUsername" class="form-control" id="ldapUsername" placeholder="{{ __('Kullanıcı Adı') }}">
-    </div>
-
-    <div class="form-group">
-        <label for="ldapPassword">{{ __('Şifre') }}</label>
-        <input type="password" name="ldapPassword" class="form-control" id="ldapPassword" placeholder="{{ __('Şifre') }}">
-    </div>
+    <form onsubmit="return ldapLogin()">
+        <div class="form-group">
+            <label for="ldapUsername">{{ __('Kullanıcı Adı') }}</label>
+            <input type="text" name="ldapUsername" class="form-control" id="ldapUsername" placeholder="{{ __('Kullanıcı Adı') }}">
+        </div>
+    
+        <div class="form-group">
+            <label for="ldapPassword">{{ __('Şifre') }}</label>
+            <input type="password" name="ldapPassword" class="form-control" id="ldapPassword" placeholder="{{ __('Şifre') }}">
+        </div>
+        <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" tabindex="-1" />
+    </form>
 
     @endcomponent
     <script>
@@ -379,6 +382,7 @@
             $('#ldapAuth').find('input[name=ldapUsername]').val("");
             $('#ldapAuth').find('input[name=ldapPassword]').val("");
             $('#ldapAuth').modal('hide');
+            return false;
         }
 
         function fetchDomainGroups(){
