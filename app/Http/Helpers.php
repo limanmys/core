@@ -314,7 +314,10 @@ if (!function_exists('generateSandboxCommand')) {
 
 function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_id, $outputs, $viewName, $functionName,$extensionDb = null)
     {
-        $serverObj->run("id");
+        if($serverObj->type == "windows_powershell" || $serverObj->type == "linux_ssh"){
+            $serverObj->run("hostname");
+        }
+        
         if(!$extension_id){
             $extension_id = extension()->id;
         }
