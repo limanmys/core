@@ -148,7 +148,7 @@
                         <h5 class="mt-4 mb-2">{{ __('Domain Grup ve Rol Grup Eşleştirmeleri') }}</h5>
                         @include('modal-button',[
                             "class" => "btn-success mb-2",
-                            "target_id" => "addMapping",
+                            "target_id" => "addRoleMapping",
                             "text" => "Ekle"
                         ])
                         @include('table',[
@@ -160,11 +160,11 @@
                                 "Domain Grubu" , "Rol Grubu" , "*hidden*" ,
                             ],
                             "display" => [
-                                "dn" , "role_name", "id:id" ,
+                                "dn" , "role_name", "id:role_mapping_id" ,
                             ],
                             "menu" => [
                                 "Sil" => [
-                                    "target" => "deleteCertificate",
+                                    "target" => "deleteRoleMapping",
                                     "icon" => " context-menu-icon-delete"
                                 ]
                             ],
@@ -267,11 +267,11 @@
    ])
 
     @component('modal-component',[
-        "id" => "addMapping",
+        "id" => "addRoleMapping",
         "title" => "Domain Grup ve Rol Grup Eşleştirmesi",
         "footer" => [
             "class" => "btn-success",
-            "onclick" => "changeOU()",
+            "onclick" => "addRoleMapping()",
             "text" => "Ekle"
         ],
     ])
@@ -292,7 +292,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label>{{ __('Rol Grubu') }}</label>
-                <select class="form-control select2" required>
+                <select name="role_id" class="form-control select2" required>
                     @foreach (\App\Role::all() as $role)
                         <option value="{{ $role->id }}">{{ $role->name }}</option>
                     @endforeach
@@ -302,6 +302,18 @@
     </div>
 
     @endcomponent
+
+    @include('modal',[
+        "id"=>"deleteRoleMapping",
+        "title" =>"Eşleştirmeyi Sil",
+        "url" => route('delete_role_mapping'),
+        "text" => "Eşleştirmeyi silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+        "next" => "reload",
+        "inputs" => [
+            "Role Mapping Id:'null'" => "role_mapping_id:hidden"
+        ],
+        "submit_text" => "Sertifikayı Sil"
+    ])
 
     @component('modal-component',[
         "id" => "ldapAuth",
@@ -356,8 +368,8 @@
                     json.message.forEach(function(item){
                         str += "<option value='" + item.id + "'>" + item.dn + "</option>";
                     });
-                    $('#addMapping').find('select[name=dn]').html(str);
-                    $('#addMapping').find('select[name=dn]').change();
+                    $('#addRoleMapping').find('select[name=dn]').html(str);
+                    $('#addRoleMapping').find('select[name=dn]').change();
                 }, function(response){
                     let error = JSON.parse(response);
                     Swal.fire({
@@ -365,6 +377,35 @@
                         title: error.message,
                         timer : 2000
                     });
+                });
+            });
+        }
+
+        function addRoleMapping(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Kaydediliyor...")}}',
+                showConfirmButton: false,
+            });
+            let data = new FormData();
+            data.append('dn', $('#addRoleMapping').find('select[name=dn]').val());
+            data.append('role_id', $('#addRoleMapping').find('select[name=role_id]').val());
+            request("{{route("add_role_mapping")}}", data, function(res) {
+                let response = JSON.parse(res);
+                Swal.close();
+                Swal.fire({
+                    position: 'center',
+                    type: 'success',
+                    title: response.message,
+                });
+                reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
                 });
             });
         }

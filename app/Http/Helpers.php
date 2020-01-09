@@ -674,10 +674,11 @@ if (!function_exists('lDecrypt')) {
 }
 if (!function_exists('setBaseDn')) {
 
-    function setBaseDn()
+    function setBaseDn($ldap_host=null)
     {
+        $ldap_host = $ldap_host ? $ldap_host : config('ldap.ldap_host');
         $flag = false;
-        $connection = ldap_connect(config('ldap.ldap_host'),389);
+        $connection = ldap_connect($ldap_host,389);
         ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3);
         $flag = ldap_bind($connection);
         $outputs = ldap_read($connection,'','objectclass=*');

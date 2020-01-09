@@ -87,7 +87,7 @@ class LoginController extends Controller
                     ]);
                 }
                 RoleUser::where('user_id', $user->id)->where('type', 'ldap')->delete();
-                if($ldapUser[0]["memberof"]['count']){
+                if(isset($ldapUser[0]["memberof"]) && $ldapUser[0]["memberof"]['count']){
                     unset($ldapUser[0]["memberof"]['count']);
                     foreach($ldapUser[0]["memberof"] as $row){
                         RoleMapping::where('group_id', md5($row))->get()->map(function($item) use ($user){

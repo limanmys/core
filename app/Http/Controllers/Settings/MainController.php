@@ -182,16 +182,12 @@ class MainController extends Controller
                 $notification->save();
             }
         }
-        $old_host = env("LDAP_HOST", "");
+        if(!setBaseDn(request('ldapAddress'))){
+            return respond('Sunucuya bağlanırken bir hata oluştu!', 201);
+        }
         setEnv([
             "LDAP_HOST" => request('ldapAddress')
         ]);
-        if(!setBaseDn()){
-            setEnv([
-                "LDAP_HOST" => $old_host
-            ]);
-            return respond('Sunucuya bağlanırken bir hata oluştu!', 201);
-        }
         return respond(__("Kaydedildi!"),200);
     }
 }
