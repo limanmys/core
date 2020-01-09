@@ -74,6 +74,13 @@
             data.append('notification_id', $(this).attr('notification-id'));
             request('{{route('notification_read')}}', data, function (response) {
                 location.reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         });
         $('.delete_not').click(function () {
@@ -81,6 +88,13 @@
             data.append('notification_id', $(this).attr('notification-id'));
             request('{{route('notification_delete')}}', data, function (response) {
                 location.href = "{{route('all_user_notifications')}}";
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         });
     </script>

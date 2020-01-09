@@ -457,6 +457,13 @@
                         }
                     }
                 });
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         }
 
@@ -469,6 +476,13 @@
                     "language" : {
                         url : "/turkce.json"
                     }
+                });
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
                 });
             });
         }

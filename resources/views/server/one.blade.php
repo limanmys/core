@@ -538,6 +538,13 @@
             form.append('action', action);
             request('{{route('server_favorite')}}', form, function (response) {
                 location.reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             })
         }
 
@@ -560,6 +567,13 @@
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             })
         }
 
@@ -581,6 +595,13 @@
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             })
         }
 
@@ -605,6 +626,13 @@
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             })
         }
         let index = 0;
@@ -657,6 +685,13 @@
             $('#updateLogs').find('.updateLogsBody').append("\n"+packages[index]+" paketi kuruluyor. Lütfen bekleyin...<span id='"+packages[index]+"'></span>");
             request('{{route('server_update_package')}}', data, function (response) {
                 checkUpdate();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             })
         }
 
@@ -752,6 +787,13 @@
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             })
         }
 
@@ -815,6 +857,13 @@
               setTimeout(function () {
                       location.reload();
               },2000);
+          }, function(response){
+            let error = JSON.parse(response);
+            Swal.fire({
+                type: 'error',
+                title: error.message,
+                timer : 2000
+            });
           });
           return false;
         }
