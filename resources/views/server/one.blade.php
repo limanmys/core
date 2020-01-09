@@ -426,6 +426,7 @@
         @if(server()->type == "linux_ssh") //|| server()->type == "windows_powershell")
             if(location.hash !== "#updatesTab"){
                 getUpdates();
+                Swal.close();
             }
         @endif
         function errorSwal(){
@@ -548,6 +549,7 @@
                 showConfirmButton: false,
             });
             request('{{route('server_package_list')}}', new FormData(), function (response) {
+                Swal.close();
                 $("#packagesTab").html(response);
                 $("#packagesTab table").DataTable({
                     bFilter: true,

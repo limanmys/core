@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Permission;
+use App\RoleUser;
 use App\User;
 use App\UserSettings;
 use App\Server;
@@ -63,6 +64,9 @@ class UserController extends Controller
     {
         // Delete Permissions
         Permission::where('morph_id', request('user_id'))->delete();
+
+        //Delete user roles
+        RoleUser::where("user_id", request('user_id'))->delete();
 
         // Delete User
         User::where("id", request('user_id'))->delete();

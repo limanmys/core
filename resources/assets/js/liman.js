@@ -37,7 +37,7 @@ function request(url, data, next, error) {
     }, 300);
     r.onreadystatechange = function () {
         if (r.readyState === 4) {
-            if(!url.includes('bildirimler') && !url.includes('kontrol')){
+            if((!url.includes('bildirimler') && !url.includes('kontrol') && id != null)){
                 Swal.close();
             }
             if (id != null && (r.status !== 200 || r.status !== 300)) {
