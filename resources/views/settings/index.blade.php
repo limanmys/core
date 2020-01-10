@@ -336,7 +336,7 @@
         "inputs" => [
             "Role Mapping Id:'null'" => "role_mapping_id:hidden"
         ],
-        "submit_text" => "Sertifikayı Sil"
+        "submit_text" => "Eşleştirmeyi Sil"
     ])
 
     @component('modal-component',[
