@@ -56,7 +56,7 @@ class LoginController extends Controller
             $domain = config('ldap.ldap_domain');
             $credientials = (object) $this->credentials($request);
             try{
-                $ldapConnection = ldap_connect("ldap://" . config('ldap.ldap_host'));
+                $ldapConnection = ldap_connect("ldaps://" . config('ldap.ldap_host'));
                 ldap_set_option($ldapConnection, LDAP_OPT_NETWORK_TIMEOUT, 10);
                 ldap_set_option($ldapConnection, LDAP_OPT_TIMELIMIT, 10);
                 ldap_set_option($ldapConnection, LDAP_OPT_PROTOCOL_VERSION, 3);
