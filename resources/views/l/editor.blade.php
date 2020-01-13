@@ -63,6 +63,13 @@
                     showConfirmButton: false,
                     timer: 1500
                 });
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         }
     </script>

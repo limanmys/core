@@ -77,13 +77,18 @@ class UserController extends Controller
 
     public function passwordReset()
     {
+        $user = User::find(request('user_id'));
+
+        if($user->auth_type == "ldap"){
+            return respond("Bu kullanıcı tipinin şifresi sıfırlanamaz", 201);
+        }
+
         // Generate Password
         do{
             $pool = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$@%^&!$%^&');
             $password = substr($pool,0,10);
         }while(!preg_match("/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/", $password));
 
-        $user = User::find(request('user_id'));
         $user->update([
             "password" => Hash::make($password),
             "forceChange" => true
@@ -93,6 +98,10 @@ class UserController extends Controller
 
     public function selfUpdate()
     {
+        if(user()->auth_type == "ldap"){
+            return respond("Bu kullanıcı tipinin bilgileri değiştirilemez!", 201);
+        }
+        
         if(!auth()->attempt([
             "email" => user()->email,
             "password" => request("old_password")
@@ -123,10 +132,17 @@ class UserController extends Controller
 
     public function adminUpdate()
     {
-        $flag = Validator::make(request()->all(), [
+        $validations = [
             'username' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
-        ]);
+        ];
+        $user = User::where("id", request('user_id'))->first();
+
+        if($user->auth_type == "ldap"){
+            unset($validations['username']);
+        }
+        
+        $flag = Validator::make(request()->all(), $validations);
 
         try{
             $flag->validate();
@@ -134,13 +150,17 @@ class UserController extends Controller
             return respond("Girilen veri geçerli değil.",201);
         }
 
-        $user = User::where("id", request('user_id'))->first();
-
-        $user->update([
+        $data = [
             'name' => request('username'),
             'email' => request('email'),
             'status' => request('status')
-        ]);
+        ];
+
+        if($user->auth_type == "ldap"){
+            unset($data['name']);
+        }
+
+        $user->update($data);
 
         return respond('Kullanıcı Güncellendi.',200);
     }

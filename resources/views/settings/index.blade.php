@@ -155,6 +155,11 @@
                         <label>{{ __('Ldap Sunucu Adresi') }}</label>
                         <input type="text" value="{{ env('LDAP_HOST', "") }}" name="ldapAddress" class="form-control" placeholder="{{ __('IP Adresi Girin') }}">
                     </div>
+                    <div class="form-group">
+                        <label>{{ __('Ldap Object GUID Alanı') }}</label>
+                        <input type="text" value="{{ config('ldap.ldap_guid_column', 'objectguid') }}" name="ldapObjectGUID" class="form-control" placeholder="{{ __('LDAP şemanızdaki objectguid alanının adını yazın.') }}">
+                        <small>{{ __('LDAP şemanızdaki objectguid alanının adını yazın.') }}</small>
+                    </div>
                     <button type="button" onclick="saveLDAPConf()" class="btn btn-primary">{{ __('Kaydet') }}</button>
                     @if(config('ldap.ldap_host', false))
                         <h5 class="mt-4 mb-2">{{ __('Domain Grup ve Rol Grup Eşleştirmeleri') }}</h5>
@@ -331,7 +336,7 @@
         "inputs" => [
             "Role Mapping Id:'null'" => "role_mapping_id:hidden"
         ],
-        "submit_text" => "Sertifikayı Sil"
+        "submit_text" => "Eşleştirmeyi Sil"
     ])
 
     @component('modal-component',[
@@ -346,15 +351,18 @@
         ],
     ])
 
-    <div class="form-group">
-        <label for="ldapUsername">{{ __('Kullanıcı Adı') }}</label>
-        <input type="text" name="ldapUsername" class="form-control" id="ldapUsername" placeholder="{{ __('Kullanıcı Adı') }}">
-    </div>
-
-    <div class="form-group">
-        <label for="ldapPassword">{{ __('Şifre') }}</label>
-        <input type="password" name="ldapPassword" class="form-control" id="ldapPassword" placeholder="{{ __('Şifre') }}">
-    </div>
+    <form onsubmit="return ldapLogin()">
+        <div class="form-group">
+            <label for="ldapUsername">{{ __('Kullanıcı Adı') }}</label>
+            <input type="text" name="ldapUsername" class="form-control" id="ldapUsername" placeholder="{{ __('Kullanıcı Adı') }}">
+        </div>
+    
+        <div class="form-group">
+            <label for="ldapPassword">{{ __('Şifre') }}</label>
+            <input type="password" name="ldapPassword" class="form-control" id="ldapPassword" placeholder="{{ __('Şifre') }}">
+        </div>
+        <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" tabindex="-1" />
+    </form>
 
     @endcomponent
     <script>
@@ -374,6 +382,7 @@
             $('#ldapAuth').find('input[name=ldapUsername]').val("");
             $('#ldapAuth').find('input[name=ldapPassword]').val("");
             $('#ldapAuth').modal('hide');
+            return false;
         }
 
         function fetchDomainGroups(){
@@ -457,6 +466,13 @@
                         }
                     }
                 });
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         }
 
@@ -469,6 +485,13 @@
                     "language" : {
                         url : "/turkce.json"
                     }
+                });
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
                 });
             });
         }
@@ -518,6 +541,7 @@
             });
             let data = new FormData();
             data.append('ldapAddress', $('input[name=ldapAddress]').val());
+            data.append('ldapObjectGUID', $('input[name=ldapObjectGUID]').val());
             request("{{route("save_ldap_conf")}}", data, function(res) {
                 let response = JSON.parse(res);
                 Swal.close();

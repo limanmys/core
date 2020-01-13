@@ -48,6 +48,13 @@
             }else{
                 $("#widget_name").text('').addAttr('disabled','');
             }
+        }, function(response){
+            let error = JSON.parse(response);
+            Swal.fire({
+                type: 'error',
+                title: error.message,
+                timer : 2000
+            });
         });
     }
 
@@ -64,6 +71,13 @@
                 element.append('<option value="'+ fixer(json[k]["target"]) + ':' + fixer(json[k]["name"]) + ':' + fixer(json[k]["type"]) + ':' + fixer(json[k]["icon"]) +'">' + fixer(json[k]["name"]) + '</option>');
             }
             element.removeAttr('disabled');
+        }, function(response){
+            let error = JSON.parse(response);
+            Swal.fire({
+                type: 'error',
+                title: error.message,
+                timer : 2000
+            });
         });
     }
 

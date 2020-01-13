@@ -178,6 +178,13 @@
                         }
                     }
                 });
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         }
 
@@ -203,6 +210,13 @@
                     }
                 });
                 $("#user_modal").modal('show');
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         }
 
@@ -232,6 +246,13 @@
             form.append("role_id",'{{$role->id}}');
             request('{{route("add_role_users")}}',form,function(){
                 reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
             return false;
         }
@@ -262,6 +283,13 @@
             form.append("role_id",'{{$role->id}}');
             request('{{route("remove_role_users")}}',form,function(){
                 reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
             return false;
         }
@@ -294,6 +322,13 @@
             form.append("role_id",'{{$role->id}}');
             request('{{route("add_role_function")}}',form,function(){
                 location.reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         }
 
@@ -324,6 +359,13 @@
                 setTimeout(function () {
                     location.reload();
                 },2000);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
         }
         
@@ -353,6 +395,13 @@
                     }
                 });
                 $("#" + type + "_modal").modal('show');
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             })
         }
         
@@ -394,6 +443,13 @@
                     setTimeout(function () {
                         location.reload();
                 },2000);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
             return false;
         }
@@ -426,6 +482,13 @@
                     setTimeout(function () {
                         location.reload();
                     },2000);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
             });
             return false;
         }

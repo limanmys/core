@@ -56,7 +56,9 @@ class LoginController extends Controller
             $domain = config('ldap.ldap_domain');
             $credientials = (object) $this->credentials($request);
             try{
-                $ldapConnection = ldap_connect("ldap://" . config('ldap.ldap_host'));
+                $ldapConnection = ldap_connect("ldaps://" . config('ldap.ldap_host'));
+                ldap_set_option($ldapConnection, LDAP_OPT_NETWORK_TIMEOUT, 10);
+                ldap_set_option($ldapConnection, LDAP_OPT_TIMELIMIT, 10);
                 ldap_set_option($ldapConnection, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ldapConnection, LDAP_OPT_X_TLS_REQUIRE_CERT, LDAP_OPT_X_TLS_NEVER);
                 ldap_set_option($ldapConnection, LDAP_OPT_REFERRALS,0);
@@ -67,7 +69,7 @@ class LoginController extends Controller
             if($flag){
                 $sr = ldap_search($ldapConnection, $base_dn, '(&(objectClass=user)(sAMAccountName='.$credientials->email.'))', [$guidColumn, 'samaccountname', 'memberof']);
                 $ldapUser = ldap_get_entries($ldapConnection, $sr);
-                if(!$ldapUser[0][$guidColumn][0]){
+                if(!isset($ldapUser[0][$guidColumn])){
                     return false;
                 }
                 $user = User::where($guidColumn, bin2hex($ldapUser[0][$guidColumn][0]))->first();

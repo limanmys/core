@@ -62,6 +62,13 @@
         request('{{route('request_update')}}',form,function () {
             Swal.close();
             location.reload();
+        }, function(response){
+            let error = JSON.parse(response);
+            Swal.fire({
+                type: 'error',
+                title: error.message,
+                timer : 2000
+            });
         })
     }
     function working(current) {

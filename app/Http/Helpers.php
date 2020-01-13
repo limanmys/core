@@ -684,6 +684,8 @@ if (!function_exists('setBaseDn')) {
         $flag = false;
         $connection = ldap_connect($ldap_host,389);
         ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+        ldap_set_option($connection, LDAP_OPT_NETWORK_TIMEOUT, 10);
+        ldap_set_option($connection, LDAP_OPT_TIMELIMIT, 10);
         $flag = ldap_bind($connection);
         $outputs = ldap_read($connection,'','objectclass=*');
         $entries = ldap_get_entries($connection,$outputs)[0];

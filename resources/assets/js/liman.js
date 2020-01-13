@@ -40,6 +40,13 @@ function request(url, data, next, error) {
             if((!url.includes('bildirimler') && !url.includes('kontrol') && id != null)){
                 Swal.close();
             }
+            if(r.status == 200 && !r.responseText){
+                Swal.fire({
+                    type: 'error',
+                    title: "İstek zaman aşımına uğradı!",
+                    timer : 2000
+                });
+            }
             if (id != null && (r.status !== 200 || r.status !== 300)) {
                 message(r.responseText);
             }
