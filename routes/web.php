@@ -101,23 +101,23 @@ Route::post('/user/setting/delete','UserController@removeSetting')->name('user_s
 Route::post('/user/setting/update','UserController@updateSetting')->name('user_setting_update');
 });
 
-Route::post('/lmn/private/extensionApi','Extension\OneController@internalExtensionApi')->middleware(['auth', 'permissions']);
+Route::post('/lmn/private/extensionApi','Extension\OneController@internalExtensionApi');
 
-Route::post('/lmn/private/runCommandApi','Extension\OneController@internalRunCommandApi')->middleware(['auth', 'permissions']);
+Route::post('/lmn/private/runCommandApi','Extension\OneController@internalRunCommandApi');
 
-Route::post('/lmn/private/putFileApi','Extension\OneController@internalPutFileApi')->middleware(['auth', 'permissions']);
+Route::post('/lmn/private/putFileApi','Extension\OneController@internalPutFileApi');
 
-Route::post('/lmn/private/getFileApi','Extension\OneController@internalGetFileApi')->middleware(['auth', 'permissions']);
+Route::post('/lmn/private/getFileApi','Extension\OneController@internalGetFileApi');
 
-Route::post('/lmn/private/runScriptApi','Extension\OneController@internalRunScriptApi')->middleware(['auth', 'permissions']);
+Route::post('/lmn/private/runScriptApi','Extension\OneController@internalRunScriptApi');
 
-Route::post('/lmn/private/putSession','Extension\OneController@internalPutSessionApi')->middleware(['auth', 'permissions']);
+Route::post('/lmn/private/putSession','Extension\OneController@internalPutSessionApi');
 
-Route::post('/lmn/private/reverseProxyRequest','Extension\OneController@internalAddProxyConfig')->middleware(['auth', 'permissions']);
+Route::post('/lmn/private/reverseProxyRequest','Extension\OneController@internalAddProxyConfig');
 
-Route::post('/lmn/private/dispatchJob','Extension\OneController@internalAddJob')->middleware(['auth', 'permissions']);
+Route::post('/lmn/private/dispatchJob','Extension\OneController@internalAddJob');
 
-Route::post('/lmn/private/getJobList','Extension\OneController@internalJobsList')->middleware(['auth', 'permissions']);
+Route::post('/lmn/private/getJobList','Extension\OneController@internalJobsList');
 
 Route::any('/upload/{any?}', function () {
     $server = app('tus-server');

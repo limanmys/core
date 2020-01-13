@@ -344,7 +344,7 @@ class OneController extends Controller
             ]);
             return "Sunucu icin yetkiniz yok.";
         }
-
+        auth()->loginUsingId($token->user_id);
         if ($server->type != "linux_ssh" && $server->type != "windows_powershell") {
             system_log(7,"EXTENSION_INTERNAL_RUN_COMMAND_FAILED",[
                 "extension_id" => extension()->id,
@@ -352,7 +352,7 @@ class OneController extends Controller
             ]);
             return "Bu sunucuda komut çalıştıramazsınız.";
         }
-
+        
         request()->request->add(['server' => $server]);
         $output = $server->run(request('command'));
 
@@ -375,6 +375,8 @@ class OneController extends Controller
             return 'Not Allowed';
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+
+        auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
         if (!Permission::can($token->user_id, 'server','id', $server->id)) {
