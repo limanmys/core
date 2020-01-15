@@ -190,6 +190,13 @@ class MainController extends Controller
         }
         if(request('ldapAddress') !== config('ldap.ldap_host')){
             RoleMapping::truncate();
+            User::where("auth_type", "ldap")->get()->map(function($item){
+                $item->permissions()->delete();
+            });
+            User::where("auth_type", "ldap")->get()->map(function($item){
+                $item->roles()->delete();
+            });
+            User::where("auth_type", "ldap")->delete();
         }
         setEnv([
             "LDAP_HOST" => request('ldapAddress'),
