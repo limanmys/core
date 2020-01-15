@@ -60,8 +60,8 @@
                 </div>
             </div>
           @elseif ($widget->type==="chart")
-            <div class="col-md-6 limanCharts" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
-                <div class="card" id="{{$widget->id}}Chart">
+            <div class="col-md-6 limanCharts mb-3" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
+                <div class="card h-100" id="{{$widget->id}}Chart">
                   <div class="card-header ui-sortable-handle" style="cursor: move;">
                     <h3 class="card-title">
                       <i class="fas fa-chart-pie mr-1"></i>
