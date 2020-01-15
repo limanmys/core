@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\AdminNotification;
 use App\Certificate;
 use App\RoleMapping;
+use App\RoleUser;
 
 class MainController extends Controller
 {
@@ -194,7 +195,7 @@ class MainController extends Controller
                 $item->permissions()->delete();
             });
             User::where("auth_type", "ldap")->get()->map(function($item){
-                $item->roles()->delete();
+                RoleUser::where("user_id", $item->id)->delete();
             });
             User::where("auth_type", "ldap")->delete();
         }
