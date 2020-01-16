@@ -296,9 +296,4 @@ $(function () {
         $("#" + modal.target.id + " .alert").fadeOut(0);
     });
 
-
-    $(".dropdown-menu").on('click', 'a.dropdown-item', function(){
-        $(this).closest('.dropdown').find('.dropdown-toggle').html($(this).text() + '<span class="caret"></span>');
-    });
-
 });
