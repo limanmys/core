@@ -293,7 +293,7 @@ $(function () {
     });
 
     $(".modal").on('show.bs.modal', function(modal) {
-        $("#" + modal.target.id + " .alert").fadeOut(0);
+        $("#" + modal.target.id + " .alert").not('.alert-info').fadeOut(0);
     });
 
 });
