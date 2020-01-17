@@ -255,7 +255,31 @@ class OneController extends Controller
         }else{
             return respond("Bu sunucudaki servisleri goremezsiniz.",403);
         }
-        return respond($services);
+        return view('table',[
+            "id" => "servicesTable",
+            "value" => $services,
+            "title" => [
+                "Servis Adı" , "Aciklamasi" , "Durumu"
+            ],
+            "display" => [
+                "name" , "description", "status"
+            ],
+            "menu" => [
+                "Baslat" => [
+                    "target" => "startService",
+                    "icon" => "fa-play"
+                ],
+                "Durdur" => [
+                    "target" => "stopService",
+                    "icon" => "fa-stop"
+                ],
+                "Yeniden Baslat" => [
+                    "target" => "restartService",
+                    "icon" => "fa-sync-alt"
+                ]
+
+            ],
+        ]);
     }
 
     public function getLogs()

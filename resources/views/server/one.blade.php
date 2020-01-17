@@ -203,31 +203,7 @@
                         </div>
                         @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
                             <div class="tab-pane fade show" id="servicesTab" role="tabpanel">
-                                @include('table',[
-                                    "id" => "servicesTable",
-                                    "value" => [],
-                                    "title" => [
-                                        "Servis Adı" , "Aciklamasi" , "Durumu"
-                                    ],
-                                    "display" => [
-                                        "name" , "description", "status"
-                                    ],
-                                    "menu" => [
-                                        "Baslat" => [
-                                            "target" => "startService",
-                                            "icon" => "fa-play"
-                                        ],
-                                        "Durdur" => [
-                                            "target" => "stopService",
-                                            "icon" => "fa-stop"
-                                        ],
-                                        "Yeniden Baslat" => [
-                                            "target" => "restartService",
-                                            "icon" => "fa-sync-alt"
-                                        ]
-                
-                                    ],
-                                ])
+                                
                             </div>
                             <div class="tab-pane fade show right" id="updatesTab" role="tabpanel">
                                 <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateAllPackages" onclick="updateAllPackages()">Tümünü Güncelle</button>
@@ -627,15 +603,12 @@
                 showConfirmButton: false,
             });
             request('{{route('server_service_list')}}', new FormData(), function (response) {
-                let json = JSON.parse(response);
-                let table = $("#servicesTab table").DataTable();
-                table.rows().remove();
-                let counter = 1;
-                json["message"].forEach(element => {
-                    let row = table.row.add([
-                        counter++, element["name"], element["description"], element["status"]
-                    ]).draw(false).node();
-                    $(row).addClass('tableRow');
+                $("#servicesTab").html(response);
+                $("#servicesTab table").DataTable({
+                    bFilter: true,
+                    "language": {
+                        url: "/turkce.json"
+                    }
                 });
                 setTimeout(function () {
                     Swal.close();
