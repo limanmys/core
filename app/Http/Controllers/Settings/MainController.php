@@ -10,6 +10,8 @@ use App\Role;
 use App\Http\Controllers\Controller;
 use App\AdminNotification;
 use App\Certificate;
+use App\RoleMapping;
+use App\RoleUser;
 
 class MainController extends Controller
 {
@@ -175,7 +177,7 @@ class MainController extends Controller
         if(!$cert){
             list($flag, $message) = retrieveCertificate(request('ldapAddress'),636);
             if($flag){
-                $flag2 = addCertificate(request('ldapAddress'),636,$message["path"]);
+                addCertificate(request('ldapAddress'),636,$message["path"]);
                 $notification = new AdminNotification();
                 $notification->title = "Yeni Sertifika Eklendi";
                 $notification->type = "new_cert";
@@ -186,6 +188,16 @@ class MainController extends Controller
         }
         if(!setBaseDn(request('ldapAddress'))){
             return respond('Sunucuya bağlanırken bir hata oluştu!', 201);
+        }
+        if(request('ldapAddress') !== config('ldap.ldap_host')){
+            RoleMapping::truncate();
+            User::where("auth_type", "ldap")->get()->map(function($item){
+                $item->permissions()->delete();
+            });
+            User::where("auth_type", "ldap")->get()->map(function($item){
+                RoleUser::where("user_id", $item->id)->delete();
+            });
+            User::where("auth_type", "ldap")->delete();
         }
         setEnv([
             "LDAP_HOST" => request('ldapAddress'),

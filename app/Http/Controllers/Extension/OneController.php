@@ -121,26 +121,16 @@ class OneController extends Controller
             $function = request("function_name");
             $extensionJson = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
         
-            $functions = [];
+            $functions = collect([]);
     
             if(array_key_exists("functions",$extensionJson)){
-                $functions = $extensionJson["functions"];
+                $functions = collect($extensionJson["functions"]);
             }
-    
-            if(empty($functions)){
-                return respond("Eklenti icin bu ozellik yapilandirilmamis.",403);
-            }
-            $flag = false;
-            $isActive = "true";
-            for($i = 0 ; $i < count($functions); $i++){
-                if(request("function_name") == $functions[$i]["name"]){
-                    $flag = true;
-                    $isActive = $functions[$i]["isActive"];
-                    break;
-                }
-            }
-            if(!$flag){
-                return respond("Eklenti icin bu ozellik yapilandirilmamis.",403);
+
+            $isActive = "false";
+            $functionOptions = $functions->where('name', request("function_name"))->first();
+            if($functionOptions){
+                $isActive = $functionOptions["isActive"];
             }
             if($isActive == "true" && !Permission::can(user()->id,"function","name",strtolower(extension()->name) , $function)){
                 abort(403, $function . " için yetkiniz yok.");

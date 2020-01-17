@@ -42,6 +42,7 @@
                             <div class="form-group">
                                 <label>{{$item["name"]}}</label>
                                 <select class="form-control" name="{{$item["variable"]}}" @if(!isset($item["required"]) || $item["required"] === true) required @endif>
+                                    <option>{{$item["name"]}}</option>
                                     @foreach(extensions() as $extension)
                                         <option value="{{$extension->id}}" @if($extension->id == old($item["variable"], extensionDb($item["variable"]))) selected @endif >{{$extension->name}}</option>
                                     @endforeach
@@ -51,6 +52,7 @@
                             <div class="form-group">
                                 <label>{{$item["name"]}}</label>
                                 <select class="form-control" name="{{$item["variable"]}}" @if(!isset($item["required"]) || $item["required"] === true) required @endif>
+                                    <option>{{$item["name"]}}</option>
                                     @foreach(servers() as $server)
                                         <option value="{{$server->id}}" @if($server->id == old($item["variable"], extensionDb($item["variable"]))) selected @endif>{{$server->name}}</option>
                                     @endforeach
