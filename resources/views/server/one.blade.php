@@ -759,15 +759,20 @@
                         style: 'multi'
                     },
                     dom: 'Blfrtip',
-                    buttons: [
-                        'selectAll',
-                        'selectNone'
-                    ],
+                    buttons: {
+                        buttons: [
+                            { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
+                            { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
+                        ],
+                        dom: {
+                            button: { className: 'btn' }
+                        }
+                    },
                     language: {
                         url : "/turkce.json",
                         buttons: {
                             selectAll: "{{ __('Tümünü Seç') }}",
-                            selectNone: "{{ __('Tümünü Kaldır') }}"
+                            selectNone: "{{ __('Tümünü Kaldır') }}",
                         }
                     }
                 });
@@ -862,10 +867,15 @@
                     style: 'multi'
                 },
                 dom: 'Blfrtip',
-                buttons: [
-                    'selectAll',
-                    'selectNone'
-                ],
+                buttons: {
+                    buttons: [
+                        { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
+                        { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
+                    ],
+                    dom: {
+                        button: { className: 'btn' }
+                    }
+                },
                 language: {
                     url : "/turkce.json",
                     buttons: {

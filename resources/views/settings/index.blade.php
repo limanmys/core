@@ -128,10 +128,15 @@
                                 style: 'multi'
                             },
                             dom: 'Blfrtip',
-                            buttons: [
-                                'selectAll',
-                                'selectNone'
-                            ],
+                            buttons: {
+                                buttons: [
+                                    { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
+                                    { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
+                                ],
+                                dom: {
+                                    button: { className: 'btn' }
+                                }
+                            },
                             language: {
                                 url : "/turkce.json",
                                 buttons: {
@@ -454,10 +459,15 @@
                         style: 'multi'
                     },
                     dom: 'Blfrtip',
-                    buttons: [
-                        'selectAll',
-                        'selectNone'
-                    ],
+                    buttons: {
+                        buttons: [
+                            { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
+                            { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
+                        ],
+                        dom: {
+                            button: { className: 'btn' }
+                        }
+                    },
                     language: {
                         url : "/turkce.json",
                         buttons: {
