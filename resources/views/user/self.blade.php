@@ -54,14 +54,14 @@
                         <div class="form-group row">
                             <label for="inputPassword" class="col-sm-2 col-form-label">{{__("Parola")}}</label>
                             <div class="col-sm-10">
-                            <input type="password" class="form-control" id="inputPassword" name="password" required minlength="10" maxlength="32" @if(user()->auth_type == "ldap") disabled @endif>
+                            <input type="password" class="form-control" id="inputPassword" name="password" minlength="10" maxlength="32" @if(user()->auth_type == "ldap") disabled @endif>
                             <small>{{__("Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.")}}</small>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="inputPasswordConfirmation" class="col-sm-2 col-form-label">{{__("Parola Onayı")}}</label>
                             <div class="col-sm-10">
-                            <input type="password" class="form-control" id="inputPasswordConfirmation" name="password_confirmation" required minlength="10" maxlength="32" @if(user()->auth_type == "ldap") disabled @endif>
+                            <input type="password" class="form-control" id="inputPasswordConfirmation" name="password_confirmation" minlength="10" maxlength="32" @if(user()->auth_type == "ldap") disabled @endif>
                             </div>
                         </div>
                         <div class="form-group row">
