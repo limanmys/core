@@ -109,25 +109,32 @@ class UserController extends Controller
             return respond("Eski Parolanız geçerli değil.",201);
         }
         $flag = Validator::make(request()->all(), [
-            'password' => ['required', 'string', 
+            'password' => ['string', 
                 'min:10','max:32','confirmed','regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/'],
         ]);
 
-        try{
-            $flag->validate();
-        }catch (\Exception $exception){
-            return respond("Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.",201);
+        if(!empty(request()->password)){
+            try{
+                $flag->validate();
+            }catch (\Exception $exception){
+                return respond("Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.",201);
+            }
+    
+            auth()->user()->update([
+               'name' => request('name'),
+               'password' => Hash::make(request('password'))
+            ]);
+    
+            auth()->logout();
+            session()->flush();
+    
+            return respond('Kullanıcı Başarıyla Güncellendi, lütfen tekrar giriş yapın.',200);
         }
 
         auth()->user()->update([
-           'name' => request('name'),
-           'password' => Hash::make(request('password'))
+            'name' => request('name')
         ]);
-
-        auth()->logout();
-        session()->flush();
-
-        return respond('Kullanıcı Başarıyla Güncellendi, lütfen tekrar giriş yapın.',200);
+        return respond('Kullanıcı Başarıyla Güncellendi',200);
     }
 
     public function adminUpdate()
