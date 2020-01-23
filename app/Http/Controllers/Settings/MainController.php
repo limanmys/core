@@ -12,6 +12,7 @@ use App\AdminNotification;
 use App\Certificate;
 use App\RoleMapping;
 use App\RoleUser;
+use App\PermissionData;
 
 class MainController extends Controller
 {
@@ -204,5 +205,31 @@ class MainController extends Controller
             "LDAP_GUID_COLUMN" => request('ldapObjectGUID'),
         ]);
         return respond(__("Kaydedildi!"),200);
+    }
+
+    public function getPermisssionData()
+    {
+        $data = PermissionData::where('permission_id',request('id'))->first();
+        if(!$data){
+            return respond("");
+        }
+        return respond($data->data);
+    }
+
+    public function writePermisssionData()
+    {
+        $data = PermissionData::where('permission_id',request('id'))->first();
+        if($data){
+            $data->update([
+                "data" => json_encode(request('data'))
+            ]);
+            return respond("Başarıyla eklendi!");
+        }
+        
+        $obj = new PermissionData();
+        $obj->data = json_encode(request('data'));
+        $obj->permission_id = request('id');
+        $obj->save();
+        return respond("Başarıyla eklendi!");
     }
 }
