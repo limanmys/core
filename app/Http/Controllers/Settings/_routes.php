@@ -10,6 +10,10 @@ Route::post('/ayarlar/liste','Settings\MainController@getList')->name('settings_
 
 Route::post('/ayar/yetki/ekle','Settings\MainController@addList')->name('settings_add_to_list')->middleware('admin');
 
+Route::post('/ayar/yetki/veriOku','Settings\MainController@getPermisssionData')->name('get_permission_data')->middleware('admin');
+
+Route::post('/ayar/yetki/veriYaz','Settings\MainController@writePermisssionData')->name('write_permission_data')->middleware('admin');
+
 Route::post('/ayar/yetki/sil','Settings\MainController@removeFromList')->name('settings_remove_from_list')->middleware('admin');
 
 Route::view('/ayar/sunucu','settings.server')->middleware('admin')->name('settings_server');

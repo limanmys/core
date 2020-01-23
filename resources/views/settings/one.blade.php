@@ -89,6 +89,12 @@
                         "display" => [
                             "name" , "id:id"
                         ],
+                        "menu" => [
+                            "Yetki Verilerini Düzenle" => [
+                                "target" => "permissionData",
+                                "icon" => "fa-database"
+                            ]
+                        ],
                         "noInitialize" => "true"
                     ])
                 </div>
@@ -103,6 +109,12 @@
                         ],
                         "display" => [
                             "name" , "id:id"
+                        ],
+                        "menu" => [
+                            "Yetki Verilerini Düzenle" => [
+                                "target" => "permissionData",
+                                "icon" => "fa-database"
+                            ]
                         ],
                         "noInitialize" => "true"
                     ])
@@ -119,6 +131,12 @@
                         "display" => [
                             "extra" , "value", "id:id"
                         ],
+                        "menu" => [
+                            "Yetki Verilerini Düzenle" => [
+                                "target" => "permissionData",
+                                "icon" => "fa-database"
+                            ]
+                        ],
                     ])
                 </div>
                 <div class="tab-pane fade show" id="liman" role="tabpanel">
@@ -132,6 +150,12 @@
                         ],
                         "display" => [
                             "name" , "id:id"
+                        ],
+                        "menu" => [
+                            "Yetki Verilerini Düzenle" => [
+                                "target" => "permissionData",
+                                "icon" => "fa-database"
+                            ]
                         ],
                         "noInitialize" => "true"
                     ])
@@ -184,6 +208,16 @@
             "submit_text" => "Seçili Eklentilere Yetki Ver",
             "onsubmit" => "addData"
         ])
+
+    @component('modal-component',[
+        "id" => "permissionDataModal",
+        "title" => "Güncelleme Günlüğü"
+    ])
+    <div class="form-group">
+    <textarea class="form-control" id="permissionDataPre" rows="20" autocomplete="off"></textarea>
+  </div>
+        <button class="btn btn-primary" onclick="writePermissionData()">{{__("Kaydet")}}</button>
+    @endcomponent
 
     @include('modal',[
        "id"=>"removeUser",
@@ -599,6 +633,59 @@
         function roleDetails(row){
             let role_id = row.querySelector('#role_id').innerHTML;
             location.href = '/rol/' + role_id;
+        }
+        let currentPermissionId = null;
+        function permissionData(row){
+            let permission_id = row.querySelector('#id').innerHTML;
+            currentPermissionId = permission_id;
+            if(permission_id == null){
+                return;
+            }
+            $("#permissionDataPre").text("");
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Okunuyor...")}}',
+                showConfirmButton: false,
+            });
+            let form = new FormData();
+            form.append('id',permission_id);
+            request('{{route('get_permission_data')}}', form, function (response) {
+                let json = JSON.parse(response);
+                $("#permissionDataPre").text(json["message"]);
+                $("#permissionDataModal").modal('show');
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
+            });
+            return false;
+        }
+
+        function writePermissionData(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Kaydediliyor...")}}',
+                showConfirmButton: false,
+            });
+            let form = new FormData();
+            form.append('id',currentPermissionId);
+            form.append('data',$("#permissionDataPre").val());
+            request('{{route('write_permission_data')}}', form, function (response) {
+                location.reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
+            });
+            return false;
         }
     </script>
 @endsection
