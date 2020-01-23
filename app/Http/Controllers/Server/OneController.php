@@ -111,6 +111,13 @@ class OneController extends Controller
             "ip_address" => request('ip_address'),
             "city" => request('city')
         ]);
+
+        foreach(session()->all() as $key => $session){
+            if(strpos($key, "cn_") === 0){
+                session()->forget($key);
+            }
+        }
+        
         return [
             "result" => 200,
             "data" => $output
