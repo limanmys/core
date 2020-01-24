@@ -353,6 +353,7 @@
                     title: '{{__("Lütfen Tüm Ayarları Tamamlayın")}}',
                     showConfirmButton: false,
                     allowOutsideClick : false,
+                    timer: 2000
                 });
                 return false;
             }
