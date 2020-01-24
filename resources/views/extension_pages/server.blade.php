@@ -1,3 +1,29 @@
+<?php
+    use Illuminate\Support\Facades\DB;
+    use App\Permission;
+    $navServers = DB::select("SELECT * FROM \"server_groups\" WHERE \"servers\" LIKE \"%" . server()->id . "%\"");
+    $cleanServers = [];
+    foreach($navServers as $rawServers){
+        $servers = explode(",",$rawServers->servers);
+        foreach($servers as $server){
+            if(Permission::can(user()->id,"server","id",$server)){
+                array_push($cleanServers,$server);
+            }
+        }
+    }
+
+    $cleanServers = array_unique($cleanServers);
+    $cleanExtensions = [];
+
+    $serverObjects = App\Server::find($cleanServers);
+    
+    foreach($serverObjects as $server){
+        $cleanExtensions[$server->id] = $server->extensions();
+    }
+    if(empty($cleanExtensions)){
+        $cleanExtensions[server()->id] = server()->extensions();
+    }
+?>
 @extends('layouts.app')
 
 @section('content')
@@ -26,14 +52,16 @@
 <div class="card">
     <div class="card-header">
             <ul class="nav nav-tabs" role="tablist">
-                @foreach (server()->extensions() as $extension)
+                @foreach ($cleanExtensions as $server_id=>$extensions)
+                    @foreach($extensions as $extension)
                     <li class="nav-item">
                         <a class="nav-link @if(request('extension_id') == $extension->id) active @endif" href="{{route('extension_server',[
                                 'extension_id' => $extension->id,
-                                'city' => server()->city,
-                                'server_id' => server()->id
+                                'city' => '06',
+                                'server_id' => $server_id
                             ])}}" role="tab">{{__($extension->name)}}</a>
                     </li>
+                    @endforeach
                 @endforeach
             </ul>
     </div>

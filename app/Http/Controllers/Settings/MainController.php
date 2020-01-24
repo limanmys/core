@@ -13,6 +13,7 @@ use App\Certificate;
 use App\RoleMapping;
 use App\RoleUser;
 use App\PermissionData;
+use App\ServerGroup;
 
 class MainController extends Controller
 {
@@ -231,5 +232,42 @@ class MainController extends Controller
         $obj->permission_id = request('id');
         $obj->save();
         return respond("Başarıyla eklendi!");
+    }
+
+    public function addServerGroup()
+    {
+        if(ServerGroup::where('name',request('name'))->exists()){
+            return respond("Bu isimle zaten bir grup var.",201);
+        }
+        $group = new ServerGroup([
+            "name" => request('name'),
+            "servers" => request('servers')
+        ]);
+        $flag = $group->save();
+        return ($flag) ? respond("Grup başarıyla eklendi!") : respond("Grup Eklenemedi!",201);
+    }
+
+    public function modifyServerGroup()
+    {
+        $group = ServerGroup::find(request('server_group_id'));
+        if(!$group){
+            return respond("Grup bulunamadı!",201);
+        }
+        $group->update([
+            "name" => request('name'),
+            "servers" => request('servers')
+        ]);
+        $flag = $group->save();
+        return ($flag) ? respond("Grup başarıyla düzenlendi!") : respond("Grup Düzenlenemedi!",201);
+    }
+
+    public function deleteServerGroup()
+    {
+        $group = ServerGroup::find(request('server_group_id'));
+        if(!$group){
+            return respond("Grup bulunamadı!",201);
+        }
+        $flag = $group->delete();
+        return ($flag) ? respond("Grup başarıyla silindi!") : respond("Grup Silinemedi!",201);
     }
 }

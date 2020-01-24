@@ -16,6 +16,12 @@ Route::post('/ayar/yetki/veriYaz','Settings\MainController@writePermisssionData'
 
 Route::post('/ayar/yetki/sil','Settings\MainController@removeFromList')->name('settings_remove_from_list')->middleware('admin');
 
+Route::post('/ayar/sunucuGrubu/ekle','Settings\MainController@addServerGroup')->name('add_server_group')->middleware('admin');
+
+Route::post('/ayar/sunucuGrubu/duzenle','Settings\MainController@modifyServerGroup')->name('modify_server_group')->middleware('admin');
+
+Route::post('/ayar/sunucuGrubu/sil','Settings\MainController@deleteServerGroup')->name('delete_server_group')->middleware('admin');
+
 Route::view('/ayar/sunucu','settings.server')->middleware('admin')->name('settings_server');
 
 Route::post('/ayar/eklenti/fonksiyonlar','Settings\MainController@getExtensionFunctions')->middleware('admin')->name('extension_function_list');
