@@ -10,6 +10,7 @@ use App\Server;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use App\ConnectorToken;
 
 class UserController extends Controller
 {
@@ -331,11 +332,7 @@ class UserController extends Controller
 
     public function cleanSessions()
     {
-        foreach(session()->all() as $key => $session){
-            if(strpos($key, "cn_") === 0){
-                session()->forget($key);
-            }
-        }
+        ConnectorToken::clear();
         return respond("Önbellek temizlendi.");
     }
 }

@@ -5,17 +5,16 @@ namespace App\Classes\Connector;
 use App\Server;
 use App\UserSettings;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Support\Str;
+use App\ConnectorToken;
 
 class WinRMConnector implements Connector
 {
     public function __construct(Server $server, $user_id)
     {
-        $server_id = "cn_".str_replace(".", "_", $server->id);
-        if (!session($server_id)) {
+        if (!ConnectorToken::get($server->id)->exists()) {
             list($username, $password) = self::retrieveCredentials();
-            self::init($username, $password, $server->id);
+            self::init($username, $password, $server->ip_address);
         }
         return true;
     }
@@ -64,21 +63,16 @@ class WinRMConnector implements Connector
 
     public static function request($url, $params,$retry = 3)
     { 
-        // First, format ip adress.
-        $server_id = "cn_". server()->id;
-        // If Session doesn't have token, create one.
-        if (!session($server_id)) {
-            // Retrieve Credentials
+        if (!ConnectorToken::get(server()->id)->exists()) {
             list($username, $password) = self::retrieveCredentials();
-
-            // Execute Init
-            self::init($username, $password, server()->ip_address);
+            self::init($username, $password, server()->id);
         }
         // Create Guzzle Object.
         $client = new Client();
         // Make Request.
+
         try{
-            $params["token"] = session($server_id);
+            $params["token"] = ConnectorToken::get(server()->id)->first()->token;
             $res = $client->request('POST', env("LIMAN_CONNECTOR_SERVER"). '/' . $url, [
                 "form_params" => $params,
                 'timeout' => 5
@@ -105,9 +99,8 @@ class WinRMConnector implements Connector
 
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
-        $server_id = "cn_".str_replace(".", "_", server()->id);
         return self::request('send',[
-            "token" => session($server_id),
+            "token" => ConnectorToken::get(server()->id)->first()->token,
             "local_path" => $localPath,
             "remote_path" => $remotePath
         ]);
@@ -115,9 +108,8 @@ class WinRMConnector implements Connector
 
     public function receiveFile($localPath, $remotePath)
     {
-        $server_id = "cn_".str_replace(".", "_", server()->id);
         return self::request('get',[
-            "token" => session($server_id),
+            "token" => ConnectorToken::get(server()->id)->first()->token,
             "local_path" => $localPath,
             "remote_path" => $remotePath
         ]);
@@ -171,11 +163,8 @@ class WinRMConnector implements Connector
         
         $json = json_decode((string) $res->getBody());
         if($putSession){
-            $server_id = "cn_".str_replace(".", "_", server()->id);
             if (auth() && auth()->user()) {
-                session()->put([
-                    $server_id => $json->token
-                ]);
+                ConnectorToken::set($json->token,server()->id);
             }
         }
         
