@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Server;
 
 use App\Classes\Connector\SSHConnector;
 use App\Classes\Connector\WinRMConnector;
+use App\ConnectorToken;
 use App\Extension;
 use App\Http\Controllers\Controller;
 use App\Notification;
@@ -112,11 +113,7 @@ class OneController extends Controller
             "city" => request('city')
         ]);
 
-        foreach(session()->all() as $key => $session){
-            if(strpos($key, "cn_") === 0){
-                session()->forget($key);
-            }
-        }
+        ConnectorToken::clear();
         
         return [
             "result" => 200,
