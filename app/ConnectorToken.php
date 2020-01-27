@@ -22,6 +22,9 @@ class ConnectorToken extends Model
 
     public static function set($token,$server_id)
     {
+        if($token == null){
+            abort(503,"Lütfen kasa üzerinden yeni bir anahtar ekleyin.");
+        }
         //Delete Old Ones
         ConnectorToken::where([
             "user_id" => user()->id,
