@@ -16,12 +16,27 @@
     $cleanExtensions = [];
 
     $serverObjects = App\Server::find($cleanServers);
-    
+    unset($cleanServers);
     foreach($serverObjects as $server){
-        $cleanExtensions[$server->id] = $server->extensions();
+        $cleanExtensions[$server->id . ":" . $server->name] = $server->extensions()->pluck('name', 'id')->toArray();
     }
     if(empty($cleanExtensions)){
-        $cleanExtensions[server()->id] = server()->extensions();
+        $cleanExtensions[server()->id . ":" . server()->name] = server()->extensions();
+    }
+
+    $last = [];
+
+    foreach($cleanExtensions as $serverobj=>$extensions){
+        list($server_id,$server_name) = explode(":",$serverobj);
+        foreach($extensions as $extension_id=>$extension_name){
+            $prefix = $extension_id . ":" . $extension_name;
+            $current = array_key_exists($prefix,$last) ? $last[$prefix] : [];
+            array_push($current,[
+                "id" => $server_id,
+                "name" => $server_name
+            ]);
+            $last[$prefix] = $current;
+        }
     }
 ?>
 @extends('layouts.app')
@@ -51,18 +66,35 @@
 @include('errors')    
 <div class="card">
     <div class="card-header">
-            <ul class="nav nav-tabs" role="tablist">
-                @foreach ($cleanExtensions as $server_id=>$extensions)
-                    @foreach($extensions as $extension)
-                    <li class="nav-item">
-                        <a class="nav-link @if(request('extension_id') == $extension->id) active @endif" href="{{route('extension_server',[
-                                'extension_id' => $extension->id,
-                                'city' => '06',
-                                'server_id' => $server_id
-                            ])}}" role="tab">{{__($extension->name)}}</a>
-                    </li>
-                    @endforeach
+            <ul id="quickNavBar" class="nav nav-tabs" role="tablist">
+                @foreach ($last as $extension=>$servers)
+                    @php(list($extension_id,$extension_name) = explode(":",$extension))
+                    @if(count($servers) == 1)
+                        <li class="nav-item">
+                            <a class="nav-link @if(request('extension_id') == $extension_id) active @endif" href="{{route('extension_server',[
+                                    'extension_id' => $extension_id,
+                                    'city' => '06',
+                                    'server_id' => $servers[0]['id']
+                                ])}}" role="tab">{{__($extension_name)}}</a>
+                        </li>
+                    @else
+                        <li class="dropdown nav-item" style="line-height:2.6"><!--  2.6 means absolutely nothing -->
+                            <a class="dropdown-toggle @if(request('extension_id') == $extension_id) active @endif" data-toggle="dropdown" href="#">{{__($extension_name)}}
+                            <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                            @foreach($servers as $server)
+                                <li class="nav-item"><a class="nav-link" href="{{route('extension_server',[
+                                    'extension_id' => $extension_id,
+                                    'city' => '06',
+                                    'server_id' => $server['id']
+                                ])}}">{{$server['name']}}</a></li>
+                            @endforeach
+                            </ul>
+                        </li>
+                        
+                    @endif
                 @endforeach
+                    
             </ul>
     </div>
     <div class="card-body">
@@ -74,4 +106,15 @@
     </div>
 </div>
 <br><span style="padding-left: 30px;">{{__("İstek")}} {{$timestamp}} {{__("saniyede tamamlandı.")}}</span>
+<script>
+    $(function(){
+        let list = [];
+        $("#quickNavBar li>a").each(function(){
+            list.push($(this).text());
+        });
+        if((new Set(list)).size !== list.length){
+            
+        }
+    })
+</script>
 @endsection
