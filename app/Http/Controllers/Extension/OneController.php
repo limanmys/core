@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Extension;
 
+use App\Classes\Connector\SSHTunnelConnector;
 use App\Extension;
 use App\Permission;
 use App\Server;
@@ -174,6 +175,7 @@ class OneController extends Controller
             abort(403, 'Not Allowed');
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+        auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
         if (!Permission::can($token->user_id, 'server','id', $server->id)) {
@@ -222,6 +224,7 @@ class OneController extends Controller
             abort(403, 'Not Allowed');
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+        auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
         if (!Permission::can($token->user_id, 'server','id', $server->id)) {
@@ -269,6 +272,7 @@ class OneController extends Controller
             abort(403, 'Not Allowed');
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+        auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
         if (!Permission::can($token->user_id, 'server','id', $server->id)) {
@@ -295,8 +299,6 @@ class OneController extends Controller
             ]);
             return request('target') . " fonksiyonu için yetkiniz yok.";
         }
-
-        $user = User::find($token->user_id);
         $command = generateSandboxCommand(server(), extension(), extension()->id, auth()->id(), "null", "null", request('target'));
         $output = shell_exec($command);
         
@@ -325,6 +327,7 @@ class OneController extends Controller
             return 'Not Allowed';
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+        auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
         if (!Permission::can($token->user_id, 'server','id', $server->id)) {
@@ -334,7 +337,6 @@ class OneController extends Controller
             ]);
             return "Sunucu icin yetkiniz yok.";
         }
-        auth()->loginUsingId($token->user_id);
         if ($server->type != "linux_ssh" && $server->type != "windows_powershell") {
             system_log(7,"EXTENSION_INTERNAL_RUN_COMMAND_FAILED",[
                 "extension_id" => extension()->id,
@@ -365,7 +367,6 @@ class OneController extends Controller
             return 'Not Allowed';
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
-
         auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
@@ -415,7 +416,6 @@ class OneController extends Controller
             return 'Not Allowed';
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
-
         auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
@@ -449,7 +449,6 @@ class OneController extends Controller
             return 'Not Allowed';
         }
         $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
-
         auth()->loginUsingId($token->user_id);
 
         $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
@@ -474,6 +473,34 @@ class OneController extends Controller
         ]);
 
         return "ok";
+    }
+
+    public function internalOpenTunnelApi()
+    {
+        if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
+            system_log(5,"EXTENSION_INTERNAL_NO_PERMISSION",[
+                "extension_id" => extension()->id,
+            ]);
+            return 'Not Allowed';
+        }
+        $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+        auth()->loginUsingId($token->user_id);
+
+        return SSHTunnelConnector::new(request('remote_host'), request('remote_port'), request('username'), request('password'));
+    }
+
+    public function internalStopTunnelApi()
+    {
+        if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
+            system_log(5,"EXTENSION_INTERNAL_NO_PERMISSION",[
+                "extension_id" => extension()->id,
+            ]);
+            return 'Not Allowed';
+        }
+        $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+        auth()->loginUsingId($token->user_id);
+
+        return SSHTunnelConnector::stop(request('remote_host'), request('remote_port'));
     }
 
     /**

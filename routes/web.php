@@ -119,6 +119,10 @@ Route::post('/lmn/private/dispatchJob','Extension\OneController@internalAddJob')
 
 Route::post('/lmn/private/getJobList','Extension\OneController@internalJobsList');
 
+Route::post('/lmn/private/openTunnel','Extension\OneController@internalOpenTunnelApi');
+
+Route::post('/lmn/private/stopTunnel','Extension\OneController@internalStopTunnelApi');
+
 Route::any('/upload/{any?}', function () {
     $server = app('tus-server');
     $extension_id = request("extension_id");
