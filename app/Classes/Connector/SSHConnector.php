@@ -66,6 +66,10 @@ class SSHConnector implements Connector
         $remotePath = "/tmp/" . Str::random();
 
         $this->sendFile($script, $remotePath);
+        $output = $this->execute("[ -f '$remotePath' ] && echo 1 || echo 0");
+        if($output != "1"){
+            abort(504,"Betik gönderilemedi");
+        }
         $this->execute("chmod +x " . $remotePath);
 
         // Run Part Of The Script
@@ -78,11 +82,16 @@ class SSHConnector implements Connector
 
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
-        return self::request('send',[
+        $output = self::request('send',[
             "token" => ConnectorToken::get(server()->id)->first()->token,
             "local_path" => $localPath,
             "remote_path" => $remotePath
         ]);
+        $output2 = $this->execute("[ -f '$remotePath' ] && echo 1 || echo 0");
+        if($output2 != "1"){
+            abort(504,"Dosya gönderilemedi");
+        }
+        return $output;
     }
 
     public static function verify($ip_address, $username, $password,$port)
