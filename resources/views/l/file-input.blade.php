@@ -8,10 +8,10 @@
     <div class="input-group" id="{{ $rand }}-file-input">
         <input type="text" id="{{ $rand }}-selected-file" placeholder="{{ isset($title) ? __($title) : '' }}" class="form-control" readonly>
         <span class="input-group-btn">
-            <button class="btn btn-labeled btn-secondary" id="{{ $rand }}-browse" style="border-radius: 0px;">{{ __('Gözat') }}</button>
+            <button type="button" class="btn btn-labeled btn-secondary" id="{{ $rand }}-browse" style="border-radius: 0px;">{{ __('Gözat') }}</button>
         </span>
         <span class="input-group-btn">
-            <button class=" btn btn-labeled btn-primary" id="{{ $rand }}-upload" disabled style="border-radius: 0px;">{{ __('Yükle') }}</button>
+            <button type="button" class=" btn btn-labeled btn-primary" id="{{ $rand }}-upload" disabled style="border-radius: 0px;">{{ __('Yükle') }}</button>
         </span>
         <input type="file" name="{{ isset($name) ? $name : '' }}" id="{{ $rand }}-upload-file" style="display:none;"/>
     </div>
