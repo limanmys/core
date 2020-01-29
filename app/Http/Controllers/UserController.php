@@ -326,7 +326,7 @@ class UserController extends Controller
             "value" => $encryptedPassword
         ]);
         $settings->save();
-
+        ConnectorToken::clear();
         return respond("Başarıyla eklendi.");
     }
 
