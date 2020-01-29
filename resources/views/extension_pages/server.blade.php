@@ -21,9 +21,9 @@
         $cleanExtensions[$server->id . ":" . $server->name] = $server->extensions()->pluck('name', 'id')->toArray();
     }
     if(empty($cleanExtensions)){
-        $cleanExtensions[server()->id . ":" . server()->name] = server()->extensions();
+        $cleanExtensions[server()->id . ":" . server()->name] = server()->extensions()->pluck('name', 'id')->toArray();
     }
-
+    
     $last = [];
 
     foreach($cleanExtensions as $serverobj=>$extensions){
