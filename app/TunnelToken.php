@@ -29,7 +29,7 @@ class TunnelToken extends Model
     public static function set($token, $local_port, $remote_host, $remote_port)
     {
         if($token == null){
-            abort(503, "Tünel açılırken bir hata oluştu.");
+            abort(504, "Tünel açılırken bir hata oluştu.");
         }
         //Delete Old Ones
         TunnelToken::where([
