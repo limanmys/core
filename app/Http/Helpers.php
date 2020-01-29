@@ -711,3 +711,44 @@ if (!function_exists('checkPort')) {
         }
     }
 }
+if (!function_exists('endsWith')) {
+    function endsWith($string, $endString) 
+    { 
+        $len = strlen($endString); 
+        if ($len == 0) { 
+            return true; 
+        } 
+        return (substr($string, -$len) === $endString); 
+    } 
+} 
+
+if (!function_exists('scanTranslations')) {
+    function scanTranslations($directory) {
+        $pattern =
+        '[^\w]' . 
+        '(?<!->)' . 
+        '(' . implode('|', ['__']) . ')' . 
+        "\(" . 
+        "[\'\"]" . 
+        '(' . 
+        '.+' . 
+        ')' .
+        "[\'\"]" . 
+        "[\),]"  
+        ;
+        $allMatches = [];
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
+        foreach ($iterator as $file) {
+            if ($file->isDir()) continue;
+            if(endsWith($file->getPathname(), ".php")){
+                $content = file_get_contents($file->getPathname());
+                if (preg_match_all("/$pattern/siU", $content, $matches)) {
+                    foreach($matches[2] as $row){
+                        $allMatches[$row] = $row;
+                    }
+                }
+            }
+        }
+        return $allMatches;
+    }
+}
