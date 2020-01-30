@@ -55,11 +55,11 @@
     @endif
 </ol>
 <div class="right" id="ext_menu" style="float:right;margin-top:-55px">
-        <button class="btn btn-primary" onclick="location.href = '{{route('extension_server_settings_page',[
+        <button data-toggle="tooltip" title="Eklenti Ayarları" class="btn btn-primary" onclick="location.href = '{{route('extension_server_settings_page',[
             "server_id" => server()->id,
             "extension_id" => extension()->id
         ])}}'"><i class="fa fa-cogs"></i></button>
-        <button class="btn btn-primary" onclick="location.href = '{{route('server_one',[
+        <button data-toggle="tooltip" title="Sunucuya Git" class="btn btn-primary" onclick="location.href = '{{route('server_one',[
             "server_id" => server()->id,
         ])}}'"><i class="fa fa-server"></i></button>
 </div>

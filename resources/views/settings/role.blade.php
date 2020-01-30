@@ -30,8 +30,8 @@
             @include('errors')
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="role_users" role="tabpanel">
-                    <button onclick="getUserList()" class="btn btn-success"><i class="fa fa-plus"></i></button>
-                    <button onclick="removeUsers()" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
+                    <button onclick="getUserList()" class="btn btn-success"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i></button>
+                    <button onclick="removeUsers()" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "role_users_table",
                         "value" => $role->users,
@@ -45,8 +45,8 @@
                     ])
                 </div>
                 <div class="tab-pane fade show" id="extension" role="tabpanel">
-                    <button onclick="getList('extension')" class="btn btn-success"><i class="fa fa-plus"></i></button>
-                    <button onclick="removePermission('extension')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
+                    <button onclick="getList('extension')" class="btn btn-success"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i></button>
+                    <button onclick="removePermission('extension')" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "extension_table",
                         "value" => $extensions,
@@ -60,8 +60,8 @@
                     ])
                 </div>
                 <div class="tab-pane fade show" id="server" role="tabpanel">
-                    <button onclick="getList('server')" class="btn btn-success"><i class="fa fa-plus"></i></button>
-                    <button onclick="removePermission('server')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
+                    <button onclick="getList('server')" class="btn btn-success"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i></button>
+                    <button onclick="removePermission('server')" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "server_table",
                         "value" => $servers,
@@ -75,8 +75,8 @@
                     ])
                 </div>
                 <div class="tab-pane fade show" id="function" role="tabpanel">
-                    <button class="btn btn-success" data-toggle="modal" data-target="#functionsModal"><i class="fa fa-plus"></i></button>
-                    <button onclick="removeFunctions()" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
+                    <button class="btn btn-success" data-toggle="modal" data-target="#functionsModal"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i></button>
+                    <button onclick="removeFunctions()" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "extensionFunctions",
                         "value" => $role->permissions->where('type','function'),
@@ -89,8 +89,8 @@
                     ])
                 </div>
                 <div class="tab-pane fade show" id="liman" role="tabpanel">
-                    <button onclick="getList('liman')" class="btn btn-success"><i class="fa fa-plus"></i></button>
-                    <button onclick="removePermission('liman')" class="btn btn-danger"><i class="fa fa-minus"></i></button><br><br>
+                    <button onclick="getList('liman')" class="btn btn-success"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i></button>
+                    <button onclick="removePermission('liman')" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "liman_table",
                         "value" => $role->permissions->where('type','liman'),

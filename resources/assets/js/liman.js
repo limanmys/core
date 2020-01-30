@@ -287,6 +287,7 @@ window.Echo = new Echo({
 });
 
 $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
     bsCustomFileInput.init();
     $('.select2').select2({
         theme: 'bootstrap4'
