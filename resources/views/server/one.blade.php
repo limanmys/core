@@ -183,7 +183,10 @@
                                     }
                                 }
                                 $arr[$extension->name . ":" . $extension->id] = "extension_id:hidden";
-                                $input_extensions[$extension->name . ":" . $extension->id] = $arr;
+                                $input_extensions[] = [
+                                    "name" => $extension->name,
+                                    "id" => $extension->id
+                                ];
                             }
                             ?>
                         </div>
@@ -377,17 +380,26 @@
         ]
     ])
     @if(count($input_extensions))
-        @include('modal',[
+        @component('modal-component',[
             "id"=>"install_extension",
             "title" => "Eklenti Ekle",
-            "type" => "info",
-            "url" => route('server_extension'),
-            "next" => "reload",
-            "selects" => $input_extensions,
-            "inputs" => [
+            "footer" => [
+                "class" => "btn-success",
+                "onclick" => "server_extension()",
+                "text" => "Ekle"
             ],
-            "submit_text" => "Ekle"
         ])
+            @include('table', [
+                "value" => $input_extensions,
+                "noInitialize" => true,
+                "title" => [
+                    "Eklenti", "*hidden*"
+                ],
+                "display" => [
+                    "name", "id:id"
+                ]
+            ])
+        @endcomponent
     @else
         <script>
         $("button[data-target='#install_extension']").click(function(){
@@ -414,6 +426,72 @@
         </div>
     @endcomponent
     <script>
+
+
+        $('#install_extension table').DataTable({
+            bFilter: true,
+            select: {
+                style: 'multi'
+            },
+            dom: 'Blfrtip',
+            buttons: {
+                buttons: [
+                    { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
+                    { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
+                ],
+                dom: {
+                    button: { className: 'btn' }
+                }
+            },
+            language: {
+                url : "/turkce.json",
+                buttons: {
+                    selectAll: "{{ __('Tümünü Seç') }}",
+                    selectNone: "{{ __('Tümünü Kaldır') }}",
+                }
+            }
+        });
+
+
+        function server_extension(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Okunuyor...")}}',
+                showConfirmButton: false,
+            });
+
+            let items = [];
+            let table = $("#install_extension table").DataTable();
+            table.rows( { selected: true } ).data().each(function(element){
+                items.push(element[2]);
+            });
+
+            if(items.length === 0){
+                Swal.fire({
+                    type: 'error',
+                    title: 'Lütfen önce seçim yapınız.'
+                });
+                return false;
+            }
+
+            let data = new FormData();
+            data.append("extensions", JSON.stringify(items));
+
+            request('{{route('server_extension')}}', data, function (response) {
+                Swal.close();
+                reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
+            })
+        }
+
+
         @if(server()->type == "linux_ssh") //|| server()->type == "windows_powershell")
             if(location.hash !== "#updatesTab"){
                 getUpdates();
