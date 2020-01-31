@@ -49,10 +49,10 @@ class SSHConnector implements Connector
 
     public function execute($command,$flag = true)
     {
-        return self::request('run',[
+        return trim(self::request('run',[
             "token" => "cn_". server()->id,
             "command" => $command
-        ]);
+        ]));
     }
 
     /**
