@@ -101,17 +101,27 @@ class MainController extends Controller
 
     public function addList()
     {
+        $arr = [];
         foreach(json_decode(request('ids'),true) as $id){
+            array_push($arr,$id);
             Permission::grant(request('user_id'),request('type'),"id",$id);
         }
+        $arr["type"] = request('type');
+        $arr["target_user_id"] = request('user_id');
+        system_log(7,"PERMISSION_GRANT",$arr);
         return respond(__("Başarılı"),200);
     }
 
     public function removeFromList()
     {
+        $arr = [];
         foreach(json_decode(request('ids'),true) as $id){
             Permission::revoke(request('user_id'),request('type'),"id",$id);
         }
+        array_push($arr,$id);
+        $arr["type"] = request('type');
+        $arr["target_user_id"] = request('user_id');
+        system_log(7,"PERMISSION_REVOKE",$arr);
         return respond(__("Başarılı"),200);
     }
 
