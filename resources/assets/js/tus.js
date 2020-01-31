@@ -11,6 +11,7 @@ function upload(option){
         retryDelays: [0, 1000, 3000, 5000, 10000],
         overridePatchMethod: true,
         chunkSize: 1000 * 1000,
+        resume: false,
         metadata: {
             filename: option.file.name,
             filetype: option.file.type
