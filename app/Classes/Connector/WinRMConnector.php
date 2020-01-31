@@ -55,10 +55,10 @@ class WinRMConnector implements Connector
     {
         // Prepare Powershell Command
         $command = "powershell.exe -encodedCommand " . base64_encode(mb_convert_encoding("\$ProgressPreference = \"SilentlyContinue\"; " . $command,"UTF-16LE","UTF-8"));
-        return self::request('run',[
+        return trim(self::request('run',[
             "token" => "cn_". server()->id,
             "command" => $command
-        ]);
+        ]));
     }
 
     public static function request($url, $params,$retry = 3)
