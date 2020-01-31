@@ -353,8 +353,8 @@ class OneController extends Controller
             "server_id" => server()->id
         ]);
 
-        ServerLog::new(request('command'),$output);
-        system_log(6,server()->id . ":" . request('command'));
+        ServerLog::new("Komut Çalıştırma",$output);
+        system_log(6,server()->id . ":" . "Komut Çalıştırma");
         return $output;
     }
 
