@@ -34,6 +34,9 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#changeLog">{{__("Son Değişiklikler")}}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#rsyslog" onclick="readLogs()">{{__("Log Yönetimi")}}</a>
+                </li>
             </ul>
         </div>
         <div class="card-body">
@@ -202,6 +205,29 @@
                         <li>{{$line}}</li>
                         @endforeach
                     </ul>
+                </div>
+
+                <div class="tab-pane fade show" id="rsyslog" role="tabpanel">
+                <p>{{__("Liman Üzerindeki İşlem Loglarını hedef bir log sunucusuna rsyslog servisi ile göndermek için hedef log sunucusunun adresi ve portunu yazınız.")}}</p>
+                    <form id="logForm" onsubmit="return saveLogSystem()">
+                        <div class="form-row">
+                            <div class="form-group col-md-10">
+                                <label for="targetHostname">{{__("Sunucu Adresi")}}</label>
+                                <input type="text" class="form-control" name="targetHostname" id="logIpAddress">
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="targetPort">{{__("Sunucu Portu")}}</label>
+                                <input type="number" class="form-control" name="targetPort" value="514" id="logPort">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                        <div class="form-group col-md-2">
+                                <label for="logInterval">{{__("Log Gönderme Aralığı (Dakika)")}}</label>
+                                <input type="number" class="form-control" name="logInterval" value="10" id="logInterval">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">{{__("Ayarları Kaydet")}}</button>
+                    </form>
                 </div>
                 <div class="tab-pane fade show" id="serverGroups" role="tabpanel">
                 @include('modal-button',[
@@ -519,6 +545,36 @@
                 });
             });
         }
+        
+        function saveLogSystem(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Kaydediliyor...")}}',
+                showConfirmButton: false,
+            });
+            let data = new FormData(document.querySelector('#logForm'));
+            console.log(data);
+            return request("{{route("save_log_system")}}", data, function(res) {
+                let response = JSON.parse(res);
+                Swal.close();
+                Swal.fire({
+                    position: 'center',
+                    type: 'success',
+                    title: response.message,
+                    showConfirmButton : false
+                });
+                reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000,
+                    showConfirmButton : false
+                });
+            });
+        }
 
         function addRoleMapping(){
             Swal.fire({
@@ -638,6 +694,29 @@
                     title: error.message,
                     timer : 2000,
                     showConfirmButton : false
+                });
+            });
+        }
+
+        function readLogs(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Okunuyor...")}}',
+                showConfirmButton: false,
+            });
+            request("{{route("get_log_system")}}", new FormData(), function(res) {
+                Swal.close();
+                let response = JSON.parse(res);
+                $("#logIpAddress").val(response["message"]["ip_address"]);
+                $("#logPort").val(response["message"]["port"]);
+                $("#logInterval").val(response["message"]["interval"]);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
                 });
             });
         }
