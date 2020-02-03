@@ -129,29 +129,32 @@ Route::any('/upload/{any?}', function () {
     $extension = \App\Extension::find($extension_id);
     if($extension){
         $path = env('EXTENSIONS_PATH') . strtolower($extension->name);
-        if (!file_exists($path."/uploads")) {
-            mkdir($path."/uploads");
-            shell_exec("sudo chown ".clean_score($extension_id).":liman ".$path."/uploads");
-            shell_exec("sudo chmod 770 ".$path."/uploads");
-        }
-        $server->setUploadDir($path."/uploads");
+    }else{
+        $path = storage_path();
     }
+    if (!file_exists($path."/uploads")) {
+        mkdir($path."/uploads");
+        shell_exec("sudo chown ".clean_score($extension_id).":liman ".$path."/uploads");
+        shell_exec("sudo chmod 770 ".$path."/uploads");
+    }
+    $server->setUploadDir($path."/uploads");
     $response = $server->serve();
     return $response->send();
 })->where('any', '.*')->middleware(['auth', 'permissions']);
 
 Route::post('/upload_info', function(){
     request()->validate([
-        'key' => 'required',
-        'extension_id' => 'required'
+        'key' => 'required'
     ]);
     $key = request('key');
     $server = app('tus-server');
-    $extension_id = request("extension_id");
     $info = $server->getCache()->get($key);
-    $extension_path = explode("/uploads/", $info['file_path'], 2)[0];
-    $info['file_path'] = str_replace($extension_path, '', $info['file_path']);
-    shell_exec("sudo chown ".clean_score($extension_id).":liman ".$info['file_path']);
-    shell_exec("sudo chmod 770 ".$info['file_path']);
+    $extension_id = request("extension_id");
+    if($extension_id){
+        $extension_path = explode("/uploads/", $info['file_path'], 2)[0];
+        $info['file_path'] = str_replace($extension_path, '', $info['file_path']);
+        shell_exec("sudo chown ".clean_score($extension_id).":liman ".$info['file_path']);
+        shell_exec("sudo chmod 770 ".$info['file_path']);
+    }
     return $info;
 })->middleware(['auth', 'permissions']);
