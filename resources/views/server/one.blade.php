@@ -79,7 +79,7 @@
                 <div class="card-header p-2">
                     <ul class="nav nav-tabs" role="tablist">
                         @php($firstRendered = false)
-                        @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
+                        @if(server()->type == "linux_ssh")
                             <li class="nav-item">
                                 <a class="nav-link active" data-toggle="pill" href="#usageTab" role="tab" aria-selected="true">{{__("Sistem Durumu")}}</a>
                             </li>
@@ -88,7 +88,7 @@
                         <li class="nav-item">
                             <a class="nav-link @if(!$firstRendered) active @endif" data-toggle="pill" href="#extensionsTab" role="tab">{{__("Eklentiler")}}</a>
                         </li>
-                        @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
+                        @if(server()->type == "linux_ssh")
                             <li class="nav-item">
                                 <a class="nav-link" data-toggle="pill" onclick="getServices()" href="#servicesTab" role="tab">{{__("Servisler")}}</a>
                             </li>
@@ -125,7 +125,7 @@
                 </div>
                 <div class="card-body">
                     <div class="tab-content">
-                        @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
+                        @if(server()->type == "linux_ssh")
                             <div class="tab-pane fade show active" id="usageTab" role="tabpanel">
                                     <h4>{{__("Kaynak Kullanımı")}}</h4>
                                     <div class="row">
