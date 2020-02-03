@@ -280,4 +280,71 @@ class MainController extends Controller
         $flag = $group->delete();
         return ($flag) ? respond("Grup başarıyla silindi!") : respond("Grup Silinemedi!",201);
     }
+
+    public function saveLogSystem()
+    {
+        $flag = request()->validate([
+            'targetHostname' => 'required|min:3',
+            'targetPort' => 'required|numeric|between:1,65535',
+            'logInterval' => 'required|numeric'
+        ]);
+        if(!$flag){
+            return respond("Girdiğiniz veriler geçerli değil!",201);
+        }
+
+        $text = "
+*.*     @@**" . request('targetHostname') . "**:" . request('targetPort') . "
+\\\$ModLoad imfile
+\\\$InputFilePollInterval " . request('logInterval') . "
+\\\$PrivDropToGroup adm
+\\\$InputFileName **" . env('LOG_PATH')  . "**
+\\\$InputFileTag **LimanApp**
+\\\$InputFileStateFile Stat-APP
+\\\$InputFileSeverity Info
+\\\$InputRunFileMonitor
+\\\$InputFilePersistStateInterval 1000
+";
+        shell_exec("sudo bash -c 'echo \"$text\" > /etc/rsyslog.d/liman.conf'");
+
+        shell_exec("sudo sed -i '/module(load=\"imudp\")/d' /etc/rsyslog.conf");
+        shell_exec("sudo sed -i '/module(load=\"imtcp\")/d' /etc/rsyslog.conf");
+        shell_exec("sudo sed -i '/input(type=\"imudp\" port=\"514\")/d' /etc/rsyslog.conf");
+        shell_exec("sudo sed -i '/input(type=\"imtcp\" port=\"514\")/d' /etc/rsyslog.conf");
+
+        $text = "
+module(load=\"imudp\")
+input(type=\"imudp\" port=\"514\")
+module(load=\"imtcp\")
+input(type=\"imtcp\" port=\"514\")";
+
+        shell_exec("echo '$text' | sudo tee -a /etc/rsyslog.conf");
+        shell_exec("sudo systemctl restart rsyslog");
+        
+        return respond("Başarıyla Kaydedildi!");
+    }
+
+    public function getLogSystem()
+    {
+        $status = trim(shell_exec("systemctl is-active rsyslog.service")) == "active" ? true : false;
+
+        $data = trim(shell_exec("cat /etc/rsyslog.d/liman.conf | grep 'InputFilePollInterval' | cut -d' ' -f2"));
+        $interval = $data == "" ? "10" : $data;
+
+        $ip_address = "";
+        $port = "";
+
+        $data = trim(shell_exec("cat /etc/rsyslog.d/liman.conf | grep '@@**'"));
+        if($data != ""){
+            $arr = explode("**",$data);
+            $ip_address = $arr[1];
+            $port = substr($arr[2],1);
+        }
+        
+        return respond([
+            "status" => $status,
+            "ip_address" => $ip_address != "" ? $ip_address : "",
+            "port" => $port != "" ? $port : "514",
+            "interval" => $interval != "" ? $interval : "10"
+        ]);
+    }
 }

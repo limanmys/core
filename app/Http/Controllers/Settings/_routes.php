@@ -20,6 +20,10 @@ Route::post('/ayar/sunucuGrubu/ekle','Settings\MainController@addServerGroup')->
 
 Route::post('/ayar/sunucuGrubu/duzenle','Settings\MainController@modifyServerGroup')->name('modify_server_group')->middleware('admin');
 
+Route::post('/ayar/log/kaydet','Settings\MainController@saveLogSystem')->name('save_log_system')->middleware('admin');
+
+Route::post('/ayar/log/oku','Settings\MainController@getLogSystem')->name('get_log_system')->middleware('admin');
+
 Route::post('/ayar/sunucuGrubu/sil','Settings\MainController@deleteServerGroup')->name('delete_server_group')->middleware('admin');
 
 Route::view('/ayar/sunucu','settings.server')->middleware('admin')->name('settings_server');
