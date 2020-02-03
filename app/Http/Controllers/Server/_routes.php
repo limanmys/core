@@ -74,9 +74,11 @@ Route::group(['middleware' => ['server']], function () {
 
     Route::post('/sunucu/guncellemeler/','Server\OneController@updateList')->name('server_update_list');
 
-    Route::post('/sunucu/guncellemeler/paket_guncelle','Server\OneController@updatePackage')->name('server_update_package');
+    Route::post('/sunucu/guncellemeler/paket_yukle','Server\OneController@installPackage')->name('server_install_package');
 
-    Route::post('/sunucu/guncellemeler/paket_kontrol','Server\OneController@checkUpdate')->name('server_check_update');
+    Route::post('/sunucu/guncellemeler/paket_kontrol','Server\OneController@checkPackage')->name('server_check_package');
+    
+    Route::post('/sunucu/guncellemeler/deb_yukle','Server\OneController@uploadDebFile')->name('server_upload_deb');
 
     Route::post('/sunucu/gunluk_kayitlari','Server\OneController@getLogs')->name('server_get_logs');
 

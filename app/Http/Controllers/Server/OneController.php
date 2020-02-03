@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Notification;
 use App\ServerLog;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use View;
@@ -301,11 +302,11 @@ class OneController extends Controller
         ]);
     }
 
-    public function updatePackage()
+    public function installPackage()
     {
         if(server()->type == "linux_ssh"){
             $package = request("package_name");
-            $raw = server()->run(sudo()."bash -c 'DEBIAN_FRONTEND=noninteractive apt install $package -qqy >/tmp/$package.txt 2>&1 & disown && echo \$!'");
+            $raw = server()->run(sudo()."bash -c 'DEBIAN_FRONTEND=noninteractive apt install \"$package\" -qqy >\"/tmp/".basename($package).".txt\" 2>&1 & disown && echo \$!'");
             ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi için güncelleme isteği gönderildi.', ['package_name' => request("package_name")]));
         }elseif (server()->type == "windows_powershell"){
             $raw = "";
@@ -313,16 +314,23 @@ class OneController extends Controller
         return $raw;
     }
 
-    public function checkUpdate()
+    public function checkPackage()
     {
         if(server()->type == "linux_ssh"){
-            $output = trim(server()->run("ps aux | grep \"apt\|dpkg\" | grep -v grep 2>/dev/null 1>/dev/null && echo '1' || echo '0'"));
-            $command_output = server()->run(sudo().'cat /tmp/'.request("package_name"). '.txt 2> /dev/null');
-            server()->run(sudo().'truncate -s 0 /tmp/'.request("package_name"). '.txt');
+            $mode = request("mode") ? request("mode") : 'update';
+            $output = trim(server()->run("ps aux | grep \"apt \|dpkg \" | grep -v grep 2>/dev/null 1>/dev/null && echo '1' || echo '0'"));
+            $command_output = server()->run(sudo().'cat "/tmp/'.basename(request("package_name")). '.txt" 2> /dev/null | base64');
+            $command_output = base64_decode($command_output);
+            server()->run(sudo().'truncate -s 0 /tmp/'.basename(request("package_name")). '.txt');
             if($output === "0"){
-                $output = server()->run(sudo().'apt list --upgradable 2>/dev/null | grep '.request("package_name"));
-                if(empty($output)){
-                    ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi paketi başarıyla kuruldu.', ['package_name' => request("package_name")]));
+                $list_method = $mode == "install" ? "--installed" : "--upgradable";
+                $package = request("package_name");
+                if(endsWith($package, ".deb")){
+                    $package = server()->run(sudo().'dpkg -I '.$package.' | grep Package: | cut -d\':\' -f2 | tr -d \'[:space:]\'');
+                }
+                $output = server()->run(sudo().'apt list '.$list_method.' 2>/dev/null | grep '.$package.' && echo 1 || echo 0');
+                if(($mode == "update" && $output == "0") || ($mode == "install" && $output != "0")){
+                    ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi başarıyla kuruldu.', ['package_name' => request("package_name")]));
                     return respond([
                         "status" => __(":package_name paketi başarıyla kuruldu.", ['package_name' => request("package_name")]),
                         "output" => trim($command_output)
@@ -344,6 +352,21 @@ class OneController extends Controller
             $output = "";
         }
         return $output;
+    }
+
+    public function uploadDebFile()
+    {
+        if(server()->type == "linux_ssh"){
+            $filePath = request('filePath');
+            if(!$filePath){
+                return respond("Dosya yolu zorunludur.",403);
+            }
+            server()->putFile($filePath, "/tmp/".basename($filePath));
+            unlink($filePath);
+            return respond("/tmp/".basename($filePath), 200);
+        }else{
+            return respond("Bu sunucuya deb paketi kuramazsınız.",403);
+        }
     }
     
     public function updateList()

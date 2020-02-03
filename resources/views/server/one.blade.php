@@ -210,14 +210,19 @@
                                 
                             </div>
                             <div class="tab-pane fade show right" id="updatesTab" role="tabpanel">
-                                <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateAllPackages" onclick="updateAllPackages()">Tümünü Güncelle</button>
-                                <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateSelectedPackages" onclick="updateSelectedPackages()">Seçilenleri Güncelle</button>
+                                <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateAllPackages" onclick="updateAllPackages()">{{ __('Tümünü Güncelle') }}</button>
+                                <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateSelectedPackages" onclick="updateSelectedPackages()">{{ __('Seçilenleri Güncelle') }}</button>
                                 <div id="updatesTabTable"></div>
                             </div>
                         @endif
                         @if(server()->type == "linux_ssh")
                             <div class="tab-pane fade show" id="packagesTab" role="tabpanel">
-                                
+                                <button type="button" data-toggle="modal" data-target="#installPackage" style="margin-bottom: 5px;" class="btn btn-success">
+                                    <i class="fas fa-upload"></i> {{ __('Paket Kur') }}
+                                </button>
+                                <div id="packages">
+
+                                </div>
                             </div>
 
                             <div class="tab-pane fade show" id="usersTab" role="tabpanel">
@@ -285,6 +290,41 @@
             </div>
         </div>
     </div>
+    @component('modal-component',[
+        "id"=>"installPackage",
+        "title" => "Paket Kur",
+        "footer" => [
+            "class" => "btn-success",
+            "onclick" => "installPackageButton()",
+            "text" => "Kur"
+        ],
+    ])
+    <ul class="nav nav-pills" role="tablist" style="margin-bottom: 15px;">
+        <li class="nav-item">
+            <a class="nav-link active" href="#fromRepo" data-toggle="tab">{{__("Depodan Yükle")}}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#fromDeb" data-toggle="tab">{{__("Paket Yükle (.deb)")}}</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="fromRepo" role="tabpanel">
+            @include('inputs', [
+                'inputs' => [
+                    "Paketin Adı" => "package:text:Paketin depodaki adını giriniz. Örneğin: chromium",
+                ]
+            ])
+        </div>
+        <div class="tab-pane fade show" id="fromDeb" role="tabpanel">
+            @include('file-input', [
+                'title' => 'Deb Paketi',
+                'name' => 'debUpload',
+                'callback' => 'onDebUploadSuccess'
+            ])
+        </div>
+    </div>
+    @endcomponent
+
     @include('modal',[
         "id"=>"delete",
         "title" => "Sunucuyu Sil",
@@ -413,7 +453,7 @@
 
     @component('modal-component',[
         "id" => "updateLogs",
-        "title" => "Güncelleme Günlüğü"
+        "title" => "Paket Yükleme Günlüğü"
     ])
         <pre style='height: 500px; font-family: "Menlo", "DejaVu Sans Mono", "Liberation Mono", "Consolas", "Ubuntu Mono", "Courier New", "andale mono", "lucida console", monospace;'>
             <code class="updateLogsBody"></code>
@@ -626,8 +666,8 @@
             });
             request('{{route('server_package_list')}}', new FormData(), function (response) {
                 Swal.close();
-                $("#packagesTab").html(response);
-                $("#packagesTab table").DataTable({
+                $("#packagesTab #packages").html(response);
+                $("#packagesTab #packages table").DataTable({
                     bFilter: true,
                     "language": {
                         url: "/turkce.json"
@@ -703,6 +743,60 @@
         }
         let index = 0;
         let packages = [];
+        let modes = {};
+
+        function installPackageButton(){
+            if($('#installPackage').find('[href="#fromRepo"]').hasClass('active')){
+                console.log("repo tab");
+                index = 0;
+                packages = [];
+                let package_name = $('#installPackage').find('input[name=package]').val();
+                if(package_name){
+                    packages.push(package_name);
+                    modes[package_name] = "install";
+                    installPackage();
+                }
+            }else if($('#installPackage').find('[href="#fromDeb"]').hasClass('active')){
+                if(!packages.length){
+                    return Swal.fire({
+                        type: 'error',
+                        title: 'Lütfen önce bir deb paketi yükleyin.'
+                    });
+                }
+                index = 0;
+                installPackage();
+            }
+        }
+
+        function onDebUploadSuccess(upload){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Yükleniyor...")}}',
+                showConfirmButton: false,
+            });
+            let data = new FormData();
+            data.append('filePath', upload.info.file_path);
+            request('{{route('server_upload_deb')}}', data, function (response) {
+                Swal.close();
+                response = JSON.parse(response);
+                if(response.message){
+                    index = 0;
+                    packages = [];
+                    packages.push(response.message);
+                    modes[response.message] = "install";
+                }
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
+            });
+        }
+
+
         function updateAllPackages(){
             index = 0;
             $('#updateLogs').find('.updateLogsBody').text("");
@@ -713,7 +807,7 @@
                     package_list_tmp.push(package_name);
                 });
                 packages = package_list_tmp;
-                updatePackage();
+                installPackage();
             });
         }
 
@@ -731,26 +825,29 @@
                 });
                 return false;
             }
-            updatePackage();
+            installPackage();
         }
 
         function updateSinglePackage(row){
             index = 0;
             packages = [];
             packages.push($(row).find("#name").text().split('/')[0]);
-            updatePackage();
+            installPackage();
         }
 
-        function updatePackage(){
+        function installPackage(){
             updateProgress();
             $('#updateLogs').modal('show');
             let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
             scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
             let data = new FormData();
             data.append("package_name", packages[index]);
+            if(modes[packages[index]]){
+                data.append("mode", modes[packages[index]]);
+            }
             $('#updateLogs').find('.updateLogsBody').append("\n"+packages[index]+" paketi kuruluyor. Lütfen bekleyin...<span id='"+packages[index]+"'></span>");
-            request('{{route('server_update_package')}}', data, function (response) {
-                checkUpdate();
+            request('{{route('server_install_package')}}', data, function (response) {
+                checkPackage();
             }, function(response){
                 let error = JSON.parse(response);
                 Swal.fire({
@@ -775,10 +872,13 @@
 
         }
 
-        function checkUpdate(){
+        function checkPackage(){
             let data = new FormData();
             data.append("package_name", packages[index]);
-            request('{{route('server_check_update')}}', data, function (response) {
+            if(modes[packages[index]]){
+                data.append("mode", modes[packages[index]]);
+            }
+            request('{{route('server_check_package')}}', data, function (response) {
                 response = JSON.parse(response);
                 if(response.message.output){
                     $('#updateLogs').find('.updateLogsBody').append("\n"+response.message.output);
@@ -790,7 +890,7 @@
                 scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
                 index++;
                 if(packages.length !== index){
-                    updatePackage();
+                    installPackage();
                 }else{
                     updateProgress();
                     getUpdates();
@@ -804,7 +904,7 @@
                     scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
                 }
                 setTimeout(function(){
-                    checkUpdate();
+                    checkPackage();
                 },5000);
             });
         }
