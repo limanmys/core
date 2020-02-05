@@ -220,11 +220,38 @@ class MainController extends Controller
 
     public function getPermisssionData()
     {
-        $data = PermissionData::where('permission_id',request('id'))->first();
-        if(!$data){
-            return respond("");
+
+        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(request('extension_name')) . DIRECTORY_SEPARATOR . "db.json"),true);
+        $function = collect($extension['functions'])->where('name', request('function_name'))->first();
+
+        if(!$function){
+            return respond("Fonksiyon bulunamadı!", 201);
         }
-        return respond($data->data);
+
+        $parameters = isset($function['parameters']) ? $function['parameters'] : null;
+        if(!$parameters){
+            return respond("Fonksiyon parametresi bulunamadı!", 201);
+        }
+        
+        $data = PermissionData::where('permission_id',request('id'))->first();
+        $data = $data ? json_decode($data->data) : (object) [];
+        foreach($parameters as $key => $parameter){
+            $parameters[$key]["value"] = isset($data->{$parameter["variable"]}) ? $data->{$parameter["variable"]} : "";
+        }
+
+        $parameters = collect(cleanArray($parameters));
+        $inputs = view("inputs", [
+            "inputs" => $parameters->mapWithKeys(function($item){
+                return [
+                    $item["name"] => $item["variable"].":".$item["type"]
+                ];
+            })
+        ])->render();
+
+        return respond([
+            "data" => $parameters,
+            "inputs" => $inputs,
+        ]);
     }
 
     public function writePermisssionData()
@@ -232,13 +259,13 @@ class MainController extends Controller
         $data = PermissionData::where('permission_id',request('id'))->first();
         if($data){
             $data->update([
-                "data" => json_encode(request('data'))
+                "data" => request('data')
             ]);
             return respond("Başarıyla eklendi!");
         }
         
         $obj = new PermissionData();
-        $obj->data = json_encode(request('data'));
+        $obj->data = request('data');
         $obj->permission_id = request('id');
         $obj->save();
         return respond("Başarıyla eklendi!");

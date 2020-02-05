@@ -44,6 +44,7 @@
                     class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required disabled hidden style="margin-top:15px">
             @endif
         @elseif(explode(":", $input)[1] == "textarea")
+            <label>{{__($name)}}</label>
             @if(count($inputs))
                 <textarea name="{{explode(":", $input)[0]}}"
                         class="form-control" required style="height: 60%"></textarea>

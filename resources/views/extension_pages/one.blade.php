@@ -267,6 +267,10 @@
                                 "name" , "description", "isActive", "name:old"
                             ],
                             "menu" => [
+                                "İzin Parametreleri" => [
+                                    "target" => "updateFunctionParameters",
+                                    "icon" => "fa-cog"
+                                ],
                                 "Ayarları Düzenle" => [
                                     "target" => "updateFunctionModal",
                                     "icon" => " context-menu-icon-edit"
@@ -303,6 +307,34 @@
                                 "-:-" => "old:hidden"
                             ],
                             "submit_text" => "Fonksiyon Duzenle"
+                        ])
+
+                        @component('modal-component',[
+                            "id" => "updateFunctionParametersModal",
+                            "title" => "Fonksiyon İzin Parametreleri"
+                        ])
+                            <button class="btn btn-success">
+                                <i data-toggle="tooltip" onclick="addFunctionParameters()" title="Ekle" class="fa fa-plus"></i>
+                            </button>
+                            <div id="functionParameters" class="mt-2"></div>
+                        @endcomponent
+
+                        @include('modal',[
+                            "id"=>"addFunctionParametersModal",
+                            "title" => "Fonksiyon İzin Parametresi Ekle",
+                            "url" => route('extension_add_function_parameters'),
+                            "next" => "getActiveFunctionParameters",
+                            "inputs" => [
+                                "Parametre Adı" => "name:text",
+                                "Değişken Adı" => "variable:text",
+                                "Tip:type" => [
+                                    "Yazı" => "text",
+                                    "Uzun Metin" => "textarea",
+                                    "Sayı" => "number"
+                                ],
+                                "function_name:function_name" => "function_name:hidden",
+                            ],
+                            "submit_text" => "Kaydet"
                         ])
             
                         @include('modal',[
@@ -360,6 +392,90 @@
                     title: error.message,
                     timer : 2000
                 });
+            });
+        }
+
+        var activeFunction = null;
+
+        function getFunctionParameters(function_name){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Yükleniyor...")}}',
+                showConfirmButton: false,
+            });
+
+            let data = new FormData();
+            data.append('function_name',function_name);
+            activeFunction = function_name;
+
+            request('{{route('extension_function_parameters')}}',data,function(response){
+                Swal.close();
+                $('#updateFunctionParametersModal').find('#functionParameters').html(response);
+                $('#updateFunctionParametersModal')
+                    .find('#functionParameters table')
+                    .DataTable(dataTablePresets('normal'));
+                $('#updateFunctionParametersModal').modal('show');
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
+            });
+        }
+
+        function getActiveFunctionParameters(){
+            $('#addFunctionParametersModal').modal('hide');
+            getFunctionParameters(activeFunction);
+        }
+
+        function updateFunctionParameters(row){
+            let function_name = $(row).find("#name").text();
+            getFunctionParameters(function_name);
+        }
+
+        function addFunctionParameters(){
+            $('#addFunctionParametersModal').find('input[name=function_name]').val(activeFunction);
+            $('#addFunctionParametersModal').modal('show');
+        }
+
+        function deleteFunctionParameters(row){
+            Swal.fire({
+                title: "{{ __('Onay') }}",
+                text: "{{ __('Parametreyi silmek istediğinizden emin misiniz?') }}",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: "{{ __('İptal') }}",
+                confirmButtonText: "{{ __('Sil') }}"
+            }).then((result) => {
+                if (result.value) {
+                    Swal.fire({
+                        position: 'center',
+                        type: 'info',
+                        title: '{{__("Yükleniyor...")}}',
+                        showConfirmButton: false,
+                    });
+                    let parameter_variable = $(row).find("#variable").text();
+                    let data = new FormData();
+                    data.append('parameter_variable',parameter_variable);
+                    data.append('function_name',activeFunction);
+                    
+                    request('{{route('extension_remove_function_parameters')}}',data,function(response){
+                        Swal.close();
+                        getFunctionParameters(activeFunction);
+                    }, function(response){
+                        let error = JSON.parse(response);
+                        Swal.fire({
+                            type: 'error',
+                            title: error.message,
+                            timer : 2000
+                        });
+                    });
+                }
             });
         }
     </script>

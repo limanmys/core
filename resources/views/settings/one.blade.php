@@ -211,12 +211,16 @@
 
     @component('modal-component',[
         "id" => "permissionDataModal",
-        "title" => "Güncelleme Günlüğü"
+        "title" => "Fonksiyon Parametreleri",
+        "footer" => [
+            "class" => "btn-success",
+            "onclick" => "writePermissionData()",
+            "text" => "Kaydet"
+        ]
     ])
-    <div class="form-group">
-    <textarea class="form-control" id="permissionDataPre" rows="20" autocomplete="off"></textarea>
-  </div>
-        <button class="btn btn-primary" onclick="writePermissionData()">{{__("Kaydet")}}</button>
+        <form id="parameterInputsForm">
+            <div id="parameterInputs"></div>
+        </form>
     @endcomponent
 
     @include('modal',[
@@ -571,6 +575,9 @@
         let currentPermissionId = null;
         function permissionData(row){
             let permission_id = row.querySelector('#id').innerHTML;
+            let function_name = row.querySelector('#extra').innerHTML;
+            let extension_name = row.querySelector('#value').innerHTML;
+
             currentPermissionId = permission_id;
             if(permission_id == null){
                 return;
@@ -584,9 +591,15 @@
             });
             let form = new FormData();
             form.append('id',permission_id);
+            form.append('function_name',function_name);
+            form.append('extension_name',extension_name);
+
             request('{{route('get_permission_data')}}', form, function (response) {
                 let json = JSON.parse(response);
-                $("#permissionDataPre").text(json["message"]);
+                $("#parameterInputs").html(json.message.inputs);
+                json.message.data.forEach(function(item){
+                    $("#parameterInputs").find('[name='+item.variable+']').val(item.value).change(); 
+                });
                 $("#permissionDataModal").modal('show');
             }, function(response){
                 let error = JSON.parse(response);
@@ -608,7 +621,12 @@
             });
             let form = new FormData();
             form.append('id',currentPermissionId);
-            form.append('data',$("#permissionDataPre").val());
+            let inputs = $('#parameterInputsForm').serializeArray();
+            let data = {};
+            inputs.forEach(function(item){
+                data[item.name] = item.value;
+            });
+            form.append('data',JSON.stringify(data));
             request('{{route('write_permission_data')}}', form, function (response) {
                 location.reload();
             }, function(response){

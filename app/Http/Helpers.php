@@ -440,6 +440,17 @@ if (!function_exists('objectToArray')) {
     }
 }
 
+if (!function_exists('cleanArray')) {
+    function cleanArray($array)
+    {
+        $newArray = [];
+        foreach($array as $row){
+            $newArray[] = $row;
+        }
+        return $newArray;
+    }
+}
+
 if (!function_exists('serverKey')) {
     /**
      * @return App\Key

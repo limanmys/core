@@ -46,6 +46,12 @@ Route::post('/eklenti/fonksiyonEkle','Extension\SettingsController@addFunction')
 
 Route::post('/eklenti/fonksiyonDuzenle','Extension\SettingsController@updateFunction')->name('extension_update_function')->middleware('admin');
 
+Route::post('/eklenti/fonksiyonParametreleri','Extension\SettingsController@getFunctionParameters')->name('extension_function_parameters')->middleware('admin');
+
+Route::post('/eklenti/fonksiyonParametreleri/sil','Extension\SettingsController@deleteFunctionParameters')->name('extension_remove_function_parameters')->middleware('admin');
+
+Route::post('/eklenti/fonksiyonParametreleri/ekle','Extension\SettingsController@addFunctionParameter')->name('extension_add_function_parameters')->middleware('admin');
+
 Route::post('/eklenti/fonksiyonSil','Extension\SettingsController@removeFunction')->name('extension_remove_function')->middleware('admin');
 
 Route::get('/eklenti/{extension_id}/public/{path}','Extension\OneController@publicFolder')->name('extension_public_folder');

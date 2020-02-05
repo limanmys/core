@@ -223,6 +223,82 @@ class SettingsController extends Controller
         return respond("Eklenti Silindi.", 200);
     }
 
+    public function getFunctionParameters()
+    {
+        $function_name = request('function_name');
+        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"), true);
+        $function = collect($extension['functions'])->where('name', $function_name)->first();
+        $parameters = isset($function['parameters']) ? $function['parameters'] : [];
+
+        return view('table', [
+            "value" => $parameters,
+            "title" => [
+                "Parametre Adı", "Değişken Adı", "Tipi"
+            ],
+            "display" => [
+                "name", "variable", "type"
+            ],
+            "menu" => [
+                "Sil" => [
+                    "target" => "deleteFunctionParameters",
+                    "icon" => "fa-trash"
+                ],
+            ]
+        ]);
+    }
+
+    public function addFunctionParameter()
+    {
+        $function_name = request('function_name');
+        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"), true);
+
+        if(isset($extension['functions'])){
+            foreach($extension['functions'] as $key => $function){
+                if($function['name'] == $function_name){
+                    $extension['functions'][$key]['parameters'] = 
+                        isset($extension['functions'][$key]['parameters']) ? 
+                        $extension['functions'][$key]['parameters'] : [];
+                    array_push($extension['functions'][$key]['parameters'], [
+                        "variable" => request("variable"),
+                        "type" => request("type"),
+                        "name" => request("name"),
+                    ]);
+                    file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
+                    return respond("Parametre başarıyla eklendi!");
+                }
+                break;
+            }
+        }
+        return respond("Fonksiyon bulunamadı!", 201);
+    }
+
+    public function deleteFunctionParameters()
+    {
+        $function_name = request('function_name');
+        $parameter_variable = request('parameter_variable');
+
+        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+
+        if(isset($extension['functions'])){
+            foreach($extension['functions'] as $key => $function){
+                if($function['name'] == $function_name){
+                    if(isset($function['parameters'])){
+                        foreach($function['parameters'] as $parameter_key => $parameter){
+                            if($parameter['variable'] == $parameter_variable){
+                                unset($extension['functions'][$key]['parameters'][$parameter_key]);
+                                file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
+                                return respond("Parametre başarıyla silindi!");
+                            }
+                        }
+                        return respond("Parametre bulunamadı!", 201);
+                    }
+                }
+                break;
+            }
+        }
+        return respond("Fonksiyon bulunamadı!", 201);
+    }
+
     public function addFunction()
     {
         $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
