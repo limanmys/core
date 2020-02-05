@@ -313,8 +313,8 @@
                             "id" => "updateFunctionParametersModal",
                             "title" => "Fonksiyon İzin Parametreleri"
                         ])
-                            <button class="btn btn-success">
-                                <i data-toggle="tooltip" onclick="addFunctionParameters()" title="Ekle" class="fa fa-plus"></i>
+                            <button class="btn btn-success" onclick="addFunctionParameters()">
+                                <i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i>
                             </button>
                             <div id="functionParameters" class="mt-2"></div>
                         @endcomponent
