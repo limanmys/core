@@ -60,11 +60,45 @@
           $(this).addClass('active');
         }
       });
-      console.log(localStorage.nightMode);
       if(localStorage.nightMode == "on"){
           $('body').addClass('skin-dark');
       }
     });
+
+    function dataTablePresets(type){
+        if(type == "normal"){
+            return {
+                bFilter: true,
+                "language" : {
+                    url : "/turkce.json"
+                }
+            };
+        }else if(type == "multiple"){
+            return {
+                bFilter: true,
+                select: {
+                    style: 'multi'
+                },
+                dom: 'Blfrtip',
+                buttons: {
+                    buttons: [
+                        { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
+                        { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
+                    ],
+                    dom: {
+                        button: { className: 'btn' }
+                    }
+                },
+                language: {
+                    url : "/turkce.json",
+                    buttons: {
+                        selectAll: "{{ __('Tümünü Seç') }}",
+                        selectNone: "{{ __('Tümünü Kaldır') }}"
+                    }
+                }
+            };
+        }
+    }
 </script>
 @endif
 @yield('body')

@@ -468,29 +468,7 @@
     <script>
 
 
-        $('#install_extension table').DataTable({
-            bFilter: true,
-            select: {
-                style: 'multi'
-            },
-            dom: 'Blfrtip',
-            buttons: {
-                buttons: [
-                    { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
-                    { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
-                ],
-                dom: {
-                    button: { className: 'btn' }
-                }
-            },
-            language: {
-                url : "/turkce.json",
-                buttons: {
-                    selectAll: "{{ __('Tümünü Seç') }}",
-                    selectNone: "{{ __('Tümünü Kaldır') }}",
-                }
-            }
-        });
+        $('#install_extension table').DataTable(dataTablePresets('multiple'));
 
 
         function server_extension(){
@@ -667,12 +645,7 @@
             request('{{route('server_package_list')}}', new FormData(), function (response) {
                 Swal.close();
                 $("#packagesTab #packages").html(response);
-                $("#packagesTab #packages table").DataTable({
-                    bFilter: true,
-                    "language": {
-                        url: "/turkce.json"
-                    }
-                });
+                $("#packagesTab #packages table").DataTable(dataTablePresets('normal'));
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
@@ -695,12 +668,7 @@
             });
             request('{{route('server_get_logs')}}', new FormData(), function (response) {
                 $("#logsTab").html(response);
-                $("#logsTab table").DataTable({
-                    bFilter: true,
-                    "language": {
-                        url: "/turkce.json"
-                    }
-                });
+                $("#logsTab table").DataTable(dataTablePresets('normal'));
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
@@ -723,12 +691,7 @@
             });
             request('{{route('server_service_list')}}', new FormData(), function (response) {
                 $("#servicesTab").html(response);
-                $("#servicesTab table").DataTable({
-                    bFilter: true,
-                    "language": {
-                        url: "/turkce.json"
-                    }
-                });
+                $("#servicesTab table").DataTable(dataTablePresets('normal'));
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
@@ -932,29 +895,7 @@
                     $('.updateSelectedPackages').hide();
                 }
                 $("#updatesTabTable").html(updates.table);
-                $("#updatesTabTable table").DataTable({
-                    bFilter: true,
-                    select: {
-                        style: 'multi'
-                    },
-                    dom: 'Blfrtip',
-                    buttons: {
-                        buttons: [
-                            { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
-                            { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
-                        ],
-                        dom: {
-                            button: { className: 'btn' }
-                        }
-                    },
-                    language: {
-                        url : "/turkce.json",
-                        buttons: {
-                            selectAll: "{{ __('Tümünü Seç') }}",
-                            selectNone: "{{ __('Tümünü Kaldır') }}",
-                        }
-                    }
-                });
+                $("#updatesTabTable table").DataTable(dataTablePresets('multiple'));
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
@@ -1040,29 +981,7 @@
         }
 
         $(function () {
-            $("#installed_extensions").DataTable({
-                bFilter: true,
-                select: {
-                    style: 'multi'
-                },
-                dom: 'Blfrtip',
-                buttons: {
-                    buttons: [
-                        { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
-                        { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
-                    ],
-                    dom: {
-                        button: { className: 'btn' }
-                    }
-                },
-                language: {
-                    url : "/turkce.json",
-                    buttons: {
-                        selectAll: "{{ __('Tümünü Seç') }}",
-                        selectNone: "{{ __('Tümünü Kaldır') }}"
-                    }
-                }
-            });
+            $("#installed_extensions").DataTable(dataTablePresets('multiple'));
         });
 
         

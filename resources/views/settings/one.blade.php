@@ -250,29 +250,7 @@
             form.append('user_id','{{$user->id}}');
             request('{{route('extension_function_list')}}', form, function (response) {
                 $(".functionsTable").html(response);
-                $('.functionsTable table').DataTable({
-                    bFilter: true,
-                    select: {
-                        style: 'multi'
-                    },
-                    dom: 'Blfrtip',
-                    buttons: {
-                        buttons: [
-                            { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
-                            { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
-                        ],
-                        dom: {
-                            button: { className: 'btn' }
-                        }
-                    },
-                    language: {
-                        url : "/turkce.json",
-                        buttons: {
-                            selectAll: "{{ __('Tümünü Seç') }}",
-                            selectNone: "{{ __('Tümünü Kaldır') }}"
-                        }
-                    }
-                });
+                $('.functionsTable table').DataTable(dataTablePresets('multiple'));
             }, function(response){
                 let error = JSON.parse(response);
                 Swal.fire({
@@ -388,29 +366,7 @@
             request('{{route('settings_get_list')}}', form, function (response) {
                 Swal.close();
                 $("#" + type + "_modal .modal-body").html(response);
-                $("#" + type + "_modal table").DataTable({
-                    bFilter: true,
-                    select: {
-                        style: 'multi'
-                    },
-                    dom: 'Blfrtip',
-                    buttons: {
-                        buttons: [
-                            { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
-                            { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
-                        ],
-                        dom: {
-                            button: { className: 'btn' }
-                        }
-                    },
-                    language: {
-                        url : "/turkce.json",
-                        buttons: {
-                            selectAll: "{{ __('Tümünü Seç') }}",
-                            selectNone: "{{ __('Tümünü Kaldır') }}"
-                        }
-                    }
-                });
+                $("#" + type + "_modal table").DataTable(dataTablePresets('multiple'));
                 $("#" + type + "_modal").modal('show');
             }, function(response){
                 let error = JSON.parse(response);
@@ -596,29 +552,7 @@
             return false;
         }
 
-        $('table').DataTable({
-            bFilter: true,
-            select: {
-                style: 'multi'
-            },
-            dom: 'Blfrtip',
-            buttons: {
-                buttons: [
-                    { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
-                    { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
-                ],
-                dom: {
-                    button: { className: 'btn' }
-                }
-            },
-            language: {
-                url : "/turkce.json",
-                buttons: {
-                    selectAll: "{{ __('Tümünü Seç') }}",
-                    selectNone: "{{ __('Tümünü Kaldır') }}"
-                }
-            }
-        });
+        $('table').DataTable(dataTablePresets('multiple'));
 
         function resetPassword(){
             $("#resetPassword [name='user_id']").val('{{$user->id}}');
