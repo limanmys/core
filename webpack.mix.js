@@ -18,6 +18,7 @@ mix.styles([
     'resources/assets/css/select2.css',
     'resources/assets/css/select2-bootstrap4.css',
     'resources/assets/css/toastr.min.css',
+    'resources/assets/css/OverlayScrollbars.css',
     'resources/assets/css/liman.css',
 ], 'public/css/liman.css').version();
 mix.combine([
@@ -44,6 +45,7 @@ mix.combine([
     'resources/assets/js/toastr.min.js',
     'resources/assets/js/echo.common.js',
     'resources/assets/js/pusher.min.js',
+    'resources/assets/js/jquery.overlayScrollbars.js',
     'resources/assets/js/liman.js',
     'resources/assets/js/tus.js',
 ], 'public/js/liman.js').version();
