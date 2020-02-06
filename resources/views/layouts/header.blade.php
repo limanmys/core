@@ -48,10 +48,12 @@
             </div>
           </li>
           <!-- Notifications Dropdown Menu -->
-          <li id="adminNotifications" class="nav-item dropdown">
-            @include('notifications',["notifications" => adminNotifications(),"id" =>
-            "adminNotifications","systemNotification" => true])
-          </li>
+          @if(user()->isAdmin())
+            <li id="adminNotifications" class="nav-item dropdown">
+              @include('notifications',["notifications" => adminNotifications(),"id" =>
+              "adminNotifications","systemNotification" => true])
+            </li>
+          @endif
           <li id="userNotifications" class="nav-item dropdown">
             @include('notifications',["notifications" => notifications()])
           </li>

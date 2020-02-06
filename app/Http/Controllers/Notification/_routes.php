@@ -4,7 +4,7 @@
 
 Route::get('/bildirimler','Notification\MainController@all')->name('all_user_notifications');
 
-Route::get('/bildirimlerSistem','Notification\MainController@allSystem')->name('all_system_notifications');
+Route::get('/bildirimlerSistem','Notification\MainController@allSystem')->name('all_system_notifications')->middleware('admin');
 
 Route::post('/bildirimler','Notification\MainController@check')->name('user_notifications');
 
