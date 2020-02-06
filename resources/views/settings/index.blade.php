@@ -711,7 +711,6 @@
             $("#modifyServerGroupTable").DataTable(dataTablePresets('multiple'));
         });
         function getUserList(){
-            $('.modal').modal('hide');
             request('{{route('get_user_list_admin')}}', new FormData(), function (response) {
                 $("#usersTable").html(response);
                 $('#usersTable table').DataTable(dataTablePresets('multiple'));
