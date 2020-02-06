@@ -89,12 +89,6 @@
                         "display" => [
                             "name" , "id:id"
                         ],
-                        "menu" => [
-                            "Yetki Verilerini Düzenle" => [
-                                "target" => "permissionData",
-                                "icon" => "fa-database"
-                            ]
-                        ],
                         "noInitialize" => "true"
                     ])
                 </div>
@@ -109,12 +103,6 @@
                         ],
                         "display" => [
                             "name" , "id:id"
-                        ],
-                        "menu" => [
-                            "Yetki Verilerini Düzenle" => [
-                                "target" => "permissionData",
-                                "icon" => "fa-database"
-                            ]
                         ],
                         "noInitialize" => "true"
                     ])
@@ -150,12 +138,6 @@
                         ],
                         "display" => [
                             "name" , "id:id"
-                        ],
-                        "menu" => [
-                            "Yetki Verilerini Düzenle" => [
-                                "target" => "permissionData",
-                                "icon" => "fa-database"
-                            ]
                         ],
                         "noInitialize" => "true"
                     ])
