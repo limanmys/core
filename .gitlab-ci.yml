@@ -19,15 +19,13 @@ Build:
     - mv create_deb.sh ../create_deb.sh
     - chmod +x ../create_deb.sh
     - git log -30 --pretty=format:"%s%x09%ad" > liman/server/storage/changelog
-    - export VERSION=$(date +'%Y.%m.%d-%s')
-    - sed -i "s/APP_VERSION=Development/APP_VERSION=$VERSION/g" liman/server/.env
+    - sed -i "s/APP_VERSION=Development/APP_VERSION=$CI_COMMIT_TAG/g" liman/server/.env
     - sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" liman/server/.env
     - sed -i "s/APP_ENV=local/APP_ENV=production/g" liman/server/.env
     - sed -i "s/EXTENSION_DEVELOPER_MODE=true/EXTENSION_DEVELOPER_MODE=false/g" liman/server/.env
     - chmod -R 775 DEBIAN/
     - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
-    - cp ../build_tools.deb ../liman-$VERSION.deb
-    - echo $VERSION > ../version
+    - cp ../build_tools.deb ../liman-$CI_COMMIT_TAG.deb
   artifacts:
     name: liman_$CI_BUILD_ID
     paths:
@@ -40,7 +38,6 @@ Deploy:
   only: 
    - tags
   script:
-   - export VERSION=$(cat version)
-   - cp build_tools.deb liman-$VERSION.deb
-   - bash deploy.sh $VERSION
-   - curl -F "file=@$(pwd)/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION.deb&pretty=1"
+   - cp build_tools.deb liman-$CI_COMMIT_TAG.deb
+   - bash deploy.sh $CI_COMMIT_TAG
+   - curl -F "file=@$(pwd)/liman-$CI_COMMIT_TAG.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$CI_COMMIT_TAG.deb&pretty=1"
