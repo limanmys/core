@@ -2,6 +2,8 @@ image: gitlab.lab:4567/liman/docker:latest
 
 Build:
   stage: build
+  only: 
+   - tags
   script:
     - mv `pwd`/build_tools/deploy.sh `pwd`/deploy.sh
     - cd build_tools
@@ -36,7 +38,7 @@ Build:
 Deploy:
   stage: deploy
   only: 
-   - master
+   - tags
   script:
    - export VERSION=$(cat version)
    - cp build_tools.deb liman-$VERSION.deb
