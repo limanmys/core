@@ -24,4 +24,4 @@ Depends: zip, unzip, dnsutils, nginx, php7.3-fpm, php7.3-curl, php7.3, php7.3-sq
 
 cd ../
 
-dpkg-deb --build build_tools
+dpkg-deb -Zgzip --build build_tools
