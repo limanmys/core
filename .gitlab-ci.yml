@@ -59,7 +59,7 @@ Build:
     - mv create_deb.sh ../create_deb.sh
     - chmod +x ../create_deb.sh
     - git log -30 --pretty=format:"%s%x09%ad" > liman/server/storage/changelog
-    - export VERSION=DEV-$(date +'%Y.%m.%d-%s')
+    - export VERSION=0.$(date +'%Y.%m.%d-%s')_dev
     - sed -i "s/APP_VERSION=Development/APP_VERSION=$VERSION/g" liman/server/.env
     - sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" liman/server/.env
     - sed -i "s/APP_ENV=local/APP_ENV=production/g" liman/server/.env
