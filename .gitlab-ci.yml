@@ -3,7 +3,7 @@ image: gitlab.lab:4567/liman/docker:latest
 Build:
   stage: build
   only: 
-   - tags
+   - release
   script:
     - mv `pwd`/build_tools/deploy.sh `pwd`/deploy.sh
     - cd build_tools
@@ -27,7 +27,7 @@ Build:
     - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
     - cp ../build_tools.deb ../liman-$CI_COMMIT_TAG.deb
   artifacts:
-    name: liman_$CI_BUILD_ID
+    name: liman_$CI_COMMIT_TAG
     paths:
     - /builds/liman/liman/version
     - /builds/liman/liman/build_tools.deb
@@ -36,8 +36,49 @@ Build:
 Deploy:
   stage: deploy
   only: 
-   - tags
+   - release
   script:
    - cp build_tools.deb liman-$CI_COMMIT_TAG.deb
-   - bash deploy.sh $CI_COMMIT_TAG
+   - bash deploy.sh $CI_COMMIT_TAG 10.154.25.80 liman-release
    - curl -F "file=@$(pwd)/liman-$CI_COMMIT_TAG.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$CI_COMMIT_TAG.deb&pretty=1"
+
+Build:
+  stage: build
+  script:
+    - mv `pwd`/build_tools/deploy.sh `pwd`/deploy.sh
+    - cd build_tools
+    - mkdir -p liman
+    - git config --global http.sslVerify false
+    - git clone --depth=50 --branch=master https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.lab/liman/liman.git liman/server
+    - git clone --depth=50 --branch=master https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.lab/liman/sandbox.git liman/sandbox
+    - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    - php composer-setup.php
+    - php7.3 composer.phar clearcache
+    - php7.3 composer.phar install --no-dev -d liman/server
+    - rm -rf composer.phar composer-setup.php liman/server/.git liman/sandbox/.git liman/webssh/.git
+    - mv create_deb.sh ../create_deb.sh
+    - chmod +x ../create_deb.sh
+    - git log -30 --pretty=format:"%s%x09%ad" > liman/server/storage/changelog
+    - export VERSION=0.$(date +'%Y.%m.%d-%s')-DEV
+    - sed -i "s/APP_VERSION=Development/APP_VERSION=$VERSION/g" liman/server/.env
+    - sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" liman/server/.env
+    - sed -i "s/APP_ENV=local/APP_ENV=production/g" liman/server/.env
+    - sed -i "s/EXTENSION_DEVELOPER_MODE=true/EXTENSION_DEVELOPER_MODE=false/g" liman/server/.env
+    - chmod -R 775 DEBIAN/
+    - ../create_deb.sh `cat liman/server/.env | grep "APP_VERSION" | cut -d "=" -f 2`
+    - cp ../build_tools.deb ../liman-$VERSION.deb
+    - echo $VERSION > ../version
+  artifacts:
+    name: liman_$VERSION
+    paths:
+    - /builds/liman/liman/version
+    - /builds/liman/liman/build_tools.deb
+    - /builds/liman/liman/deploy.sh
+
+Deploy:
+  stage: deploy
+  script:
+   - export VERSION=$(cat version)
+   - cp build_tools.deb liman-$VERSION.deb
+   - bash deploy.sh $VERSION 10.154.25.5 liman
+   - curl -F "file=@$(pwd)/liman-$VERSION.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-build&filename=liman-$VERSION.deb&pretty=1"
