@@ -42,15 +42,20 @@
             <br><br>
         
             @include('table',[
-                "value" => extensions(),
+                "value" => extensions()->map(function($item){
+                    if(!$item["issuer"]){
+                        $item["issuer"] = __('Doğrulanmadı!');
+                    }
+                    return $item;
+                }),
                 "sortable" => true,
                 "sortUpdateUrl" => route('update_ext_orders'),
                 "afterSortFunction" => 'location.reload',
                 "title" => [
-                    "Eklenti Adı" , "Versiyon", "Son Güncelleme Tarihi", "*hidden*"
+                    "Eklenti Adı" , "Versiyon", "İmzalayan", "Son Güncelleme Tarihi", "*hidden*"
                 ],
                 "display" => [
-                    "name" , "version", "updated_at", "id:extension_id"
+                    "name" , "version", "issuer", "updated_at", "id:extension_id"
                 ],
                 "menu" => [
                     "Sil" => [
@@ -79,6 +84,7 @@
         "title" => "Eklenti Yükle",
         "url" => route('extension_upload'),
         "next" => "reload",
+        "error" => "extensionUploadError",
         "inputs" => [
             "Lütfen Eklenti Dosyasını(.lmne) Seçiniz" => "extension:file",
         ],
@@ -146,6 +152,43 @@
                 });
             }
         });
+
+        function extensionUploadError(response){
+            let error = JSON.parse(response);
+            if(error.status == 203){
+                $('#extensionUpload_alert').hide();
+                Swal.fire({
+                    title: "{{ __('Onay') }}",
+                    text: error.message,
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    cancelButtonText: "{{ __('İptal') }}",
+                    confirmButtonText: "{{ __('Tamam') }}"
+                }).then((result) => {
+                    if (result.value) {
+                        Swal.fire({
+                            position: 'center',
+                            type: 'info',
+                            title: '{{__("Yükleniyor...")}}',
+                            showConfirmButton: false,
+                        });
+
+                        let data = new FormData(document.querySelector('#extensionUpload_form'))
+                        data.append("force", "1");
+                        request('{{route('extension_upload')}}',data,function(response){
+                            Swal.close();
+                            reload();
+                        }, function(response){
+                            let error = JSON.parse(response);
+                            Swal.close();
+                            $('#extensionUpload_alert').removeClass('alert-danger').removeAttr('hidden').removeClass('alert-success').addClass('alert-danger').html(error.message).fadeIn();
+                        });
+                    }
+                });
+            }
+        }
         
         function downloadDebFile(form){
             window.location.assign('/indir/eklenti_deb/' + form.getElementsByTagName('select')[0].value);
