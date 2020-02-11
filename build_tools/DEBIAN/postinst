@@ -2,6 +2,7 @@
 
 # Create Required Folders for Liman
 mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions}
+gpg --import /liman/server/storage/aciklab.public
 
 # User Creation
 if getent passwd liman > /dev/null 2>&1; then

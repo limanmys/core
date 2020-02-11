@@ -72,7 +72,7 @@ class MainController extends Controller
     public function upload()
     {
         $flag = Validator::make(request()->all(), [
-            'extension' => 'required |  max:5000000 | mimes:zip'
+            'extension' => 'required | max:5000000'
         ]);
         try{
             $flag->validate();
@@ -80,11 +80,27 @@ class MainController extends Controller
             return respond("Lütfen geçerli bir eklenti giriniz.",201);
         }
 
+        $zipFile = request()->file('extension');
+        if(endsWith(request()->file('extension')->getClientOriginalName(), ".signed")){
+            $verify = trim(shell_exec("gpg --verify --status-fd 1 ".request()->file('extension')->path()." | grep GOODSIG || echo 0"));
+            if(!(bool) $verify){
+                return respond("Eklenti dosyanız doğrulanamadı.",201);
+            }
+            $decrypt =  trim(shell_exec("gpg --status-fd 1 -d -o '/tmp/".request()->file('extension')->getClientOriginalName()."' ".request()->file('extension')->path()." | grep FAILURE > /dev/null && echo 0 || echo 1"));
+            if(!(bool) $decrypt){
+                return respond("Eklenti dosyası doğrulanırken bir hata oluştu!.",201);
+            }
+            $zipFile = "/tmp/".request()->file('extension')->getClientOriginalName();
+        }else{
+            if(!request()->has('force')){
+                return respond("Bu eklenti imzalanmamış bir eklenti, yine de kurmak istediğinize emin misiniz?",203);
+            }
+        }
         // Initialize Zip Archive Object to use it later.
         $zip = new ZipArchive;
 
         // Try to open zip file.
-        if (!$zip->open(request()->file('extension'))) {
+        if (!$zip->open($zipFile)) {
             system_log(7,"EXTENSION_UPLOAD_FAILED_CORRUPTED");
             return respond("Eklenti Dosyası Açılamıyor.", 201);
         }
@@ -103,6 +119,12 @@ class MainController extends Controller
         $file = file_get_contents($path . '/db.json');
 
         $json = json_decode($file, true);
+
+        if(isset($verify)){
+            $json["issuer"] = explode(" ", $verify, 4)[3];
+        }else{
+            $json["issuer"] = "";
+        }
 
         // Check If Extension Already Exists.
         $extension = Extension::where('name', $json["name"])->first();

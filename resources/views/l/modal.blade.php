@@ -15,7 +15,7 @@
             @isset($onsubmit)
                 <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return {{$onsubmit}}(this)" target="#">
             @else
-                <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return @isset($url)request('{{$url}}',this,@isset($next){{$next}}@endisset)"@endisset target="#">
+                <form @isset($id)id="{{$id}}_form"@endisset onsubmit="return @isset($url)request('{{$url}}',this,@isset($next){{$next}}@endisset,@isset($error){{$error}}@endisset)"@endisset target="#">
             @endif
                 <div class="modal-body">
                     <div id="{{$id}}_alert" class="alert" role="alert" hidden></div>
