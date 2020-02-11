@@ -138,7 +138,7 @@ class OneController extends Controller
         $flag = server()->run($query, false);
 
         // Respond according to the flag.
-        if ($flag == "1\n") {
+        if ($flag == "1") {
 //            ServerLog::new("Dosya Yükleme " . request('path'), "Sunucuya dosya yüklendi\n" . request('path') . " ", server()->id, auth()->id());
             return respond("Dosya başarıyla yüklendi.");
         }
