@@ -533,7 +533,7 @@
             request('{{route('server_check')}}', data, function (response) {
                 let json = JSON.parse(response);
                 let element = $(".status_" + id);
-                element.removeClass('btn-secondary').addClass(json["message"]);
+                element.removeClass('btn-secondary').removeClass('btn-danger').removeClass('btn-success').addClass(json["message"]);
             });
         }
 

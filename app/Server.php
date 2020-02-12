@@ -100,7 +100,7 @@ class Server extends Model
         $query = sudo() . "systemctl is-failed " . $service_name;
 
         // Execute and return outputs.
-        return ($this->connector()->execute($query,false) == "active\n") ? true : false;
+        return ($this->connector()->execute($query,false) == "active") ? true : false;
     }
 
     /**
