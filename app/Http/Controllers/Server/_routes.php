@@ -72,6 +72,24 @@ Route::group(['middleware' => ['server']], function () {
 
     Route::post('/sunucu/servis/','Server\OneController@serviceList')->name('server_service_list');
 
+    Route::post('/sunucu/yetkili_kullanicilar/','Server\OneController@getSudoers')->name('server_sudoers_list');
+
+    Route::post('/sunucu/yetkili_kullanicilar/ekle','Server\OneController@addSudoers')->name('server_add_sudoers');
+
+    Route::post('/sunucu/yetkili_kullanicilar/sil','Server\OneController@deleteSudoers')->name('server_delete_sudoers');
+
+    Route::post('/sunucu/yerel_kullanicilar/','Server\OneController@getLocalUsers')->name('server_local_user_list');
+
+    Route::post('/sunucu/yerel_kullanicilar/ekle','Server\OneController@addLocalUser')->name('server_add_local_user');
+
+    Route::post('/sunucu/yerel_gruplar/','Server\OneController@getLocalGroups')->name('server_local_group_list');
+
+    Route::post('/sunucu/yerel_gruplar/ekle','Server\OneController@addLocalGroup')->name('server_add_local_group');
+
+    Route::post('/sunucu/yerel_gruplar/kullanicilar','Server\OneController@getLocalGroupDetails')->name('server_local_group_users_list');
+
+    Route::post('/sunucu/yerel_gruplar/kullanicilar/ekle','Server\OneController@addLocalGroupUser')->name('server_add_local_group_user');
+    
     Route::post('/sunucu/guncellemeler/','Server\OneController@updateList')->name('server_update_list');
 
     Route::post('/sunucu/guncellemeler/paket_yukle','Server\OneController@installPackage')->name('server_install_package');

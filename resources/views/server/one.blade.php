@@ -102,11 +102,15 @@
                                         <small class="badge bg-danger updateCount" style="display:none;margin-left: 5px;">0</small>
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="pill" href="#usersTab" role="tab">{{__("Yerel Kullanıcılar")}}</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="pill" href="#groupsTab" role="tab">{{__("Yerel Gruplar")}}</a>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                                      {{ __('Kullanıcı İşlemleri') }} <span class="caret"></span>
+                                    </a>
+                                    <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 40px, 0px);">
+                                        <a class="dropdown-item" href="#usersTab" onclick="getLocalUsers()" data-toggle="tab">{{__("Yerel Kullanıcılar")}}</a>
+                                        <a class="dropdown-item" href="#groupsTab" onclick="getLocalGroups()" data-toggle="tab">{{__("Yerel Gruplar")}}</a>
+                                        <a class="dropdown-item" href="#sudoersTab" onclick="getSudoers()" data-toggle="tab">{{__("Yetkili Kullanıcılar")}}</a>
+                                    </div>
                                 </li>
                             @endif
                         @endif
@@ -226,11 +230,45 @@
                             </div>
 
                             <div class="tab-pane fade show" id="usersTab" role="tabpanel">
-                                <pre>{{server()->run("cut -d: -f1,3 /etc/passwd | egrep ':[0-9]{4}$' | cut -d: -f1")}}</pre>
+                                @include('modal-button',[
+                                    "class"     =>  "btn btn-success mb-2",
+                                    "target_id" =>  "addLocalUser",
+                                    "text"      =>  "Kullanıcı Ekle",
+                                    "icon" => "fas fa-plus"
+                                ])
+                                <div id="users"></div>
                             </div>
 
                             <div class="tab-pane fade show" id="groupsTab" role="tabpanel">
-                                <pre>{{server()->run("getent group | cut -d ':' -f1")}}</pre>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        @include('modal-button',[
+                                            "class"     =>  "btn btn-success mb-2",
+                                            "target_id" =>  "addLocalGroup",
+                                            "text"      =>  "Grup Ekle",
+                                            "icon" => "fas fa-plus"
+                                        ])
+                                        <div id="groups"></div>
+                                    </div>
+                                    <div class="col-md-6 d-none">
+                                        @include('modal-button',[
+                                            "class"     =>  "btn btn-success mb-2",
+                                            "target_id" =>  "addLocalGroupUserModal",
+                                            "text"      =>  "Kullanıcı Ekle",
+                                            "icon" => "fas fa-plus"
+                                        ])
+                                        <div id="groupUsers"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade show" id="sudoersTab" role="tabpanel">
+                                @include('modal-button',[
+                                    "class"     =>  "btn btn-success mb-2",
+                                    "target_id" =>  "addSudoers",
+                                    "text"      =>  "Tam Yetkili Kullanıcı Ekle",
+                                    "icon" => "fas fa-plus"
+                                ])
+                                <div id="sudoers"></div>
                             </div>
                         @endif
                         <div class="tab-pane fade show" id="logsTab" role="tabpanel">
@@ -343,6 +381,59 @@
         "onsubmit" => "removeExtensionFunc",
         "submit_text" => "Eklentileri Sil"
     ])
+
+    @include('modal',[
+        "id"=>"addLocalUser",
+        "title" => "Kullanıcı Ekle",
+        "url" => route('server_add_local_user'),
+        "next" => "reload",
+        "inputs" => [
+            "İsim" => "user_name:text",
+            "Şifre" => "user_password:password",
+            "Şifre Onayı" => "user_password_confirmation:password"
+        ],
+        "submit_text" => "Kullanıcı Ekle"
+    ])
+
+    @include('modal',[
+        "id"=>"addSudoers",
+        "title" => "Tam Yetkili Kullanıcı Ekle",
+        "url" => route('server_add_sudoers'),
+        "next" => "getSudoers",
+        "inputs" => [
+            "İsim" => "name:text:Grup veya kullanıcı ekleyebilirsiniz. Örneğin: kullaniciadi veya %grupadi"
+        ],
+        "submit_text" => "Grup Ekle"
+    ])
+
+    @include('modal',[
+        "id"=>"addLocalGroup",
+        "title" => "Grup Ekle",
+        "url" => route('server_add_local_group'),
+        "next" => "reload",
+        "inputs" => [
+            "İsim" => "group_name:text"
+        ],
+        "submit_text" => "Grup Ekle"
+    ])
+
+    @component('modal-component',[
+        "id"=>"addLocalGroupUserModal",
+        "title" => "Gruba Kullanıcı Ekle",
+        "submit_text" => "Ekle",
+        "footer" => [
+            "class" => "btn-success",
+            "onclick" => "addLocalGroupUser()",
+            "text" => "Ekle"
+        ],
+    ])
+        @include('inputs', [
+            "inputs" => [
+                "İsim" => "user:text"
+            ],
+        ])
+    @endcomponent
+
 
     @include('modal',[
         "id"=>"startService",
@@ -630,6 +721,190 @@
                 Swal.fire({
                     type: 'error',
                     title: error.message,
+                    timer : 2000
+                });
+            })
+        }
+
+        function getSudoers(){
+            $('.modal').modal('hide');
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Okunuyor...")}}',
+                showConfirmButton: false,
+            });
+
+            request('{{route('server_sudoers_list')}}', new FormData(), function (response) {
+                Swal.close();
+                $("#sudoersTab #sudoers").html(response);
+                $("#sudoersTab #sudoers table").DataTable(dataTablePresets('normal'));
+                setTimeout(function () {
+                    Swal.close();
+                }, 1500);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
+            })
+        }
+
+        function deleteSudoers(row){
+            Swal.fire({
+                title: "{{ __('Onay') }}",
+                text: "{{ __('Yetkili kullanıcıyı silmek istediğinizden emin misiniz?') }}",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: "{{ __('İptal') }}",
+                confirmButtonText: "{{ __('Sil') }}"
+            }).then((result) => {
+                if (result.value) {
+                    Swal.fire({
+                        position: 'center',
+                        type: 'info',
+                        title: '{{__("Yükleniyor...")}}',
+                        showConfirmButton: false,
+                    });
+                    let data = new FormData();
+                    data.append('name',$(row).find("#name").text());
+                    
+                    request('{{route('server_delete_sudoers')}}',data,function(response){
+                        Swal.close();
+                        getSudoers();
+                    }, function(response){
+                        let error = JSON.parse(response);
+                        Swal.fire({
+                            type: 'error',
+                            title: error.message,
+                            timer : 2000
+                        });
+                    });
+                }
+            });
+        }
+
+        function getLocalUsers(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Okunuyor...")}}',
+                showConfirmButton: false,
+            });
+
+            request('{{route('server_local_user_list')}}', new FormData(), function (response) {
+                Swal.close();
+                $("#usersTab #users").html(response);
+                $("#usersTab #users table").DataTable(dataTablePresets('normal'));
+                setTimeout(function () {
+                    Swal.close();
+                }, 1500);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
+            })
+        }
+
+        function getLocalGroups(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Okunuyor...")}}',
+                showConfirmButton: false,
+            });
+
+            request('{{route('server_local_group_list')}}', new FormData(), function (response) {
+                Swal.close();
+                $("#groupsTab #groups").html(response);
+                $("#groupsTab #groups table").DataTable(dataTablePresets('normal'));
+                setTimeout(function () {
+                    Swal.close();
+                }, 1500);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
+            })
+        }
+
+        let activeLocalGroup = "";
+        let activeLocalGroupElement = "";
+
+        function localGroupDetails(element){
+            $('#groups').closest('.col-md-12').removeClass("col-md-12").addClass('col-md-6');
+            $('#groupUsers').closest('.col-md-6').removeClass('d-none');
+            $(element).parent().find('tr').css('fontWeight','normal');
+            $(element).parent().find('tr').css('backgroundColor','');
+            $(element).css('backgroundColor','#b0bed9');
+            $(element).css('fontWeight','bolder');
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Okunuyor...")}}',
+                showConfirmButton: false,
+            });
+            let group = element.querySelector('#group').innerHTML;
+            activeLocalGroup = group;
+            activeLocalGroupElement = element;
+            let data = new FormData();
+            data.append('group', group);
+
+            request('{{route('server_local_group_users_list')}}', data, function (response) {
+                Swal.close();
+                $("#groupsTab #groupUsers").html(response);
+                $("#groupsTab #groupUsers table").DataTable(dataTablePresets('normal'));
+                setTimeout(function () {
+                    Swal.close();
+                }, 1500);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
+            })
+        }
+
+        function addLocalGroupUser(){
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Okunuyor...")}}',
+                showConfirmButton: false,
+            });
+
+            let form = new FormData();
+            form.append('group',activeLocalGroup);
+            form.append('user',$('#addLocalGroupUserModal').find("input[name=user]").val());
+
+            request('{{route('server_add_local_group_user')}}',form,function(response){
+                let json = JSON.parse(response);
+                Swal.fire({
+                    type: 'info',
+                    title: json.message,
+                    showConfirmButton: false,
+                    timer : 3000
+                });
+                localGroupDetails(activeLocalGroupElement);
+                $('#addLocalGroupUserModal').modal('hide');
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    showConfirmButton: false,
                     timer : 2000
                 });
             })

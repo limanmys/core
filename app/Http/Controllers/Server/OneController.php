@@ -223,6 +223,186 @@ class OneController extends Controller
         ];
     }
 
+    public function getLocalUsers()
+    {
+        if(server()->type == "linux_ssh"){
+            $output = server()->run("cut -d: -f1,3 /etc/passwd | egrep ':[0-9]{4}$' | cut -d: -f1");
+            $output = trim($output);
+            if(empty($output)){
+                $users = [];
+            }else{
+                $output = explode("\n", $output);
+                foreach($output as $user){
+                    $users[] = [
+                        "user" => $user
+                    ];
+                }
+            }
+        }
+        return view('table', [
+            "value" => $users,
+            "title" => [
+                "Kullanıcı Adı"
+            ],
+            "display" => [
+                "user"
+            ]
+        ]);
+    }
+
+    public function addLocalUser()
+    {
+        if(server()->type == "linux_ssh"){
+            $user_name = request("user_name");
+            $user_password = request("user_password");
+            $user_password_confirmation = request("user_password_confirmation");
+            if($user_password !== $user_password_confirmation){
+                return respond("Şifreler uyuşmuyor!", 201);
+            }
+            $output = trim(server()->run(sudo()."bash -c 'useradd --no-user-group -p $(openssl passwd -1 $user_password) $user_name -s \"/bin/bash\"' &> /dev/null && echo 1 || echo 0"));
+            if($output == "0"){
+                return respond("Kullanıcı eklenemedi!", 201);
+            }
+            return respond("Kullanıcı başarıyla eklendi!", 200);
+        }
+        
+    }
+
+    public function getLocalGroups()
+    {
+        if(server()->type == "linux_ssh"){
+            $output = server()->run("getent group | cut -d ':' -f1");
+            $output = trim($output);
+            if(empty($output)){
+                $groups = [];
+            }else{
+                $output = explode("\n", $output);
+                foreach($output as $group){
+                    $groups[] = [
+                        "group" => $group
+                    ];
+                }
+                $groups = array_reverse($groups);
+            }
+        }
+        return view('table', [
+            "value" => $groups,
+            "title" => [
+                "Grup Adı"
+            ],
+            "display" => [
+                "group"
+            ],
+            "onclick" => "localGroupDetails"
+        ]);
+    }
+
+    public function getLocalGroupDetails()
+    {
+        if(server()->type == "linux_ssh"){
+            $group = request("group");
+            $output = trim(server()->run(sudo()."getent group $group | cut -d ':' -f4"));
+        
+            $users = [];
+            if(!empty($output)){
+                $users = array_map(function($value){
+                    return(["name" => $value]);
+                }, explode(",", $output));
+            }
+        }
+        return view('table', [
+            "value" => $users,
+            "title" => [
+                "Kullanıcı Adı"
+            ],
+            "display" => [
+                "name"
+            ]
+        ]);
+    }
+
+    public function addLocalGroup()
+    {
+        if(server()->type == "linux_ssh"){
+            $group_name = request("group_name");
+            $output = trim(server()->run(sudo()."groupadd $group_name &> /dev/null && echo 1 || echo 0"));
+            if($output == "0"){
+                return respond("Grup eklenemedi!", 201);
+            }
+            return respond("Grup başarıyla eklendi!", 200);
+        }
+    }
+
+    public function addLocalGroupUser()
+    {
+        if(server()->type == "linux_ssh"){
+            $group = request("group");
+            $user = request("user");
+            $output = trim(server()->run(sudo()."usermod -a -G $group $user &> /dev/null && echo 1 || echo 0"));
+            if($output != "1"){
+                return respond("Kullanıcı gruba eklenemedi!", 201);
+            }
+            return respond("Kullanıcı gruba başarıyla eklendi!");
+        }
+    }
+
+    public function getSudoers()
+    {
+        if(server()->type == "linux_ssh"){
+            $output = trim(server()->run(sudo()."cat /etc/sudoers /etc/sudoers.d/* | grep -v '^#\|^Defaults' | sed '/^$/d' | awk '{ print $1 \"*-*\" $2 \" \" $3 }'"));
+        
+            $sudoers = [];
+            if(!empty($output)){
+                $sudoers = array_map(function($value){
+                    $fetch = explode("*-*", $value);
+                    return(["name" => $fetch[0], "access" => $fetch[1]]);
+                }, explode("\n", $output));
+            }
+        }
+        return view('table', [
+            "value" => $sudoers,
+            "title" => [
+                "İsim", "Yetki"
+            ],
+            "display" => [
+                "name", "access"
+            ],
+            "menu" => [
+                "Sil" => [
+                    "target" => "deleteSudoers",
+                    "icon" => "fa-trash"
+                ],
+            ]
+        ]);
+    }
+
+    public function addSudoers()
+    {
+        if(server()->type == "linux_ssh"){
+            $name = request("name");
+            $name = str_replace(" ", "\\x20", $name);
+            $output = trim(server()->run(sudo()."bash -c 'echo \"$name ALL=(ALL:ALL) ALL\" | tee /etc/sudoers.d/$name' &> /dev/null && echo 1 || echo 0"));
+            if($output == "0"){
+                return respond("Tam yetkili kullanıcı eklenemedi!", 201);
+            }
+            return respond("Tam yetkili kullanıcı başarıyla eklendi!", 200);
+        }
+    }
+
+    public function deleteSudoers()
+    {
+        //TODO: check here for bugs
+        if(server()->type == "linux_ssh"){
+            $name = request("name");
+            $name = str_replace(" ", "\\x20", $name);
+            $output = trim(server()->run(sudo()."bash -c 'if [ -f \"/etc/sudoers.d/$name\" ]; then rm /etc/sudoers.d/$name && echo 1 || echo 0; else echo 0; fi'"));
+            if($output == "0"){
+                return respond("Tam yetkili kullanıcı silinemedi!", 201);
+            }
+            return respond("Tam yetkili kullanıcı başarıyla silindi!", 200);
+        }
+    }
+
     public function serviceList()
     {
         $services = [];
