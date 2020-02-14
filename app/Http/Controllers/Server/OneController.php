@@ -381,6 +381,10 @@ class OneController extends Controller
         if(server()->type == "linux_ssh"){
             $name = request("name");
             $name = str_replace(" ", "\\x20", $name);
+            $checkFile = server()->run("[ -f '/etc/sudoers.d/$name' ] && echo 1 || echo 0");
+            if($checkFile == "1"){
+                return respond("Bu isimde bir kullanıcı zaten ekli!", 201);
+            }
             $output = trim(server()->run(sudo()."bash -c 'echo \"$name ALL=(ALL:ALL) ALL\" | tee /etc/sudoers.d/$name' &> /dev/null && echo 1 || echo 0"));
             if($output == "0"){
                 return respond("Tam yetkili kullanıcı eklenemedi!", 201);
