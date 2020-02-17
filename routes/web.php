@@ -51,6 +51,8 @@ Route::post('/collapse','HomeController@collapse')->name('set_collapse');
 
 Route::get('/', 'HomeController@index')->name('home');
 
+Route::post('/', 'HomeController@getLimanStats')->name('liman_stats')->middleware('admin');
+
 // Vault Route
 
 Route::get('/kasa', 'UserController@userKeyList')->name('keys');
