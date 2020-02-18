@@ -245,7 +245,6 @@ class MainController extends Controller
         system_log(6,"EXTENSION_CREATE",[
             "extension_id" => $ext->id
         ]);
-
         return respond(route('extension_one', $ext->id), 300);
     }
 
