@@ -320,12 +320,12 @@ class MainController extends Controller
         }
 
         $text = "
-*.*     @@**" . request('targetHostname') . "**:" . request('targetPort') . "
+*.*     @@" . request('targetHostname') . ":" . request('targetPort') . "
 \\\$ModLoad imfile
 \\\$InputFilePollInterval " . request('logInterval') . "
 \\\$PrivDropToGroup adm
-\\\$InputFileName **" . env('LOG_PATH')  . "**
-\\\$InputFileTag **LimanApp**
+\\\$InputFileName " . env('LOG_PATH')  . "
+\\\$InputFileTag LimanApp
 \\\$InputFileStateFile Stat-APP
 \\\$InputFileSeverity Info
 \\\$InputRunFileMonitor
