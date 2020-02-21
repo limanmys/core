@@ -10,7 +10,7 @@
         </div>
         <div class="col-sm-6">
             <div class="float-sm-right">
-                <button data-toggle="tooltip" title="Ayarlar" class="btn btn-primary" data-toggle="modal" data-target="#extSettings"><i class="fa fa-cogs"></i></button>
+                <button data-toggle="tooltip" title="Ayarlar" class="btn btn-primary" onclick="openSettingsModal()"><i class="fa fa-cogs"></i></button>
             </div>
         </div>
     </nav>
@@ -152,6 +152,10 @@
                 });
             }
         });
+
+        function openSettingsModal(){
+            $('#extSettings').modal('show');
+        }
 
         function extensionUploadError(response){
             let error = JSON.parse(response);
