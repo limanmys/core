@@ -37,6 +37,9 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#rsyslog" onclick="readLogs()">{{__("Log Yönetimi")}}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#externalNotifications" onclick="">{{__("Dış Bildirimler")}}</a>
+                </li>
             </ul>
         </div>
         <div class="card-body">
@@ -183,6 +186,37 @@
                         <li>{{$line}}</li>
                         @endforeach
                     </ul>
+                </div>
+
+                <div class="tab-pane fade show" id="externalNotifications" role="tabpanel">
+                @include('modal-button',[
+                        "class" => "btn-primary",
+                        "target_id" => "addNewNotificationSource",
+                        "text" => "Yeni İstemci Ekle"
+                    ])<br><br>
+                    @include('table',[
+                            "value" => \App\ExternalNotification::all(),
+                            "title" => [
+                                "İsim" , "İp Adresi / Hostname", "Son Erişim Tarihi" , "*hidden*" ,
+                            ],
+                            "display" => [
+                                "name" , "ip", "last_used", "id:id" ,
+                            ],
+                            "menu" => [
+                                "Düzenle" => [
+                                    "target" => "editExternalNotificationToken",
+                                    "icon" => " context-menu-icon-edit"
+                                ],
+                                "Yeni Token Al" => [
+                                    "target" => "renewExternalNotificationToken",
+                                    "icon" => "fa-lock"
+                                ],
+                                "Sil" => [
+                                    "target" => "deleteExternalNotificationToken",
+                                    "icon" => " context-menu-icon-delete"
+                                ]
+                            ],
+                        ])
                 </div>
 
                 <div class="tab-pane fade show" id="rsyslog" role="tabpanel">
@@ -452,6 +486,57 @@
             "Role Mapping Id:'null'" => "role_mapping_id:hidden"
         ],
         "submit_text" => "Eşleştirmeyi Sil"
+    ])
+
+    @include('modal',[
+        "id"=>"addNewNotificationSource",
+        "title" => "Yeni Bildirim İstemcisi Ekle",
+        "url" => route('add_notification_channel'),
+        "text" => "İp Adresi bölümüne izin vermek istediğiniz bir subnet adresini ya da ip adresini yazarak erişimi kısıtlayabilirsiniz. Örneğin : 192.168.1.0/24 ",
+        "next" => "debug",
+        "inputs" => [
+            "Adı" => "name:text",
+            "İp Adresi / Hostname" => "ip:text",
+        ],
+        "submit_text" => "Ekle"
+    ])
+
+    @include('modal',[
+        "id"=>"editExternalNotificationToken",
+        "title" =>"İstemciyi Düzenle",
+        "url" => route('edit_notification_channel'),
+        "text" => "İp Adresi bölümüne izin vermek istediğiniz bir subnet adresini ya da ip adresini yazarak erişimi kısıtlayabilirsiniz. Örneğin : 192.168.1.0/24 ",
+        "next" => "reload",
+        "inputs" => [
+            "Adı" => "name:text",
+            "İp Adresi / Hostname" => "ip:text",
+            "-:-" => "id:hidden"
+        ],
+        "submit_text" => "Yenile"
+    ])
+
+    @include('modal',[
+        "id"=>"renewExternalNotificationToken",
+        "title" =>"İstemci Token'ı Yenile",
+        "url" => route('renew_notification_channel'),
+        "text" => "İstemciye ait token'i yenilemek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+        "next" => "debug",
+        "inputs" => [
+            "-:-" => "id:hidden"
+        ],
+        "submit_text" => "Yenile"
+    ])
+
+    @include('modal',[
+        "id"=>"deleteExternalNotificationToken",
+        "title" =>"İstemciyi Sil",
+        "url" => route('revoke_notification_channel'),
+        "text" => "İstemciyi silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+        "next" => "reload",
+        "inputs" => [
+            "-:-" => "id:hidden"
+        ],
+        "submit_text" => "Sil"
     ])
 
     @component('modal-component',[

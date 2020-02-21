@@ -101,6 +101,15 @@ Route::post('/user/update','UserController@adminUpdate')->name('update_user')->m
 Route::post('/user/setting/delete','UserController@removeSetting')->name('user_setting_remove');
 
 Route::post('/user/setting/update','UserController@updateSetting')->name('user_setting_update');
+
+Route::post('/ayar/bildirimKanali/ekle','ExternalNotificationController@create')->name('add_notification_channel')->middleware('admin');
+
+Route::post('/ayar/bildirimKanali/duzenle','ExternalNotificationController@edit')->name('edit_notification_channel')->middleware('admin');
+
+Route::post('/ayar/bildirimKanali/sil','ExternalNotificationController@revoke')->name('revoke_notification_channel')->middleware('admin');
+
+Route::post('/ayar/bildirimKanali/yenile','ExternalNotificationController@renew')->name('renew_notification_channel')->middleware('admin');
+
 });
 
 Route::post('/lmn/private/extensionApi','Extension\OneController@internalExtensionApi');

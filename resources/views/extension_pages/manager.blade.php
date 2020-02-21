@@ -113,6 +113,7 @@
     @include('modal',[
         "id"=>"newExtension",
         "url" => route('extension_new'),
+        "next" => "debug",
         "title" => "Yeni Eklenti Oluştur",
         "inputs" => [
             "Eklenti Adı" => "name:text"
@@ -203,10 +204,10 @@
         }
 
         @if(env("EXTENSION_DEVELOPER_MODE"))
-        function details(element){
-            let extension_id = element.querySelector('#extension_id').innerHTML;
-            window.location.href = "/eklentiler/" + extension_id
-        }
+            function details(element){
+                let extension_id = element.querySelector('#extension_id').innerHTML;
+                window.location.href = "/eklentiler/" + extension_id
+            }
         @endif
 </script>
 @endsection
