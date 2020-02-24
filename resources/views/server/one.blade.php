@@ -112,6 +112,9 @@
                                         <a class="dropdown-item" href="#sudoersTab" onclick="getSudoers()" data-toggle="tab">{{__("Yetkili Kullanıcılar")}}</a>
                                     </div>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" onclick="getOpenPorts()" href="#openPortsTab" role="tab">{{__("Açık Portlar")}}</a>
+                                </li>
                             @endif
                         @endif
                         <li class="nav-item">
@@ -274,6 +277,10 @@
                         <div class="tab-pane fade show" id="logsTab" role="tabpanel">
                                 
                         </div>
+                        <div class="tab-pane fade show" id="openPortsTab" role="tabpanel">
+                                
+                        </div>
+                        
                         <div class="tab-pane fade show" id="settingsTab" role="tabpanel">
                             <table class="notDataTable" style="width: 900px;">
                                 <tr>
@@ -921,6 +928,31 @@
                 Swal.close();
                 $("#packagesTab #packages").html(response);
                 $("#packagesTab #packages table").DataTable(dataTablePresets('normal'));
+                setTimeout(function () {
+                    Swal.close();
+                }, 1500);
+            }, function(response){
+                let error = JSON.parse(response);
+                Swal.fire({
+                    type: 'error',
+                    title: error.message,
+                    timer : 2000
+                });
+            })
+        }
+
+        function getOpenPorts() {
+            Swal.fire({
+                position: 'center',
+                type: 'info',
+                title: '{{__("Okunuyor...")}}',
+                showConfirmButton: false,
+            });
+            request('{{route('server_get_open_ports')}}', new FormData(), function (response) {
+                let json = JSON.parse(response);
+                Swal.close();
+                $("#openPortsTab").html(json.message);
+                $("#openPortsTab table").DataTable(dataTablePresets('normal'));
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);

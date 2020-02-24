@@ -111,4 +111,6 @@ Route::group(['middleware' => ['server']], function () {
     Route::post('/sunucu/servis/durdur','Server\OneController@stopService')->name('server_stop_service');
 
     Route::post('/sunucu/servis/yenidenBaslat','Server\OneController@restartService')->name('server_restart_service');
+
+    Route::post('/sunucu/acikPortlar','Server\OneController@getOpenPorts')->name('server_get_open_ports');
 });

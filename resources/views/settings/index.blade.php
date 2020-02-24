@@ -617,7 +617,6 @@
                 showConfirmButton: false,
             });
             let data = new FormData(document.querySelector('#logForm'));
-            console.log(data);
             return request("{{route("save_log_system")}}", data, function(res) {
                 let response = JSON.parse(res);
                 Swal.close();
