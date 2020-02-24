@@ -362,9 +362,10 @@ input(type=\"imtcp\" port=\"514\")";
 
         $data = trim(shell_exec("cat /etc/rsyslog.d/liman.conf | grep '@@**'"));
         if($data != ""){
-            $arr = explode("**",$data);
-            $ip_address = $arr[1];
-            $port = substr($arr[2],1);
+            $arr = explode("@@",$data);
+            $ip_port = explode(":",$arr[1]);
+            $ip_address = $ip_port[0];
+            $port =$ip_port[1];
         }
         
         return respond([
