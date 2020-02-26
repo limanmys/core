@@ -1,5 +1,21 @@
 let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');
 
+function showSwal(message,type,timer = false){
+    let config = {
+        position: 'top-end',
+        type: type,
+        title: message,
+        toast : true,
+        showConfirmButton: false,
+        allowOutsideClick : false,
+        timerProgressBar : true
+    };
+    if(timer){
+        config["timer"] = timer;
+    }
+    Swal.fire(config);
+}
+
 function request(url, data, next, error) {
     let id = null;
 
@@ -166,14 +182,17 @@ function route(url) {
 }
 
 window.onbeforeunload = function () {
-    Swal.fire({
-        position: 'center',
-        type: 'info',
-        title: 'Yükleniyor...',
-        showConfirmButton: false,
-        allowOutsideClick : false,
-    });
+    showSwal('Yükleniyor...','info');
+    // Swal.fire({
+    //     position: 'center',
+    //     type: 'info',
+    //     title: 'Yükleniyor...',
+    //     showConfirmButton: false,
+    //     allowOutsideClick : false,
+    // });
 };
+
+
 
 function message(data) {
     let json = JSON.parse(data);
