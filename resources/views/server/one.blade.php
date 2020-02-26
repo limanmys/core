@@ -950,7 +950,6 @@
             });
             request('{{route('server_get_open_ports')}}', new FormData(), function (response) {
                 let json = JSON.parse(response);
-                Swal.close();
                 $("#openPortsTab").html(json.message);
                 $("#openPortsTab table").DataTable(dataTablePresets('normal'));
                 setTimeout(function () {
