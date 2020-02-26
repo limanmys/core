@@ -1042,12 +1042,7 @@
         }
 
         function getUpdates(getList) {
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
             request('{{route('server_update_list')}}', new FormData(), function (response) {
                 let updates = JSON.parse(response);
                 if(getList){
@@ -1070,11 +1065,7 @@
                 }, 1500);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
 
@@ -1091,13 +1082,7 @@
                 data.push(element[4]);
             });
             if(data.length === 0){
-                Swal.fire({
-                  type: 'error',
-                  title: '{{__("Lütfen önce seçim yapınız.")}}',
-                  position: 'center',
-                  timer: 2000,
-                  showConfirmButton: false
-              });
+                showSwal('{{__("Lütfen önce seçim yapınız.")}}','error',2000);
                 return false;
             };
             $("#delete_extensions").modal('show');
@@ -1109,42 +1094,21 @@
               data.push(element[4]);
           });
           if(data.length === 0){
-              Swal.fire({
-                  type: 'error',
-                  title: '{{__("Lütfen önce seçim yapınız.")}}',
-                  position: 'center',
-                  timer: 2000,
-                  showConfirmButton: false
-              });
+              showSwal('{{__("Lütfen önce seçim yapınız.")}}','error',2000);
               return false;
           }
-          Swal.fire({
-              position: 'center',
-              type: 'info',
-              title: '{{__("Siliniyor...")}}',
-              showConfirmButton: false
-          });
+          showSwal('{{__("Siliniyor...")}}','info');
           let form = new FormData();
           form.append('extensions',JSON.stringify(data));
           request('{{route('server_extension_remove')}}', form, function (response) {
               let json = JSON.parse(response);
-              Swal.fire({
-                  position: 'center',
-                  type: 'success',
-                  title: json["message"],
-                  showConfirmButton: false,
-                  timer: 2000
-              });
+              showSwal(json["message"],'success',2000);
               setTimeout(function () {
                       location.reload();
               },2000);
           }, function(response){
             let error = JSON.parse(response);
-            Swal.fire({
-                type: 'error',
-                title: error.message,
-                timer : 2000
-            });
+            showSwal(error.message,'error',2000);
           });
           return false;
         }
