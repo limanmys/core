@@ -50,11 +50,7 @@
             }
         }, function(response){
             let error = JSON.parse(response);
-            Swal.fire({
-                type: 'error',
-                title: error.message,
-                timer : 2000
-            });
+            showSwal(error.message,'error',2000);
         });
     }
 
@@ -73,22 +69,13 @@
             element.removeAttr('disabled');
         }, function(response){
             let error = JSON.parse(response);
-            Swal.fire({
-                type: 'error',
-                title: error.message,
-                timer : 2000
-            });
+            showSwal(error.message,'error',2000);
         });
     }
 
     function widget_control(element){
         if(!$(element).find('select[name=widget_name]').val()){
-            Swal.fire({
-                type: 'error',
-                title: "{{_("Önce bir widget seçmelisiniz!")}}",
-                timer : 2000,
-                showConfirmButton: false
-            });
+            showSwal("{{_("Önce bir widget seçmelisiniz!")}}",'error',2000);
             return false;
         }
         return true;

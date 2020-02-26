@@ -50,12 +50,7 @@
         window.location.href = "/ayarlar/" + user_id
     }
     function update(current,status) {
-        Swal.fire({
-            position: 'center',
-            type: 'info',
-            title: '{{__("Kaydediliyor.")}}',
-            showConfirmButton: false,
-        });
+        showSwal('{{__("Kaydediliyor.")}}','info');
         let form = new FormData();
         form.append('status',status);
         form.append('request_id',current.querySelector('#request_id').innerHTML);
@@ -64,11 +59,7 @@
             location.reload();
         }, function(response){
             let error = JSON.parse(response);
-            Swal.fire({
-                type: 'error',
-                title: error.message,
-                timer : 2000
-            });
+            showSwal(error.message,'error',2000);
         })
     }
     function working(current) {

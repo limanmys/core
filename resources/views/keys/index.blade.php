@@ -83,21 +83,11 @@
    <script>
         function cleanSessions(){
             request('{{route('clean_sessions')}}', new FormData(), function(response){
-                Swal.fire({
-                    position: 'center',
-                    type: 'success',
-                    title: "{{__("Önbellek temizlendi!")}}",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+                showSwal("{{__("Önbellek temizlendi!")}}",'success',2000);
                 reload();
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
    </script>

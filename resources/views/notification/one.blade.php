@@ -65,11 +65,7 @@ if(!$item){
                 location.reload();
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         });
         $('.delete_not').click(function () {
@@ -79,11 +75,7 @@ if(!$item){
                 location.href = "{{route('all_user_notifications')}}";
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         });
     </script>

@@ -163,11 +163,7 @@
                 $('.functionsTable table').DataTable(dataTablePresets('multiple'));
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 
@@ -178,33 +174,19 @@
                 $("#user_modal").modal('show');
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 
         function addUsers(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Güncelleniyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Güncelleniyor...")}}','info');
             let data = [];
             let table = $('#user_modal table').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[3]);
             });
             if(data.length == 0){
-                Swal.fire({
-                    type: 'error',
-                    title: 'Lütfen önce seçim yapınız.',
-                    timer : 2000,
-                    showConfirmButton: false,
-                });
+                showSwal('{{__("Lütfen önce seçim yapınız."}}','error',2000);
                 return false;
             }
             let form = new FormData();
@@ -214,34 +196,20 @@
                 reload();
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
             return false;
         }
 
         function removeUsers(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Güncelleniyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Güncelleniyor...")}}','info');
             let data = [];
             let table = $('#role_users table').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[3]);
             });
             if(data.length == 0){
-                Swal.fire({
-                    type: 'error',
-                    title: 'Lütfen önce seçim yapınız.',
-                    timer : 2000,
-                    showConfirmButton: false,
-                });
+                showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
                 return false;
             }
             let form = new FormData();
@@ -251,34 +219,20 @@
                 reload();
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
             return false;
         }
 
         function addFunctions(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Güncelleniyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Güncelleniyor...")}}','info');
             let data = [];
             let table = $('.functionsTable table').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[1]);
             });
             if(data.length == 0){
-                Swal.fire({
-                    type: 'error',
-                    title: 'Lütfen önce seçim yapınız.',
-                    timer : 2000,
-                    showConfirmButton: false,
-                });
+                showSwal('{{__("Lütfen önce seçim yapınız.")}}','error',2000);
                 return false;
             }
             let form = new FormData();
@@ -290,21 +244,12 @@
                 location.reload();
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 
         function removeFunctions(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Güncelleniyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Güncelleniyor...")}}','info');
             let data = [];
             let table = $('#extensionFunctions').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
@@ -315,23 +260,13 @@
             form.append("role_id",'{{$role->id}}');
             request('{{route("remove_role_function")}}',form,function(response){
                 let json = JSON.parse(response);
-                Swal.fire({
-                    position: 'center',
-                    type: 'success',
-                    title: json["message"],
-                    showConfirmButton: false,
-                    timer: 2000
-                });
+                showSwal(json["message"],'success',2000);
                 setTimeout(function () {
                     location.reload();
                 },2000);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
         
@@ -346,11 +281,7 @@
                 $("#" + type + "_modal").modal('show');
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
         
@@ -362,19 +293,10 @@
             });
 
             if(data === []){
-                Swal.fire({
-                    type: 'error',
-                    title: 'Lütfen önce seçim yapınız.',
-                    timer : 2000
-                });
+                showSwal('{{__("Lütfen önce seçim yapınız.")}}','error',2000);
                 return false;
             }
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Siliniyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Siliniyor...")}}','info');
 
             let form = new FormData();
             form.append('ids',JSON.stringify(data));
@@ -382,34 +304,19 @@
             form.append('type',element);
             request('{{route('remove_role_permission_list')}}', form, function (response) {
                 let json = JSON.parse(response);
-                Swal.fire({
-                        position: 'center',
-                        type: 'success',
-                        title: json["message"],
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                    setTimeout(function () {
+                showSwal(json["message"],'success',2000);
+                setTimeout(function () {
                         location.reload();
                 },2000);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
             return false;
         }
 
         function addData(modalElement) {
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Ekleniyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Ekleniyor...")}}','info');
             let data = [];
             let table = $(modalElement).find('table').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
@@ -421,23 +328,13 @@
             form.append('type',modalElement.getAttribute('id').split('_')[0]);
             request('{{route('add_role_permission_list')}}', form, function (response) {
                 let json = JSON.parse(response);
-                Swal.fire({
-                        position: 'center',
-                        type: 'success',
-                        title: json["message"],
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                    setTimeout(function () {
-                        location.reload();
-                    },2000);
+                showSwal(json["message"],'success',2000);
+                setTimeout(function () {
+                    location.reload();
+                },2000);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
             return false;
         }

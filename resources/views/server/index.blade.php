@@ -192,72 +192,32 @@
         let isGeneralOK = false;
         let isKeyOK = false;
         function checkAccess(form) {
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Kontrol Ediliyor...")}}',
-                showConfirmButton: false,
-                allowOutsideClick : false,
-            });
+            showSwal('{{__("Kontrol Ediliyor...")}}','info');
             return request('{{route('server_check_access')}}',form,function (response) {
                 let json = JSON.parse(response);
-                Swal.fire({
-                    position: 'center',
-                    type: "success",
-                    title: json["message"],
-                    showConfirmButton: false,
-                    allowOutsideClick : false,
-                    timer: 2000
-                });
+                showSwal(json["message"],'success',2000);
                 isNetworkOK = true;
                 $("#networkTab").css('color','green');
                 $("#generalTab").click();
             },function (response) {
                 let json = JSON.parse(response);
-                Swal.fire({
-                    position: 'center',
-                    type: "error",
-                    title: json["message"],
-                    showConfirmButton: false,
-                    allowOutsideClick : false,
-                    timer: 2000
-                });
+                showSwal(json.message,'error',2000);
                 isNetworkOK = false;
                 $("#networkTab").css('color','red');
             });
         }
 
         function checkGeneral(form){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Kontrol Ediliyor...")}}',
-                showConfirmButton: false,
-                allowOutsideClick : false,
-            });
+            showSwal('{{__("Kontrol Ediliyor...")}}','info');
             return request('{{route('server_verify_name')}}',form,function (response) {
                 let json = JSON.parse(response);
-                Swal.fire({
-                    position: 'center',
-                    type: "success",
-                    title: json["message"],
-                    showConfirmButton: false,
-                    allowOutsideClick : false,
-                    timer: 500
-                });
+            showSwal(json["message"],'success',500);
                 isGeneralOK = true;
                 $("#generalTab").css('color','green');
                 $("#keyTab").click();
             },function (response) {
                 let json = JSON.parse(response);
-                Swal.fire({
-                    position: 'center',
-                    type: "error",
-                    title: json["message"],
-                    showConfirmButton: false,
-                    allowOutsideClick : false,
-                    timer: 2000
-                });
+                showSwal(json["message"],'error',2000);
                 isGeneralOK = false;
                 $("#generalTab").css('color','red');
             });
@@ -273,36 +233,16 @@
             }
             let data = new FormData(form);
             data.append('ip_address',$("#serverHostName").val());
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Kontrol Ediliyor...")}}',
-                showConfirmButton: false,
-                allowOutsideClick : false,
-            });
+            showSwal('{{__("Kontrol Ediliyor...")}}','info');
             return request('{{route('server_verify_key')}}',data,function (response) {
                 let json = JSON.parse(response);
-                Swal.fire({
-                    position: 'center',
-                    type: "success",
-                    title: json["message"],
-                    showConfirmButton: false,
-                    allowOutsideClick : false,
-                    timer: 2000
-                });
+                showSwal(json["message"],'success',2000);
                 isKeyOK = true;
                 $("#keyTab").css('color','green');
                 $("#summaryTab").click();
             },function (response) {
                 let json = JSON.parse(response);
-                Swal.fire({
-                    position: 'center',
-                    type: "error",
-                    title: json["message"],
-                    showConfirmButton: false,
-                    allowOutsideClick : false,
-                    timer: 2000
-                });
+                showSwal(json["message"],'error',2000);
                 isKeyOK = false;
                 $("#keyTab").css('color','red');
             });
@@ -347,23 +287,10 @@
 
         function addServer() {
             if(!isNetworkOK || !isGeneralOK || !isKeyOK){
-                Swal.fire({
-                    position: 'center',
-                    type: 'info',
-                    title: '{{__("Lütfen Tüm Ayarları Tamamlayın")}}',
-                    showConfirmButton: false,
-                    allowOutsideClick : false,
-                    timer: 2000
-                });
+                showSwal('{{__("Lütfen Tüm Ayarları Tamamlayın")}}','info',2000);
                 return false;
             }
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Sunucu Ekleniyor...")}}',
-                showConfirmButton: false,
-                allowOutsideClick : false,
-            });
+            showSwal('{{__("Sunucu Ekleniyor...")}}','info');
             let form = new FormData();
             form.append("name",$("#server_name").val());
             form.append("ip_address",$("#serverHostName").val());
@@ -371,38 +298,20 @@
             form.append("city",$("#serverCity").val());
             form.append('type',$("input[name=operating_system]:checked").val());
             if($("#useKey").is(':checked') === true){
-                console.log("checked");
                 form.append('username',$("#keyUsername").val());
                 form.append('password',$("#keyPassword").val());
             }
             request('{{route('server_add')}}',form,"",function (errors) {
                 let json = JSON.parse(errors);
                 if(json["status"] == "202"){
-                    Swal.fire({
-                        position: 'center',
-                        type: 'info',
-                        title: json["message"],
-                        showConfirmButton: true,
-                        allowOutsideClick : false,
-                    });
+                    showSwal(json["message"],'info');
                     $(".modal").modal('hide');
                 }else{
-                    Swal.fire({
-                        position: 'center',
-                        type: 'error',
-                        title: json["message"],
-                        showConfirmButton: false,
-                        allowOutsideClick : false,
-                        timer : 2000
-                    });
+                    showSwal(json["message"],'error',2000);
                 }
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
     </script>

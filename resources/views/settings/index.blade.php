@@ -34,9 +34,9 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#changeLog">{{__("Son Değişiklikler")}}</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#rsyslog" onclick="readLogs()">{{__("Log Yönetimi")}}</a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#externalNotifications" onclick="">{{__("Dış Bildirimler")}}</a>
                 </li>
@@ -600,80 +600,41 @@
                     $('#addRoleMapping').find('select[name=dn]').change();
                 }, function(response){
                     let error = JSON.parse(response);
-                    Swal.fire({
-                        type: 'error',
-                        title: error.message,
-                        timer : 2000
-                    });
+                    showSwal(error.message,'error',2000);
                 });
             });
         }
         
         function saveLogSystem(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Kaydediliyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Kaydediliyor...")}}','info');
             let data = new FormData(document.querySelector('#logForm'));
             return request("{{route("save_log_system")}}", data, function(res) {
                 let response = JSON.parse(res);
-                Swal.close();
-                Swal.fire({
-                    position: 'center',
-                    type: 'success',
-                    title: response.message,
-                    showConfirmButton : false
-                });
+                showSwal(response.message,'success');
                 reload();
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000,
-                    showConfirmButton : false
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 
         function addRoleMapping(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Kaydediliyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Kaydediliyor...")}}','info');
             let data = new FormData();
             data.append('dn', $('#addRoleMapping').find('select[name=dn]').val());
             data.append('role_id', $('#addRoleMapping').find('select[name=role_id]').val());
             request("{{route("add_role_mapping")}}", data, function(res) {
                 let response = JSON.parse(res);
-                Swal.close();
-                Swal.fire({
-                    position: 'center',
-                    type: 'success',
-                    title: response.message,
-                });
+                showSwal(response.message,'success');
                 reload();
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 
         function addServerGroup(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Ekleniyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Ekleniyor...")}}','info');
             let data = new FormData();
             let tableData = [];
             let table = $("#serverGroupServers").DataTable();
@@ -684,23 +645,13 @@
             data.append('servers', tableData.join());
             request("{{route("add_server_group")}}", data, function(response) {
                 let res = JSON.parse(response);
-                Swal.fire({
-                    type: 'success',
-                    title: res.message,
-                    timer : 2000,
-                    showConfirmButton : false
-                });
+                showSwal(res.message,'success',2000);
                 setTimeout(() => {
                     location.reload();
                 }, 1000);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000,
-                    showConfirmButton : false
-                });
+                showSwal(error.message,'error',2000);
             });
         }
         function modifyServerGroupHandler(row){
@@ -723,12 +674,7 @@
 
         let current_server_group = null;
         function modifyServerGroup(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Düzenleniyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Düzenleniyor...")}}','center');
             let data = new FormData();
             let tableData = [];
             let table = $("#modifyServerGroupTable").DataTable();
@@ -740,33 +686,18 @@
             data.append('server_group_id',current_server_group);
             request("{{route("modify_server_group")}}", data, function(response) {
                 let res = JSON.parse(response);
-                Swal.fire({
-                    type: 'success',
-                    title: res.message,
-                    timer : 2000,
-                    showConfirmButton : false
-                });
+                showSwal(res.message,'success',2000);
                 setTimeout(() => {
                     location.reload();
                 }, 1000);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000,
-                    showConfirmButton : false
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 
         function readLogs(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
             request("{{route("get_log_system")}}", new FormData(), function(res) {
                 Swal.close();
                 let response = JSON.parse(res);
@@ -775,11 +706,7 @@
                 $("#logInterval").val(response["message"]["interval"]);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 
@@ -800,11 +727,7 @@
                 $('#usersTable table').DataTable(dataTablePresets('multiple'));
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 
@@ -815,11 +738,7 @@
                 $('#rolesTable table').DataTable(dataTablePresets('normal'));
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 
@@ -834,12 +753,7 @@
         }
 
         function checkHealth() {
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
             request("{{route('health_check')}}", new FormData(), function (success) {
                 Swal.close();
                 let json = JSON.parse(success);
@@ -860,31 +774,17 @@
         }
 
         function saveLDAPConf(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Kaydediliyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Kaydediliyor...")}}','info');
             let data = new FormData();
             data.append('ldapAddress', $('input[name=ldapAddress]').val());
             data.append('ldapObjectGUID', $('input[name=ldapObjectGUID]').val());
             request("{{route("save_ldap_conf")}}", data, function(res) {
                 let response = JSON.parse(res);
-                Swal.close();
-                Swal.fire({
-                    position: 'center',
-                    type: 'success',
-                    title: response.message,
-                });
+                showSwal(response.message,'success');
                 reload();
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 

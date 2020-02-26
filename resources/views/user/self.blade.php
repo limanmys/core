@@ -84,37 +84,20 @@
             }
         });
         function saveUser(data) {
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Kaydediliyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Kaydediliyor...")}}','info');
             let form = new FormData(data);
             request('{{route('profile_update')}}',form,function (response) {
                 Swal.close();
                 let json = JSON.parse(response);
                 if(json["status"] === 200){
-                    Swal.fire({
-                        position: 'center',
-                        type: 'success',
-                        title: json["message"],
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
+                    showSwal(json.message,'success',2000);
                     setTimeout(function () {
                         location.reload();
                     },1600);
                 }
             },function (response) {
                 let json = JSON.parse(response);
-                Swal.fire({
-                    position: 'center',
-                    type: 'error',
-                    title: json["message"],
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+                showSwal(json.message,'error',2000);
             });
             return false;
 

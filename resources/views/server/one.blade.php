@@ -541,10 +541,7 @@
     @else
         <script>
         $("button[data-target='#install_extension']").click(function(){
-            Swal.fire({
-                type: 'error',
-                title: '{{__('Seçilebilir herhangi bir eklenti bulunmamaktadır!')}}'
-            });
+            showSwal("{{__('Seçilebilir herhangi bir eklenti bulunmamaktadır!')}}",'error',2000);
         });
         </script>
     @endif
@@ -570,12 +567,7 @@
 
 
         function server_extension(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
 
             let items = [];
             let table = $("#install_extension table").DataTable();
@@ -584,10 +576,7 @@
             });
 
             if(items.length === 0){
-                Swal.fire({
-                    type: 'error',
-                    title: 'Lütfen önce seçim yapınız.'
-                });
+                showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error');
                 return false;
             }
 
@@ -599,11 +588,7 @@
                 reload();
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
 
@@ -615,11 +600,7 @@
             }
         @endif
         function errorSwal(){
-            Swal.fire({
-                position: 'center',
-                type: 'error',
-                title: '{{__("Ayarlarınız doğrulanamadı!")}}',
-            });
+            showSwal('{{__("Ayarlarınız doğrulanamadı!")}}','error',2000);
         }
 
         function checkStatus(id) {
@@ -725,22 +706,13 @@
                 location.reload();
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
 
         function getSudoers(){
             $('.modal').modal('hide');
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
 
             request('{{route('server_sudoers_list')}}', new FormData(), function (response) {
                 Swal.close();
@@ -751,11 +723,7 @@
                 }, 1500);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
 
@@ -771,12 +739,7 @@
                 confirmButtonText: "{{ __('Sil') }}"
             }).then((result) => {
                 if (result.value) {
-                    Swal.fire({
-                        position: 'center',
-                        type: 'info',
-                        title: '{{__("Yükleniyor...")}}',
-                        showConfirmButton: false,
-                    });
+                    showSwal('{{__("Yükleniyor...")}}','info');
                     let data = new FormData();
                     data.append('name',$(row).find("#name").text());
                     
@@ -785,23 +748,14 @@
                         getSudoers();
                     }, function(response){
                         let error = JSON.parse(response);
-                        Swal.fire({
-                            type: 'error',
-                            title: error.message,
-                            timer : 2000
-                        });
+                        showSwal(error.message,'error',2000);
                     });
                 }
             });
         }
 
         function getLocalUsers(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
 
             request('{{route('server_local_user_list')}}', new FormData(), function (response) {
                 Swal.close();
@@ -812,21 +766,12 @@
                 }, 1500);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
 
         function getLocalGroups(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
 
             request('{{route('server_local_group_list')}}', new FormData(), function (response) {
                 Swal.close();
@@ -837,11 +782,7 @@
                 }, 1500);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
 
@@ -855,12 +796,7 @@
             $(element).parent().find('tr').css('backgroundColor','');
             $(element).css('backgroundColor','#b0bed9');
             $(element).css('fontWeight','bolder');
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
             let group = element.querySelector('#group').innerHTML;
             activeLocalGroup = group;
             activeLocalGroupElement = element;
@@ -876,21 +812,12 @@
                 }, 1500);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
 
         function addLocalGroupUser(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
 
             let form = new FormData();
             form.append('group',activeLocalGroup);
@@ -898,32 +825,17 @@
 
             request('{{route('server_add_local_group_user')}}',form,function(response){
                 let json = JSON.parse(response);
-                Swal.fire({
-                    type: 'info',
-                    title: json.message,
-                    showConfirmButton: false,
-                    timer : 3000
-                });
+                showSwal(json.message,'info',2000);
                 localGroupDetails(activeLocalGroupElement);
                 $('#addLocalGroupUserModal').modal('hide');
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    showConfirmButton: false,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
 
         function getPackages() {
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
             request('{{route('server_package_list')}}', new FormData(), function (response) {
                 Swal.close();
                 $("#packagesTab #packages").html(response);
@@ -933,21 +845,12 @@
                 }, 1500);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
 
         function getOpenPorts() {
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
             request('{{route('server_get_open_ports')}}', new FormData(), function (response) {
                 let json = JSON.parse(response);
                 $("#openPortsTab").html(json.message);
@@ -957,21 +860,12 @@
                 }, 1500);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
 
         function getLogs() {
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
             request('{{route('server_get_logs')}}', new FormData(), function (response) {
                 $("#logsTab").html(response);
                 $("#logsTab table").DataTable(dataTablePresets('normal'));
@@ -980,21 +874,12 @@
                 }, 1500);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
 
         function getServices() {
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Okunuyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Okunuyor...")}}','info');
             request('{{route('server_service_list')}}', new FormData(), function (response) {
                 $("#servicesTab").html(response);
                 $("#servicesTab table").DataTable(dataTablePresets('normal'));
@@ -1003,11 +888,7 @@
                 }, 1500);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
         let index = 0;
@@ -1027,10 +908,8 @@
                 }
             }else if($('#installPackage').find('[href="#fromDeb"]').hasClass('active')){
                 if(!packages.length){
-                    return Swal.fire({
-                        type: 'error',
-                        title: 'Lütfen önce bir deb paketi yükleyin.'
-                    });
+                    showSwal("{{__('Lütfen önce bir deb paketi yükleyin.')}}",'error');
+                    return;
                 }
                 index = 0;
                 installPackage();
@@ -1038,12 +917,7 @@
         }
 
         function onDebUploadSuccess(upload){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Yükleniyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Yükleniyor...")}}','info');
             let data = new FormData();
             data.append('filePath', upload.info.file_path);
             request('{{route('server_upload_deb')}}', data, function (response) {
@@ -1057,11 +931,7 @@
                 }
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 
@@ -1088,10 +958,7 @@
                 packages.push(element[1].split('/')[0]);
             });
             if(packages.length === 0){
-                Swal.fire({
-                    type: 'error',
-                    title: 'Lütfen önce seçim yapınız.'
-                });
+                showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error');
                 return false;
             }
             installPackage();
@@ -1119,11 +986,7 @@
                 checkPackage();
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             })
         }
 

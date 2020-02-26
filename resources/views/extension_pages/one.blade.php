@@ -359,12 +359,7 @@
         }
 
         function updateExtension(type,tableId = null){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Kaydediliyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Kaydediliyor...")}}','info');
             let data = new FormData();
             data.append('type',type);
             data.append('name',$("#extensionName").val());
@@ -375,35 +370,20 @@
             data.append('sslPorts',$("#sslPorts").val());
             data.append('verification',$("#verification").val());
             request('{{route('extension_settings_update')}}',data,function(){
-                Swal.fire({
-                    position: 'center',
-                    type: 'success',
-                    title: "{{__("Başarıyla kaydedildi")}}",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+                showSwal("{{__("Başarıyla kaydedildi")}}",'success');
                 setTimeout(function(){
                     location.reload();
                 },1500);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 
         var activeFunction = null;
 
         function getFunctionParameters(function_name){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Yükleniyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Yükleniyor...")}}','info');
 
             let data = new FormData();
             data.append('function_name',function_name);
@@ -418,11 +398,7 @@
                 $('#updateFunctionParametersModal').modal('show');
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
 
@@ -453,12 +429,7 @@
                 confirmButtonText: "{{ __('Sil') }}"
             }).then((result) => {
                 if (result.value) {
-                    Swal.fire({
-                        position: 'center',
-                        type: 'info',
-                        title: '{{__("Yükleniyor...")}}',
-                        showConfirmButton: false,
-                    });
+                    showSwal('{{__("Yükleniyor...")}}','info');
                     let parameter_variable = $(row).find("#variable").text();
                     let data = new FormData();
                     data.append('parameter_variable',parameter_variable);
@@ -469,11 +440,7 @@
                         getFunctionParameters(activeFunction);
                     }, function(response){
                         let error = JSON.parse(response);
-                        Swal.fire({
-                            type: 'error',
-                            title: error.message,
-                            timer : 2000
-                        });
+                        showSwal(error.message,'error',2000);
                     });
                 }
             });

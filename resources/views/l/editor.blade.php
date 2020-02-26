@@ -44,32 +44,17 @@
         }
 
         function save(){
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Kaydediliyor...")}}',
-                showConfirmButton: false,
-            });
+            showSwal('{{__("Kaydediliyor...")}}','info');
             let code = JSON.stringify(window.editor.getValue());
             let data = new FormData();
             data.append('code',code);
             data.append('page','{{request('page_name')}}');
             data.append('extension_id','{{extension()->_id}}');
             request('{{route('extension_code_update')}}',data,function(response){
-                Swal.fire({
-                    position: 'center',
-                    type: 'success',
-                    title: "{{__("Başarıyla kaydedildi")}}",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+                showSwal("{{__("Başarıyla kaydedildi")}}",'success',2000);
             }, function(response){
                 let error = JSON.parse(response);
-                Swal.fire({
-                    type: 'error',
-                    title: error.message,
-                    timer : 2000
-                });
+                showSwal(error.message,'error',2000);
             });
         }
     </script>

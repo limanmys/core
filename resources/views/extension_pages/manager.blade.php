@@ -145,12 +145,7 @@
         $("#extensionUpload input").on('change',function(){
             if(this.files[0].size / 1024 / 1024 > 100){
                 $(this).val('');
-                Swal.fire({
-                    position: 'center',
-                    type: 'error',
-                    title: '{{__("Maksimum eklenti boyutunu (100MB) aştınız!")}}',
-                    showConfirmButton: false,
-                });
+                showSwal('{{__("Maksimum eklenti boyutunu (100MB) aştınız!")}}','error');
             }
         });
 
@@ -173,12 +168,7 @@
                     confirmButtonText: "{{ __('Tamam') }}"
                 }).then((result) => {
                     if (result.value) {
-                        Swal.fire({
-                            position: 'center',
-                            type: 'info',
-                            title: '{{__("Yükleniyor...")}}',
-                            showConfirmButton: false,
-                        });
+                        showSwal('{{__("Yükleniyor...")}}','info');
 
                         let data = new FormData(document.querySelector('#extensionUpload_form'))
                         data.append("force", "1");

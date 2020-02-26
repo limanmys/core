@@ -99,13 +99,7 @@
     <script>
         let path = "";
         function retrieveCertificate() {
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Sertifika Alınıyor...")}}',
-                showConfirmButton: false,
-                allowOutsideClick : false,
-            });
+            showSwal('{{__("Sertifika Alınıyor...")}}','info');
             let form = new FormData();
             form.append('hostname',$("#hostname").val());
             form.append('port',$("#port").val());
@@ -126,26 +120,13 @@
                 Swal.close();
             },function (errors) {
                 let json = JSON.parse(errors);
-                Swal.fire({
-                    position: 'center',
-                    type: 'error',
-                    title: json["message"],
-                    showConfirmButton: false,
-                    allowOutsideClick : false,
-                    timer : 2000
-                });
+                showSwal(json["message"],'error',2000);
             });
 
         }
         
         function verifyCertificate() {
-            Swal.fire({
-                position: 'center',
-                type: 'info',
-                title: '{{__("Sertifika Ekleniyor...")}}',
-                showConfirmButton: false,
-                allowOutsideClick : false,
-            });
+            showSwal('{{__("Sertifika Ekleniyor...")}}','info');
             let form = new FormData();
             form.append('path',path);
             form.append('server_hostname',$("#hostname").val());
@@ -154,27 +135,13 @@
             form.append('server_id','{{request('server_id')}}');
             request('{{route('verify_certificate')}}',form,function (success) {
                 let json = JSON.parse(success);
-                Swal.fire({
-                    position: 'center',
-                    type: 'info',
-                    title: json["message"],
-                    showConfirmButton: false,
-                    allowOutsideClick : false,
-                    timer : 2000
-                });
+                showSwal(json["message"],'info',2000);
                 setTimeout(function () {
                     location.href = "{{route('settings')}}" + "#certificates";
                 },1000);
             },function (errors) {
                 let json = JSON.parse(errors);
-                Swal.fire({
-                    position: 'center',
-                    type: 'error',
-                    title: json["message"],
-                    showConfirmButton: false,
-                    allowOutsideClick : false,
-                    timer : 2000
-                });
+                showSwal(json["message"],"error",2000);
             });
         }
     </script>

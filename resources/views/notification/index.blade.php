@@ -61,11 +61,7 @@
             location.reload();
         }, function(response){
             let error = JSON.parse(response);
-            Swal.fire({
-                type: 'error',
-                title: error.message,
-                timer : 2000
-            });
+            showSwal(error.message,'error',2000);
         });
     });
     $('#delete_read').click(function(){
@@ -74,11 +70,7 @@
             location.reload();
         }, function(response){
             let error = JSON.parse(response);
-            Swal.fire({
-                type: 'error',
-                title: error.message,
-                timer : 2000
-            });
+            showSwal(error.message,'error',2000);
         });
     });
     $('.mark_read').click(function(){
@@ -88,11 +80,7 @@
             location.reload();
         }, function(response){
             let error = JSON.parse(response);
-            Swal.fire({
-                type: 'error',
-                title: error.message,
-                timer : 2000
-            });
+            showSwal(error.message,'error',2000);
         });
     });
     $('.delete_not').click(function(){
@@ -102,11 +90,7 @@
             location.reload();
         }, function(response){
             let error = JSON.parse(response);
-            Swal.fire({
-                type: 'error',
-                title: error.message,
-                timer : 2000
-            });
+            showSwal(error.message,'error',2000);
         });
     });
 </script>

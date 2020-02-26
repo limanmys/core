@@ -27,13 +27,7 @@ function request(url, data, next, error) {
     }
 
     if (id != null) {
-        Swal.fire({
-            position: 'center',
-            type: 'info',
-            title: 'Yükleniyor...',
-            showConfirmButton: false,
-            allowOutsideClick : false,
-        });
+        showSwal('Yükleniyor...','info');
     }
 
     modalData = data;
@@ -57,11 +51,7 @@ function request(url, data, next, error) {
                 Swal.close();
             }
             if(r.status == 200 && !r.responseText){
-                Swal.fire({
-                    type: 'error',
-                    title: "İstek zaman aşımına uğradı!",
-                    timer : 2000
-                });
+                showSwal("İstek zaman aşımına uğradı!",'error',2000);
             }
             if (id != null && (r.status !== 200 || r.status !== 300)) {
                 message(r.responseText);
@@ -85,12 +75,7 @@ function request(url, data, next, error) {
                     return window.location = response["message"];
                     break;
                 case 403:
-                    Swal.fire({
-                        position: 'center',
-                        type: 'error',
-                        title: response["message"],
-                        showConfirmButton: false,
-                    });
+                    showSwal(response["message"],'error',2000);
                     break;
                 default:
                   if(error)
@@ -183,16 +168,7 @@ function route(url) {
 
 window.onbeforeunload = function () {
     showSwal('Yükleniyor...','info');
-    // Swal.fire({
-    //     position: 'center',
-    //     type: 'info',
-    //     title: 'Yükleniyor...',
-    //     showConfirmButton: false,
-    //     allowOutsideClick : false,
-    // });
 };
-
-
 
 function message(data) {
     let json = JSON.parse(data);

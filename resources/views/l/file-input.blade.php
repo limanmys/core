@@ -50,12 +50,7 @@
         upload({
             file: selectedFile[0],
             onError: function(error){
-                Swal.fire({
-                    position: 'center',
-                    type: 'error',
-                    title: error,
-                    showConfirmButton: false,
-                });
+                showSwal(error,'error');
             },
             onProgress: function(bytesUploaded, bytesTotal){
                 let percent = (bytesUploaded/bytesTotal)*100;
