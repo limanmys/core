@@ -2,7 +2,7 @@ let csrf = document.getElementsByName('csrf-token')[0].getAttribute('content');
 
 function showSwal(message,type,timer = false){
     let config = {
-        position: 'top-end',
+        position: 'bottom-start',
         type: type,
         title: message,
         toast : true,
