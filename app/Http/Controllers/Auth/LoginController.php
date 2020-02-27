@@ -48,7 +48,7 @@ class LoginController extends Controller
         $flag =  $this->guard()->attempt(
             $this->credentials($request), $request->filled('remember')
         );
-        if(!$flag && config('ldap.ldap_host', false)){
+        if(!$flag && config('ldap.ldap_host', false) && config('ldap.ldap_status', true)){
             if(!config('ldap.ldap_domain', false)){
                 setBaseDn();
             }
@@ -78,7 +78,7 @@ class LoginController extends Controller
                 if(!isset($ldapUser[0][$guidColumn])){
                     return false;
                 }
-                $userGroups = $ldapUser[0]["memberof"];
+                $userGroups = isset($ldapUser[0]["memberof"]) ? $ldapUser[0]["memberof"] : [];
                 unset($userGroups['count']);
 
                 if(!(((bool) $restrictedGroups) == false && ((bool) $restrictedUsers) == false)){

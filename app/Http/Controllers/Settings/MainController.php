@@ -214,6 +214,7 @@ class MainController extends Controller
         setEnv([
             "LDAP_HOST" => request('ldapAddress'),
             "LDAP_GUID_COLUMN" => request('ldapObjectGUID'),
+            "LDAP_STATUS" => request('ldapStatus'),
         ]);
         return respond(__("Kaydedildi!"),200);
     }

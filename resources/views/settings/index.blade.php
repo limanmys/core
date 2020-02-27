@@ -152,6 +152,12 @@
                         <input type="text" value="{{ config('ldap.ldap_guid_column', 'objectguid') }}" name="ldapObjectGUID" class="form-control" placeholder="{{ __('LDAP şemanızdaki objectguid alanının adını yazın.') }}">
                         <small>{{ __('LDAP şemanızdaki objectguid alanının adını yazın.') }}</small>
                     </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="ldapStatus" id="ldapStatus" @if(config('ldap.ldap_status', true)) checked @endif>
+                        <label class="form-check-label" for="ldapStatus">
+                          {{ __('Entegrasyonu Aktifleştir') }}
+                        </label>
+                      </div>
                     <button type="button" onclick="saveLDAPConf()" class="btn btn-primary">{{ __('Kaydet') }}</button>
                     @if(config('ldap.ldap_host', false))
                         <ul class="nav nav-pills" role="tablist" style="margin-top: 15px;margin-bottom: 15px;">
@@ -909,6 +915,7 @@
             let data = new FormData();
             data.append('ldapAddress', $('input[name=ldapAddress]').val());
             data.append('ldapObjectGUID', $('input[name=ldapObjectGUID]').val());
+            data.append('ldapStatus', $('input[name=ldapStatus]').prop('checked'));
             request("{{route("save_ldap_conf")}}", data, function(res) {
                 let response = JSON.parse(res);
                 showSwal(response.message,'success');
