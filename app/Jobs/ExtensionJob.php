@@ -32,7 +32,7 @@ class ExtensionJob implements ShouldQueue
         $this->function = $function;
         $this->parameters = $parameters;
         $this->session = session()->all();
-        $this->cookie = $_COOKIE["liman_session"];
+        $this->cookie = isset($_COOKIE["liman_session"]) ? $_COOKIE["liman_session"] : '';
     }
 
     /**
