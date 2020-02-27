@@ -28,6 +28,12 @@ Route::post('/rol/yetki_listesi/fonksiyon_sil','Roles\RoleController@removeFunct
 
 Route::post('/rol/domain_gruplari','Roles\RoleMappingController@fetchDomainGroups')->name('fetch_domain_groups')->middleware('admin');
 
+Route::post('/rol/domain_kullanicilari','Roles\RoleMappingController@fetchDomainUsers')->name('fetch_domain_users')->middleware('admin');
+
+Route::post('/rol/kisitlama_ekle','Roles\RoleMappingController@addLdapRestriction')->name('add_ldap_restriction')->middleware('admin');
+
+Route::post('/rol/kisitlama_sil','Roles\RoleMappingController@deleteLdapRestriction')->name('delete_ldap_restriction')->middleware('admin');
+
 Route::post('/rol/eslestirme_ekle','Roles\RoleMappingController@add')->name('add_role_mapping')->middleware('admin');
 
 Route::post('/rol/eslestirme_sil','Roles\RoleMappingController@delete')->name('delete_role_mapping')->middleware('admin');

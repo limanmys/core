@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use Adldap\Laravel\Facades\Adldap;
 use App\Http\Controllers\Controller;
+use App\LdapRestriction;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
@@ -55,6 +56,11 @@ class LoginController extends Controller
             $base_dn = config('ldap.ldap_base_dn');
             $domain = config('ldap.ldap_domain');
             $credientials = (object) $this->credentials($request);
+
+            $ldap_restrictions = LdapRestriction::all();
+            $restrictedUsers = $ldap_restrictions->where('type', 'user')->pluck('name')->all();
+            $restrictedGroups = $ldap_restrictions->where('type', 'group')->pluck('name')->all();
+
             try{
                 $ldapConnection = ldap_connect("ldaps://" . config('ldap.ldap_host'));
                 ldap_set_option($ldapConnection, LDAP_OPT_NETWORK_TIMEOUT, 10);
@@ -72,6 +78,23 @@ class LoginController extends Controller
                 if(!isset($ldapUser[0][$guidColumn])){
                     return false;
                 }
+                $userGroups = $ldapUser[0]["memberof"];
+                unset($userGroups['count']);
+
+                if(!(((bool) $restrictedGroups) == false && ((bool) $restrictedUsers) == false)){
+                    $groupCheck = (bool) $restrictedGroups;
+                    $userCheck = (bool) $restrictedUsers;
+                    if($restrictedGroups && count(array_intersect($userGroups, $restrictedGroups)) === 0){
+                        $groupCheck = false;
+                    }
+                    if($restrictedUsers && !in_array(strtolower($credientials->email), $restrictedUsers)){
+                        $userCheck = false;
+                    }
+                    if($groupCheck === false && $userCheck === false){
+                        return false;
+                    }
+                }
+
                 $user = User::where($guidColumn, bin2hex($ldapUser[0][$guidColumn][0]))->first();
                 if(!$user){
                     $user = User::create([

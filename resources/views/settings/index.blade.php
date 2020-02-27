@@ -154,30 +154,67 @@
                     </div>
                     <button type="button" onclick="saveLDAPConf()" class="btn btn-primary">{{ __('Kaydet') }}</button>
                     @if(config('ldap.ldap_host', false))
-                        <h5 class="mt-4 mb-2">{{ __('Domain Grup ve Rol Grup Eşleştirmeleri') }}</h5>
-                        @include('modal-button',[
-                            "class" => "btn-success mb-2",
-                            "target_id" => "addRoleMapping",
-                            "text" => "Ekle"
-                        ])
-                        @include('table',[
-                            "value" => \App\RoleMapping::all()->map(function($item){
-                                $item->role_name = $item->role->name;
-                                return $item;
-                            }),
-                            "title" => [
-                                "Domain Grubu" , "Rol Grubu" , "*hidden*" ,
-                            ],
-                            "display" => [
-                                "dn" , "role_name", "id:role_mapping_id" ,
-                            ],
-                            "menu" => [
-                                "Sil" => [
-                                    "target" => "deleteRoleMapping",
-                                    "icon" => " context-menu-icon-delete"
-                                ]
-                            ],
-                        ])
+                        <ul class="nav nav-pills" role="tablist" style="margin-top: 15px;margin-bottom: 15px;">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#restrictions" data-toggle="tab">{{__("Giriş Kısıtlamaları")}}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#mappings" data-toggle="tab">{{__("Domain Grup ve Rol Grup Eşleştirmeleri")}}</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="restrictions" role="tabpanel">
+                                @include('alert', [
+                                    "title" => "Bilgilendirme",
+                                    "message" => "Bu alana bir kullanıcı veya grup eklediğinizde eklediğiniz kullanıcılar dışındakiler ve eklediğiniz gruplarda olmayan kullanıcılar giriş yapamaz. Herhangi bir kısıt eklemezseniz herkes giriş yapabilir."
+                                ])
+                                @include('modal-button',[
+                                    "class" => "btn-success mb-2",
+                                    "target_id" => "addLdapRestriction",
+                                    "text" => "Ekle"
+                                ])
+                                @include('table',[
+                                    "value" => \App\LdapRestriction::all(),
+                                    "title" => [
+                                        "Tip" , "İsim" , "*hidden*" ,
+                                    ],
+                                    "display" => [
+                                        "type" , "name", "id:ldap_restriction_id" ,
+                                    ],
+                                    "menu" => [
+                                        "Sil" => [
+                                            "target" => "deleteLdapRestriction",
+                                            "icon" => " context-menu-icon-delete"
+                                        ]
+                                    ],
+                                ])
+                            </div>
+                            <div class="tab-pane fade show" id="mappings" role="tabpanel">
+                                @include('modal-button',[
+                                    "class" => "btn-success mb-2",
+                                    "target_id" => "addRoleMapping",
+                                    "text" => "Ekle"
+                                ])
+                                @include('table',[
+                                    "value" => \App\RoleMapping::all()->map(function($item){
+                                        $item->role_name = $item->role->name;
+                                        return $item;
+                                    }),
+                                    "title" => [
+                                        "Domain Grubu" , "Rol Grubu" , "*hidden*" ,
+                                    ],
+                                    "display" => [
+                                        "dn" , "role_name", "id:role_mapping_id" ,
+                                    ],
+                                    "menu" => [
+                                        "Sil" => [
+                                            "target" => "deleteRoleMapping",
+                                            "icon" => " context-menu-icon-delete"
+                                        ]
+                                    ],
+                                ])
+                            </div>
+                        </div>
                     @endif
                 </div>
                 <div class="tab-pane fade show" id="changeLog" role="tabpanel">
@@ -377,6 +414,46 @@
     ])
 
     @component('modal-component',[
+        "id" => "addLdapRestriction",
+        "title" => "Giriş Kısıtlaması Ekle",
+        "footer" => [
+            "class" => "btn-success",
+            "onclick" => "addLdapRestriction()",
+            "text" => "Ekle"
+        ],
+    ])
+
+    <div class="form-group">
+        <label>{{ __('Kısıtlama Tipi') }}</label>
+        <select name="type" class="form-control" required onchange="restrictionType(this)">
+            <option value="user">{{ __('Kullanıcıya İzin Ver') }}</option>
+            <option value="group">{{ __('Gruba İzin Ver') }}</option>
+        </select>
+    </div>
+    <div class="form-group" id="domainUserSelect">
+        <label>{{ __('Kullanıcı Adı') }}</label>
+        <div class="input-group">
+            <select class="form-control select2" name="username" data-placeholder="{{ __('Kullanıcı Adı Yazınız') }}" data-tags="true">
+            </select>
+            <span class="input-group-append">
+                <button type="button" onclick="fetchDomainUsers()" class="btn btn-primary">{{ __('LDAP\'tan Getir') }}</button>
+            </span>
+        </div>
+    </div>
+    <div class="form-group" id="domainGroupSelect" style="display:none;">
+        <label>{{ __('Domain Grubu (DN)') }}</label>
+        <div class="input-group">
+            <select class="form-control select2" name="dn" data-placeholder="{{ __('DN Yazınız') }}" data-tags="true">
+            </select>
+            <span class="input-group-append">
+                <button type="button" onclick="fetchDomainGroups()" class="btn btn-primary">{{ __('LDAP\'tan Getir') }}</button>
+            </span>
+        </div>
+    </div>
+
+    @endcomponent
+
+    @component('modal-component',[
         "id" => "addRoleMapping",
         "title" => "Domain Grup ve Rol Grup Eşleştirmesi",
         "footer" => [
@@ -385,9 +462,6 @@
             "text" => "Ekle"
         ],
     ])
-
-
-
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
@@ -412,7 +486,6 @@
             </div>
         </div>
     </div>
-
     @endcomponent
 
 
@@ -475,6 +548,18 @@
     ])
 
     @endcomponent
+
+    @include('modal',[
+        "id"=>"deleteLdapRestriction",
+        "title" =>"Kısıtlamayı Sil",
+        "url" => route('delete_ldap_restriction'),
+        "text" => "Kısıtlamayı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+        "next" => "reload",
+        "inputs" => [
+            "Ldap Restriction Id:'null'" => "ldap_restriction_id:hidden"
+        ],
+        "submit_text" => "Kısıtlamayı Sil"
+    ])
 
     @include('modal',[
         "id"=>"deleteRoleMapping",
@@ -585,6 +670,26 @@
             return false;
         }
 
+        function fetchDomainUsers(){
+            ldapAuth(function(ldapUsername, ldapPassword){
+                let data =  new FormData();
+                data.append('ldapUsername', ldapUsername);
+                data.append('ldapPassword', ldapPassword);
+                request('{{route('fetch_domain_users')}}', data, function (response) {
+                    let json = JSON.parse(response);
+                    var str = "";
+                    json.message.forEach(function(item){
+                        str += "<option value='" + item + "'>" + item + "</option>";
+                    });
+                    $('select[name=username]').html(str);
+                    $('select[name=username]').change();
+                }, function(response){
+                    let error = JSON.parse(response);
+                    showSwal(error.message,'error',2000);
+                });
+            });
+        }
+
         function fetchDomainGroups(){
             ldapAuth(function(ldapUsername, ldapPassword){
                 let data =  new FormData();
@@ -596,12 +701,38 @@
                     json.message.forEach(function(item){
                         str += "<option value='" + item.id + "'>" + item.dn + "</option>";
                     });
-                    $('#addRoleMapping').find('select[name=dn]').html(str);
-                    $('#addRoleMapping').find('select[name=dn]').change();
+                    $('select[name=dn]').html(str);
+                    $('select[name=dn]').change();
                 }, function(response){
                     let error = JSON.parse(response);
                     showSwal(error.message,'error',2000);
                 });
+            });
+        }
+
+        function restrictionType(element){
+            if($(element).val() == "user"){
+                $('#domainUserSelect').show();
+                $('#domainGroupSelect').hide();
+            }else if($(element).val() == "group"){
+                $('#domainGroupSelect').show();
+                $('#domainUserSelect').hide();
+            }
+        }
+
+        function addLdapRestriction(){
+            showSwal('{{__("Kaydediliyor...")}}','info');
+            let data = new FormData();
+            data.append('dn', $('#addLdapRestriction').find('select[name=dn]').val());
+            data.append('username', $('#addLdapRestriction').find('select[name=username]').val());
+            data.append('type', $('#addLdapRestriction').find('select[name=type]').val());
+            request("{{route("add_ldap_restriction")}}", data, function(res) {
+                let response = JSON.parse(res);
+                showSwal(response.message,'success');
+                reload();
+            }, function(response){
+                let error = JSON.parse(response);
+                showSwal(error.message,'error',2000);
             });
         }
         
