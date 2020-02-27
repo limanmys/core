@@ -186,7 +186,7 @@
                 data.push(element[3]);
             });
             if(data.length == 0){
-                showSwal('{{__("Lütfen önce seçim yapınız."}}','error',2000);
+                showSwal('{{__("Lütfen önce seçim yapınız.")}}','error',2000);
                 return false;
             }
             let form = new FormData();
