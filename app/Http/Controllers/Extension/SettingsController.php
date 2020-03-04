@@ -45,7 +45,14 @@ class SettingsController extends Controller
         system_log(7,"EXTENSION_SETTINGS_PAGE",[
             "extension_id" => extension()->_id,
         ]);
-
+        if(extension()->language == null){
+            extension()->update([
+                "language" => "php"
+            ]);
+            $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+            $extension["language"] = "php";
+            file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
+        }
         // Return view with required parameters.
         return view('extension_pages.one', [
             "files" => $files
@@ -124,9 +131,19 @@ class SettingsController extends Controller
                             $values[$key]["icon"] = request('icon');
                             break;
                         case "views":
-                            rename(env(
-                                'EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR . "views" . DIRECTORY_SEPARATOR. request('name_old') . '.blade.php',
-                                env('EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR .  "views" . DIRECTORY_SEPARATOR .request('name') . '.blade.php');
+                            switch($extension["language"]){
+                                case "python":
+                                    rename(env(
+                                        'EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR . "views" . DIRECTORY_SEPARATOR. request('name_old') . '.html.jinja',
+                                        env('EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR .  "views" . DIRECTORY_SEPARATOR .request('name') . '.html.jinja');
+                                    break;
+                                case "php":
+                                default:
+                                rename(env(
+                                    'EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR . "views" . DIRECTORY_SEPARATOR. request('name_old') . '.blade.php',
+                                    env('EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR .  "views" . DIRECTORY_SEPARATOR .request('name') . '.blade.php');
+                            }
+                            
                             $values[$key]["scripts"] = request('scripts');
                             $values[$key]["name"] = request('name');
                             break;
@@ -174,7 +191,17 @@ class SettingsController extends Controller
                     "scripts" => request('scripts'),
                     "name" => request('name'),
                 ]);
-                $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . request('name') . '.blade.php';
+                switch($extension["language"]){
+                    case "python":
+                        $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . request('name') . '.html.jinja';
+                        file_put_contents($file,"from liman import *
+");
+                    break;
+                    case "php":
+                    default:
+                        $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . request('name') . '.blade.php';
+                }
+                
 
                 if(!is_file($file)){
                     touch($file);
@@ -206,7 +233,15 @@ class SettingsController extends Controller
             }
         }
         if (request('table') == "views") {
-            $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/' . request('name') . '.blade.php';
+            switch($extension["language"]){
+                case "python":
+                    $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . request('name') . '.html.jinja';
+                break;
+                case "php":
+                default:
+                    $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . request('name') . '.blade.php';
+            }
+            
             if(is_file($file)){
                 unlink($file);
             }
@@ -220,7 +255,7 @@ class SettingsController extends Controller
             "settings_type" => request('table')
         ]);
 
-        return respond("Eklenti Silindi.", 200);
+        return respond("Sayfa Silindi.", 200);
     }
 
     public function getFunctionParameters()

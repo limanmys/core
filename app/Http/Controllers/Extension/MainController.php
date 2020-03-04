@@ -195,6 +195,7 @@ class MainController extends Controller
             "version" => "0.0.1",
             "icon" => "",
             "service" => "",
+            "language" => request('language')
         ]);
         $ext->save();
 
@@ -210,6 +211,7 @@ class MainController extends Controller
                     "scripts" => ""
                 ]
             ],
+            "language" => request('language'),
             "status" => 0,
             "service" => "",
             "support" => auth()->user()->email,
@@ -233,8 +235,16 @@ class MainController extends Controller
         shell_exec("sudo chown liman:" . clean_score($ext->id) . " " . $passPath);
         shell_exec("sudo chmod 640 " . $passPath);
 
-        touch($folder . '/views/index.blade.php');
-        touch($folder . '/views/functions.php');
+        switch(request('language')){
+            case "python":
+                touch($folder . '/views/index.html.jinja');
+                touch($folder . '/views/functions.py');
+                break;
+            case "php":
+            default:
+                touch($folder . '/views/index.blade.php');
+                touch($folder . '/views/functions.php');
+        }
 
         shell_exec('sudo chown -R ' . clean_score($ext->id) . ':liman ' . $folder);
         shell_exec('sudo chmod -R 770 ' . $folder);

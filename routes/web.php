@@ -37,6 +37,10 @@ require_once(app_path('Http/Controllers/Widgets/_routes.php'));
 
 require_once(app_path('Http/Controllers/Roles/_routes.php'));
 
+// Internal Sandbox Routes
+
+require_once(app_path('Http/Controllers/Extension/Sandbox/_routes.php'));
+
 // Change the language
 Route::get('/locale', 'HomeController@setLocale')->name('set_locale');
 
@@ -112,28 +116,6 @@ Route::post('/ayar/bildirimKanali/yenile','ExternalNotificationController@renew'
 
 });
 
-Route::post('/lmn/private/extensionApi','Extension\OneController@internalExtensionApi');
-
-Route::post('/lmn/private/runCommandApi','Extension\OneController@internalRunCommandApi');
-
-Route::post('/lmn/private/putFileApi','Extension\OneController@internalPutFileApi');
-
-Route::post('/lmn/private/getFileApi','Extension\OneController@internalGetFileApi');
-
-Route::post('/lmn/private/runScriptApi','Extension\OneController@internalRunScriptApi');
-
-Route::post('/lmn/private/putSession','Extension\OneController@internalPutSessionApi');
-
-Route::post('/lmn/private/reverseProxyRequest','Extension\OneController@internalAddProxyConfig');
-
-Route::post('/lmn/private/dispatchJob','Extension\OneController@internalAddJob');
-
-Route::post('/lmn/private/getJobList','Extension\OneController@internalJobsList');
-
-Route::post('/lmn/private/openTunnel','Extension\OneController@internalOpenTunnelApi');
-
-Route::post('/lmn/private/stopTunnel','Extension\OneController@internalStopTunnelApi');
-
 Route::any('/upload/{any?}', function () {
     $server = app('tus-server');
     $extension_id = request("extension_id");
@@ -169,3 +151,7 @@ Route::post('/upload_info', function(){
     }
     return $info;
 })->middleware(['auth', 'permissions']);
+
+Route::get('/ejs',function(){
+    return view('ejs');
+});

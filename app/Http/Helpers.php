@@ -279,6 +279,25 @@ if (!function_exists('user')) {
     }
 }
 
+if (!function_exists('sandbox')) {
+    /**
+     * @param null $id
+     * @return App\Classes\Sandbox\Sandbox
+     */
+    function sandbox()
+    {
+        switch(extension()->language){
+            case "python":
+                return new App\Classes\Sandbox\PythonSandbox;
+            break;
+            case "php":
+            default:
+                return new App\Classes\Sandbox\PHPSandbox;
+            break;
+        }
+    }
+}
+
 if (!function_exists('extensionDb')) {
     /**
      * @param $key
@@ -321,7 +340,17 @@ function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_
         if(!$extension_id){
             $extension_id = extension()->id;
         }
-        $functions = env('EXTENSIONS_PATH') . strtolower($extensionObj["name"]) . "/views/functions.php";
+
+        switch(extension()->language){
+            case "python":
+                $functions = env('EXTENSIONS_PATH') . strtolower($extensionObj["name"]) . "/views/functions.py";
+            break;
+            case "php":
+            default:
+            $functions = env('EXTENSIONS_PATH') . strtolower($extensionObj["name"]) . "/views/functions.php";
+                break;
+        }
+        
 
         $combinerFile = env('SANDBOX_PATH') . "index.php";
 
@@ -392,16 +421,30 @@ function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_
         $array = [$functions,strtolower(extension()->name),
             $viewName,$server,$extension,$extensionDb,$outputsJson,$request,$functionName,
             $apiRoute,$navigationRoute,$token,$extension_id,$permissions, session('locale'),$_COOKIE["liman_session"],$sessionData,json_encode($userData)];
-        $encrypted = openssl_encrypt(Str::random() . base64_encode(json_encode($array)),
-            'aes-256-cfb8',shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
-            0,Str::random());
-        $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
-        
-        $command = "sudo runuser " . clean_score(extension()->id) .
-            " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
+
+        switch(extension()->language){
+            case "python":
+                $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
+                $combinerFile = "/liman/extensions/" . strtolower(extension()->name) . "/views/functions.py";
+                $encrypted = base64_encode(json_encode($array));
+                $command = "sudo -u " . clean_score(extension()->id) .
+                    " bash -c 'export PYTHONPATH=\$PYTHONPATH:/liman/sandbox/python; timeout 30 /usr/bin/python3.7 $combinerFile $keyPath $encrypted 2>&1'";
+            break;
+            case "php":
+            default:
+                $encrypted = openssl_encrypt(Str::random() . base64_encode(json_encode($array)),
+                    'aes-256-cfb8',shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
+                    0,Str::random());
+                $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
+                $combinerFile = "/liman/sandbox/php/index.php";
+                $command = "sudo runuser " . clean_score(extension()->id) .
+                    " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
+            break;
+        }
         return $command;
     }
 }
+
 if (!function_exists('getObject')) {
     /**
      * @param $type
