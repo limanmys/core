@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Adldap\Laravel\Facades\Adldap;
 use App\Http\Controllers\Controller;
 use App\LdapRestriction;
 use Carbon\Carbon;
