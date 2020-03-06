@@ -6,9 +6,7 @@ function showSwal(message,type,timer = false){
         type: type,
         title: message,
         toast : true,
-        showConfirmButton: false,
-        allowOutsideClick : false,
-        timerProgressBar : true
+        showConfirmButton: false
     };
     if(timer){
         config["timer"] = timer;
@@ -92,6 +90,10 @@ function reload() {
   setTimeout(function() {
     location.reload();
   }, 1000);
+}
+
+function closeCurrentModal(id){
+    $("#" + id).modal('hide');
 }
 
 function redirect(url) {
