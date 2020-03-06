@@ -4,7 +4,7 @@ namespace App\Classes\Sandbox;
 
 class PythonSandbox implements Sandbox{
     private $path = "/liman/sandbox/python/index.py";
-    private $fileExtension = ".blade.php";
+    private $fileExtension = ".html.ninja";
 
     public function getPath(){
         return $this->path;

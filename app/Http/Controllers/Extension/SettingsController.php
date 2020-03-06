@@ -130,23 +130,6 @@ class SettingsController extends Controller
                             $values[$key]["name"] = request('name');
                             $values[$key]["icon"] = request('icon');
                             break;
-                        case "views":
-                            switch($extension["language"]){
-                                case "python":
-                                    rename(env(
-                                        'EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR . "views" . DIRECTORY_SEPARATOR. request('name_old') . '.html.jinja',
-                                        env('EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR .  "views" . DIRECTORY_SEPARATOR .request('name') . '.html.jinja');
-                                    break;
-                                case "php":
-                                default:
-                                rename(env(
-                                    'EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR . "views" . DIRECTORY_SEPARATOR. request('name_old') . '.blade.php',
-                                    env('EXTENSIONS_PATH') . strtolower(extension()->name) . DIRECTORY_SEPARATOR .  "views" . DIRECTORY_SEPARATOR .request('name') . '.blade.php');
-                            }
-                            
-                            $values[$key]["scripts"] = request('scripts');
-                            $values[$key]["name"] = request('name');
-                            break;
                     }
                     break;
                 }
@@ -186,28 +169,6 @@ class SettingsController extends Controller
                     "icon" => request('icon'),
                 ]);
                 break;
-            case "views":
-                array_push($values, [
-                    "scripts" => request('scripts'),
-                    "name" => request('name'),
-                ]);
-                switch($extension["language"]){
-                    case "python":
-                        $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . request('name') . '.html.jinja';
-                        file_put_contents($file,"from liman import *
-");
-                    break;
-                    case "php":
-                    default:
-                        $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . request('name') . '.blade.php';
-                }
-                
-
-                if(!is_file($file)){
-                    touch($file);
-                }
-
-                break;
         }
         $extension[request('table')] = $values;
 
@@ -232,20 +193,7 @@ class SettingsController extends Controller
                 break;
             }
         }
-        if (request('table') == "views") {
-            switch($extension["language"]){
-                case "python":
-                    $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . request('name') . '.html.jinja';
-                break;
-                case "php":
-                default:
-                    $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . request('name') . '.blade.php';
-            }
-            
-            if(is_file($file)){
-                unlink($file);
-            }
-        }
+
         $extension[request('table')] = $values;
 
         file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));

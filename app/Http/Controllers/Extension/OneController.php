@@ -185,33 +185,12 @@ class OneController extends Controller
         try{
             shell_exec('sudo userdel ' . clean_score(extension()->id));
             shell_exec('rm ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id);
-            shell_exec('sudo dpkg --remove liman-' . Str::slug(extension()->name));
             extension()->delete();
         }catch (Exception $exception){
         }
 
         system_log(3,"EXTENSION_REMOVE");
         return respond('Eklenti Başarıyla Silindi');
-    }
-
-    /**
-     * @return Factory|View
-     */
-    public function page()
-    {
-        if (request('page_name') == "functions") {
-            $fileName = request('page_name') . '.php';
-        } else {
-            $fileName = request('page_name') . '.blade.php';
-        }
-        $file = file_get_contents(env('EXTENSIONS_PATH') . strtolower(extension()->name) . '/views/' . $fileName);
-        system_log(7,"EXTENSION_CODE_EDITOR",[
-            "extension_id" => extension()->id,
-            "file" => $fileName
-        ]);
-        return view('l.editor', [
-            "file" => $file
-        ]);
     }
 
     public function publicFolder()

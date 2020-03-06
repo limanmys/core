@@ -79,6 +79,7 @@ class InternalController extends Controller
         $successCount = $all->where('status',1)->count();
         $failCount = $all->where('status',2)->count();
 
+        // Return everything.
         return json_encode([
             "hold" => $holdCount,
             "success" => $successCount,
@@ -106,6 +107,7 @@ class InternalController extends Controller
     */
     public function runCommand()
     {
+        // Execute the command
         request()->request->add(['server' => server()]);
         $output = server()->run(request('command'));
 
@@ -113,9 +115,9 @@ class InternalController extends Controller
             "extension_id" => extension()->id,
             "server_id" => server()->id
         ]);
-
         ServerLog::new("Komut Çalıştırma",$output);
         system_log(6,server()->id . ":" . "Komut Çalıştırma");
+        
         return $output;
     }
 
@@ -135,8 +137,7 @@ class InternalController extends Controller
     */
     public function runScript()
     {
-        $filePath = env("EXTENSIONS_PATH") . strtolower(extension()->name) .
-             "/scripts/" . request("scriptName");
+        $filePath = env("EXTENSIONS_PATH") . strtolower(extension()->name) . "/scripts/" . request("scriptName");
         if( !is_file($filePath)){
             system_log(7,"EXTENSION_INTERNAL_RUN_SCRIPT_FAILED_NOT_FOUND",[
                 "extension_id" => extension()->id,
