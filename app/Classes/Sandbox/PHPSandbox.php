@@ -48,8 +48,10 @@ class PHPSandbox implements Sandbox
         unset($request["server_id"]);
         $request = json_encode($request);
 
-        $apiRoute = route('extension_function_api', [
-            "extension_id" => extension()->id
+        $apiRoute = route('extension_server', [
+            "extension_id" => extension()->id,
+            "city" => server()->city,
+            "server_id" => server()->id
         ]);
 
         $navigationRoute = route('extension_server', [

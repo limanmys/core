@@ -16,23 +16,28 @@ class MainController extends Controller
     public function __construct()
     {
         $this->middleware(function($request,$next){
-            $this->extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
-
-            list($result,$redirect) = $this->checkForMissingSettings();
-
-            if(!$result){
-                return $redirect;
-            }
-
-            $this->checkPermissions();
-            $this->sandbox = sandbox();
+            initializeClass();
             return $next($request);
         });
     }
 
-    public function getAPI()
+    private function initializeClass()
     {
-        $page = request('page') ? request('page') : 'index';
+        $this->extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+
+        list($result,$redirect) = $this->checkForMissingSettings();
+
+        if(!$result){
+            return $redirect;
+        }
+
+        $this->checkPermissions();
+        $this->sandbox = sandbox();
+    }
+
+    public function API()
+    {
+        $page = request('target_function') ? request('target_function') : 'index';
 
         list($output, $timestamp) = $this->executeSandbox($page);
 
@@ -41,37 +46,15 @@ class MainController extends Controller
             "server_id" => server()->id,
             "view" => ""
         ]);
-        
-        return view('extension_pages.server', [
-            "viewName" => "",
-            "view" => $output,
-            "timestamp" => $timestamp
-        ]);
-    }
-
-    public function postAPI()
-    {
-        list($output, $timestamp) = $this->executeSandbox(request('function_name'));
-
-        system_log(7,"EXTENSION_RUN",[
-            "extension_id" => extension()->id,
-            "server_id" => server()->id,
-            "target_name" => request('function_name')
-        ]);
-
-        $code = 200;
-        try{
-            $json = json_decode($output,true);
-            if(array_key_exists("status",$json)){
-                $code = intval($json["status"]);
-            }
-        }catch (\Exception $exception){};
-
-        if(is_json($output)){
-          return response()->json(json_decode($output), $code);
+        if(request()->wantsJson()){
+            return $output;
+        }else{
+            return view('extension_pages.server', [
+                "viewName" => "",
+                "view" => $output,
+                "timestamp" => $timestamp
+            ]);
         }
-
-        return response($output, $code);
     }
 
     private function checkForMissingSettings(){
@@ -123,6 +106,9 @@ class MainController extends Controller
     }
 
     private function executeSandbox($function){
+        if(!isset($this->sandbox)){
+            $this->initializeClass();
+        }
         $command = $this->sandbox->command($function);
 
         $before = Carbon::now();
