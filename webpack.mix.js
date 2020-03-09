@@ -23,6 +23,7 @@ mix.styles([
 ], 'public/css/liman.css').version();
 mix.combine([
     'resources/assets/js/jquery.js',
+    'resources/assets/js/moment.js',
     'resources/assets/js/jquery-ui.js',
     'resources/assets/js/split.min.js',
     'resources/assets/js/bootstrap.bundle.min.js',
