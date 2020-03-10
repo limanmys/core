@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers\Extension\Sandbox;
 
+use App\Classes\Connector\SSHTunnelConnector;
+use App\Extension;
 use App\Http\Controllers\Controller;
+use App\Permission;
+use App\Server;
+use App\Token;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class InternalController extends Controller
 {
     public function __construct()
     {
-        checkPermissions();
+        $this->checkPermissions();
     }
 
     /**
