@@ -284,9 +284,12 @@ if (!function_exists('sandbox')) {
      * @param null $id
      * @return App\Classes\Sandbox\Sandbox
      */
-    function sandbox()
+    function sandbox($language = null)
     {
-        switch(extension()->language){
+        if($language == null){
+            $language = extension()->language;
+        }
+        switch($language){
             case "python":
                 return new App\Classes\Sandbox\PythonSandbox;
             break;

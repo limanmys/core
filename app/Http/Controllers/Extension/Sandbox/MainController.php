@@ -46,8 +46,21 @@ class MainController extends Controller
             "server_id" => server()->id,
             "view" => ""
         ]);
+        if(trim($output) == ""){
+            abort(504,"İstek zaman aşımına uğradı!");
+        }
         if(request()->wantsJson()){
-            return $output;
+            $code = 200;
+            try{
+                $json = json_decode($output,true);
+                if(array_key_exists("status",$json)){
+                    $code = intval($json["status"]);
+                }
+            }catch (\Exception $exception){};
+            if(is_json($output)){
+                return response()->json(json_decode($output), $code);
+            }
+            return response($output, $code);
         }else{
             return view('extension_pages.server', [
                 "viewName" => "",

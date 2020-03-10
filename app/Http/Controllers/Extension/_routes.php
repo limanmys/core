@@ -53,4 +53,4 @@ Route::post('/eklenti/fonksiyonParametreleri/ekle','Extension\SettingsController
 
 Route::post('/eklenti/fonksiyonSil','Extension\SettingsController@removeFunction')->name('extension_remove_function')->middleware('admin');
 
-Route::get('/eklenti/{extension_id}/public/{path}','Extension\OneController@publicFolder')->name('extension_public_folder');
+Route::get('/eklenti/{extension_id}/public/{path?}','Extension\OneController@publicFolder')->name('extension_public_folder');

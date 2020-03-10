@@ -235,7 +235,7 @@ class MainController extends Controller
         shell_exec("sudo chown liman:" . clean_score($ext->id) . " " . $passPath);
         shell_exec("sudo chmod 640 " . $passPath);
 
-        foreach(sandbox()->getInitialFiles() as $file){
+        foreach(sandbox(request('language'))->getInitialFiles() as $file){
             touch($folder . "/views/$file");
         }
 

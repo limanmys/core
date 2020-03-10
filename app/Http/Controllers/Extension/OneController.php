@@ -198,7 +198,7 @@ class OneController extends Controller
         $basePath = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/public/";
 
         $targetPath = $basePath . base64_decode(request('path'));
-        
+
         if(realpath($targetPath) != $targetPath){
             abort(404);
         }

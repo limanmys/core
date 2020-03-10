@@ -2,6 +2,7 @@
 
 namespace App\Classes\Sandbox;
 
+use App\Permission;
 use App\Token;
 use Illuminate\Support\Str;
 use App\UserSettings;
@@ -83,13 +84,17 @@ class PHPSandbox implements Sandbox
             "email" => user()->email
         ];
 
-        $sessionData = json_encode(session()->all());
-
         $functionsPath = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/views/functions.php";
 
+        $publicPath = route('extension_public_folder',[
+            "extension_id" => extension()->id,
+            "path" => ""
+        ]);
+
+        $isAjax = request()->wantsJson() ? true : false;
         $array = [
             $functionsPath, $function, server()->toArray(), extension()->toArray(), $extensionDb,
-            $request, $apiRoute, $navigationRoute, $token, $permissions, session('locale'), json_encode($userData)
+            $request, $apiRoute, $navigationRoute, $token, $permissions, session('locale'), json_encode($userData), $publicPath, $isAjax
         ];
         
         $encrypted = openssl_encrypt(
@@ -101,10 +106,9 @@ class PHPSandbox implements Sandbox
         );
 
         $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
-        $combinerFile = "/liman/sandbox/php/index.php";
-        $command = "sudo runuser " . clean_score(extension()->id) .
+
+        return "sudo runuser " . clean_score(extension()->id) .
             " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
-        return $command;
     }
 
     public function getInitialFiles()
