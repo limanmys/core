@@ -26,7 +26,6 @@ class MainController extends Controller
         $this->extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
 
         list($result,$redirect) = $this->checkForMissingSettings();
-
         if(!$result){
             return $redirect;
         }
@@ -81,10 +80,10 @@ class MainController extends Controller
                 system_log(7,"EXTENSION_MISSING_SETTINGS",[
                     "extension_id" => extension()->id
                 ]);
-                return [false,redirect(route('extension_server_settings_page', [
+                redirect_now(route('extension_server_settings_page', [
                     "server_id" => server()->id,
                     "extension_id" => extension()->id
-                ]))];
+                ]));
             }
         }
         return [true,null];
