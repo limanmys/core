@@ -42,12 +42,11 @@ class OneController extends Controller
         request()->request->add(['target_function' => $widget->function]);
 
         $sandboxController = new MainController();
-        $output = $sandboxController->API();
+        $output = $sandboxController->API()->content();
 
         if(!$output){
             return respond(__("Widget Hiçbir Veri Döndürmedi"), 400);
         }
-        
         $output_json = json_decode($output, true);
         if(!isset($output_json)){
           return respond(__("Bilinmeyen bir hata oluştu."), 400);
