@@ -35,7 +35,7 @@ jobs:
           composer clearcache
           composer install --no-dev -d package/server
           git --git-dir=package/server/.git log -30 --pretty=format:"%s%x09%ad" > package/server/storage/changelog
-          rm -rf package/server/.git package/sandbox/php/.git package/sandbox/python/.git
+          rm -rf package/server/.git package/sandbox/.git
           sed -i "s/APP_VERSION=Development/APP_VERSION=$GITHUB_RUN_ID/g" package/server/.env
           sed -i "s/APP_VERSION=Development/APP_VERSION=$GITHUB_RUN_ID/g" package/server/.env
           sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" package/server/.env
