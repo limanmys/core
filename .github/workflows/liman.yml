@@ -42,7 +42,7 @@ jobs:
           sed -i "s/APP_ENV=local/APP_ENV=production/g" package/server/.env
           sed -i "s/EXTENSION_DEVELOPER_MODE=true/EXTENSION_DEVELOPER_MODE=false/g" package/server/.env
           mv package/server/build_tools/DEBIAN package/
-          rmdir package/server/build_tools
+          rm -rf package/server/build_tools
           cd package
           touch DEBIAN/md5sums
           touch DEBIAN/md5sums
