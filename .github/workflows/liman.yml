@@ -8,21 +8,21 @@ jobs:
       - name: Getting Main Liman Repository
         uses: actions/checkout@v2
         with:
-          path: package/server
+          path: package/liman/server
 
       - name: Getting Liman' PHP Sandbox
         uses: actions/checkout@v2
         with:
           repository: mertcelen/liman-sandbox
           ref : new_sandbox_structure
-          path: package/sandbox/php
+          path: package/liman/sandbox/php
           token: ${{ secrets.CI_TOKEN }}
 
       - name: Getting Liman' Python Sandbox
         uses: actions/checkout@v2
         with:
           repository: mertcelen/liman-sandbox-python
-          path: package/sandbox/python
+          path: package/liman/sandbox/python
           token: ${{ secrets.CI_TOKEN }}
 
       - name: Set up Liman Environment
@@ -34,16 +34,16 @@ jobs:
       - name: Build Liman Package
         run: |
           composer clearcache
-          composer install --no-dev -d package/server
-          git --git-dir=package/server/.git log -30 --pretty=format:"%s%x09%ad" > package/server/storage/changelog
-          rm -rf package/server/.git package/sandbox/php/.git package/sandbox/python/.git
-          sed -i "s/APP_VERSION=Development/APP_VERSION=$GITHUB_RUN_ID/g" package/server/.env
-          sed -i "s/APP_VERSION=Development/APP_VERSION=$GITHUB_RUN_ID/g" package/server/.env
-          sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" package/server/.env
-          sed -i "s/APP_ENV=local/APP_ENV=production/g" package/server/.env
-          sed -i "s/EXTENSION_DEVELOPER_MODE=true/EXTENSION_DEVELOPER_MODE=false/g" package/server/.env
-          mv package/server/build_tools/DEBIAN package/
-          rm -rf package/server/build_tools
+          composer install --no-dev -d package/liman/server
+          git --git-dir=package/liman/server/.git log -30 --pretty=format:"%s%x09%ad" > package/liman/server/storage/changelog
+          rm -rf package/liman/server/.git package/liman/sandbox/php/.git package/liman/sandbox/python/.git
+          sed -i "s/APP_VERSION=Development/APP_VERSION=$GITHUB_RUN_ID/g" package/liman/server/.env
+          sed -i "s/APP_VERSION=Development/APP_VERSION=$GITHUB_RUN_ID/g" package/liman/server/.env
+          sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" package/liman/server/.env
+          sed -i "s/APP_ENV=local/APP_ENV=production/g" package/liman/server/.env
+          sed -i "s/EXTENSION_DEVELOPER_MODE=true/EXTENSION_DEVELOPER_MODE=false/g" package/liman/server/.env
+          mv package/liman/server/build_tools/DEBIAN package/liman/
+          rm -rf package/liman/server/build_tools
           cd package
           touch DEBIAN/md5sums
           touch DEBIAN/md5sums
