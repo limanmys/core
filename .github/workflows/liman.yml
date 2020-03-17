@@ -1,0 +1,76 @@
+name: Liman CI
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Getting Main Liman Repository
+        uses: actions/checkout@v2
+        with:
+          path: package/server
+
+      - name: Getting Liman' PHP Sandbox
+        uses: actions/checkout@v2
+        with:
+          repository: mertcelen/liman-sandbox
+          path: package/sandbox/php
+          token: ${{ secrets.CI_TOKEN }}
+
+      - name: Getting Liman' Python Sandbox
+        uses: actions/checkout@v2
+        with:
+          repository: mertcelen/liman-sandbox-python
+          path: package/sandbox/python
+          token: ${{ secrets.CI_TOKEN }}
+
+      - name: Set up Liman Environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.3"
+          tools: composer
+          extensions : ssh2, curl, sqlite3, ldap, mbstring, xml, zip, posix, smbclient, mongodb, gd
+      - name: Build Liman Package
+        run: |
+          composer clearcache
+          composer install --no-dev -d package/server
+          git --git-dir=package/server/.git log -30 --pretty=format:"%s%x09%ad" > package/server/storage/changelog
+          rm -rf package/server/.git package/sandbox/php/.git package/sandbox/python/.git
+          sed -i "s/APP_VERSION=Development/APP_VERSION=$GITHUB_RUN_ID/g" package/server/.env
+          sed -i "s/APP_VERSION=Development/APP_VERSION=$GITHUB_RUN_ID/g" package/server/.env
+          sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" package/server/.env
+          sed -i "s/APP_ENV=local/APP_ENV=production/g" package/server/.env
+          sed -i "s/EXTENSION_DEVELOPER_MODE=true/EXTENSION_DEVELOPER_MODE=false/g" package/server/.env
+          mv package/server/build_tools/DEBIAN package/
+          rmdir package/server/build_tools
+          cd package
+          touch DEBIAN/md5sums
+          touch DEBIAN/md5sums
+          touch DEBIAN/control
+
+          find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum  1>/dev/null 2>/dev/null || true
+
+          chmod 775 DEBIAN/preinst
+          chmod 775 DEBIAN/postinst
+
+          echo """Package: Liman
+          Version: $GITHUB_RUN_ID
+          Installed-Size: 29892
+          Maintainer: Mert CELEN <mcelen@havelsan.com.tr>
+          Section: admin
+          Date : $GITHUB_RUN_ID
+          Architecture: amd64
+          Priority: important
+          Description: Liman MYS
+          Depends: zip, unzip, dnsutils, nginx, php7.3-fpm, php7.3-curl, php7.3, php7.3-sqlite3, php7.3-ldap, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-ssh2, php7.3-posix, libnginx-mod-http-headers-more-filter, php7.3-smbclient, krb5-user, smbclient, libssl1.1, acl, novnc, supervisor, expect, php-mongodb, php7.3-gd, gpg, rsyslog
+          """ > DEBIAN/control
+          cd ../
+          dpkg-deb -Zgzip --build package
+      - name : Release Package
+        uses: actions/upload-artifact@v1
+        with:
+          name: liman
+          path: "/home/runner/work/liman/liman/package.deb"
+      - name : Send to Slack.
+        run : |
+          curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-release&filename=liman-$GITHUB_RUN_ID.deb&pretty=1"
