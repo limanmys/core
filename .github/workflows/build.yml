@@ -71,6 +71,3 @@ jobs:
         with:
           name: liman
           path: "/home/runner/work/liman/liman/package.deb"
-      - name : Send to Slack.
-        run : |
-          curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-release&filename=liman-$GITHUB_RUN_ID.deb&pretty=1"
