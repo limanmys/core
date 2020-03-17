@@ -19,7 +19,7 @@ Date : $1
 Architecture: amd64
 Priority: important
 Description: Liman System Manager
-Depends: zip, unzip, dnsutils, nginx, php7.3-fpm, php7.3-curl, php7.3, php7.3-sqlite3, php7.3-ldap, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-ssh2, php7.3-posix, libnginx-mod-http-headers-more-filter, php7.3-smbclient, krb5-user, smbclient, libssl1.1, acl, novnc, supervisor, expect, php-mongodb, php7.3-gd, rsyslog
+Depends: zip, unzip, dnsutils, nginx, php7.3-fpm, php7.3-curl, php7.3, php7.3-sqlite3, php7.3-ldap, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-ssh2, php7.3-posix, libnginx-mod-http-headers-more-filter, php7.3-smbclient, krb5-user, smbclient, libssl1.1, acl, novnc, supervisor, expect, php-mongodb, php7.3-gd, gpg, rsyslog
 """ > DEBIAN/control
 
 cd ../
