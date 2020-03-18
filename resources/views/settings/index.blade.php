@@ -678,41 +678,63 @@
 
         function fetchDomainUsers(){
             ldapAuth(function(ldapUsername, ldapPassword){
-                let data =  new FormData();
-                data.append('ldapUsername', ldapUsername);
-                data.append('ldapPassword', ldapPassword);
-                request('{{route('fetch_domain_users')}}', data, function (response) {
-                    let json = JSON.parse(response);
-                    var str = "";
-                    json.message.forEach(function(item){
-                        str += "<option value='" + item + "'>" + item + "</option>";
-                    });
-                    $('select[name=username]').html(str);
-                    $('select[name=username]').change();
-                }, function(response){
-                    let error = JSON.parse(response);
-                    showSwal(error.message,'error',2000);
+                $('select[name=username]').select2({
+                    theme: 'bootstrap4',
+                    ajax: {
+                        type: 'POST',
+                        url: "{{ route('fetch_domain_users') }}",
+                        dataType: 'json',
+                        delay: 250,
+                        headers: {
+                            "X-CSRF-TOKEN" : $('meta[name=csrf-token]').attr("content"),
+                        },
+                        data: function (params) {
+                            return {
+                                query: params.term, // search term
+                                ldapUsername: ldapUsername,
+                                ldapPassword: ldapPassword,
+                            };
+                        },
+                        processResults: function (data, params) {
+                            return {
+                                results: data.message
+                            };
+                        },
+                        cache: true
+                    },
                 });
+                $('select[name=username]').select2('open');
             });
         }
 
         function fetchDomainGroups(){
             ldapAuth(function(ldapUsername, ldapPassword){
-                let data =  new FormData();
-                data.append('ldapUsername', ldapUsername);
-                data.append('ldapPassword', ldapPassword);
-                request('{{route('fetch_domain_groups')}}', data, function (response) {
-                    let json = JSON.parse(response);
-                    var str = "";
-                    json.message.forEach(function(item){
-                        str += "<option value='" + item.id + "'>" + item.dn + "</option>";
-                    });
-                    $('select[name=dn]').html(str);
-                    $('select[name=dn]').change();
-                }, function(response){
-                    let error = JSON.parse(response);
-                    showSwal(error.message,'error',2000);
+                $('select[name=dn]').select2({
+                    theme: 'bootstrap4',
+                    ajax: {
+                        type: 'POST',
+                        url: "{{ route('fetch_domain_groups') }}",
+                        dataType: 'json',
+                        delay: 250,
+                        headers: {
+                            "X-CSRF-TOKEN" : $('meta[name=csrf-token]').attr("content"),
+                        },
+                        data: function (params) {
+                            return {
+                                query: params.term, // search term
+                                ldapUsername: ldapUsername,
+                                ldapPassword: ldapPassword,
+                            };
+                        },
+                        processResults: function (data, params) {
+                            return {
+                                results: data.message
+                            };
+                        },
+                        cache: true
+                    },
                 });
+                $('select[name=dn]').select2('open');
             });
         }
 
