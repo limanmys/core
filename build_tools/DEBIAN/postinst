@@ -124,6 +124,9 @@ php /liman/server/artisan config:clear
 # Clear Sandbox Cache
 rm -rf /tmp/liman
 
+# Delete Old Sandbox Files
+rm -rf /liman/sandbox/{.git,vendor,views,.gitignore,composer.json,composer.lock,index.php}
+
 # Set Permissions
 chown -R liman:liman /liman/{server,database,certs,sandbox,logs}
 chmod 700 -R /liman/{server,database,certs,logs}
@@ -135,7 +138,7 @@ chmod 755 /{liman,liman/extensions,liman/keys}
 if [ -f "/etc/systemd/system/liman.service" ]; then
     echo "Liman Connector Service Already Added.";
 else
-        echo """
+    echo """
 [Unit]
 Description=Liman Connector Service
 After=network.target
@@ -156,7 +159,7 @@ fi
 if [ -f "/etc/systemd/system/liman-vnc.service" ]; then
     echo "Liman Connector Service Already Added.";
 else
-        echo """
+    echo """
 [Unit]
 Description=Liman VNC Service
 After=network.target
@@ -220,7 +223,6 @@ chmod 700 /liman/keys/vnc
 touch /liman/keys/vnc/config
 chown liman:liman /liman/keys/vnc /liman/keys/vnc/config
 chmod 700 /liman/keys/vnc/config
-
 
 # Modify ini file to use decoder.
 if grep --quiet liman-decoder.so /etc/php/7.3/cli/php.ini; then
