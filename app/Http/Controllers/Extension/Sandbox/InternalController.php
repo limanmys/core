@@ -5,9 +5,13 @@ namespace App\Http\Controllers\Extension\Sandbox;
 use App\Classes\Connector\SSHTunnelConnector;
 use App\Extension;
 use App\Http\Controllers\Controller;
+use App\JobHistory;
+use App\Jobs\ExtensionJob;
 use App\Permission;
 use App\Server;
+use App\ServerLog;
 use App\Token;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -306,7 +310,6 @@ class InternalController extends Controller
             ]);
             abort(504,"Sunucu icin yetkiniz yok.");
         }
-
         $extension = Extension::find(request('extension_id')) or abort(404, 'Eklenti Bulunamadi');
         if (!Permission::can($token->user_id, 'extension','id', $extension->id)) {
             system_log(7,"EXTENSION_NO_PERMISSION_SERVER",[
