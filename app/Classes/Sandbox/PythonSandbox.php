@@ -14,13 +14,13 @@ class PythonSandbox implements Sandbox{
         return $this->fileExtension;
     }
 
-    public function command(){
+    public function command($function){
         return "";
     }
 
     public function getInitialFiles(){
         return [
-            "index.html.jinja" , "functions.php"
+            "index.blade.php" , "functions.php"
         ];
     }
 }
