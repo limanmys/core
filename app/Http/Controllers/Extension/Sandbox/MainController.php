@@ -61,6 +61,15 @@ class MainController extends Controller
             }
             return response($output, $code);
         }else{
+            // Let's check output is json or not.
+            $json = json_decode($output,true);
+            if(json_last_error() == JSON_ERROR_NONE){
+                $output = view('l.alert',[
+                    "title" => extension()->name,
+                    "message" => array_key_exists("message",$json) ? $json["message"] : "Bilinmeyen bir hata oluştu, lütfen eklenti geliştiricisi ile iletişime geçiniz.",
+                    "type" => array_key_exists("status",$json) && intval($json["status"]) > 200 ? "danger" : "info"
+                ]);
+            }
             return view('extension_pages.server', [
                 "viewName" => "",
                 "view" => $output,
