@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Extension\Sandbox;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Jobs\ExtensionRenderJob;
 use App\UserSettings;
 use App\Permission;
-use App\Classes\Sandbox\PHPSandbox;
 use Carbon\Carbon;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class MainController extends Controller
 {
+    use DispatchesJobs;
     private $extension;
 
     public function __construct()
@@ -131,7 +133,9 @@ class MainController extends Controller
             $this->initializeClass();
         }
         $command = $this->sandbox->command($function);
-
+        $job = (new ExtensionRenderJob($command))->onQueue('extension');
+        $job_id = $this->dispatch($job);
+        abort(254,$job_id);
         $before = Carbon::now();
         $output = shell_exec($command);
         return [$output, $before->diffInMilliseconds(Carbon::now()) / 1000];

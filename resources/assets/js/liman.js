@@ -75,6 +75,10 @@ function request(url, data, next, error) {
                 case 403:
                     showSwal(response["message"],'error',2000);
                     break;
+                case 254:
+                    let json = JSON.parse(r.responseText);
+                    observeAPIRequest(json.message,next,null);
+                    break;
                 default:
                   if(error)
                     return error(r.responseText);
@@ -84,6 +88,36 @@ function request(url, data, next, error) {
         }
     };
     return false;
+}
+
+function observeAPIRequest(job_id,next,targetHTML){
+    let server_id = $('meta[name=server_id]').attr("content");
+    let extension_id = $('meta[name=extension_id]').attr("content");
+    let r = new XMLHttpRequest();
+    let data = new FormData();
+    data.append('server_id',server_id);
+    data.append('extension_id',extension_id);
+    data.append('job_id',job_id);
+    r.open("POST", "/extension/observeRender");
+    r.setRequestHeader('X-CSRF-TOKEN', csrf);
+    r.setRequestHeader("Accept", "text/json");
+    setTimeout(function () {
+        r.send(data);
+    }, 300);
+    r.onreadystatechange = function () {
+        if (r.readyState !== 4) {
+            return false;
+        }
+        let json = JSON.parse(r.responseText);
+        if(json.message.finished){
+            $(targetHTML).html(json.message.result);
+            next(json.message.result);
+        }else{
+            setTimeout(function () {
+                observeAPIRequest(job_id,next,targetHTML);
+            },1500);
+        }
+    };
 }
 
 function reload() {

@@ -260,4 +260,21 @@ class MainController extends Controller
       }
       return respond('Sıralamalar güncellendi',200);
     }
+
+    public function observeAPI()
+    {
+        $file = storage_path("extension_cache/") . request('job_id');
+        if(is_file($file)){
+            $response = respond([
+                "result" => file_get_contents($file),
+                "finished" => true
+            ]);
+            unlink($file);
+            return $response;
+        }
+        return respond([
+            "result" => null,
+            "finished" => false
+        ]);
+    }
 }

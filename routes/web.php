@@ -116,6 +116,8 @@ Route::post('/ayar/bildirimKanali/yenile','ExternalNotificationController@renew'
 
 });
 
+Route::post('/extension/observeRender','Extension\MainController@observeAPI')->name('extension_observe_render')->middleware('auth');
+
 Route::any('/upload/{any?}', function () {
     $server = app('tus-server');
     $extension_id = request("extension_id");
