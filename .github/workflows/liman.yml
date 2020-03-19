@@ -25,6 +25,13 @@ jobs:
           path: package/liman/sandbox/python
           token: ${{ secrets.CI_TOKEN }}
 
+      - name: Getting Liman' WebSSH
+          uses: actions/checkout@v2
+          with:
+            repository: mertcelen/webssh
+            path: package/liman/webssh
+            token: ${{ secrets.CI_TOKEN }}
+
       - name: Set up Liman Environment
         uses: shivammathur/setup-php@v2
         with:

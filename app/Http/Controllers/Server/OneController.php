@@ -11,9 +11,11 @@ use App\Notification;
 use App\ServerLog;
 use Carbon\Carbon;
 use Exception;
+use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use View;
+use GuzzleHttp\Client;
 
 class OneController extends Controller
 {
@@ -122,6 +124,33 @@ class OneController extends Controller
             "result" => 200,
             "data" => $output
         ];
+    }
+
+    public function terminal()
+    {
+        $client = new Client(['verify' => false]);
+
+        $xsrfRequest = $client->request('GET','http://127.0.0.1:8888/');
+        $re = '/<input(.*?)name=\"_xsrf\"(.*)value=\"(.*?)\"/i';
+        preg_match($re, $xsrfRequest->getBody(), $matches, PREG_OFFSET_CAPTURE, 0);
+        $token = $matches[3][0];
+
+        $r = $client->request('POST', 'http://127.0.0.1:8888/', [
+            'form_params' => [
+                "hostname" => server()->ip_address,
+                "username" => "pardus",
+                "password" => "1",
+                "term" => "xterm-256color",
+                "_xsrf" => $token
+            ],
+            "cookies" => CookieJar::fromArray(["_xsrf" => $token], '127.0.0.1')
+        ]);
+        if(json_decode($r->getBody()) && json_last_error() == JSON_ERROR_NONE){
+            $json = json_decode($r->getBody());
+            return response()->view('terminal.index',["id" => $json->id, "token" => $token])->withCookie('_xsrf',$token);
+        }else{
+            return respond("Bilinmeyen bir hata oluştu!",201);
+        }
     }
 
     public function upload()
