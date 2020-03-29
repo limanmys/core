@@ -40,7 +40,7 @@ jobs:
       - name: Build Liman Package
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt install recode -y 1>/dev/null 2>/dev/null
-          MESSAGE=`git log -1 --pretty=%B | recode ascii..html`
+          MESSAGE=`git --git-dir=package/liman/server/.git log -1 --pretty=%B | recode ascii..html`
           composer clearcache
           composer install --no-dev -d package/liman/server
           git --git-dir=package/liman/server/.git log -30 --pretty=format:"%s%x09%ad" > package/liman/server/storage/changelog
