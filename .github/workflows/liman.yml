@@ -39,6 +39,8 @@ jobs:
           extensions : ssh2, curl, sqlite3, ldap, mbstring, xml, zip, posix, smbclient, mongodb, gd
       - name: Build Liman Package
         run: |
+          apt install recode
+          MESSAGE=`git log -1 --pretty=%B | recode ascii..html
           composer clearcache
           composer install --no-dev -d package/liman/server
           git --git-dir=package/liman/server/.git log -30 --pretty=format:"%s%x09%ad" > package/liman/server/storage/changelog
@@ -74,4 +76,4 @@ jobs:
           cd ../
           dpkg-deb -Zgzip --build package
           echo $GITHUB_REF
-          [ "$GITHUB_REF" == "refs/heads/master" ] && curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-release&filename=liman-$GITHUB_RUN_ID.deb&pretty=1" || echo
+          [ "$GITHUB_REF" == "refs/heads/master" ] && curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-release&filename=liman-$GITHUB_RUN_ID.deb&pretty=1&title=$MESSAGE" || echo
