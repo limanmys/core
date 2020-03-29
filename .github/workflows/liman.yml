@@ -14,7 +14,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: mertcelen/liman-sandbox
-          ref : new_sandbox_structure
           path: package/liman/sandbox/php
           token: ${{ secrets.CI_TOKEN }}
 
@@ -74,12 +73,6 @@ jobs:
           """ > DEBIAN/control
           cd ../
           dpkg-deb -Zgzip --build package
-      - name : Release Package
-        uses: actions/upload-artifact@v1
-        with:
-          name: liman
-          path: "/home/runner/work/liman/liman/package.deb"
-      - name : Send to Slack.
         if: github.ref == 'refs/heads/master'
         run : |
           curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-release&filename=liman-$GITHUB_RUN_ID.deb&pretty=1"
