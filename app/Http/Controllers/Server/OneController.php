@@ -138,8 +138,8 @@ class OneController extends Controller
         $r = $client->request('POST', 'http://127.0.0.1:8888/', [
             'form_params' => [
                 "hostname" => server()->ip_address,
-                "username" => "pardus",
-                "password" => "1",
+                "username" => extensionDb("clientUsername"),
+                "password" => extensionDb("clientPassword"),
                 "term" => "xterm-256color",
                 "_xsrf" => $token
             ],
