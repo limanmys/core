@@ -39,7 +39,7 @@ jobs:
           extensions : ssh2, curl, sqlite3, ldap, mbstring, xml, zip, posix, smbclient, mongodb, gd
       - name: Build Liman Package
         run: |
-          apt install recode
+          DEBIAN_FRONTEND=noninteractive sudo apt install recode -y
           MESSAGE=`git log -1 --pretty=%B | recode ascii..html
           composer clearcache
           composer install --no-dev -d package/liman/server
