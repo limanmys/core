@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use View;
 use GuzzleHttp\Client;
+use App\UserSettings;
 
 class OneController extends Controller
 {
@@ -681,7 +682,7 @@ class OneController extends Controller
             try{
                 $flag = WinRMConnector::create(server(),request('username'),request('password'),auth()->id(),null);
             }catch (\Exception $exception){
-                $flag = $exception->getMessage();
+                $flag = "test";
             }
         }
 
@@ -698,6 +699,26 @@ class OneController extends Controller
                 "type" => "windows_powershell"
             ]);
         }
+
+        // Add credentials
+        $encKey = env('APP_KEY') . user()->id  . server()->id;
+        $encrypted = openssl_encrypt(Str::random(16) . base64_encode(request('username')),'aes-256-cfb8',$encKey,0,Str::random(16));
+        UserSettings::updateOrCreate([
+            "user_id" => user()->id,
+            "server_id" => server()->id,
+            "name" => "clientUsername"
+        ],[
+            "value" => $encrypted
+        ]);
+
+        $encrypted = openssl_encrypt(Str::random(16) . base64_encode(request('password')),'aes-256-cfb8',$encKey,0,Str::random(16));
+        UserSettings::updateOrCreate([
+            "user_id" => user()->id,
+            "server_id" => server()->id,
+            "name" => "clientPassword"
+        ],[
+            "value" => $encrypted
+        ]);
 
         return respond("Sunucu Başarıyla Yükseltildi.");
     }
