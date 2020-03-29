@@ -52,9 +52,9 @@ class MainController extends Controller
     {
         // Generate Extension Folder Path
         $path = env("EXTENSIONS_PATH") . strtolower(extension()->name);
-
         $tempPath = "/tmp/" . Str::random() . ".zip";
 
+        // Zip the current extension
         shell_exec("cd $path && zip -r $tempPath .");
 
         system_log(6,"EXTENSION_DOWNLOAD",[
@@ -195,6 +195,7 @@ class MainController extends Controller
             "version" => "0.0.1",
             "icon" => "",
             "service" => "",
+            "language" => request('language')
         ]);
         $ext->save();
 
@@ -210,6 +211,7 @@ class MainController extends Controller
                     "scripts" => ""
                 ]
             ],
+            "language" => request('language'),
             "status" => 0,
             "service" => "",
             "support" => auth()->user()->email,
@@ -233,8 +235,9 @@ class MainController extends Controller
         shell_exec("sudo chown liman:" . clean_score($ext->id) . " " . $passPath);
         shell_exec("sudo chmod 640 " . $passPath);
 
-        touch($folder . '/views/index.blade.php');
-        touch($folder . '/views/functions.php');
+        foreach(sandbox(request('language'))->getInitialFiles() as $file){
+            touch($folder . "/views/$file");
+        }
 
         shell_exec('sudo chown -R ' . clean_score($ext->id) . ':liman ' . $folder);
         shell_exec('sudo chmod -R 770 ' . $folder);

@@ -115,8 +115,16 @@
         "url" => route('extension_new'),
         "next" => "debug",
         "title" => "Yeni Eklenti Oluştur",
+        "selects" => [
+            "PHP 7.3:php" => [
+                "-:php" => "language:hidden"
+            ],
+            "Python 3.7(BETA):python" => [
+                "-:python" => "language:hidden"
+            ]
+        ],
         "inputs" => [
-            "Eklenti Adı" => "name:text"
+            "Eklenti Adı" => "name:text",
         ],
         "submit_text" => "Oluştur"
     ])

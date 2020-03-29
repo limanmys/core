@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Server;
 use App\LdapRestriction;
+use App\UserSettings;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
@@ -11,6 +13,7 @@ use App\User;
 use App\RoleMapping;
 use App\RoleUser;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 /**
  * Class LoginController
@@ -122,6 +125,29 @@ class LoginController extends Controller
                             ]);
                         });
                     }
+                }
+                // Let's add user credentials to database.
+                // First, find servers.
+                foreach(Server::where('ip_address',trim(env('LDAP_HOST')))->get() as $server){
+
+                    $encKey = env('APP_KEY') . $user->id  . $server->id;
+                    $encrypted = openssl_encrypt(Str::random(16) . base64_encode($credientials->email),'aes-256-cfb8',$encKey,0,Str::random(16));
+                    UserSettings::updateOrCreate([
+                        "user_id" => $user->id,
+                        "server_id" => $server->id,
+                        "name" => "clientUsername"
+                    ],[
+                        "value" => $encrypted
+                    ]);
+                    $encKey = env('APP_KEY') . $user->id  . $server->id;
+                    $encrypted = openssl_encrypt(Str::random(16) . base64_encode($credientials->password),'aes-256-cfb8',$encKey,0,Str::random(16));
+                    UserSettings::updateOrCreate([
+                        "user_id" => $user->id,
+                        "server_id" => $server->id,
+                        "name" => "clientPassword"
+                    ],[
+                        "value" => $encrypted
+                    ]);
                 }
                 $this->guard()->login($user, $request->filled('remember'));
                 return true;

@@ -1,10 +1,12 @@
 <?php
 
-// Extension' Server' Home Route
-Route::get('/l/{extension_id}/{city}/{server_id}', 'Extension\OneController@renderView')->name('extension_server')->middleware(['server','extension']);
+Route::match(array('GET', 'POST'),'/l/{extension_id}/{city}/{server_id}/{target_function?}','Extension\Sandbox\MainController@API')->name('extension_server')->middleware(['server','extension']);
 
-// Extension' Server' Any Route Handler
-Route::get('/l2/{extension_id}/{city}/{server_id}/{unique_code?}', 'Extension\OneController@renderView')->middleware(['server', 'extension'])->name('extension_server_route');
+// Extension' Server' Home Route
+// Route::get('/l/{extension_id}/{city}/{server_id}/{page?}', 'Extension\Sandbox\MainController@getAPI')->name('extension_server')->middleware(['server','extension']);
+
+// Extension Function Api
+// Route::post('/eklenti2/{extension_id}/{function_name?}', 'Extension\Sandbox\MainController@postAPI')->name('extension_function_api')->middleware('server_api');
 
 // Extension Management Route
 Route::post('/extension/run/{unique_code}', 'Extension\OneController@route')->name('extension_api')->middleware(['server_api', 'extension']);
@@ -22,9 +24,6 @@ Route::post('/eklentiler_api', 'Extension\SettingsController@allServersApi')->na
 
 // Extension Details Route
 Route::get('/eklentiler/{extension_id}', 'Extension\SettingsController@settings_one')->name('extension_one');
-
-// Extension Function Api
-Route::post('/eklenti2/{extension_id}/{function_name?}', 'Extension\OneController@runFunction')->name('extension_function_api')->middleware('server_api');
 
 // Extension Server Setting Page
 Route::get('/ayarlar/{extension_id}/{server_id}', 'Extension\OneController@serverSettingsPage')->name('extension_server_settings_page')->middleware(['server','extension']);
@@ -54,4 +53,4 @@ Route::post('/eklenti/fonksiyonParametreleri/ekle','Extension\SettingsController
 
 Route::post('/eklenti/fonksiyonSil','Extension\SettingsController@removeFunction')->name('extension_remove_function')->middleware('admin');
 
-Route::get('/eklenti/{extension_id}/public/{path}','Extension\OneController@publicFolder')->name('extension_public_folder');
+Route::get('/eklenti/{extension_id}/public/{path?}','Extension\OneController@publicFolder')->name('extension_public_folder');

@@ -109,12 +109,6 @@ supervisorctl start liman-extension-worker
 #Increase Php-Fpm Memory
 sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php/7.3/fpm/php.ini
 
-# Restart and enable services.
-systemctl restart nginx
-systemctl enable nginx
-systemctl enable php7.3-fpm
-systemctl restart php7.3-fpm
-
 # Run Database Migration
 php /liman/server/artisan migrate --force
 php /liman/server/artisan cache:clear
@@ -123,6 +117,9 @@ php /liman/server/artisan config:clear
 
 # Clear Sandbox Cache
 rm -rf /tmp/liman
+
+# Delete Old Sandbox Files
+rm -rf /liman/sandbox/{.git,vendor,views,.gitignore,composer.json,composer.lock,index.php}
 
 # Set Permissions
 chown -R liman:liman /liman/{server,database,certs,sandbox,logs}
@@ -135,7 +132,7 @@ chmod 755 /{liman,liman/extensions,liman/keys}
 if [ -f "/etc/systemd/system/liman.service" ]; then
     echo "Liman Connector Service Already Added.";
 else
-        echo """
+    echo """
 [Unit]
 Description=Liman Connector Service
 After=network.target
@@ -153,10 +150,31 @@ WantedBy=multi-user.target
 fi
 
 # Create Systemd Service
+if [ -f "/etc/systemd/system/liman-webssh.service" ]; then
+    echo "Liman WebSSH Service Already Added.";
+else
+    echo """
+[Unit]
+Description=Liman WebSSH Service
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=liman
+ExecStart=/usr/bin/python3 /liman/webssh/run.py
+
+[Install]
+WantedBy=multi-user.target
+    """ > /etc/systemd/system/liman-webssh.service
+fi
+
+# Create Systemd Service
 if [ -f "/etc/systemd/system/liman-vnc.service" ]; then
     echo "Liman Connector Service Already Added.";
 else
-        echo """
+    echo """
 [Unit]
 Description=Liman VNC Service
 After=network.target
@@ -177,8 +195,10 @@ sed -i "s/upload_max_filesize.*/upload_max_filesize = 50M/g" /etc/php/7.3/fpm/ph
 systemctl daemon-reload
 systemctl enable liman
 systemctl enable liman-vnc
+systemctl enable liman-webssh
 systemctl restart liman
 systemctl restart liman-vnc
+systemctl restart liman-webssh
 systemctl reload php7.3-fpm.service
 # Create Socket Service
 if [ -f "/etc/systemd/system/liman-socket.service" ]; then
@@ -221,13 +241,18 @@ touch /liman/keys/vnc/config
 chown liman:liman /liman/keys/vnc /liman/keys/vnc/config
 chmod 700 /liman/keys/vnc/config
 
-
 # Modify ini file to use decoder.
 if grep --quiet liman-decoder.so /etc/php/7.3/cli/php.ini; then
     echo "Decoder already enabled"; 
 else
     echo "extension=liman-decoder.so" >> /etc/php/7.3/cli/php.ini
 fi
+
+# Restart and enable services.
+systemctl restart nginx
+systemctl enable nginx
+systemctl enable php7.3-fpm
+systemctl restart php7.3-fpm
 
 # Enable Liman
 php /liman/server/artisan up

@@ -21,7 +21,7 @@ class Extension extends Model
      * @var array
      */
     protected $fillable = [
-        "name" , "version", "icon", "service", "sslPorts", "issuer"
+        "name" , "version", "icon", "service", "sslPorts", "issuer", "language"
     ];
 
     /**

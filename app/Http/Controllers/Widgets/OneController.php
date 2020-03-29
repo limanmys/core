@@ -12,6 +12,7 @@ use App\UserSettings;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Http\Controllers\Extension\Sandbox\MainController;
 
 class OneController extends Controller
 {
@@ -32,20 +33,16 @@ class OneController extends Controller
                 return respond(__("Eklenti ayarları eksik.") . " <a href='".url('ayarlar/'.$extension->id.'/'.$widget->server_id)."'>".__("Ayarlara Git.")."</a>", 400);
             }
         }
+
         $server = Server::find($widget->server_id);
         request()->request->add(['server' => $server]);
         request()->request->add(['widget' => $widget]);
         request()->request->add(['extension_id' => $extension->id]);
         request()->request->add(['extension' => $extension]);
+        request()->request->add(['target_function' => $widget->function]);
 
-        $command = generateSandboxCommand($server, $extension, "", auth()->id(), "null", "null", $widget->function);
-        $output = shell_exec($command);
-
-        $sessions = \App\TmpSession::where('session_id', session()->getId())->get();
-        foreach($sessions as $session){
-            session()->put($session->key, $session->value);
-            $session->delete();
-        }
+        $sandboxController = new MainController();
+        $output = $sandboxController->API()->content();
 
         if(!$output){
             return respond(__("Widget Hiçbir Veri Döndürmedi"), 400);

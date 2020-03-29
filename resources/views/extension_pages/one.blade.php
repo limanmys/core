@@ -22,9 +22,6 @@
                     <a class="nav-link" data-toggle="pill" href="#tab_2" role="tab" >{{__("Eklenti Veritabanı")}}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="pill" href="#tab_2_2" role="tab">{{__("Sayfa Ayarları")}}</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#tab_3" role="tab">{{__("Widgetlar")}}</a>
                 </li>
                 <li class="nav-item">
@@ -36,9 +33,14 @@
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="tab_1" role="tabpanel">
                         <h3>{{__("Eklenti Adı")}}</h3>
-                        <input id="extensionName" type="text" class="form-control" value="{{$extension["name"]}}" disabled required>
+                        <input id="extensionName" type="text" class="form-control" value="{{$extension['name']}}" disabled required>
                         <h3>{{__("Yayınlayan")}}</h3>
-                        <input type="text" name="name" class="form-control" value="{{$extension["publisher"]}}" disabled required>
+                        <input type="text" name="name" class="form-control" value="{{$extension['publisher']}}" disabled required>
+                        <h3>{{__("Yazılım Dili")}}</h3>
+                        <select name="programmingLanguage" class="form-control" value="{{$extension['language']}}" autocomplete="off" disabled>
+                            <option value="php" @if($extension["language"] == "php") selected='true' @endif >PHP 7.3</option>
+                            <option value="python" @if($extension["language"] == "python") selected='true' @endif>Python 3</option>
+                        </select>
                         <h3>{{__("Destek Email'i")}}</h3>
                         <input id="support" type="text" name="email" class="form-control" value="{{$extension["support"]}}" required>
                         <h3>{{__("Logo (Font Awesome Ikon)")}}</h3>
@@ -128,55 +130,6 @@
                                 "table:database" => "table:hidden"
                             ],
                             "submit_text" => "Veri'yi Sil"
-                        ])
-                    </div>
-                    <div class="tab-pane fade show" id="tab_2_2" role="tabpanel">
-                        @include('modal-button',[
-                            "class" => "btn-success btn-sm",
-                            "target_id" => "add_view",
-                            "text" => "Sayfa Ekle"
-                        ])<br><br>
-                        @include('table',[
-                            "value" => $extension["views"],
-                            "title" => [
-                                "Sayfa Adı" , "*hidden*", "*hidden*"
-                            ],
-                            "display" => [
-                                "name" , "name:name_old", "scripts:scripts_old"
-                            ],
-                            "menu" => [
-                                "Kodu Düzenle" => [
-                                    "target" => "editPage",
-                                    "icon" => " context-menu-icon-edit"
-                                ],
-                                "Sil" => [
-                                    "target" => "remove_view",
-                                    "icon" => " context-menu-icon-delete"
-                                ]
-                            ]
-                        ])
-                        @include('modal',[
-                            "id"=>"add_view",
-                            "title" => "Sayfa Ekle",
-                            "url" => route('extension_settings_add'),
-                            "next" => "reload",
-                            "inputs" => [
-                                "Sayfa Adı" => "name:text",
-                                "table:views" => "table:hidden",
-                            ],
-                            "submit_text" => "Sayfa Ekle"
-                        ])
-                        @include('modal',[
-                            "id"=>"remove_view",
-                            "title" => "Sayfa'yı Sil",
-                            "url" => route('extension_settings_remove'),
-                            "next" => "reload",
-                            "text" => "Sayfa'yı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-                            "inputs" => [
-                                "Sayfa Adı:a" => "name:hidden",
-                                "table:views" => "table:hidden",
-                            ],
-                            "submit_text" => "Sayfa'yı Sil"
                         ])
                     </div>
                     <div class="tab-pane fade show" id="tab_3" role="tabpanel">
