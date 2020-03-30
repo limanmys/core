@@ -110,7 +110,7 @@ class ExtensionJob implements ShouldQueue
         unset($request["server_id"]);
         $request = json_encode($request);
 
-        $apiRoute = route('extension_function_api', [
+        $apiRoute = route('extension_server', [
             "extension_id" => $extension_id
         ]);
 

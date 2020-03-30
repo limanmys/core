@@ -407,10 +407,6 @@ function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_
         unset($request["server_id"]);
         $request = json_encode($request);
 
-        $apiRoute = route('extension_function_api', [
-            "extension_id" => $extension_id
-        ]);
-
         $navigationRoute = route('extension_server_route', [
             "server_id" => $serverObj->id,
             "extension_id" => $extension_id,
@@ -443,7 +439,7 @@ function generateSandboxCommand($serverObj, $extensionObj, $extension_id, $user_
         $sessionData = json_encode(session()->all());
         $array = [$functions,strtolower(extension()->name),
             $viewName,$server,$extension,$extensionDb,$outputsJson,$request,$functionName,
-            $apiRoute,$navigationRoute,$token,$extension_id,$permissions, session('locale'),$_COOKIE["liman_session"],$sessionData,json_encode($userData)];
+            $navigationRoute,$navigationRoute,$token,$extension_id,$permissions, session('locale'),$_COOKIE["liman_session"],$sessionData,json_encode($userData)];
 
         switch(extension()->language){
             case "python":

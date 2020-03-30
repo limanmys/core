@@ -19,7 +19,7 @@ class PythonSandbox implements Sandbox{
         return $this->fileExtension;
     }
 
-    public function command($function){
+    public function command($function, $extensionDb = null){
         $combinerFile = $this->path;
 
         $settings = UserSettings::where([

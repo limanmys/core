@@ -71,7 +71,8 @@ class OneController extends Controller
                         ]);
                     }
                 }
-                $command = generateSandboxCommand(server(), $extension, extension()->id, auth()->id(), "", "null", $extension["verification"],$extensionDb);
+                $extensionDb = json_encode($extensionDb);
+                $command = sandbox()->command($extension["verification"],$extensionDb);
                 $output = shell_exec($command);
                 if(is_json($output)){
                     $message = json_decode($output);

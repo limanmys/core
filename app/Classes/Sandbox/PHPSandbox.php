@@ -22,7 +22,7 @@ class PHPSandbox implements Sandbox
         return $this->fileExtension;
     }
 
-    public function command($function)
+    public function command($function, $extensionDb = null)
     {
         $combinerFile = $this->path;
 
@@ -30,17 +30,18 @@ class PHPSandbox implements Sandbox
             "user_id" => user()->id,
             "server_id" => server()->id,
         ]);
-
-        $extensionDb = [];
-        foreach ($settings->get() as $setting) {
-            $key = env('APP_KEY') . user()->id . extension()->id . server()->id;
-            $decrypted = openssl_decrypt($setting->value, 'aes-256-cfb8', $key);
-            $stringToDecode = substr($decrypted, 16);
-            $extensionDb[$setting->name] = base64_decode($stringToDecode);
+        if($extensionDb == null){
+            $extensionDb = [];
+            foreach ($settings->get() as $setting) {
+                $key = env('APP_KEY') . user()->id . extension()->id . server()->id;
+                $decrypted = openssl_decrypt($setting->value, 'aes-256-cfb8', $key);
+                $stringToDecode = substr($decrypted, 16);
+                $extensionDb[$setting->name] = base64_decode($stringToDecode);
+            }
+    
+            $extensionDb = json_encode($extensionDb);
         }
-
-        $extensionDb = json_encode($extensionDb);
-
+        
         $request = request()->all();
         unset($request["permissions"]);
         unset($request["extension"]);
