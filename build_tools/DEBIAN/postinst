@@ -191,6 +191,7 @@ WantedBy=multi-user.target
 fi
 
 sed -i "s/upload_max_filesize.*/upload_max_filesize = 50M/g" /etc/php/7.3/fpm/php.ini
+sed -i "s/post_max_size.*/post_max_size = 50M/g" /etc/php/7.3/fpm/php.ini
 
 systemctl daemon-reload
 systemctl enable liman
