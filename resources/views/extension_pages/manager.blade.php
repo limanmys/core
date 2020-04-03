@@ -44,7 +44,7 @@
             @include('table',[
                 "value" => extensions()->map(function($item){
                     if(!$item["issuer"]){
-                        $item["issuer"] = __('Doğrulanmadı!');
+                        $item["issuer"] = __('Güvenli olmayan üretici!');
                     }
                     return $item;
                 }),

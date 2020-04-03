@@ -2,7 +2,6 @@
 
 # Create Required Folders for Liman
 mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions}
-$(which gpg) --import /liman/server/storage/aciklab.public
 
 # User Creation
 if getent passwd liman > /dev/null 2>&1; then
@@ -17,6 +16,8 @@ else
     echo "liman     ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
     echo "Liman User Created"
 fi
+
+runuser liman -c '$(which gpg) --import /liman/server/storage/aciklab.public'
 
 # Certificate Creation
 if [ -f "/liman/certs/liman.crt" ]; then
