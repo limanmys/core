@@ -20,7 +20,7 @@ class PermissionManager
         $request->request->add(['permissions' => auth()->user()->permissions]);
 
         // If user is admin, allow request.
-        if(auth()->user()->isAdmin()){
+        if(auth()->user()->isAdmin() || env('LIMAN_RESTRICTED') == true){
             $this->initializeObjects();
             return $next($request);
         }

@@ -4,12 +4,14 @@
           <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" href="#" onclick="request('{{route('set_collapse')}}',new FormData(),null)"><i class="fas fa-bars"></i></a>
           </li>
-          {{-- <li class="nav-item d-none d-sm-inline-block">
-            <a href="index3.html" class="nav-link">Home</a>
+          @if(env('LIMAN_RESTRICTED') == true && !user()->isAdmin())
+          <li class="nav-item d-none d-sm-inline-block">
+            <a href="/" class="nav-link">{{__("Ana Sayfa")}}</a>
           </li>
           <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link">Contact</a>
-          </li> --}}
+            <a href="/ayarlar/{{request('extension_id')}}/{{request('server_id')}}" class="nav-link">{{__("Ayarlar")}}</a>
+          </li>
+          @endif
         </ul>
         <!-- Right navbar links -->
         <ul class="navbar-nav ml-auto">
