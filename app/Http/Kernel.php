@@ -29,6 +29,7 @@ class Kernel extends HttpKernel
             Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\ForcePasswordChange::class,
+            \App\Http\Middleware\RestrictedMode::class
         ],
     ];
 
@@ -47,7 +48,8 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'extension' => Extension::class
+        'extension' => Extension::class,
+        'restricted' => \App\Http\Middleware\RestrictedMode::class
     ];
 
     protected $middlewarePriority = [

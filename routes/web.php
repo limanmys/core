@@ -153,5 +153,5 @@ Route::post('/upload_info', function(){
 })->middleware(['auth', 'permissions']);
 
 Route::get('/ejs',function(){
-    return view('ejs');
+    $certificate = Spatie\SslCertificate\SslCertificate::createForHostName();
 });

@@ -1,3 +1,8 @@
+@if(env('LIMAN_RESTRICTED') == true && !user()->isAdmin())
+    @include('extension_pages.server_restricted',["view" => $view]);
+    @php(die())
+@endif
+
 <?php
     use Illuminate\Support\Facades\DB;
     use App\Permission;
