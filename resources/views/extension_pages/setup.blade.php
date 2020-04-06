@@ -10,9 +10,6 @@
     <li class="breadcrumb-item active" aria-current="page">{{__("Eklenti Ayarları")}}</li>
 </ol>
 <button class="btn btn-primary" onclick="history.back()">{{__("Geri Dön")}}</button><br><br>
-@if(!empty($errors) && count($errors))
-    {!! $errors->getBag('default')->first('message') !!}
-@endif
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">{{__("Eklenti Ayarları")}}</h3>
@@ -23,16 +20,17 @@
         ])}}" method="POST">
     @csrf
         <div class="card-body">
-            @if(count($similar))
+            @if(!empty($errors) && count($errors))
+                <div class="alert alert-danger" role="alert">
+                {!! $errors->getBag('default')->first('message') !!}
+                </div>
+            @elseif(count($similar))
                 <div class="alert alert-info" role="alert">
                     {{__("Önceki ayarlarınızdan sizin için birkaç veri eklendi.")}}
                 </div>
             @endif
             @if($extension["database"])
                 @foreach($extension["database"] as $item)
-                        @if(($item["variable"] == "clientUsername" || $item["variable"] == "clientPassword") && extensionDb($item["variable"]))
-                            @continue
-                        @endif
                         @if($item["variable"] == "certificate")
                             <div class="form-group">
                                 <label>{{$item["name"]}}</label>
