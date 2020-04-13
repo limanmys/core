@@ -29,7 +29,7 @@
                 <h3 class="card-title">{{ _('Sunucu Bilgileri') }}</h3>
             </div>
             <div class="card-body">
-                @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
+                @if(server()->type == "linux_ssh" || server()->type == "windows_powershell" || server()->type == "linux_certificate")
                     <strong>{{ __('Hostname') }}</strong>
                     <p class="text-muted">
                         {{$hostname}}
@@ -37,7 +37,7 @@
                     <hr>
                     <strong>{{ __('İşletim Sistemi') }}</strong>
                     <p class="text-muted">
-                        @if(server()->type == "linux_ssh")
+                        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
                             {{server()->run("lsb_release -ds")}}
                         @else
                             {{ explode("|",server()->run("(Get-WmiObject Win32_OperatingSystem).name"))[0]}}
@@ -79,7 +79,7 @@
                 <div class="card-header p-2">
                     <ul class="nav nav-tabs" role="tablist">
                         @php($firstRendered = false)
-                        @if(server()->type == "linux_ssh")
+                        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
                             <li class="nav-item">
                                 <a class="nav-link active" data-toggle="pill" href="#usageTab" role="tab" aria-selected="true">{{__("Sistem Durumu")}}</a>
                             </li>
@@ -88,11 +88,11 @@
                         <li class="nav-item">
                             <a class="nav-link @if(!$firstRendered) active @endif" data-toggle="pill" href="#extensionsTab" role="tab">{{__("Eklentiler")}}</a>
                         </li>
-                        @if(server()->type == "linux_ssh")
+                        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
                             <li class="nav-item">
                                 <a class="nav-link" data-toggle="pill" onclick="getServices()" href="#servicesTab" role="tab">{{__("Servisler")}}</a>
                             </li>
-                            @if(server()->type == "linux_ssh")
+                            @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
                                 <li class="nav-item">
                                     <a class="nav-link" data-toggle="pill" onclick="getPackages()" href="#packagesTab" role="tab">{{__("Paketler")}}</a>
                                 </li>
@@ -135,7 +135,7 @@
                 </div>
                 <div class="card-body">
                     <div class="tab-content">
-                        @if(server()->type == "linux_ssh")
+                        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
                             <div class="tab-pane fade show active" id="usageTab" role="tabpanel">
                                     <h4>{{__("Kaynak Kullanımı")}}</h4>
                                     <div class="row">
@@ -215,7 +215,7 @@
                                 "text" => "İndir"
                             ])
                         </div>
-                        @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
+                        @if(server()->type == "linux_ssh" || server()->type == "windows_powershell" || server()->type == "linux_certificate")
                             <div class="tab-pane fade show" id="servicesTab" role="tabpanel">
                                 
                             </div>
@@ -225,7 +225,7 @@
                                 <div id="updatesTabTable"></div>
                             </div>
                         @endif
-                        @if(server()->type == "linux_ssh")
+                        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
                             <div class="tab-pane fade show" id="packagesTab" role="tabpanel">
                                 <button type="button" data-toggle="modal" data-target="#installPackage" style="margin-bottom: 5px;" class="btn btn-success">
                                     <i class="fas fa-upload"></i> {{ __('Paket Kur') }}
@@ -596,7 +596,7 @@
         }
 
 
-        @if(server()->type == "linux_ssh") //|| server()->type == "windows_powershell")
+        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate") //|| server()->type == "windows_powershell")
             if(location.hash !== "#updatesTab"){
                 getUpdates();
                 Swal.close();
@@ -627,7 +627,7 @@
 
         @endforeach
         @endif
-        @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
+        @if(server()->type == "linux_ssh" || server()->type == "windows_powershell" || server()->type == "linux_certificate")
         setInterval(function () {
             stats();
         }, 15000);

@@ -156,7 +156,7 @@ class InternalController extends Controller
             return "Betik Bulunamadi";
         }
 
-        if (server()->type != "linux_ssh" && server()->type != "windows_powershell") {
+        if (server()->type != "linux_ssh" && server()->type != "linux_certificate" && server()->type != "windows_powershell") {
             system_log(7,"EXTENSION_INTERNAL_RUN_COMMAND_FAILED",[
                 "extension_id" => extension()->id,
                 "server_id" => request('server_id')

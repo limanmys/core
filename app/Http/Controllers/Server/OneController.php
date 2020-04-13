@@ -25,7 +25,7 @@ class OneController extends Controller
         if (!\server()) {
             abort(504, "Sunucu Bulunamadı.");
         }
-        if(server()->type == "linux_ssh" || server()->type == "windows_powershell"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate" || server()->type == "windows_powershell"){
           View::share('hostname', server()->run("hostname"));
         }
         return view('server.one', [
@@ -137,15 +137,36 @@ class OneController extends Controller
         $token = $matches[3][0];
 
         $r = $client->request('POST', 'http://127.0.0.1:8888/', [
-            'form_params' => [
-                "hostname" => server()->ip_address,
-                "username" => extensionDb("clientUsername"),
-                "password" => extensionDb("clientPassword"),
-                "term" => "xterm-256color",
-                "_xsrf" => $token
+            'multipart' => [
+                [
+                    'name'     => 'hostname',
+                    'contents' => server()->ip_address
+                ],
+                [
+                    'name'     => 'username',
+                    'contents' => extensionDb("clientUsername")
+                ],
+                [
+                    'name'     => 'password',
+                    'contents' => server()->type == "linux_ssh" ? extensionDb("clientPassword") : ""
+                ],
+                [
+                    'name'     => 'privatekey',
+                    'contents' => server()->type == "linux_certificate" ? extensionDb("clientPassword") : "",
+                    'filename' => 'id_rsa'
+                ],
+                [
+                    'name'     => 'term',
+                    'contents' => 'xterm-256color'
+                ],
+                [
+                    'name'     => '_xsrf',
+                    'contents' => $token
+                ],
             ],
             "cookies" => CookieJar::fromArray(["_xsrf" => $token], '127.0.0.1')
         ]);
+        //TODO terminal for certificate
         if(json_decode($r->getBody()) && json_last_error() == JSON_ERROR_NONE){
             $json = json_decode($r->getBody());
             return response()->view('terminal.index',["id" => $json->id, "token" => $token])->withCookie('_xsrf',$token);
@@ -227,7 +248,7 @@ class OneController extends Controller
 
     public function stats()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $disk = server()->run('df -h / | grep /',false);
             preg_match("/(\d+)%/",$disk,$test);
             $disk = $test[1];
@@ -255,7 +276,7 @@ class OneController extends Controller
 
     public function getLocalUsers()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $output = server()->run("cut -d: -f1,3 /etc/passwd | egrep ':[0-9]{4}$' | cut -d: -f1");
             $output = trim($output);
             if(empty($output)){
@@ -282,7 +303,7 @@ class OneController extends Controller
 
     public function addLocalUser()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $user_name = request("user_name");
             $user_password = request("user_password");
             $user_password_confirmation = request("user_password_confirmation");
@@ -300,7 +321,7 @@ class OneController extends Controller
 
     public function getLocalGroups()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $output = server()->run("getent group | cut -d ':' -f1");
             $output = trim($output);
             if(empty($output)){
@@ -329,7 +350,7 @@ class OneController extends Controller
 
     public function getLocalGroupDetails()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $group = request("group");
             $output = trim(server()->run(sudo()."getent group $group | cut -d ':' -f4"));
         
@@ -353,7 +374,7 @@ class OneController extends Controller
 
     public function addLocalGroup()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $group_name = request("group_name");
             $output = trim(server()->run(sudo()."groupadd $group_name &> /dev/null && echo 1 || echo 0"));
             if($output == "0"){
@@ -365,7 +386,7 @@ class OneController extends Controller
 
     public function addLocalGroupUser()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $group = request("group");
             $user = request("user");
             $output = trim(server()->run(sudo()."usermod -a -G $group $user &> /dev/null && echo 1 || echo 0"));
@@ -378,7 +399,7 @@ class OneController extends Controller
 
     public function getSudoers()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $output = trim(server()->run(sudo()."cat /etc/sudoers /etc/sudoers.d/* | grep -v '^#\|^Defaults' | sed '/^$/d' | awk '{ print $1 \"*-*\" $2 \" \" $3 }'"));
         
             $sudoers = [];
@@ -408,7 +429,7 @@ class OneController extends Controller
 
     public function addSudoers()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $name = request("name");
             $name = str_replace(" ", "\\x20", $name);
             $checkFile = server()->run("[ -f '/etc/sudoers.d/$name' ] && echo 1 || echo 0");
@@ -426,7 +447,7 @@ class OneController extends Controller
     public function deleteSudoers()
     {
         //TODO: check here for bugs
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $name = request("name");
             $name = str_replace(" ", "\\x20", $name);
             $output = trim(server()->run(sudo()."bash -c 'if [ -f \"/etc/sudoers.d/$name\" ]; then rm /etc/sudoers.d/$name && echo 1 || echo 0; else echo 0; fi'"));
@@ -440,7 +461,7 @@ class OneController extends Controller
     public function serviceList()
     {
         $services = [];
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $raw = server()->run("systemctl list-units | grep service | awk '{print $1 \":\"$2\" \"$3\" \"$4\":\"$5\" \"$6\" \"$7\" \"$8\" \"$9\" \"$10}'",false);
             foreach (explode("\n", $raw) as $package) {
                 if ($package == "") {
@@ -518,7 +539,7 @@ class OneController extends Controller
 
     public function installPackage()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $package = request("package_name");
             $raw = server()->run(sudo()."bash -c 'DEBIAN_FRONTEND=noninteractive apt install \"$package\" -qqy >\"/tmp/".basename($package).".txt\" 2>&1 & disown && echo \$!'");
             ServerLog::new(__('Paket Güncelleme: :package_name', ['package_name' => request("package_name")]), __(':package_name paketi için güncelleme isteği gönderildi.', ['package_name' => request("package_name")]));
@@ -530,7 +551,7 @@ class OneController extends Controller
 
     public function checkPackage()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $mode = request("mode") ? request("mode") : 'update';
             $output = trim(server()->run("ps aux | grep \"apt \|dpkg \" | grep -v grep 2>/dev/null 1>/dev/null && echo '1' || echo '0'"));
             $command_output = server()->run(sudo().'cat "/tmp/'.basename(request("package_name")). '.txt" 2> /dev/null | base64');
@@ -570,7 +591,7 @@ class OneController extends Controller
 
     public function uploadDebFile()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $filePath = request('filePath');
             if(!$filePath){
                 return respond("Dosya yolu zorunludur.",403);
@@ -585,7 +606,7 @@ class OneController extends Controller
     
     public function updateList()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $updates = [];
             $raw = server()->run(sudo()."apt-get -qq update 2> /dev/null > /dev/null; ".sudo()."apt list --upgradable 2>/dev/null | sed '1,1d'");
             foreach (explode("\n", $raw) as $package) {
@@ -631,7 +652,7 @@ class OneController extends Controller
 
     public function packageList()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $raw = server()->run(sudo()."apt list --installed 2>/dev/null | sed '1,1d'", false);
             $packages = [];
             foreach (explode("\n", $raw) as $package) {
@@ -665,7 +686,7 @@ class OneController extends Controller
 
     public function upgradeServer()
     {
-        if(server()->type == "linux_ssh" || server()->type == "windows_powershell"){
+        if(server()->type == "linux_ssh" || server()->type == "windows_powershell" || server()->type == "linux_certificate"){
             return respond("Bu Sunucuda yukseltme yapilamaz.",201);
         }
 
@@ -739,7 +760,7 @@ class OneController extends Controller
 
     public function startService()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $command = sudo()."systemctl start " . request('name');
         }else{
             $command = "Start-Service " . request("name");   
@@ -750,7 +771,7 @@ class OneController extends Controller
 
     public function stopService()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $command = sudo()."systemctl stop " . request('name');
         }else{
             $command = "Stop-Service " . request("name");   
@@ -761,7 +782,7 @@ class OneController extends Controller
 
     public function restartService()
     {
-        if(server()->type == "linux_ssh"){
+        if(server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $command = sudo()."systemctl restart " . request('name');
         }else{
             $command = "Restart-Service " . request("name");   
@@ -772,7 +793,7 @@ class OneController extends Controller
 
     public function getOpenPorts()
     {
-        if(server()->type != "linux_ssh"){
+        if(server()->type != "linux_ssh" && server()->type != "linux_certificate"){
             return respond("Bu sunucuda portlari kontrol edemezsiniz!",201);
         }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Server;
 
 use App\Classes\Connector\SSHConnector;
+use App\Classes\Connector\SSHCertificateConnector;
 use App\Classes\Connector\WinRMConnector;
 use App\Server;
 use App\Http\Controllers\Controller;
@@ -30,11 +31,13 @@ class MainController extends Controller
 
     public function verifyKey()
     {
-        if(request('key_type') == "ssh"){
+        if(request('key_type') == "linux_ssh"){
             return SSHConnector::verify(request('ip_address'),request('username'),request('password'),request('port'));
-        }else if (request('key_type') == "winrm"){
+        }else if (request('key_type') == "windows_powershell"){
             return WinRMConnector::verify(request('ip_address'),request('username'),request('password'),request('port'));
-        }else{
+        }else if(request('key_type') == "linux_certificate"){
+            return SSHCertificateConnector::verify(request('ip_address'),request('username'),request('password'),request('port'));
+        }{
             return respond("Bu anahtara göre bir yapı bulunamadı.",201);
         }
     }

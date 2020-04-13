@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Server;
 use App\AdminNotification;
 use App\Certificate;
 use App\Classes\Connector\SSHConnector;
+use App\Classes\Connector\SSHCertificateConnector;
 use App\Classes\Connector\WinRMConnector;
 use App\Http\Controllers\Controller;
 use App\Permission;
@@ -35,10 +36,6 @@ class AddController extends Controller
         // Create object with parameters.
         $this->server = new Server();
         $this->server->fill(request()->all());
-        if(request('username') && request('password')){
-            $this->server->type = (($this->server->type == "windows") ? "windows_powershell" : "linux_ssh");
-        }
-
         $this->server->user_id = auth()->id();
 
         // Check if Server is online or not.
@@ -55,7 +52,7 @@ class AddController extends Controller
         // Add Server to request object to use it later.
         request()->request->add(["server" => $this->server]);
 
-        if(server()->type == "windows_powershell" || server()->type == "linux_ssh"){
+        if(server()->type == "windows_powershell" || server()->type == "linux_ssh" || server()->type == "linux_certificate"){
             $encKey = env('APP_KEY') . user()->id . server()->id;
             $encryptedUsername = openssl_encrypt(Str::random(16) . base64_encode(request('username')),'aes-256-cfb8',$encKey,0,Str::random(16));
             $encryptedPassword = openssl_encrypt(Str::random(16) . base64_encode(request('password')),'aes-256-cfb8',$encKey,0,Str::random(16));
@@ -94,6 +91,9 @@ class AddController extends Controller
                 $next = $this->windows_powershell();
                 break;
 
+            case("linux_certificate"):
+                $next = $this->linux_certificate();
+                break;
             default:
                 $next = respond("Sunucu türü bulunamadı.",404);
                 break;
@@ -104,6 +104,18 @@ class AddController extends Controller
     private function linux_ssh()
     {
         $flag = SSHConnector::create($this->server,request('username'), request('password'),auth()->id(),null);
+
+        if(!$flag){
+            $this->server->delete();
+            return respond("SSH Hatası",400);
+        }
+
+        return $this->grantPermissions();
+    }
+
+    private function linux_certificate()
+    {
+        $flag = SSHCertificateConnector::create($this->server,request('username'),request('certificateText'),auth()->id(),null);
 
         if(!$flag){
             $this->server->delete();

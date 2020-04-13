@@ -129,13 +129,17 @@
                                     <div class="form-group">
                                         <label><h4>{{__("Anahtar Türü")}}</h4></label>
                                         <select name="key_type" class="form-control" disabled onchange="setPort(this)" id="keyType">
-                                            <option value="ssh" selected>{{__("SSH")}}</option>
-                                            <option value="winrm">{{__("WinRM")}}</option>
+                                            <option value="linux_ssh" selected>{{__("SSH")}}</option>
+                                            <option value="linux_certificate">{{__("SSH Anahtarı")}}</option>
+                                            <option value="windows_powershell">{{__("WinRM")}}</option>
                                         </select>
                                     </div><hr>
                                     <h4>{{__("Kullanıcı Adı")}}</h4>
                                     <input id="keyUsername" type="text" name="username" class="form-control" placeholder="{{__("Kullanıcı Adı")}}" required disabled><br>
-                                    <h4>{{__("Şifre")}}</h4>
+                                    <h4 id="passwordPrompt">{{__("Şifre")}}</h4>
+                                    <h4 id="certificatePrompt">{{__("SSH Private Key")}}</h4>
+                                    <label id="certificateInformLabel">{{__("Anahtarınızın çalışabilmesi için şifreli olmaması ve sudo komutlarını çalıştırması için sudoers dosyasında NOPASSWD olarak eklenmiş olması gerekmektedir.")}}</label>
+                                    <textarea class="form-control" name="password" id="keyPasswordCert" cols="30" rows="10" required disabled></textarea>
                                     <input id="keyPassword" type="password" name="password" class="form-control" placeholder="{{__("Şifre")}}" required disabled><br>
                                     <h4>{{__("Port")}}</h4>
                                     <small>{{__("Eğer bilmiyorsanız varsayılan olarak bırakabilirsiniz.")}}</small>
@@ -267,12 +271,33 @@
             let server_id = element.querySelector('#server_id').innerHTML;
             window.location.href = "/sunucular/" + server_id
         }
-
+        $("#keyPasswordCert").fadeOut(0);
+        $("#certificateInformLabel").fadeOut(0);
+        $("#keyPassword").fadeIn(0);
+        $("#certificatePrompt").fadeOut(0);
+        $("#passwordPrompt").fadeIn(0);
         function setPort(select) {
-            if(select.value === "winrm"){
+            if(select.value === "windows_powershell"){
                 $("#port").val("5986");
-            }else if(select.value === "ssh"){
+                $("#keyPasswordCert").fadeOut(0).attr("disabled","true");
+                $("#certificateInformLabel").fadeOut(0);
+                $("#keyPassword").fadeIn(0).removeAttr("disabled");
+                $("#certificatePrompt").fadeOut(0);
+                $("#passwordPrompt").fadeIn(0);
+            }else if(select.value === "linux_ssh"){
                 $("#port").val("22");
+                $("#keyPasswordCert").fadeOut(0).attr("disabled","true");
+                $("#keyPassword").fadeIn(0).removeAttr("disabled");
+                $("#certificateInformLabel").fadeOut(0);
+                $("#passwordPrompt").fadeIn(0);
+                $("#certificatePrompt").fadeOut(0);
+            }else if(select.value === "linux_certificate"){
+                $("#port").val("22");
+                $("#keyPasswordCert").fadeIn(0).removeAttr("disabled");
+                $("#certificateInformLabel").fadeIn(0);
+                $("#passwordPrompt").fadeOut(0);
+                $("#keyPassword").fadeOut(0).attr("disabled","true");
+                $("#certificatePrompt").fadeIn(0);
             }
         }
 
@@ -296,10 +321,17 @@
             form.append("ip_address",$("#serverHostName").val());
             form.append("control_port",$("#serverControlPort").val());
             form.append("city",$("#serverCity").val());
-            form.append('type',$("input[name=operating_system]:checked").val());
+
             if($("#useKey").is(':checked') === true){
                 form.append('username',$("#keyUsername").val());
-                form.append('password',$("#keyPassword").val());
+                if($("#keyType").val() == "linux_certificate"){
+                    form.append('password',$("#keyPasswordCert").val());
+                }else{
+                    form.append('password',$("#keyPassword").val());
+                }
+                form.append('type',$("#keyType").val());
+            }else{
+                form.append('type',$("input[name=operating_system]:checked").val());
             }
             request('{{route('server_add')}}',form,"",function (errors) {
                 let json = JSON.parse(errors);
