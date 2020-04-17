@@ -179,6 +179,8 @@ class AddController extends Controller
                 }
             }
         }
+        hook("server_add_successful",["server" => $this->server]);
+
         return respond(route('server_one',$this->server->id),300);
     }
 }

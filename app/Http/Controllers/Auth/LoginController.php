@@ -43,6 +43,10 @@ class LoginController extends Controller
         $user->save();
 
         system_log(7,"LOGIN_SUCCESS");
+
+        hook("login_successful",[
+            "user" => $user
+        ]);
     }
 
     public function attemptLogin(Request $request)

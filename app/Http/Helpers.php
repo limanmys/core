@@ -301,6 +301,29 @@ if (!function_exists('sandbox')) {
     }
 }
 
+if (!function_exists('hook')) {
+    /**
+     * @param $name
+     * @param array $data
+     * @return void
+     */
+    function hook($name, $data = [])
+    {
+        $hooks = App\ModuleHook::where('hook',$name)->get();
+
+        array_key_exists("user", $data) ? $data["user"] = user() : null;
+        array_key_exists("extension", $data) ? $data["extension"] = extension() : null;
+        array_key_exists("server", $data) ? $data["server"] = server() : null;
+
+        $data = base64_encode(json_encode($data));
+
+        foreach($hooks as $hook){
+            $command = "/liman/modules/" . strtolower($hook->module_name) . "/main $name $data";
+            shell_exec("bash -c '$command & disown'");
+        }
+    }
+}
+
 if (!function_exists('redirect_now')) {
     function redirect_now($url, $code = 302)
     {

@@ -49,4 +49,11 @@
       0 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     ),
   ),
+  'spatie/laravel-web-tinker' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Spatie\\WebTinker\\WebTinkerServiceProvider',
+    ),
+  ),
 );
