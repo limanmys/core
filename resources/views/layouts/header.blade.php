@@ -6,7 +6,7 @@
           <img src="/images/liman_logo_white.png" alt="Liman Logo" class="brand-image"
                style="opacity: .8;margin-left: 1.3rem;">
           <span class="brand-text font-weight-light">liman</span>
-          <span class="right badge badge-success">BETA</span>
+          <span class="right badge badge-success">v 0.94</span>
         </a>
         <!-- Sidebar -->
         <div class="sidebar">  
@@ -78,6 +78,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="/modules" class="nav-link">
+                        <i class="nav-icon fas fa-puzzle-piece"></i>
+                        <p>{{__("Modüller")}}</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="/ayarlar" class="nav-link">
                         <i class="nav-icon fas fa-cog"></i>
                         <p>{{__("Ayarlar")}}</p>
@@ -90,12 +96,6 @@
                         @if(\App\LimanRequest::where('status',0)->count())
                             <span class="badge badge-info right">{{\App\LimanRequest::where('status',0)->count()}}</span>
                         @endif
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/modules" class="nav-link">
-                        <i class="nav-icon fas fa-puzzle-piece"></i>
-                        <p>{{__("Modüller")}}</p>
                     </a>
                 </li>
               @else

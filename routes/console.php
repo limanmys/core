@@ -131,10 +131,27 @@ Artisan::command('module:add {module_name}',function($module_name){
             "level" => 3
         ]);
         $notification->save();
-
+        shell_exec("chmod +x /liman/modules/" . $module->name . "/main");
         $this->info("Modul basariyla yuklendi, lutfen liman arayuzunden yetkilerini onaylayin.");
     }else{
         $this->error("Modul yuklenemedi, bir hata olustu.\n$flag");
     }
 
 })->describe("New module add");
+
+Artisan::command('module:remove {module_id}',function($module_id){
+    $module = Module::find($module_id)->first();
+
+    if(!$module){
+        return $this->error("Modul bulunamadi!");
+    }
+
+    $flag = $module->delete();
+
+    if($flag){
+        $this->info("Modul basariyla silindi.");
+    }else{
+        $this->error("Modul silinemedi.$flag");
+    }
+
+})->describe("Module remove");
