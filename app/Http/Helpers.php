@@ -310,7 +310,10 @@ if (!function_exists('hook')) {
      */
     function hook($name, $data = [])
     {
-        $hooks = App\ModuleHook::where('hook',$name)->get();
+        $hooks = App\ModuleHook::where([
+            'hook' => $name,
+            'enabled' => true
+        ])->get();
 
         array_key_exists("user", $data) ? $data["user"] = user() : null;
         array_key_exists("extension", $data) ? $data["extension"] = extension() : null;
@@ -332,7 +335,7 @@ if (!function_exists('hook')) {
                 continue;
             }
             
-            $command = "/liman/modules/" . strtolower($hook->module_name) . "/main $name $data";
+            $command = "/liman/modules/" . $hook->module_name . "/main $name $data";
             shell_exec("bash -c '$command & disown'");
         }
     }
