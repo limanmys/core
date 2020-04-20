@@ -92,6 +92,12 @@
                         @endif
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="/modules" class="nav-link">
+                        <i class="nav-icon fas fa-puzzle-piece"></i>
+                        <p>{{__("Modüller")}}</p>
+                    </a>
+                </li>
               @else
                 <li class="nav-header">{{__("Yetki Talebi")}}</li>
                 <li class="nav-item">

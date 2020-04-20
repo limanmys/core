@@ -33,6 +33,11 @@ require_once(app_path('Http/Controllers/Settings/_routes.php'));
 
 require_once(app_path('Http/Controllers/Widgets/_routes.php'));
 
+// Modules Routes
+
+require_once(app_path('Http/Controllers/Module/_routes.php'));
+
+
 // Role Routes
 
 require_once(app_path('Http/Controllers/Roles/_routes.php'));

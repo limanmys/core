@@ -27,6 +27,14 @@
                 header("Location: $url", true);
                 exit();
                 break;
+            case "new_module":
+                $url = route('modules_index');
+                $notification->update([
+                    "read" => "true"
+                ]);
+                header("Location: $url", true);
+                exit();
+                break;
             default:
                 break;
         }

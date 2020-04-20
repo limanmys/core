@@ -8,6 +8,6 @@ class AdminNotification extends Model
 {
     use UsesUuid;
     protected $fillable = [
-        "read"
+        "read", "title", "message", "type", "level"
     ];
 }

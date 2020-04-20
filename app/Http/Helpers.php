@@ -6,6 +6,7 @@ use App\Notification;
 use App\Permission;
 use App\Server;
 use App\Certificate;
+use App\Module;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
@@ -316,8 +317,21 @@ if (!function_exists('hook')) {
         array_key_exists("server", $data) ? $data["server"] = server() : null;
 
         $data = base64_encode(json_encode($data));
-
+        $modellist = [];
         foreach($hooks as $hook){
+            if(!array_key_exists($hook->module_name,$modellist)){
+                $foo = Module::where("name",$hook->module_name)->first();
+                if(!$foo){
+                    continue;
+                }
+                $modellist[$hook->module_name] = $foo->enabled;
+                unset($foo);
+            }
+
+            if($modellist[$hook->module_name] == false){
+                continue;
+            }
+            
             $command = "/liman/modules/" . strtolower($hook->module_name) . "/main $name $data";
             shell_exec("bash -c '$command & disown'");
         }
