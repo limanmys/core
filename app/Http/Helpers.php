@@ -336,7 +336,7 @@ if (!function_exists('hook')) {
             }
             
             $command = "/liman/modules/" . $hook->module_name . "/main $name $data";
-            shell_exec("bash -c '$command & disown'");
+            shell_exec("bash -c '$command & disown' &");
         }
     }
 }

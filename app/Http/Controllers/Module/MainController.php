@@ -69,4 +69,21 @@ class MainController extends Controller
             return respond("Bir hata oluştu.$flag",201);
         }
     }
+
+    public function getModuleSettings()
+    {
+        $module = Module::findOrFail(request('module_id'))->first();
+
+        $template = file_get_contents("/liman/modules/" . $module->name . "/template.json");
+        $template = json_decode($template,true);
+        if(json_last_error() != JSON_ERROR_NONE){
+            return respond("Modul ayarlari okunamiyor.",201);
+        }
+
+        $inputs = $template["settings"];
+        
+        return view('l.inputs',[
+            "inputs" => $inputs
+        ]);
+    }
 }

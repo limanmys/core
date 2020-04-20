@@ -21,14 +21,23 @@
                 "display" => [
                     "name" , "enabled_text", "hook_count", "id:module_id", "enabled:enabled"
                 ],
-                "onclick" => "details"
+                "menu" => [
+                    "Verileri Düzenle" => [
+                        "target" => "getModuleSettings",
+                        "icon" => " context-menu-icon-edit"
+                    ],
+                    "Yetkileri Düzenle" => [
+                        "target" => "details",
+                        "icon" => "fas fa-user-secret"
+                    ]
+                ]
             ])
         </div>
     </div>
     
     @component('modal-component',[
         "id" => "moduleDetails",
-        "title" => "Modül Detayları"
+        "title" => "Modül Yetkileri"
     ])
     <div>
         <div class="float-right">
@@ -56,6 +65,13 @@
         </div>
     </div><br>
     <div id="moduleHooksWrapper"></div>
+    @endcomponent
+
+    @component('modal-component',[
+        "id" => "moduleVariables",
+        "title" => "Modül Yetkileri"
+    ])
+    <div id="moduleVariablesWrapper"></div>
     @endcomponent
 
     <script>
@@ -135,6 +151,18 @@
                 lastElement.querySelector("#enabled_text").innerHTML = "İzin Verilmemiş";
             }
             
+        }
+
+        function getModuleSettings(element){
+            let form = new FormData();
+            form.append('module_id',element.querySelector('#module_id').innerHTML);
+            request("{{route('module_settings_get')}}",form,function(success){
+                $("#moduleVariablesWrapper").html(success);
+                $("#moduleVariables").modal('show');
+            },function(error){
+                let json = JSON.parse(error);
+                showSwal(json.message,'error',2000);
+            });
         }
     </script>
 @endsection
