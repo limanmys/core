@@ -69,9 +69,12 @@
 
     @component('modal-component',[
         "id" => "moduleVariables",
-        "title" => "Modül Yetkileri"
+        "title" => "Modül Verileri"
     ])
-    <div id="moduleVariablesWrapper"></div>
+    <form onsubmit="return saveModuleSettings(this)">
+        <div id="moduleVariablesWrapper"></div>
+        <button type="submit" class="btn btn-primary">{{__("Kaydet")}}</button>
+    </form>
     @endcomponent
 
     <script>
@@ -154,11 +157,39 @@
         }
 
         function getModuleSettings(element){
+            showSwal("Yükleniyor...",'info');
+            lastElement = element;
             let form = new FormData();
             form.append('module_id',element.querySelector('#module_id').innerHTML);
             request("{{route('module_settings_get')}}",form,function(success){
-                $("#moduleVariablesWrapper").html(success);
+                let json = JSON.parse(success);
+                $("#moduleVariablesWrapper").html(json.message.view);
+                $("#moduleVariablesWrapper input").each(function(){
+                    let current = $(this);
+                    current.val(json.message.data[current.attr("name")]);
+                });
                 $("#moduleVariables").modal('show');
+                Swal.close();
+            },function(error){
+                let json = JSON.parse(error);
+                showSwal(json.message,'error',2000);
+            });
+        }
+
+        function saveModuleSettings(formHTML){
+            let form = new FormData();
+            showSwal("Kaydediliyor...",'info');
+            form.append('module_id',lastElement.querySelector('#module_id').innerHTML);
+            $(formHTML).find("input").each(function(){
+                let element = $(this);
+                form.append("mod-" + element.attr("name"), element.val());
+            });
+            return request("{{route('module_settings_save')}}",form,function(success){
+                let json = JSON.parse(success);
+                showSwal(json.message,'success');
+                setTimeout(() => {
+                    getModuleSettings(lastElement);
+                }, 1500);
             },function(error){
                 let json = JSON.parse(error);
                 showSwal(json.message,'error',2000);

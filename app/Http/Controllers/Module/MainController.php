@@ -82,8 +82,57 @@ class MainController extends Controller
 
         $inputs = $template["settings"];
         
-        return view('l.inputs',[
+        $view = view('l.inputs',[
             "inputs" => $inputs
+        ])->render();
+        
+        $data = [];
+
+        $settingsPath = "/liman/modules/" . $module->name . "/settings.json";
+        if(is_file($settingsPath)){
+            $data = file_get_contents($settingsPath);
+            $data = json_decode($data,true);
+            if(json_last_error() == JSON_ERROR_NONE){
+                $data = $data["variables"];
+            }
+        }
+
+        return respond([
+            "view" => $view,
+            "data" => $data
         ]);
+    }
+
+    public function saveModuleSettings()
+    {
+        $module = Module::findOrFail(request('module_id'))->first();
+
+        $filePath = "/liman/modules/" . $module->name . "/settings.json";
+        $data = [
+            "variables" => []
+        ];
+
+        if(is_file($filePath)){
+            $dataJson = file_get_contents($filePath);
+            $dataJson = json_decode($dataJson,true);
+            if(json_last_error() == JSON_ERROR_NONE){
+                $data = $dataJson;
+            }
+        }
+        
+        foreach (request()->all() as $key => $value) {
+            if(substr($key,0,4) == "mod-"){
+                $data["variables"][substr($key,4)] = $value;
+            }
+        }
+
+        $flag = file_put_contents($filePath,json_encode($data,JSON_PRETTY_PRINT));
+        
+        if($flag){
+            return respond("Ayarlar başarıyla kaydedildi.");
+        }else{
+            return respond("Ayarlar kaydedilemedi!",201);
+        }
+
     }
 }

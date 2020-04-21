@@ -9,3 +9,5 @@ Route::post('/modules/hooks/update','Module\MainController@modifyHookStatus')->n
 Route::post('/modules/update','Module\MainController@modifyModuleStatus')->name('module_update');
 
 Route::post('/modules/getSettings','Module\MainController@getModuleSettings')->name('module_settings_get');
+
+Route::post('/modules/saveSettings','Module\MainController@saveModuleSettings')->name('module_settings_save');
