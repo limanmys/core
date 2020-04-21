@@ -139,8 +139,8 @@ Artisan::command('module:add {module_name}',function($module_name){
 
 })->describe("New module add");
 
-Artisan::command('module:remove {module_id}',function($module_id){
-    $module = Module::find($module_id)->first();
+Artisan::command('module:remove {module_name}',function($module_name){
+    $module = Module::where('name',$module_name)->first();
 
     if(!$module){
         return $this->error("Modul bulunamadi!");
