@@ -178,6 +178,7 @@ class OneController extends Controller
      */
     public function remove()
     {
+        hook('extension_delete_attempt',extension());
         try {
             shell_exec("sudo rm -r " . env('EXTENSIONS_PATH') . strtolower(extension()->name));
         } catch (Exception $exception) {
@@ -189,6 +190,10 @@ class OneController extends Controller
             extension()->delete();
         }catch (Exception $exception){
         }
+
+        hook('extension_delete_successful',[
+            "request" => request()->all()
+        ]);
 
         system_log(3,"EXTENSION_REMOVE");
         return respond('Eklenti Başarıyla Silindi');

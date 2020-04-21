@@ -17,10 +17,13 @@ class LogoutController extends Controller
     public function logout()
     {
         system_log(7,"LOGOUT_SUCCESS");
+        hook('logout_attempt',[
+            "user" => user()
+        ]);
         //Logout User
         Auth::logout();
         session()->flush();
-
+        hook('logout_successful');
         //Redirect User
         return respond(route('login'),300);
     }

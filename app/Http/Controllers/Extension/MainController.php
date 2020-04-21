@@ -71,6 +71,10 @@ class MainController extends Controller
      */
     public function upload()
     {
+        hook('extension_upload_attempt',[
+            "request" => request()->all()
+        ]);
+
         $flag = Validator::make(request()->all(), [
             'extension' => 'required | max:5000000'
         ]);
@@ -173,6 +177,9 @@ class MainController extends Controller
             "extension_id" => $new->id
         ]);
 
+        hook('extension_upload_successful',[
+            "extension" => $new
+        ]);
         return respond("Eklenti Başarıyla yüklendi.",200);
     }
 

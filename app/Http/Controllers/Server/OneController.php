@@ -37,6 +37,10 @@ class OneController extends Controller
 
     public function remove()
     {
+        hook('server_delete',[
+            "server" => server()
+        ]);
+
         // Check if authenticated user is owner or admin.
         if (server()->user_id != auth()->id() && !auth()->user()->isAdmin()) {
             // Throw error
@@ -84,6 +88,11 @@ class OneController extends Controller
 
     public function enableExtension()
     {
+        hook('server_extension_add',[
+            "server" => server(),
+            "request" => request()->all()
+        ]);
+
         if(!auth()->user()->id == server()->user_id && !auth()->user()->isAdmin()){
             return respond("Bu islemi yalnizca sunucu sahibi ya da bir yonetici yapabilir.");
         }
@@ -111,6 +120,10 @@ class OneController extends Controller
                 __(":old isimli sunucu adı :new olarak değiştirildi.", ["old" => server()->name, "new" => request('name')])
             );
         }
+
+        hook('server_update',[
+            "request" => request()->all()
+        ]);
 
         $output = server()->update([
             "name" => request('name'),
@@ -746,9 +759,15 @@ class OneController extends Controller
 
     public function removeExtension()
     {
+        hook('server_extension_remove',[
+            "server" => server(),
+            "request" => request()->all()
+        ]);
+
         if(server()->user_id != auth()->user()->id && !auth()->user()->isAdmin()){
             return respond("Yalnızca sunucu sahibi ya da yönetici bir eklentiyi silebilir.",201);
         }
+        
         foreach (json_decode(request('extensions')) as $key => $value) {
           DB::table("server_extensions")->where([
               "server_id" => server()->id,

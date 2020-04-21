@@ -25,6 +25,10 @@ class AddController extends Controller
     {
         $this->authorize('create','\App\Server');
 
+        hook('server_add_attempt',[
+            "request" => request()->all()
+        ]);
+        
         // Check if name is already in use.
         if(Server::where([
             'user_id' => auth()->id(),
