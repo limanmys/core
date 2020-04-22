@@ -6,6 +6,7 @@ use App\Notification;
 use App\Permission;
 use App\Server;
 use App\Certificate;
+use App\Module;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
@@ -301,6 +302,45 @@ if (!function_exists('sandbox')) {
     }
 }
 
+if (!function_exists('hook')) {
+    /**
+     * @param $name
+     * @param array $data
+     * @return void
+     */
+    function hook($name, $data = [])
+    {
+        $hooks = App\ModuleHook::where([
+            'hook' => $name,
+            'enabled' => true
+        ])->get();
+
+        array_key_exists("user", $data) ? $data["user"] = user() : null;
+        array_key_exists("extension", $data) ? $data["extension"] = extension() : null;
+        array_key_exists("server", $data) ? $data["server"] = server() : null;
+
+        $data = base64_encode(json_encode($data));
+        $modellist = [];
+        foreach($hooks as $hook){
+            if(!array_key_exists($hook->module_name,$modellist)){
+                $foo = Module::where("name",$hook->module_name)->first();
+                if(!$foo){
+                    continue;
+                }
+                $modellist[$hook->module_name] = $foo->enabled;
+                unset($foo);
+            }
+
+            if($modellist[$hook->module_name] == false){
+                continue;
+            }
+            
+            $command = "/liman/modules/" . $hook->module_name . "/main $name $data";
+            shell_exec("bash -c '$command & disown' &");
+        }
+    }
+}
+
 if (!function_exists('redirect_now')) {
     function redirect_now($url, $code = 302)
     {
@@ -583,7 +623,8 @@ if (!function_exists('checkHealth')) {
             "logs" => "0700",
             "sandbox" => "0755",
             "server" => "0700",
-            "webssh" => "0700"
+            "webssh" => "0700",
+            "modules" => "0700"
         ];
         $messages = [];
 

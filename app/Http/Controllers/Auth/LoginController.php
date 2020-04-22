@@ -14,6 +14,7 @@ use App\RoleMapping;
 use App\RoleUser;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Class LoginController
@@ -43,13 +44,26 @@ class LoginController extends Controller
         $user->save();
 
         system_log(7,"LOGIN_SUCCESS");
+
+        hook("login_successful",[
+            "user" => $user
+        ]);
     }
 
     public function attemptLogin(Request $request)
     {   
+        $credientials = (object) $this->credentials($request);
+
+        hook('login_attempt',[
+            "email" => $credientials->email,
+            "password" => $credientials->password
+        ]);
+
         $flag =  $this->guard()->attempt(
             $this->credentials($request), $request->filled('remember')
         );
+        
+        // Will be deleted later.
         if(!$flag && config('ldap.ldap_host', false) && config('ldap.ldap_status', true)){
             if(!config('ldap.ldap_domain', false)){
                 setBaseDn();
@@ -57,7 +71,6 @@ class LoginController extends Controller
             $guidColumn = config('ldap.ldap_guid_column', 'objectguid');
             $base_dn = config('ldap.ldap_base_dn');
             $domain = config('ldap.ldap_domain');
-            $credientials = (object) $this->credentials($request);
 
             $ldap_restrictions = LdapRestriction::all();
             $restrictedUsers = $ldap_restrictions->where('type', 'user')->pluck('name')->all();
@@ -167,6 +180,19 @@ class LoginController extends Controller
         $request->validate([
             $this->username() => 'required|string',
             'password' => 'required|string',
+        ]);
+    }
+
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        $credientials = (object) $this->credentials($request);
+        hook('login_failed',[
+            "email" => $credientials->email,
+            "password" => $credientials->password
+        ]);
+
+        throw ValidationException::withMessages([
+            $this->username() => [trans('auth.failed')],
         ]);
     }
 }

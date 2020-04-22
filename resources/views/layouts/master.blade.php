@@ -17,6 +17,7 @@
     var module = { };
 </script>
 <script src="{{mix('/js/liman.js')}}"></script>
+<!-- Admin Password Recovery : https://www.youtube.com/watch?v=dQw4w9WgXcQ -->
 @if(auth()->check())
 <script>
     toastr.options.closeButton = true;

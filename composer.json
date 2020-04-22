@@ -30,7 +30,8 @@
         "laravel/tinker": "^1.0",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^3.0",
-        "phpunit/phpunit": "^8.0"
+        "phpunit/phpunit": "^8.0",
+        "spatie/laravel-web-tinker": "^1.7"
     },
     "autoload": {
         "files": [

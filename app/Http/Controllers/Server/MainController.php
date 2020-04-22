@@ -31,6 +31,14 @@ class MainController extends Controller
 
     public function verifyKey()
     {
+        hook("server_key_verify",["key" => [
+            "key_type" => request('key_type'),
+            "ip_address" => request('ip_address'),
+            "username" => request('username'),
+            "password" => request('password'),
+            "port" => request('port')
+        ]]);
+
         if(request('key_type') == "linux_ssh"){
             return SSHConnector::verify(request('ip_address'),request('username'),request('password'),request('port'));
         }else if (request('key_type') == "windows_powershell"){
