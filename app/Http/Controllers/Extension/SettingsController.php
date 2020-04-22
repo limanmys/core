@@ -136,7 +136,11 @@ class SettingsController extends Controller
             }
             $extension[request("table")] = $values;
         }
-
+        if(array_key_exists("version_code",$extension)){
+            $extension["version_code"] = intval($extension["version_code"]) + 1;
+        }else{
+            $extension["version_code"] = 1;
+        }
         file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
 
         system_log(7,"EXTENSION_SETTINGS_UPDATE",[
@@ -172,6 +176,12 @@ class SettingsController extends Controller
         }
         $extension[request('table')] = $values;
 
+        if(array_key_exists("version_code",$extension)){
+            $extension["version_code"] = intval($extension["version_code"]) + 1;
+        }else{
+            $extension["version_code"] = 1;
+        }
+        
         file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
 
         system_log(7,"EXTENSION_SETTINGS_ADD",[
@@ -195,6 +205,12 @@ class SettingsController extends Controller
         }
 
         $extension[request('table')] = $values;
+
+        if(array_key_exists("version_code",$extension)){
+            $extension["version_code"] = intval($extension["version_code"]) + 1;
+        }else{
+            $extension["version_code"] = 1;
+        }
 
         file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
 
@@ -246,6 +262,13 @@ class SettingsController extends Controller
                         "type" => request("type"),
                         "name" => request("name"),
                     ]);
+
+                    if(array_key_exists("version_code",$extension)){
+                        $extension["version_code"] = intval($extension["version_code"]) + 1;
+                    }else{
+                        $extension["version_code"] = 1;
+                    }
+
                     file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
                     return respond("Parametre başarıyla eklendi!");
                 }
@@ -269,6 +292,11 @@ class SettingsController extends Controller
                         foreach($function['parameters'] as $parameter_key => $parameter){
                             if($parameter['variable'] == $parameter_variable){
                                 unset($extension['functions'][$key]['parameters'][$parameter_key]);
+                                if(array_key_exists("version_code",$extension)){
+                                    $extension["version_code"] = intval($extension["version_code"]) + 1;
+                                }else{
+                                    $extension["version_code"] = 1;
+                                }
                                 file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
                                 return respond("Parametre başarıyla silindi!");
                             }
@@ -299,7 +327,11 @@ class SettingsController extends Controller
         ]);
 
         $extension["functions"] = $functions;
-
+        if(array_key_exists("version_code",$extension)){
+            $extension["version_code"] = intval($extension["version_code"]) + 1;
+        }else{
+            $extension["version_code"] = 1;
+        }
         file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
 
         system_log(7,"EXTENSION_SETTINGS_ADD_FUNCTION",[
@@ -335,7 +367,11 @@ class SettingsController extends Controller
         }
 
         $extension["functions"] = $functions;
-
+        if(array_key_exists("version_code",$extension)){
+            $extension["version_code"] = intval($extension["version_code"]) + 1;
+        }else{
+            $extension["version_code"] = 1;
+        }
         file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
 
         system_log(7,"EXTENSION_SETTINGS_UPDATE_FUNCTION",[
@@ -368,7 +404,11 @@ class SettingsController extends Controller
         }
 
         $extension["functions"] = $functions;
-
+        if(array_key_exists("version_code",$extension)){
+            $extension["version_code"] = intval($extension["version_code"]) + 1;
+        }else{
+            $extension["version_code"] = 1;
+        }
         file_put_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json",json_encode($extension, JSON_PRETTY_PRINT));
 
         system_log(7,"EXTENSION_SETTINGS_REMOVE_FUNCTION",[
