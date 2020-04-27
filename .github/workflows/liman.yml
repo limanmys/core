@@ -75,4 +75,4 @@ jobs:
           """ > DEBIAN/control
           cd ../
           dpkg-deb -Zgzip --build package
-          [ "$GITHUB_REF" == "refs/heads/master" ] && curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-5gpwY1sVlknWFuZvnQjbtbKl&channels=liman-release&filename=liman-$GITHUB_RUN_ID.deb&pretty=1" || echo
+          [ "$GITHUB_REF" == "refs/heads/master" ] && curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-NFLf9tgYahuMsmeT7rwp5wnD&channels=liman-release&filename=liman-$GITHUB_RUN_ID.deb&pretty=1" || echo
