@@ -38,16 +38,16 @@ class Kernel extends ConsoleKernel
             $messages = checkHealth();
             if ($messages[0]["type"] != "success") {
                 AdminNotification::where('type', 'health_problem')->delete();
-                $notification = new AdminNotification();
-                $notification->title = "Sağlık Problemi Bulundu!";
-                $notification->type = "health_problem";
-                $notification->message = "Detaylar için lütfen ayarlardan sağlık kontrolünü kontrol edin.";
-                $notification->level = 3;
-                $notification->save();
+                AdminNotification::create([
+                    "title" => "Sağlık Problemi Bulundu!",
+                    "type" => "health_problem",
+                    "message" => "Detaylar için lütfen ayarlardan sağlık kontrolünü kontrol edin.",
+                    "level" => 3,
+                ]);
             }
         })->hourly()->name('Health Check');
-        //Check Package Update Every 30 Min
 
+        //Check Package Update Every 30 Min
         $schedule->call(function () {
             shell_exec("sudo apt update");
             $output = shell_exec("apt list --upgradable");
@@ -55,12 +55,12 @@ class Kernel extends ConsoleKernel
                 return;
             }
             AdminNotification::where('type', 'liman_update')->delete();
-            $notification = new AdminNotification();
-            $notification->title = "Liman Güncellemesi Mevcut!";
-            $notification->type = "liman_update";
-            $notification->message = "Yeni bir liman sürümü mevcut ayrıntılı bilgi için tıklayınız.";
-            $notification->level = 3;
-            $notification->save();
+            AdminNotification::create([
+                "title" => "Liman Güncellemesi Mevcut!",
+                "type" => "liman_update",
+                "message" => "Yeni bir liman sürümü mevcut ayrıntılı bilgi için tıklayınız.",
+                "level" => 3,
+            ]);
         })->everyThirtyMinutes()->name('Update Check');
     }
 

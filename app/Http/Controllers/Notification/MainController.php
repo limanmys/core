@@ -20,7 +20,6 @@ class MainController extends Controller
             "notifications" => $notifications,
             "system" => false
         ]);
-
     }
     public function delete()
     {
@@ -48,7 +47,7 @@ class MainController extends Controller
             "read" => false
         ])->orderBy('updated_at', 'desc')->get();
         $adminNotifications = [];
-        if(auth()->user()->isAdmin()){
+        if (auth()->user()->isAdmin()) {
             $adminNotifications = AdminNotification::where([
                 "read" => "false"
             ])->orderBy('updated_at', 'desc')->get();
@@ -68,8 +67,9 @@ class MainController extends Controller
         if (!$notification) {
             return respond("Bildirim Bulunamadi", 201);
         }
-        $notification->read = true;
-        $notification->save();
+        $notification->update([
+            "read" => true
+        ]);
         return $notification->id;
     }
 
@@ -92,10 +92,10 @@ class MainController extends Controller
             "read" => "true"
         ]);
         $adminUsers = User::where('status', 1)->get();
-        foreach($adminUsers as $user){
+        foreach ($adminUsers as $user) {
             $user->notify(new NotificationSent([]));
         }
-        return respond("Hepsi Okundu.",200);
+        return respond("Hepsi Okundu.", 200);
     }
 
     public function allSystem()
@@ -106,5 +106,4 @@ class MainController extends Controller
             "system" => true
         ]);
     }
-
 }

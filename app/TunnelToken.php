@@ -28,7 +28,7 @@ class TunnelToken extends Model
 
     public static function set($token, $local_port, $remote_host, $remote_port)
     {
-        if($token == null){
+        if ($token == null) {
             abort(504, "Tünel açılırken bir hata oluştu.");
         }
         //Delete Old Ones
@@ -39,7 +39,7 @@ class TunnelToken extends Model
             "remote_port" => $remote_port
         ])->delete();
 
-        $tokenObj = new TunnelToken([
+        return TunnelToken::create([
             "user_id" => user()->id,
             "extension_id" => extension()->id,
             "remote_host" => $remote_host,
@@ -47,11 +47,10 @@ class TunnelToken extends Model
             "token" => $token,
             "local_port" => $local_port,
         ]);
-        return $tokenObj->save();
     }
 
-    public static function remove($token){
-
+    public static function remove($token)
+    {
         return TunnelToken::where([
             "user_id" => user()->id,
             "extension_id" => extension()->id,

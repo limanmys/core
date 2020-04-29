@@ -197,14 +197,13 @@ class MainController extends Controller
         if (Extension::where("name", request("name"))->exists()) {
             return respond("Bu isimle zaten bir eklenti var.", 201);
         }
-        $ext = new Extension([
+        $ext = Extension::create([
             "name" => request("name"),
             "version" => "0.0.1",
             "icon" => "",
             "service" => "",
             "language" => request('language')
         ]);
-        $ext->save();
 
         $json = [
             "name" => $name,
@@ -261,9 +260,9 @@ class MainController extends Controller
     public function updateExtOrders()
     {
         foreach (json_decode(request('data')) as $extension) {
-            $data = Extension::find($extension->id);
-            $data->order = $extension->order;
-            $data->save();
+            Extension::find($extension->id)->update([
+                "order" => $extension->order
+            ]);
         }
         return respond('Sıralamalar güncellendi', 200);
     }

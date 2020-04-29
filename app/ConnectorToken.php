@@ -20,10 +20,10 @@ class ConnectorToken extends Model
         ]);
     }
 
-    public static function set($token,$server_id)
+    public static function set($token, $server_id)
     {
-        if($token == null){
-            abort(504,"Lütfen kasa üzerinden yeni bir anahtar ekleyin.");
+        if ($token == null) {
+            abort(504, "Lütfen kasa üzerinden yeni bir anahtar ekleyin.");
         }
         //Delete Old Ones
         ConnectorToken::where([
@@ -31,12 +31,11 @@ class ConnectorToken extends Model
             "server_id" => $server_id
         ])->delete();
 
-        $tokenObj = new ConnectorToken([
+        return ConnectorToken::create([
             "user_id" => user()->id,
             "server_id" => $server_id,
             "token" => $token
         ]);
-        return $tokenObj->save();
     }
 
     public static function clear()

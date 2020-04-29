@@ -135,11 +135,10 @@ if (!function_exists('addCertificate')) {
         shell_exec("sudo update-ca-certificates");
 
         // Create Certificate Object.
-        $cert = new Certificate([
+        return Certificate::create([
             "server_hostname" => $hostname,
             "origin" => $port
         ]);
-        return $cert->save();
     }
 }
 

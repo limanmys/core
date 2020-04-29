@@ -24,17 +24,17 @@ class Permission extends Model
 {
     use UsesUuid;
 
-    protected $table = "permissions";    
+    protected $table = "permissions";
 
     protected $fillable = [
         "morph_id", "morph_type", "type", "key", "value", "extra", "blame"
     ];
 
-    public static function can($user_id, $type, $key, $value ,$extra = null)
+    public static function can($user_id, $type, $key, $value, $extra = null)
     {
         $user = User::find($user_id);
         // Verify if user is admin.
-        if($user->isAdmin()){
+        if ($user->isAdmin()) {
             return true;
         }
 
@@ -50,9 +50,9 @@ class Permission extends Model
             ])->exists();
     }
 
-    public static function grant($morph_id, $type, $key, $value ,$extra = null, $morph_type="users")
+    public static function grant($morph_id, $type, $key, $value, $extra = null, $morph_type = "users")
     {
-        $permission =  Permission::firstOrCreate([
+        return Permission::firstOrCreate([
             "morph_id" => $morph_id,
             "morph_type" => $morph_type,
             "type" => $type,
@@ -61,11 +61,9 @@ class Permission extends Model
             "extra" => $extra,
             "blame" => user()->id
         ]);
-
-        return $permission->save();
     }
 
-    public static function revoke($morph_id, $type, $key, $value ,$extra = null)
+    public static function revoke($morph_id, $type, $key, $value, $extra = null)
     {
         $permission = Permission::where([
             "morph_id" => $morph_id,
@@ -74,7 +72,7 @@ class Permission extends Model
             "value" => $value,
             "extra" => $extra
         ])->first();
-        if($permission){
+        if ($permission) {
             return $permission->delete();
         }
 
