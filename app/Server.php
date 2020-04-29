@@ -79,15 +79,15 @@ class Server extends Model
     /**
      * @param $script
      * @param $parameters
-     * @param null $extra
+     * @param false $runAsRoot
      * @return string
      */
-    public function runScript($script, $parameters, $extra = null)
+    public function runScript($script, $parameters, $runAsRoot=false)
     {
         // Create Connector Object
         $connector = $this->connector();
 
-        return $connector->runScript($script,$parameters,$extra);
+        return $connector->runScript($script, $parameters, $runAsRoot);
     }
 
     /**

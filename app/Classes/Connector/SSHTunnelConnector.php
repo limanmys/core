@@ -1,20 +1,23 @@
 <?php
+
 namespace App\Classes\Connector;
 
 use App\TunnelToken;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+
 /**
  * Class SSHTunnelConnector
  * @package App\Classes\Connector
  */
-class SSHTunnelConnector{
+class SSHTunnelConnector
+{
 
     public static function new($remote_host, $remote_port, $username, $password)
     {
-        if(TunnelToken::get($remote_host, $remote_port)->exists()){
+        if (TunnelToken::get($remote_host, $remote_port)->exists()) {
             $tunnel = TunnelToken::get($remote_host, $remote_port)->first();
-            if(checkPort("127.0.0.1", $tunnel->local_port)){
+            if (checkPort("127.0.0.1", $tunnel->local_port)) {
                 return $tunnel->local_port;
             }
         }
@@ -32,33 +35,33 @@ class SSHTunnelConnector{
 
     public static function stop($remote_host, $remote_port)
     {
-        if(TunnelToken::get($remote_host, $remote_port)->exists()){
+        if (TunnelToken::get($remote_host, $remote_port)->exists()) {
             $tunnel = TunnelToken::get($remote_host, $remote_port)->first();
             TunnelToken::remove($tunnel->token);
             self::request("stop", [
-                "token" => $tunnel->token.":".$tunnel->local_port,
+                "token" => $tunnel->token . ":" . $tunnel->local_port,
             ]);
-            return "ok";
+            return true;
         }
         return null;
     }
 
-    public static function request($url, $params,$retry = 3)
+    public static function request($url, $params, $retry = 3)
     {
         // Create Guzzle Object.
         $client = new Client();
         // Make Request.
-        try{
-            $res = $client->request('POST', env("LIMAN_CONNECTOR_SERVER"). '/' . $url, ["form_params" => $params]);
-        }catch(BadResponseException $e){
+        try {
+            $res = $client->request('POST', env("LIMAN_CONNECTOR_SERVER") . '/' . $url, ["form_params" => $params]);
+        } catch (BadResponseException $e) {
             // In case of error, handle error.
             $json = json_decode((string) $e->getResponse()->getBody()->getContents());
             // If it's first time, retry after recreating ticket.
-            if($retry){
-                return self::request($url,$params,$retry -1 );
-            }else{
+            if ($retry) {
+                return self::request($url, $params, $retry - 1);
+            } else {
                 // If nothing works, abort.
-                abort(402,"Tünel işlemleri sırasında bir hata oluştu.");
+                abort(402, "Tünel işlemleri sırasında bir hata oluştu.");
             }
         }
         // Simply parse and return output.
