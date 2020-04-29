@@ -9,22 +9,22 @@ class Server
 {
     public function handle($request, Closure $next)
     {
-        if(in_array(server()->control_port,knownPorts()) && !Certificate::where([
+        if (in_array(server()->control_port, knownPorts()) && !Certificate::where([
             'server_hostname' => server()->ip_address,
             'origin' => server()->control_port
-        ])->exists()){
-            abort(504,server()->name."(".server()->ip_address.") ".__("isimli sunucu henüz onaylanmamış!"));
+        ])->exists()) {
+            abort(504, server()->name . "(" . server()->ip_address . ") " . __("isimli sunucu henüz onaylanmamış!"));
             return redirect()->back()->withErrors([
-                "message" => server()->name."(".server()->ip_address.") ".__("isimli sunucu henüz onaylanmamış!")
+                "message" => server()->name . "(" . server()->ip_address . ") " . __("isimli sunucu henüz onaylanmamış!")
             ]);
         }
-        $status = @fsockopen(server()->ip_address,server()->control_port,$errno,$errstr,(intval(env('SERVER_CONNECTION_TIMEOUT')) / 1000));
-        if(is_resource($status)){
+        $status = @fsockopen(server()->ip_address, server()->control_port, $errno, $errstr, (intval(env('SERVER_CONNECTION_TIMEOUT')) / 1000));
+        if (is_resource($status)) {
             return $next($request);
-        }else{
-            abort(504,server()->name."(".server()->ip_address.") ".__("isimli sunucuya erişim sağlanamadı!"));
+        } else {
+            abort(504, server()->name . "(" . server()->ip_address . ") " . __("isimli sunucuya erişim sağlanamadı!"));
             return redirect()->back()->withErrors([
-                "message" => server()->name."(".server()->ip_address.") ".__("isimli sunucuya erişim sağlanamadı!")
+                "message" => server()->name . "(" . server()->ip_address . ") " . __("isimli sunucuya erişim sağlanamadı!")
             ]);
         }
     }

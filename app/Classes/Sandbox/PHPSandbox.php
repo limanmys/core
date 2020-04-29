@@ -30,7 +30,7 @@ class PHPSandbox implements Sandbox
             "user_id" => user()->id,
             "server_id" => server()->id,
         ]);
-        if($extensionDb == null){
+        if ($extensionDb == null) {
             $extensionDb = [];
             foreach ($settings->get() as $setting) {
                 $key = env('APP_KEY') . user()->id . extension()->id . server()->id;
@@ -38,16 +38,17 @@ class PHPSandbox implements Sandbox
                 $stringToDecode = substr($decrypted, 16);
                 $extensionDb[$setting->name] = base64_decode($stringToDecode);
             }
-    
+
             $extensionDb = json_encode($extensionDb);
         }
-        
-        $request = request()->all();
-        unset($request["permissions"]);
-        unset($request["extension"]);
-        unset($request["server"]);
-        unset($request["script"]);
-        unset($request["server_id"]);
+
+        $request = request()->except([
+            "permissions",
+            "extension",
+            "server",
+            "script",
+            "server_id"
+        ]);
         $request = json_encode($request);
 
         $apiRoute = route('extension_server', [
@@ -87,7 +88,7 @@ class PHPSandbox implements Sandbox
 
         $functionsPath = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/views/functions.php";
 
-        $publicPath = route('extension_public_folder',[
+        $publicPath = route('extension_public_folder', [
             "extension_id" => extension()->id,
             "path" => ""
         ]);
@@ -97,7 +98,7 @@ class PHPSandbox implements Sandbox
             $functionsPath, $function, server()->toArray(), extension()->toArray(), $extensionDb,
             $request, $apiRoute, $navigationRoute, $token, $permissions, session('locale'), json_encode($userData), $publicPath, $isAjax
         ];
-        
+
         $encrypted = openssl_encrypt(
             Str::random() . base64_encode(json_encode($array)),
             'aes-256-cfb8',
@@ -108,7 +109,7 @@ class PHPSandbox implements Sandbox
 
         $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
 
-        return "sudo runuser " . clean_score(extension()->id) .
+        return "sudo runuser " . cleanDash(extension()->id) .
             " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
     }
 

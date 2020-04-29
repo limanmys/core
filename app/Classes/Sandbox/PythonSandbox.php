@@ -7,19 +7,23 @@ use App\Token;
 use App\UserSettings;
 use Illuminate\Support\Str;
 
-class PythonSandbox implements Sandbox{
+class PythonSandbox implements Sandbox
+{
     private $path = "/liman/sandbox/python/index.py";
     private $fileExtension = ".html.ninja";
 
-    public function getPath(){
+    public function getPath()
+    {
         return $this->path;
     }
 
-    public function getFileExtension(){
+    public function getFileExtension()
+    {
         return $this->fileExtension;
     }
 
-    public function command($function, $extensionDb = null){
+    public function command($function, $extensionDb = null)
+    {
         $combinerFile = $this->path;
 
         $settings = UserSettings::where([
@@ -37,12 +41,13 @@ class PythonSandbox implements Sandbox{
 
         $extensionDb = json_encode($extensionDb);
 
-        $request = request()->all();
-        unset($request["permissions"]);
-        unset($request["extension"]);
-        unset($request["server"]);
-        unset($request["script"]);
-        unset($request["server_id"]);
+        $request = request()->except([
+            "permissions",
+            "extension",
+            "server",
+            "script",
+            "server_id"
+        ]);
         $request = json_encode($request);
 
         $apiRoute = route('extension_server', [
@@ -82,7 +87,7 @@ class PythonSandbox implements Sandbox{
 
         $functionsPath = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/views/functions.py";
 
-        $publicPath = route('extension_public_folder',[
+        $publicPath = route('extension_public_folder', [
             "extension_id" => extension()->id,
             "path" => ""
         ]);
@@ -93,23 +98,24 @@ class PythonSandbox implements Sandbox{
             $request, $apiRoute, $navigationRoute, $token, $permissions, session('locale'), json_encode($userData), $publicPath, $isAjax
         ];
 
-//        $encrypted = openssl_encrypt(
-//            Str::random() . base64_encode(json_encode($array)),
-//            'aes-256-cfb8',
-//            shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
-//            0,
-//            Str::random()
-//        );
+        //        $encrypted = openssl_encrypt(
+        //            Str::random() . base64_encode(json_encode($array)),
+        //            'aes-256-cfb8',
+        //            shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
+        //            0,
+        //            Str::random()
+        //        );
         $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
         $combinerFile = "/liman/extensions/" . strtolower(extension()->name) . "/views/functions.py";
         $encrypted = base64_encode(json_encode($array));
-        return "sudo -u " . clean_score(extension()->id) .
+        return "sudo -u " . cleanDash(extension()->id) .
             " bash -c 'export PYTHONPATH=\$PYTHONPATH:/liman/sandbox/python; timeout 30 /usr/bin/python3 $combinerFile $keyPath $encrypted 2>&1'";
     }
 
-    public function getInitialFiles(){
+    public function getInitialFiles()
+    {
         return [
-            "index.blade.php" , "functions.py"
+            "index.blade.php", "functions.py"
         ];
     }
 }

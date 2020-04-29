@@ -29,14 +29,14 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // Delete Old Tokens every night
-        $schedule->call(function (){
+        $schedule->call(function () {
             DB::table('tokens')->truncate();
         })->dailyAt("23:59")->name('Token Cleanup');
 
         // Run Health Check every hour.
-        $schedule->call(function (){
+        $schedule->call(function () {
             $messages = checkHealth();
-            if($messages[0]["type"] != "success"){
+            if ($messages[0]["type"] != "success") {
                 AdminNotification::where('type', 'health_problem')->delete();
                 $notification = new AdminNotification();
                 $notification->title = "Sağlık Problemi Bulundu!";
@@ -48,10 +48,10 @@ class Kernel extends ConsoleKernel
         })->hourly()->name('Health Check');
         //Check Package Update Every 30 Min
 
-        $schedule->call(function (){
+        $schedule->call(function () {
             shell_exec("sudo apt update");
             $output = shell_exec("apt list --upgradable");
-            if(!strpos($output,"liman")){
+            if (!strpos($output, "liman")) {
                 return;
             }
             AdminNotification::where('type', 'liman_update')->delete();
@@ -71,7 +71,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

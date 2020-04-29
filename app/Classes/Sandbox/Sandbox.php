@@ -8,7 +8,7 @@ interface Sandbox
 
     public function getFileExtension();
 
-    public function command($function,$extensiondb = null);
+    public function command($function, $extensiondb = null);
 
     public function getInitialFiles();
 }

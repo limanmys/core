@@ -16,9 +16,9 @@ class ForcePasswordChange
     public function handle($request, Closure $next)
     {
         $safeRoutes = [
-            'password_change' , 'password_change_save' ,'logout'
+            'password_change', 'password_change_save', 'logout'
         ];
-        if(auth()->check() && user()->forceChange == true && !in_array(request()->route()->getName(),$safeRoutes)){
+        if (auth()->check() && user()->forceChange == true && !in_array(request()->route()->getName(), $safeRoutes)) {
             return redirect(route('password_change'));
         }
         return $next($request);

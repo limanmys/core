@@ -7,7 +7,8 @@ use Illuminate\Session\Store;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 
-class SessionTimeout {
+class SessionTimeout
+{
 
     /**
      * Instance of Session Store
@@ -21,7 +22,8 @@ class SessionTimeout {
      */
     protected $timeout = 900;
 
-    public function __construct(Store $session){
+    public function __construct(Store $session)
+    {
         $this->session        = $session;
         $this->redirectUrl    = route('login');
         $this->sessionLabel   = 'warning';
@@ -42,28 +44,25 @@ class SessionTimeout {
      */
     public function handle($request, Closure $next)
     {
-        if(!Auth::check()){
+        if (!Auth::check()) {
             $this->session->forget('lastActivityTime');
             return $next($request);
         }
-        if(! $this->session->has('lastActivityTime'))
-        {
+        if (!$this->session->has('lastActivityTime')) {
             $this->session->put('lastActivityTime', time());
-        }
-        else if( time() - $this->session->get('lastActivityTime') > $this->getTimeOut())
-        {
+        } else if (time() - $this->session->get('lastActivityTime') > $this->getTimeOut()) {
             $this->session->forget('lastActivityTime');
             Auth::logout();
-            $message = __(':timeout dakika boyunca aktif olmadığınız için oturumunuz sonlandırıldı.', ['timeout' => $this->getTimeOut()/60]);
-            if($request->wantsJson()){
+            $message = __(':timeout dakika boyunca aktif olmadığınız için oturumunuz sonlandırıldı.', ['timeout' => $this->getTimeOut() / 60]);
+            if ($request->wantsJson()) {
                 $this->session->flash($this->getSessionLabel(), $message);
                 return respond($this->getRedirectUrl(), 300);
-            }else{
+            } else {
                 return redirect($this->getRedirectUrl())->with([$this->getSessionLabel() => $message]);
             }
         }
-        if(!in_array($request->route()->getName(),$this->exclude)){
-            $this->session->put('lastActivityTime',time());
+        if (!in_array($request->route()->getName(), $this->exclude)) {
+            $this->session->put('lastActivityTime', time());
         }
         return $next($request);
     }
@@ -74,7 +73,7 @@ class SessionTimeout {
      */
     private function getTimeOut()
     {
-        return  ($this->lifetime * 60) ?: $this->timeout;
+        return ($this->lifetime * 60) ?: $this->timeout;
     }
 
     /**
@@ -83,7 +82,7 @@ class SessionTimeout {
      */
     private function getRedirectUrl()
     {
-        return  (env('SESSION_TIMEOUT_REDIRECTURL')) ?: $this->redirectUrl;
+        return (env('SESSION_TIMEOUT_REDIRECTURL')) ?: $this->redirectUrl;
     }
 
     /**
@@ -92,7 +91,6 @@ class SessionTimeout {
      */
     private function getSessionLabel()
     {
-        return  (env('SESSION_LABEL')) ?: $this->sessionLabel;
+        return (env('SESSION_LABEL')) ?: $this->sessionLabel;
     }
-
 }

@@ -218,7 +218,7 @@ class InternalController extends Controller
 
         // Update Permissions
         shell_exec("sudo chmod 770 " . request('localPath'));
-        shell_exec("sudo chown " . clean_score(extension()->id) . ":liman " . request('localPath'));
+        shell_exec("sudo chown " . cleanDash(extension()->id) . ":liman " . request('localPath'));
 
         system_log(7, "EXTENSION_INTERNAL_RECEIVE_FILE", [
             "extension_id" => extension()->id,

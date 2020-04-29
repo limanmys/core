@@ -6,11 +6,11 @@ use Closure;
 
 class Parameters
 {
-    public function handle($request, Closure $next,...$parameters)
+    public function handle($request, Closure $next, ...$parameters)
     {
         // Check for each parameters if it is existing or simply has more characters than 0
         foreach ($parameters as $parameter) {
-            if(!request()->has($parameter) || !strlen(request($parameter))){
+            if (!request()->has($parameter) || !strlen(request($parameter))) {
 
                 // If found something that is missing, abort the process and warn user.
                 return respond("Eksik Parametre > $parameter", 403);

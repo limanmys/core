@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Middleware;
 
 use TusPhp\Request;
@@ -11,9 +12,8 @@ class TusAuthenticated implements TusMiddleware
 
     public function handle(Request $request, Response $response)
     {
-        if (! auth()->check()) {
+        if (!auth()->check()) {
             throw new UnauthorizedHttpException('User not authenticated');
         }
-
     }
 }
