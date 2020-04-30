@@ -13,11 +13,11 @@ Route::post('/sunucu/ekle', 'Server\AddController@main')->name('server_add')->mi
 
 Route::post('/sunucu/guncelle', 'Server\OneController@update')->name('server_update')->middleware('parameters:server_id,name,control_port,city');
 
-Route::post('/sunucu/erisimKontrolu','Server\MainController@checkAccess')->name('server_check_access')->middleware('parameters:hostname,port');
+Route::post('/sunucu/erisimKontrolu', 'Server\MainController@checkAccess')->name('server_check_access')->middleware('parameters:hostname,port');
 
-Route::post('/sunucu/isimKontrol','Server\MainController@verifyName')->name('server_verify_name')->middleware('parameters:server_name');
+Route::post('/sunucu/isimKontrol', 'Server\MainController@verifyName')->name('server_verify_name')->middleware('parameters:server_name');
 
-Route::post('/sunucu/anahtarKontrol','Server\MainController@verifyKey')->name('server_verify_key')->middleware('parameters:ip_address,username,password,port');
+Route::post('/sunucu/anahtarKontrol', 'Server\MainController@verifyKey')->name('server_verify_key')->middleware('parameters:ip_address,username,password,port');
 
 // Remove Server Route
 
@@ -66,51 +66,51 @@ Route::group(['middleware' => ['server']], function () {
 
     //Route::post('/sunucu/yetkilendir', 'Server\OneController@grant')->name('server_grant_permission')->middleware('parameters:server_id,email');
 
-    Route::post('/sunucu/favori','Server\OneController@favorite')->name('server_favorite')->middleware('parameters:server_id,action');
+    Route::post('/sunucu/favori', 'Server\OneController@favorite')->name('server_favorite')->middleware('parameters:server_id,action');
 
-    Route::post('/sunucu/durum','Server\OneController@stats')->name('server_stats');
+    Route::post('/sunucu/durum', 'Server\OneController@stats')->name('server_stats');
 
-    Route::post('/sunucu/servis/','Server\OneController@serviceList')->name('server_service_list');
+    Route::post('/sunucu/servis/', 'Server\OneController@serviceList')->name('server_service_list');
 
-    Route::post('/sunucu/yetkili_kullanicilar/','Server\OneController@getSudoers')->name('server_sudoers_list');
+    Route::post('/sunucu/yetkili_kullanicilar/', 'Server\OneController@getSudoers')->name('server_sudoers_list');
 
-    Route::post('/sunucu/yetkili_kullanicilar/ekle','Server\OneController@addSudoers')->name('server_add_sudoers');
+    Route::post('/sunucu/yetkili_kullanicilar/ekle', 'Server\OneController@addSudoers')->name('server_add_sudoers');
 
-    Route::post('/sunucu/yetkili_kullanicilar/sil','Server\OneController@deleteSudoers')->name('server_delete_sudoers');
+    Route::post('/sunucu/yetkili_kullanicilar/sil', 'Server\OneController@deleteSudoers')->name('server_delete_sudoers');
 
-    Route::post('/sunucu/yerel_kullanicilar/','Server\OneController@getLocalUsers')->name('server_local_user_list');
+    Route::post('/sunucu/yerel_kullanicilar/', 'Server\OneController@getLocalUsers')->name('server_local_user_list');
 
-    Route::post('/sunucu/yerel_kullanicilar/ekle','Server\OneController@addLocalUser')->name('server_add_local_user');
+    Route::post('/sunucu/yerel_kullanicilar/ekle', 'Server\OneController@addLocalUser')->name('server_add_local_user');
 
-    Route::post('/sunucu/yerel_gruplar/','Server\OneController@getLocalGroups')->name('server_local_group_list');
+    Route::post('/sunucu/yerel_gruplar/', 'Server\OneController@getLocalGroups')->name('server_local_group_list');
 
-    Route::post('/sunucu/yerel_gruplar/ekle','Server\OneController@addLocalGroup')->name('server_add_local_group');
+    Route::post('/sunucu/yerel_gruplar/ekle', 'Server\OneController@addLocalGroup')->name('server_add_local_group');
 
-    Route::post('/sunucu/yerel_gruplar/kullanicilar','Server\OneController@getLocalGroupDetails')->name('server_local_group_users_list');
+    Route::post('/sunucu/yerel_gruplar/kullanicilar', 'Server\OneController@getLocalGroupDetails')->name('server_local_group_users_list');
 
-    Route::post('/sunucu/yerel_gruplar/kullanicilar/ekle','Server\OneController@addLocalGroupUser')->name('server_add_local_group_user');
-    
-    Route::post('/sunucu/guncellemeler/','Server\OneController@updateList')->name('server_update_list');
+    Route::post('/sunucu/yerel_gruplar/kullanicilar/ekle', 'Server\OneController@addLocalGroupUser')->name('server_add_local_group_user');
 
-    Route::post('/sunucu/guncellemeler/paket_yukle','Server\OneController@installPackage')->name('server_install_package');
+    Route::post('/sunucu/guncellemeler/', 'Server\OneController@updateList')->name('server_update_list');
 
-    Route::post('/sunucu/guncellemeler/paket_kontrol','Server\OneController@checkPackage')->name('server_check_package');
-    
-    Route::post('/sunucu/guncellemeler/deb_yukle','Server\OneController@uploadDebFile')->name('server_upload_deb');
+    Route::post('/sunucu/guncellemeler/paket_yukle', 'Server\OneController@installPackage')->name('server_install_package');
 
-    Route::post('/sunucu/gunluk_kayitlari','Server\OneController@getLogs')->name('server_get_logs');
+    Route::post('/sunucu/guncellemeler/paket_kontrol', 'Server\OneController@checkPackage')->name('server_check_package');
 
-    Route::post('/sunucu/paketler','Server\OneController@packageList')->name('server_package_list');
+    Route::post('/sunucu/guncellemeler/deb_yukle', 'Server\OneController@uploadDebFile')->name('server_upload_deb');
 
-    Route::post('/sunucu/yukselt','Server\OneController@upgradeServer')->name('server_upgrade');
+    Route::post('/sunucu/gunluk_kayitlari', 'Server\OneController@getLogs')->name('server_get_logs');
 
-    Route::post('/sunucu/eklentiSil','Server\OneController@removeExtension')->name('server_extension_remove');
+    Route::post('/sunucu/paketler', 'Server\OneController@packageList')->name('server_package_list');
 
-    Route::post('/sunucu/servis/baslat','Server\OneController@startService')->name('server_start_service');
+    Route::post('/sunucu/yukselt', 'Server\OneController@upgradeServer')->name('server_upgrade');
 
-    Route::post('/sunucu/servis/durdur','Server\OneController@stopService')->name('server_stop_service');
+    Route::post('/sunucu/eklentiSil', 'Server\OneController@removeExtension')->name('server_extension_remove');
 
-    Route::post('/sunucu/servis/yenidenBaslat','Server\OneController@restartService')->name('server_restart_service');
+    Route::post('/sunucu/servis/baslat', 'Server\OneController@startService')->name('server_start_service');
 
-    Route::post('/sunucu/acikPortlar','Server\OneController@getOpenPorts')->name('server_get_open_ports');
+    Route::post('/sunucu/servis/durdur', 'Server\OneController@stopService')->name('server_stop_service');
+
+    Route::post('/sunucu/servis/yenidenBaslat', 'Server\OneController@restartService')->name('server_restart_service');
+
+    Route::post('/sunucu/acikPortlar', 'Server\OneController@getOpenPorts')->name('server_get_open_ports');
 });

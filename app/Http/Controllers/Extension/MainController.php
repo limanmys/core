@@ -157,21 +157,19 @@ class MainController extends Controller
         $extension_folder = env('EXTENSIONS_PATH') . strtolower($json["name"]);
         $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $new->id;
         file_put_contents($passPath, Str::random(32));
-        shell_exec("sudo chown liman:" . cleanDash($new->id) . " " . $passPath);
-        shell_exec("sudo chmod 640 " . $passPath);
 
-        shell_exec("sudo mkdir -p $extension_folder");
-
-        shell_exec("sudo cp -r " . $path . "/* " . $extension_folder . DIRECTORY_SEPARATOR);
-
-        shell_exec('sudo chown ' . cleanDash($new->id) . ':liman ' . $extension_folder);
-        shell_exec('sudo chmod 770 ' . $extension_folder);
-
-        shell_exec("sudo chown -R " . cleanDash($new->id) . ':liman "' . $extension_folder . '"');
-        shell_exec("sudo chmod -R 770 \"" . $extension_folder . "\"");
-
-        shell_exec("sudo chown liman:" . cleanDash($new->id) . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
-        shell_exec("sudo chmod 640 " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
+        shell_exec("
+            sudo chown liman:" . cleanDash($new->id) . " $passPath;
+            sudo chmod 640 $passPath;
+            sudo mkdir -p $extension_folder;
+            sudo cp -r " . $path . "/* " . $extension_folder . DIRECTORY_SEPARATOR . ";
+            sudo chown " . cleanDash($new->id) . ":liman $extension_folder;
+            sudo chmod 770 $extension_folder;
+            sudo chown -R " . cleanDash($new->id) . ":liman $extension_folder;
+            sudo chmod -R 770 $extension_folder;
+            sudo chown liman:" . cleanDash($new->id) . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json;
+            sudo chmod 640 " . $extension_folder . DIRECTORY_SEPARATOR . "db.json;
+        ");
 
         system_log(3, "EXTENSION_UPLOAD_SUCCESS", [
             "extension_id" => $new->id
@@ -224,9 +222,11 @@ class MainController extends Controller
             "icon" => ""
         ];
 
-        shell_exec("mkdir " . $folder);
-        shell_exec("mkdir " . $folder . DIRECTORY_SEPARATOR . "views");
-        shell_exec("mkdir " . $folder . DIRECTORY_SEPARATOR . "scripts");
+        shell_exec("
+            mkdir $folder;
+            mkdir $folder" . DIRECTORY_SEPARATOR . "views;
+            mkdir $folder" . DIRECTORY_SEPARATOR . "scripts;
+        ");
 
         touch($folder . DIRECTORY_SEPARATOR . "db.json");
 
@@ -238,18 +238,21 @@ class MainController extends Controller
 
         $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $ext->id;
         file_put_contents($passPath, Str::random(32));
-        shell_exec("sudo chown liman:" . cleanDash($ext->id) . " " . $passPath);
-        shell_exec("sudo chmod 640 " . $passPath);
+        shell_exec("
+            sudo chown liman:" . cleanDash($ext->id) . " $passPath;
+            sudo chmod 640 $passPath;
+        ");
 
         foreach (sandbox(request('language'))->getInitialFiles() as $file) {
             touch($folder . "/views/$file");
         }
 
-        shell_exec('sudo chown -R ' . cleanDash($ext->id) . ':liman ' . $folder);
-        shell_exec('sudo chmod -R 770 ' . $folder);
-
-        shell_exec("sudo chown liman:" . cleanDash($ext->id) . " " . $folder . DIRECTORY_SEPARATOR . "db.json");
-        shell_exec("sudo chmod 640 " . $folder . DIRECTORY_SEPARATOR . "db.json");
+        shell_exec("
+            sudo chown -R " . cleanDash($ext->id) . ":liman $folder;
+            sudo chmod -R 770 $folder;
+            sudo chown liman:" . cleanDash($ext->id) . " $folder" . DIRECTORY_SEPARATOR . "db.json;
+            sudo chmod 640  $folder" . DIRECTORY_SEPARATOR . "db.json;
+        ");
 
         system_log(6, "EXTENSION_CREATE", [
             "extension_id" => $ext->id

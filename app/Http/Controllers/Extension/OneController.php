@@ -2,28 +2,16 @@
 
 namespace App\Http\Controllers\Extension;
 
-use App\Classes\Connector\SSHTunnelConnector;
-use App\Extension;
-use App\Permission;
-use App\Server;
 use App\Http\Controllers\Controller;
-use App\User;
 use App\UserSettings;
 use Carbon\Carbon;
-use App\Token;
 use function request;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
 use Illuminate\Support\Str;
-use App\ServerLog;
-use App\Jobs\ExtensionJob;
-use App\JobHistory;
-use Illuminate\Contracts\Bus\Dispatcher;
 
 /**
  * Class OneController
