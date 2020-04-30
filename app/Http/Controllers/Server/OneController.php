@@ -22,14 +22,20 @@ class OneController extends Controller
 {
     public function one()
     {
-        if (!\server()) {
+        $server = server();
+        if (!$server) {
             abort(504, "Sunucu Bulunamadı.");
         }
-        if (server()->type == "linux_ssh" || server()->type == "linux_certificate" || server()->type == "windows_powershell") {
-            View::share('hostname', server()->run("hostname"));
-        }
+
+        $outputs = [
+            "hostname" => $server->run("hostname"),
+            "version" => $server->getVersion()
+        ];
+
         return view('server.one', [
-            "server" => server(),
+            "server" => $server,
+            "favorite" => $server->isFavorite(),
+            "outputs" => $outputs,
             "installed_extensions" => $this->installedExtensions(),
             "available_extensions" => $this->availableExtensions(),
         ]);
