@@ -19,6 +19,9 @@ use App\User;
 class Notification extends Model
 {
     use UsesUuid;
+    protected $fillable = [
+        "user_id", "title", "type", "message", "server_id", "extension_id", "level", "read"
+    ];
     public static function new($title, $type, $message, $server_id = null, $extension_id = null, $level = 0)
     {
         // Create a notification object and fill values.

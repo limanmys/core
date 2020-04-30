@@ -8,6 +8,6 @@ class PermissionData extends Model
 {
     use UsesUuid;
     protected $fillable = [
-        "data"
+        "permission_id", "data"
     ];
 }
