@@ -2,12 +2,14 @@
 
 namespace App;
 
+use App\Classes\Connector\Connector;
 use App\Classes\Connector\SSHConnector;
 use App\Classes\Connector\SSHCertificateConnector;
 use App\Classes\Connector\WinRMConnector;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;
+use App\UserFavorites;
 
 /**
  * Class Server
@@ -29,7 +31,7 @@ class Server extends Model
     public $key;
 
     /**
-     * @return SSHConnector|WinRMConnector
+     * @return Connector
      */
     private function connector()
     {
@@ -51,6 +53,10 @@ class Server extends Model
      */
     public function run($command,$log = true)
     {
+        if(!$this->canRunCommand()){
+            return false;
+        }
+
         // Execute and return outputs.
         return $this->connector()->execute($command,$log);
     }
@@ -138,4 +144,36 @@ class Server extends Model
         });
     }
 
+    public function isFavorite()
+    {
+        return UserFavorites::where(["user_id" => user()->id,"server_id" => server()->id])->exists();
+    }
+
+    public function canRunCommand()
+    {
+        return $this->type == "linux_ssh" || $this->type == "linux_certificate" || $this->type == "windows_powershell";
+    }
+
+    public function isLinux()
+    {
+        return $this->type == "linux_ssh" || $this->type == "linux_certificate" || $this->type == "linux";
+    }
+
+    public function isWindows()
+    {
+        return $this->type == "windows" || $this->type == "windows_powershell";
+    }
+
+    public function getVersion()
+    {
+        if(!$this->canRunCommand()){
+            return false;
+        }
+
+        if($this->isLinux()){
+            return $this->run("lsb_release -ds");
+        }
+
+        return explode("|",($this->run("(Get-WmiObject Win32_OperatingSystem).name"))[0]);
+    }
 }

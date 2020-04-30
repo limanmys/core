@@ -8,51 +8,43 @@
             <li class="breadcrumb-item active" aria-current="page">{{$server->name}}</li>
         </ol>
     </nav>
+
     <div class="row mb-2 serverName">
         <div class="col-auto align-self-center">
-            @if(\Illuminate\Support\Facades\DB::table("user_favorites")->where(["user_id" => auth()->user()->id,"server_id" => server()->id])->exists())
+            @if($favorite)
                 <button onclick="favorite('false')" class="btn btn-warning fas fa-star btn-sm" data-toggle="tooltip" title="Favorilerden Çıkar"></button>
             @else
                 <button onclick="favorite('true')" class="btn btn-success far fa-star btn-sm" data-toggle="tooltip" title="Favorilere Ekle"></button>
             @endif
         </div>
         <div class="col-auto align-self-center">
-            <h5>{{server()->name}}</h5>
+            <h5>{{$server->name}}</h5>
         </div>
     </div>
+
     @include('errors')
 
     <div class="row">
         <div class="col-md-3">
             <div class="card card-primary">
             <div class="card-header">
-                <h3 class="card-title">{{ _('Sunucu Bilgileri') }}</h3>
+                <h3 class="card-title">{{ __('Sunucu Bilgileri') }}</h3>
             </div>
             <div class="card-body">
-                @if(server()->type == "linux_ssh" || server()->type == "windows_powershell" || server()->type == "linux_certificate")
-                    <strong>{{ __('Hostname') }}</strong>
-                    <p class="text-muted">
-                        {{$hostname}}
-                    </p>
-                    <hr>
-                    <strong>{{ __('İşletim Sistemi') }}</strong>
-                    <p class="text-muted">
-                        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
-                            {{server()->run("lsb_release -ds")}}
-                        @else
-                            {{ explode("|",server()->run("(Get-WmiObject Win32_OperatingSystem).name"))[0]}}
-                        @endif
-                    </p>
-                    <hr>
-                @endif
+                <strong>{{ __('Hostname') }}</strong>
+                <p class="text-muted">{{$outputs["hostname"]}}</p>
+                <hr>
+                <strong>{{ __('İşletim Sistemi') }}</strong>
+                <p class="text-muted">{{$outputs["version"]}}</p>
+                <hr>
                 <strong>{{ __('IP Adresi') }}</strong>
                 <p class="text-muted">
-                    {{ server()->ip_address }}
+                    {{ $server->ip_address }}
                 </p>
                 <hr>
                 <strong>{{ __('Şehir') }}</strong>
                 <p class="text-muted">
-                    {{ cities(server()->city) }}
+                    {{ cities($server->city) }}
                 </p>
                 <hr>
                 <strong>{{ __('Eklenti Durumları') }}</strong>
@@ -215,67 +207,66 @@
                                 "text" => "İndir"
                             ])
                         </div>
-                        @if(server()->type == "linux_ssh" || server()->type == "windows_powershell" || server()->type == "linux_certificate")
-                            <div class="tab-pane fade show" id="servicesTab" role="tabpanel">
-                                
-                            </div>
+                        @if($server->canRunCommand())
+                            <div class="tab-pane fade show" id="servicesTab" role="tabpanel"></div>
                             <div class="tab-pane fade show right" id="updatesTab" role="tabpanel">
                                 <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateAllPackages" onclick="updateAllPackages()">{{ __('Tümünü Güncelle') }}</button>
                                 <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateSelectedPackages" onclick="updateSelectedPackages()">{{ __('Seçilenleri Güncelle') }}</button>
                                 <div id="updatesTabTable"></div>
                             </div>
-                        @endif
-                        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
-                            <div class="tab-pane fade show" id="packagesTab" role="tabpanel">
-                                <button type="button" data-toggle="modal" data-target="#installPackage" style="margin-bottom: 5px;" class="btn btn-success">
-                                    <i class="fas fa-upload"></i> {{ __('Paket Kur') }}
-                                </button>
-                                <div id="packages">
 
-                                </div>
-                            </div>
+                            @if($server->isLinux())
+                                    <div class="tab-pane fade show" id="packagesTab" role="tabpanel">
+                                        <button type="button" data-toggle="modal" data-target="#installPackage" style="margin-bottom: 5px;" class="btn btn-success">
+                                            <i class="fas fa-upload"></i> {{ __('Paket Kur') }}
+                                        </button>
+                                        <div id="packages">
 
-                            <div class="tab-pane fade show" id="usersTab" role="tabpanel">
-                                @include('modal-button',[
-                                    "class"     =>  "btn btn-success mb-2",
-                                    "target_id" =>  "addLocalUser",
-                                    "text"      =>  "Kullanıcı Ekle",
-                                    "icon" => "fas fa-plus"
-                                ])
-                                <div id="users"></div>
-                            </div>
-
-                            <div class="tab-pane fade show" id="groupsTab" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        @include('modal-button',[
-                                            "class"     =>  "btn btn-success mb-2",
-                                            "target_id" =>  "addLocalGroup",
-                                            "text"      =>  "Grup Ekle",
-                                            "icon" => "fas fa-plus"
-                                        ])
-                                        <div id="groups"></div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 d-none">
+
+                                    <div class="tab-pane fade show" id="usersTab" role="tabpanel">
                                         @include('modal-button',[
                                             "class"     =>  "btn btn-success mb-2",
-                                            "target_id" =>  "addLocalGroupUserModal",
+                                            "target_id" =>  "addLocalUser",
                                             "text"      =>  "Kullanıcı Ekle",
                                             "icon" => "fas fa-plus"
                                         ])
-                                        <div id="groupUsers"></div>
+                                        <div id="users"></div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade show" id="sudoersTab" role="tabpanel">
-                                @include('modal-button',[
-                                    "class"     =>  "btn btn-success mb-2",
-                                    "target_id" =>  "addSudoers",
-                                    "text"      =>  "Tam Yetkili Kullanıcı Ekle",
-                                    "icon" => "fas fa-plus"
-                                ])
-                                <div id="sudoers"></div>
-                            </div>
+
+                                    <div class="tab-pane fade show" id="groupsTab" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                @include('modal-button',[
+                                                    "class"     =>  "btn btn-success mb-2",
+                                                    "target_id" =>  "addLocalGroup",
+                                                    "text"      =>  "Grup Ekle",
+                                                    "icon" => "fas fa-plus"
+                                                ])
+                                                <div id="groups"></div>
+                                            </div>
+                                            <div class="col-md-6 d-none">
+                                                @include('modal-button',[
+                                                    "class"     =>  "btn btn-success mb-2",
+                                                    "target_id" =>  "addLocalGroupUserModal",
+                                                    "text"      =>  "Kullanıcı Ekle",
+                                                    "icon" => "fas fa-plus"
+                                                ])
+                                                <div id="groupUsers"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade show" id="sudoersTab" role="tabpanel">
+                                        @include('modal-button',[
+                                            "class"     =>  "btn btn-success mb-2",
+                                            "target_id" =>  "addSudoers",
+                                            "text"      =>  "Tam Yetkili Kullanıcı Ekle",
+                                            "icon" => "fas fa-plus"
+                                        ])
+                                        <div id="sudoers"></div>
+                                    </div>
+                            @endif
                         @endif
                         <div class="tab-pane fade show" id="logsTab" role="tabpanel">
                                 
@@ -596,12 +587,13 @@
         }
 
 
-        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate") //|| server()->type == "windows_powershell")
+        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
             if(location.hash !== "#updatesTab"){
                 getUpdates();
                 Swal.close();
             }
         @endif
+
         function errorSwal(){
             showSwal('{{__("Ayarlarınız doğrulanamadı!")}}','error',2000);
         }
@@ -620,13 +612,13 @@
         }
 
         @if($installed_extensions->count() > 0)
-        @foreach($installed_extensions as $service)
-        setInterval(function () {
-            checkStatus('{{$service->id}}');
-        }, 3000);
-
-        @endforeach
+            @foreach($installed_extensions as $service)
+            setInterval(function () {
+                checkStatus('{{$service->id}}');
+            }, 3000);
+            @endforeach
         @endif
+
         @if(server()->type == "linux_ssh" || server()->type == "windows_powershell" || server()->type == "linux_certificate")
         setInterval(function () {
             stats();
@@ -944,8 +936,8 @@
             $('#updateLogs').find('.updateLogsBody').text("");
             getUpdates(function(package_list){
                 let package_list_tmp = [];
-                package_list.forEach(function(package){
-                    let package_name = package.name.split('/')[0];
+                package_list.forEach(function(pkg){
+                    let package_name = pkg.name.split('/')[0];
                     package_list_tmp.push(package_name);
                 });
                 packages = package_list_tmp;
@@ -1091,6 +1083,7 @@
             };
             $("#delete_extensions").modal('show');
         }
+
         function removeExtensionFunc() {
           let data = [];
           let table = $("#installed_extensions").DataTable();
