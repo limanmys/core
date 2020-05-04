@@ -4,15 +4,15 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-        <li class="breadcrumb-item active" aria-current="page">{{__("Widgetlar")}}</li>
+        <li class="breadcrumb-item active" aria-current="page">{{__("Bileşenler")}}</li>
     </ol>
 </nav>
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">{{__("Widgetlar")}}</h3>
+        <h3 class="card-title">{{__("Bileşenler")}}</h3>
     </div>
     <div class="card-body">
-        <button class="btn btn-success" onclick="window.location.href = '{{route('widget_add_page')}}'">{{__("Widget Ekle")}}</button>
+        <button class="btn btn-success" onclick="window.location.href = '{{route('widget_add_page')}}'">{{__("Bileşen Ekle")}}</button>
         <br><br>
         @include('errors')
         <?php
@@ -49,7 +49,7 @@
 
 @include('modal',[
     "id"=>"add_server",
-    "title" => "Widget Ekle",
+    "title" => "Bileşen Ekle",
     "url" => route('widget_add'),
     "next" => "addToTable",
     "inputs" => [
@@ -64,7 +64,7 @@
 
 @include('modal',[
     "id"=>"edit",
-    "title" => "Widget Düzenle",
+    "title" => "Bileşen Düzenle",
     "url" => route('widget_update'),
     "next" => "updateTable",
     "inputs" => [
@@ -80,13 +80,13 @@
 
 @include('modal',[
     "id"=>"delete",
-    "title" =>"Widget'ı Sil",
+    "title" =>"Bileşeni Sil",
     "url" => route('widget_remove'),
-    "text" => "Widget'ı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+    "text" => "Bileşeni silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
     "next" => "reload",
     "inputs" => [
-        "Widget Id:'null'" => "widget_id:hidden"
+        "Bileşen Id:'null'" => "widget_id:hidden"
     ],
-    "submit_text" => "Widget'ı Sil"
+    "submit_text" => "Bileşeni Sil"
 ])
 @endsection
