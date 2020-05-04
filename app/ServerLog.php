@@ -4,12 +4,10 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @method static where(array $array)
- */
 class ServerLog extends Model
 {
     use UsesUuid;
+
     protected $fillable = ['command', 'server_id', 'user_id', 'output'];
 
     public static function new($command, $output, $server_id = null, $user_id = null)

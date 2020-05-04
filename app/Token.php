@@ -5,9 +5,6 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-/**
- * @method static where(string $string, $param)
- */
 class Token extends Model
 {
     use UsesUuid;

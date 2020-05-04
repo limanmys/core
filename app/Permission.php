@@ -2,23 +2,7 @@
 
 namespace App;
 
-use Carbon\Carbon;
-use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-
-/**
- * App\Permission
- *
- * @property-read mixed $id
- * @method static Builder|Permission newModelQuery()
- * @method static Builder|Permission newQuery()
- * @method static Builder|Permission query()
- * @method static where(string $string, $user_id)
- * @mixin Model
- */
 
 class Permission extends Model
 {

@@ -168,14 +168,16 @@ class OneController extends Controller
         hook('extension_delete_attempt', extension());
         try {
             shell_exec("sudo rm -r " . env('EXTENSIONS_PATH') . strtolower(extension()->name));
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
         }
 
         try {
-            shell_exec('sudo userdel ' . cleanDash(extension()->id));
-            shell_exec('rm ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id);
+            shell_exec("
+                sudo userdel " . cleanDash(extension()->id) . ";
+                rm " . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id . ";
+            ");
             extension()->delete();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
         }
 
         hook('extension_delete_successful', [

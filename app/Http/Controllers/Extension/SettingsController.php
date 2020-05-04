@@ -148,7 +148,7 @@ class SettingsController extends Controller
             "settings_type" => request('table')
         ]);
 
-        return respond("Guncellendi", 200);
+        return respond("Güncellendi.", 200);
     }
 
     public function add()

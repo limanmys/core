@@ -89,11 +89,11 @@ class MainController extends Controller
         system_log(7, "REQUEST_UPDATE", [
             "action" => $request
         ]);
-        $text = request("status") == "1" ? "İşleniyor." : (request("status") == "2" ? "Tamamlandı" : "Reddedildi");
+        $text = request("status") == "1" ? __("İşleniyor.") : (request("status") == "2" ? __("Tamamlandı") : __("Reddedildi"));
         Notification::send(
             __("Talebiniz güncellendi"),
             "notify",
-            __("Talebiniz \":status\" olarak güncellendi.", ["status" => __($text)]),
+            __("Talebiniz \":status\" olarak güncellendi.", ["status" => $text]),
             $request->user_id
         );
         if (request('status') == "4") {

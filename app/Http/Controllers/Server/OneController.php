@@ -812,13 +812,13 @@ class OneController extends Controller
             $command = "Restart-Service " . request("name");
         }
         server()->run($command);
-        return respond("Servis Yeniden Baslatildi", 200);
+        return respond("Servis Yeniden Başlatıldı", 200);
     }
 
     public function getOpenPorts()
     {
         if (server()->type != "linux_ssh" && server()->type != "linux_certificate") {
-            return respond("Bu sunucuda portlari kontrol edemezsiniz!", 201);
+            return respond("Bu sunucuda portları kontrol edemezsiniz!", 201);
         }
 
         $output = trim(server()->run(sudo() . "lsof -i -P -n | grep LISTEN | awk -F' ' '{print $1,$3,$5,$8,$9}'"));

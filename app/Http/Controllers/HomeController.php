@@ -149,8 +149,4 @@ class HomeController extends Controller
         ]);
         return respond('Talebiniz başarıyla alındı.', 200);
     }
-
-    public function test()
-    {
-    }
 }
