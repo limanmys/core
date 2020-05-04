@@ -54,10 +54,6 @@ Route::group(['middleware' => ['server']], function () {
 
     Route::post('/sunucu/yukle', 'Server\OneController@upload')->name('server_upload')->middleware('parameters:file,path');
 
-    // Server Terminal Route
-
-    Route::get('/sunucu/terminal', 'Server\OneController@terminal')->name('server_terminal');
-
     // Server Download File Route
 
     Route::get('/sunucu/indir', 'Server\OneController@download')->name('server_download')->middleware('parameters:path');

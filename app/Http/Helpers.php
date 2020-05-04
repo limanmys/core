@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use App\Token;
+use Jenssegers\Blade\Blade;
 
 if (!function_exists('respond')) {
     /**
@@ -39,6 +39,97 @@ if (!function_exists('respond')) {
         }
     }
 }
+
+if (!function_exists('registerModuleRoutes')) {
+    function registerModuleRoutes()
+    {
+        $files = searchModuleFiles('routes.php');
+        foreach($files as $file){
+            require_once($file . "/routes.php");
+        }
+    }
+}
+
+if (!function_exists('searchModuleFiles')) {
+    function searchModuleFiles($type)
+    {
+        $command = "find /liman/modules/ -name '" .  $type . "'";
+
+        $output = trim(shell_exec($command));
+        if($output == "")
+        {
+            return [];
+        }
+
+        $data = explode("\n",$output);
+        $arr = [];
+        foreach($data as $file){
+            array_push($arr,dirname($file));
+        }
+        return $arr;
+    }
+}
+
+if (!function_exists('settingsModuleViews')) {
+    /**
+     * @return mixed
+     */
+    function settingsModuleViews()
+    {
+        $str = "";
+        foreach(searchModuleFiles('settings.blade.php') as $file){
+            $blade = new Blade([realpath(base_path('resources/views/l')),$file], "/tmp");
+            $str .= $blade->render('settings');
+        }
+        return $str;
+    }
+}
+
+if (!function_exists('settingsModuleButtons')) {
+    /**
+     * @return mixed
+     */
+    function settingsModuleButtons()
+    {
+        $str = "";
+        foreach(searchModuleFiles('settings') as $file){
+            $foo = substr($file,15);
+            $name = substr($foo,0,strpos($foo,"/"));
+            $str .= "<li class=\"nav-item\">
+               <a class=\"nav-link\" data-toggle=\"tab\" href=\"#$name\">$name</a>
+            </li>";
+        }
+        return $str;
+    }
+}
+
+if (!function_exists('serverModuleViews')) {
+    /**
+     * @return mixed
+     */
+    function serverModuleViews()
+    {
+        $str = "";
+        foreach(searchModuleFiles('server.blade.php') as $file){
+            $blade = new Blade([realpath(base_path('resources/views/l')),$file], "/tmp");
+            $str .= $blade->render('server');
+        }
+        return $str;
+    }
+}
+
+if (!function_exists('serverModuleButtons')) {
+    /**
+     * @return mixed
+     */
+    function serverModuleButtons()
+    {
+        return "<li class=\"nav-item\">
+    <a class=\"nav-link\" data-toggle=\"pill\" onclick=\"terminalTab()\" href=\"#terminalTab\" role=\"tab\">Terminal</a>
+</li>";
+    }
+}
+
 
 if (!function_exists('notifications')) {
     /**

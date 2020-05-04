@@ -28,7 +28,17 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         parent::boot();
+    }
 
-        //
+    public function shouldDiscoverEvents()
+    {
+        return true;
+    }
+
+    protected function discoverEventsWithin()
+    {
+        return [
+            "/liman/modules/",
+        ];
     }
 }

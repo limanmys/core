@@ -94,9 +94,7 @@
                                         <small class="badge bg-danger updateCount" style="display:none;margin-left: 5px;">0</small>
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="pill" onclick="openTerminal()" href="#terminalTab" role="tab">{{__("Terminal")}}</a>
-                                </li>
+
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
                                       {{ __('Kullanıcı İşlemleri') }} <span class="caret"></span>
@@ -123,6 +121,7 @@
                                 <a class="nav-link" data-toggle="pill" href="#extraTab" role="tab">{{__("Ek Özellikler")}}</a>
                             </li>
                         @endif
+                        {!! serverModuleButtons() !!}
                     </ul>
                 </div>
                 <div class="card-body">
@@ -192,9 +191,7 @@
                             }
                             ?>
                         </div>
-                        <div class="tab-pane fade show" id="terminalTab" role="tabpanel">
-                            <iframe id="terminalFrame" src="" style="width: 100%;height: 600px;background: black"></iframe>
-                        </div>
+                            {!! serverModuleViews() !!}
                         <div class="tab-pane fade show" id="filesTab" role="tabpanel">
                             @include('modal-button',[
                                 "class" => "btn-primary fa fa-upload",
@@ -1062,13 +1059,6 @@
                 let error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
-        }
-
-        function openTerminal() {
-            let terminalFrame = $("#terminalFrame");
-            if (terminalFrame.attr("src") === "") {
-                terminalFrame.attr("src", "{{route('server_terminal',["server_id" => $server->id])}}");
-            }
         }
 
         function removeExtension(){

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "85d1215f53f34d47a10b38ecec8d2e1a",
+    "content-hash": "48b0bb6e6123b4392e7c453f7068fa83",
     "packages": [
         {
             "name": "ankitpokhrel/tus-php",
@@ -1099,6 +1099,54 @@
             ],
             "description": "A set of generic stream wrappers",
             "time": "2020-04-08T14:59:33+00:00"
+        },
+        {
+            "name": "jenssegers/blade",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jenssegers/blade.git",
+                "reference": "d221b717b4302ad71476ebd05abf0c2b98cbd7d8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jenssegers/blade/zipball/d221b717b4302ad71476ebd05abf0c2b98cbd7d8",
+                "reference": "d221b717b4302ad71476ebd05abf0c2b98cbd7d8",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/view": "^5.5|^6.0|^7.0",
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.0|^7.0",
+                "satooshi/php-coveralls": "^1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jenssegers\\Blade\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jens Segers",
+                    "homepage": "https://jenssegers.com"
+                }
+            ],
+            "description": "The standalone version of Laravel's Blade templating engine for use outside of Laravel.",
+            "keywords": [
+                "blade",
+                "laravel",
+                "render",
+                "template",
+                "view"
+            ],
+            "time": "2020-03-17T15:00:55+00:00"
         },
         {
             "name": "laravel/framework",

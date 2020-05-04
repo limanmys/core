@@ -148,50 +148,7 @@ class OneController extends Controller
 
     public function terminal()
     {
-        $client = new Client(['verify' => false]);
 
-        $xsrfRequest = $client->request('GET', 'http://127.0.0.1:8888/');
-        $re = '/<input(.*?)name=\"_xsrf\"(.*)value=\"(.*?)\"/i';
-        preg_match($re, $xsrfRequest->getBody(), $matches, PREG_OFFSET_CAPTURE, 0);
-        $token = $matches[3][0];
-
-        $r = $client->request('POST', 'http://127.0.0.1:8888/', [
-            'multipart' => [
-                [
-                    'name'     => 'hostname',
-                    'contents' => server()->ip_address
-                ],
-                [
-                    'name'     => 'username',
-                    'contents' => extensionDb("clientUsername")
-                ],
-                [
-                    'name'     => 'password',
-                    'contents' => server()->type == "linux_ssh" ? extensionDb("clientPassword") : ""
-                ],
-                [
-                    'name'     => 'privatekey',
-                    'contents' => server()->type == "linux_certificate" ? extensionDb("clientPassword") : "",
-                    'filename' => 'id_rsa'
-                ],
-                [
-                    'name'     => 'term',
-                    'contents' => 'xterm-256color'
-                ],
-                [
-                    'name'     => '_xsrf',
-                    'contents' => $token
-                ],
-            ],
-            "cookies" => CookieJar::fromArray(["_xsrf" => $token], '127.0.0.1')
-        ]);
-        //TODO terminal for certificate
-        if (json_decode($r->getBody()) && json_last_error() == JSON_ERROR_NONE) {
-            $json = json_decode($r->getBody());
-            return response()->view('terminal.index', ["id" => $json->id, "token" => $token])->withCookie('_xsrf', $token);
-        } else {
-            return respond("Bilinmeyen bir hata oluştu!", 201);
-        }
     }
 
     public function upload()

@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('body_class', 'sidebar-mini layout-fixed ' . ((\Session::has('collapse')) ? 'sidebar-collapse' : ''))
+@section('body_class', 'sidebar-mini layout-fixed ' . ((session()->has('collapse')) ? 'sidebar-collapse' : ''))
 
 @section('body')
     <div class="wrapper">

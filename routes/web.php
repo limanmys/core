@@ -155,3 +155,5 @@ Route::post('/upload_info', function () {
     }
     return $info;
 })->middleware(['auth', 'permissions']);
+
+registerModuleRoutes();
