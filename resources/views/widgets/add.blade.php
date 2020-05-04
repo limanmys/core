@@ -4,13 +4,13 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-        <li class="breadcrumb-item" aria-current="page"><a href="{{route('widgets')}}">{{__("Widgetlar")}}</a></li>
-        <li class="breadcrumb-item active" aria-current="page">{{__("Widget Ekle")}}</li>
+        <li class="breadcrumb-item" aria-current="page"><a href="{{route('widgets')}}">{{__("Bileşenler")}}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{__("Bileşen Ekle")}}</li>
     </ol>
 </nav>
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">{{__("Widget Ekle")}}</h3>
+        <h3 class="card-title">{{__("Bileşen Ekle")}}</h3>
     </div>
     <div class="card-body">
         @include('errors')
@@ -23,10 +23,10 @@
             </select><br>
             <h4>{{__("Eklenti")}}</h4>
             <select class="form-control" id="extension_id" disabled onchange="getWidgets()" required name="extension_id"></select><br>
-            <h4>{{__("Widget")}}</h4>
+            <h4>{{__("Bileşen")}}</h4>
             <select class="form-control" id="widget_name" disabled="" name="widget_name"></select><br>
             @csrf
-            <button class="btn btn-success" type="submit">{{__("Widget Ekle")}}</button>
+            <button class="btn btn-success" type="submit">{{__("Bileşen Ekle")}}</button>
         </form>
     </div>
 </div>

@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class ConnectorToken extends Model
 {
     use UsesUuid;
+
     protected $fillable = [
         "user_id", "server_id", "token"
     ];
-
 
     public static function get($server_id)
     {

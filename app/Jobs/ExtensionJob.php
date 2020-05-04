@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use App\Token;
 use Illuminate\Support\Str;
-use App\JobHistory;
+use App\Permission;
 
 class ExtensionJob implements ShouldQueue
 {

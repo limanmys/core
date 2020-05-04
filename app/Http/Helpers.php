@@ -221,8 +221,7 @@ if (!function_exists('addCertificate')) {
     {
         $file = "liman-" . $hostname . "_" . $port . ".crt";
         $cert = file_get_contents('/tmp/' . $path);
-        $query = "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . $file;
-        shell_exec($query);
+        shell_exec("echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . $file);
         shell_exec("sudo update-ca-certificates");
 
         // Create Certificate Object.

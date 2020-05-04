@@ -21,8 +21,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        View::composer('layouts.header',function($view){
-            $view->with('USER_FAVORITES',user()->favorites());
         });
         Carbon::setLocale(app()->getLocale());
         Notification::observe(NotificationObserver::class);

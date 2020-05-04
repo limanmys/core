@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class TunnelToken extends Model
 {
     use UsesUuid;
+
     protected $fillable = [
         "token",
         "remote_host",

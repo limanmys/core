@@ -13,18 +13,20 @@ class Server
             'server_hostname' => server()->ip_address,
             'origin' => server()->control_port
         ])->exists()) {
-            abort(504, server()->name . "(" . server()->ip_address . ") " . __("isimli sunucu henüz onaylanmamış!"));
+            $message = __(":server_name isimli sunucu henüz onaylanmamış!", ["server_name" => server()->name . "(" . server()->ip_address . ")"]);
+            abort(504, $message);
             return redirect()->back()->withErrors([
-                "message" => server()->name . "(" . server()->ip_address . ") " . __("isimli sunucu henüz onaylanmamış!")
+                "message" => $message
             ]);
         }
         $status = @fsockopen(server()->ip_address, server()->control_port, $errno, $errstr, (intval(env('SERVER_CONNECTION_TIMEOUT')) / 1000));
         if (is_resource($status)) {
             return $next($request);
         } else {
-            abort(504, server()->name . "(" . server()->ip_address . ") " . __("isimli sunucuya erişim sağlanamadı!"));
+            $message = __(":server_name isimli sunucuya erişim sağlanamadı!", ["server_name" => server()->name . "(" . server()->ip_address . ")"]);
+            abort(504, $message);
             return redirect()->back()->withErrors([
-                "message" => server()->name . "(" . server()->ip_address . ") " . __("isimli sunucuya erişim sağlanamadı!")
+                "message" => $message
             ]);
         }
     }

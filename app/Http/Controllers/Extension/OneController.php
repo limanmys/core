@@ -2,28 +2,16 @@
 
 namespace App\Http\Controllers\Extension;
 
-use App\Classes\Connector\SSHTunnelConnector;
-use App\Extension;
-use App\Permission;
-use App\Server;
 use App\Http\Controllers\Controller;
-use App\User;
 use App\UserSettings;
 use Carbon\Carbon;
-use App\Token;
 use function request;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
 use Illuminate\Support\Str;
-use App\ServerLog;
-use App\Jobs\ExtensionJob;
-use App\JobHistory;
-use Illuminate\Contracts\Bus\Dispatcher;
 
 /**
  * Class OneController
@@ -180,14 +168,16 @@ class OneController extends Controller
         hook('extension_delete_attempt', extension());
         try {
             shell_exec("sudo rm -r " . env('EXTENSIONS_PATH') . strtolower(extension()->name));
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
         }
 
         try {
-            shell_exec('sudo userdel ' . cleanDash(extension()->id));
-            shell_exec('rm ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id);
+            shell_exec("
+                sudo userdel " . cleanDash(extension()->id) . ";
+                rm " . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id . ";
+            ");
             extension()->delete();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
         }
 
         hook('extension_delete_successful', [

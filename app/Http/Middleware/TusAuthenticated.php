@@ -13,7 +13,7 @@ class TusAuthenticated implements TusMiddleware
     public function handle(Request $request, Response $response)
     {
         if (!auth()->check()) {
-            throw new UnauthorizedHttpException('User not authenticated');
+            throw new UnauthorizedHttpException('Kullanıcı giriş yapmadı!');
         }
     }
 }

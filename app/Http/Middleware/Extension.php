@@ -30,12 +30,12 @@ class Extension
             ])->exists()) {
                 continue;
             }
-            $notification = new AdminNotification();
-            $notification->title = "Yeni Sertifika Onayı";
-            $notification->type = "cert_request";
-            $notification->message = $server->ip_address . ":" . trim($port) . ":" . $server->id;
-            $notification->level = 3;
-            $notification->save();
+            AdminNotification::create([
+                "title" => "Yeni Sertifika Onayı",
+                "type" => "cert_request",
+                "message" => $server->ip_address . ":" . trim($port) . ":" . $server->id,
+                "level" => 3
+            ]);
             return redirect()->back()->withErrors([
                 "message" => "Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede bu sunucu ile eklentiye erişemezsiniz."
             ]);
