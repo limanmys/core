@@ -21,7 +21,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        });
         Carbon::setLocale(app()->getLocale());
         Notification::observe(NotificationObserver::class);
         AdminNotification::observe(AdminNotificationObserver::class);
