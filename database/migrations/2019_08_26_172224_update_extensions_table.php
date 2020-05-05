@@ -13,7 +13,7 @@ class UpdateExtensionsTable extends Migration
      */
     public function up()
     {
-        Schema::table('extensions',function (Blueprint $table){
+        Schema::table('extensions', function (Blueprint $table) {
             $table->string("sslPorts")->nullable();
         });
     }

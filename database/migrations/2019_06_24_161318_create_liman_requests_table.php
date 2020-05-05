@@ -16,7 +16,11 @@ class CreateLimanRequestsTable extends Migration
         Schema::create('liman_requests', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid("user_id");
-            $table->foreign("user_id")->references("id")->on("users")->onDelete("cascade");
+            $table
+                ->foreign("user_id")
+                ->references("id")
+                ->on("users")
+                ->onDelete("cascade");
             $table->string("status");
             $table->string("speed");
             $table->string("type");

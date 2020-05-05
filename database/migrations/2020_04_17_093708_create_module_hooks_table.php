@@ -19,7 +19,11 @@ class CreateModuleHooksTable extends Migration
             $table->string('hook');
             $table->string('module_name');
             $table->boolean('enabled')->default(true);
-            $table->foreign("module_id")->references("id")->on("modules")->onDelete("cascade");
+            $table
+                ->foreign("module_id")
+                ->references("id")
+                ->on("modules")
+                ->onDelete("cascade");
             $table->timestamps();
         });
     }

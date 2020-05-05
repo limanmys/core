@@ -16,9 +16,19 @@ class CreateServerExtensionsTable extends Migration
         Schema::create('server_extensions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid("server_id");
-            $table->foreign("server_id")->references("id")->on("servers")->onDelete("cascade")->nullable();
+            $table
+                ->foreign("server_id")
+                ->references("id")
+                ->on("servers")
+                ->onDelete("cascade")
+                ->nullable();
             $table->uuid("extension_id");
-            $table->foreign("extension_id")->references("id")->on("extensions")->onDelete("cascade")->nullable();
+            $table
+                ->foreign("extension_id")
+                ->references("id")
+                ->on("extensions")
+                ->onDelete("cascade")
+                ->nullable();
             $table->timestamps();
         });
     }

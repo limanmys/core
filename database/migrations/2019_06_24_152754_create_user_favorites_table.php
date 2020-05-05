@@ -16,9 +16,18 @@ class CreateUserFavoritesTable extends Migration
         Schema::create('user_favorites', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid("user_id");
-            $table->foreign("user_id")->references("id")->on("users")->onDelete("cascade");
+            $table
+                ->foreign("user_id")
+                ->references("id")
+                ->on("users")
+                ->onDelete("cascade");
             $table->uuid("server_id");
-            $table->foreign("server_id")->references("id")->on("servers")->onDelete("cascade")->nullable();
+            $table
+                ->foreign("server_id")
+                ->references("id")
+                ->on("servers")
+                ->onDelete("cascade")
+                ->nullable();
             $table->timestamps();
         });
     }

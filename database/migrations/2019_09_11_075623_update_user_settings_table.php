@@ -16,7 +16,9 @@ class UpdateUserSettingsTable extends Migration
     public function up()
     {
         // First, retrieve all data.
-        $settings = DB::table('user_settings')->get()->toArray();
+        $settings = DB::table('user_settings')
+            ->get()
+            ->toArray();
 
         // Since SQLite doesnt support dropping foreign keys, drop Existing Database if exists.
         Schema::dropIfExists('user_settings');
@@ -25,29 +27,46 @@ class UpdateUserSettingsTable extends Migration
         Schema::create('user_settings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid("server_id")->nullable();
-            $table->foreign("server_id")->references("id")->on("servers")->onDelete("cascade");
+            $table
+                ->foreign("server_id")
+                ->references("id")
+                ->on("servers")
+                ->onDelete("cascade");
             $table->uuid("user_id");
-            $table->foreign("user_id")->references("id")->on("users")->onDelete("cascade");
+            $table
+                ->foreign("user_id")
+                ->references("id")
+                ->on("users")
+                ->onDelete("cascade");
             $table->string("name");
             $table->string("value");
             $table->timestamps();
         });
 
         //Move Data.
-        foreach($settings as $setting){
-            if(!array_key_exists("extension_id",$setting)){
+        foreach ($settings as $setting) {
+            if (!array_key_exists("extension_id", $setting)) {
                 continue;
             }
             // Decrypt data since since we dont have extension_id anymore, we need to use another salt.
-            $key = env('APP_KEY') . $setting->user_id . $setting->extension_id . $setting->server_id;
-            $decrypted = openssl_decrypt($setting->value,'aes-256-cfb8',$key);
-            $stringToDecode = substr($decrypted,16);
+            $key =
+                env('APP_KEY') .
+                $setting->user_id .
+                $setting->extension_id .
+                $setting->server_id;
+            $decrypted = openssl_decrypt($setting->value, 'aes-256-cfb8', $key);
+            $stringToDecode = substr($decrypted, 16);
             $value = base64_decode($stringToDecode);
 
             // Now Encrypt Again.
             $key = env('APP_KEY') . $setting->user_id;
-            $encrypted = openssl_encrypt(Str::random(16) . base64_encode($value),
-                'aes-256-cfb8',$key,0,Str::random(16));
+            $encrypted = openssl_encrypt(
+                Str::random(16) . base64_encode($value),
+                'aes-256-cfb8',
+                $key,
+                0,
+                Str::random(16)
+            );
 
             // Fill data, we don't use model here, since we may delete it in the future.
             DB::table('user_settings')->insert([
@@ -57,7 +76,7 @@ class UpdateUserSettingsTable extends Migration
                 "name" => $setting->name,
                 "value" => $encrypted,
                 "created_at" => $setting->created_at,
-                "updated_at" => $setting->updated_at
+                "updated_at" => $setting->updated_at,
             ]);
         }
     }

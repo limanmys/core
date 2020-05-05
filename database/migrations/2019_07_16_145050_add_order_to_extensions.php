@@ -14,7 +14,7 @@ class AddOrderToExtensions extends Migration
     public function up()
     {
         Schema::table('extensions', function (Blueprint $table) {
-          $table->integer('order')->default(0);
+            $table->integer('order')->default(0);
         });
     }
 

@@ -13,7 +13,7 @@ class UpdateServersTableEnabled extends Migration
      */
     public function up()
     {
-        Schema::table('servers',function (Blueprint $table){
+        Schema::table('servers', function (Blueprint $table) {
             $table->string("enabled")->default(true);
         });
     }

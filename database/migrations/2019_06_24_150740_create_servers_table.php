@@ -21,7 +21,11 @@ class CreateServersTable extends Migration
             $table->string("city");
             $table->string("control_port");
             $table->uuid("user_id");
-            $table->foreign("user_id")->references("id")->on("users")->onDelete("cascade");
+            $table
+                ->foreign("user_id")
+                ->references("id")
+                ->on("users")
+                ->onDelete("cascade");
             $table->timestamps();
         });
     }
