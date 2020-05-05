@@ -16,13 +16,15 @@
                 <button href="#tab_1" type="button" class="btn btn-success" data-toggle="modal" data-target="#add_server">{{__("Sunucu Ekle")}}</button><br><br>
             @endcan
             @include('errors')
-            <?php
+            @php
             use Illuminate\Support\Facades\DB;
             $servers = servers();
-            foreach ($servers as $server){
-                $server->extension_count = DB::table('server_extensions')->where('server_id',$server->id)->count();
+            foreach ($servers as $server) {
+                $server->extension_count = DB::table('server_extensions')
+                    ->where('server_id', $server->id)
+                    ->count();
             }
-            ?>
+            @endphp
             @include('table',[
                 "value" => $servers,
                 "title" => [

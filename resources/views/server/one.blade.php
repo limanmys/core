@@ -174,22 +174,27 @@
                                 ],
                                 "noInitialize" => "true"
                             ])
-                            <?php
+                            @php
                             $input_extensions = [];
                             foreach ($available_extensions as $extension) {
                                 $arr = [];
                                 if (isset($extension->install)) {
-                                    foreach ($extension->install as $key => $parameter) {
-                                        $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
+                                    foreach (
+                                        $extension->install
+                                        as $key => $parameter
+                                    ) {
+                                        $arr[$parameter["name"]] =
+                                            $key . ":" . $parameter["type"];
                                     }
                                 }
-                                $arr[$extension->name . ":" . $extension->id] = "extension_id:hidden";
+                                $arr[$extension->name . ":" . $extension->id] =
+                                    "extension_id:hidden";
                                 $input_extensions[] = [
                                     "name" => $extension->name,
-                                    "id" => $extension->id
+                                    "id" => $extension->id,
                                 ];
                             }
-                            ?>
+                            @endphp
                         </div>
                             {!! serverModuleViews() !!}
                         <div class="tab-pane fade show" id="filesTab" role="tabpanel">

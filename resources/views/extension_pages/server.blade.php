@@ -3,47 +3,58 @@
     @php(die())
 @endif
 
-<?php
-    use Illuminate\Support\Facades\DB;
-    use App\Permission;
-    $navServers = DB::select("SELECT * FROM \"server_groups\" WHERE \"servers\" LIKE \"%" . server()->id . "%\"");
-    $cleanServers = [];
-    foreach($navServers as $rawServers){
-        $servers = explode(",",$rawServers->servers);
-        foreach($servers as $server){
-            if(Permission::can(user()->id,"server","id",$server)){
-                array_push($cleanServers,$server);
-            }
+@php
+use Illuminate\Support\Facades\DB;
+use App\Permission;
+$navServers = DB::select(
+    "SELECT * FROM \"server_groups\" WHERE \"servers\" LIKE \"%" .
+        server()->id .
+        "%\""
+);
+$cleanServers = [];
+foreach ($navServers as $rawServers) {
+    $servers = explode(",", $rawServers->servers);
+    foreach ($servers as $server) {
+        if (Permission::can(user()->id, "server", "id", $server)) {
+            array_push($cleanServers, $server);
         }
     }
+}
 
-    $cleanServers = array_unique($cleanServers);
-    $cleanExtensions = [];
+$cleanServers = array_unique($cleanServers);
+$cleanExtensions = [];
 
-    $serverObjects = App\Server::find($cleanServers);
-    unset($cleanServers);
-    foreach($serverObjects as $server){
-        $cleanExtensions[$server->id . ":" . $server->name] = $server->extensions()->pluck('name', 'id')->toArray();
-    }
-    if(empty($cleanExtensions)){
-        $cleanExtensions[server()->id . ":" . server()->name] = server()->extensions()->pluck('name', 'id')->toArray();
-    }
-    
-    $last = [];
+$serverObjects = App\Server::find($cleanServers);
+unset($cleanServers);
+foreach ($serverObjects as $server) {
+    $cleanExtensions[$server->id . ":" . $server->name] = $server
+        ->extensions()
+        ->pluck('name', 'id')
+        ->toArray();
+}
+if (empty($cleanExtensions)) {
+    $cleanExtensions[server()->id . ":" . server()->name] = server()
+        ->extensions()
+        ->pluck('name', 'id')
+        ->toArray();
+}
 
-    foreach($cleanExtensions as $serverobj=>$extensions){
-        list($server_id,$server_name) = explode(":",$serverobj);
-        foreach($extensions as $extension_id=>$extension_name){
-            $prefix = $extension_id . ":" . $extension_name;
-            $current = array_key_exists($prefix,$last) ? $last[$prefix] : [];
-            array_push($current,[
-                "id" => $server_id,
-                "name" => $server_name
-            ]);
-            $last[$prefix] = $current;
-        }
+$last = [];
+
+foreach ($cleanExtensions as $serverobj => $extensions) {
+    list($server_id, $server_name) = explode(":", $serverobj);
+    foreach ($extensions as $extension_id => $extension_name) {
+        $prefix = $extension_id . ":" . $extension_name;
+        $current = array_key_exists($prefix, $last) ? $last[$prefix] : [];
+        array_push($current, [
+            "id" => $server_id,
+            "name" => $server_name,
+        ]);
+        $last[$prefix] = $current;
     }
-?>
+}
+@endphp
+
 @extends('layouts.app')
 
 @section('content')

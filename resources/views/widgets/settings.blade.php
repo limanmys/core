@@ -15,16 +15,16 @@
         <button class="btn btn-success" onclick="window.location.href = '{{route('widget_add_page')}}'">{{__("Bileşen Ekle")}}</button>
         <br><br>
         @include('errors')
-        <?php
-            foreach($widgets as $widget){
-                $extension = \App\Extension::find($widget->extension_id);
-                if($extension){
-                    $widget->extension_name = $extension->name;
-                }else{
-                    $widget->extension_name = "Eklenti Silinmiş";
-                }
+        @php 
+        foreach ($widgets as $widget) {
+            $extension = \App\Extension::find($widget->extension_id);
+            if ($extension) {
+                $widget->extension_name = $extension->name;
+            } else {
+                $widget->extension_name = "Eklenti Silinmiş";
             }
-        ?>
+        } 
+        @endphp
         @include('table',[
             "value" => $widgets,
             "title" => [
