@@ -67,6 +67,7 @@ class LoginController extends Controller
 
         Event::listen('login_attempt_success',function($data){
             $this->guard()->login($data, request()->filled('remember'));
+            $flag = true;
         });
 
         return $flag;

@@ -81,61 +81,54 @@ Artisan::command('module:add {module_name}',function($module_name){
         return $this->error("Modul klasoru bulunamadi!");
     }
 
-    if(!is_file("/liman/modules/$module_name/main") || !is_file("/liman/modules/$module_name/template.json")){
-        return $this->error("Modul gecerli degil.");
-    }
+//    if(!is_file("/liman/modules/$module_name/main") || !is_file("/liman/modules/$module_name/template.json")){
+//        return $this->error("Modul gecerli degil.");
+//    }
+//
+//    $this->info("$module_name modulu ekleniyor.");
+//
+//    //Let's read the template.
+//    $template = file_get_contents("/liman/modules/$module_name/template.json");
+//    $template = json_decode($template,true);
+//
+//    if(json_last_error() != JSON_ERROR_NONE){
+//        return $this->error("Modul ayar dosyasi anlasilmadi, lutfen modul yoneticisiyle iletisime gecin");
+//    }
+//
+//    // Check if module already exists.
+//    if(Module::where('name',$module_name)->exists()){
+//        return $this->error("Bu isimde bir modul zaten ekli.");
+//    }
 
-    $this->info("$module_name modulu ekleniyor.");
+    $module = Module::create(["name" => $module_name, "enabled" => true]);
+//    // Let's check module hooks.
+//    $listen = $template["hooks"]["listen"];
+//    $dbArray = [];
+//
+//    $now = Carbon::now('utc')->toDateTimeString();
+//
+//    foreach ($listen as $value) {
+//        array_push($dbArray,[
+//            "hook" => $value,
+//            "id" => Str::uuid(),
+//            "module_id" => $module->id,
+//            "module_name" => $module->name,
+//            "enabled" => false,
+//            "created_at" => $now,
+//            "updated_at" => $now
+//        ]);
+//    }
+//
+//    $flag = ModuleHook::insert($dbArray);
 
-    //Let's read the template.
-    $template = file_get_contents("/liman/modules/$module_name/template.json");
-    $template = json_decode($template,true);
-
-    if(json_last_error() != JSON_ERROR_NONE){
-        return $this->error("Modul ayar dosyasi anlasilmadi, lutfen modul yoneticisiyle iletisime gecin");
-    }
-
-    // Check if module already exists.
-    if(Module::where('name',$module_name)->exists()){
-        return $this->error("Bu isimde bir modul zaten ekli.");
-    }
-
-    $module = new Module(["name" => $module_name]);
-    $module->save();
-
-    // Let's check module hooks.
-    $listen = $template["hooks"]["listen"];
-    $dbArray = [];
-
-    $now = Carbon::now('utc')->toDateTimeString();
-
-    foreach ($listen as $value) {
-        array_push($dbArray,[
-            "hook" => $value,
-            "id" => Str::uuid(),
-            "module_id" => $module->id,
-            "module_name" => $module->name,
-            "enabled" => false,
-            "created_at" => $now,
-            "updated_at" => $now
-        ]);
-    }
-
-    $flag = ModuleHook::insert($dbArray);
-
-    if($flag){
-        $notification = new AdminNotification([
-            "title" => "Yeni Modül Eklendi",
-            "type" => "new_module",
-            "message" => "$module->name isminde bir modül sisteme eklendi.",
-            "level" => 3
-        ]);
-        $notification->save();
-        shell_exec("chmod +x /liman/modules/" . $module->name . "/main");
-        $this->info("Modul basariyla yuklendi, lutfen liman arayuzunden yetkilerini onaylayin.");
-    }else{
-        $this->error("Modul yuklenemedi, bir hata olustu.\n$flag");
-    }
+    $notification = new AdminNotification([
+        "title" => "Yeni Modül Eklendi",
+        "type" => "new_module",
+        "message" => "$module->name isminde bir modül sisteme eklendi.",
+        "level" => 3
+    ]);
+    $notification->save();
+    $this->info("Modul basariyla yuklendi, lutfen liman arayuzunden yetkilerini onaylayin.");
 
 })->describe("New module add");
 

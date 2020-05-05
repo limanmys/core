@@ -92,7 +92,7 @@ if (!function_exists('settingsModuleButtons')) {
     function settingsModuleButtons()
     {
         $str = "";
-        foreach(searchModuleFiles('settings') as $file){
+        foreach(searchModuleFiles('settings.blade.php') as $file){
             $foo = substr($file,15);
             $name = substr($foo,0,strpos($foo,"/"));
             $str .= "<li class=\"nav-item\">
@@ -124,9 +124,15 @@ if (!function_exists('serverModuleButtons')) {
      */
     function serverModuleButtons()
     {
-        return "<li class=\"nav-item\">
-    <a class=\"nav-link\" data-toggle=\"pill\" onclick=\"terminalTab()\" href=\"#terminalTab\" role=\"tab\">Terminal</a>
-</li>";
+        $str = "";
+        foreach(searchModuleFiles('server.blade.php') as $file){
+            $foo = substr($file,15);
+            $name = substr($foo,0,strpos($foo,"/"));
+            $str .= "<li class=\"nav-item\">
+               <a class=\"nav-link\" data-toggle=\"tab\" href=\"#$name\">$name</a>
+            </li>";
+        }
+        return $str;
     }
 }
 

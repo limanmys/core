@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Create Required Folders for Liman
-mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions}
+mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions,modules}
 
 # User Creation
 if getent passwd liman > /dev/null 2>&1; then
@@ -123,8 +123,8 @@ rm -rf /tmp/liman
 rm -rf /liman/sandbox/{.git,vendor,views,.gitignore,composer.json,composer.lock,index.php}
 
 # Set Permissions
-chown -R liman:liman /liman/{server,database,certs,sandbox,logs}
-chmod 700 -R /liman/{server,database,certs,logs,webssh}
+chown -R liman:liman /liman/{server,database,certs,sandbox,logs,webssh,modules}
+chmod 700 -R /liman/{server,database,certs,logs,webssh,modules}
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
