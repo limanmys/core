@@ -4,7 +4,6 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Log Channel
@@ -61,7 +60,7 @@ return [
         ],
 
         'papertrail' => [
-            'driver'  => 'monolog',
+            'driver' => 'monolog',
             'level' => 'debug',
             'handler' => SyslogUdpHandler::class,
             'handler_with' => [
@@ -88,5 +87,4 @@ return [
             'level' => 'debug',
         ],
     ],
-
 ];

@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     //Available Hooks
     "senders" => [
         "login_attempt",
@@ -68,7 +67,7 @@ return [
         "wallet_setting_update_attempt",
         "wallet_setting_update_successful",
         "wallet_setting_delete_attempt",
-        "wallet_setting_delete_successful"
+        "wallet_setting_delete_successful",
     ],
 
     "listeners" => [
@@ -83,9 +82,9 @@ return [
         "extension_add",
         "extension_remove",
         "certificate_add",
-        "certificate_remove"
+        "certificate_remove",
     ],
 
     // Hooks execute timeout
-    "timeout" => 5
+    "timeout" => 5,
 ];

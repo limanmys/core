@@ -3,7 +3,6 @@
 use BeyondCode\LaravelWebSockets\Dashboard\Http\Middleware\Authorize;
 
 return [
-
     /*
      * Set a custom dashboard configuration
      */
@@ -41,7 +40,8 @@ return [
      * You can create a custom provider by implementing the
      * `AppProvider` interface.
      */
-    'app_provider' => BeyondCode\LaravelWebSockets\Apps\ConfigAppProvider::class,
+    'app_provider' =>
+        BeyondCode\LaravelWebSockets\Apps\ConfigAppProvider::class,
 
     /*
      * This array contains the hosts of which you want to allow incoming requests.
@@ -68,10 +68,7 @@ return [
      * the chance to add your own middleware to this list or change any of
      * the existing middleware. Or, you can simply stick with this list.
      */
-    'middleware' => [
-        'web',
-        Authorize::class,
-    ],
+    'middleware' => ['web', Authorize::class],
 
     'statistics' => [
         /*
@@ -79,7 +76,8 @@ return [
          * The only requirement is that the model should extend
          * `WebSocketsStatisticsEntry` provided by this package.
          */
-        'model' => \BeyondCode\LaravelWebSockets\Statistics\Models\WebSocketsStatisticsEntry::class,
+        'model' =>
+            \BeyondCode\LaravelWebSockets\Statistics\Models\WebSocketsStatisticsEntry::class,
 
         /*
          * Here you can specify the interval in seconds at which statistics should be logged.
@@ -131,5 +129,6 @@ return [
      * The only requirement is that the class should implement
      * `ChannelManager` interface provided by this package.
      */
-    'channel_manager' => \BeyondCode\LaravelWebSockets\WebSockets\Channels\ChannelManagers\ArrayChannelManager::class,
+    'channel_manager' =>
+        \BeyondCode\LaravelWebSockets\WebSockets\Channels\ChannelManagers\ArrayChannelManager::class,
 ];
