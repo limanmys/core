@@ -17,12 +17,12 @@ class Token extends Model
         //        $old = Token::where('user_id',($user_id) ? $user_id : auth()->id())->get();
         // if($old) $old->destroy();
 
-        $token = $token = Str::random(32);
+        $token = Str::random(32);
         while (Token::where('token', $token)->exists()) {
-            $token = $token = Str::random(32);
+            $token = Str::random(32);
         }
 
-        return Token::create([
+        return Token::firstOrCreate([
             "token" => $token,
             "user_id" => ($user_id) ? $user_id : auth()->id()
         ]);

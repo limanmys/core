@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Validator;
 
 class RoleMappingController extends Controller
 {
-
-
     public function add()
     {
         $flag = Validator::make(request()->all(), [
@@ -34,7 +32,6 @@ class RoleMappingController extends Controller
 
         return respond("Rol eşleştirmesi başarıyla eklendi.");
     }
-
 
     public function delete()
     {
