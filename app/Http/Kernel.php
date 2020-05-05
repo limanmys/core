@@ -5,7 +5,6 @@ namespace App\Http;
 use App\Http\Middleware\Extension;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
-
 class Kernel extends HttpKernel
 {
     protected $middleware = [
@@ -29,13 +28,14 @@ class Kernel extends HttpKernel
             Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\ForcePasswordChange::class,
-            \App\Http\Middleware\RestrictedMode::class
+            \App\Http\Middleware\RestrictedMode::class,
         ],
     ];
 
     protected $routeMiddleware = [
         'auth' => Middleware\Authenticate::class,
-        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'auth.basic' =>
+            \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
@@ -49,7 +49,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'extension' => Extension::class,
-        'restricted' => \App\Http\Middleware\RestrictedMode::class
+        'restricted' => \App\Http\Middleware\RestrictedMode::class,
     ];
 
     protected $middlewarePriority = [

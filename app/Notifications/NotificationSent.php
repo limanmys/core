@@ -41,8 +41,9 @@ class NotificationSent extends Notification
      */
     public function toBroadcast($notifiable)
     {
-        return (new BroadcastMessage((array) $this->notification))
-            ->onConnection('sync');
+        return (new BroadcastMessage(
+            (array) $this->notification
+        ))->onConnection('sync');
     }
 
     /**

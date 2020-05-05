@@ -17,7 +17,6 @@ use App\ServerGroup;
 
 class MainController extends Controller
 {
-
     public function __construct()
     {
         // Specifiy that this controller requires admin middleware in all functions.
@@ -26,10 +25,12 @@ class MainController extends Controller
 
     public function index()
     {
-        $changelog = is_file(storage_path('changelog')) ? file_get_contents(storage_path('changelog')) : "";
+        $changelog = is_file(storage_path('changelog'))
+            ? file_get_contents(storage_path('changelog'))
+            : "";
         return view('settings.index', [
             "users" => User::all(),
-            "changelog" => $changelog
+            "changelog" => $changelog,
         ]);
     }
 
@@ -37,8 +38,18 @@ class MainController extends Controller
     {
         return view('settings.one', [
             "user" => $user,
-            "servers" => Server::find($user->permissions->where('type', 'server')->pluck('value')->toArray()),
-            "extensions" => Extension::find($user->permissions->where('type', 'extension')->pluck('value')->toArray())
+            "servers" => Server::find(
+                $user->permissions
+                    ->where('type', 'server')
+                    ->pluck('value')
+                    ->toArray()
+            ),
+            "extensions" => Extension::find(
+                $user->permissions
+                    ->where('type', 'extension')
+                    ->pluck('value')
+                    ->toArray()
+            ),
         ]);
     }
 
@@ -46,23 +57,19 @@ class MainController extends Controller
     {
         return view('l.table', [
             "value" => \App\User::all(),
-            "title" => [
-                "Kullanıcı Adı", "Email", "*hidden*",
-            ],
-            "display" => [
-                "name", "email", "id:user_id",
-            ],
+            "title" => ["Kullanıcı Adı", "Email", "*hidden*"],
+            "display" => ["name", "email", "id:user_id"],
             "menu" => [
                 "Parolayı Sıfırla" => [
                     "target" => "passwordReset",
-                    "icon" => "fa-lock"
+                    "icon" => "fa-lock",
                 ],
                 "Sil" => [
                     "target" => "delete",
-                    "icon" => " context-menu-icon-delete"
-                ]
+                    "icon" => " context-menu-icon-delete",
+                ],
             ],
-            "onclick" => "details"
+            "onclick" => "details",
         ]);
     }
 
@@ -74,17 +81,32 @@ class MainController extends Controller
         $display = [];
         switch (request('type')) {
             case "server":
-                $data = Server::whereNotIn('id', $user->permissions->where('type', 'server')->pluck('value')->toArray())->get();
+                $data = Server::whereNotIn(
+                    'id',
+                    $user->permissions
+                        ->where('type', 'server')
+                        ->pluck('value')
+                        ->toArray()
+                )->get();
                 $title = ["*hidden*", "İsim", "Türü", "İp Adresi"];
                 $display = ["id:id", "name", "type", "ip_address"];
                 break;
             case "extension":
-                $data = Extension::whereNotIn('id', $user->permissions->where('type', 'extension')->pluck('value')->toArray())->get();
+                $data = Extension::whereNotIn(
+                    'id',
+                    $user->permissions
+                        ->where('type', 'extension')
+                        ->pluck('value')
+                        ->toArray()
+                )->get();
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
                 break;
             case "role":
-                $data = Role::whereNotIn('id', $user->roles->pluck('id')->toArray())->get();
+                $data = Role::whereNotIn(
+                    'id',
+                    $user->roles->pluck('id')->toArray()
+                )->get();
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
                 break;
@@ -127,43 +149,67 @@ class MainController extends Controller
 
     public function getExtensionFunctions()
     {
-        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") . strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"), true);
-        $functions = array_key_exists("functions", $extension) ? $extension["functions"] : [];
+        $extension = json_decode(
+            file_get_contents(
+                env("EXTENSIONS_PATH") .
+                    strtolower(extension()->name) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
+            ),
+            true
+        );
+        $functions = array_key_exists("functions", $extension)
+            ? $extension["functions"]
+            : [];
         $lang = session('locale');
-        $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/lang/" . $lang . ".json";
+        $file =
+            env('EXTENSIONS_PATH') .
+            strtolower(extension()->name) .
+            "/lang/" .
+            $lang .
+            ".json";
 
         //Translate Items.
         $cleanFunctions = [];
         if (is_file($file)) {
             $json = json_decode(file_get_contents($file), true);
             for ($i = 0; $i < count($functions); $i++) {
-                if (array_key_exists("isActive", $functions[$i]) && $functions[$i]["isActive"] == "false") {
+                if (
+                    array_key_exists("isActive", $functions[$i]) &&
+                    $functions[$i]["isActive"] == "false"
+                ) {
                     continue;
                 }
-                $description = (array_key_exists($functions[$i]["description"], $json))
-                    ? $json[$functions[$i]["description"]] : $functions[$i]["description"];
+                $description = array_key_exists(
+                    $functions[$i]["description"],
+                    $json
+                )
+                    ? $json[$functions[$i]["description"]]
+                    : $functions[$i]["description"];
                 array_push($cleanFunctions, [
                     "name" => $functions[$i]["name"],
-                    "description" => $description
+                    "description" => $description,
                 ]);
             }
         }
 
         return view('l.table', [
             "value" => $cleanFunctions,
-            "title" => [
-                "*hidden*", "Aciklama"
-            ],
-            "display" => [
-                "name:name", "description"
-            ]
+            "title" => ["*hidden*", "Aciklama"],
+            "display" => ["name:name", "description"],
         ]);
     }
 
     public function addFunctionPermissions()
     {
         foreach (explode(",", request('functions')) as $function) {
-            Permission::grant(request('user_id'), "function", "name", strtolower(extension()->name), $function);
+            Permission::grant(
+                request('user_id'),
+                "function",
+                "name",
+                strtolower(extension()->name),
+                $function
+            );
         }
         return respond(__("Başarılı"), 200);
     }
@@ -185,17 +231,23 @@ class MainController extends Controller
     {
         $cert = Certificate::where([
             'server_hostname' => request('ldapAddress'),
-            'origin' => 636
+            'origin' => 636,
         ])->first();
         if (!$cert) {
-            list($flag, $message) = retrieveCertificate(request('ldapAddress'), 636);
+            list($flag, $message) = retrieveCertificate(
+                request('ldapAddress'),
+                636
+            );
             if ($flag) {
                 addCertificate(request('ldapAddress'), 636, $message["path"]);
                 AdminNotification::create([
                     "title" => "Yeni Sertifika Eklendi",
                     "type" => "new_cert",
-                    "message" => "Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.<br><br><a href='" . route('settings') . "#certificates'>Detaylar</a>",
-                    "level" => 3
+                    "message" =>
+                        "Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.<br><br><a href='" .
+                        route('settings') .
+                        "#certificates'>Detaylar</a>",
+                    "level" => 3,
                 ]);
             }
         }
@@ -204,12 +256,16 @@ class MainController extends Controller
         }
         if (request('ldapAddress') !== config('ldap.ldap_host')) {
             RoleMapping::truncate();
-            User::where("auth_type", "ldap")->get()->map(function ($item) {
-                $item->permissions()->delete();
-            });
-            User::where("auth_type", "ldap")->get()->map(function ($item) {
-                RoleUser::where("user_id", $item->id)->delete();
-            });
+            User::where("auth_type", "ldap")
+                ->get()
+                ->map(function ($item) {
+                    $item->permissions()->delete();
+                });
+            User::where("auth_type", "ldap")
+                ->get()
+                ->map(function ($item) {
+                    RoleUser::where("user_id", $item->id)->delete();
+                });
             User::where("auth_type", "ldap")->delete();
         }
         setEnv([
@@ -222,15 +278,26 @@ class MainController extends Controller
 
     public function getPermisssionData()
     {
-
-        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") . strtolower(request('extension_name')) . DIRECTORY_SEPARATOR . "db.json"), true);
-        $function = collect($extension['functions'])->where('name', request('function_name'))->first();
+        $extension = json_decode(
+            file_get_contents(
+                env("EXTENSIONS_PATH") .
+                    strtolower(request('extension_name')) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
+            ),
+            true
+        );
+        $function = collect($extension['functions'])
+            ->where('name', request('function_name'))
+            ->first();
 
         if (!$function) {
             return respond("Fonksiyon bulunamadı!", 201);
         }
 
-        $parameters = isset($function['parameters']) ? $function['parameters'] : null;
+        $parameters = isset($function['parameters'])
+            ? $function['parameters']
+            : null;
         if (!$parameters) {
             return respond("Fonksiyon parametresi bulunamadı!", 201);
         }
@@ -238,16 +305,18 @@ class MainController extends Controller
         $data = PermissionData::where('permission_id', request('id'))->first();
         $data = $data ? json_decode($data->data) : (object) [];
         foreach ($parameters as $key => $parameter) {
-            $parameters[$key]["value"] = isset($data->{$parameter["variable"]}) ? $data->{$parameter["variable"]} : "";
+            $parameters[$key]["value"] = isset($data->{$parameter["variable"]})
+                ? $data->{$parameter["variable"]}
+                : "";
         }
 
         $parameters = collect(cleanArray($parameters));
         $inputs = view("inputs", [
             "inputs" => $parameters->mapWithKeys(function ($item) {
                 return [
-                    $item["name"] => $item["variable"] . ":" . $item["type"]
+                    $item["name"] => $item["variable"] . ":" . $item["type"],
                 ];
-            })
+            }),
         ])->render();
 
         return respond([
@@ -261,14 +330,14 @@ class MainController extends Controller
         $data = PermissionData::where('permission_id', request('id'))->first();
         if ($data) {
             $data->update([
-                "data" => request('data')
+                "data" => request('data'),
             ]);
             return respond("Başarıyla eklendi!");
         }
 
         PermissionData::create([
             "data" => request('data'),
-            "permission_id" => request('id')
+            "permission_id" => request('id'),
         ]);
         return respond("Başarıyla eklendi!");
     }
@@ -280,9 +349,11 @@ class MainController extends Controller
         }
         $flag = ServerGroup::create([
             "name" => request('name'),
-            "servers" => request('servers')
+            "servers" => request('servers'),
         ]);
-        return ($flag) ? respond("Grup başarıyla eklendi!") : respond("Grup Eklenemedi!", 201);
+        return $flag
+            ? respond("Grup başarıyla eklendi!")
+            : respond("Grup Eklenemedi!", 201);
     }
 
     public function modifyServerGroup()
@@ -293,9 +364,11 @@ class MainController extends Controller
         }
         $flag = $group->update([
             "name" => request('name'),
-            "servers" => request('servers')
+            "servers" => request('servers'),
         ]);
-        return ($flag) ? respond("Grup başarıyla düzenlendi!") : respond("Grup Düzenlenemedi!", 201);
+        return $flag
+            ? respond("Grup başarıyla düzenlendi!")
+            : respond("Grup Düzenlenemedi!", 201);
     }
 
     public function deleteServerGroup()
@@ -305,7 +378,9 @@ class MainController extends Controller
             return respond("Grup bulunamadı!", 201);
         }
         $flag = $group->delete();
-        return ($flag) ? respond("Grup başarıyla silindi!") : respond("Grup Silinemedi!", 201);
+        return $flag
+            ? respond("Grup başarıyla silindi!")
+            : respond("Grup Silinemedi!", 201);
     }
 
     public function saveLogSystem()
@@ -313,18 +388,27 @@ class MainController extends Controller
         $flag = request()->validate([
             'targetHostname' => 'required|min:3',
             'targetPort' => 'required|numeric|between:1,65535',
-            'logInterval' => 'required|numeric'
+            'logInterval' => 'required|numeric',
         ]);
         if (!$flag) {
             return respond("Girdiğiniz veriler geçerli değil!", 201);
         }
 
-        $text = "
-*.*     @@" . request('targetHostname') . ":" . request('targetPort') . "
+        $text =
+            "
+*.*     @@" .
+            request('targetHostname') .
+            ":" .
+            request('targetPort') .
+            "
 \\\$ModLoad imfile
-\\\$InputFilePollInterval " . request('logInterval') . "
+\\\$InputFilePollInterval " .
+            request('logInterval') .
+            "
 \\\$PrivDropToGroup adm
-\\\$InputFileName " . env('LOG_PATH')  . "
+\\\$InputFileName " .
+            env('LOG_PATH') .
+            "
 \\\$InputFileTag LimanApp
 \\\$InputFileStateFile Stat-APP
 \\\$InputFileSeverity Info
@@ -335,8 +419,12 @@ class MainController extends Controller
 
         shell_exec("sudo sed -i '/module(load=\"imudp\")/d' /etc/rsyslog.conf");
         shell_exec("sudo sed -i '/module(load=\"imtcp\")/d' /etc/rsyslog.conf");
-        shell_exec("sudo sed -i '/input(type=\"imudp\" port=\"514\")/d' /etc/rsyslog.conf");
-        shell_exec("sudo sed -i '/input(type=\"imtcp\" port=\"514\")/d' /etc/rsyslog.conf");
+        shell_exec(
+            "sudo sed -i '/input(type=\"imudp\" port=\"514\")/d' /etc/rsyslog.conf"
+        );
+        shell_exec(
+            "sudo sed -i '/input(type=\"imtcp\" port=\"514\")/d' /etc/rsyslog.conf"
+        );
 
         $text = "
 module(load=\"imudp\")
@@ -352,9 +440,16 @@ input(type=\"imtcp\" port=\"514\")";
 
     public function getLogSystem()
     {
-        $status = trim(shell_exec("systemctl is-active rsyslog.service")) == "active" ? true : false;
+        $status =
+            trim(shell_exec("systemctl is-active rsyslog.service")) == "active"
+                ? true
+                : false;
 
-        $data = trim(shell_exec("cat /etc/rsyslog.d/liman.conf | grep 'InputFilePollInterval' | cut -d' ' -f2"));
+        $data = trim(
+            shell_exec(
+                "cat /etc/rsyslog.d/liman.conf | grep 'InputFilePollInterval' | cut -d' ' -f2"
+            )
+        );
         $interval = $data == "" ? "10" : $data;
 
         $ip_address = "";
@@ -372,7 +467,7 @@ input(type=\"imtcp\" port=\"514\")";
             "status" => $status,
             "ip_address" => $ip_address != "" ? $ip_address : "",
             "port" => $port != "" ? $port : "514",
-            "interval" => $interval != "" ? $interval : "10"
+            "interval" => $interval != "" ? $interval : "10",
         ]);
     }
 }

@@ -18,7 +18,13 @@ class Server extends Model
     /**
      * @var array
      */
-    protected $fillable = ['name', 'ip_address', 'city', 'type', 'control_port'];
+    protected $fillable = [
+        'name',
+        'ip_address',
+        'city',
+        'type',
+        'control_port',
+    ];
     /**
      * @var
      */
@@ -36,7 +42,10 @@ class Server extends Model
         } elseif ($this->type == "linux_certificate") {
             return new SSHCertificateConnector($this, auth()->id());
         } else {
-            abort(504, "Bu sunucuda komut çalıştırmak için bir bağlantınız yok.");
+            abort(
+                504,
+                "Bu sunucuda komut çalıştırmak için bir bağlantınız yok."
+            );
         }
     }
 
@@ -97,13 +106,23 @@ class Server extends Model
     public function isRunning($service_name)
     {
         if ($this->type == "windows" || $this->type == "linux") {
-            return is_resource(@fsockopen($this->ip_address, $this->control_port, $errno, $errstr, env('SERVER_CONNECTION_TIMEOUT')));
+            return is_resource(
+                @fsockopen(
+                    $this->ip_address,
+                    $this->control_port,
+                    $errno,
+                    $errstr,
+                    env('SERVER_CONNECTION_TIMEOUT')
+                )
+            );
         }
         // Check if services are alive or not.
         $query = sudo() . "systemctl is-failed " . $service_name;
 
         // Execute and return outputs.
-        return ($this->connector()->execute($query, false) == "active") ? true : false;
+        return $this->connector()->execute($query, false) == "active"
+            ? true
+            : false;
     }
 
     /**
@@ -112,7 +131,17 @@ class Server extends Model
     public function isAlive()
     {
         // Simply Check Port If It's Alive
-        if (is_resource(@fsockopen($this->ip_address, $this->control_port, $errno, $errstr, env('SERVER_CONNECTION_TIMEOUT')))) {
+        if (
+            is_resource(
+                @fsockopen(
+                    $this->ip_address,
+                    $this->control_port,
+                    $errno,
+                    $errstr,
+                    env('SERVER_CONNECTION_TIMEOUT')
+                )
+            )
+        ) {
             return true;
         } else {
             // Abort, Since server is unavailable.
@@ -133,24 +162,38 @@ class Server extends Model
 
     public function extensions()
     {
-        return $this->belongsToMany('\App\Extension', 'server_extensions')->get()->filter(function ($extension) {
-            return Permission::can(user()->id, 'extension', 'id', $extension->id);
-        });
+        return $this->belongsToMany('\App\Extension', 'server_extensions')
+            ->get()
+            ->filter(function ($extension) {
+                return Permission::can(
+                    user()->id,
+                    'extension',
+                    'id',
+                    $extension->id
+                );
+            });
     }
 
     public function isFavorite()
     {
-        return UserFavorites::where(["user_id" => user()->id, "server_id" => server()->id])->exists();
+        return UserFavorites::where([
+            "user_id" => user()->id,
+            "server_id" => server()->id,
+        ])->exists();
     }
 
     public function canRunCommand()
     {
-        return $this->type == "linux_ssh" || $this->type == "linux_certificate" || $this->type == "windows_powershell";
+        return $this->type == "linux_ssh" ||
+            $this->type == "linux_certificate" ||
+            $this->type == "windows_powershell";
     }
 
     public function isLinux()
     {
-        return $this->type == "linux_ssh" || $this->type == "linux_certificate" || $this->type == "linux";
+        return $this->type == "linux_ssh" ||
+            $this->type == "linux_certificate" ||
+            $this->type == "linux";
     }
 
     public function isWindows()
@@ -168,6 +211,9 @@ class Server extends Model
             return $this->run("lsb_release -ds");
         }
 
-        return explode("|", ($this->run("(Get-WmiObject Win32_OperatingSystem).name"))[0]);
+        return explode(
+            "|",
+            $this->run("(Get-WmiObject Win32_OperatingSystem).name")[0]
+        );
     }
 }

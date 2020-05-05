@@ -12,7 +12,13 @@ class Extension extends Model
      * @var array
      */
     protected $fillable = [
-        "name", "version", "icon", "service", "sslPorts", "issuer", "language"
+        "name",
+        "version",
+        "icon",
+        "service",
+        "sslPorts",
+        "issuer",
+        "language",
     ];
 
     /**
@@ -40,18 +46,24 @@ class Extension extends Model
     {
         // Get all Servers which have this extension.
         if ($city) {
-            return Server::getAll()->where('city', $city)->filter(function ($value) {
-                return DB::table('server_extensions')->where([
-                    "server_id" => $value->id,
-                    "extension_id" => request("extension_id")
-                ])->exists();
-            });
+            return Server::getAll()
+                ->where('city', $city)
+                ->filter(function ($value) {
+                    return DB::table('server_extensions')
+                        ->where([
+                            "server_id" => $value->id,
+                            "extension_id" => request("extension_id"),
+                        ])
+                        ->exists();
+                });
         }
         return Server::getAll()->filter(function ($value) {
-            return DB::table('server_extensions')->where([
-                "server_id" => $value->id,
-                "extension_id" => request("extension_id")
-            ])->exists();
+            return DB::table('server_extensions')
+                ->where([
+                    "server_id" => $value->id,
+                    "extension_id" => request("extension_id"),
+                ])
+                ->exists();
         });
     }
 
@@ -63,7 +75,9 @@ class Extension extends Model
     protected static function boot()
     {
         parent::boot();
-        static::addGlobalScope('extensions', function (\Illuminate\Database\Eloquent\Builder $builder) {
+        static::addGlobalScope('extensions', function (
+            \Illuminate\Database\Eloquent\Builder $builder
+        ) {
             $builder->orderBy('order');
         });
     }

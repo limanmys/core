@@ -27,15 +27,22 @@ if (!function_exists('respond')) {
     function respond($message, $status = 200)
     {
         if (request()->wantsJson()) {
-            return response()->json([
-                "message" => is_array($message) ? $message : __($message),
-                "status" => $status
-            ], $status);
+            return response()->json(
+                [
+                    "message" => is_array($message) ? $message : __($message),
+                    "status" => $status,
+                ],
+                $status
+            );
         } else {
-            return response()->view('general.error', [
-                "message" => __($message),
-                "status" => $status
-            ], $status);
+            return response()->view(
+                'general.error',
+                [
+                    "message" => __($message),
+                    "status" => $status,
+                ],
+                $status
+            );
         }
     }
 }
@@ -44,8 +51,8 @@ if (!function_exists('registerModuleRoutes')) {
     function registerModuleRoutes()
     {
         $files = searchModuleFiles('routes.php');
-        foreach($files as $file){
-            require_once($file . "/routes.php");
+        foreach ($files as $file) {
+            require_once $file . "/routes.php";
         }
     }
 }
@@ -53,18 +60,17 @@ if (!function_exists('registerModuleRoutes')) {
 if (!function_exists('searchModuleFiles')) {
     function searchModuleFiles($type)
     {
-        $command = "find /liman/modules/ -name '" .  $type . "'";
+        $command = "find /liman/modules/ -name '" . $type . "'";
 
         $output = trim(shell_exec($command));
-        if($output == "")
-        {
+        if ($output == "") {
             return [];
         }
 
-        $data = explode("\n",$output);
+        $data = explode("\n", $output);
         $arr = [];
-        foreach($data as $file){
-            array_push($arr,dirname($file));
+        foreach ($data as $file) {
+            array_push($arr, dirname($file));
         }
         return $arr;
     }
@@ -77,8 +83,11 @@ if (!function_exists('settingsModuleViews')) {
     function settingsModuleViews()
     {
         $str = "";
-        foreach(searchModuleFiles('settings.blade.php') as $file){
-            $blade = new Blade([realpath(base_path('resources/views/l')),$file], "/tmp");
+        foreach (searchModuleFiles('settings.blade.php') as $file) {
+            $blade = new Blade(
+                [realpath(base_path('resources/views/l')), $file],
+                "/tmp"
+            );
             $str .= $blade->render('settings');
         }
         return $str;
@@ -92,9 +101,9 @@ if (!function_exists('settingsModuleButtons')) {
     function settingsModuleButtons()
     {
         $str = "";
-        foreach(searchModuleFiles('settings.blade.php') as $file){
-            $foo = substr($file,15);
-            $name = substr($foo,0,strpos($foo,"/"));
+        foreach (searchModuleFiles('settings.blade.php') as $file) {
+            $foo = substr($file, 15);
+            $name = substr($foo, 0, strpos($foo, "/"));
             $str .= "<li class=\"nav-item\">
                <a class=\"nav-link\" data-toggle=\"tab\" href=\"#$name\">$name</a>
             </li>";
@@ -110,8 +119,11 @@ if (!function_exists('serverModuleViews')) {
     function serverModuleViews()
     {
         $str = "";
-        foreach(searchModuleFiles('server.blade.php') as $file){
-            $blade = new Blade([realpath(base_path('resources/views/l')),$file], "/tmp");
+        foreach (searchModuleFiles('server.blade.php') as $file) {
+            $blade = new Blade(
+                [realpath(base_path('resources/views/l')), $file],
+                "/tmp"
+            );
             $str .= $blade->render('server');
         }
         return $str;
@@ -125,9 +137,9 @@ if (!function_exists('serverModuleButtons')) {
     function serverModuleButtons()
     {
         $str = "";
-        foreach(searchModuleFiles('server.blade.php') as $file){
-            $foo = substr($file,15);
-            $name = substr($foo,0,strpos($foo,"/"));
+        foreach (searchModuleFiles('server.blade.php') as $file) {
+            $foo = substr($file, 15);
+            $name = substr($foo, 0, strpos($foo, "/"));
             $str .= "<li class=\"nav-item\">
                <a class=\"nav-link\" data-toggle=\"tab\" href=\"#$name\">$name</a>
             </li>";
@@ -135,7 +147,6 @@ if (!function_exists('serverModuleButtons')) {
         return $str;
     }
 }
-
 
 if (!function_exists('notifications')) {
     /**
@@ -145,8 +156,10 @@ if (!function_exists('notifications')) {
     {
         return Notification::where([
             "user_id" => auth()->id(),
-            "read" => false
-        ])->orderBy('updated_at', 'desc')->get();
+            "read" => false,
+        ])
+            ->orderBy('updated_at', 'desc')
+            ->get();
     }
 }
 
@@ -156,9 +169,7 @@ if (!function_exists('knownPorts')) {
      */
     function knownPorts()
     {
-        return [
-            "5986", "636"
-        ];
+        return ["5986", "636"];
     }
 }
 
@@ -168,24 +179,38 @@ if (!function_exists('retrieveCertificate')) {
      */
     function retrieveCertificate($hostname, $port)
     {
-        $get = stream_context_create(array("ssl" => array(
-            "capture_peer_cert" => TRUE,
-            "allow_self_signed" => TRUE,
-            "verify_peer" => FALSE,
-            "verify_peer_name" => FALSE
-        )));
+        $get = stream_context_create([
+            "ssl" => [
+                "capture_peer_cert" => true,
+                "allow_self_signed" => true,
+                "verify_peer" => false,
+                "verify_peer_name" => false,
+            ],
+        ]);
         $flag = false;
         try {
-            $read = stream_socket_client("ssl://" .
-                $hostname . ":" . $port, $errno, $errstr, intval(env('SERVER_CONNECTION_TIMEOUT')), STREAM_CLIENT_CONNECT, $get);
+            $read = stream_socket_client(
+                "ssl://" . $hostname . ":" . $port,
+                $errno,
+                $errstr,
+                intval(env('SERVER_CONNECTION_TIMEOUT')),
+                STREAM_CLIENT_CONNECT,
+                $get
+            );
             $flag = true;
         } catch (\Exception $exception) {
         }
 
         if (!$flag) {
             try {
-                $read = stream_socket_client("tlsv1.1://" .
-                    $hostname . ":" . $port, $errno, $errstr, intval(env('SERVER_CONNECTION_TIMEOUT')), STREAM_CLIENT_CONNECT, $get);
+                $read = stream_socket_client(
+                    "tlsv1.1://" . $hostname . ":" . $port,
+                    $errno,
+                    $errstr,
+                    intval(env('SERVER_CONNECTION_TIMEOUT')),
+                    STREAM_CLIENT_CONNECT,
+                    $get
+                );
                 $flag = true;
             } catch (\Exception $exception) {
                 return [false, "Sertifika alınamıyor!"];
@@ -193,12 +218,31 @@ if (!function_exists('retrieveCertificate')) {
         }
 
         $cert = stream_context_get_params($read);
-        $certinfo = openssl_x509_parse($cert['options']['ssl']['peer_certificate']);
-        openssl_x509_export($cert["options"]["ssl"]["peer_certificate"], $publicKey);
-        $certinfo["subjectKeyIdentifier"] = array_key_exists("subjectKeyIdentifier", $certinfo["extensions"]) ? $certinfo["extensions"]["subjectKeyIdentifier"] : "";
-        $certinfo["authorityKeyIdentifier"] = array_key_exists("authorityKeyIdentifier", $certinfo["extensions"]) ? substr($certinfo["extensions"]["authorityKeyIdentifier"], 6) : "";
-        $certinfo["validFrom_time_t"] = Carbon::createFromTimestamp($certinfo["validFrom_time_t"])->format('H:i d/m/Y');
-        $certinfo["validTo_time_t"] = Carbon::createFromTimestamp($certinfo["validTo_time_t"])->format('H:i d/m/Y');
+        $certinfo = openssl_x509_parse(
+            $cert['options']['ssl']['peer_certificate']
+        );
+        openssl_x509_export(
+            $cert["options"]["ssl"]["peer_certificate"],
+            $publicKey
+        );
+        $certinfo["subjectKeyIdentifier"] = array_key_exists(
+            "subjectKeyIdentifier",
+            $certinfo["extensions"]
+        )
+            ? $certinfo["extensions"]["subjectKeyIdentifier"]
+            : "";
+        $certinfo["authorityKeyIdentifier"] = array_key_exists(
+            "authorityKeyIdentifier",
+            $certinfo["extensions"]
+        )
+            ? substr($certinfo["extensions"]["authorityKeyIdentifier"], 6)
+            : "";
+        $certinfo["validFrom_time_t"] = Carbon::createFromTimestamp(
+            $certinfo["validFrom_time_t"]
+        )->format('H:i d/m/Y');
+        $certinfo["validTo_time_t"] = Carbon::createFromTimestamp(
+            $certinfo["validTo_time_t"]
+        )->format('H:i d/m/Y');
         unset($certinfo["extensions"]);
         $path = Str::random(10);
         $certinfo["path"] = $path;
@@ -214,8 +258,10 @@ if (!function_exists('adminNotifications')) {
     function adminNotifications()
     {
         return AdminNotification::where([
-            "read" => "false"
-        ])->orderBy('updated_at', 'desc')->get();
+            "read" => "false",
+        ])
+            ->orderBy('updated_at', 'desc')
+            ->get();
     }
 }
 
@@ -227,20 +273,20 @@ if (!function_exists('addCertificate')) {
     {
         $file = "liman-" . $hostname . "_" . $port . ".crt";
         $cert = file_get_contents('/tmp/' . $path);
-        shell_exec("echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . $file);
+        shell_exec(
+            "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . $file
+        );
         shell_exec("sudo update-ca-certificates");
 
         // Create Certificate Object.
         return Certificate::create([
             "server_hostname" => $hostname,
-            "origin" => $port
+            "origin" => $port,
         ]);
     }
 }
 
-
 if (!function_exists('system_log')) {
-
     /**
      * @param $level
      * @param $message
@@ -309,12 +355,13 @@ if (!function_exists('servers')) {
      */
     function servers()
     {
-        return auth()->user()->servers();
+        return auth()
+            ->user()
+            ->servers();
     }
 }
 
 if (!function_exists('extensions')) {
-
     /**
      * @param array $filter
      * @return array
@@ -336,7 +383,7 @@ if (!function_exists('extensionRoute')) {
             "extension_id" => request()->route('extension_id'),
             "server_id" => request()->route('server_id'),
             "city" => request()->route('city'),
-            "unique_code" => $route
+            "unique_code" => $route,
         ]);
     }
 }
@@ -378,11 +425,11 @@ if (!function_exists('sandbox')) {
         }
         switch ($language) {
             case "python":
-                return new App\Classes\Sandbox\PythonSandbox;
+                return new App\Classes\Sandbox\PythonSandbox();
                 break;
             case "php":
             default:
-                return new App\Classes\Sandbox\PHPSandbox;
+                return new App\Classes\Sandbox\PHPSandbox();
                 break;
         }
     }
@@ -398,12 +445,14 @@ if (!function_exists('hook')) {
     {
         $hooks = App\ModuleHook::where([
             'hook' => $name,
-            'enabled' => true
+            'enabled' => true,
         ])->get();
 
-        array_key_exists("user", $data) ? $data["user"] = user() : null;
-        array_key_exists("extension", $data) ? $data["extension"] = extension() : null;
-        array_key_exists("server", $data) ? $data["server"] = server() : null;
+        array_key_exists("user", $data) ? ($data["user"] = user()) : null;
+        array_key_exists("extension", $data)
+            ? ($data["extension"] = extension())
+            : null;
+        array_key_exists("server", $data) ? ($data["server"] = server()) : null;
 
         $data = base64_encode(json_encode($data));
         $modellist = [];
@@ -421,7 +470,8 @@ if (!function_exists('hook')) {
                 continue;
             }
 
-            $command = "/liman/modules/" . $hook->module_name . "/main $name $data";
+            $command =
+                "/liman/modules/" . $hook->module_name . "/main $name $data";
             shell_exec("bash -c '$command & disown' &");
         }
     }
@@ -439,11 +489,10 @@ if (!function_exists('redirect_now')) {
             // also the __toString() magic method cannot throw exceptions
             // in that case also we need to manually call the exception
             // handler
-            $previousErrorHandler = set_exception_handler(function () {
-            });
+            $previousErrorHandler = set_exception_handler(function () {});
             restore_error_handler();
             call_user_func($previousErrorHandler, $exception);
-            die;
+            die();
         }
     }
 }
@@ -454,11 +503,13 @@ if (!function_exists('extensionDb')) {
      */
     function extensionDb($key)
     {
-        $target = DB::table("user_settings")->where([
-            "user_id" => auth()->user()->id,
-            "server_id" => server()->id,
-            "name" => $key
-        ])->first();
+        $target = DB::table("user_settings")
+            ->where([
+                "user_id" => auth()->user()->id,
+                "server_id" => server()->id,
+                "name" => $key,
+            ])
+            ->first();
         if ($target) {
             $key = env('APP_KEY') . auth()->user()->id . server()->id;
             $decrypted = openssl_decrypt($target->value, 'aes-256-cfb8', $key);
@@ -470,14 +521,15 @@ if (!function_exists('extensionDb')) {
 }
 
 if (!function_exists('sudo')) {
-
     function sudo()
     {
         if (server()->type == "linux_certificate") {
             return "sudo ";
         }
         $pass64 = base64_encode(extensionDb("clientPassword") . "\n");
-        return 'echo ' . $pass64 . ' | base64 -d | sudo -S -p " " id 2>/dev/null 1>/dev/null; sudo ';
+        return 'echo ' .
+            $pass64 .
+            ' | base64 -d | sudo -S -p " " id 2>/dev/null 1>/dev/null; sudo ';
     }
 }
 
@@ -554,7 +606,10 @@ if (!function_exists('cities')) {
      */
     function cities($city = null)
     {
-        $cities = json_decode(file_get_contents(storage_path("cities.json")), true);
+        $cities = json_decode(
+            file_get_contents(storage_path("cities.json")),
+            true
+        );
         if ($city) {
             return array_search($city, $cities);
         }
@@ -575,7 +630,11 @@ if (!function_exists('isJson')) {
     function isJson($string, $return_data = false)
     {
         $data = json_decode($string);
-        return (json_last_error() == JSON_ERROR_NONE) ? ($return_data ? $data : TRUE) : FALSE;
+        return json_last_error() == JSON_ERROR_NONE
+            ? ($return_data
+                ? $data
+                : true)
+            : false;
     }
 }
 
@@ -588,17 +647,19 @@ if (!function_exists('getPermissions')) {
 if (!function_exists('setEnv')) {
     function setEnv(array $values)
     {
-
         $envFile = app()->environmentFilePath();
         $str = file_get_contents($envFile);
 
         if (count($values) > 0) {
             foreach ($values as $envKey => $envValue) {
-
                 $str .= "\n"; // In case the searched variable is in the last line without \n
                 $keyPosition = strpos($str, "{$envKey}=");
                 $endOfLinePosition = strpos($str, "\n", $keyPosition);
-                $oldLine = substr($str, $keyPosition, $endOfLinePosition - $keyPosition);
+                $oldLine = substr(
+                    $str,
+                    $keyPosition,
+                    $endOfLinePosition - $keyPosition
+                );
 
                 // If key does not exist, add it
                 if (!$keyPosition || !$endOfLinePosition || !$oldLine) {
@@ -610,7 +671,9 @@ if (!function_exists('setEnv')) {
         }
 
         $str = substr($str, 0, -1);
-        if (!file_put_contents($envFile, $str)) return false;
+        if (!file_put_contents($envFile, $str)) {
+            return false;
+        }
         return true;
     }
 }
@@ -627,7 +690,7 @@ if (!function_exists('checkHealth')) {
             "sandbox" => "0755",
             "server" => "0700",
             "webssh" => "0700",
-            "modules" => "0700"
+            "modules" => "0700",
         ];
         $messages = [];
 
@@ -638,7 +701,7 @@ if (!function_exists('checkHealth')) {
             if (!file_exists($file)) {
                 array_push($messages, [
                     "type" => "danger",
-                    "message" => "'/liman/$name' isimli sistem dosyası bulunamadı"
+                    "message" => "'/liman/$name' isimli sistem dosyası bulunamadı",
                 ]);
                 continue;
             }
@@ -646,7 +709,10 @@ if (!function_exists('checkHealth')) {
             if (getPermissions('/liman/' . $name) != $permission) {
                 array_push($messages, [
                     "type" => "danger",
-                    "message" => "'/liman/$name' izni hatalı (" . getPermissions('/liman/' . $name) . ")."
+                    "message" =>
+                        "'/liman/$name' izni hatalı (" .
+                        getPermissions('/liman/' . $name) .
+                        ").",
                 ]);
             }
 
@@ -656,23 +722,26 @@ if (!function_exists('checkHealth')) {
             if ($owner != "liman" || $group != "liman") {
                 array_push($messages, [
                     "type" => "danger",
-                    "message" => "'/liman/$name' dosyasının sahibi hatalı ($owner : $group)."
+                    "message" => "'/liman/$name' dosyasının sahibi hatalı ($owner : $group).",
                 ]);
             }
         }
 
         // Check Extra Files
-        $extra = array_diff(array_diff(scandir("/liman"), array('..', '.')), array_keys($allowed));
+        $extra = array_diff(
+            array_diff(scandir("/liman"), ['..', '.']),
+            array_keys($allowed)
+        );
         foreach ($extra as $item) {
             array_push($messages, [
                 "type" => "warning",
-                "message" => "'/liman/$item' dosyasina izin verilmiyor."
+                "message" => "'/liman/$item' dosyasina izin verilmiyor.",
             ]);
         }
         if (empty($messages)) {
             array_push($messages, [
                 "type" => "success",
-                "message" => "Herşey Yolunda, sıkıntı yok!"
+                "message" => "Herşey Yolunda, sıkıntı yok!",
             ]);
         }
 
@@ -690,7 +759,6 @@ if (!function_exists('lDecrypt')) {
     }
 }
 if (!function_exists('setBaseDn')) {
-
     function setBaseDn($ldap_host = null)
     {
         $ldap_host = $ldap_host ? $ldap_host : config('ldap.ldap_host');
@@ -702,11 +770,15 @@ if (!function_exists('setBaseDn')) {
         $flag = ldap_bind($connection);
         $outputs = ldap_read($connection, '', 'objectclass=*');
         $entries = ldap_get_entries($connection, $outputs)[0];
-        $domain = str_replace("dc=", "", strtolower($entries["rootdomainnamingcontext"][0]));
+        $domain = str_replace(
+            "dc=",
+            "",
+            strtolower($entries["rootdomainnamingcontext"][0])
+        );
         $domain = str_replace(",", ".", $domain);
         setEnv([
             "LDAP_BASE_DN" => $entries["rootdomainnamingcontext"][0],
-            "LDAP_DOMAIN" => $domain
+            "LDAP_DOMAIN" => $domain,
         ]);
         return $flag;
     }
@@ -731,7 +803,7 @@ if (!function_exists('endsWith')) {
         if ($len == 0) {
             return true;
         }
-        return (substr($string, -$len) === $endString);
+        return substr($string, -$len) === $endString;
     }
 }
 
@@ -741,7 +813,9 @@ if (!function_exists('scanTranslations')) {
         $pattern =
             '[^\w]' .
             '(?<!->)' .
-            '(' . implode('|', ['__']) . ')' .
+            '(' .
+            implode('|', ['__']) .
+            ')' .
             "\(" .
             "[\'\"]" .
             '(' .
@@ -750,9 +824,13 @@ if (!function_exists('scanTranslations')) {
             "[\'\"]" .
             "[\),]";
         $allMatches = [];
-        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($directory)
+        );
         foreach ($iterator as $file) {
-            if ($file->isDir()) continue;
+            if ($file->isDir()) {
+                continue;
+            }
             if (endsWith($file->getPathname(), ".php")) {
                 $content = file_get_contents($file->getPathname());
                 if (preg_match_all("/$pattern/siU", $content, $matches)) {

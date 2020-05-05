@@ -11,9 +11,13 @@ class ExternalNotificationController extends Controller
     public function create()
     {
         $token = (string) Str::uuid();
-        if (ExternalNotification::create(
-            request()->merge(["token" => $token])->all()
-        )) {
+        if (
+            ExternalNotification::create(
+                request()
+                    ->merge(["token" => $token])
+                    ->all()
+            )
+        ) {
             return respond("Token Oluşturuldu!\n$token");
         } else {
             return respond("Token Oluşturulamadı!", 201);
@@ -41,9 +45,11 @@ class ExternalNotificationController extends Controller
             return respond("Bu istemci bulunamadı!", 201);
         }
         $token = (string) Str::uuid();
-        if ($obj->update([
-            "token" => $token
-        ])) {
+        if (
+            $obj->update([
+                "token" => $token,
+            ])
+        ) {
             return respond("Token başarıyla yenilendi!\n$token");
         }
     }

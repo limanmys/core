@@ -11,7 +11,13 @@ class Permission extends Model
     protected $table = "permissions";
 
     protected $fillable = [
-        "morph_id", "morph_type", "type", "key", "value", "extra", "blame"
+        "morph_id",
+        "morph_type",
+        "type",
+        "key",
+        "value",
+        "extra",
+        "blame",
     ];
 
     public static function can($user_id, $type, $key, $value, $extra = null)
@@ -30,12 +36,19 @@ class Permission extends Model
                 "type" => $type,
                 "key" => $key,
                 "value" => $value,
-                "extra" => $extra
-            ])->exists();
+                "extra" => $extra,
+            ])
+            ->exists();
     }
 
-    public static function grant($morph_id, $type, $key, $value, $extra = null, $morph_type = "users")
-    {
+    public static function grant(
+        $morph_id,
+        $type,
+        $key,
+        $value,
+        $extra = null,
+        $morph_type = "users"
+    ) {
         return Permission::firstOrCreate([
             "morph_id" => $morph_id,
             "morph_type" => $morph_type,
@@ -43,7 +56,7 @@ class Permission extends Model
             "key" => $key,
             "value" => $value,
             "extra" => $extra,
-            "blame" => user()->id
+            "blame" => user()->id,
         ]);
     }
 
@@ -54,7 +67,7 @@ class Permission extends Model
             "type" => $type,
             "key" => $key,
             "value" => $value,
-            "extra" => $extra
+            "extra" => $extra,
         ])->first();
         if ($permission) {
             return $permission->delete();

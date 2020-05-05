@@ -8,7 +8,5 @@ class UserFavorites extends Model
 {
     use UsesUuid;
 
-    protected $fillable = [
-        "user_id", "server_id"
-    ];
+    protected $fillable = ["user_id", "server_id"];
 }

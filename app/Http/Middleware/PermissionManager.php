@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\Gate;
 class PermissionManager
 {
     // Verify those values if request have either in request url or body.
-    protected $verify = [
-        "extension", "script", "server"
-    ];
+    protected $verify = ["extension", "script", "server"];
 
     // Main Function of Middleware
     public function handle($request, Closure $next)
@@ -20,7 +18,12 @@ class PermissionManager
         $request->request->add(['permissions' => auth()->user()->permissions]);
 
         // If user is admin, allow request.
-        if (auth()->user()->isAdmin() || env('LIMAN_RESTRICTED') == true) {
+        if (
+            auth()
+                ->user()
+                ->isAdmin() ||
+            env('LIMAN_RESTRICTED') == true
+        ) {
             $this->initializeObjects();
             return $next($request);
         }
@@ -40,7 +43,6 @@ class PermissionManager
 
     private function check($target)
     {
-
         //Let's get value from request parameters.
         $value = request($target . "_id");
 
@@ -54,7 +56,9 @@ class PermissionManager
     private function initializeObjects()
     {
         foreach ($this->verify as $target) {
-            request()->request->add([$target => getObject($target, request($target . '_id'))]);
+            request()->request->add([
+                $target => getObject($target, request($target . '_id')),
+            ]);
         }
     }
 }

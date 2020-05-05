@@ -18,10 +18,10 @@ class RoleMappingController extends Controller
             'role_id' => ['required', 'exists:roles,id'],
         ]);
 
-        try{
+        try {
             $flag->validate();
-        }catch (\Exception $exception){
-            return respond("Lütfen geçerli veri giriniz.",201);
+        } catch (\Exception $exception) {
+            return respond("Lütfen geçerli veri giriniz.", 201);
         }
 
         RoleMapping::create([
@@ -39,10 +39,10 @@ class RoleMappingController extends Controller
             'role_mapping_id' => ['required', 'exists:role_mappings,id'],
         ]);
 
-        try{
+        try {
             $flag->validate();
-        }catch (\Exception $exception){
-            return respond("Lütfen geçerli veri giriniz.",201);
+        } catch (\Exception $exception) {
+            return respond("Lütfen geçerli veri giriniz.", 201);
         }
 
         RoleMapping::find(request('role_mapping_id'))->delete();

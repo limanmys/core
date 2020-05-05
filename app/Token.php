@@ -24,9 +24,9 @@ class Token extends Model
 
         Token::firstOrCreate([
             "token" => $token,
-            "user_id" => ($user_id) ? $user_id : auth()->id()
+            "user_id" => $user_id ? $user_id : auth()->id(),
         ]);
-        
+
         return $token;
     }
 }

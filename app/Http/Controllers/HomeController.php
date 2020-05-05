@@ -26,19 +26,26 @@ class HomeController extends Controller
     public function index()
     {
         system_log(7, "HOMEPAGE");
-        $widgets = Widget::where('user_id', auth()->id())->orderBy('order')->get();
+        $widgets = Widget::where('user_id', auth()->id())
+            ->orderBy('order')
+            ->get();
         foreach ($widgets as $widget) {
-            $widget->server_name = Server::where('id', $widget->server_id)->first()->name;
+            $widget->server_name = Server::where(
+                'id',
+                $widget->server_id
+            )->first()->name;
         }
 
         return view('index', [
-            "widgets" => $widgets
+            "widgets" => $widgets,
         ]);
     }
 
     public function getLimanStats()
     {
-        $cpuUsage = shell_exec("grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print \"%\" usage}'");
+        $cpuUsage = shell_exec(
+            "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print \"%\" usage}'"
+        );
         $cpuUsage = substr($cpuUsage, 0, 5);
         $ramUsage = shell_exec("free -t | awk 'NR == 2 {printf($3/$2*100)}'");
         $ramUsage = substr($ramUsage, 0, 5);
@@ -51,13 +58,16 @@ class HomeController extends Controller
         $secondDown = self::calculateNetworkBytes();
         $secondUp = self::calculateNetworkBytes(false);
 
-        $network =   strval(intval(($secondDown - $firstDown) / 1024 / 1024) / 2)
-            . " mb/sn ↓  " . strval(intval(($secondUp - $firstUp) / 1024 / 1024) / 2) . " mb/sn ↑";
+        $network =
+            strval(intval(($secondDown - $firstDown) / 1024 / 1024) / 2) .
+            " mb/sn ↓  " .
+            strval(intval(($secondUp - $firstUp) / 1024 / 1024) / 2) .
+            " mb/sn ↑";
         return response([
             "cpu" => $cpuUsage,
             "ram" => "%" . $ramUsage,
             "disk" => "%" . $diskUsage[1],
-            "network" => $network
+            "network" => $network,
         ]);
     }
 
@@ -65,7 +75,10 @@ class HomeController extends Controller
     {
         system_log(7, "SET_LOCALE");
         $languages = ["tr", "en"];
-        if (request()->has('locale') && in_array(request('locale'), $languages)) {
+        if (
+            request()->has('locale') &&
+            in_array(request('locale'), $languages)
+        ) {
             \Session::put('locale', request('locale'));
             return redirect()->back();
         } else {
@@ -133,7 +146,7 @@ class HomeController extends Controller
             }
         }
         return view('permission.all', [
-            "requests" => $requests
+            "requests" => $requests,
         ]);
     }
 
@@ -145,7 +158,7 @@ class HomeController extends Controller
             "note" => request('note'),
             "type" => request('type'),
             "speed" => request('speed'),
-            "status" => 0
+            "status" => 0,
         ]);
         return respond('Talebiniz başarıyla alındı.', 200);
     }

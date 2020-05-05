@@ -50,7 +50,14 @@ class InternalController extends Controller
         $history->save();
 
         // Create job to work on.
-        $job = (new ExtensionJob($history, server(), extension(), user(), request('function_name'), request('parameters')))->onQueue('extension_queue');
+        $job = (new ExtensionJob(
+            $history,
+            server(),
+            extension(),
+            user(),
+            request('function_name'),
+            request('parameters')
+        ))->onQueue('extension_queue');
 
         // Dispatch job right away.
         $job_id = app(Dispatcher::class)->dispatch($job);
@@ -146,7 +153,11 @@ class InternalController extends Controller
      */
     public function runScript()
     {
-        $filePath = env("EXTENSIONS_PATH") . strtolower(extension()->name) . "/scripts/" . request("scriptName");
+        $filePath =
+            env("EXTENSIONS_PATH") .
+            strtolower(extension()->name) .
+            "/scripts/" .
+            request("scriptName");
         if (!is_file($filePath)) {
             system_log(7, "EXTENSION_INTERNAL_RUN_SCRIPT_FAILED_NOT_FOUND", [
                 "extension_id" => extension()->id,
@@ -155,7 +166,11 @@ class InternalController extends Controller
             return "Betik Bulunamadi";
         }
 
-        if (server()->type != "linux_ssh" && server()->type != "linux_certificate" && server()->type != "windows_powershell") {
+        if (
+            server()->type != "linux_ssh" &&
+            server()->type != "linux_certificate" &&
+            server()->type != "windows_powershell"
+        ) {
             system_log(7, "EXTENSION_INTERNAL_RUN_COMMAND_FAILED", [
                 "extension_id" => extension()->id,
                 "server_id" => request('server_id'),
@@ -163,7 +178,11 @@ class InternalController extends Controller
             return "Bu sunucuda komut çalıştıramazsınız.";
         }
 
-        $output = server()->runScript($filePath, request("parameters"), request("runAsRoot") == "yes" ? true : false);
+        $output = server()->runScript(
+            $filePath,
+            request("parameters"),
+            request("runAsRoot") == "yes" ? true : false
+        );
 
         system_log(7, "EXTENSION_INTERNAL_RUN_COMMAND", [
             "extension_id" => extension()->id,
@@ -188,7 +207,10 @@ class InternalController extends Controller
      */
     public function putFile()
     {
-        $output = server()->putFile(request('localPath'), request('remotePath'));
+        $output = server()->putFile(
+            request('localPath'),
+            request('remotePath')
+        );
 
         system_log(7, "EXTENSION_INTERNAL_SEND_FILE", [
             "extension_id" => extension()->id,
@@ -196,7 +218,7 @@ class InternalController extends Controller
             "file_name" => request('remotePath'),
         ]);
 
-        return ($output) ? "ok" : "no";
+        return $output ? "ok" : "no";
     }
 
     /**
@@ -214,11 +236,19 @@ class InternalController extends Controller
      */
     public function getFile()
     {
-        $output = server()->getFile(request('remotePath'), request('localPath'));
+        $output = server()->getFile(
+            request('remotePath'),
+            request('localPath')
+        );
 
         // Update Permissions
         shell_exec("sudo chmod 770 " . request('localPath'));
-        shell_exec("sudo chown " . cleanDash(extension()->id) . ":liman " . request('localPath'));
+        shell_exec(
+            "sudo chown " .
+                cleanDash(extension()->id) .
+                ":liman " .
+                request('localPath')
+        );
 
         system_log(7, "EXTENSION_INTERNAL_RECEIVE_FILE", [
             "extension_id" => extension()->id,
@@ -226,7 +256,7 @@ class InternalController extends Controller
             "file_name" => request('remotePath'),
         ]);
 
-        return ($output) ? "ok" : "no";
+        return $output ? "ok" : "no";
     }
 
     /**
@@ -246,7 +276,12 @@ class InternalController extends Controller
      */
     public function openTunnel()
     {
-        return SSHTunnelConnector::new(request('remote_host'), request('remote_port'), request('username'), request('password'));
+        return SSHTunnelConnector::new(
+            request('remote_host'),
+            request('remote_port'),
+            request('username'),
+            request('password')
+        );
     }
 
     /**
@@ -262,7 +297,10 @@ class InternalController extends Controller
      */
     public function stopTunnel()
     {
-        return SSHTunnelConnector::stop(request('remote_host'), request('remote_port'));
+        return SSHTunnelConnector::stop(
+            request('remote_host'),
+            request('remote_port')
+        );
     }
 
     /**
@@ -298,10 +336,12 @@ class InternalController extends Controller
             ]);
             abort(403, 'Not Allowed');
         }
-        $token = Token::where('token', request('token'))->first() or abort(403, "Token gecersiz");
+        ($token = Token::where('token', request('token'))->first()) or
+            abort(403, "Token gecersiz");
         auth()->loginUsingId($token->user_id);
 
-        $server = Server::find(request('server_id')) or abort(404, 'Sunucu Bulunamadi');
+        ($server = Server::find(request('server_id'))) or
+            abort(404, 'Sunucu Bulunamadi');
         if (!Permission::can($token->user_id, 'server', 'id', $server->id)) {
             system_log(7, "EXTENSION_NO_PERMISSION_SERVER", [
                 "extension_id" => extension()->id,
@@ -309,8 +349,11 @@ class InternalController extends Controller
             ]);
             abort(504, "Sunucu icin yetkiniz yok.");
         }
-        $extension = Extension::find(request('extension_id')) or abort(404, 'Eklenti Bulunamadi');
-        if (!Permission::can($token->user_id, 'extension', 'id', $extension->id)) {
+        ($extension = Extension::find(request('extension_id'))) or
+            abort(404, 'Eklenti Bulunamadi');
+        if (
+            !Permission::can($token->user_id, 'extension', 'id', $extension->id)
+        ) {
             system_log(7, "EXTENSION_NO_PERMISSION_SERVER", [
                 "extension_id" => extension()->id,
                 "server_id" => request('server_id'),

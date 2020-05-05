@@ -22,15 +22,38 @@ class OneController extends Controller
         if (!$widget) {
             return respond(__("Bileşen Bulunamadı"), 201);
         }
-        $extension =  Extension::one($widget->extension_id);
-        $extensionData = json_decode(file_get_contents(env("EXTENSIONS_PATH") . strtolower(extension($widget->extension_id)->name) . DIRECTORY_SEPARATOR . "db.json"), true);
+        $extension = Extension::one($widget->extension_id);
+        $extensionData = json_decode(
+            file_get_contents(
+                env("EXTENSIONS_PATH") .
+                    strtolower(extension($widget->extension_id)->name) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
+            ),
+            true
+        );
         foreach ($extensionData["database"] as $item) {
-            if (!UserSettings::where([
-                "user_id" => auth()->user()->id,
-                "server_id" => $widget->server_id,
-                "name" => $item["variable"]
-            ])->exists()) {
-                return respond(__("Eklenti ayarları eksik.") . " <a href='" . url('ayarlar/' . $extension->id . '/' . $widget->server_id) . "'>" . __("Ayarlara Git.") . "</a>", 400);
+            if (
+                !UserSettings::where([
+                    "user_id" => auth()->user()->id,
+                    "server_id" => $widget->server_id,
+                    "name" => $item["variable"],
+                ])->exists()
+            ) {
+                return respond(
+                    __("Eklenti ayarları eksik.") .
+                        " <a href='" .
+                        url(
+                            'ayarlar/' .
+                                $extension->id .
+                                '/' .
+                                $widget->server_id
+                        ) .
+                        "'>" .
+                        __("Ayarlara Git.") .
+                        "</a>",
+                    400
+                );
             }
         }
 
@@ -40,7 +63,7 @@ class OneController extends Controller
             'widget' => $widget,
             'extension_id' => $extension->id,
             'extension' => $extension,
-            'target_function' => $widget->function
+            'target_function' => $widget->function,
         ]);
 
         $sandboxController = new MainController();
@@ -70,7 +93,7 @@ class OneController extends Controller
             "server_id" => \request('server_id'),
             "extension_id" => \request('extension_id'),
             "title" => \request('title'),
-            "function_name" => \request('function_name')
+            "function_name" => \request('function_name'),
         ]);
         return respond(__("Başarıyla güncellendi."));
     }
@@ -86,7 +109,15 @@ class OneController extends Controller
 
     public function widgetList()
     {
-        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") . strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"), true);
+        $extension = json_decode(
+            file_get_contents(
+                env("EXTENSIONS_PATH") .
+                    strtolower(extension()->name) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
+            ),
+            true
+        );
         return $extension["widgets"];
     }
 }

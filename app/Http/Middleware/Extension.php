@@ -24,21 +24,27 @@ class Extension
         }
         $ports = explode(',', extension()->sslPorts);
         foreach ($ports as $port) {
-            if (Certificate::where([
-                "server_hostname" => $server->ip_address,
-                "origin" => trim($port)
-            ])->exists()) {
+            if (
+                Certificate::where([
+                    "server_hostname" => $server->ip_address,
+                    "origin" => trim($port),
+                ])->exists()
+            ) {
                 continue;
             }
             AdminNotification::create([
                 "title" => "Yeni Sertifika Onayı",
                 "type" => "cert_request",
-                "message" => $server->ip_address . ":" . trim($port) . ":" . $server->id,
-                "level" => 3
+                "message" =>
+                    $server->ip_address . ":" . trim($port) . ":" . $server->id,
+                "level" => 3,
             ]);
-            return redirect()->back()->withErrors([
-                "message" => "Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede bu sunucu ile eklentiye erişemezsiniz."
-            ]);
+            return redirect()
+                ->back()
+                ->withErrors([
+                    "message" =>
+                        "Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede bu sunucu ile eklentiye erişemezsiniz.",
+                ]);
         }
         return $next($request);
     }

@@ -18,8 +18,18 @@ class RoleController extends Controller
     {
         return view('settings.role', [
             "role" => $role,
-            "servers" => Server::find($role->permissions->where('type', 'server')->pluck('value')->toArray()),
-            "extensions" => Extension::find($role->permissions->where('type', 'extension')->pluck('value')->toArray())
+            "servers" => Server::find(
+                $role->permissions
+                    ->where('type', 'server')
+                    ->pluck('value')
+                    ->toArray()
+            ),
+            "extensions" => Extension::find(
+                $role->permissions
+                    ->where('type', 'extension')
+                    ->pluck('value')
+                    ->toArray()
+            ),
         ]);
     }
 
@@ -27,26 +37,22 @@ class RoleController extends Controller
     {
         return view('table', [
             "value" => Role::all(),
-            "title" => [
-                "Rol Grubu Adı", "*hidden*",
-            ],
-            "display" => [
-                "name", "id:role_id",
-            ],
+            "title" => ["Rol Grubu Adı", "*hidden*"],
+            "display" => ["name", "id:role_id"],
             "menu" => [
                 "Sil" => [
                     "target" => "deleteRole",
-                    "icon" => " context-menu-icon-delete"
-                ]
+                    "icon" => " context-menu-icon-delete",
+                ],
             ],
-            "onclick" => "roleDetails"
+            "onclick" => "roleDetails",
         ]);
     }
 
     public function add()
     {
         hook('role_group_add_attempt', [
-            "request" => request()->all()
+            "request" => request()->all(),
         ]);
 
         $flag = Validator::make(request()->all(), [
@@ -60,11 +66,11 @@ class RoleController extends Controller
         }
 
         $role = Role::create([
-            "name" => request('name')
+            "name" => request('name'),
         ]);
 
         hook('role_group_add_successful', [
-            "role" => $role
+            "role" => $role,
         ]);
 
         return respond("Rol grubu başarıyla eklendi.");
@@ -88,7 +94,7 @@ class RoleController extends Controller
         foreach (json_decode(request('users')) as $user) {
             RoleUser::firstOrCreate([
                 "user_id" => $user,
-                "role_id" => request('role_id')
+                "role_id" => request('role_id'),
             ]);
         }
         return respond(__("Grup üyeleri başarıyla eklendi."), 200);
@@ -99,7 +105,7 @@ class RoleController extends Controller
         foreach (json_decode(request('ids')) as $role) {
             RoleUser::firstOrCreate([
                 "user_id" => request('user_id'),
-                "role_id" => $role
+                "role_id" => $role,
             ]);
         }
         return respond(__("Rol grupları kullanıcıya başarıyla eklendi."), 200);
@@ -109,8 +115,9 @@ class RoleController extends Controller
     {
         RoleUser::whereIn("role_id", json_decode(request('ids')))
             ->where([
-                "user_id" => request('user_id')
-            ])->delete();
+                "user_id" => request('user_id'),
+            ])
+            ->delete();
         return respond(__("Rol grupları başarıyla silindi."), 200);
     }
 
@@ -118,8 +125,9 @@ class RoleController extends Controller
     {
         RoleUser::whereIn("user_id", json_decode(request('users')))
             ->where([
-                "role_id" => request('role_id')
-            ])->delete();
+                "role_id" => request('role_id'),
+            ])
+            ->delete();
         return respond(__("Grup üyeleri başarıyla silindi."), 200);
     }
 
@@ -131,12 +139,24 @@ class RoleController extends Controller
         $display = [];
         switch (request('type')) {
             case "server":
-                $data = Server::whereNotIn('id', $role->permissions->where('type', 'server')->pluck('value')->toArray())->get();
+                $data = Server::whereNotIn(
+                    'id',
+                    $role->permissions
+                        ->where('type', 'server')
+                        ->pluck('value')
+                        ->toArray()
+                )->get();
                 $title = ["*hidden*", "İsim", "Türü", "İp Adresi"];
                 $display = ["id:id", "name", "type", "ip_address"];
                 break;
             case "extension":
-                $data = Extension::whereNotIn('id', $role->permissions->where('type', 'extension')->pluck('value')->toArray())->get();
+                $data = Extension::whereNotIn(
+                    'id',
+                    $role->permissions
+                        ->where('type', 'extension')
+                        ->pluck('value')
+                        ->toArray()
+                )->get();
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
                 break;
@@ -154,7 +174,14 @@ class RoleController extends Controller
     public function addList()
     {
         foreach (json_decode(request('ids'), true) as $id) {
-            Permission::grant(request('role_id'), request('type'), "id", $id, null, "roles");
+            Permission::grant(
+                request('role_id'),
+                request('type'),
+                "id",
+                $id,
+                null,
+                "roles"
+            );
         }
         return respond(__("Başarılı"), 200);
     }
@@ -170,7 +197,14 @@ class RoleController extends Controller
     public function addFunctionPermissions()
     {
         foreach (explode(",", request('functions')) as $function) {
-            Permission::grant(request('role_id'), "function", "name", strtolower(extension()->name), $function, "roles");
+            Permission::grant(
+                request('role_id'),
+                "function",
+                "name",
+                strtolower(extension()->name),
+                $function,
+                "roles"
+            );
         }
         return respond(__("Başarılı"), 200);
     }

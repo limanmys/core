@@ -64,21 +64,24 @@ class MainController extends Controller
         system_log(7, "REQUEST_LIST");
 
         return view('permission.list', [
-            "requests" => $requests
+            "requests" => $requests,
         ]);
     }
 
     public function one()
     {
         $request = LimanRequest::where('id', request('permission_id'))->first();
-        $request->user_name = User::where('id', $request->user_id)->first()->name;
+        $request->user_name = User::where(
+            'id',
+            $request->user_id
+        )->first()->name;
 
         system_log(7, "REQUEST_DETAILS", [
-            "request_id" => $request
+            "request_id" => $request,
         ]);
 
         return view('permission.requests.' . $request->type, [
-            "request" => $request
+            "request" => $request,
         ]);
     }
 
@@ -87,13 +90,20 @@ class MainController extends Controller
         $request = LimanRequest::where('id', request('request_id'))->first();
 
         system_log(7, "REQUEST_UPDATE", [
-            "action" => $request
+            "action" => $request,
         ]);
-        $text = request("status") == "1" ? __("İşleniyor.") : (request("status") == "2" ? __("Tamamlandı") : __("Reddedildi"));
+        $text =
+            request("status") == "1"
+                ? __("İşleniyor.")
+                : (request("status") == "2"
+                    ? __("Tamamlandı")
+                    : __("Reddedildi"));
         Notification::send(
             __("Talebiniz güncellendi"),
             "notify",
-            __("Talebiniz \":status\" olarak güncellendi.", ["status" => $text]),
+            __("Talebiniz \":status\" olarak güncellendi.", [
+                "status" => $text,
+            ]),
             $request->user_id
         );
         if (request('status') == "4") {
@@ -102,7 +112,7 @@ class MainController extends Controller
         }
 
         $request->update([
-            "status" => request('status')
+            "status" => request('status'),
         ]);
         return respond("Talep Güncellendi", 200);
     }

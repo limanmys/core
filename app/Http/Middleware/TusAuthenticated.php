@@ -9,7 +9,6 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class TusAuthenticated implements TusMiddleware
 {
-
     public function handle(Request $request, Response $response)
     {
         if (!auth()->check()) {

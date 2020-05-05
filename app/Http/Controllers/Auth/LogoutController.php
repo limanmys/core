@@ -18,7 +18,7 @@ class LogoutController extends Controller
     {
         system_log(7, "LOGOUT_SUCCESS");
         hook('logout_attempt', [
-            "user" => user()
+            "user" => user(),
         ]);
         //Logout User
         Auth::logout();

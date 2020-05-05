@@ -41,10 +41,12 @@ class SSHConnector implements Connector
 
     public function execute($command, $flag = true)
     {
-        return trim(self::request('run', [
-            "token" => "cn_" . server()->id,
-            "command" => $command
-        ]));
+        return trim(
+            self::request('run', [
+                "token" => "cn_" . server()->id,
+                "command" => $command,
+            ])
+        );
     }
 
     /**
@@ -65,7 +67,7 @@ class SSHConnector implements Connector
         $this->execute("chmod +x " . $remotePath);
 
         // Run Part Of The Script
-        $query = ($runAsRoot) ? sudo() : '';
+        $query = $runAsRoot ? sudo() : '';
         $query = $query . $remotePath . " " . $parameters . " 2>&1";
         $output = $this->execute($query);
 
@@ -77,7 +79,7 @@ class SSHConnector implements Connector
         $output = self::request('send', [
             "token" => ConnectorToken::get(server()->id)->first()->token,
             "local_path" => $localPath,
-            "remote_path" => $remotePath
+            "remote_path" => $remotePath,
         ]);
         $check = $this->execute("[ -f '$remotePath' ] && echo 1 || echo 0");
         if ($check != "1") {
@@ -100,7 +102,7 @@ class SSHConnector implements Connector
         return self::request('get', [
             "token" => ConnectorToken::get(server()->id)->first()->token,
             "local_path" => $localPath,
-            "remote_path" => $remotePath
+            "remote_path" => $remotePath,
         ]);
     }
 
@@ -112,8 +114,13 @@ class SSHConnector implements Connector
      * @param $key
      * @return bool
      */
-    public static function create(\App\Server $server, $username, $password, $user_id, $key)
-    {
+    public static function create(
+        \App\Server $server,
+        $username,
+        $password,
+        $user_id,
+        $key
+    ) {
         $token = self::init($username, $password, $server->ip_address);
         if ($token) {
             return true;
@@ -127,16 +134,19 @@ class SSHConnector implements Connector
         $username = UserSettings::where([
             'user_id' => user()->id,
             'server_id' => server()->id,
-            'name' => 'clientUsername'
+            'name' => 'clientUsername',
         ])->first();
         $password = UserSettings::where([
             'user_id' => user()->id,
             'server_id' => server()->id,
-            'name' => 'clientPassword'
+            'name' => 'clientPassword',
         ])->first();
 
         if (!$username || !$password) {
-            abort(504, "Bu sunucu için SSH anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.");
+            abort(
+                504,
+                "Bu sunucu için SSH anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz."
+            );
         }
 
         return [lDecrypt($username["value"]), lDecrypt($password["value"])];
@@ -152,11 +162,22 @@ class SSHConnector implements Connector
         $client = new Client();
         // Make Request.
         try {
-            $params["token"] = ConnectorToken::get(server()->id)->first()->token;
-            $res = $client->request('POST', env("LIMAN_CONNECTOR_SERVER") . '/' . $url, ["form_params" => $params]);
+            $params["token"] = ConnectorToken::get(
+                server()->id
+            )->first()->token;
+            $res = $client->request(
+                'POST',
+                env("LIMAN_CONNECTOR_SERVER") . '/' . $url,
+                ["form_params" => $params]
+            );
         } catch (BadResponseException $e) {
             // In case of error, handle error.
-            $json = json_decode((string) $e->getResponse()->getBody()->getContents());
+            $json = json_decode(
+                (string) $e
+                    ->getResponse()
+                    ->getBody()
+                    ->getContents()
+            );
             // If it's first time, retry after recreating ticket.
             if ($retry) {
                 list($username, $password) = self::retrieveCredentials();
@@ -172,19 +193,27 @@ class SSHConnector implements Connector
         return $json->output;
     }
 
-    public static function init($username, $password, $hostname, $putSession = true)
-    {
+    public static function init(
+        $username,
+        $password,
+        $hostname,
+        $putSession = true
+    ) {
         $client = new Client();
         try {
-            $res = $client->request('POST', env('LIMAN_CONNECTOR_SERVER') . '/new', [
-                'form_params' => [
-                    "username" => $username,
-                    "password" => $password,
-                    "hostname" => $hostname,
-                    "connection_type" => "ssh"
-                ],
-                'timeout' => 5
-            ]);
+            $res = $client->request(
+                'POST',
+                env('LIMAN_CONNECTOR_SERVER') . '/new',
+                [
+                    'form_params' => [
+                        "username" => $username,
+                        "password" => $password,
+                        "hostname" => $hostname,
+                        "connection_type" => "ssh",
+                    ],
+                    'timeout' => 5,
+                ]
+            );
         } catch (\Exception $e) {
             return null;
         }

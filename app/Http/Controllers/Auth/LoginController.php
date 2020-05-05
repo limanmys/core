@@ -42,13 +42,13 @@ class LoginController extends Controller
     {
         $user->update([
             "last_login_at" => Carbon::now()->toDateTimeString(),
-            "last_login_ip" => $request->ip()
+            "last_login_ip" => $request->ip(),
         ]);
 
         system_log(7, "LOGIN_SUCCESS");
 
         hook("login_successful", [
-            "user" => $user
+            "user" => $user,
         ]);
     }
 
@@ -56,16 +56,16 @@ class LoginController extends Controller
     {
         $credientials = (object) $this->credentials($request);
 
-        $flag =  $this->guard()->attempt(
+        $flag = $this->guard()->attempt(
             $this->credentials($request),
             $request->filled('remember')
         );
 
-        if(!$flag){
+        if (!$flag) {
             event('login_attempt', $credientials);
         }
 
-        Event::listen('login_attempt_success',function($data){
+        Event::listen('login_attempt_success', function ($data) {
             $this->guard()->login($data, request()->filled('remember'));
             $flag = true;
         });
@@ -77,7 +77,7 @@ class LoginController extends Controller
     {
         $request->request->add([
             $this->username() => $request->liman_email_mert,
-            "password" => $request->liman_password_baran
+            "password" => $request->liman_password_baran,
         ]);
         $request->validate([
             $this->username() => 'required|string',
@@ -90,7 +90,7 @@ class LoginController extends Controller
         $credientials = (object) $this->credentials($request);
         hook('login_failed', [
             "email" => $credientials->email,
-            "password" => $credientials->password
+            "password" => $credientials->password,
         ]);
 
         throw ValidationException::withMessages([

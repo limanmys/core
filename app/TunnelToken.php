@@ -14,7 +14,7 @@ class TunnelToken extends Model
         "remote_port",
         "local_port",
         "user_id",
-        "extension_id"
+        "extension_id",
     ];
 
     public static function get($remote_host, $remote_port)
@@ -23,7 +23,7 @@ class TunnelToken extends Model
             "user_id" => user()->id,
             "extension_id" => extension()->id,
             "remote_host" => $remote_host,
-            "remote_port" => $remote_port
+            "remote_port" => $remote_port,
         ]);
     }
 
@@ -37,7 +37,7 @@ class TunnelToken extends Model
             "user_id" => user()->id,
             "extension_id" => extension()->id,
             "remote_host" => $remote_host,
-            "remote_port" => $remote_port
+            "remote_port" => $remote_port,
         ])->delete();
 
         return TunnelToken::create([

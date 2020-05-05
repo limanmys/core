@@ -8,15 +8,13 @@ class ConnectorToken extends Model
 {
     use UsesUuid;
 
-    protected $fillable = [
-        "user_id", "server_id", "token"
-    ];
+    protected $fillable = ["user_id", "server_id", "token"];
 
     public static function get($server_id)
     {
         return ConnectorToken::where([
             "user_id" => user()->id,
-            "server_id" => $server_id
+            "server_id" => $server_id,
         ]);
     }
 
@@ -28,13 +26,13 @@ class ConnectorToken extends Model
         //Delete Old Ones
         ConnectorToken::where([
             "user_id" => user()->id,
-            "server_id" => $server_id
+            "server_id" => $server_id,
         ])->delete();
 
         return ConnectorToken::create([
             "user_id" => user()->id,
             "server_id" => $server_id,
-            "token" => $token
+            "token" => $token,
         ]);
     }
 
@@ -42,7 +40,7 @@ class ConnectorToken extends Model
     {
         //Delete Old Ones
         return ConnectorToken::where([
-            "user_id" => user()->id
+            "user_id" => user()->id,
         ])->delete();
     }
 }

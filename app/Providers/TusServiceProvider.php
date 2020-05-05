@@ -29,8 +29,7 @@ class TusServiceProvider extends ServiceProvider
 
             $server->middleware()->add(TusAuthenticated::class);
 
-            $server
-                ->setApiPath('/upload');
+            $server->setApiPath('/upload');
             return $server;
         });
     }

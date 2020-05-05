@@ -15,9 +15,7 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        Registered::class => [
-            SendEmailVerificationNotification::class,
-        ],
+        Registered::class => [SendEmailVerificationNotification::class],
     ];
 
     /**
@@ -37,8 +35,6 @@ class EventServiceProvider extends ServiceProvider
 
     protected function discoverEventsWithin()
     {
-        return [
-            "/liman/modules/",
-        ];
+        return ["/liman/modules/"];
     }
 }

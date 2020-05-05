@@ -8,7 +8,5 @@ class ModuleHook extends Model
 {
     use UsesUuid;
 
-    protected $fillable = [
-        "module_id", "module_name", "hook", "enabled"
-    ];
+    protected $fillable = ["module_id", "module_name", "hook", "enabled"];
 }

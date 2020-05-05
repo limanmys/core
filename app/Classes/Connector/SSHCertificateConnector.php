@@ -57,7 +57,7 @@ class SSHCertificateConnector implements Connector
         $this->execute("chmod +x " . $remotePath);
 
         // Run Part Of The Script
-        $query = ($runAsRoot) ? sudo() : '';
+        $query = $runAsRoot ? sudo() : '';
         $query = $query . $remotePath . " " . $parameters . " 2>&1";
         $output = $this->execute($query);
 
@@ -75,7 +75,11 @@ class SSHCertificateConnector implements Connector
 
             $this->sftp = $sftp;
         }
-        return $this->sftp->put($remotePath, $localPath, SFTP::SOURCE_LOCAL_FILE);
+        return $this->sftp->put(
+            $remotePath,
+            $localPath,
+            SFTP::SOURCE_LOCAL_FILE
+        );
     }
 
     public static function verify($ip_address, $username, $password, $port)
@@ -84,7 +88,10 @@ class SSHCertificateConnector implements Connector
         $key = new RSA();
         $key->loadKey($password);
         if (!$ssh->login($username, $key)) {
-            return respond("Bu Kullanıcı adı ve anahtar ile bağlanılamadı.", 201);
+            return respond(
+                "Bu Kullanıcı adı ve anahtar ile bağlanılamadı.",
+                201
+            );
         }
 
         return respond("Kullanıcı adı ve anahtar doğrulandı.", 200);
@@ -105,8 +112,13 @@ class SSHCertificateConnector implements Connector
         return $this->sftp->get($remotePath, $localPath);
     }
 
-    public static function create(\App\Server $server, $username, $password, $user_id, $key)
-    {
+    public static function create(
+        \App\Server $server,
+        $username,
+        $password,
+        $user_id,
+        $key
+    ) {
         return true;
     }
 
@@ -115,16 +127,19 @@ class SSHCertificateConnector implements Connector
         $username = UserSettings::where([
             'user_id' => user()->id,
             'server_id' => server()->id,
-            'name' => 'clientUsername'
+            'name' => 'clientUsername',
         ])->first();
         $password = UserSettings::where([
             'user_id' => user()->id,
             'server_id' => server()->id,
-            'name' => 'clientPassword'
+            'name' => 'clientPassword',
         ])->first();
 
         if (!$username || !$password) {
-            abort(504, "Bu sunucu için SSH anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.");
+            abort(
+                504,
+                "Bu sunucu için SSH anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz."
+            );
         }
 
         return [lDecrypt($username["value"]), lDecrypt($password["value"])];

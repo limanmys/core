@@ -8,9 +8,7 @@ class Module extends Model
 {
     use UsesUuid;
 
-    protected $fillable = [
-        "name", "enabled"
-    ];
+    protected $fillable = ["name", "enabled"];
 
     public function hooks()
     {

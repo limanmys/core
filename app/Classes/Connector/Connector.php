@@ -16,5 +16,11 @@ interface Connector
 
     public static function verify($ip_address, $username, $password, $port);
 
-    public static function create(\App\Server $server, $username, $password, $user_id, $key);
+    public static function create(
+        \App\Server $server,
+        $username,
+        $password,
+        $user_id,
+        $key
+    );
 }

@@ -23,7 +23,15 @@ class MainController extends Controller
 
     private function initializeClass()
     {
-        $this->extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") . strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"), true);
+        $this->extension = json_decode(
+            file_get_contents(
+                env("EXTENSIONS_PATH") .
+                    strtolower(extension()->name) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
+            ),
+            true
+        );
 
         list($result, $redirect) = $this->checkForMissingSettings();
         if (!$result) {
@@ -36,14 +44,16 @@ class MainController extends Controller
 
     public function API()
     {
-        $page = request('target_function') ? request('target_function') : 'index';
+        $page = request('target_function')
+            ? request('target_function')
+            : 'index';
 
         list($output, $timestamp) = $this->executeSandbox($page);
 
         system_log(7, "EXTENSION_RENDER_PAGE", [
             "extension_id" => extension()->id,
             "server_id" => server()->id,
-            "view" => ""
+            "view" => "",
         ]);
         if (trim($output) == "") {
             abort(504, "İstek zaman aşımına uğradı!");
@@ -56,7 +66,7 @@ class MainController extends Controller
                     $code = intval($json["status"]);
                 }
             } catch (\Exception $exception) {
-            };
+            }
             if (isJson($output)) {
                 return response()->json(json_decode($output), $code);
             }
@@ -67,14 +77,20 @@ class MainController extends Controller
             if (json_last_error() == JSON_ERROR_NONE) {
                 $output = view('l.alert', [
                     "title" => extension()->name,
-                    "message" => array_key_exists("message", $json) ? $json["message"] : "Bilinmeyen bir hata oluştu, lütfen eklenti geliştiricisi ile iletişime geçiniz.",
-                    "type" => array_key_exists("status", $json) && intval($json["status"]) > 200 ? "danger" : "info"
+                    "message" => array_key_exists("message", $json)
+                        ? $json["message"]
+                        : "Bilinmeyen bir hata oluştu, lütfen eklenti geliştiricisi ile iletişime geçiniz.",
+                    "type" =>
+                        array_key_exists("status", $json) &&
+                        intval($json["status"]) > 200
+                            ? "danger"
+                            : "info",
                 ]);
             }
             return view('extension_pages.server', [
                 "viewName" => "",
                 "view" => $output,
-                "timestamp" => $timestamp
+                "timestamp" => $timestamp,
             ]);
         }
     }
@@ -82,19 +98,25 @@ class MainController extends Controller
     private function checkForMissingSettings()
     {
         foreach ($this->extension["database"] as $setting) {
-            if (isset($setting["required"]) && $setting["required"] === false) continue;
-            if (!UserSettings::where([
-                "user_id" => user()->id,
-                "server_id" => server()->id,
-                "name" => $setting["variable"]
-            ])->exists()) {
-                system_log(7, "EXTENSION_MISSING_SETTINGS", [
-                    "extension_id" => extension()->id
-                ]);
-                redirect_now(route('extension_server_settings_page', [
+            if (isset($setting["required"]) && $setting["required"] === false) {
+                continue;
+            }
+            if (
+                !UserSettings::where([
+                    "user_id" => user()->id,
                     "server_id" => server()->id,
-                    "extension_id" => extension()->id
-                ]));
+                    "name" => $setting["variable"],
+                ])->exists()
+            ) {
+                system_log(7, "EXTENSION_MISSING_SETTINGS", [
+                    "extension_id" => extension()->id,
+                ]);
+                redirect_now(
+                    route('extension_server_settings_page', [
+                        "server_id" => server()->id,
+                        "extension_id" => extension()->id,
+                    ])
+                );
             }
         }
         return [true, null];
@@ -102,13 +124,29 @@ class MainController extends Controller
 
     private function checkPermissions()
     {
-        if (!Permission::can(auth()->id(), "function", "name", strtolower(extension()->name), request('function_name'))) {
+        if (
+            !Permission::can(
+                auth()->id(),
+                "function",
+                "name",
+                strtolower(extension()->name),
+                request('function_name')
+            )
+        ) {
             system_log(7, "EXTENSION_NO_PERMISSION", [
                 "extension_id" => extension()->id,
-                "target_name" => request('function_name')
+                "target_name" => request('function_name'),
             ]);
             $function = request("function_name");
-            $extensionJson = json_decode(file_get_contents(env("EXTENSIONS_PATH") . strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"), true);
+            $extensionJson = json_decode(
+                file_get_contents(
+                    env("EXTENSIONS_PATH") .
+                        strtolower(extension()->name) .
+                        DIRECTORY_SEPARATOR .
+                        "db.json"
+                ),
+                true
+            );
 
             $functions = collect([]);
 
@@ -117,11 +155,22 @@ class MainController extends Controller
             }
 
             $isActive = "false";
-            $functionOptions = $functions->where('name', request("function_name"))->first();
+            $functionOptions = $functions
+                ->where('name', request("function_name"))
+                ->first();
             if ($functionOptions) {
                 $isActive = $functionOptions["isActive"];
             }
-            if ($isActive == "true" && !Permission::can(user()->id, "function", "name", strtolower(extension()->name), $function)) {
+            if (
+                $isActive == "true" &&
+                !Permission::can(
+                    user()->id,
+                    "function",
+                    "name",
+                    strtolower(extension()->name),
+                    $function
+                )
+            ) {
                 abort(403, $function . " için yetkiniz yok.");
             }
         }

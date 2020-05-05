@@ -12,7 +12,6 @@ use GuzzleHttp\Exception\BadResponseException;
  */
 class SSHTunnelConnector
 {
-
     public static function new($remote_host, $remote_port, $username, $password)
     {
         if (TunnelToken::get($remote_host, $remote_port)->exists()) {
@@ -26,10 +25,15 @@ class SSHTunnelConnector
             "username" => $username,
             "password" => $password,
             "hostname" => $remote_host,
-            "remote_port" => $remote_port
+            "remote_port" => $remote_port,
         ]);
         $token_parse = explode(':', $req->token);
-        TunnelToken::set($token_parse[0], $token_parse[1], $remote_host, $remote_port);
+        TunnelToken::set(
+            $token_parse[0],
+            $token_parse[1],
+            $remote_host,
+            $remote_port
+        );
         return $token_parse[1];
     }
 
@@ -52,10 +56,19 @@ class SSHTunnelConnector
         $client = new Client();
         // Make Request.
         try {
-            $res = $client->request('POST', env("LIMAN_CONNECTOR_SERVER") . '/' . $url, ["form_params" => $params]);
+            $res = $client->request(
+                'POST',
+                env("LIMAN_CONNECTOR_SERVER") . '/' . $url,
+                ["form_params" => $params]
+            );
         } catch (BadResponseException $e) {
             // In case of error, handle error.
-            $json = json_decode((string) $e->getResponse()->getBody()->getContents());
+            $json = json_decode(
+                (string) $e
+                    ->getResponse()
+                    ->getBody()
+                    ->getContents()
+            );
             // If it's first time, retry after recreating ticket.
             if ($retry) {
                 return self::request($url, $params, $retry - 1);

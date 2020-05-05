@@ -46,32 +46,49 @@ class PythonSandbox implements Sandbox
             "extension",
             "server",
             "script",
-            "server_id"
+            "server_id",
         ]);
         $request = json_encode($request);
 
         $apiRoute = route('extension_server', [
             "extension_id" => extension()->id,
             "city" => server()->city,
-            "server_id" => server()->id
+            "server_id" => server()->id,
         ]);
 
         $navigationRoute = route('extension_server', [
             "server_id" => server()->id,
             "extension_id" => extension()->id,
-            "city" => server()->city
+            "city" => server()->city,
         ]);
 
         $token = Token::create(user()->id);
 
         if (!user()->isAdmin()) {
-            $extensionJson = json_decode(file_get_contents(env("EXTENSIONS_PATH") . strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"), true);
+            $extensionJson = json_decode(
+                file_get_contents(
+                    env("EXTENSIONS_PATH") .
+                        strtolower(extension()->name) .
+                        DIRECTORY_SEPARATOR .
+                        "db.json"
+                ),
+                true
+            );
             $permissions = [];
             if (array_key_exists("functions", $extensionJson)) {
                 foreach ($extensionJson["functions"] as $item) {
-                    if (Permission::can(user()->id, "function", "name", strtolower(extension()->name), $item["name"]) || $item["isActive"] != "true") {
+                    if (
+                        Permission::can(
+                            user()->id,
+                            "function",
+                            "name",
+                            strtolower(extension()->name),
+                            $item["name"]
+                        ) ||
+                        $item["isActive"] != "true"
+                    ) {
                         array_push($permissions, $item["name"]);
-                    };
+                    }
                 }
             }
             $permissions = json_encode($permissions);
@@ -82,20 +99,35 @@ class PythonSandbox implements Sandbox
         $userData = [
             "id" => user()->id,
             "name" => user()->name,
-            "email" => user()->email
+            "email" => user()->email,
         ];
 
-        $functionsPath = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/views/functions.py";
+        $functionsPath =
+            env('EXTENSIONS_PATH') .
+            strtolower(extension()->name) .
+            "/views/functions.py";
 
         $publicPath = route('extension_public_folder', [
             "extension_id" => extension()->id,
-            "path" => ""
+            "path" => "",
         ]);
 
         $isAjax = request()->wantsJson() ? true : false;
         $array = [
-            $functionsPath, $function, server()->toArray(), extension()->toArray(), $extensionDb,
-            $request, $apiRoute, $navigationRoute, $token, $permissions, session('locale'), json_encode($userData), $publicPath, $isAjax
+            $functionsPath,
+            $function,
+            server()->toArray(),
+            extension()->toArray(),
+            $extensionDb,
+            $request,
+            $apiRoute,
+            $navigationRoute,
+            $token,
+            $permissions,
+            session('locale'),
+            json_encode($userData),
+            $publicPath,
+            $isAjax,
         ];
 
         //        $encrypted = openssl_encrypt(
@@ -106,16 +138,18 @@ class PythonSandbox implements Sandbox
         //            Str::random()
         //        );
         $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
-        $combinerFile = "/liman/extensions/" . strtolower(extension()->name) . "/views/functions.py";
+        $combinerFile =
+            "/liman/extensions/" .
+            strtolower(extension()->name) .
+            "/views/functions.py";
         $encrypted = base64_encode(json_encode($array));
-        return "sudo -u " . cleanDash(extension()->id) .
+        return "sudo -u " .
+            cleanDash(extension()->id) .
             " bash -c 'export PYTHONPATH=\$PYTHONPATH:/liman/sandbox/python; timeout 30 /usr/bin/python3 $combinerFile $keyPath $encrypted 2>&1'";
     }
 
     public function getInitialFiles()
     {
-        return [
-            "index.blade.php", "functions.py"
-        ];
+        return ["index.blade.php", "functions.py"];
     }
 }

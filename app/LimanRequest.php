@@ -6,9 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class LimanRequest extends Model
 {
-  use UsesUuid;
+    use UsesUuid;
 
-  protected $fillable = [
-    "user_id", "status", "speed", "type", "note", "email"
-  ];
+    protected $fillable = [
+        "user_id",
+        "status",
+        "speed",
+        "type",
+        "note",
+        "email",
+    ];
 }

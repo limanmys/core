@@ -8,11 +8,7 @@ class ExternalNotification extends Model
 {
     use UsesUuid;
 
-    protected $fillable = [
-        "name", "last_used", "ip"
-    ];
+    protected $fillable = ["name", "last_used", "ip"];
 
-    protected $hidden = [
-        "token"
-    ];
+    protected $hidden = ["token"];
 }
