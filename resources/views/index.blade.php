@@ -40,65 +40,65 @@
           </div>
       </div>
       @if(user()->isAdmin())
-      <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box loading">
-            <span class="info-box-icon bg-info"><i class="fas fa-microchip"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">{{__("Cpu Kullanımı")}}</span>
-              <span class="info-box-number" id="cpuUsage">
-                <div class="overlay" style="background: rgba(255,255,255,.9);">
-                      <div class="spinner-border" role="status">
-                        <span class="sr-only">{{__("Yükleniyor")}}</span>
-                      </div>
-                  </div></span>
-            </div>
-          </div>
-      </div>
-      <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fas fa-memory"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">{{__("Ram Kullanımı")}}</span>
-              <span class="info-box-number" id="ramUsage">
-                <div class="overlay" style="background: rgba(255,255,255,.9);">
-                      <div class="spinner-border" role="status">
-                        <span class="sr-only">{{__("Yükleniyor")}}</span>
-                      </div>
-                </div>
-              </span>
-            </div>
-          </div>
-      </div>
-      <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="far fa-hdd"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">{{__("Disk Kullanımı")}}</span>
-              <span class="info-box-number" id="diskUsage">
+        <div class="col-md-3 col-sm-4 col-xs-12">
+            <div class="info-box loading">
+              <span class="info-box-icon bg-info"><i class="fas fa-microchip"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">{{__("Cpu Kullanımı")}}</span>
+                <span class="info-box-number" id="cpuUsage">
                   <div class="overlay" style="background: rgba(255,255,255,.9);">
-                      <div class="spinner-border" role="status">
-                        <span class="sr-only">{{__("Yükleniyor")}}</span>
-                      </div>
-                  </div>
-              </span>
+                        <div class="spinner-border" role="status">
+                          <span class="sr-only">{{__("Yükleniyor")}}</span>
+                        </div>
+                    </div></span>
+              </div>
             </div>
-          </div>
-      </div>
-      <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fas fa-network-wired"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">{{__("Ağ Kullanımı")}}</span>
-              <span class="info-box-number" id="networkUsage">
-              <div class="overlay" style="background: rgba(255,255,255,.9);">
-                      <div class="spinner-border" role="status">
-                        <span class="sr-only">{{__("Yükleniyor")}}</span>
-                      </div>
+        </div>
+        <div class="col-md-3 col-sm-4 col-xs-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-info"><i class="fas fa-memory"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">{{__("Ram Kullanımı")}}</span>
+                <span class="info-box-number" id="ramUsage">
+                  <div class="overlay" style="background: rgba(255,255,255,.9);">
+                        <div class="spinner-border" role="status">
+                          <span class="sr-only">{{__("Yükleniyor")}}</span>
+                        </div>
                   </div>
-              </span>
+                </span>
+              </div>
             </div>
-          </div>
-      </div>
+        </div>
+        <div class="col-md-3 col-sm-4 col-xs-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-info"><i class="far fa-hdd"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">{{__("Disk Kullanımı")}}</span>
+                <span class="info-box-number" id="diskUsage">
+                    <div class="overlay" style="background: rgba(255,255,255,.9);">
+                        <div class="spinner-border" role="status">
+                          <span class="sr-only">{{__("Yükleniyor")}}</span>
+                        </div>
+                    </div>
+                </span>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-4 col-xs-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-info"><i class="fas fa-network-wired"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">{{__("Ağ Kullanımı")}}</span>
+                <span class="info-box-number" id="networkUsage">
+                <div class="overlay" style="background: rgba(255,255,255,.9);">
+                        <div class="spinner-border" role="status">
+                          <span class="sr-only">{{__("Yükleniyor")}}</span>
+                        </div>
+                    </div>
+                </span>
+              </div>
+            </div>
+        </div>
       @endif
     </div>
     <div class="row sortable-widget">

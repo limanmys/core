@@ -1,9 +1,10 @@
-<?php
+@php
     if(user()->forceChange != true){
         header('Location: '.route('home'));
         die();
     }
-?>
+@endphp
+
 @extends('layouts.app')
 
 @section('body_class', 'login-page')

@@ -8,7 +8,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{$user->name . __(" kullanıcısı ayarları")}}</li>
         </ol>
     </nav>
-    <h2>{{$user->name . __(" kullanıcısı ayarları")}}</h2>
+    <h2>{{ __(":user_name kullanıcısı ayarları", ["user_name" => $user->name])}}</h2>
     <div class="card">
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
