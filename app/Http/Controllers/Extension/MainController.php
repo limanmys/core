@@ -263,7 +263,7 @@ class MainController extends Controller
     public function updateExtOrders()
     {
         foreach (json_decode(request('data')) as $extension) {
-            Extension::find($extension->id)->update([
+            Extension::where('id', $extension->id)->update([
                 "order" => $extension->order
             ]);
         }
