@@ -6,7 +6,7 @@
           <img src="/images/liman_logo_white.png" alt="Liman Logo" class="brand-image"
                style="opacity: .8;margin-left: 1.3rem;">
           <span class="brand-text font-weight-light">liman</span>
-          <span class="right badge badge-success">v 0.94</span>
+          <span class="right badge badge-success">v0.94</span>
         </a>
         <!-- Sidebar -->
         <div class="sidebar">  
