@@ -91,44 +91,44 @@
         "submit_text" => "Yükle"
     ])
     @if(env("EXTENSION_DEVELOPER_MODE"))
-    <?php
-        $input_extensions = [];
-        foreach(extensions() as $extension){
-            $input_extensions[$extension->name] = $extension->id;
-        }
-    ?>
+        @php
+            $input_extensions = [];
+            foreach(extensions() as $extension){
+                $input_extensions[$extension->name] = $extension->id;
+            }
+        @endphp
 
-    @include('modal',[
-        "id"=>"extensionExport",
-        "onsubmit" => "downloadFile",
-        "title" => "Eklenti İndir",
-        "next" => "",
-        "inputs" => [
-            "Eklenti Secin:extension_id" => $input_extensions
-        ],
-        "submit_text" => "İndir"
-    ])
-
-
-    @include('modal',[
-        "id"=>"newExtension",
-        "url" => route('extension_new'),
-        "next" => "debug",
-        "title" => "Yeni Eklenti Oluştur",
-        "selects" => [
-            "PHP 7.3:php" => [
-                "-:php" => "language:hidden"
+        @include('modal',[
+            "id"=>"extensionExport",
+            "onsubmit" => "downloadFile",
+            "title" => "Eklenti İndir",
+            "next" => "",
+            "inputs" => [
+                "Eklenti Seçin:extension_id" => $input_extensions
             ],
-            "Python 3.7(BETA):python" => [
-                "-:python" => "language:hidden"
-            ]
-        ],
-        "inputs" => [
-            "Eklenti Adı" => "name:text",
-        ],
-        "submit_text" => "Oluştur"
-    ])
-@endif
+            "submit_text" => "İndir"
+        ])
+
+
+        @include('modal',[
+            "id"=>"newExtension",
+            "url" => route('extension_new'),
+            "next" => "debug",
+            "title" => "Yeni Eklenti Oluştur",
+            "selects" => [
+                "PHP 7.3:php" => [
+                    "-:php" => "language:hidden"
+                ],
+                "Python 3.7(BETA):python" => [
+                    "-:python" => "language:hidden"
+                ]
+            ],
+            "inputs" => [
+                "Eklenti Adı" => "name:text",
+            ],
+            "submit_text" => "Oluştur"
+        ])
+    @endif
     @include('modal',[
        "id"=>"delete",
        "title" =>"Eklentiyi Sil",
@@ -142,70 +142,69 @@
    ])
 
 <script>
-        $('input[name=ext_count]').val('{{env('NAV_EXTENSION_HIDE_COUNT', 10)}}');
-        function downloadFile(form){
-            window.location.assign('/indir/eklenti/' + form.getElementsByTagName('select')[0].value);
-            setTimeout(function(){
-              Swal.close();
-            }, 1000);
-            return false;
+    $('input[name=ext_count]').val('{{env('NAV_EXTENSION_HIDE_COUNT', 10)}}');
+    function downloadFile(form){
+        window.location.assign('/indir/eklenti/' + form.getElementsByTagName('select')[0].value);
+        setTimeout(function(){
+            Swal.close();
+        }, 1000);
+        return false;
+    }
+    $("#extensionUpload input").on('change',function(){
+        if(this.files[0].size / 1024 / 1024 > 100){
+            $(this).val('');
+            showSwal('{{__("Maksimum eklenti boyutunu (100MB) aştınız!")}}','error');
         }
-        $("#extensionUpload input").on('change',function(){
-            if(this.files[0].size / 1024 / 1024 > 100){
-                $(this).val('');
-                showSwal('{{__("Maksimum eklenti boyutunu (100MB) aştınız!")}}','error');
-            }
-        });
+    });
 
-        function openSettingsModal(){
-            $('#extSettings').modal('show');
+    function openSettingsModal(){
+        $('#extSettings').modal('show');
+    }
+
+    function extensionUploadError(response){
+        let error = JSON.parse(response);
+        if(error.status == 203){
+            $('#extensionUpload_alert').hide();
+            Swal.fire({
+                title: "{{ __('Onay') }}",
+                text: error.message,
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: "{{ __('İptal') }}",
+                confirmButtonText: "{{ __('Tamam') }}"
+            }).then((result) => {
+                if (result.value) {
+                    showSwal('{{__("Yükleniyor...")}}','info');
+                    let data = new FormData(document.querySelector('#extensionUpload_form'))
+                    data.append("force", "1");
+                    request('{{route('extension_upload')}}',data,function(response){
+                        Swal.close();
+                        reload();
+                    }, function(response){
+                        let error = JSON.parse(response);
+                        Swal.close();
+                        $('#extensionUpload_alert').removeClass('alert-danger').removeAttr('hidden').removeClass('alert-success').addClass('alert-danger').html(error.message).fadeIn();
+                    });
+                }
+            });
         }
+    }
+    
+    function downloadDebFile(form){
+        window.location.assign('/indir/eklenti_deb/' + form.getElementsByTagName('select')[0].value);
+        setTimeout(function(){
+            Swal.close();
+        }, 1000);
+        return false;
+    }
 
-        function extensionUploadError(response){
-            let error = JSON.parse(response);
-            if(error.status == 203){
-                $('#extensionUpload_alert').hide();
-                Swal.fire({
-                    title: "{{ __('Onay') }}",
-                    text: error.message,
-                    type: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    cancelButtonText: "{{ __('İptal') }}",
-                    confirmButtonText: "{{ __('Tamam') }}"
-                }).then((result) => {
-                    if (result.value) {
-                        showSwal('{{__("Yükleniyor...")}}','info');
-
-                        let data = new FormData(document.querySelector('#extensionUpload_form'))
-                        data.append("force", "1");
-                        request('{{route('extension_upload')}}',data,function(response){
-                            Swal.close();
-                            reload();
-                        }, function(response){
-                            let error = JSON.parse(response);
-                            Swal.close();
-                            $('#extensionUpload_alert').removeClass('alert-danger').removeAttr('hidden').removeClass('alert-success').addClass('alert-danger').html(error.message).fadeIn();
-                        });
-                    }
-                });
-            }
+    @if(env("EXTENSION_DEVELOPER_MODE"))
+        function details(element){
+            let extension_id = element.querySelector('#extension_id').innerHTML;
+            window.location.href = "/eklentiler/" + extension_id
         }
-        
-        function downloadDebFile(form){
-            window.location.assign('/indir/eklenti_deb/' + form.getElementsByTagName('select')[0].value);
-            setTimeout(function(){
-              Swal.close();
-            }, 1000);
-            return false;
-        }
-
-        @if(env("EXTENSION_DEVELOPER_MODE"))
-            function details(element){
-                let extension_id = element.querySelector('#extension_id').innerHTML;
-                window.location.href = "/eklentiler/" + extension_id
-            }
-        @endif
+    @endif
 </script>
 @endsection

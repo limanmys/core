@@ -1,4 +1,4 @@
-<?php
+@php
     $servers = extension()->servers(request('city'));
     if($servers->count() == 1){
         $url = route('extension_server',[
@@ -9,7 +9,7 @@
         header("Location: $url", true);
         exit();
     }
-?>
+@endphp
 
 @extends('layouts.app')
 
