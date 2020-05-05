@@ -22,9 +22,11 @@ class Token extends Model
             $token = Str::random(32);
         }
 
-        return Token::firstOrCreate([
+        Token::firstOrCreate([
             "token" => $token,
             "user_id" => ($user_id) ? $user_id : auth()->id()
         ]);
+        
+        return $token;
     }
 }
