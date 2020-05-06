@@ -1,4 +1,4 @@
-@php
+<?php
 $item = \App\Notification::where([
     "user_id" => auth()->id(),
     "id" => request('notification_id')
@@ -13,7 +13,7 @@ if(!$item){
         return redirect()->back();
     }
 }
-@endphp
+?>
 
 @extends('layouts.app')
 @section('content')

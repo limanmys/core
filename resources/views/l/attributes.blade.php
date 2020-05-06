@@ -1,12 +1,12 @@
-
-@php
+<?php
     $rand = str_random(3);
     if(extensionDb("server_type") == "Active Directory" || extensionDb("server_type") == "Samba"){
         $data = $data["windows"];
     }else{
         $data = $data["linux"];
     }
-@endphp
+?>
+
 @isset($open)
     <div class="box box-default box-solid">
         @else

@@ -1,9 +1,9 @@
-@php
+<?php
     if(user()->forceChange != true){
         header('Location: '.route('home'));
         die();
     }
-@endphp
+?>
 
 @extends('layouts.app')
 

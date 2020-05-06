@@ -174,7 +174,7 @@
                                 ],
                                 "noInitialize" => "true"
                             ])
-                            @php
+                            <?php
                             $input_extensions = [];
                             foreach ($available_extensions as $extension) {
                                 $arr = [];
@@ -194,7 +194,7 @@
                                     "id" => $extension->id,
                                 ];
                             }
-                            @endphp
+                            ?>
                         </div>
                             {!! serverModuleViews() !!}
                         <div class="tab-pane fade show" id="filesTab" role="tabpanel">
