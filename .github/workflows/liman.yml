@@ -11,7 +11,7 @@ jobs:
           path: package/liman/server
 
       - name: Checking code format
-        run: 
+        run: |
           sudo apt install npm -y
           cd package/liman/server/
           npm install
