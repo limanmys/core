@@ -90,16 +90,19 @@ class MainController extends Controller
                 ]);
             }
 
-            if(config('liman.liman_restricted')== true && !user()->isAdmin()){
-                return view('extension_pages.server_restricted',[
-                    "view" => $output
+            if (
+                config('liman.liman_restricted') == true &&
+                !user()->isAdmin()
+            ) {
+                return view('extension_pages.server_restricted', [
+                    "view" => $output,
                 ]);
             }
             return view('extension_pages.server', [
                 "viewName" => "",
                 "view" => $output,
                 "timestamp" => $timestamp,
-                "last" => $this->getNavigationServers()
+                "last" => $this->getNavigationServers(),
             ]);
         }
     }
@@ -202,8 +205,8 @@ class MainController extends Controller
     {
         $navServers = DB::select(
             "SELECT * FROM \"server_groups\" WHERE \"servers\" LIKE \"%" .
-            server()->id .
-            "%\""
+                server()->id .
+                "%\""
         );
         $cleanServers = [];
         foreach ($navServers as $rawServers) {
@@ -239,7 +242,9 @@ class MainController extends Controller
             list($server_id, $server_name) = explode(":", $serverobj);
             foreach ($extensions as $extension_id => $extension_name) {
                 $prefix = $extension_id . ":" . $extension_name;
-                $current = array_key_exists($prefix, $last) ? $last[$prefix] : [];
+                $current = array_key_exists($prefix, $last)
+                    ? $last[$prefix]
+                    : [];
                 array_push($current, [
                     "id" => $server_id,
                     "name" => $server_name,

@@ -7,5 +7,5 @@ return [
     "extension_developer_mode" => true,
     "nav_extension_hide_count" => 10,
     "widget_refresh_time" => 30000, //ms
-    "liman_restricted" => false
+    "liman_restricted" => false,
 ];

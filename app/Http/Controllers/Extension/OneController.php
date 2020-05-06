@@ -243,7 +243,7 @@ class OneController extends Controller
         try {
             shell_exec(
                 "sudo rm -r " .
-                "/liman/extensions/" .
+                    "/liman/extensions/" .
                     strtolower(extension()->name)
             );
         } catch (\Exception $exception) {
