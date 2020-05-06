@@ -9,6 +9,10 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: package/liman/server
+        run: 
+          sudo apt install npm -y
+          npm install
+          npm run check
 
       - name: Getting Liman' PHP Sandbox
         uses: actions/checkout@v2
