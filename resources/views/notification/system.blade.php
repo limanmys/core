@@ -1,4 +1,4 @@
-@php
+<?php
     $notification = \App\AdminNotification::where('id',(request('notification_id')))->first();
     if(!$notification){
         header("Location: /", true);
@@ -38,7 +38,7 @@
         default:
             break;
     }
-@endphp
+?>
 
 @extends('layouts.app')
 

@@ -91,12 +91,12 @@
         "submit_text" => "Yükle"
     ])
     @if(env("EXTENSION_DEVELOPER_MODE"))
-        @php
+        <?php
             $input_extensions = [];
             foreach(extensions() as $extension){
                 $input_extensions[$extension->name] = $extension->id;
             }
-        @endphp
+        ?>
 
         @include('modal',[
             "id"=>"extensionExport",

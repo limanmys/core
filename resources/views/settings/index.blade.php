@@ -110,14 +110,14 @@
                     <pre id="output"></pre>
                 </div>
                 <div class="tab-pane fade show" id="servers" role="tabpanel">
-                    @php
+                    <?php
                     $servers = servers();
                     foreach ($servers as $server) {
                         $server->enabled = $server->enabled
                             ? __("Aktif")
                             : __("Pasif");
                     }
-                    @endphp
+                    ?>
                     <button class="btn btn-success" onclick="serverStatus(true)" disabled>{{__("Aktifleştir")}}</button>
                     <button class="btn btn-danger" onchange="serverStatus(false)" disabled>{{__("Pasifleştir")}}</button><br><br>
                     @include('table',[

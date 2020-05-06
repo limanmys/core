@@ -3,7 +3,7 @@
     @php(die())
 @endif
 
-@php
+<?php
 use Illuminate\Support\Facades\DB;
 use App\Permission;
 $navServers = DB::select(
@@ -53,7 +53,7 @@ foreach ($cleanExtensions as $serverobj => $extensions) {
         $last[$prefix] = $current;
     }
 }
-@endphp
+?>
 
 @extends('layouts.app')
 
