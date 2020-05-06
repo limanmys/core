@@ -112,7 +112,7 @@ class Server extends Model
                     $this->control_port,
                     $errno,
                     $errstr,
-                    env('SERVER_CONNECTION_TIMEOUT')
+                    intval(config('liman.server_connection_timeout'))
                 )
             );
         }
@@ -138,7 +138,7 @@ class Server extends Model
                     $this->control_port,
                     $errno,
                     $errstr,
-                    env('SERVER_CONNECTION_TIMEOUT')
+                    intval(config('liman.server_connection_timeout'))
                 )
             )
         ) {

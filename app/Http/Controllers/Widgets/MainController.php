@@ -15,7 +15,7 @@ class MainController extends Controller
                 ->user()
                 ->isAdmin() &&
             Widget::where("user_id", auth()->user()->id)->count() >
-                env("USER_WIDGET_COUNT")
+                intval(config('liman.user_widget_count'))
         ) {
             return respond(
                 "Bileşen kotanızı aştınız, yeni widget ekleyemezsiniz"

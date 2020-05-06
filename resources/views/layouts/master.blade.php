@@ -134,11 +134,11 @@
             checkNotifications();
         @endif
 
-        $('.ext_nav').slice({{env('NAV_EXTENSION_HIDE_COUNT', 10)}}, $('.ext_nav').length).hide();
+        $('.ext_nav').slice({{intval(config('liman.nav_extension_hide_count'))}}, $('.ext_nav').length).hide();
         $('.ext_nav_more_less').click(function(){
             if ($('.ext_nav').length == $('.ext_nav:visible').length) {
                 $('.ext_nav_more_less').find('p').text("{{__('...daha fazla')}}");
-                $('.ext_nav').slice({{env('NAV_EXTENSION_HIDE_COUNT', 10)}}, $('.ext_nav').length).hide();
+                $('.ext_nav').slice({{intval(config('liman.nav_extension_hide_count'))}}, $('.ext_nav').length).hide();
             }else{
                 $('.ext_nav_more_less').find('p').text("{{__('daha az...')}}");
                 $('.ext_nav:hidden').show();

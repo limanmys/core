@@ -26,7 +26,7 @@ class OneController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -194,7 +194,7 @@ class OneController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -243,7 +243,7 @@ class OneController extends Controller
         try {
             shell_exec(
                 "sudo rm -r " .
-                    env('EXTENSIONS_PATH') .
+                "/liman/extensions/" .
                     strtolower(extension()->name)
             );
         } catch (\Exception $exception) {
@@ -277,7 +277,7 @@ class OneController extends Controller
     public function publicFolder()
     {
         $basePath =
-            env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/public/";
+            "/liman/extensions/" . strtolower(extension()->name) . "/public/";
 
         $targetPath = $basePath . base64_decode(request('path'));
 

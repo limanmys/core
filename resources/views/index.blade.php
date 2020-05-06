@@ -186,7 +186,7 @@
         startQueue()
         setInterval(function(){
             startQueue()
-        },{{env("WIDGET_REFRESH_TIME")}});
+        },{{config('liman.widget_refresh_time')}});
 
         function startQueue(){
           currentWidget = 0;

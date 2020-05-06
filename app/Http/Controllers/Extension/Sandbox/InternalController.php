@@ -154,7 +154,7 @@ class InternalController extends Controller
     public function runScript()
     {
         $filePath =
-            env("EXTENSIONS_PATH") .
+            "/liman/extensions/" .
             strtolower(extension()->name) .
             "/scripts/" .
             request("scriptName");
@@ -316,10 +316,10 @@ class InternalController extends Controller
      */
     public function addProxyConfig()
     {
-        if (!is_dir(env("KEYS_PATH") . "vnc")) {
-            mkdir(env("KEYS_PATH") . "vnc", 0700);
+        if (!is_dir("/liman/keys/" . "vnc")) {
+            mkdir("/liman/keys/" . "vnc", 0700);
         }
-        $writer = fopen(env("KEYS_PATH") . "vnc/config", "a+");
+        $writer = fopen("/liman/keys/" . "vnc/config", "a+");
         $hostname = request('hostname');
         $port = request('port');
         $token = Str::uuid();

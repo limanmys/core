@@ -67,7 +67,7 @@ class PythonSandbox implements Sandbox
         if (!user()->isAdmin()) {
             $extensionJson = json_decode(
                 file_get_contents(
-                    env("EXTENSIONS_PATH") .
+                    "/liman/extensions/" .
                         strtolower(extension()->name) .
                         DIRECTORY_SEPARATOR .
                         "db.json"
@@ -103,7 +103,7 @@ class PythonSandbox implements Sandbox
         ];
 
         $functionsPath =
-            env('EXTENSIONS_PATH') .
+            "/liman/extensions/" .
             strtolower(extension()->name) .
             "/views/functions.py";
 

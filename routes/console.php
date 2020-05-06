@@ -41,10 +41,10 @@ Artisan::command('administrator',function (){
 
 
 Artisan::command('scan:translations',function (){
-    if(!env("EXTENSION_DEVELOPER_MODE")){
+    if(config('liman.extension_developer_mode') != true){
         return $this->error("You need to open extension developer mode for use this function.");
     }
-    $extension_path = env("EXTENSIONS_PATH");
+    $extension_path = "/liman/extensions/";
     $extensions = glob($extension_path.'/*', GLOB_ONLYDIR);
     $this->info("Started to scanning extension folders.");
     foreach($extensions as $extension){
@@ -63,7 +63,7 @@ Artisan::command('scan:translations',function (){
     $this->info("Finished scanning extension folders.");
 
     $this->info("Started to scanning server files.");
-    $server_path = env("SERVER_PATH");
+    $server_path = "/liman/server";
     $this->comment("Scanning: ".$server_path);
     $output = "$server_path/resources/lang/en.json";
     $translations = scanTranslations($server_path);

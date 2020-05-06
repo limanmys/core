@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\UserSettings;
 use App\Permission;
+use App\Server;
 use App\Classes\Sandbox\PHPSandbox;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class MainController extends Controller
 {
@@ -25,7 +27,7 @@ class MainController extends Controller
     {
         $this->extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -87,10 +89,17 @@ class MainController extends Controller
                             : "info",
                 ]);
             }
+
+            if(config('liman.liman_restricted')== true && !user()->isAdmin()){
+                return view('extension_pages.server_restricted',[
+                    "view" => $output
+                ]);
+            }
             return view('extension_pages.server', [
                 "viewName" => "",
                 "view" => $output,
                 "timestamp" => $timestamp,
+                "last" => $this->getNavigationServers()
             ]);
         }
     }
@@ -140,7 +149,7 @@ class MainController extends Controller
             $function = request("function_name");
             $extensionJson = json_decode(
                 file_get_contents(
-                    env("EXTENSIONS_PATH") .
+                    "/liman/extensions/" .
                         strtolower(extension()->name) .
                         DIRECTORY_SEPARATOR .
                         "db.json"
@@ -187,5 +196,58 @@ class MainController extends Controller
         $before = Carbon::now();
         $output = shell_exec($command);
         return [$output, $before->diffInMilliseconds(Carbon::now()) / 1000];
+    }
+
+    private function getNavigationServers()
+    {
+        $navServers = DB::select(
+            "SELECT * FROM \"server_groups\" WHERE \"servers\" LIKE \"%" .
+            server()->id .
+            "%\""
+        );
+        $cleanServers = [];
+        foreach ($navServers as $rawServers) {
+            $servers = explode(",", $rawServers->servers);
+            foreach ($servers as $server) {
+                if (Permission::can(user()->id, "server", "id", $server)) {
+                    array_push($cleanServers, $server);
+                }
+            }
+        }
+
+        $cleanServers = array_unique($cleanServers);
+        $cleanExtensions = [];
+
+        $serverObjects = Server::find($cleanServers);
+        unset($cleanServers);
+        foreach ($serverObjects as $server) {
+            $cleanExtensions[$server->id . ":" . $server->name] = $server
+                ->extensions()
+                ->pluck('name', 'id')
+                ->toArray();
+        }
+        if (empty($cleanExtensions)) {
+            $cleanExtensions[server()->id . ":" . server()->name] = server()
+                ->extensions()
+                ->pluck('name', 'id')
+                ->toArray();
+        }
+
+        $last = [];
+
+        foreach ($cleanExtensions as $serverobj => $extensions) {
+            list($server_id, $server_name) = explode(":", $serverobj);
+            foreach ($extensions as $extension_id => $extension_name) {
+                $prefix = $extension_id . ":" . $extension_name;
+                $current = array_key_exists($prefix, $last) ? $last[$prefix] : [];
+                array_push($current, [
+                    "id" => $server_id,
+                    "name" => $server_name,
+                ]);
+                $last[$prefix] = $current;
+            }
+        }
+
+        return $last;
     }
 }

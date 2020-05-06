@@ -151,7 +151,7 @@ class MainController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -163,7 +163,7 @@ class MainController extends Controller
             : [];
         $lang = session('locale');
         $file =
-            env('EXTENSIONS_PATH') .
+            "/liman/extensions/" .
             strtolower(extension()->name) .
             "/lang/" .
             $lang .
@@ -280,7 +280,7 @@ class MainController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(request('extension_name')) .
                     DIRECTORY_SEPARATOR .
                     "db.json"

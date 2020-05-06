@@ -17,7 +17,7 @@ class MainController extends Controller
             request('port'),
             $errno,
             $errstr,
-            intval(env('SERVER_CONNECTION_TIMEOUT')) / 1000
+            intval(config('liman.server_connection_timeout')) / 1000
         );
         if (is_resource($status)) {
             return respond("Sunucuya başarıyla erişim sağlandı.", 200);

@@ -53,7 +53,7 @@ class MainController extends Controller
     public function download()
     {
         // Generate Extension Folder Path
-        $path = env("EXTENSIONS_PATH") . strtolower(extension()->name);
+        $path = "/liman/extensions/" . strtolower(extension()->name);
         $tempPath = "/tmp/" . Str::random() . ".zip";
 
         // Zip the current extension
@@ -204,7 +204,7 @@ class MainController extends Controller
             shell_exec('sudo useradd -r -s /bin/sh ' . cleanDash($new->id));
         }
 
-        $extension_folder = env('EXTENSIONS_PATH') . strtolower($json["name"]);
+        $extension_folder = "/liman/extensions/" . strtolower($json["name"]);
         $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $new->id;
         file_put_contents($passPath, Str::random(32));
 
@@ -255,7 +255,7 @@ class MainController extends Controller
     public function newExtension()
     {
         $name = trim(request('name'));
-        $folder = env('EXTENSIONS_PATH') . strtolower($name);
+        $folder = "/liman/extensions/" . strtolower($name);
 
         preg_match('/[A-Za-z]+/', request("name"), $output);
         if (empty($output) || $output[0] != $name) {

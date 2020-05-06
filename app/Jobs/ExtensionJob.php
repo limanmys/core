@@ -110,11 +110,11 @@ class ExtensionJob implements ShouldQueue
         $extensionDb = null
     ) {
         $functions =
-            env('EXTENSIONS_PATH') .
+            "/liman/extensions/" .
             strtolower($extensionObj["name"]) .
             "/views/functions.php";
 
-        $combinerFile = env('SANDBOX_PATH') . "index.php";
+        $combinerFile = "/liman/sandbox/php/index.php";
 
         $server = json_encode($serverObj->toArray());
 
@@ -166,7 +166,7 @@ class ExtensionJob implements ShouldQueue
         if (!$this->user->isAdmin()) {
             $extensionJson = json_decode(
                 file_get_contents(
-                    env("EXTENSIONS_PATH") .
+                    "/liman/extensions/" .
                         strtolower($extensionObj->name) .
                         DIRECTORY_SEPARATOR .
                         "db.json"

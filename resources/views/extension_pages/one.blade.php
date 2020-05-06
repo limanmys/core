@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    @php($extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true))
+    @php($extension = json_decode(file_get_contents("/liman/extensions/" .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true))
 
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">

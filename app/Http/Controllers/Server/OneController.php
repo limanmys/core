@@ -80,7 +80,7 @@ class OneController extends Controller
                 extension()->service,
                 $errno,
                 $errstr,
-                intval(env('SERVER_CONNECTION_TIMEOUT')) / 1000
+                intval(config('liman.server_connection_timeout')) / 1000
             );
             $flag = is_resource($status);
         } else {

@@ -25,7 +25,7 @@ class OneController extends Controller
         $extension = Extension::one($widget->extension_id);
         $extensionData = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension($widget->extension_id)->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -111,7 +111,7 @@ class OneController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"

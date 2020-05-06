@@ -23,9 +23,7 @@ class SettingsController extends Controller
     public function saveSettings()
     {
         if (intval(request('ext_count')) > 0) {
-            setEnv([
-                "NAV_EXTENSION_HIDE_COUNT" => request('ext_count'),
-            ]);
+            config(['liman.nav_extension_hide_count' => request('ext_count')]);
             return respond('Ayarlar başarıyla kaydedildi.');
         } else {
             return respond('Bu ayar minimum 1 olmalıdır.', 201);
@@ -41,7 +39,7 @@ class SettingsController extends Controller
     {
         // Go through all files and list them as tree style in array.
         $files = $this->tree(
-            env('EXTENSIONS_PATH') . strtolower(extension()->name)
+            "/liman/extensions/" . strtolower(extension()->name)
         );
 
         system_log(7, "EXTENSION_SETTINGS_PAGE", [
@@ -53,7 +51,7 @@ class SettingsController extends Controller
             ]);
             $extension = json_decode(
                 file_get_contents(
-                    env("EXTENSIONS_PATH") .
+                    "/liman/extensions/" .
                         strtolower(extension()->name) .
                         DIRECTORY_SEPARATOR .
                         "db.json"
@@ -62,7 +60,7 @@ class SettingsController extends Controller
             );
             $extension["language"] = "php";
             file_put_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json",
@@ -122,7 +120,7 @@ class SettingsController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -169,7 +167,7 @@ class SettingsController extends Controller
             $extension["version_code"] = 1;
         }
         file_put_contents(
-            env("EXTENSIONS_PATH") .
+            "/liman/extensions/" .
                 strtolower(extension()->name) .
                 DIRECTORY_SEPARATOR .
                 "db.json",
@@ -188,7 +186,7 @@ class SettingsController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -224,7 +222,7 @@ class SettingsController extends Controller
         }
 
         file_put_contents(
-            env("EXTENSIONS_PATH") .
+            "/liman/extensions/" .
                 strtolower(extension()->name) .
                 DIRECTORY_SEPARATOR .
                 "db.json",
@@ -243,7 +241,7 @@ class SettingsController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -268,7 +266,7 @@ class SettingsController extends Controller
         }
 
         file_put_contents(
-            env("EXTENSIONS_PATH") .
+            "/liman/extensions/" .
                 strtolower(extension()->name) .
                 DIRECTORY_SEPARATOR .
                 "db.json",
@@ -288,7 +286,7 @@ class SettingsController extends Controller
         $function_name = request('function_name');
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -320,7 +318,7 @@ class SettingsController extends Controller
         $function_name = request('function_name');
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -350,7 +348,7 @@ class SettingsController extends Controller
                     }
 
                     file_put_contents(
-                        env("EXTENSIONS_PATH") .
+                        "/liman/extensions/" .
                             strtolower(extension()->name) .
                             DIRECTORY_SEPARATOR .
                             "db.json",
@@ -371,7 +369,7 @@ class SettingsController extends Controller
 
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -402,7 +400,7 @@ class SettingsController extends Controller
                                     $extension["version_code"] = 1;
                                 }
                                 file_put_contents(
-                                    env("EXTENSIONS_PATH") .
+                                    "/liman/extensions/" .
                                         strtolower(extension()->name) .
                                         DIRECTORY_SEPARATOR .
                                         "db.json",
@@ -424,7 +422,7 @@ class SettingsController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -451,7 +449,7 @@ class SettingsController extends Controller
             $extension["version_code"] = 1;
         }
         file_put_contents(
-            env("EXTENSIONS_PATH") .
+            "/liman/extensions/" .
                 strtolower(extension()->name) .
                 DIRECTORY_SEPARATOR .
                 "db.json",
@@ -470,7 +468,7 @@ class SettingsController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -505,7 +503,7 @@ class SettingsController extends Controller
             $extension["version_code"] = 1;
         }
         file_put_contents(
-            env("EXTENSIONS_PATH") .
+            "/liman/extensions/" .
                 strtolower(extension()->name) .
                 DIRECTORY_SEPARATOR .
                 "db.json",
@@ -524,7 +522,7 @@ class SettingsController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                env("EXTENSIONS_PATH") .
+                "/liman/extensions/" .
                     strtolower(extension()->name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
@@ -555,7 +553,7 @@ class SettingsController extends Controller
             $extension["version_code"] = 1;
         }
         file_put_contents(
-            env("EXTENSIONS_PATH") .
+            "/liman/extensions/" .
                 strtolower(extension()->name) .
                 DIRECTORY_SEPARATOR .
                 "db.json",

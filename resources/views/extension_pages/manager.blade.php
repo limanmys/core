@@ -26,7 +26,7 @@
                 "target_id" => "extensionUpload",
                 "text" => "Yükle"
             ])
-            @if(env("EXTENSION_DEVELOPER_MODE"))
+            @if(config('liman.extension_developer_mode') == true)
                 @include('modal-button',[
                     "class" => "btn-secondary",
                     "target_id" => "extensionExport",
@@ -63,7 +63,7 @@
                         "icon" => " context-menu-icon-delete"
                     ]
                 ],
-                "onclick" => env("EXTENSION_DEVELOPER_MODE") ? "details" : ""
+                "onclick" => config('liman.extension_developer_mode') ? "details" : ""
             ])
         </div>
     </div>
@@ -90,7 +90,7 @@
         ],
         "submit_text" => "Yükle"
     ])
-    @if(env("EXTENSION_DEVELOPER_MODE"))
+    @if(config('liman.extension_developer_mode') == true)
         @php
             $input_extensions = [];
             foreach(extensions() as $extension){
@@ -142,7 +142,7 @@
    ])
 
 <script>
-    $('input[name=ext_count]').val('{{env('NAV_EXTENSION_HIDE_COUNT', 10)}}');
+    $('input[name=ext_count]').val('{{intval(config('liman.nav_extension_hide_count'))}}');
     function downloadFile(form){
         window.location.assign('/indir/eklenti/' + form.getElementsByTagName('select')[0].value);
         setTimeout(function(){
@@ -200,7 +200,7 @@
         return false;
     }
 
-    @if(env("EXTENSION_DEVELOPER_MODE"))
+    @if(config('liman.extension_developer_mode') == true)
         function details(element){
             let extension_id = element.querySelector('#extension_id').innerHTML;
             window.location.href = "/eklentiler/" + extension_id

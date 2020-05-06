@@ -39,7 +39,7 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
-        if (env("EXTENSION_DEVELOPER_MODE")) {
+        if (config('liman.extension_developer_mode') == true) {
             $this->mapExtensionDeveloperRoutes();
         }
     }
