@@ -9,8 +9,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: package/liman/server
+
+      - name: Checking code format
         run: 
           sudo apt install npm -y
+          cd package/liman/server/
           npm install
           npm run check
 
