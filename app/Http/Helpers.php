@@ -57,6 +57,16 @@ if (!function_exists('registerModuleRoutes')) {
     }
 }
 
+if (!function_exists('registerModuleListeners')) {
+    function registerModuleListeners()
+    {
+        $files = searchModuleFiles('listeners.php');
+        foreach ($files as $file) {
+            require_once $file . "/listeners.php";
+        }
+    }
+}
+
 if (!function_exists('searchModuleFiles')) {
     function searchModuleFiles($type)
     {
@@ -104,8 +114,11 @@ if (!function_exists('settingsModuleButtons')) {
         foreach (searchModuleFiles('settings.blade.php') as $file) {
             $foo = substr($file, 15);
             $name = substr($foo, 0, strpos($foo, "/"));
-            $str .= "<li class=\"nav-item\">
-               <a id\"" . $name . "tab\" class=\"nav-link\" data-toggle=\"tab\" href=\"#$name\">$name</a>
+            $str .=
+                "<li class=\"nav-item\">
+               <a id\"" .
+                $name .
+                "tab\" class=\"nav-link\" data-toggle=\"tab\" href=\"#$name\">$name</a>
             </li>";
         }
         return $str;
@@ -140,8 +153,11 @@ if (!function_exists('serverModuleButtons')) {
         foreach (searchModuleFiles('server.blade.php') as $file) {
             $foo = substr($file, 15);
             $name = substr($foo, 0, strpos($foo, "/"));
-            $str .= "<li class=\"nav-item\">
-               <a id=\"" . $name . "tab\"class=\"nav-link\" data-toggle=\"tab\" href=\"#$name\">$name</a>
+            $str .=
+                "<li class=\"nav-item\">
+               <a id=\"" .
+                $name .
+                "tab\"class=\"nav-link\" data-toggle=\"tab\" href=\"#$name\">$name</a>
             </li>";
         }
         return $str;
