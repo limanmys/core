@@ -102,6 +102,9 @@ Artisan::command('module:add {module_name}', function ($module_name) {
         return $this->error("Modul klasoru bulunamadi!");
     }
 
+    if(Module::where(["name" => $module_name])->exists()){
+        return $this->error("Boyle bir modul zaten var!");
+    }
     $module = Module::create(["name" => $module_name, "enabled" => true]);
     
     $notification = new AdminNotification([
