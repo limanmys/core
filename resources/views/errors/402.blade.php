@@ -10,7 +10,7 @@
     
                 <p>
                     {{ $exception->getMessage() }}
-                    <a class="btn btn-primary mt-2" href="{{ URL::previous() }}">Geri Dön</a>
+                    <a class="btn btn-primary mt-2" href="{{ URL::previous() }}">{{_("Geri Dön")}}</a>
                 </p>
             </div>
         </div>
