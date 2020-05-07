@@ -2,10 +2,7 @@
 
 use App\User;
 use App\Module;
-use App\ModuleHook;
 use App\AdminNotification;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 
 Artisan::command('administrator', function () {
@@ -103,7 +100,7 @@ Artisan::command('module:add {module_name}', function ($module_name) {
     }
 
     $module = Module::create(["name" => $module_name, "enabled" => true]);
-    
+
     $notification = new AdminNotification([
         "title" => "Yeni Modül Eklendi",
         "type" => "new_module",
@@ -111,9 +108,7 @@ Artisan::command('module:add {module_name}', function ($module_name) {
         "level" => 3,
     ]);
     $notification->save();
-    $this->info(
-        "Modul basariyla yuklendi."
-    );
+    $this->info("Modul basariyla yuklendi.");
 })->describe("New module add");
 
 Artisan::command('module:remove {module_name}', function ($module_name) {
