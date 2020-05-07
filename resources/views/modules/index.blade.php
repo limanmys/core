@@ -21,7 +21,7 @@
                 "display" => [
                     "name" , "enabled_text", "hook_count", "id:module_id", "enabled:enabled"
                 ],
-                "menu" => [
+                /*"menu" => [
                     "Verileri Düzenle" => [
                         "target" => "getModuleSettings",
                         "icon" => " context-menu-icon-edit"
@@ -30,7 +30,7 @@
                         "target" => "details",
                         "icon" => "fas fa-user-secret"
                     ]
-                ]
+                ]*/
             ])
         </div>
     </div>
