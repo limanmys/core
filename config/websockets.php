@@ -24,7 +24,7 @@ return [
         [
             'id' => 'liman',
             'name' => env('APP_NAME'),
-            'key' => 'liman',
+            'key' => 'liman-key',
             'secret' => env('APP_KEY'),
             'path' => env('PUSHER_APP_PATH'),
             'capacity' => null,

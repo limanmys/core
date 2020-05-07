@@ -282,7 +282,7 @@
     "Bir sunucu silindi.": "Bir sunucu silindi.",
     ":server (:ip) isimli sunucu silindi.": ":server (:ip) isimli sunucu silindi.",
     "Server Adı Güncellemesi": "Server Adı Güncellemesi",
-    ":old isimli sunucu adı :new olarak değiştirildi.": ":old isimli sunucu adı :new olarak değiştirildi.",
+    ":old isimli sunucunun adı :new olarak değiştirildi.": ":old isimli sunucunun adı :new olarak değiştirildi.",
     "Paket Güncelleme: :package_name": "Paket Güncelleme: :package_name",
     ":package_name paketi için güncelleme isteği gönderildi.": ":package_name paketi için güncelleme isteği gönderildi.",
     ":package_name paketi başarıyla kuruldu.": ":package_name paketi başarıyla kuruldu.",

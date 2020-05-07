@@ -154,7 +154,7 @@ class OneController extends Controller
             Notification::new(
                 __("Server Adı Güncellemesi"),
                 "notify",
-                __(":old isimli sunucu adı :new olarak değiştirildi.", [
+                __(":old isimli sunucunun adı :new olarak değiştirildi.", [
                     "old" => server()->name,
                     "new" => request('name'),
                 ])
