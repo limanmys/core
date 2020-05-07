@@ -48,7 +48,7 @@ jobs:
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt install recode -y 1>/dev/null 2>/dev/null
           MESSAGE=`git --git-dir=package/liman/server/.git log -1 --pretty=%B | recode ascii..html`
-          VERSION=`cat /liman/server/storage/VERSION`
+          VERSION=`cat package/liman/server/storage/VERSION`
           DATE=$(date)
           composer clearcache
           composer install --no-dev -d package/liman/server
