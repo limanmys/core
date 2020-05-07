@@ -1,4 +1,4 @@
-@if(env('LIMAN_RESTRICTED') == true && !user()->isAdmin())
+@if(config('liman.liman_restricted') == true && !user()->isAdmin())
     @include('extension_pages.setup_restricted');
     @php(die())
 @endif

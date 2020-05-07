@@ -4,7 +4,7 @@
           <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" href="#" onclick="request('{{route('set_collapse')}}',new FormData(),null)"><i class="fas fa-bars"></i></a>
           </li>
-          @if(env('LIMAN_RESTRICTED') == true && !user()->isAdmin())
+          @if(config('liman.liman_restricted') == true && !user()->isAdmin())
           <li class="nav-item d-none d-sm-inline-block">
             <a href="/" class="nav-link">{{__("Ana Sayfa")}}</a>
           </li>

@@ -25,19 +25,19 @@ class RestrictedMode
             "password_change",
             "password_change_save",
         ];
-        if (env('LIMAN_RESTRICTED') == true && user() && !user()->isAdmin()) {
+        if (config('liman.liman_restricted') == true && user() && !user()->isAdmin()) {
             $request->request->add([
-                'server_id' => env("LIMAN_RESTRICTED_SERVER"),
-                'extension_id' => env("LIMAN_RESTRICTED_EXTENSION"),
-                "server" => \App\Server::find(env("LIMAN_RESTRICTED_SERVER")),
+                'server_id' => config('liman.liman_restricted_server'),
+                'extension_id' => config('liman.liman_restricted_extension'),
+                "server" => \App\Server::find(config('liman.liman_restricted_server')),
                 "extension" => \App\Extension::find(
-                    env("LIMAN_RESTRICTED_EXTENSION")
+                    config('liman.liman_restricted_extension')
                 ),
             ]);
             if (!in_array(\Request::route()->getName(), $safeRoutes)) {
                 return redirect()->route("extension_server", [
-                    "extension_id" => env("LIMAN_RESTRICTED_EXTENSION"),
-                    "server_id" => env("LIMAN_RESTRICTED_SERVER"),
+                    "extension_id" => config('liman.liman_restricted_extension'),
+                    "server_id" => config('liman.liman_restricted_server'),
                     "city" => server()->city,
                 ]);
             }

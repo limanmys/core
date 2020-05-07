@@ -227,6 +227,13 @@ class OneController extends Controller
                 $similar[$item["variable"]] = base64_decode($stringToDecode);
             }
         }
+        
+        if(config('liman.liman_restricted') == true && !user()->isAdmin()){
+            return response()->view('extension_pages.setup_restricted', [
+                'extension' => $extension,
+                'similar' => $similar,
+            ]);
+        }
 
         return response()->view('extension_pages.setup', [
             'extension' => $extension,
@@ -256,7 +263,7 @@ class OneController extends Controller
                     cleanDash(extension()->id) .
                     ";
                 rm " .
-                    env('KEYS_PATH') .
+                    '/liman/keys/' .
                     DIRECTORY_SEPARATOR .
                     extension()->id .
                     ";

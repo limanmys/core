@@ -205,7 +205,7 @@ class MainController extends Controller
         }
 
         $extension_folder = "/liman/extensions/" . strtolower($json["name"]);
-        $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $new->id;
+        $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $new->id;
         file_put_contents($passPath, Str::random(32));
 
         shell_exec(
@@ -321,7 +321,7 @@ class MainController extends Controller
             shell_exec('sudo useradd -r -s /bin/sh ' . cleanDash($ext->id));
         }
 
-        $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $ext->id;
+        $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $ext->id;
         file_put_contents($passPath, Str::random(32));
         shell_exec(
             "

@@ -167,7 +167,7 @@ class SSHConnector implements Connector
             )->first()->token;
             $res = $client->request(
                 'POST',
-                env("LIMAN_CONNECTOR_SERVER") . '/' . $url,
+                'http://127.0.0.1:5000/' . $url,
                 ["form_params" => $params]
             );
         } catch (BadResponseException $e) {
@@ -203,7 +203,7 @@ class SSHConnector implements Connector
         try {
             $res = $client->request(
                 'POST',
-                env('LIMAN_CONNECTOR_SERVER') . '/new',
+                'http://127.0.0.1:5000/new',
                 [
                     'form_params' => [
                         "username" => $username,

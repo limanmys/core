@@ -18,6 +18,6 @@
     <h1>{{__("Bakım Zamanı")}}</h1>
     <div>
         <p>{{__("Liman Merkezi Yönetim Sistemi şu an bakımda. Lütfen daha sonra tekrar deneyin.")}}</p>
-        <p>&mdash; {{env("BRAND_NAME")}}</p>
+        <p>&mdash; {{config('liman.brand')}}</p>
     </div>
 </article>

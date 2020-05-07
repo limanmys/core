@@ -30,11 +30,11 @@ return [
     'connections' => [
         'pusher' => [
             'driver' => 'pusher',
-            'key' => env('PUSHER_APP_KEY'),
+            'key' => 'liman-key',
             'secret' => env('APP_KEY'),
-            'app_id' => env('PUSHER_APP_ID'),
+            'app_id' => 'liman',
             'options' => [
-                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'cluster' => 'eu',
                 'encrypted' => true,
                 'host' => '127.0.0.1',
                 'port' => 6001,

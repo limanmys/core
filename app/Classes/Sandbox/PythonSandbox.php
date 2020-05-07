@@ -130,14 +130,7 @@ class PythonSandbox implements Sandbox
             $isAjax,
         ];
 
-        //        $encrypted = openssl_encrypt(
-        //            Str::random() . base64_encode(json_encode($array)),
-        //            'aes-256-cfb8',
-        //            shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
-        //            0,
-        //            Str::random()
-        //        );
-        $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
+        $keyPath = '/liman/keys' . DIRECTORY_SEPARATOR . extension()->id;
         $combinerFile =
             "/liman/extensions/" .
             strtolower(extension()->name) .

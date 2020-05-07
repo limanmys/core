@@ -144,7 +144,7 @@ class PHPSandbox implements Sandbox
             'aes-256-cfb8',
             shell_exec(
                 'cat ' .
-                    env('KEYS_PATH') .
+                    '/liman/keys' .
                     DIRECTORY_SEPARATOR .
                     extension()->id
             ),
@@ -152,7 +152,7 @@ class PHPSandbox implements Sandbox
             Str::random()
         );
 
-        $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
+        $keyPath = '/liman/keys' . DIRECTORY_SEPARATOR . extension()->id;
 
         return "sudo runuser " .
             cleanDash(extension()->id) .

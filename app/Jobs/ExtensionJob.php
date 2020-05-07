@@ -218,12 +218,12 @@ class ExtensionJob implements ShouldQueue
             Str::random() . base64_encode(json_encode($array)),
             'aes-256-cfb8',
             shell_exec(
-                'cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . $extension_id
+                'cat ' . '/liman/keys' . DIRECTORY_SEPARATOR . $extension_id
             ),
             0,
             Str::random()
         );
-        $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $extension_id;
+        $keyPath = '/liman/keys' . DIRECTORY_SEPARATOR . $extension_id;
 
         $command =
             "sudo runuser " .

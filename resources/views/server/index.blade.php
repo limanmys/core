@@ -55,7 +55,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span></button>
                 </div>
-                <ul class="nav nav-tabs" role="tablist">
+                <ul class="nav nav-tabs" role="tablist" style="padding:20px;">
                     <li class="nav-item">
                         <a class="nav-link active" data-toggle="pill" id="networkTab" href="#network" role="tab" aria-controls="network" aria-selected="true">{{__("Bağlantı Bilgileri")}}</a>
                     </li>

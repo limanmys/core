@@ -56,7 +56,6 @@ jobs:
           sed -i "s/APP_VERSION=Development/APP_VERSION=$GITHUB_RUN_ID/g" package/liman/server/.env
           sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" package/liman/server/.env
           sed -i "s/APP_ENV=local/APP_ENV=production/g" package/liman/server/.env
-          sed -i "s/EXTENSION_DEVELOPER_MODE=true/EXTENSION_DEVELOPER_MODE=false/g" package/liman/server/.env
           mv package/liman/server/build_tools/DEBIAN package/
           rm -rf package/liman/server/build_tools
           cd package

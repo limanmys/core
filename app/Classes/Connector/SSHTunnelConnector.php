@@ -58,7 +58,7 @@ class SSHTunnelConnector
         try {
             $res = $client->request(
                 'POST',
-                env("LIMAN_CONNECTOR_SERVER") . '/' . $url,
+                'http://127.0.0.1:5000/' . $url,
                 ["form_params" => $params]
             );
         } catch (BadResponseException $e) {

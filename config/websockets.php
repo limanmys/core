@@ -22,9 +22,9 @@ return [
      */
     'apps' => [
         [
-            'id' => env('PUSHER_APP_ID'),
+            'id' => 'liman',
             'name' => env('APP_NAME'),
-            'key' => env('PUSHER_APP_KEY'),
+            'key' => 'liman',
             'secret' => env('APP_KEY'),
             'path' => env('PUSHER_APP_PATH'),
             'capacity' => null,
