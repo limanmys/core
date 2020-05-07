@@ -246,9 +246,6 @@ class MainController extends Controller
             "extension_id" => $new->id,
         ]);
 
-        hook('extension_upload_successful', [
-            "extension" => $new,
-        ]);
         return respond("Eklenti Başarıyla yüklendi.", 200);
     }
 
