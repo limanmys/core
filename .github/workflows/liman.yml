@@ -67,7 +67,7 @@ jobs:
           chmod 775 DEBIAN/postinst
 
           echo """Package: Liman
-          Version: $VERSION
+          Version: $VERSION$GITHUB_RUN_ID
           Installed-Size: 29892
           Maintainer: Mert CELEN <mcelen@havelsan.com.tr>
           Section: admin

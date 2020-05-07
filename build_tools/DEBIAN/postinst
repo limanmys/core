@@ -254,9 +254,9 @@ systemctl enable php7.3-fpm
 systemctl restart php7.3-fpm
 
 # Optimize Liman
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+php /liman/server/artisan config:cache
+php /liman/server/artisan route:cache
+php /liman/server/artisan view:cache
 
 # Enable Liman
 php /liman/server/artisan up
