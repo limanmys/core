@@ -48,14 +48,12 @@ jobs:
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt install recode -y 1>/dev/null 2>/dev/null
           MESSAGE=`git --git-dir=package/liman/server/.git log -1 --pretty=%B | recode ascii..html`
+          VERSION=`cat /liman/server/storage/VERSION`
+          DATE=$(date)
           composer clearcache
           composer install --no-dev -d package/liman/server
           git --git-dir=package/liman/server/.git log -30 --pretty=format:"%s%x09%ad" > package/liman/server/storage/changelog
           rm -rf package/liman/server/.git package/liman/sandbox/php/.git package/liman/sandbox/python/.git
-          sed -i "s/APP_VERSION=Development/APP_VERSION=$GITHUB_RUN_ID/g" package/liman/server/.env
-          sed -i "s/APP_VERSION=Development/APP_VERSION=$GITHUB_RUN_ID/g" package/liman/server/.env
-          sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" package/liman/server/.env
-          sed -i "s/APP_ENV=local/APP_ENV=production/g" package/liman/server/.env
           mv package/liman/server/build_tools/DEBIAN package/
           rm -rf package/liman/server/build_tools
           cd package
@@ -69,11 +67,11 @@ jobs:
           chmod 775 DEBIAN/postinst
 
           echo """Package: Liman
-          Version: $GITHUB_RUN_ID
+          Version: $VERSION
           Installed-Size: 29892
           Maintainer: Mert CELEN <mcelen@havelsan.com.tr>
           Section: admin
-          Date : $GITHUB_RUN_ID
+          Date : $DATE
           Architecture: amd64
           Priority: important
           Description: Liman MYS
@@ -81,4 +79,4 @@ jobs:
           """ > DEBIAN/control
           cd ../
           dpkg-deb -Zgzip --build package
-          [ "$GITHUB_REF" == "refs/heads/master" ] && curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-NFLf9tgYahuMsmeT7rwp5wnD&channels=liman-release&filename=liman-$GITHUB_RUN_ID.deb&pretty=1" || echo
+          [ "$GITHUB_REF" == "refs/heads/master" ] && curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-NFLf9tgYahuMsmeT7rwp5wnD&channels=liman-release&filename=liman-$VERSION.deb&pretty=1" || echo

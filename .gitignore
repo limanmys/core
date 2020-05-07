@@ -18,3 +18,5 @@ composer.lock
 /vendor
 vendor/*
 /public/sqlite.php
+.env
+config/liman.php

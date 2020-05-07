@@ -3,6 +3,15 @@
 # Create Required Folders for Liman
 mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions,modules}
 
+# environment creation
+if [ -f "/liman/server/.env" ]; then
+    echo "Upgrading liman."
+else
+    cp /liman/server/.env.example /liman/server/.env
+    php /liman/server/artisan key:generate
+    echo "Installing liman."
+fi
+
 # User Creation
 if getent passwd liman > /dev/null 2>&1; then
     sed -i '/liman/d' /etc/sudoers
@@ -58,18 +67,6 @@ fi
 
 mv /liman/server/nginx.conf /etc/nginx/sites-available/liman.conf
 ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
-
-# Fpm Optimizations
-# if grep --quiet LIMAN_OPTIMIZATIONS /etc/php/7.3/fpm/php-fpm.conf; then
-#     echo "Fpm settings already optimized."; 
-# else
-#     echo """
-#     ;LIMAN_OPTIMIZATIONS
-#     emergency_restart_threshold 10
-#     emergency_restart_interval 1m
-#     process_control_timeout 10s
-#     """ >> /etc/php/7.3/fpm/php-fpm.conf
-# fi
 
 # Nginx Auto Redirection
 if grep --quiet LIMAN_OPTIMIZATIONS /etc/nginx/sites-available/default; then
@@ -255,6 +252,11 @@ systemctl restart nginx
 systemctl enable nginx
 systemctl enable php7.3-fpm
 systemctl restart php7.3-fpm
+
+# Optimize Liman
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
 
 # Enable Liman
 php /liman/server/artisan up

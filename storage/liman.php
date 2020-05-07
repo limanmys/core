@@ -1,6 +1,7 @@
 <?php
 
 return [
+    "version" => "1.0 RC1",
     "server_connection_timeout" => 5000, //ms
     "user_widget_count" => 10,
     "extension_developer_mode" => true,

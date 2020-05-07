@@ -106,7 +106,6 @@
     "Pasif": "Pasif",
     "Aktifleştir": "Aktifleştir",
     "Pasifleştir": "Pasifleştir",
-    "Liman Sürümünüz : \" . env(\"APP_VERSION": "Liman Sürümünüz : \" . env(\"APP_VERSION",
     "Liman Üzerindeki İşlem Loglarını hedef bir log sunucusuna rsyslog servisi ile göndermek için hedef log sunucusunun adresi ve portunu yazınız.": "Liman Üzerindeki İşlem Loglarını hedef bir log sunucusuna rsyslog servisi ile göndermek için hedef log sunucusunun adresi ve portunu yazınız.",
     "Log Gönderme Aralığı (Dakika)": "Log Gönderme Aralığı (Dakika)",
     "Ayarları Kaydet": "Ayarları Kaydet",

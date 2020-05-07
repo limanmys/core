@@ -148,6 +148,16 @@ if (!function_exists('serverModuleButtons')) {
     }
 }
 
+if (!function_exists('getVersion')) {
+    /**
+     * @return mixed
+     */
+    function getVersion()
+    {
+        return file_get_contents(storage_path('VERSION'));
+    }
+}
+
 if (!function_exists('notifications')) {
     /**
      * @return mixed

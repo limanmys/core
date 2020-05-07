@@ -106,7 +106,7 @@ class UserController extends Controller
         ]);
 
         // Respond
-        return respond(route('settings'), 300);
+        return respond("Kullanıcı Başarıyla Silindi!",200);
     }
 
     public function passwordReset()

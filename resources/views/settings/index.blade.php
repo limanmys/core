@@ -140,7 +140,7 @@
                     @if($updateOutput)
                         <pre>{{$updateOutput}}</pre>
                     @else
-                        <pre>{{__("Liman Sürümünüz : " . env("APP_VERSION") . " güncel.")}}</pre>
+                        <pre>{{__("Liman Sürümünüz : " . getVersion() . " güncel.")}}</pre>
                     @endif
                 </div>
 

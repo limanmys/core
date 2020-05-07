@@ -1,5 +1,5 @@
 <!doctype html>
-<title>{{__("Sunucu Bakımda")}}</title>
+<title>{{__("Bakım")}}</title>
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
 <style>
   html, body { padding: 0; margin: 0; width: 100%; height: 100%; }
@@ -18,6 +18,6 @@
     <h1>{{__("Bakım Zamanı")}}</h1>
     <div>
         <p>{{__("Liman Merkezi Yönetim Sistemi şu an bakımda. Lütfen daha sonra tekrar deneyin.")}}</p>
-        <p>&mdash; {{config('liman.brand')}}</p>
+        <p>{{config('liman.brand')}}</p>
     </div>
 </article>
