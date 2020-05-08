@@ -294,8 +294,9 @@ class OneController extends Controller
                 "free -t | awk 'NR == 2 {printf($3/$2*100)}'",
                 false
             );
-            $cpu = server()->run("vmstat 1 1|tail -1|awk '{print $15}'", false);
-            $cpu = 100 - intval(substr($cpu, 0, -1));
+            $cpu = server()->run("cat <(grep 'cpu ' /proc/stat) <(sleep 1 && grep 'cpu ' /proc/stat) | awk -v RS=\"\" '{print ($13-$2+$15-$4)*100/($13-$2+$15-$4+$16-$5)}'",false);
+            // $cpu = server()->run("vmstat 1 1|tail -1|awk '{print $15}'", false);
+            // $cpu = 100 - intval($cpu);
         } elseif (server()->type == "windows_powershell") {
             $cpu = substr(
                 server()->run(
