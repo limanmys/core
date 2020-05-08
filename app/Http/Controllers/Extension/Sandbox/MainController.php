@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\UserSettings;
 use App\Permission;
 use App\Server;
+use App\ServerLog;
 use App\Classes\Sandbox\PHPSandbox;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -49,6 +50,8 @@ class MainController extends Controller
         $page = request('target_function')
             ? request('target_function')
             : 'index';
+
+        ServerLog::new(extension()->name, $page);
 
         list($output, $timestamp) = $this->executeSandbox($page);
 

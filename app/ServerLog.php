@@ -47,6 +47,7 @@ class ServerLog extends Model
                 continue;
             }
             $log->username = $user->name;
+            $log->output = substr($log->output,0,100);
         }
         return $logs;
     }

@@ -642,8 +642,8 @@ class OneController extends Controller
     {
         return view('l.table', [
             "value" => ServerLog::retrieve(true),
-            "title" => ["Başlık", "Açıklama", "Kullanıcı"],
-            "display" => ["command", "output", "username"],
+            "title" => ["Başlık", "Açıklama", "Kullanıcı","İşlem Tarihi"],
+            "display" => ["command", "output", "username","created_at"],
         ]);
     }
 
