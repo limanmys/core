@@ -111,11 +111,28 @@ class MainController extends Controller
                 $display = ["id:id", "name"];
                 break;
             case "liman":
+                $data = [
+                    [
+                        "id" => "view_logs",
+                        "name" => "Sunucu Günlük Kayıtlarını Görüntüleme"
+                    ],
+                    [
+                        "id" => "add_server",
+                        "name" => "Sunucu Ekleme"
+                    ],
+                    [
+                        "id" => "server_services",
+                        "name" => "Sunucu Servislerini Görüntüleme"
+                    ]
+                ];
+                $title = ["*hidden*", "İsim"];
+                $display = ["id:id", "name"];
+                break;
             default:
                 abort(504, "Tip Bulunamadı");
         }
         return view('l.table', [
-            "value" => $data,
+            "value" => (object)$data,
             "title" => $title,
             "display" => $display,
         ]);
@@ -137,14 +154,25 @@ class MainController extends Controller
     public function removeFromList()
     {
         $arr = [];
-        foreach (json_decode(request('ids'), true) as $id) {
-            Permission::revoke(request('user_id'), request('type'), "id", $id);
+        $flag = false;
+        $ids = json_decode(request('ids'), true);
+
+        if($ids == []){
+            return respond("Lütfen bir seçim yapın",201);
+        }
+
+        foreach ($ids as $id) {
+            $flag = Permission::revoke(request('user_id'), request('type'), "id", $id);
         }
         array_push($arr, $id);
         $arr["type"] = request('type');
         $arr["target_user_id"] = request('user_id');
         system_log(7, "PERMISSION_REVOKE", $arr);
-        return respond(__("Başarılı"), 200);
+        if($flag){
+            return respond(__("Başarılı"), 200);
+        }else{
+            return respond(__("Yetki(ler) silinemedi"), 201);
+        }
     }
 
     public function getExtensionFunctions()

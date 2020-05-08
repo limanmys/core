@@ -27,6 +27,9 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#function" role="tab">{{__("Fonksiyon Yetkileri")}}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#liman" role="tab">{{__("Liman Yetkileri")}}</a>
+                </li>
             </ul>
         </div>
         <div class="card-body">
@@ -132,7 +135,7 @@
                     <button onclick="removePermission('liman')" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "liman_table",
-                        "value" => $user->permissions->where('type','liman'),
+                        "value" => getLimanPermissions($user->id),
                         "title" => [
                             "Adı" , "*hidden*"
                         ],
@@ -188,6 +191,12 @@
             "id" => "extension_modal",
             "title" => "Eklenti Listesi",
             "submit_text" => "Seçili Eklentilere Yetki Ver",
+            "onsubmit" => "addData"
+        ])
+    @include('modal',[
+            "id" => "liman_modal",
+            "title" => "Özellik Listesi",
+            "submit_text" => "Seçili Özelliklere Yetki Ver",
             "onsubmit" => "addData"
         ])
 
@@ -304,6 +313,7 @@
         }
         
         function getList(type) {
+            showSwal("Okunuyor...",'info');
             let form = new FormData();
             form.append('type', type);
             form.append('user_id','{{$user->id}}');

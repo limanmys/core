@@ -12,9 +12,10 @@
             <h3 class="card-title">{{__("Sunucular")}}</h3>
         </div>
         <div class="card-body">
-            @can('create','\App\Server')
+            @if(\App\Permission::can(user()->id,'liman','id','add_server'))
                 <button href="#tab_1" type="button" class="btn btn-success" data-toggle="modal" data-target="#add_server">{{__("Sunucu Ekle")}}</button><br><br>
-            @endcan
+            @endif
+            
             @include('errors')
             <?php
                 use Illuminate\Support\Facades\DB;

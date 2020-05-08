@@ -81,9 +81,11 @@
                             <a class="nav-link @if(!$firstRendered) active @endif" data-toggle="pill" href="#extensionsTab" role="tab">{{__("Eklentiler")}}</a>
                         </li>
                         @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="pill" onclick="getServices()" href="#servicesTab" role="tab">{{__("Servisler")}}</a>
-                            </li>
+                            @if(\App\Permission::can(user()->id,'liman','id','server_services'))
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" onclick="getServices()" href="#servicesTab" role="tab">{{__("Servisler")}}</a>
+                                </li>
+                            @endif
                             @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
                                 <li class="nav-item">
                                     <a class="nav-link" data-toggle="pill" onclick="getPackages()" href="#packagesTab" role="tab">{{__("Paketler")}}</a>
@@ -110,9 +112,11 @@
                                 </li>
                             @endif
                         @endif
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="pill" href="#logsTab" onclick="getLogs()" role="tab">{{__("Günlük Kayıtları")}}</a>
-                        </li>
+                        @if(\App\Permission::can(user()->id,'liman','id','view_logs'))
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="pill" href="#logsTab" onclick="getLogs()" role="tab">{{__("Günlük Kayıtları")}}</a>
+                            </li>
+                        @endif
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="pill" href="#settingsTab" role="tab">{{__("Sunucu Ayarları")}}</a>
                         </li>

@@ -23,7 +23,9 @@ class AddController extends Controller
 
     public function main()
     {
-        $this->authorize('create', '\App\Server');
+        if(!Permission::can(user()->id,'liman','id','add_server')){
+            return respond("Bu işlemi yapmak için yetkiniz yok!",201);
+        }
 
         hook('server_add_attempt', [
             "request" => request()->all(),

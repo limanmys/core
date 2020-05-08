@@ -9,6 +9,7 @@ use App\Extension;
 use App\Http\Controllers\Controller;
 use App\Notification;
 use App\ServerLog;
+use App\Permission;
 use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Cookie\CookieJar;
@@ -571,6 +572,9 @@ class OneController extends Controller
 
     public function serviceList()
     {
+        if(!Permission::can(user()->id,'liman','id','server_services')){
+            return respond("Bu işlemi yapmak için yetkiniz yok!",201);
+        }
         $services = [];
         if (
             server()->type == "linux_ssh" ||
@@ -640,6 +644,9 @@ class OneController extends Controller
 
     public function getLogs()
     {
+        if(!Permission::can(user()->id,'liman','id','view_logs')){
+            return respond("Sunucu Günlük Kayıtlarını görüntülemek için yetkiniz yok",201);
+        }
         return view('l.table', [
             "value" => ServerLog::retrieve(true),
             "title" => ["Başlık", "Açıklama", "Kullanıcı","İşlem Tarihi"],

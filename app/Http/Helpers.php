@@ -86,6 +86,31 @@ if (!function_exists('searchModuleFiles')) {
     }
 }
 
+if (!function_exists('getLimanPermissions')) {
+    /**
+     * @return mixed
+     */
+    function getLimanPermissions($user_id)
+    {
+        $map = [
+            "view_logs" => "Sunucu Günlük Kayıtlarını Görüntüleme",
+            "add_server" => "Sunucu Ekleme",
+            "server_services" => "Sunucu Servislerini Görüntüleme",
+        ];
+        $permissions = Permission::where([
+            "morph_id" => $user_id ? $user_id : user()->id,
+            "type" => "liman",
+            "key" => "id",
+        ])->get();
+        $permissions = $permissions->map(function ($permission) use(&$map) {
+            $permission->name = __($map[$permission->value]);
+            $permission->id = $permission->value;
+            return $permission;
+        });
+        return $permissions;
+    }
+}
+
 if (!function_exists('settingsModuleViews')) {
     /**
      * @return mixed
