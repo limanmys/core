@@ -59,6 +59,13 @@ Route::post(
     ->name('delete_server_group')
     ->middleware('admin');
 
+Route::post(
+    '/ayar/kisitliMod',
+    'Settings\MainController@restrictedMode'
+)
+    ->name('restricted_mode_update')
+    ->middleware('admin');
+
 Route::view('/ayar/sunucu', 'settings.server')
     ->middleware('admin')
     ->name('settings_server');

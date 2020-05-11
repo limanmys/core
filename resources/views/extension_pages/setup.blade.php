@@ -1,8 +1,3 @@
-@if(config('liman.liman_restricted') == true && !user()->isAdmin())
-    @include('extension_pages.setup_restricted');
-    @php(die())
-@endif
-
 @extends('layouts.app')
 
 @section('content')

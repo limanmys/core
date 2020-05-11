@@ -90,7 +90,7 @@
         ],
         "submit_text" => "Yükle"
     ])
-    @if(env("EXTENSION_DEVELOPER_MODE"))
+    @if(config('liman.extension_developer_mode') == true)
         <?php
             $input_extensions = [];
             foreach(extensions() as $extension){
@@ -190,14 +190,6 @@
                 }
             });
         }
-    }
-    
-    function downloadDebFile(form){
-        window.location.assign('/indir/eklenti_deb/' + form.getElementsByTagName('select')[0].value);
-        setTimeout(function(){
-            Swal.close();
-        }, 1000);
-        return false;
     }
 
     @if(config('liman.extension_developer_mode') == true)

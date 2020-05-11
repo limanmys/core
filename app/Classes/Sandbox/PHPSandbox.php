@@ -154,9 +154,12 @@ class PHPSandbox implements Sandbox
 
         $keyPath = '/liman/keys' . DIRECTORY_SEPARATOR . extension()->id;
 
+        $soPath = "/liman/extensions/" . strtolower(extension()->name) . "/liman.so";
+
+        $extra = is_file($soPath) ? "-dextension=$soPath ": "";
         return "sudo runuser " .
             cleanDash(extension()->id) .
-            " -c 'timeout 30 /usr/bin/php -d display_errors=on $combinerFile $keyPath $encrypted'";
+            " -c 'timeout 30 /usr/bin/php $extra-d display_errors=on $combinerFile $keyPath $encrypted'";
     }
 
     public function getInitialFiles()

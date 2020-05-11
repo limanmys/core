@@ -94,7 +94,7 @@ class MainController extends Controller
             }
 
             if (
-                config('liman.liman_restricted') == true &&
+                env('LIMAN_RESTRICTED') == true &&
                 !user()->isAdmin()
             ) {
                 return view('extension_pages.server_restricted', [

@@ -161,6 +161,23 @@ class RoleController extends Controller
                 $display = ["id:id", "name"];
                 break;
             case "liman":
+                $data = [
+                    [
+                        "id" => "view_logs",
+                        "name" => "Sunucu Günlük Kayıtlarını Görüntüleme"
+                    ],
+                    [
+                        "id" => "add_server",
+                        "name" => "Sunucu Ekleme"
+                    ],
+                    [
+                        "id" => "server_services",
+                        "name" => "Sunucu Servislerini Görüntüleme"
+                    ]
+                ];
+                $title = ["*hidden*", "İsim"];
+                $display = ["id:id", "name"];
+                break;
             default:
                 abort(504, "Tip Bulunamadı");
         }

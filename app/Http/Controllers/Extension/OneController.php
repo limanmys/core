@@ -228,7 +228,7 @@ class OneController extends Controller
             }
         }
         
-        if(config('liman.liman_restricted') == true && !user()->isAdmin()){
+        if(env('LIMAN_RESTRICTED') == true && !user()->isAdmin()){
             return response()->view('extension_pages.setup_restricted', [
                 'extension' => $extension,
                 'similar' => $similar,

@@ -22,7 +22,7 @@ class PermissionManager
             auth()
                 ->user()
                 ->isAdmin() ||
-            config('liman.liman_restricted') == true
+            env('LIMAN_RESTRICTED') == true
         ) {
             $this->initializeObjects();
             return $next($request);
