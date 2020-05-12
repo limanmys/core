@@ -223,15 +223,6 @@ systemctl daemon-reload
 systemctl enable liman-socket
 systemctl restart liman-socket
 
-# Copy Decoder
-cp /liman/server/storage/decoder.so /usr/lib/php/20180731/liman-decoder.so
-chmod 644 /usr/lib/php/20180731/liman-decoder.so
-
-# Copy libphpcpp
-cp /liman/server/storage/libphpcpp.so.2.2.0 /usr/lib/libphpcpp.so.2.2.0
-ln -f -s /usr/lib/libphpcpp.so.2.2.0 /usr/lib/libphpcpp.so.2.2
-chmod 644 /usr/lib/libphpcpp.so.2.2.0
-
 # Prepare Folders for vnc
 rm -rf /liman/keys/vnc
 mkdir /liman/keys/vnc
@@ -239,13 +230,6 @@ chmod 700 /liman/keys/vnc
 touch /liman/keys/vnc/config
 chown liman:liman /liman/keys/vnc /liman/keys/vnc/config
 chmod 700 /liman/keys/vnc/config
-
-# Modify ini file to use decoder.
-if grep --quiet liman-decoder.so /etc/php/7.3/cli/php.ini; then
-    echo "Decoder already enabled"; 
-else
-    echo "extension=liman-decoder.so" >> /etc/php/7.3/cli/php.ini
-fi
 
 # Restart and enable services.
 systemctl restart nginx
