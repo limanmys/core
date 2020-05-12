@@ -229,13 +229,13 @@ class MainController extends Controller
         foreach ($serverObjects as $server) {
             $cleanExtensions[$server->id . ":" . $server->name] = $server
                 ->extensions()
-                ->pluck('name', 'id')
+                ->pluck('display_name', 'id')
                 ->toArray();
         }
         if (empty($cleanExtensions)) {
             $cleanExtensions[server()->id . ":" . server()->name] = server()
                 ->extensions()
-                ->pluck('name', 'id')
+                ->pluck('display_name', 'id')
                 ->toArray();
         }
 
