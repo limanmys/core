@@ -5,7 +5,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
             <li class="breadcrumb-item"><a href="{{route('extensions_settings')}}">{{__("Eklenti Yönetimi")}}</a></li>
-            <li class="breadcrumb-item"><a href="{{route('extension_one',["extension_id" => extension()->_id])}}">{{ extension()->name }}</a></li>
+            <li class="breadcrumb-item"><a href="{{route('extension_one',["extension_id" => extension()->_id])}}">{{ extension()->display_name }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ request('page_name') }}</li>
         </ol>
     </nav>

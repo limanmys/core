@@ -100,7 +100,7 @@ class MainController extends Controller
                         ->toArray()
                 )->get();
                 $title = ["*hidden*", "İsim"];
-                $display = ["id:id", "name"];
+                $display = ["id:id", "display_name"];
                 break;
             case "role":
                 $data = Role::whereNotIn(

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Extension extends Model
 {
@@ -80,5 +81,10 @@ class Extension extends Model
         ) {
             $builder->orderBy('order');
         });
+    }
+
+    public function getDisplayNameAttribute($value)
+    {
+        return Str::title(str_replace("-"," ",$this->name));
     }
 }

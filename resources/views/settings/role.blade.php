@@ -125,7 +125,7 @@
                 <select id="extensionId" class="form-control" onchange="getFunctionList()">
                     <option selected disabled>{{__("...")}}</option>
                     @foreach(extensions() as $extension)
-                        <option value="{{$extension->id}}">{{$extension->name}}</option>
+                        <option value="{{$extension->id}}">{{$extension->display_name}}</option>
                     @endforeach
                 </select><br>
                 <div class="functionsTable"></div>

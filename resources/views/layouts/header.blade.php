@@ -38,7 +38,7 @@
                         <li class="nav-item">
                             <a href="/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
                                 <i class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-'.$extension->icon}}"></i>
-                                <p>{{__($extension->name)}}</p>
+                                <p>{{__($extension->display_name)}}</p>
                             </a>
                         </li>
                         @endforeach
@@ -56,8 +56,14 @@
                 @foreach(extensions() as $extension)
                     <li class="nav-item ext_nav" @if($loop->iteration > intval(config('liman.nav_extension_hide_count')))style="display:none;"@endif>
                         <a href="/l/{{$extension->id}}" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
-                            <i class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-'.$extension->icon}}"></i>
-                            <p>{{__($extension->name)}}</p>
+                        @if(empty($extension->icon))
+                            <i class="nav-icon fab fa-etsy"></i>
+                        @elseif(substr($extension->icon,0,2) == 'fa')  
+                            <i class="nav-icon {{$extension->icon}}"></i>
+                        @else
+                            <i class="nav-icon fab {{'fas fa-'.$extension->icon}}"></i>
+                        @endif
+                            <p>{{__($extension->display_name)}}</p>
                         </a>
                     </li>
                 @endforeach

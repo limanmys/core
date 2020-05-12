@@ -94,7 +94,7 @@
         <?php
             $input_extensions = [];
             foreach(extensions() as $extension){
-                $input_extensions[$extension->name] = $extension->id;
+                $input_extensions[$extension->display_name] = $extension->id;
             }
         ?>
 

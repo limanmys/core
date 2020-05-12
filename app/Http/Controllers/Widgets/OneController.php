@@ -102,7 +102,7 @@ class OneController extends Controller
     {
         $extensions = [];
         foreach (server()->extensions() as $extension) {
-            $extensions[$extension->id] = $extension->name;
+            $extensions[$extension->id] = $extension->display_name;
         }
         return $extensions;
     }

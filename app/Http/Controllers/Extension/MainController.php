@@ -254,7 +254,7 @@ class MainController extends Controller
         $name = trim(request('name'));
         $folder = "/liman/extensions/" . strtolower($name);
 
-        preg_match('/[A-Za-z]+/', request("name"), $output);
+        preg_match('/[A-Za-z-]+/', request("name"), $output);
         if (empty($output) || $output[0] != $name) {
             return respond(
                 "Eklenti isminde yalnızca harflere izin verilmektedir.",

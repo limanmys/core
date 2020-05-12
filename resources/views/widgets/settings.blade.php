@@ -19,7 +19,7 @@
         foreach ($widgets as $widget) {
             $extension = \App\Extension::find($widget->extension_id);
             if ($extension) {
-                $widget->extension_name = $extension->name;
+                $widget->extension_name = $extension->display_name;
             } else {
                 $widget->extension_name = "Eklenti Silinmiş";
             }

@@ -3,13 +3,13 @@
 @section('content')
 <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-    <li class="breadcrumb-item"><a href="/l/{{extension()->id}}">{{extension()->name}} {{ __('Sunucuları') }}</a>
+    <li class="breadcrumb-item"><a href="/l/{{extension()->id}}">{{extension()->display_name}} {{ __('Sunucuları') }}</a>
     </li>
     <li class="breadcrumb-item"><a href="/l/{{extension()->id}}/{{request('city')}}">{{cities(request('city'))}}</a></li>
     @if($viewName === "index")
-      <li class="breadcrumb-item active" aria-current="page">{{server()->name}} - {{extension()->name}}</li>
+      <li class="breadcrumb-item active" aria-current="page">{{server()->name}} - {{extension()->display_name}}</li>
     @else
-      <li class="breadcrumb-item"><a href="/l/{{extension()->id}}/{{request('city')}}/{{server()->id}}">{{server()->name}} - {{extension()->name}}</a></li>
+      <li class="breadcrumb-item"><a href="/l/{{extension()->id}}/{{request('city')}}/{{server()->id}}">{{server()->name}} - {{extension()->display_name}}</a></li>
       <li class="breadcrumb-item active" aria-current="page">{{__($viewName)}}</li>
     @endif
 </ol>

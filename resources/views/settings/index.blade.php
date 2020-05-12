@@ -178,7 +178,7 @@
                             <select name="LIMAN_RESTRICTED_EXTENSION" id="restrictedExtension" class="form-control select2" required>
                                 <option value="" disabled selected>{{__('Lütfen bir eklenti seçin.')}}</option>
                                         @foreach(extensions() as $extension)
-                                            <option value="{{$extension->id}}" @if(env("LIMAN_RESTRICTED_EXTENSION") == $extension->id) selected @endif>{{$extension->name}}</option>
+                                            <option value="{{$extension->id}}" @if(env("LIMAN_RESTRICTED_EXTENSION") == $extension->id) selected @endif>{{$extension->display_name}}</option>
                                         @endforeach
                             </select>
                         </div>
