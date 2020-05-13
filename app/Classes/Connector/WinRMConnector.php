@@ -204,7 +204,8 @@ class WinRMConnector implements Connector
         $username,
         $password,
         $user_id,
-        $key
+        $key,
+        $port = null
     ) {
         $token = self::init($username, $password, $server->ip_address);
         if ($token) {

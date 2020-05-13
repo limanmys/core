@@ -30,7 +30,7 @@ class SSHCertificateConnector implements Connector
     public function __construct(\App\Server $server, $user_id)
     {
         list($username, $password) = self::retrieveCredentials();
-        self::init($username, $password, $server->ip_address);
+        self::init($username, $password, $server->ip_address,$server->key_port ? $server->key_port : 22);
         return true;
     }
 
@@ -67,7 +67,7 @@ class SSHCertificateConnector implements Connector
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
         if ($this->sftp == null) {
-            $sftp = new SFTP(server()->ip_address);
+            $sftp = new SFTP(server()->ip_address,server()->key_port);
             list($username, $password) = self::retrieveCredentials();
             if (!$sftp->login($username, $password)) {
                 return false;
@@ -117,7 +117,8 @@ class SSHCertificateConnector implements Connector
         $username,
         $password,
         $user_id,
-        $key
+        $key,
+        $port = null
     ) {
         return true;
     }
@@ -145,9 +146,9 @@ class SSHCertificateConnector implements Connector
         return [lDecrypt($username["value"]), lDecrypt($password["value"])];
     }
 
-    public function init($username, $password, $hostname, $putSession = true)
+    public function init($username, $password, $hostname, $port = 22, $putSession = true)
     {
-        $ssh = new SSH2($hostname);
+        $ssh = new SSH2($hostname,$port);
         $key = new RSA();
         $key->loadKey($password);
         if (!$ssh->login($username, $key)) {

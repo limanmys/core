@@ -333,6 +333,7 @@
                     form.append('password',$("#keyPassword").val());
                 }
                 form.append('type',$("#keyType").val());
+                form.append('key_port',$("#port").val());
             }else{
                 form.append('type',$("input[name=operating_system]:checked").val());
             }

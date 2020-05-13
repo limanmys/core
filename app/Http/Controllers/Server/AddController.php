@@ -45,7 +45,7 @@ class AddController extends Controller
         $this->server = new Server();
         $this->server->fill(request()->all());
         $this->server->user_id = auth()->id();
-
+        request('key_port') ? $this->server->key_port = request('key_port') : null;
         // Check if Server is online or not.
         if (!$this->server->isAlive()) {
             return respond("Sunucuyla bağlantı kurulamadı.", 406);
@@ -133,7 +133,8 @@ class AddController extends Controller
             request('username'),
             request('password'),
             auth()->id(),
-            null
+            null,
+            $this->server->key_port,
         );
 
         if (!$flag) {
