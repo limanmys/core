@@ -21,6 +21,7 @@ interface Connector
         $username,
         $password,
         $user_id,
-        $key
+        $key,
+        $port = null
     );
 }

@@ -33,7 +33,7 @@ class SSHConnector implements Connector
     {
         if (!ConnectorToken::get($server->id)->exists()) {
             list($username, $password) = self::retrieveCredentials();
-            self::init($username, $password, $server->ip_address);
+            self::init($username, $password, $server->ip_address,$server->key_port ? $server->key_port : 22);
         }
 
         return true;
@@ -90,7 +90,7 @@ class SSHConnector implements Connector
 
     public static function verify($ip_address, $username, $password, $port)
     {
-        $token = self::init($username, $password, $ip_address, false);
+        $token = self::init($username, $password, $ip_address, $port, false);
         if ($token) {
             return respond("Kullanıcı adı ve şifre doğrulandı.", 200);
         }
@@ -119,9 +119,10 @@ class SSHConnector implements Connector
         $username,
         $password,
         $user_id,
-        $key
+        $key,
+        $port = null
     ) {
-        $token = self::init($username, $password, $server->ip_address);
+        $token = self::init($username, $password, $server->ip_address,$port ? $port : 22);
         if ($token) {
             return true;
         } else {
@@ -156,7 +157,7 @@ class SSHConnector implements Connector
     {
         if (!ConnectorToken::get(server()->id)->exists()) {
             list($username, $password) = self::retrieveCredentials();
-            self::init($username, $password, server()->id);
+            self::init($username, $password, server()->ip_address,server()->key_port ? server()->key_port : 22);
         }
         // Create Guzzle Object.
         $client = new Client();
@@ -181,7 +182,7 @@ class SSHConnector implements Connector
             // If it's first time, retry after recreating ticket.
             if ($retry) {
                 list($username, $password) = self::retrieveCredentials();
-                self::init($username, $password, server()->ip_address);
+                self::init($username, $password, server()->ip_address,server()->key_port ? server()->key_port : 22);
                 return self::request($url, $params, $retry - 1);
             } else {
                 // If nothing works, abort.
@@ -197,6 +198,7 @@ class SSHConnector implements Connector
         $username,
         $password,
         $hostname,
+        $port,
         $putSession = true
     ) {
         $client = new Client();
@@ -209,6 +211,7 @@ class SSHConnector implements Connector
                         "username" => $username,
                         "password" => $password,
                         "hostname" => $hostname,
+                        "port" => $port,
                         "connection_type" => "ssh",
                     ],
                     'timeout' => 5,
@@ -217,7 +220,6 @@ class SSHConnector implements Connector
         } catch (\Exception $e) {
             return null;
         }
-
         $json = json_decode((string) $res->getBody());
         //Escape For . character in session.
         if ($putSession) {
