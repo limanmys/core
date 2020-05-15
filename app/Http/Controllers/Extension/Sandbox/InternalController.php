@@ -7,6 +7,7 @@ use App\Extension;
 use App\Http\Controllers\Controller;
 use App\JobHistory;
 use App\Jobs\ExtensionJob;
+use App\Notification;
 use App\Permission;
 use App\Server;
 use App\ServerLog;
@@ -299,6 +300,15 @@ class InternalController extends Controller
         return SSHTunnelConnector::stop(
             request('remote_host'),
             request('remote_port')
+        );
+    }
+
+    public function sendNotification()
+    {
+        Notification::new(
+            request('title') . " (" . extension()->display_name . ")",
+            request('type'),
+            request('message')
         );
     }
 

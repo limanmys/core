@@ -16,6 +16,11 @@ Route::post(
 );
 
 Route::post(
+    '/lmn/private/sendNotification',
+    'Extension\Sandbox\InternalController@sendNotification'
+)->name('SandboxSendNotification');
+
+Route::post(
     '/lmn/private/runCommandApi',
     'Extension\Sandbox\InternalController@runCommand'
 )->name('SandboxRunCommand');

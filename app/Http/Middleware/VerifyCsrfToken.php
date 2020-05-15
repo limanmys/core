@@ -30,5 +30,6 @@ class VerifyCsrfToken extends Middleware
         "/lmn/private/getJobList",
         "/lmn/private/openTunnel",
         "/lmn/private/stopTunnel",
+        "/lmn/private/sendNotification",
     ];
 }
