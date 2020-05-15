@@ -79,7 +79,7 @@ class MainController extends Controller
         } else {
             // Let's check output is json or not.
             $json = json_decode($output, true);
-            if (json_last_error() == JSON_ERROR_NONE) {
+            if (json_last_error() == JSON_ERROR_NONE && is_array($json)) {
                 $output = view('l.alert', [
                     "title" => extension()->name,
                     "message" => array_key_exists("message", $json)
