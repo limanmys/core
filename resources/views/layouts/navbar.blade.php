@@ -25,32 +25,10 @@
           </li>
 @endif
 <script>
-  let currentlyLight = window.localStorage.getItem("dark") ?  window.localStorage.getItem("dark") : true;
-  function toggleDarkMode(){
-    currentlyLight = !currentlyLight;
-    window.localStorage.setItem("dark",currentlyLight);
-    let icon = $("#darkModeIcon");
-    if(currentlyLight){
-      icon.attr("class","far fa-tired");
-      $("#darkModeCss").remove();
-    }else{
-      icon.attr("class","fas fa-grin-stars");
-      var link = document.createElement( "link" );
-      link.href = "https://192.168.0.10/css/dark.css";
-      link.type = "text/css";
-      link.id = "darkModeCss";
-      link.rel = "stylesheet";
-      link.media = "screen,print";
-      document.getElementsByTagName( "head" )[0].appendChild( link );
-    }
-  }
-  toggleDarkMode();
+	if(currentlyDark == true){
+		setDarkMode();
+	}
 </script>
-        <!-- Left navbar links -->
-
-          @if(env('LIMAN_RESTRICTED') == true && !user()->isAdmin())
-
-          @endif
         </ul>
         <!-- Right navbar links -->
         <ul class="navbar-nav ml-auto">
