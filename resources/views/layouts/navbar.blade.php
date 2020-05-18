@@ -1,16 +1,55 @@
-<nav class="main-header navbar navbar-expand navbar-light">
-        <!-- Left navbar links -->
-        <ul class="navbar-nav">
+@if(env('LIMAN_RESTRICTED') == true && !user()->isAdmin())
+<nav class="main-header navbar navbar-expand navbar-dark" style="margin-left:0px;max-height:60px">
+<ul class="navbar-nav"  style="line-height:45px;">
+<a href="/" class="brand-link">
+        <img src="/images/liman_logo-white.svg" height="30" style="opacity: .8;margin-left: 0.3rem;">
+          <span class="right badge badge-success" style="margin-left:10px;">1.0-RC6</span>
+        </a>
+<li class="nav-item d-none d-sm-inline-block">
+              <a href="/" class="nav-link">{{__("Ana Sayfa")}}</a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+              <a href="/ayarlar/{{request('extension_id')}}/{{request('server_id')}}" class="nav-link">{{__("Ayarlar")}}</a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+              <a href="mailto:{{env('APP_NOTIFICATION_EMAIL')}}?subject={{env('BRAND_NAME')}} {{extension()->display_name}} {{extension()->version}}" class="nav-link">{{__("Destek Al")}}</a>
+            </li>
+@else
+<nav class="main-header navbar navbar-expand navbar-dark" style="height:58.86px;border:0px;"> <!-- exactly 58.86 :) -->
+<ul class="navbar-nav">
           <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" href="#" onclick="request('{{route('set_collapse')}}',new FormData(),null)"><i class="fas fa-bars"></i></a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" onclick="toggleDarkMode()"><i id="darkModeIcon" class="far fa-tired"></i></a>
+          </li>
+@endif
+<script>
+  let currentlyLight = window.localStorage.getItem("dark") ?  window.localStorage.getItem("dark") : true;
+  function toggleDarkMode(){
+    currentlyLight = !currentlyLight;
+    window.localStorage.setItem("dark",currentlyLight);
+    let icon = $("#darkModeIcon");
+    if(currentlyLight){
+      icon.attr("class","far fa-tired");
+      $("#darkModeCss").remove();
+    }else{
+      icon.attr("class","fas fa-grin-stars");
+      var link = document.createElement( "link" );
+      link.href = "https://192.168.0.10/css/dark.css";
+      link.type = "text/css";
+      link.id = "darkModeCss";
+      link.rel = "stylesheet";
+      link.media = "screen,print";
+      document.getElementsByTagName( "head" )[0].appendChild( link );
+    }
+  }
+  toggleDarkMode();
+</script>
+        <!-- Left navbar links -->
+
           @if(env('LIMAN_RESTRICTED') == true && !user()->isAdmin())
-          <li class="nav-item d-none d-sm-inline-block">
-            <a href="/" class="nav-link">{{__("Ana Sayfa")}}</a>
-          </li>
-          <li class="nav-item d-none d-sm-inline-block">
-            <a href="/ayarlar/{{request('extension_id')}}/{{request('server_id')}}" class="nav-link">{{__("Ayarlar")}}</a>
-          </li>
+
           @endif
         </ul>
         <!-- Right navbar links -->
@@ -53,7 +92,7 @@
 
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                     <div class="card card-widget widget-user-2" style="margin-bottom: 0px;">
-                        <div class="widget-user-header bg-warning">
+                        <div class="widget-user-header bg-warning" style="color:black">
                           <h3 class="widget-user-username" style="margin-left: 0px;">{{user()->name}}</h3>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Son Giriş Tarihi : ") . user()->last_login_at}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Giriş Yapılan Son Ip : ") . user()->last_login_ip}}</h5>
@@ -61,12 +100,12 @@
                         <div class="card-footer p-0">
                           <ul class="nav flex-column">
                             <li class="nav-item">
-                              <a href="{{route('my_profile')}}" class="nav-link">
+                              <a href="{{route('my_profile')}}" class="nav-link text-dark">
                                 {{__("Profil")}}
                               </a>
                             </li>
                             <li class="nav-item">
-                              <a onclick="request('/cikis',new FormData(),null)" class="nav-link">
+                              <a onclick="request('/cikis',new FormData(),null)" class="nav-link text-dark">
                                 {{__("Çıkış Yap")}}
                               </a>
                             </li>

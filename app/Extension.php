@@ -20,6 +20,7 @@ class Extension extends Model
         "sslPorts",
         "issuer",
         "language",
+        "support"
     ];
 
     /**

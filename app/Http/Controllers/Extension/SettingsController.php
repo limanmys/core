@@ -23,7 +23,7 @@ class SettingsController extends Controller
     public function saveSettings()
     {
         if (intval(request('ext_count')) > 0) {
-            config(['liman.nav_extension_hide_count' => request('ext_count')]);
+            setEnv(['NAV_EXTENSION_HIDE_COUNT' => request('ext_count')]);
             return respond('Ayarlar başarıyla kaydedildi.');
         } else {
             return respond('Bu ayar minimum 1 olmalıdır.', 201);
@@ -136,6 +136,7 @@ class SettingsController extends Controller
             $extension["version"] = request("version");
             $extension["verification"] = request("verification");
             $extension["sslPorts"] = request("sslPorts");
+            $extension["supportedLiman"] = request("supportedLiman");
         } else {
             $values = $extension[request('table')];
             foreach ($values as $key => $value) {

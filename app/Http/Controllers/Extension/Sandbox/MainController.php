@@ -104,7 +104,6 @@ class MainController extends Controller
             return view('extension_pages.server', [
                 "viewName" => "",
                 "view" => $output,
-                "timestamp" => $timestamp,
                 "last" => $this->getNavigationServers(),
             ]);
         }

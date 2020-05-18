@@ -33,28 +33,30 @@
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="tab_1" role="tabpanel">
                         <h3>{{__("Eklenti Adı")}}</h3>
-                        <input id="extensionName" type="text" class="form-control" value="{{$extension['name']}}" disabled required>
+                        <input id="extensionName" type="text" class="form-control" value="{{$extension['name']}}" disabled required><br>
                         <h3>{{__("Yayınlayan")}}</h3>
-                        <input type="text" name="name" class="form-control" value="{{$extension['publisher']}}" disabled required>
+                        <input type="text" name="name" class="form-control" value="{{$extension['publisher']}}" disabled required><br>
                         <h3>{{__("Yazılım Dili")}}</h3>
-                        <select name="programmingLanguage" class="form-control" value="{{$extension['language']}}" autocomplete="off" disabled>
+                        <select name="programmingLanguage" class="form-control" value="{{$extension['language']}}" autocomplete="off" disabled><br>
                             <option value="php" @if($extension["language"] == "php") selected='true' @endif >PHP 7.3</option>
                             <option value="python" @if($extension["language"] == "python") selected='true' @endif>Python 3</option>
-                        </select>
+                        </select><br>
                         <h3>{{__("Destek Email'i")}}</h3>
-                        <input id="support" type="text" name="email" class="form-control" value="{{$extension["support"]}}" required>
+                        <input id="support" type="text" name="email" class="form-control" value="{{$extension["support"]}}" required><br>
                         <h3>{{__("Logo (Font Awesome Ikon)")}}</h3>
-                        <input id="icon" type="text" name="icon" class="form-control" value="{{$extension["icon"]}}" required>
+                        <input id="icon" type="text" name="icon" class="form-control" value="{{$extension["icon"]}}" required><br>
+                        <h3>{{__("Gerekli Minimum Liman Sürümü")}}</h3>
+                        <input id="supportedLiman" type="text" name="icon" class="form-control" value="{{array_key_exists("supportedLiman",$extension) ? $extension["supportedLiman"] : getVersion()}}" required><br>
                         <h3>{{__("Versiyon")}}</h3>
-                        <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}" required>
+                        <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}" required><br>
                         <h3>{{__("Ayar Doğrulama Fonksiyonu/Betiği")}}</h3>
-                        <input id="verification" type="text" name="verification" class="form-control" value="{{array_key_exists("verification",$extension) ? $extension["verification"] : ""}}" required>
+                        <input id="verification" type="text" name="verification" class="form-control" value="{{array_key_exists("verification",$extension) ? $extension["verification"] : ""}}" required><br>
                         <h3>{{__("Servis Adı yada Kontrol Etmek için Port")}}</h3>
-                        <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}" required>
+                        <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}" required><br>
                         <h3>{{__("SSL Sertifikası Eklenecek Portlar")}}</h3>
-                        <small>{{__("Birden fazla port yazmak için aralarında virgül bırakabilirsiniz.")}}</small>
+                        <small>{{__("Birden fazla port yazmak için aralarında virgül bırakabilirsiniz.")}}</small><br>
                         <input id="sslPorts" type="text" name="service" class="form-control" value="{{array_key_exists("sslPorts",$extension) ? $extension["sslPorts"] : ""}}" required><br>
-                        <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button>
+                        <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button><br>
                     </div>
                     <div class="tab-pane fade show" id="tab_2" role="tabpanel">
                         @include('modal-button',[
@@ -321,6 +323,7 @@
             data.append('version',$("#version").val());
             data.append('service',$("#service").val());
             data.append('sslPorts',$("#sslPorts").val());
+            data.append('supportedLiman',$("#supportedLiman").val());
             data.append('verification',$("#verification").val());
             request('{{route('extension_settings_update')}}',data,function(){
                 showSwal("{{__("Başarıyla kaydedildi")}}",'success');

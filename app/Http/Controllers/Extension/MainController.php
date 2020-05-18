@@ -165,8 +165,12 @@ class MainController extends Controller
 
         // Now that we have everything, let's extract database.
         $file = file_get_contents($path . '/db.json');
-
+        
         $json = json_decode($file, true);
+
+        if(array_key_exists("supportedLiman",$json) && version_compare($json["supportedLiman"],getVersion()) !== -1){
+            return respond("Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum sürüm " . $json["supportedLiman"],201);
+        }
 
         if (isset($verify)) {
             $json["issuer"] = explode(" ", $verify, 4)[3];
@@ -288,6 +292,7 @@ class MainController extends Controller
             "language" => request('language'),
             "status" => 0,
             "service" => "",
+            "supportedLiman" => file_get_contents(storage_path('VERSION')),
             "support" => auth()->user()->email,
             "icon" => "",
         ];

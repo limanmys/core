@@ -3,10 +3,8 @@
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="/" class="brand-link">
-          <img src="/images/liman_logo_white.png" alt="Liman Logo" class="brand-image"
-               style="opacity: .8;margin-left: 1.3rem;">
-          <span class="brand-text font-weight-light">liman</span>
-          <span class="right badge badge-success">{{getVersion()}}</span>
+        <img src="/images/liman_logo-white.svg" height="30" style="opacity: .8;margin-left: 0.3rem;">
+          <span class="right badge badge-success" style="margin-left:10px;">{{getVersion()}}</span>
         </a>
         <!-- Sidebar -->
         <div class="sidebar">  
@@ -54,7 +52,7 @@
               @if(count(extensions()))
                 <li class="nav-header">{{__("Eklentiler")}}</li>
                 @foreach(extensions() as $extension)
-                    <li class="nav-item ext_nav" @if($loop->iteration > intval(config('liman.nav_extension_hide_count')))style="display:none;"@endif>
+                    <li class="nav-item ext_nav" @if($loop->iteration > intval(env('NAV_EXTENSION_HIDE_COUNT')))style="display:none;"@endif>
                         <a href="/l/{{$extension->id}}" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
                         @if(empty($extension->icon))
                             <i class="nav-icon fab fa-etsy"></i>
@@ -67,7 +65,7 @@
                         </a>
                     </li>
                 @endforeach
-                @if(count(extensions()) > intval(config('liman.nav_extension_hide_count')))
+                @if(count(extensions()) > intval(env('NAV_EXTENSION_HIDE_COUNT')))
                 <li class="nav-item ext_nav_more_less">
                     <a href="javascript:void(0)" class="nav-link">
                         <p>{{__('...daha fazla')}}</p>
@@ -83,12 +81,14 @@
                         <p>{{__("Eklentiler")}}</p>
                     </a>
                 </li>
+                @if(\App\Module::exists())
                 <li class="nav-item">
                     <a href="/modules" class="nav-link">
                         <i class="nav-icon fas fa-puzzle-piece"></i>
                         <p>{{__("Modüller")}}</p>
                     </a>
                 </li>
+                @endif
                 <li class="nav-item">
                     <a href="/ayarlar" class="nav-link">
                         <i class="nav-icon fas fa-cog"></i>

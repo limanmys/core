@@ -142,7 +142,7 @@
    ])
 
 <script>
-    $('input[name=ext_count]').val('{{intval(config('liman.nav_extension_hide_count'))}}');
+    $('input[name=ext_count]').val('{{intval(env('NAV_EXTENSION_HIDE_COUNT'))}}');
     function downloadFile(form){
         window.location.assign('/indir/eklenti/' + form.getElementsByTagName('select')[0].value);
         setTimeout(function(){

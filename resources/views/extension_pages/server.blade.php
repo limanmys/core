@@ -21,6 +21,7 @@
         <button data-toggle="tooltip" title="Sunucuya Git" class="btn btn-primary" onclick="location.href = '{{route('server_one',[
             "server_id" => server()->id,
         ])}}'"><i class="fa fa-server"></i></button>
+        <button data-toggle="tooltip" title="Destek Al" class="btn btn-primary" onclick="location.href = 'mailto:{{env('APP_NOTIFICATION_EMAIL')}}?subject={{env('BRAND_NAME')}} {{extension()->display_name}} {{extension()->version}}'"><i class="fas fa-headset"></i></button>
 </div>
 @include('errors')    
 <div class="card">
@@ -64,7 +65,6 @@
         </div>
     </div>
 </div>
-<br><span style="padding-left: 30px;">{{__("İstek")}} {{$timestamp}} {{__("saniyede tamamlandı.")}}</span>
 <script>
     $(function(){
         let list = [];

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{{__("Liman Sistem Yönetimi")}}</title>
+    <title>{{__("Liman Merkezi Sistem Yönetimi")}}</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{mix('/css/liman.css')}}">
@@ -134,11 +134,11 @@
             checkNotifications();
         @endif
 
-        $('.ext_nav').slice({{intval(config('liman.nav_extension_hide_count'))}}, $('.ext_nav').length).hide();
+        $('.ext_nav').slice({{intval(env('NAV_EXTENSION_HIDE_COUNT'))}}, $('.ext_nav').length).hide();
         $('.ext_nav_more_less').click(function(){
             if ($('.ext_nav').length == $('.ext_nav:visible').length) {
                 $('.ext_nav_more_less').find('p').text("{{__('...daha fazla')}}");
-                $('.ext_nav').slice({{intval(config('liman.nav_extension_hide_count'))}}, $('.ext_nav').length).hide();
+                $('.ext_nav').slice({{intval(env('NAV_EXTENSION_HIDE_COUNT'))}}, $('.ext_nav').length).hide();
             }else{
                 $('.ext_nav_more_less').find('p').text("{{__('daha az...')}}");
                 $('.ext_nav:hidden').show();
