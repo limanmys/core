@@ -318,7 +318,7 @@ function toggleDarkMode() {
 function setDarkMode() {
   document.getElementById("darkModeIcon").className = "fas fa-grin-stars";
   var link = document.createElement("link");
-  link.href = "https://192.168.0.10/css/dark.css";
+  link.href = "/css/dark.css";
   link.type = "text/css";
   link.id = "darkModeCss";
   link.rel = "stylesheet";
