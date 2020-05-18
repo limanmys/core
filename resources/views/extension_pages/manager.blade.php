@@ -26,7 +26,7 @@
                 "target_id" => "extensionUpload",
                 "text" => "Yükle"
             ])
-            @if(config('liman.extension_developer_mode') == true)
+            @if(env('EXTENSION_DEVELOPER_MODE') == true)
                 @include('modal-button',[
                     "class" => "btn-secondary",
                     "target_id" => "extensionExport",
@@ -63,7 +63,7 @@
                         "icon" => " context-menu-icon-delete"
                     ]
                 ],
-                "onclick" => config('liman.extension_developer_mode') ? "details" : ""
+                "onclick" => env('EXTENSION_DEVELOPER_MODE') ? "details" : ""
             ])
         </div>
     </div>
@@ -90,7 +90,7 @@
         ],
         "submit_text" => "Yükle"
     ])
-    @if(config('liman.extension_developer_mode') == true)
+    @if(env('EXTENSION_DEVELOPER_MODE') == true)
         <?php
             $input_extensions = [];
             foreach(extensions() as $extension){
@@ -192,7 +192,7 @@
         }
     }
 
-    @if(config('liman.extension_developer_mode') == true)
+    @if(env('EXTENSION_DEVELOPER_MODE') == true)
         function details(element){
             let extension_id = element.querySelector('#extension_id').innerHTML;
             window.location.href = "/eklentiler/" + extension_id

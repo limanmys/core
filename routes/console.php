@@ -43,7 +43,7 @@ Artisan::command('administrator', function () {
 })->describe('Create administrator account to use');
 
 Artisan::command('scan:translations', function () {
-    if (config('liman.extension_developer_mode') != true) {
+    if (env('EXTENSION_DEVELOPER_MODE') != true) {
         return $this->error(
             "You need to open extension developer mode for use this function."
         );
