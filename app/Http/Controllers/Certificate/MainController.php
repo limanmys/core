@@ -32,7 +32,7 @@ class MainController extends Controller
             ".crt";
         $cert = file_get_contents('/tmp/' . request('path'));
         shell_exec(
-            "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . $file
+            "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . strtolower($file)
         );
         shell_exec("sudo update-ca-certificates");
 
