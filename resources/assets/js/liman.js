@@ -1,4 +1,5 @@
 let csrf = document.getElementsByName("csrf-token")[0].getAttribute("content");
+let customRequestData = [];
 
 function showSwal(message, type, timer = false) {
   let config = {
@@ -37,6 +38,10 @@ function request(url, data, next, error) {
   server_id != "" && data.append("server_id", server_id);
   extension_id != "" && data.append("extension_id", extension_id);
 
+  for (const [key, value] of Object.entries(customRequestData)) {
+    data.append(key,value);
+  }
+  
   let r = new XMLHttpRequest();
   r.open("POST", url);
   r.setRequestHeader("X-CSRF-TOKEN", csrf);

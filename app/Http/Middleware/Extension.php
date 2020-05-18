@@ -26,7 +26,7 @@ class Extension
         foreach ($ports as $port) {
             if (
                 Certificate::where([
-                    "server_hostname" => $server->ip_address,
+                    "server_hostname" => strtolower($server->ip_address),
                     "origin" => trim($port),
                 ])->exists()
             ) {
