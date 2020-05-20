@@ -328,10 +328,10 @@ if (!function_exists('addCertificate')) {
             "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . strtolower($file)
         );
         shell_exec("sudo update-ca-certificates");
-
+        
         // Create Certificate Object.
         return Certificate::create([
-            "server_hostname" => $hostname,
+            "server_hostname" => strtolower($hostname),
             "origin" => $port,
         ]);
     }
@@ -779,6 +779,19 @@ if (!function_exists('lDecrypt')) {
         return base64_decode($stringToDecode);
     }
 }
+
+if (!function_exists('getExtensionViewCount')) {
+    function getExtensionViewCount()
+    {
+        $count = intval(env('NAV_EXTENSION_HIDE_COUNT'));
+        if($count == null){
+            setEnv(['NAV_EXTENSION_HIDE_COUNT' => 10]);
+            return 10;
+        }
+        return $count;
+    }
+}
+
 if (!function_exists('setBaseDn')) {
     function setBaseDn($ldap_host = null)
     {

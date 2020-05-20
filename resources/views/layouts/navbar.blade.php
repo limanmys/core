@@ -3,7 +3,7 @@
 <ul class="navbar-nav"  style="line-height:45px;">
 <a href="/" class="brand-link">
         <img src="/images/liman_logo-white.svg" height="30" style="opacity: .8;margin-left: 0.3rem;">
-          <span class="right badge badge-success" style="margin-left:10px;">1.0-RC6</span>
+          <span class="right badge badge-success" style="margin-left:10px;">{{getVersion()}}</span>
         </a>
 <li class="nav-item d-none d-sm-inline-block">
               <a href="/" class="nav-link">{{__("Ana Sayfa")}}</a>
