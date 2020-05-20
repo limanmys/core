@@ -250,7 +250,7 @@
     "Birden fazla port yazmak için aralarında virgül bırakabilirsiniz.": "Birden fazla port yazmak için aralarında virgül bırakabilirsiniz.",
     "Parametreyi silmek istediğinizden emin misiniz?": "Parametreyi silmek istediğinizden emin misiniz?",
     ":server_name isimli sunucuya erişim sağlanamadı!": ":server_name isimli sunucuya erişim sağlanamadı!",
-    ":server_name isimli sunucu için gerekli SSL sertifikası henüz onaylanmamış!": ":server_name isimli sunucu için gerekli SSL sertifikası henüz onaylanmamış!",
+    ":server_name isimli sunucu için gerekli SSL sertifikası henüz eklenmemiş!": ":server_name isimli sunucu için gerekli SSL sertifikası henüz eklenmemiş!",
     "Başarılı": "Success",
     "Kaydedildi!": "Kaydedildi!",
     "Parola alanları uyuşmuyor!": "Parola alanları uyuşmuyor!",

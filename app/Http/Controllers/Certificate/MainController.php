@@ -37,7 +37,10 @@ class MainController extends Controller
         shell_exec("sudo update-ca-certificates");
 
         // Create Certificate Object.
-        $cert = Certificate::create(request()->all());
+        $cert = Certificate::create([
+            "server_hostname" => strtolower(request('server_hostname')),
+            "origin" => request('origin')
+        ]);
 
         // Update Admin Notification
         AdminNotification::where('id', request('notification_id'))->update([

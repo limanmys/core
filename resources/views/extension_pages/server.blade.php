@@ -3,15 +3,7 @@
 @section('content')
 <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-    <li class="breadcrumb-item"><a href="/l/{{extension()->id}}">{{extension()->display_name}} {{ __('Sunucuları') }}</a>
-    </li>
-    <li class="breadcrumb-item"><a href="/l/{{extension()->id}}/{{request('city')}}">{{cities(request('city'))}}</a></li>
-    @if($viewName === "index")
-      <li class="breadcrumb-item active" aria-current="page">{{server()->name}} - {{extension()->display_name}}</li>
-    @else
-      <li class="breadcrumb-item"><a href="/l/{{extension()->id}}/{{request('city')}}/{{server()->id}}">{{server()->name}} - {{extension()->display_name}}</a></li>
-      <li class="breadcrumb-item active" aria-current="page">{{__($viewName)}}</li>
-    @endif
+    <li class="breadcrumb-item active"><a href="/l/{{extension()->id}}/{{request('city')}}/{{server()->id}}">{{extension()->display_name . __(" - Ana Sayfa")}}</a></li>
 </ol>
 <div class="right" id="ext_menu" style="float:right;margin-top:-55px">
         <button data-toggle="tooltip" title="Eklenti Ayarları" class="btn btn-primary" onclick="location.href = '{{route('extension_server_settings_page',[
@@ -24,9 +16,12 @@
         <button data-toggle="tooltip" title="Destek Al" class="btn btn-primary" onclick="location.href = 'mailto:{{env('APP_NOTIFICATION_EMAIL')}}?subject={{env('BRAND_NAME')}} {{extension()->display_name}} {{extension()->version}}'"><i class="fas fa-headset"></i></button>
 </div>
 @include('errors')    
+
 <div class="card">
+    @if(count($last) > 1)
     <div class="card-header">
             <ul id="quickNavBar" class="nav nav-tabs" role="tablist">
+                
                 @foreach ($last as $extension=>$servers)
                     @php(list($extension_id,$extension_name) = explode(":",$extension))
                     @if(count($servers) == 1)
@@ -54,9 +49,11 @@
                         
                     @endif
                 @endforeach
+                
                     
             </ul>
     </div>
+    @endif
     <div class="card-body">
         <div class="tab-content">
             <div class="tab-pane fade show active" role="tabpanel">
@@ -65,6 +62,7 @@
         </div>
     </div>
 </div>
+
 <script>
     $(function(){
         let list = [];

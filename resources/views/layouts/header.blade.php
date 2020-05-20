@@ -52,7 +52,7 @@
               @if(count(extensions()))
                 <li class="nav-header">{{__("Eklentiler")}}</li>
                 @foreach(extensions() as $extension)
-                    <li class="nav-item ext_nav" @if($loop->iteration > intval(env('NAV_EXTENSION_HIDE_COUNT')))style="display:none;"@endif>
+                    <li class="nav-item ext_nav" @if($loop->iteration > getExtensionViewCount())style="display:none;"@endif>
                         <a href="/l/{{$extension->id}}" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
                         @if(empty($extension->icon))
                             <i class="nav-icon fab fa-etsy"></i>
@@ -65,7 +65,7 @@
                         </a>
                     </li>
                 @endforeach
-                @if(count(extensions()) > intval(env('NAV_EXTENSION_HIDE_COUNT')))
+                @if(count(extensions()) > getExtensionViewCount())
                 <li class="nav-item ext_nav_more_less">
                     <a href="javascript:void(0)" class="nav-link">
                         <p>{{__('...daha fazla')}}</p>
