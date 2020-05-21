@@ -512,4 +512,39 @@ input(type=\"imtcp\" port=\"514\")";
             return respond("Kısıtlı mod ayarları güncellenemedi!",201);
         }
     }
+
+    public function getDNSServers()
+    {
+        $data = `grep nameserver /etc/resolv.conf | grep -v "#"`;
+        $arr = explode("\n",$data);
+        $clean = [];
+        foreach($arr as $ip){
+            if($ip == ""){continue;}
+            $foo = explode(" ",trim($ip));
+            array_push($clean,$foo[1]);
+        }
+        return respond($clean);
+    }
+
+    public function setDNSServers()
+    {
+        `sudo chattr -i /etc/resolv.conf`;
+        $str = "";
+        foreach([request('dns1'),request('dns2'),request('dns3')] as $ip){
+            if($ip == null){
+                continue;
+            }
+            $str .= "nameserver $ip
+";
+        }
+        $str = trim($str);
+        $output = `echo "$str" | sudo tee /etc/resolv.conf`;
+        $compare = trim(`cat /etc/resolv.conf`) == $str ? true : false;
+        if($compare){
+            `sudo chattr +i /etc/resolv.conf`;
+            return respond("DNS Ayarları güncellendi!");
+        }else{
+            return respond("DNS Ayarları güncellenemedi!",201);
+        }
+    }
 }
