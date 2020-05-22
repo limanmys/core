@@ -195,7 +195,7 @@
                 data.push(element[3]);
             });
             if(data.length == 0){
-                showSwal('{{__("Lütfen önce seçim yapınız.")}}','error',2000);
+                showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
                 return false;
             }
             let form = new FormData();
@@ -241,7 +241,7 @@
                 data.push(element[1]);
             });
             if(data.length == 0){
-                showSwal('{{__("Lütfen önce seçim yapınız.")}}','error',2000);
+                showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
                 return false;
             }
             let form = new FormData();
@@ -264,6 +264,10 @@
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[3]);
             });
+            if(data.length == 0){
+                showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
+                return false;
+            }
             let form = new FormData();
             form.append("functions",data);
             form.append("role_id",'{{$role->id}}');
@@ -301,10 +305,11 @@
                 data.push(element[2]);
             });
 
-            if(data === []){
-                showSwal('{{__("Lütfen önce seçim yapınız.")}}','error',2000);
+            if(data.length == 0){
+                showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
                 return false;
             }
+            
             showSwal('{{__("Siliniyor...")}}','info');
 
             let form = new FormData();
@@ -331,6 +336,10 @@
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[1]);
             });
+            if(data.length == 0){
+                showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
+                return false;
+            }
             let form = new FormData();
             form.append('ids',JSON.stringify(data));
             form.append('role_id','{{$role->id}}');

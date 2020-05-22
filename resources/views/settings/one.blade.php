@@ -394,6 +394,10 @@
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[1]);
             });
+            if(data.length == 0){
+                showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
+                return false;
+            }
             let form = new FormData();
             form.append('ids',JSON.stringify(data));
             form.append('user_id','{{$user->id}}');
@@ -418,6 +422,10 @@
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[1]);
             });
+            if(data.length == 0){
+                showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
+                return false;
+            }
             let form = new FormData();
             form.append('ids',JSON.stringify(data));
             form.append('user_id','{{$user->id}}');
@@ -490,6 +498,10 @@
             inputs.forEach(function(item){
                 data[item.name] = item.value;
             });
+            if(data.length == 0){
+                showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
+                return false;
+            } 
             form.append('data',JSON.stringify(data));
             request('{{route('write_permission_data')}}', form, function (response) {
                 location.reload();
