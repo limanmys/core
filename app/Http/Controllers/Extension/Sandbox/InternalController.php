@@ -12,7 +12,7 @@ use App\Permission;
 use App\Server;
 use App\ServerLog;
 use App\Token;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
