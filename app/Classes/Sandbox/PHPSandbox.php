@@ -11,6 +11,21 @@ class PHPSandbox implements Sandbox
 {
     private $path = "/liman/sandbox/php/index.php";
     private $fileExtension = ".blade.php";
+    private $server,$extension,$user,$request;
+
+    public function __construct($server = null, $extension = null, $user = null,$request = null)
+    {
+        $this->server = ($server) ? $server : server();
+        $this->extension = ($extension) ? $extension : extension();
+        $this->user = ($user) ? $user : user();
+        $this->request = ($request) ? $request : request()->except([
+            "permissions",
+            "extension",
+            "server",
+            "script",
+            "server_id",
+        ]);
+    }
 
     public function getPath()
     {
@@ -27,17 +42,17 @@ class PHPSandbox implements Sandbox
         $combinerFile = $this->path;
 
         $settings = UserSettings::where([
-            "user_id" => user()->id,
-            "server_id" => server()->id,
+            "user_id" => $this->user->id,
+            "server_id" => $this->server->id,
         ]);
         if ($extensionDb == null) {
             $extensionDb = [];
             foreach ($settings->get() as $setting) {
                 $key =
                     env('APP_KEY') .
-                    user()->id .
-                    extension()->id .
-                    server()->id;
+                    $this->user->id .
+                    $this->extension->id .
+                    $this->server->id;
                 $decrypted = openssl_decrypt(
                     $setting->value,
                     'aes-256-cfb8',
@@ -50,34 +65,27 @@ class PHPSandbox implements Sandbox
             $extensionDb = json_encode($extensionDb);
         }
 
-        $request = request()->except([
-            "permissions",
-            "extension",
-            "server",
-            "script",
-            "server_id",
-        ]);
-        $request = json_encode($request);
+        $request = json_encode($this->request);
 
         $apiRoute = route('extension_server', [
-            "extension_id" => extension()->id,
-            "city" => server()->city,
-            "server_id" => server()->id,
+            "extension_id" => $this->extension->id,
+            "city" => $this->server->city,
+            "server_id" => $this->server->id,
         ]);
 
         $navigationRoute = route('extension_server', [
-            "server_id" => server()->id,
-            "extension_id" => extension()->id,
-            "city" => server()->city,
+            "server_id" => $this->server->id,
+            "extension_id" => $this->extension->id,
+            "city" => $this->server->city,
         ]);
 
-        $token = Token::create(user()->id);
+        $token = Token::create($this->user->id);
 
-        if (!user()->isAdmin()) {
+        if (!$this->user->isAdmin()) {
             $extensionJson = json_decode(
                 file_get_contents(
                     "/liman/extensions/" .
-                        strtolower(extension()->name) .
+                        strtolower($this->extension->name) .
                         DIRECTORY_SEPARATOR .
                         "db.json"
                 ),
@@ -88,10 +96,10 @@ class PHPSandbox implements Sandbox
                 foreach ($extensionJson["functions"] as $item) {
                     if (
                         Permission::can(
-                            user()->id,
+                            $this->user->id,
                             "function",
                             "name",
-                            strtolower(extension()->name),
+                            strtolower($this->extension->name),
                             $item["name"]
                         ) ||
                         $item["isActive"] != "true"
@@ -106,18 +114,18 @@ class PHPSandbox implements Sandbox
         }
 
         $userData = [
-            "id" => user()->id,
-            "name" => user()->name,
-            "email" => user()->email,
+            "id" => $this->user->id,
+            "name" => $this->user->name,
+            "email" => $this->user->email,
         ];
 
         $functionsPath =
             "/liman/extensions/" .
-            strtolower(extension()->name) .
+            strtolower($this->extension->name) .
             "/views/functions.php";
 
         $publicPath = route('extension_public_folder', [
-            "extension_id" => extension()->id,
+            "extension_id" => $this->extension->id,
             "path" => "",
         ]);
 
@@ -125,8 +133,8 @@ class PHPSandbox implements Sandbox
         $array = [
             $functionsPath,
             $function,
-            server()->toArray(),
-            extension()->toArray(),
+            $this->server->toArray(),
+            $this->extension->toArray(),
             $extensionDb,
             $request,
             $apiRoute,
@@ -146,19 +154,19 @@ class PHPSandbox implements Sandbox
                 'cat ' .
                     '/liman/keys' .
                     DIRECTORY_SEPARATOR .
-                    extension()->id
+                    $this->extension->id
             ),
             0,
             Str::random()
         );
 
-        $keyPath = '/liman/keys' . DIRECTORY_SEPARATOR . extension()->id;
+        $keyPath = '/liman/keys' . DIRECTORY_SEPARATOR . $this->extension->id;
 
-        $soPath = "/liman/extensions/" . strtolower(extension()->name) . "/liman.so";
+        $soPath = "/liman/extensions/" . strtolower($this->extension->name) . "/liman.so";
 
         $extra = is_file($soPath) ? "-dextension=$soPath ": "";
         return "sudo runuser " .
-            cleanDash(extension()->id) .
+            cleanDash($this->extension->id) .
             " -c 'timeout 30 /usr/bin/php $extra-d display_errors=on $combinerFile $keyPath $encrypted'";
     }
 

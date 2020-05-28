@@ -58,7 +58,7 @@ class MainController extends Controller
         system_log(7, "EXTENSION_RENDER_PAGE", [
             "extension_id" => extension()->id,
             "server_id" => server()->id,
-            "view" => "",
+            "view" => $page,
         ]);
         if (trim($output) == "") {
             abort(504, "İstek zaman aşımına uğradı!");
