@@ -24,6 +24,7 @@ class ExtensionJob implements ShouldQueue
         $request,
         $session,
         $cookie,
+        $sandbox,
         $history;
 
     /**
@@ -46,9 +47,10 @@ class ExtensionJob implements ShouldQueue
         $this->function = $function;
         $this->parameters = $parameters;
         $this->session = session()->all();
-        $this->cookie = isset($_COOKIE["liman_session"])
-            ? $_COOKIE["liman_session"]
-            : '';
+        foreach ($parameters as $key => $param) {
+            request()->request->add([$key => $param]);
+        }
+        $this->sandbox = sandbox();
     }
 
     /**
@@ -58,22 +60,10 @@ class ExtensionJob implements ShouldQueue
      */
     public function handle()
     {
-        $request = [];
-        $parameters = json_decode($this->parameters);
-        foreach ($parameters as $key => $param) {
-            $request[$key] = $param;
-        }
-        $this->request = $request;
-        $command = self::sandbox(
-            $this->server,
-            $this->extension,
-            $this->extension->id,
-            $this->user->id,
-            "null",
-            "null",
-            $this->function
-        );
+        $command = $this->sandbox->command($this->function);
+        
         $output = shell_exec($command);
+        
         system_log(7, "EXTENSION_BACKGROUND_RUN", [
             "extension_id" => $this->extension->id,
             "server_id" => $this->server->id,

@@ -372,6 +372,9 @@ class MainController extends Controller
 
     public function addServerGroup()
     {
+        if(!request('name') || strlen(request('name')) < 1){
+            return respond("Lütfen bir grup ismi girin.",201);
+        }
         if (ServerGroup::where('name', request('name'))->exists()) {
             return respond("Bu isimle zaten bir grup var.", 201);
         }
