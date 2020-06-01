@@ -82,4 +82,5 @@ jobs:
           cd ../
           dpkg-deb -Zgzip --build package
           [ "$GITHUB_REF" == "refs/heads/master" ] && CHANNEL="liman-release" || CHANNEL="liman-dev-release"
-          curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-NFLf9tgYahuMsmeT7rwp5wnD&channels=$CHANNEL&filename=liman-$VERSION-$GITHUB_RUN_ID.deb&pretty=1&initial_comment=$COMMIT" || echo
+          [ "$GITHUB_REF" == "refs/heads/master" ] && FILE_NAME="liman-$VERSION-$GITHUB_RUN_ID.deb" || FILE_NAME="liman-${GITHUB_REF#refs/heads/}-$VERSION-$GITHUB_RUN_ID.deb"
+          curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-NFLf9tgYahuMsmeT7rwp5wnD&channels=$CHANNEL&filename=$FILE_NAME&pretty=1&initial_comment=$COMMIT" || echo
