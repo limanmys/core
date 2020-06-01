@@ -48,9 +48,9 @@ jobs:
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt install jq -y 1>/dev/null 2>/dev/null
           VERSION=`cat package/liman/server/storage/VERSION`
-          BRANCH="BRANCH : ${GITHUB_REF#refs/heads/}"
-          BRANCH=$(echo $BRANCH | jq -SrR @uri)
-          COMMIT=`git --git-dir=package/liman/server/.git log -1 --pretty=%B | jq -SrR @uri`
+          COMMIT="${GITHUB_REF#refs/heads/} : "
+          COMMIT+=`git --git-dir=package/liman/server/.git log -1 --pretty=%B`
+          COMMIT=`echo $COMMIT | jq -SrR @uri`
           DATE=$(date)
           composer clearcache
           composer install --no-dev -d package/liman/server
@@ -82,4 +82,4 @@ jobs:
           cd ../
           dpkg-deb -Zgzip --build package
           [ "$GITHUB_REF" == "refs/heads/master" ] && CHANNEL="liman-release" || CHANNEL="liman-dev-release"
-          curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-NFLf9tgYahuMsmeT7rwp5wnD&channels=$CHANNEL&filename=liman-$VERSION-$GITHUB_RUN_ID.deb&pretty=1&initial_comment=$COMMIT&title=$BRANCH" || echo
+          curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-NFLf9tgYahuMsmeT7rwp5wnD&channels=$CHANNEL&filename=liman-$VERSION-$GITHUB_RUN_ID.deb&pretty=1&initial_comment=$COMMIT" || echo
