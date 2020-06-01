@@ -51,6 +51,12 @@ return [
             'days' => 14,
         ],
 
+        'extension' => [
+            'driver' => 'single',
+            'path' => env('LOG_EXTENSION_PATH','/liman/logs/extension.log'),
+            'level' => 'info',
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

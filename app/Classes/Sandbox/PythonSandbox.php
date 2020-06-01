@@ -11,7 +11,7 @@ class PythonSandbox implements Sandbox
 {
     private $path = "/liman/sandbox/python/index.py";
     private $fileExtension = ".html.ninja";
-    private $server,$extension,$user,$request;
+    private $server,$extension,$user,$request,$logId;
 
     public function __construct($server = null, $extension = null, $user = null,$request = null)
     {
@@ -30,6 +30,10 @@ class PythonSandbox implements Sandbox
     public function getPath()
     {
         return $this->path;
+    }
+
+    public function setLogId($logId){
+        $this->logId = $logId;
     }
 
     public function getFileExtension()
@@ -136,6 +140,7 @@ class PythonSandbox implements Sandbox
             json_encode($userData),
             $publicPath,
             $isAjax,
+            $this->logId
         ];
 
         $keyPath = '/liman/keys' . DIRECTORY_SEPARATOR . $this->extension->id;

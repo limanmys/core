@@ -51,7 +51,9 @@ class MainController extends Controller
             ? request('target_function')
             : 'index';
 
-        ServerLog::new(extension()->name, $page);
+        $logObject = ServerLog::new(extension()->name, $page);
+        
+        $this->sandbox->setLogId($logObject->id);
 
         list($output, $timestamp) = $this->executeSandbox($page);
 
@@ -59,6 +61,7 @@ class MainController extends Controller
             "extension_id" => extension()->id,
             "server_id" => server()->id,
             "view" => $page,
+            "log_id" => $logObject->id
         ]);
         if (trim($output) == "") {
             abort(504, "İstek zaman aşımına uğradı!");

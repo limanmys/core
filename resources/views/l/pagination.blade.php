@@ -1,18 +1,13 @@
-{{--
-    "current"
-    "count"
-    "onclick"
---}}
-<ul class="pagination" style="cursor:pointer">
-    <li class="paginate_button previous @if($current == 1) disabled @endif" id="example2_previous">
-        <a @if($current != 1) onclick="{{$onclick . '(' . ($current - 1 ). ')'}}" @endif data-dt-idx="0" tabindex="0">{{__("Önceki")}}</a>
-    </li>
-    @for($i = 1 ; $i <= intval($count); $i++)
-        <li class="paginate_button @if($i == $current) active @endif">
-            <a onclick="{{$onclick . '(' . ($i). ')'}}" tabindex="0">{{$i}}</a>
-        </li>
-    @endfor
-    <li class="paginate_button next @if($current == $count) disabled @endif" id="example2_next">
-        <a @if($current != $count) onclick="{{$onclick . '(' . ($current + 1 ). ')'}}" @endif data-dt-idx="0" tabindex="0">{{__("Sonraki")}}</a>
-    </li>
-</ul>
+<div class="input-group" style="max-width: 220px;z-index: 1;">
+    <span class="input-group-btn">
+        <button @if($current != 1) onclick="{{$onclick . '(' . ($current - 1 ). ')'}}" @else disabled @endif class="btn btn-default" type="button">{{__("Önceki")}}</button>
+    </span>
+    <select onchange="{{$onclick . '(this.value)'}}" class="form-control">
+        @for($i = 1 ; $i <= intval($count); $i++)
+            <option value="{{$i}}"@if($i == $current) selected @endif">{{$i}}</option>
+        @endfor
+    </select>
+    <span class="input-group-btn">
+        <button @if($current != $count) onclick="{{$onclick . '(' . ($current + 1 ). ')'}}" @else disabled @endif class="btn btn-default" type="button">{{__("Sonraki")}}</button>
+    </span>
+</div>

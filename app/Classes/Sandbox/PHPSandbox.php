@@ -11,7 +11,7 @@ class PHPSandbox implements Sandbox
 {
     private $path = "/liman/sandbox/php/index.php";
     private $fileExtension = ".blade.php";
-    private $server,$extension,$user,$request;
+    private $server,$extension,$user,$request,$logId;
 
     public function __construct($server = null, $extension = null, $user = null,$request = null)
     {
@@ -30,6 +30,10 @@ class PHPSandbox implements Sandbox
     public function getPath()
     {
         return $this->path;
+    }
+
+    public function setLogId($logId){
+        $this->logId = $logId;
     }
 
     public function getFileExtension()
@@ -145,6 +149,7 @@ class PHPSandbox implements Sandbox
             json_encode($userData),
             $publicPath,
             $isAjax,
+            $this->logId
         ];
 
         $encrypted = openssl_encrypt(
