@@ -316,12 +316,11 @@ class InternalController extends Controller
 
     public function sendLog()
     {
-        $log = new ExtensionLog([
+        $log = ExtensionLog::create([
             "log_id" => request('log_id'),
             "message" => request('message'),
             "title" => request('title')
         ]);
-        $log->save();
 
         Log::channel('extension')->info(json_encode($log->toArray()));
     }
