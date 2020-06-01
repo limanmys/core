@@ -13,4 +13,6 @@ interface Sandbox
     public function command($function, $extensiondb = null);
 
     public function getInitialFiles();
+
+    public function setLogId($logId);
 }

@@ -46,9 +46,11 @@ jobs:
           extensions : ssh2, curl, sqlite3, ldap, mbstring, xml, zip, posix, smbclient, mongodb, gd
       - name: Build Liman Package
         run: |
-          DEBIAN_FRONTEND=noninteractive sudo apt install recode -y 1>/dev/null 2>/dev/null
-          MESSAGE=`git --git-dir=package/liman/server/.git log -1 --pretty=%B | recode ascii..html`
+          DEBIAN_FRONTEND=noninteractive sudo apt install jq -y 1>/dev/null 2>/dev/null
           VERSION=`cat package/liman/server/storage/VERSION`
+          COMMIT="${GITHUB_REF#refs/heads/} : "
+          COMMIT+=`git --git-dir=package/liman/server/.git log -1 --pretty=%B`
+          COMMIT=`echo $COMMIT | jq -SrR @uri`
           DATE=$(date)
           composer clearcache
           composer install --no-dev -d package/liman/server
@@ -79,4 +81,6 @@ jobs:
           """ > DEBIAN/control
           cd ../
           dpkg-deb -Zgzip --build package
-          [ "$GITHUB_REF" == "refs/heads/master" ] && curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-NFLf9tgYahuMsmeT7rwp5wnD&channels=liman-release&filename=liman-$VERSION-$GITHUB_RUN_ID.deb&pretty=1" || echo
+          [ "$GITHUB_REF" == "refs/heads/master" ] && CHANNEL="liman-release" || CHANNEL="liman-dev-release"
+          [ "$GITHUB_REF" == "refs/heads/master" ] && FILE_NAME="liman-$VERSION-$GITHUB_RUN_ID.deb" || FILE_NAME="liman-${GITHUB_REF#refs/heads/}-$VERSION-$GITHUB_RUN_ID.deb"
+          curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-NFLf9tgYahuMsmeT7rwp5wnD&channels=$CHANNEL&filename=$FILE_NAME&pretty=1&initial_comment=$COMMIT" || echo

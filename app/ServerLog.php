@@ -24,19 +24,23 @@ class ServerLog extends Model
         ]);
     }
 
-    public static function retrieve($readable = false, $server_id = null)
+    public static function retrieve($readable = false, $searchQuery = null,$server_id = null)
     {
         // First, Retrieve Logs.
-        $logs = ServerLog::where([
+        $query = ServerLog::where([
             "server_id" => $server_id == null ? server()->id : $server_id,
-        ])
-            ->orderBy('updated_at', 'DESC')
-            ->get();
+        ]);
+        if($searchQuery != null){
+            $query = $query->where('command', 'LIKE', '%'.$searchQuery.'%')->orWhere('output', 'LIKE', '%'.$searchQuery.'%');
+        }
+        $query2 = clone $query;
+        $logs = $query->orderBy('updated_at', 'DESC')->paginate(10);
 
         // If it's not requested as readable, which means id's only without logic.
         if (!$readable) {
             return $logs;
         }
+        $count = $query2->count();
 
         // First, convert user_id's into the user names.
         $users = User::all();
@@ -49,6 +53,6 @@ class ServerLog extends Model
             $log->username = $user->name;
             $log->output = substr($log->output,0,100);
         }
-        return $logs;
+        return [$logs,$count];
     }
 }

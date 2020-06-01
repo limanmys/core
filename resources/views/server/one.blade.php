@@ -114,7 +114,7 @@
                         @endif
                         @if(\App\Permission::can(user()->id,'liman','id','view_logs'))
                             <li class="nav-item">
-                                <a class="nav-link" data-toggle="pill" href="#logsTab" onclick="getLogs()" role="tab">{{__("Günlük Kayıtları")}}</a>
+                                <a class="nav-link" data-toggle="pill" href="#logsTab" onclick="getLogs()" role="tab">{{__("Erişim Kayıtları")}}</a>
                             </li>
                         @endif
                         <li class="nav-item">
@@ -275,10 +275,19 @@
                             @endif
                         @endif
                         <div class="tab-pane fade show" id="logsTab" role="tabpanel">
-                                
+                            <div class="form-group">
+                                    <label>{{__('Arama Terimi')}}</label>
+                                    <div class="input-group">
+                                        <input id="logQueryFilter" type="text" class="form-control" placeholder="{{__('Arama Terimi')}}">
+                                        <span class="input-group-append">
+                                            <button type="button" class="btn btn-primary btn-flat" onclick="getLogs()"><i class="fa fa-search" aria-hidden="true"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            <div id="logsWrapper">
+                            </div>
                         </div>
-                        <div class="tab-pane fade show" id="openPortsTab" role="tabpanel">
-                                
+                        <div class="tab-pane fade show" id="openPortsTab" role="tabpanel"> 
                         </div>
                         
                         <div class="tab-pane fade show" id="settingsTab" role="tabpanel">
@@ -559,6 +568,22 @@
                 <span class="sr-only progress-info"></span>
             </div>
         </div>
+    @endcomponent
+
+    @component('modal-component',[
+        "id"=>"logDetailModal",
+        "title" => "Log Detayı"
+    ])
+    <div class="row">
+        <div class="col-4">
+            <div class="list-group" role="tablist" id="logTitleWrapper">
+            </div>
+        </div>
+        <div class="col-8">
+            <div class="tab-content" id="logContentWrapper">
+            </div>
+        </div>
+    </div>
     @endcomponent
     <script>
 
@@ -865,11 +890,44 @@
             })
         }
 
-        function getLogs() {
+        function getLogs(page = 1) {
             showSwal('{{__("Okunuyor...")}}','info');
-            request('{{route('server_get_logs')}}', new FormData(), function (response) {
-                $("#logsTab").html(response);
-                $("#logsTab table").DataTable(dataTablePresets('normal'));
+            let form = new FormData();
+            form.append('page',page);
+            let query = $("#logQueryFilter").val();
+            if(query.length !== 0){
+                form.append('query',query);
+            }
+            request('{{route('server_get_logs')}}', form, function (response) {
+                let json = JSON.parse(response);
+                $("#logsWrapper").html(json.message.table);
+                setTimeout(function () {
+                    Swal.close();
+                }, 1500);
+            }, function(response){
+                let error = JSON.parse(response);
+                showSwal(error.message,'error',2000);
+            })
+        }
+
+        function getLogDetails(element){
+            let log_id = element.querySelector('#id').innerHTML;
+            showSwal('{{__("Okunuyor...")}}','info');
+            let form = new FormData();
+            form.append('log_id',log_id);
+            request('{{route('server_get_log_details')}}', form, function (response) {
+                let json = JSON.parse(response);
+                let modal = $("#logDetailModal");
+                let logTitleWrapper = $("#logTitleWrapper");
+                let logContentWrapper = $("#logContentWrapper");
+                logTitleWrapper.html("");
+                logContentWrapper.html("");
+                $.each(json.message,function (index,current) {
+                    current.id =  "a" + Math.random().toString(36).substr(2, 9);
+                    logTitleWrapper.append("<a class='list-group-item list-group-item-action' id='"+ current.id + "_title' href='#" + current.id + "_content' data-toggle='list' role='tab' aria-controls='home'>" + current.title + "</a>");
+                    logContentWrapper.append("<div class='tab-pane fade' id='" + current.id + "_content' role='tabpanel' aria-labelledby='" + current.id +"_title'><pre style='white-space:pre-wrap;'>" + current.message + "</pre></div>");
+                });
+                modal.modal("show");
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);

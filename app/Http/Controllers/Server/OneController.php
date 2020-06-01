@@ -9,6 +9,7 @@ use App\Extension;
 use App\Http\Controllers\Controller;
 use App\Notification;
 use App\ServerLog;
+use App\ExtensionLog;
 use App\Permission;
 use Carbon\Carbon;
 use Exception;
@@ -647,11 +648,34 @@ class OneController extends Controller
         if(!Permission::can(user()->id,'liman','id','view_logs')){
             return respond("Sunucu Günlük Kayıtlarını görüntülemek için yetkiniz yok",201);
         }
-        return view('l.table', [
-            "value" => ServerLog::retrieve(true),
-            "title" => ["Başlık", "Açıklama", "Kullanıcı","İşlem Tarihi"],
-            "display" => ["command", "output", "username","created_at"],
+        list($logs,$count) = ServerLog::retrieve(true,request('query'));
+
+        $table =  view('table',[
+            "value" => $logs,
+            "startingNumber" => request('page') ? (intval(request('page'))-1) * request('size') : 0,
+            "title" => ["Eklenti", "Fonksiyon", "Kullanıcı","İşlem Tarihi", "*hidden*"],
+            "display" => ["command", "output", "username","created_at","id:id"],
+            "onclick" => "getLogDetails"
+        ])->render();
+    
+        $pagination = view('pagination',[
+            "current" => request('page') ? intval(request('page')) : 1,
+            "count" => floor($count / 10) + 1,
+            "onclick" => "getLogs"
+        ])->render();
+
+        return respond([
+            "table" => $table . "<br>" . $pagination
         ]);
+    }
+
+    public function getLogDetails()
+    {
+        $logs = ExtensionLog::where('log_id',request('log_id'))->get();
+        if($logs->count() == 0){
+            return respond("Bu loga ait detay bulunamadı",201);
+        }
+        return respond($logs->toArray());
     }
 
     public function installPackage()
