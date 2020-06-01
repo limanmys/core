@@ -24,7 +24,7 @@ class MainController extends Controller
         });
     }
 
-    private function initializeClass()
+    public function initializeClass()
     {
         $this->extension = json_decode(
             file_get_contents(
