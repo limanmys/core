@@ -89,9 +89,6 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     Route::post('/arama/', 'SearchController@index')->name('search');
 
-    // Log View Route
-    Route::view('/logs/{log_id}', 'logs.one');
-
     // User Add
     Route::post('/kullanici/ekle', 'UserController@add')
         ->name('user_add')
@@ -106,8 +103,6 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
     Route::post('/kullanici/parola/sifirla', 'UserController@passwordReset')
         ->name('user_password_reset')
         ->middleware('admin');
-
-    Route::view('/logs/{log_id}', 'logs.one');
 
     Route::view('/profil', 'user.self')->name('my_profile');
 

@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 use App\UserSettings;
 use App\Permission;
 use App\Server;
-use App\ServerLog;
 use App\Classes\Sandbox\PHPSandbox;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class MainController extends Controller
 {
@@ -51,9 +51,9 @@ class MainController extends Controller
             ? request('target_function')
             : 'index';
 
-        $logObject = ServerLog::new(extension()->name, $page);
+        $logId = (string) Str::uuid();
         
-        $this->sandbox->setLogId($logObject->id);
+        $this->sandbox->setLogId($logId);
 
         list($output, $timestamp) = $this->executeSandbox($page);
 
@@ -61,7 +61,7 @@ class MainController extends Controller
             "extension_id" => extension()->id,
             "server_id" => server()->id,
             "view" => $page,
-            "log_id" => $logObject->id
+            "log_id" => $logId
         ]);
         if (trim($output) == "") {
             abort(504, "İstek zaman aşımına uğradı!");
