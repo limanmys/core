@@ -357,7 +357,7 @@ if (!function_exists('system_log')) {
      */
     function system_log($level, $message, $array = [])
     {
-        $array["user_id"] = auth()->id();
+        $array["user_id"] = user()->id;
         $array["ip_address"] = request()->ip();
 
         switch ($level) {

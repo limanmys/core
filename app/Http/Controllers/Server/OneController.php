@@ -648,13 +648,20 @@ class OneController extends Controller
 
         $page = request('page') * 10;
         $query = request('query') ? request('query') : "";
-        $count = intval(trim(`grep EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep '$query' | wc -l`));
+        $server_id = request('server_id');
+        $count = intval(trim(`grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep '$query' | grep $server_id | wc -l`));
         $head = $page > $count ? $count % 10 : 10;
-        $data = trim(`grep EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep '$query' | tail -$page | head -$head | tac`);
+        $data = trim(`grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep '$query' | grep $server_id | tail -$page | head -$head | tac`);
         $clean = [];
         
         $knownUsers = [];
         $knownExtensions = [];
+        
+        if($data == ""){
+            return respond([
+                "table" => "Bu aramaya göre bir sonuç bulunamadı."
+            ]);
+        }
 
         foreach(explode("\n",$data) as $row){
             $dateEndPos = strposX($row, " ", 2);
@@ -663,13 +670,29 @@ class OneController extends Controller
             $parsed = json_decode($json,true);
             $parsed["date"] = $date;
             if(!array_key_exists($parsed["extension_id"],$knownExtensions)){
-                $name = Extension::find($parsed["extension_id"])->first()->display_name;
-                $knownExtensions[$parsed["extension_id"]] = $name;
+                $extension = Extension::find($parsed["extension_id"]);
+                if($extension){
+                    $knownExtensions[$parsed["extension_id"]] = $extension->display_name;
+                }else{
+                    $knownExtensions[$parsed["extension_id"]] = $parsed["extension_id"];
+                }
             }
+
             $parsed["extension_id"] = $knownExtensions[$parsed["extension_id"]];
             if(!array_key_exists("log_id",$parsed)){
                 $parsed["log_id"] = null;
             }
+            if(!array_key_exists($parsed["user_id"],$knownUsers)){
+                $user = User::find($parsed["user_id"]);
+                if($user){
+                    $knownUsers[$parsed["user_id"]] = $user->name;
+                }else{
+                    $knownUsers[$parsed["user_id"]] = $parsed["user_id"];
+                }
+                
+            }
+            $parsed["user_id"] = $knownUsers[$parsed["user_id"]];
+
             array_push($clean,$parsed);
         }
 
