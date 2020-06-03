@@ -316,8 +316,8 @@ class InternalController extends Controller
     {
         Log::channel('extension')->info(json_encode([
             "log_id" => request('log_id'),
-            "message" => request('message'),
-            "title" => request('title')
+            "message" => base64_encode(request('message')),
+            "title" => base64_encode(request('title'))
         ]));
     }
 

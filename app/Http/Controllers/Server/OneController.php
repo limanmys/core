@@ -728,6 +728,8 @@ class OneController extends Controller
             $date = substr($row,1,$dateEndPos -2);
             $json = substr($row,strpos($row,"{"));
             $parsed = json_decode($json,true);
+            $parsed["title"] = base64_decode($parsed["title"]);
+            $parsed["message"] = base64_decode($parsed["message"]);
             array_push($logs,$parsed);
         }
 
