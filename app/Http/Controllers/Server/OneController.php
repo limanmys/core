@@ -649,9 +649,9 @@ class OneController extends Controller
         $page = request('page') * 10;
         $query = request('query') ? request('query') : "";
         $server_id = request('server_id');
-        $count = intval(trim(`grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep '$query' | grep $server_id | wc -l`));
+        $count = intval(trim(`grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep '"display":"true"'| grep '$query' | grep $server_id | wc -l`));
         $head = $page > $count ? $count % 10 : 10;
-        $data = trim(`grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep '$query' | grep $server_id | tail -$page | head -$head | tac`);
+        $data = trim(`grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep '"display":"true"'| grep '$query' | grep $server_id | tail -$page | head -$head | tac`);
         $clean = [];
         
         $knownUsers = [];

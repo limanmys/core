@@ -43,8 +43,9 @@
                         @endif
                     @else
                         @if(is_array($k))
-                            <td id="{{$item}}">{{$k[$item]}}</td>
+                            <td id="{{$item}}">{{array_key_exists($item,$k) ? $k[$item] : ""}}</td>
                         @else
+                        <!-- Find Optimal Solution for objects. -->
                             <td id="{{$item}}">{{$k->__get($item)}}</td>
                         @endif
                     @endif

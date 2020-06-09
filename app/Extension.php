@@ -20,7 +20,12 @@ class Extension extends Model
         "sslPorts",
         "issuer",
         "language",
-        "support"
+        "support",
+        "displays"
+    ];
+
+    protected $casts = [
+        'displays' => 'array'
     ];
 
     /**
