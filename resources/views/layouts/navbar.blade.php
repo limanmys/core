@@ -21,7 +21,7 @@
             <a class="nav-link" data-widget="pushmenu" href="#" onclick="request('{{route('set_collapse')}}',new FormData(),null)"><i class="fas fa-bars"></i></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" onclick="toggleDarkMode()"><i id="darkModeIcon" class="far fa-tired"></i></a>
+            <a class="nav-link" onclick="toggleDarkMode()"><i id="darkModeIcon" class="fas fa-sun"></i></a>
           </li>
 @endif
 <script>
