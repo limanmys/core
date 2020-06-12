@@ -4,14 +4,12 @@ namespace App\Http\Controllers\Extension\Sandbox;
 
 use App\Classes\Connector\SSHTunnelConnector;
 use App\Extension;
-use App\ExtensionLog;
 use App\Http\Controllers\Controller;
 use App\JobHistory;
 use App\Jobs\ExtensionJob;
 use App\Notification;
 use App\Permission;
 use App\Server;
-use App\ServerLog;
 use App\Token;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Log;
@@ -316,13 +314,11 @@ class InternalController extends Controller
 
     public function sendLog()
     {
-        $log = ExtensionLog::create([
+        Log::channel('extension')->info(json_encode([
             "log_id" => request('log_id'),
-            "message" => request('message'),
-            "title" => request('title')
-        ]);
-
-        Log::channel('extension')->info(json_encode($log->toArray()));
+            "message" => base64_encode(request('message')),
+            "title" => base64_encode(request('title'))
+        ]));
     }
 
     /**

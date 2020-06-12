@@ -890,6 +890,11 @@
             })
         }
 
+        $("#logQueryFilter").on('keyup', function (e) {
+            if (e.keyCode === 13) {
+                getLogs();
+            }
+        });
         function getLogs(page = 1) {
             showSwal('{{__("Okunuyor...")}}','info');
             let form = new FormData();

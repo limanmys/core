@@ -47,6 +47,18 @@ if (!function_exists('respond')) {
     }
 }
 
+if (!function_exists('strposX')) {
+    function strposX($haystack, $needle, $number){
+        if($number == '1'){
+            return strpos($haystack, $needle);
+        }elseif($number > '1'){
+            return strpos($haystack, $needle, strposX($haystack, $needle, $number - 1) + strlen($needle));
+        }else{
+            return error_log('Error: Value for parameter $number is out of range');
+        }
+    }
+}
+
 if (!function_exists('registerModuleRoutes')) {
     function registerModuleRoutes()
     {
@@ -345,7 +357,7 @@ if (!function_exists('system_log')) {
      */
     function system_log($level, $message, $array = [])
     {
-        $array["user_id"] = auth()->id();
+        $array["user_id"] = user()->id;
         $array["ip_address"] = request()->ip();
 
         switch ($level) {

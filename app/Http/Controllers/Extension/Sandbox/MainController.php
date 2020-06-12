@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 use App\UserSettings;
 use App\Permission;
 use App\Server;
-use App\ServerLog;
 use App\Classes\Sandbox\PHPSandbox;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class MainController extends Controller
 {
@@ -51,17 +51,37 @@ class MainController extends Controller
             ? request('target_function')
             : 'index';
 
-        $logObject = ServerLog::new(extension()->name, $page);
+        $logId = (string) Str::uuid();
         
-        $this->sandbox->setLogId($logObject->id);
+        $this->sandbox->setLogId($logId);
 
         list($output, $timestamp) = $this->executeSandbox($page);
+
+        // Find the function in file. TODO find better solution here.
+        $extension = json_decode(
+            file_get_contents(
+                "/liman/extensions/" .
+                    strtolower(extension()->name) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
+            ),
+            true
+        );
+
+        $display = false;
+        foreach($extension["functions"] as $function){
+            if($function["name"] == $page){
+                $display = array_key_exists("displayLog",$function) ? $function["displayLog"] : false;
+                break;
+            }
+        }
 
         system_log(7, "EXTENSION_RENDER_PAGE", [
             "extension_id" => extension()->id,
             "server_id" => server()->id,
             "view" => $page,
-            "log_id" => $logObject->id
+            "log_id" => $logId,
+            "display" => $display
         ]);
         if (trim($output) == "") {
             abort(504, "İstek zaman aşımına uğradı!");

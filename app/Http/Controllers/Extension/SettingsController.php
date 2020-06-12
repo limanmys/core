@@ -441,7 +441,24 @@ class SettingsController extends Controller
             "name" => request("name"),
             "description" => request("description"),
             "isActive" => request()->has("isActive") ? "true" : "false",
+            "displayLog" => request()->has("displayLog") ? "true" : "false",
         ]);
+
+        $extensionSQL = extension();
+        if(request()->has("displayLog")){
+            if($extensionSQL->displays == null) {
+                $extensionSQL->update([
+                    "displays" => [request('name')]
+                ]);
+            }else{
+                $current = $extensionSQL->displays;
+                array_push($current,request('name'));
+                $extensionSQL->update([
+                    "displays" => $current
+                ]);
+            }
+        }
+        
 
         $extension["functions"] = $functions;
         if (array_key_exists("version_code", $extension)) {
@@ -493,8 +510,29 @@ class SettingsController extends Controller
                     "name" => request("name"),
                     "description" => request("description"),
                     "isActive" => request()->has("isActive") ? "true" : "false",
+                    "displayLog" => request()->has("displayLog") ? "true" : "false",
                 ];
             }
+        }
+
+        $extensionSQL = extension();
+        if($extensionSQL->displays != null) {
+            $current = $extensionSQL->displays;
+            if(request()->has('displayLog')){
+                if(!in_array(request('name'),$current)){
+                    array_push($current,request('name'));
+                }
+            }else{
+                if(in_array(request('name'),$current)){
+                    unset($current[array_search(request('name'),$current)]);
+                }
+            }
+            if(empty($current)){
+                $current = null;
+            }
+            extension()->update([
+                "displays" => $current
+            ]);
         }
 
         $extension["functions"] = $functions;

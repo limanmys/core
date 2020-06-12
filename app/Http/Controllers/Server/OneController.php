@@ -8,8 +8,7 @@ use App\ConnectorToken;
 use App\Extension;
 use App\Http\Controllers\Controller;
 use App\Notification;
-use App\ServerLog;
-use App\ExtensionLog;
+use App\User;
 use App\Permission;
 use Carbon\Carbon;
 use Exception;
@@ -216,10 +215,8 @@ class OneController extends Controller
 
         // Respond according to the flag.
         if ($flag == "1") {
-            //            ServerLog::new("Dosya Yükleme " . request('path'), "Sunucuya dosya yüklendi\n" . request('path') . " ", server()->id, auth()->id());
             return respond("Dosya başarıyla yüklendi.");
         }
-        //        ServerLog::new("Dosya Yükleme " . request('path'), "Sunucuya dosya yüklenemedi\n" . request('path') . " ", server()->id, auth()->id());
         return respond('Dosya yüklenemedi.', 201);
     }
 
@@ -648,13 +645,62 @@ class OneController extends Controller
         if(!Permission::can(user()->id,'liman','id','view_logs')){
             return respond("Sunucu Günlük Kayıtlarını görüntülemek için yetkiniz yok",201);
         }
-        list($logs,$count) = ServerLog::retrieve(true,request('query'));
+
+        $page = request('page') * 10;
+        $query = request('query') ? request('query') : "";
+        $server_id = request('server_id');
+        $count = intval(trim(`grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep '"display":"true"'| grep '$query' | grep $server_id | wc -l`));
+        $head = $page > $count ? $count % 10 : 10;
+        $data = trim(`grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep '"display":"true"'| grep '$query' | grep $server_id | tail -$page | head -$head | tac`);
+        $clean = [];
+        
+        $knownUsers = [];
+        $knownExtensions = [];
+        
+        if($data == ""){
+            return respond([
+                "table" => "Bu aramaya göre bir sonuç bulunamadı."
+            ]);
+        }
+
+        foreach(explode("\n",$data) as $row){
+            $dateEndPos = strposX($row, " ", 2);
+            $date = substr($row,1,$dateEndPos -2);
+            $json = substr($row,strpos($row,"{"));
+            $parsed = json_decode($json,true);
+            $parsed["date"] = $date;
+            if(!array_key_exists($parsed["extension_id"],$knownExtensions)){
+                $extension = Extension::find($parsed["extension_id"]);
+                if($extension){
+                    $knownExtensions[$parsed["extension_id"]] = $extension->display_name;
+                }else{
+                    $knownExtensions[$parsed["extension_id"]] = $parsed["extension_id"];
+                }
+            }
+
+            $parsed["extension_id"] = $knownExtensions[$parsed["extension_id"]];
+            if(!array_key_exists("log_id",$parsed)){
+                $parsed["log_id"] = null;
+            }
+            if(!array_key_exists($parsed["user_id"],$knownUsers)){
+                $user = User::find($parsed["user_id"]);
+                if($user){
+                    $knownUsers[$parsed["user_id"]] = $user->name;
+                }else{
+                    $knownUsers[$parsed["user_id"]] = $parsed["user_id"];
+                }
+                
+            }
+            $parsed["user_id"] = $knownUsers[$parsed["user_id"]];
+
+            array_push($clean,$parsed);
+        }
 
         $table =  view('table',[
-            "value" => $logs,
-            "startingNumber" => request('page') ? (intval(request('page'))-1) * request('size') : 0,
+            "value" => (array) $clean,
+            "startingNumber" => (intval(request('page')) - 1) * 10,
             "title" => ["Eklenti", "Fonksiyon", "Kullanıcı","İşlem Tarihi", "*hidden*"],
-            "display" => ["command", "output", "username","created_at","id:id"],
+            "display" => ["extension_id", "view", "user_id","date","log_id:id"],
             "onclick" => "getLogDetails"
         ])->render();
     
@@ -671,11 +717,23 @@ class OneController extends Controller
 
     public function getLogDetails()
     {
-        $logs = ExtensionLog::where('log_id',request('log_id'))->get();
-        if($logs->count() == 0){
+        $query = request('log_id');
+        $data = trim(`grep '$query' /liman/logs/extension.log`);
+        if($data == ""){
             return respond("Bu loga ait detay bulunamadı",201);
         }
-        return respond($logs->toArray());
+        $logs = [];
+        foreach(explode("\n",$data) as $row){
+            $dateEndPos = strposX($row, " ", 2);
+            $date = substr($row,1,$dateEndPos -2);
+            $json = substr($row,strpos($row,"{"));
+            $parsed = json_decode($json,true);
+            $parsed["title"] = base64_decode($parsed["title"]);
+            $parsed["message"] = base64_decode($parsed["message"]);
+            array_push($logs,$parsed);
+        }
+
+        return respond($logs);
     }
 
     public function installPackage()
@@ -691,14 +749,9 @@ class OneController extends Controller
                     basename($package) .
                     ".txt\" 2>&1 & disown && echo \$!'"
             );
-            ServerLog::new(
-                __('Paket Güncelleme: :package_name', [
-                    'package_name' => request("package_name"),
-                ]),
-                __(':package_name paketi için güncelleme isteği gönderildi.', [
-                    'package_name' => request("package_name"),
-                ])
-            );
+            system_log(7,"Paket Güncelleme",[
+                'package_name' => request("package_name")
+            ]);
         } elseif (server()->type == "windows_powershell") {
             $raw = "";
         }
@@ -754,14 +807,9 @@ class OneController extends Controller
                     ($mode == "update" && $output == "0") ||
                     ($mode == "install" && $output != "0")
                 ) {
-                    ServerLog::new(
-                        __('Paket Güncelleme: :package_name', [
-                            'package_name' => request("package_name"),
-                        ]),
-                        __(':package_name paketi başarıyla kuruldu.', [
-                            'package_name' => request("package_name"),
-                        ])
-                    );
+                    system_log(7,"Paket Güncelleme Başarılı",[
+                        'package_name' => request("package_name")
+                    ]);
                     return respond([
                         "status" => __(
                             ":package_name paketi başarıyla kuruldu.",
@@ -770,14 +818,9 @@ class OneController extends Controller
                         "output" => trim($command_output),
                     ]);
                 } else {
-                    ServerLog::new(
-                        __('Paket Güncelleme: :package_name', [
-                            'package_name' => request("package_name"),
-                        ]),
-                        __(':package_name paketi kurulamadı.', [
-                            'package_name' => request("package_name"),
-                        ])
-                    );
+                    system_log(7,"Paket Güncelleme Başarısız",[
+                        'package_name' => request("package_name")
+                    ]);
                     return respond([
                         "status" => __(":package_name paketi kurulamadı.", [
                             'package_name' => request("package_name"),
