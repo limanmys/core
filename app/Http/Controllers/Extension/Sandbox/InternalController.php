@@ -10,9 +10,9 @@ use App\Jobs\ExtensionJob;
 use App\Notification;
 use App\Permission;
 use App\Server;
-use App\ServerLog;
 use App\Token;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -309,6 +309,17 @@ class InternalController extends Controller
             request('title') . " (" . extension()->display_name . ")",
             request('type'),
             request('message')
+        );
+    }
+
+    public function sendLog()
+    {
+        Log::channel('extension')->info(
+            json_encode([
+                "log_id" => request('log_id'),
+                "message" => base64_encode(request('message')),
+                "title" => base64_encode(request('title')),
+            ])
         );
     }
 

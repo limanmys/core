@@ -316,7 +316,7 @@ function toggleDarkMode() {
 }
 
 function setDarkMode() {
-  document.getElementById("darkModeIcon").className = "fas fa-grin-stars";
+  document.getElementById("darkModeIcon").className = "fas fa-moon";
   var link = document.createElement("link");
   link.href = "/css/dark.css";
   link.type = "text/css";
@@ -328,7 +328,7 @@ function setDarkMode() {
 }
 
 function setLightMode() {
-  document.getElementById("darkModeIcon").className = "far fa-tired";
+  document.getElementById("darkModeIcon").className = "fas fa-sun";
   $("#darkModeCss").remove();
   window.localStorage.setItem("dark", "false");
 }

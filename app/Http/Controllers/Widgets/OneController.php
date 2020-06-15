@@ -67,6 +67,7 @@ class OneController extends Controller
         ]);
 
         $sandboxController = new MainController();
+        $sandboxController->initializeClass();
         $output = $sandboxController->API()->content();
 
         if (!$output) {

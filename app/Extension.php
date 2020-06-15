@@ -20,7 +20,12 @@ class Extension extends Model
         "sslPorts",
         "issuer",
         "language",
-        "support"
+        "support",
+        "displays",
+    ];
+
+    protected $casts = [
+        'displays' => 'array',
     ];
 
     /**
@@ -86,6 +91,6 @@ class Extension extends Model
 
     public function getDisplayNameAttribute($value)
     {
-        return Str::title(str_replace("-"," ",$this->name));
+        return Str::title(str_replace("-", " ", $this->name));
     }
 }

@@ -169,6 +169,11 @@ Route::group(['middleware' => ['server']], function () {
         'Server\OneController@getLogs'
     )->name('server_get_logs');
 
+    Route::post(
+        '/sunucu/gunluk_kayitlari_detay',
+        'Server\OneController@getLogDetails'
+    )->name('server_get_log_details');
+
     Route::post('/sunucu/paketler', 'Server\OneController@packageList')->name(
         'server_package_list'
     );

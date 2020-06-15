@@ -216,10 +216,10 @@
                         @include('table',[
                             "value" => array_key_exists("functions",$extension) ? $extension["functions"] : [],
                             "title" => [
-                                "Fonksiyon Adı" , "Çeviri Key'i", "Yetki Sistemi" ,"*hidden*"
+                                "Fonksiyon Adı" , "Çeviri Key'i", "Yetki Sistemi", "Logu Görüntüle" ,"*hidden*"
                             ],
                             "display" => [
-                                "name" , "description", "isActive", "name:old"
+                                "name" , "description", "isActive", "displayLog", "name:old"
                             ],
                             "menu" => [
                                 "İzin Parametreleri" => [
@@ -227,7 +227,7 @@
                                     "icon" => "fa-cog"
                                 ],
                                 "Ayarları Düzenle" => [
-                                    "target" => "updateFunctionModal",
+                                    "target" => "updateFunctionModalHandler",
                                     "icon" => " context-menu-icon-edit"
                                 ],
                                 "Sil" => [
@@ -246,6 +246,7 @@
                                 "Fonksiyon Adı" => "name:text",
                                 "Açıklama (Çeviri Key)" => "description:text",
                                 "Yetki Sistemine Dahil Et" => "isActive:checkbox",
+                                "Sunucu Loglarında Görüntüle" => "displayLog:checkbox",
                             ],
                             "submit_text" => "Fonksiyon Ekle"
                         ])
@@ -259,6 +260,7 @@
                                 "Fonksiyon Adı" => "name:text",
                                 "Açıklama (Çeviri Key)" => "description:text",
                                 "Yetki Sistemine Dahil Et" => "isActive:checkbox",
+                                "Sunucu Loglarında Görüntüle" => "displayLog:checkbox",
                                 "-:-" => "old:hidden"
                             ],
                             "submit_text" => "Fonksiyon Duzenle"
@@ -400,6 +402,20 @@
                     });
                 }
             });
+        }
+        function updateFunctionModalHandler(element){
+            let modal = $("#updateFunctionModal");
+            modal.find("input[name='name']").val(element.querySelector('#name').innerHTML);
+            modal.find("input[name='old']").val(element.querySelector('#name').innerHTML);
+            modal.find("input[name='description']").val(element.querySelector('#description').innerHTML);
+            if(element.querySelector('#isActive') && element.querySelector('#isActive').innerHTML == "true"){
+                modal.find("input[name='isActive']").prop("checked",true);
+            }
+            if(element.querySelector('#displayLog') && element.querySelector('#displayLog').innerHTML == "true"){
+                modal.find("input[name='displayLog']").prop("checked",true);
+            }
+            
+            modal.modal('show');
         }
     </script>
 @endsection
