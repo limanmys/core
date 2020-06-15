@@ -52,7 +52,7 @@ class MainController extends Controller
             : 'index';
 
         $logId = (string) Str::uuid();
-        
+
         $this->sandbox->setLogId($logId);
 
         list($output, $timestamp) = $this->executeSandbox($page);
@@ -69,10 +69,14 @@ class MainController extends Controller
         );
 
         $display = false;
-        foreach($extension["functions"] as $function){
-            if($function["name"] == $page){
-                $display = array_key_exists("displayLog",$function) ? $function["displayLog"] : false;
-                break;
+        if (array_key_exists("functions", $extension)) {
+            foreach ($extension["functions"] as $function) {
+                if ($function["name"] == $page) {
+                    $display = array_key_exists("displayLog", $function)
+                        ? $function["displayLog"]
+                        : false;
+                    break;
+                }
             }
         }
 
@@ -81,7 +85,7 @@ class MainController extends Controller
             "server_id" => server()->id,
             "view" => $page,
             "log_id" => $logId,
-            "display" => $display
+            "display" => $display,
         ]);
         if (trim($output) == "") {
             abort(504, "İstek zaman aşımına uğradı!");
@@ -116,10 +120,7 @@ class MainController extends Controller
                 ]);
             }
 
-            if (
-                env('LIMAN_RESTRICTED') == true &&
-                !user()->isAdmin()
-            ) {
+            if (env('LIMAN_RESTRICTED') == true && !user()->isAdmin()) {
                 return view('extension_pages.server_restricted', [
                     "view" => $output,
                 ]);
