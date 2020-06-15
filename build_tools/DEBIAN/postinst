@@ -231,14 +231,15 @@ touch /liman/keys/vnc/config
 chown liman:liman /liman/keys/vnc /liman/keys/vnc/config
 chmod 700 /liman/keys/vnc/config
 
+# Optimize Liman
+php /liman/server/artisan optimize:clear
+
 # Restart and enable services.
 systemctl restart nginx
 systemctl enable nginx
 systemctl enable php7.3-fpm
 systemctl restart php7.3-fpm
 
-# Optimize Liman
-php /liman/server/artisan optimize:clear
 
 # Enable Liman
 php /liman/server/artisan up
