@@ -169,7 +169,6 @@ Route::group(['middleware' => ['server']], function () {
         'Server\OneController@getLogs'
     )->name('server_get_logs');
 
-
     Route::post(
         '/sunucu/gunluk_kayitlari_detay',
         'Server\OneController@getLogDetails'
@@ -202,6 +201,11 @@ Route::group(['middleware' => ['server']], function () {
         '/sunucu/servis/yenidenBaslat',
         'Server\OneController@restartService'
     )->name('server_restart_service');
+
+    Route::post(
+        '/sunucu/servis/durum',
+        'Server\OneController@statusService'
+    )->name('server_service_status');
 
     Route::post(
         '/sunucu/acikPortlar',
