@@ -165,7 +165,7 @@ class MainController extends Controller
 
         // Now that we have everything, let's extract database.
         $file = file_get_contents($path . '/db.json');
-        
+
         $json = json_decode($file, true);
 
         // if(array_key_exists("supportedLiman",$json) && version_compare(getVersion(),$json["supportedLiman"]) < 0){
@@ -336,6 +336,9 @@ class MainController extends Controller
             sudo chmod 640 $passPath;
         "
         );
+
+        request()->request->add(['server' => "none"]);
+        request()->request->add(['extension_id' => $ext->id]);
 
         foreach (sandbox(request('language'))->getInitialFiles() as $file) {
             touch($folder . "/views/$file");
