@@ -108,6 +108,33 @@ class InternalController extends Controller
 
     public function internalExtensions()
     {
+        $extension = Extension::where([
+            "name" => request("target_extension_name"),
+        ])->first();
+        if (!$extension) {
+            return false;
+        }
+
+        $server = Server::where(["id" => request("target_server_id")])->first();
+        if (!$server) {
+            return false;
+        }
+
+        $newRequestData = [
+            "extension_id" => $extension->id,
+            "extension" => $extension,
+            "server" => $server,
+            "server_id" => $server->id,
+        ];
+
+        $newRequestData = array_merge(
+            $newRequestData,
+            json_decode(request('extra_params'), true)
+        );
+        request()->merge($newRequestData);
+        $controller = new MainController();
+        $controller->initializeClass();
+        return $controller->API();
     }
 
     /**
@@ -314,11 +341,13 @@ class InternalController extends Controller
 
     public function sendLog()
     {
-        Log::channel('extension')->info(json_encode([
-            "log_id" => request('log_id'),
-            "message" => base64_encode(request('message')),
-            "title" => base64_encode(request('title'))
-        ]));
+        Log::channel('extension')->info(
+            json_encode([
+                "log_id" => request('log_id'),
+                "message" => base64_encode(request('message')),
+                "title" => base64_encode(request('title')),
+            ])
+        );
     }
 
     /**
