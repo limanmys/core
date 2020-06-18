@@ -20,7 +20,7 @@ Artisan::command('administrator', function () {
     );
     $user = User::where([
         "name" => "Administrator",
-        "email" => "administrator@liman.app",
+        "email" => "administrator@liman.dev",
     ])->first();
     if ($user) {
         $user->update([
@@ -30,7 +30,7 @@ Artisan::command('administrator', function () {
         $user = new User();
         $user->fill([
             "name" => "Administrator",
-            "email" => "administrator@liman.app",
+            "email" => "administrator@liman.dev",
             "password" => Hash::make($password),
             "status" => 1,
         ]);
@@ -38,7 +38,7 @@ Artisan::command('administrator', function () {
     $user->save();
 
     $this->comment("Liman MYS Administrator Kullanıcısı");
-    $this->comment("Email  : administrator@liman.app");
+    $this->comment("Email  : administrator@liman.dev");
     $this->comment("Parola : " . $password . "");
 })->describe('Create administrator account to use');
 
@@ -99,7 +99,7 @@ Artisan::command('module:add {module_name}', function ($module_name) {
         return $this->error("Modul klasoru bulunamadi!");
     }
 
-    if(Module::where(["name" => $module_name])->exists()){
+    if (Module::where(["name" => $module_name])->exists()) {
         return $this->error("Boyle bir modul zaten var!");
     }
     $module = Module::create(["name" => $module_name, "enabled" => true]);

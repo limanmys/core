@@ -1,6 +1,6 @@
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-    @if(auth()->check() && user()->email == "administrator@liman.app")
+    @if(auth()->check() && user()->email == "administrator@liman.dev")
     <div class="alert alert-danger customAlert">
         <b>{{__("Tam yetkili yönetici hesabı ile giriş yaptınız, sisteme zarar verebilirsiniz.")}}</b>
     </div>

@@ -14,7 +14,7 @@ class AddSupportToExtensions extends Migration
     public function up()
     {
         Schema::table('extensions', function (Blueprint $table) {
-            $table->string('support')->default('administrator@liman.app');
+            $table->string('support')->default('administrator@liman.dev');
         });
     }
 
