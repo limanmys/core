@@ -3,6 +3,15 @@
 # Create Required Folders for Liman
 mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions,modules}
 
+# environment creation
+if [ -f "/liman/server/.env" ]; then
+    echo "Upgrading liman."
+else
+    cp /liman/server/.env.example /liman/server/.env
+    php /liman/server/artisan key:generate
+    echo "Installing liman."
+fi
+
 # User Creation
 if getent passwd liman > /dev/null 2>&1; then
     sed -i '/liman/d' /etc/sudoers
