@@ -7,47 +7,60 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Sunucular")}}</li>
         </ol>
     </nav>
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">{{__("Sunucular")}}</h3>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card card-primary card-outline">
+              <div class="card-body box-profile">
+                <h3 class="profile-username text-center">{{__("Sunucular")}}</h3>
+                <p class="text-muted text-center">Bu sayfadan mevcut sunucularını görebilirsiniz. Ayrıca yeni sunucu eklemek için Sunucu Ekle butonunu kullanabilirsiniz.</p>
+              </div>
+            </div>
         </div>
-        <div class="card-body">
-            @if(\App\Permission::can(user()->id,'liman','id','add_server'))
-                <button href="#tab_1" type="button" class="btn btn-success" data-toggle="modal" data-target="#add_server">{{__("Sunucu Ekle")}}</button><br><br>
-            @endif
-            
-            @include('errors')
-            <?php
-                use Illuminate\Support\Facades\DB;
-                $servers = servers();
-                foreach ($servers as $server) {
-                    $server->extension_count = DB::table('server_extensions')
-                        ->where('server_id', $server->id)
-                        ->count();
-                }
-            ?>
-            @include('table',[
-                "value" => $servers,
-                "title" => [
-                    "Sunucu Adı" , "İp Adresi" , "*hidden*" , "Kontrol Portu", "Eklenti Sayısı", "*hidden*" ,"*hidden*"
-                ],
-                "display" => [
-                    "name" , "ip_address", "type:type" , "control_port", "extension_count", "city:city", "id:server_id"
-                ],
-                "menu" => [
-                    "Düzenle" => [
-                        "target" => "edit",
-                        "icon" => " context-menu-icon-edit"
-                    ],
-                    "Sil" => [
-                        "target" => "delete",
-                        "icon" => " context-menu-icon-delete"
-                    ]
-                ],
-                "onclick" => "details"
-            ])
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                        @if(\App\Permission::can(user()->id,'liman','id','add_server'))
+                        <button href="#tab_1" type="button" class="btn btn-success" data-toggle="modal" data-target="#add_server">{{__("Sunucu Ekle")}}</button><br><br>
+                    @endif
+                    
+                    @include('errors')
+                    <?php
+                    use Illuminate\Support\Facades\DB;
+                    $servers = servers();
+                    foreach ($servers as $server) {
+                        $server->extension_count = DB::table(
+                            'server_extensions'
+                        )
+                            ->where('server_id', $server->id)
+                            ->count();
+                    }
+                    ?>
+                    @include('table',[
+                        "value" => $servers,
+                        "title" => [
+                            "Sunucu Adı" , "İp Adresi" , "*hidden*" , "Kontrol Portu", "Eklenti Sayısı", "*hidden*" ,"*hidden*"
+                        ],
+                        "display" => [
+                            "name" , "ip_address", "type:type" , "control_port", "extension_count", "city:city", "id:server_id"
+                        ],
+                        "menu" => [
+                            "Düzenle" => [
+                                "target" => "edit",
+                                "icon" => " context-menu-icon-edit"
+                            ],
+                            "Sil" => [
+                                "target" => "delete",
+                                "icon" => " context-menu-icon-delete"
+                            ]
+                        ],
+                        "onclick" => "details"
+                    ])
+                </div>
+            </div>
         </div>
     </div>
+
     <div class="modal fade" id="add_server">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">

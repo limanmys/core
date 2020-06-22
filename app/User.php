@@ -34,7 +34,7 @@ class User extends Authenticatable
         'objectguid',
         'auth_type',
         'last_login_at',
-        'last_login_ip'
+        'last_login_ip',
     ];
 
     /**
@@ -106,5 +106,10 @@ class User extends Authenticatable
     public function roles()
     {
         return $this->belongsToMany('App\Role', "role_users");
+    }
+
+    public function accessTokens()
+    {
+        return $this->hasMany('\App\AccessToken');
     }
 }

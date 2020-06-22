@@ -8,63 +8,67 @@
                 <li class="breadcrumb-item active" aria-current="page">{{ __('Eklenti Yönetimi') }}</li>
             </ol>
         </div>
-        <div class="col-sm-6">
-            <div class="float-sm-right">
-                <button data-toggle="tooltip" title="Ayarlar" class="btn btn-primary" onclick="openSettingsModal()"><i class="fa fa-cogs"></i></button>
+    </nav>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card card-primary card-outline">
+              <div class="card-body box-profile">
+                <h3 class="profile-username text-center">{{__("Eklentiler")}}</h3>
+                <p class="text-muted text-center">Bu sayfadan mevcut eklentileri görebilirsiniz. Ayrıca yeni eklenti eklemek için Yükle butonunu kullanabilirsiniz.</p>
+              </div>
             </div>
         </div>
-    </nav>
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">{{__("Eklentiler")}}</h3>
-        </div>
-        <div class="card-body">
-            @include('errors')    
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                @include('modal-button',[
+                        "class" => "btn-primary",
+                        "target_id" => "extensionUpload",
+                        "text" => "Yükle"
+                    ])
+                @if(env('EXTENSION_DEVELOPER_MODE') == true)
+                        @include('modal-button',[
+                            "class" => "btn-secondary",
+                            "target_id" => "extensionExport",
+                            "text" => "İndir"
+                        ])
+                        @include('modal-button',[
+                            "class" => "btn-info",
+                            "target_id" => "newExtension",
+                            "text" => "Yeni"
+                        ])
+                @endif
+                        <div class="float-sm-right">
+                            <button data-toggle="tooltip" title="Ayarlar" class="btn btn-primary" onclick="openSettingsModal()"><i class="fa fa-cogs"></i></button>
+                        </div><br><br>
+                    @include('errors')    
 
-            @include('modal-button',[
-                "class" => "btn-primary",
-                "target_id" => "extensionUpload",
-                "text" => "Yükle"
-            ])
-            @if(env('EXTENSION_DEVELOPER_MODE') == true)
-                @include('modal-button',[
-                    "class" => "btn-secondary",
-                    "target_id" => "extensionExport",
-                    "text" => "İndir"
-                ])
-                @include('modal-button',[
-                    "class" => "btn-info",
-                    "target_id" => "newExtension",
-                    "text" => "Yeni"
-                ])
-            @endif
-        
-            <br><br>
-        
-            @include('table',[
-                "value" => extensions()->map(function($item){
-                    if(!$item["issuer"]){
-                        $item["issuer"] = __('Güvenli olmayan üretici!');
-                    }
-                    return $item;
-                }),
-                "sortable" => true,
-                "sortUpdateUrl" => route('update_ext_orders'),
-                "afterSortFunction" => 'location.reload',
-                "title" => [
-                    "Eklenti Adı" , "Versiyon", "İmzalayan", "Son Güncelleme Tarihi", "*hidden*"
-                ],
-                "display" => [
-                    "name" , "version", "issuer", "updated_at", "id:extension_id"
-                ],
-                "menu" => [
-                    "Sil" => [
-                        "target" => "delete",
-                        "icon" => " context-menu-icon-delete"
-                    ]
-                ],
-                "onclick" => env('EXTENSION_DEVELOPER_MODE') ? "details" : ""
-            ])
+                    @include('table',[
+                        "value" => extensions()->map(function($item){
+                            if(!$item["issuer"]){
+                                $item["issuer"] = __('Güvenli olmayan üretici!');
+                            }
+                            return $item;
+                        }),
+                        "sortable" => true,
+                        "sortUpdateUrl" => route('update_ext_orders'),
+                        "afterSortFunction" => 'location.reload',
+                        "title" => [
+                            "Eklenti Adı" , "Versiyon", "İmzalayan", "Son Güncelleme Tarihi", "*hidden*"
+                        ],
+                        "display" => [
+                            "name" , "version", "issuer", "updated_at", "id:extension_id"
+                        ],
+                        "menu" => [
+                            "Sil" => [
+                                "target" => "delete",
+                                "icon" => " context-menu-icon-delete"
+                            ]
+                        ],
+                        "onclick" => env('EXTENSION_DEVELOPER_MODE') ? "details" : ""
+                    ])
+                </div>
+            </div>
         </div>
     </div>
 
@@ -92,10 +96,10 @@
     ])
     @if(env('EXTENSION_DEVELOPER_MODE') == true)
         <?php
-            $input_extensions = [];
-            foreach(extensions() as $extension){
-                $input_extensions[$extension->display_name] = $extension->id;
-            }
+        $input_extensions = [];
+        foreach (extensions() as $extension) {
+            $input_extensions[$extension->display_name] = $extension->id;
+        }
         ?>
 
         @include('modal',[

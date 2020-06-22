@@ -106,6 +106,20 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     Route::view('/profil', 'user.self')->name('my_profile');
 
+    Route::get('/profil/anahtarlarim', 'UserController@myAccessTokens')->name(
+        'my_access_tokens'
+    );
+
+    Route::post(
+        '/profil/anahtarlarim/ekle',
+        'UserController@createAccessToken'
+    )->name('create_access_token');
+
+    Route::post(
+        '/profil/anahtarlarim/sil',
+        'UserController@revokeAccessToken'
+    )->name('revoke_access_token');
+
     Route::post('/profil', 'UserController@selfUpdate')->name('profile_update');
 
     Route::post('/user/update', 'UserController@adminUpdate')

@@ -6,6 +6,7 @@ use App\Permission;
 use App\RoleUser;
 use App\User;
 use App\UserSettings;
+use App\AccessToken;
 use App\Server;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -106,7 +107,7 @@ class UserController extends Controller
         ]);
 
         // Respond
-        return respond("Kullanıcı Başarıyla Silindi!",200);
+        return respond("Kullanıcı Başarıyla Silindi!", 200);
     }
 
     public function passwordReset()
@@ -446,5 +447,31 @@ class UserController extends Controller
     {
         ConnectorToken::clear();
         return respond("Önbellek temizlendi.");
+    }
+
+    public function myAccessTokens()
+    {
+        return view("user.keys");
+    }
+
+    public function createAccessToken()
+    {
+        $token = Str::random(64);
+        AccessToken::create([
+            "user_id" => user()->id,
+            "name" => request("name"),
+            "token" => $token,
+        ]);
+        return respond("Anahtar Başarıyla Oluşturuldu<br>$token");
+    }
+
+    public function revokeAccessToken()
+    {
+        $token = AccessToken::find(request("token_id"));
+        if (!$token || $token->user_id != user()->id) {
+            return respond("Anahtar Bulunamadı!", 201);
+        }
+        $token->delete();
+        return respond("Anahtar Başarıyla Silindi");
     }
 }
