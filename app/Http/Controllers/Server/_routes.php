@@ -203,6 +203,11 @@ Route::group(['middleware' => ['server']], function () {
     )->name('server_restart_service');
 
     Route::post(
+        '/sunucu/servis/durum',
+        'Server\OneController@statusService'
+    )->name('server_service_status');
+
+    Route::post(
         '/sunucu/acikPortlar',
         'Server\OneController@getOpenPorts'
     )->name('server_get_open_ports');

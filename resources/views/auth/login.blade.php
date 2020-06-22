@@ -62,7 +62,7 @@
         <center><h6>Havelsan © 2020 <a href="https://liman.havelsan.com.tr" target="_blank">(İletişim)</a></h6></center>
     </div>
     <style>
-        .login-page, .card-body, input {
+        .login-page, .card-body {
             background: linear-gradient(261deg, #007bff, #343a40);
             background-size: 400% 400%;
 

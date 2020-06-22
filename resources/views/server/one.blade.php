@@ -395,7 +395,7 @@
     @include('modal',[
         "id"=>"delete_extensions",
         "title" => "Eklentileri Sil",
-        "text" => "Secili eklentileri silmek istediginize emin misiniz?",
+        "text" => "Seçili eklentileri silmek istediğinize emin misiniz?",
         "type" => "danger",
         "onsubmit" => "removeExtensionFunc",
         "submit_text" => "Eklentileri Sil"
@@ -456,21 +456,21 @@
 
     @include('modal',[
         "id"=>"startService",
-        "title" => "Servisi Baslat",
-        "text" => "Secili servisi baslatmak istediginize emin misiniz?",
+        "title" => "Servisi Başlat",
+        "text" => "Seçili servisi başlatmak istediğinize emin misiniz?",
         "type" => "danger",
         "next" => "reload",
         "inputs" => [
             "name:-" => "name:hidden",
         ],
         "url" => route('server_start_service'),
-        "submit_text" => "Servisi Baslat"
+        "submit_text" => "Servisi Başlat"
     ])
 
     @include('modal',[
         "id"=>"stopService",
         "title" => "Servisi Durdur",
-        "text" => "Secili servisi durdurmak istediginize emin misiniz?",
+        "text" => "Seçili servisi durdurmak istediğinize emin misiniz?",
         "type" => "danger",
         "next" => "reload",
         "inputs" => [
@@ -482,15 +482,15 @@
 
     @include('modal',[
         "id"=>"restartService",
-        "title" => "Servisi Yeniden Baslat",
-        "text" => "Secili servisi yeniden baslatmak istediginize emin misiniz?",
+        "title" => "Servisi Yeniden Başlat",
+        "text" => "Seçili servisi yeniden başlatmak istediğinize emin misiniz?",
         "type" => "danger",
         "next" => "reload",
         "inputs" => [
             "name:-" => "name:hidden",
         ],
         "url" => route('server_restart_service'),
-        "submit_text" => "Servisi Yeniden Baslat"
+        "submit_text" => "Servisi Yeniden Başlat"
     ])
 
     @include('modal',[
@@ -571,6 +571,13 @@
                 <span class="sr-only progress-info"></span>
             </div>
         </div>
+    @endcomponent
+
+    @component('modal-component',[
+        "id" => "serviceStatusModal",
+        "title" => "Servis Durumu"
+    ])
+        <pre id="serviceStatusWrapper"></pre>
     @endcomponent
 
     @component('modal-component',[
@@ -884,6 +891,24 @@
                 let json = JSON.parse(response);
                 $("#openPortsTab").html(json.message);
                 $("#openPortsTab table").DataTable(dataTablePresets('normal'));
+                setTimeout(function () {
+                    Swal.close();
+                }, 1500);
+            }, function(response){
+                let error = JSON.parse(response);
+                showSwal(error.message,'error',2000);
+            })
+        }
+
+        function statusService(element) {
+            let name = element.querySelector('#name').innerHTML;
+            showSwal('{{__("Okunuyor...")}}','info');
+            let form = new FormData();
+            form.append('name',name);
+            request('{{route('server_service_status')}}', form, function (response) {
+                let json = JSON.parse(response);
+                $("#serviceStatusWrapper").html(json.message);
+                $("#serviceStatusModal").modal('show');
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);

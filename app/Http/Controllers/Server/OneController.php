@@ -631,7 +631,11 @@ class OneController extends Controller
             "title" => ["Servis Adı", "Aciklamasi", "Durumu"],
             "display" => ["name", "description", "status"],
             "menu" => [
-                "Baslat" => [
+                "Detaylar" => [
+                    "target" => "statusService",
+                    "icon" => "fa-info-circle",
+                ],
+                "Başlat" => [
                     "target" => "startService",
                     "icon" => "fa-play",
                 ],
@@ -639,7 +643,7 @@ class OneController extends Controller
                     "target" => "stopService",
                     "icon" => "fa-stop",
                 ],
-                "Yeniden Baslat" => [
+                "Yeniden Başlat" => [
                     "target" => "restartService",
                     "icon" => "fa-sync-alt",
                 ],
@@ -1143,6 +1147,23 @@ class OneController extends Controller
         }
         server()->run($command);
         return respond("Servis Yeniden Başlatıldı", 200);
+    }
+
+    public function statusService()
+    {
+        if (
+            server()->type == "linux_ssh" ||
+            server()->type == "linux_certificate"
+        ) {
+            $command = sudo() . "systemctl status " . request('name');
+        } else {
+            return respond(
+                "Windows Sunucularda yalnızca servis durumu görüntülenmektedir.",
+                201
+            );
+        }
+        $output = server()->run($command);
+        return respond($output, 200);
     }
 
     public function getOpenPorts()
