@@ -20,14 +20,13 @@ class Kernel extends HttpKernel
             Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
+            \App\Http\Middleware\APILogin::class,
             \Illuminate\Session\Middleware\AuthenticateSession::class,
             Middleware\Language::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            //Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\ForcePasswordChange::class,
             \App\Http\Middleware\RestrictedMode::class,
-            \App\Http\Middleware\APILogin::class,
         ],
     ];
 
