@@ -22,7 +22,7 @@
                     <a class="nav-link" data-toggle="pill" href="#tab_2" role="tab" >{{__("Eklenti Veritabanı")}}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="pill" href="#tab_3" role="tab">{{__("Widgetlar")}}</a>
+                    <a class="nav-link" data-toggle="pill" href="#tab_3" role="tab">{{__("Bileşenler")}}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#tab_4" role="tab">{{__("Fonksiyonlar")}}</a>

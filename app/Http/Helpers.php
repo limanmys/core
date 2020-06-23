@@ -48,13 +48,20 @@ if (!function_exists('respond')) {
 }
 
 if (!function_exists('strposX')) {
-    function strposX($haystack, $needle, $number){
-        if($number == '1'){
+    function strposX($haystack, $needle, $number)
+    {
+        if ($number == '1') {
             return strpos($haystack, $needle);
-        }elseif($number > '1'){
-            return strpos($haystack, $needle, strposX($haystack, $needle, $number - 1) + strlen($needle));
-        }else{
-            return error_log('Error: Value for parameter $number is out of range');
+        } elseif ($number > '1') {
+            return strpos(
+                $haystack,
+                $needle,
+                strposX($haystack, $needle, $number - 1) + strlen($needle)
+            );
+        } else {
+            return error_log(
+                'Error: Value for parameter $number is out of range'
+            );
         }
     }
 }
@@ -114,7 +121,7 @@ if (!function_exists('getLimanPermissions')) {
             "type" => "liman",
             "key" => "id",
         ])->get();
-        $permissions = $permissions->map(function ($permission) use(&$map) {
+        $permissions = $permissions->map(function ($permission) use (&$map) {
             $permission->name = __($map[$permission->value]);
             $permission->id = $permission->value;
             return $permission;
@@ -337,10 +344,11 @@ if (!function_exists('addCertificate')) {
         $file = "liman-" . $hostname . "_" . $port . ".crt";
         $cert = file_get_contents('/tmp/' . $path);
         shell_exec(
-            "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . strtolower($file)
+            "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" .
+                strtolower($file)
         );
         shell_exec("sudo update-ca-certificates");
-        
+
         // Create Certificate Object.
         return Certificate::create([
             "server_hostname" => strtolower($hostname),
@@ -796,7 +804,7 @@ if (!function_exists('getExtensionViewCount')) {
     function getExtensionViewCount()
     {
         $count = intval(env('NAV_EXTENSION_HIDE_COUNT'));
-        if($count == null){
+        if ($count == null) {
             setEnv(['NAV_EXTENSION_HIDE_COUNT' => 10]);
             return 10;
         }

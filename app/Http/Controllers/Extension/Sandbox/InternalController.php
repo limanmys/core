@@ -20,7 +20,9 @@ class InternalController extends Controller
 {
     public function __construct()
     {
-        $this->checkPermissions();
+        if (array_key_exists("SERVER_ADDR", $_SERVER)) {
+            $this->checkPermissions();
+        }
     }
 
     /**

@@ -21,11 +21,11 @@ class Extension extends Model
         "issuer",
         "language",
         "support",
-        "displays"
+        "displays",
     ];
 
     protected $casts = [
-        'displays' => 'array'
+        'displays' => 'array',
     ];
 
     /**
@@ -91,6 +91,6 @@ class Extension extends Model
 
     public function getDisplayNameAttribute($value)
     {
-        return Str::title(str_replace("-"," ",$this->name));
+        return Str::title(str_replace("-", " ", $this->name));
     }
 }

@@ -121,7 +121,7 @@
                   </a>
               </li>
               <li class="nav-item">
-                  <a href="/widgetlar" class="nav-link">
+                  <a href="/bilesenler" class="nav-link">
                       <i class="nav-icon fas fa-chart-pie"></i>
                       <p>{{__("Bileşenler")}}</p>
                   </a>

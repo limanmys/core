@@ -53,7 +53,7 @@ return [
 
         'extension' => [
             'driver' => 'single',
-            'path' => env('LOG_EXTENSION_PATH','/liman/logs/extension.log'),
+            'path' => env('LOG_EXTENSION_PATH', '/liman/logs/extension.log'),
             'level' => 'info',
         ],
 

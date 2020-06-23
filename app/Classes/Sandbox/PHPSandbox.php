@@ -11,20 +11,26 @@ class PHPSandbox implements Sandbox
 {
     private $path = "/liman/sandbox/php/index.php";
     private $fileExtension = ".blade.php";
-    private $server,$extension,$user,$request,$logId;
+    private $server, $extension, $user, $request, $logId;
 
-    public function __construct($server = null, $extension = null, $user = null,$request = null)
-    {
-        $this->server = ($server) ? $server : server();
-        $this->extension = ($extension) ? $extension : extension();
-        $this->user = ($user) ? $user : user();
-        $this->request = ($request) ? $request : request()->except([
-            "permissions",
-            "extension",
-            "server",
-            "script",
-            "server_id",
-        ]);
+    public function __construct(
+        $server = null,
+        $extension = null,
+        $user = null,
+        $request = null
+    ) {
+        $this->server = $server ? $server : server();
+        $this->extension = $extension ? $extension : extension();
+        $this->user = $user ? $user : user();
+        $this->request = $request
+            ? $request
+            : request()->except([
+                "permissions",
+                "extension",
+                "server",
+                "script",
+                "server_id",
+            ]);
     }
 
     public function getPath()
@@ -32,7 +38,8 @@ class PHPSandbox implements Sandbox
         return $this->path;
     }
 
-    public function setLogId($logId){
+    public function setLogId($logId)
+    {
         $this->logId = $logId;
     }
 
@@ -149,7 +156,7 @@ class PHPSandbox implements Sandbox
             json_encode($userData),
             $publicPath,
             $isAjax,
-            $this->logId
+            $this->logId,
         ];
 
         $encrypted = openssl_encrypt(
@@ -167,9 +174,12 @@ class PHPSandbox implements Sandbox
 
         $keyPath = '/liman/keys' . DIRECTORY_SEPARATOR . $this->extension->id;
 
-        $soPath = "/liman/extensions/" . strtolower($this->extension->name) . "/liman.so";
+        $soPath =
+            "/liman/extensions/" .
+            strtolower($this->extension->name) .
+            "/liman.so";
 
-        $extra = is_file($soPath) ? "-dextension=$soPath ": "";
+        $extra = is_file($soPath) ? "-dextension=$soPath " : "";
         return "sudo runuser " .
             cleanDash($this->extension->id) .
             " -c 'timeout 30 /usr/bin/php $extra-d display_errors=on $combinerFile $keyPath $encrypted'";

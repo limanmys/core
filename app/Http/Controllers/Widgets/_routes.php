@@ -1,10 +1,10 @@
 <?php
 
-Route::get('/widgetlar', 'Widgets\MainController@settings')->name('widgets');
+Route::get('/bilesenler', 'Widgets\MainController@settings')->name('widgets');
 
 Route::post('/widget/ekle', 'Widgets\MainController@add')->name('widget_add');
 
-Route::view('/widget/ekle', 'widgets.add')->name('widget_add_page');
+Route::view('/bilesen/ekle', 'widgets.add')->name('widget_add_page');
 
 Route::post('/widget', 'Widgets\OneController@one')
     ->name('widget_one')

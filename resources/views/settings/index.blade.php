@@ -40,6 +40,9 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#restrictedMode" onclick="">{{__("Kısıtlı Mod")}}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#dnsSettings" onclick="getDNS()">{{__("DNS Ayarları")}}</a>
+                </li>
                 {!! settingsModuleButtons() !!}
             </ul>
         </div>
@@ -111,6 +114,18 @@
                 </div>
                 <div class="tab-pane fade show" id="health" role="tabpanel">
                     <pre id="output"></pre>
+                </div>
+                <div class="tab-pane fade show" id="dnsSettings" role="tabpanel">
+                    <p>{{__("Liman'ın sunucu adreslerini çözebilmesi için gerekli DNS sunucularını aşağıdan düzenleyebilirsiniz.")}}</p>
+                    <form onsubmit="return saveDNS(this);">
+                        <label>{{__("Öncelikli DNS Sunucusu")}}</label>
+                        <input type="text" name="dns1" id="dns1" class="form-control">
+                        <label>{{__("Alternatif DNS Sunucusu")}}</label>
+                        <input type="text" name="dns2" id="dns2" class="form-control">
+                        <label>{{__("Alternatif DNS Sunucusu")}}</label>
+                        <input type="text" name="dns3" id="dns3" class="form-control"><br>
+                        <button type="submit" class="btn btn-primary">{{__("Kaydet")}}</button>
+                    </form>
                 </div>
                 <div class="tab-pane fade show" id="servers" role="tabpanel">
                     <?php
@@ -451,8 +466,6 @@
 
     @endcomponent
 
-
-
     @include('modal',[
         "id"=>"deleteRoleMapping",
         "title" =>"Eşleştirmeyi Sil",
@@ -698,7 +711,34 @@
                 alert("hata");
             });
         }
+        
 
+        function saveDNS(form){
+            return request('{{route('set_liman_dns_servers')}}',form, function (success){
+                let json = JSON.parse(success);
+                showSwal(json["message"],'success',2000);
+                setTimeout(() => {
+                    getDNS();
+                }, 1500);
+            }, function(error){
+                let json = JSON.parse(error);
+                showSwal(json.message,'error',2000);
+            });
+        }
+
+        function getDNS(){
+            showSwal('{{__("Okunuyor")}}','info');
+            request('{{route('get_liman_dns_servers')}}',new FormData(),function(success){
+                let json = JSON.parse(success);
+                $("#dns1").val(json["message"][0]);
+                $("#dns2").val(json["message"][1]);
+                $("#dns3").val(json["message"][2]);
+                Swal.close();
+            },function(error){
+                let json = JSON.parse(error);
+                showSwal(json.message,'error',2000);
+            });
+        }
 
 
         $('#add_user').on('shown.bs.modal', function (e) {

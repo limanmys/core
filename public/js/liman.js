@@ -10010,15 +10010,13 @@ if (
                     height: t.outerHeight(!0),
                     float: t.css("float"),
                   },
-                  n = e("<div></div>")
-                    .addClass("ui-effects-wrapper")
-                    .css({
-                      fontSize: "100%",
-                      background: "transparent",
-                      border: "none",
-                      margin: 0,
-                      padding: 0,
-                    }),
+                  n = e("<div></div>").addClass("ui-effects-wrapper").css({
+                    fontSize: "100%",
+                    background: "transparent",
+                    border: "none",
+                    margin: 0,
+                    padding: 0,
+                  }),
                   o = { width: t.width(), height: t.height() },
                   r = document.activeElement;
                 try {
@@ -11367,14 +11365,11 @@ if (
                     return 0 === parseInt(e(this).attr("tabIndex"), 10);
                   })
                   .attr("tabIndex", -1),
-            i
-              .attr("aria-hidden", "false")
-              .prev()
-              .attr({
-                "aria-selected": "true",
-                "aria-expanded": "true",
-                tabIndex: 0,
-              });
+            i.attr("aria-hidden", "false").prev().attr({
+              "aria-selected": "true",
+              "aria-expanded": "true",
+              tabIndex: 0,
+            });
         },
         _animate: function (e, t, i) {
           var n,
@@ -15868,15 +15863,15 @@ if (
             /^(canvas|textarea|input|select|button|img)$/i
           ) &&
             (this.element.wrap(
-              e(
-                "<div class='ui-wrapper' style='overflow: hidden;'></div>"
-              ).css({
-                position: this.element.css("position"),
-                width: this.element.outerWidth(),
-                height: this.element.outerHeight(),
-                top: this.element.css("top"),
-                left: this.element.css("left"),
-              })
+              e("<div class='ui-wrapper' style='overflow: hidden;'></div>").css(
+                {
+                  position: this.element.css("position"),
+                  width: this.element.outerWidth(),
+                  height: this.element.outerHeight(),
+                  top: this.element.css("top"),
+                  left: this.element.css("left"),
+                }
+              )
             ),
             (this.element = this.element
               .parent()
@@ -20543,13 +20538,11 @@ if (
         this._setOptionDisabled(this.options.disabled),
           this._setupEvents(this.options.event),
           this._setupHeightStyle(this.options.heightStyle),
-          this.tabs
-            .not(this.active)
-            .attr({
-              "aria-selected": "false",
-              "aria-expanded": "false",
-              tabIndex: -1,
-            }),
+          this.tabs.not(this.active).attr({
+            "aria-selected": "false",
+            "aria-expanded": "false",
+            tabIndex: -1,
+          }),
           this.panels
             .not(this._getPanelForTab(this.active))
             .hide()
@@ -30567,13 +30560,11 @@ if ((version[0] <= 2 && version[1] < 17) || version[0] >= 3)
                 (e.append(t("<td>").addClass("separator")),
                 i.append(
                   t("<td>").append(
-                    t("<button>")
-                      .addClass("btn btn-primary")
-                      .attr({
-                        "data-action": "togglePeriod",
-                        tabindex: "-1",
-                        title: this._options.tooltips.togglePeriod,
-                      })
+                    t("<button>").addClass("btn btn-primary").attr({
+                      "data-action": "togglePeriod",
+                      tabindex: "-1",
+                      title: this._options.tooltips.togglePeriod,
+                    })
                   )
                 ),
                 n.append(t("<td>").addClass("separator"))),
@@ -63453,17 +63444,15 @@ if ((version[0] <= 2 && version[1] < 17) || version[0] >= 3)
                 (i.target = t.target),
                 (i.is_touch = "touchstart" === t.type),
                 !1 !== o &&
-                  (i.helper = e("<div id='vakata-dnd'></div>")
-                    .html(o)
-                    .css({
-                      display: "block",
-                      margin: "0",
-                      padding: "0",
-                      position: "absolute",
-                      top: "-2000px",
-                      lineHeight: "16px",
-                      zIndex: "10000",
-                    })),
+                  (i.helper = e("<div id='vakata-dnd'></div>").html(o).css({
+                    display: "block",
+                    margin: "0",
+                    padding: "0",
+                    position: "absolute",
+                    top: "-2000px",
+                    lineHeight: "16px",
+                    zIndex: "10000",
+                  })),
                 e(l).on(
                   "mousemove.vakata.jstree touchmove.vakata.jstree",
                   e.vakata.dnd.drag
@@ -70976,12 +70965,10 @@ if ((version[0] <= 2 && version[1] < 17) || version[0] >= 3)
         function d() {
           clearTimeout(m),
             (x.hideEta = 0),
-            v
-              .stop(!0, !0)
-              [p.showMethod]({
-                duration: p.showDuration,
-                easing: p.showEasing,
-              });
+            v.stop(!0, !0)[p.showMethod]({
+              duration: p.showDuration,
+              easing: p.showEasing,
+            });
         }
         function f() {
           var e = ((x.hideEta - new Date().getTime()) / x.maxHideTime) * 100;

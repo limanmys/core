@@ -110,3 +110,11 @@ Route::view('/sifreDegistir', 'user.password')
 Route::post('/sifreDegistir', 'UserController@forcePasswordChange')
     ->middleware('auth')
     ->name('password_change_save');
+
+Route::post('/dnsOku','Settings\MainController@getDNSServers')
+    ->middleware('admin')
+    ->name('get_liman_dns_servers');
+
+Route::post('/dnsYaz','Settings\MainController@setDNSServers')
+    ->middleware('admin')
+    ->name('set_liman_dns_servers');

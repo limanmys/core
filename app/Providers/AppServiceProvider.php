@@ -19,8 +19,10 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
-    {
+    public function boot(
+        \Illuminate\Routing\Router $router,
+        \Illuminate\Contracts\Http\Kernel $kernel
+    ) {
         View::composer('layouts.header', function ($view) {
             $view->with('USER_FAVORITES', user()->favorites());
         });
@@ -31,6 +33,13 @@ class AppServiceProvider extends ServiceProvider
             'users' => 'App\User',
             'roles' => 'App\Role',
         ]);
+
+        if (request()->headers->has("liman-token") == false) {
+            $router->pushMiddlewareToGroup(
+                "web",
+                \App\Http\Middleware\VerifyCsrfToken::class
+            );
+        }
     }
 
     /**

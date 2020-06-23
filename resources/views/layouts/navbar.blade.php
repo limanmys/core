@@ -83,6 +83,11 @@
                               </a>
                             </li>
                             <li class="nav-item">
+                              <a href="{{route('my_access_tokens')}}" class="nav-link text-dark">
+                                {{__("Kişisel Erişim Anahtarları")}}
+                              </a>
+                            </li>
+                            <li class="nav-item">
                               <a onclick="request('/cikis',new FormData(),null)" class="nav-link text-dark">
                                 {{__("Çıkış Yap")}}
                               </a>

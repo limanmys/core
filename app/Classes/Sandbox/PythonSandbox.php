@@ -11,20 +11,26 @@ class PythonSandbox implements Sandbox
 {
     private $path = "/liman/sandbox/python/index.py";
     private $fileExtension = ".html.ninja";
-    private $server,$extension,$user,$request,$logId;
+    private $server, $extension, $user, $request, $logId;
 
-    public function __construct($server = null, $extension = null, $user = null,$request = null)
-    {
-        $this->server = ($server) ? $server : server();
-        $this->extension = ($extension) ? $extension : extension();
-        $this->user = ($user) ? $user : user();
-        $this->request = ($request) ? $request : request()->except([
-            "permissions",
-            "extension",
-            "server",
-            "script",
-            "server_id",
-        ]);
+    public function __construct(
+        $server = null,
+        $extension = null,
+        $user = null,
+        $request = null
+    ) {
+        $this->server = $server ? $server : server();
+        $this->extension = $extension ? $extension : extension();
+        $this->user = $user ? $user : user();
+        $this->request = $request
+            ? $request
+            : request()->except([
+                "permissions",
+                "extension",
+                "server",
+                "script",
+                "server_id",
+            ]);
     }
 
     public function getPath()
@@ -32,7 +38,8 @@ class PythonSandbox implements Sandbox
         return $this->path;
     }
 
-    public function setLogId($logId){
+    public function setLogId($logId)
+    {
         $this->logId = $logId;
     }
 
@@ -52,14 +59,18 @@ class PythonSandbox implements Sandbox
 
         $extensionDb = [];
         foreach ($settings->get() as $setting) {
-            $key = env('APP_KEY') . $this->user->id . $this->extension->id . $this->server->id;
+            $key =
+                env('APP_KEY') .
+                $this->user->id .
+                $this->extension->id .
+                $this->server->id;
             $decrypted = openssl_decrypt($setting->value, 'aes-256-cfb8', $key);
             $stringToDecode = substr($decrypted, 16);
             $extensionDb[$setting->name] = base64_decode($stringToDecode);
         }
 
         $extensionDb = json_encode($extensionDb);
-        
+
         $request = json_encode($this->request);
 
         $apiRoute = route('extension_server', [
@@ -140,7 +151,7 @@ class PythonSandbox implements Sandbox
             json_encode($userData),
             $publicPath,
             $isAjax,
-            $this->logId
+            $this->logId,
         ];
 
         $keyPath = '/liman/keys' . DIRECTORY_SEPARATOR . $this->extension->id;
