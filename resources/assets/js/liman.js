@@ -112,7 +112,7 @@ function limanRequestBuilder(index, token) {
   return (
     "curl -d '" +
     str +
-    '\' -H "Content-Type: application/json" -H "Accept: application/json"-H "liman-token: ' +
+    '\' -H "Content-Type: application/json" -H "Accept: application/json" -H "liman-token: ' +
     token +
     '" -X POST ' +
     limanRequestList[index]["url"]
