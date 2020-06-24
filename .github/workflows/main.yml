@@ -56,6 +56,7 @@ jobs:
           composer install --no-dev -d package/liman/server
           git --git-dir=package/liman/server/.git log -30 --pretty=format:"%s%x09%ad" > package/liman/server/storage/changelog
           rm -rf package/liman/server/.git package/liman/sandbox/php/.git package/liman/sandbox/python/.git
+          rm -rf package/liman/server/node_modules
           mv package/liman/server/build_tools/DEBIAN package/
           rm -rf package/liman/server/build_tools
           cd package
