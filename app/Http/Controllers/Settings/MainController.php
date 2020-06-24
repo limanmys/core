@@ -532,7 +532,9 @@ input(type=\"imtcp\" port=\"514\")";
     public function setDNSServers()
     {
         `sudo chattr -i /etc/resolv.conf`;
-        $str = "";
+        $str = "
+options rotate timeout:3
+";
         foreach([request('dns1'),request('dns2'),request('dns3')] as $ip){
             if($ip == null){
                 continue;

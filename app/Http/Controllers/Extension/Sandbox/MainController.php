@@ -128,6 +128,7 @@ class MainController extends Controller
             return view('extension_pages.server', [
                 "viewName" => "",
                 "view" => $output,
+                "tokens" => user()->accessTokens()->get()->toArray(),
                 "last" => $this->getNavigationServers(),
             ]);
         }

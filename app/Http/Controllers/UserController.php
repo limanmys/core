@@ -462,7 +462,7 @@ class UserController extends Controller
             "name" => request("name"),
             "token" => $token,
         ]);
-        return respond("Anahtar Başarıyla Oluşturuldu<br>$token");
+        return respond("Anahtar Başarıyla Oluşturuldu.");
     }
 
     public function revokeAccessToken()

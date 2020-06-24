@@ -1,5 +1,7 @@
 let csrf = document.getElementsByName("csrf-token")[0].getAttribute("content");
 let customRequestData = [];
+let limanRecordRequests = false;
+let limanRequestList = [];
 
 function showSwal(message, type, timer = false) {
   let config = {
@@ -40,6 +42,18 @@ function request(url, data, next, error) {
 
   for (const [key, value] of Object.entries(customRequestData)) {
     data.append(key, value);
+  }
+
+  if (limanRecordRequests) {
+    let parsed = {};
+    for (var pair of data.entries()) {
+      parsed[pair[0]] = pair[1];
+    }
+    limanRequestList.push({
+      target: url.substring(url.lastIndexOf("/") + 1),
+      url: url,
+      form: parsed,
+    });
   }
 
   let r = new XMLHttpRequest();
@@ -91,6 +105,18 @@ function request(url, data, next, error) {
     }
   };
   return false;
+}
+
+function limanRequestBuilder(index, token) {
+  let str = JSON.stringify(limanRequestList[index]["form"]);
+  return (
+    "curl -d '" +
+    str +
+    '\' -H "Content-Type: application/json" -H "Accept: application/json" -H "liman-token: ' +
+    token +
+    '" -X POST ' +
+    limanRequestList[index]["url"]
+  );
 }
 
 function reload() {

@@ -14,7 +14,7 @@
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
                 <h3 class="profile-username text-center">{{__("Kişisel Erişim Anahtarlarım")}}</h3>
-                <p class="text-muted text-center">{{__("Size ait Kişisel Erişim Anahtarları'nın listesini görüntüleyebilirsiniz. Gizlilik sebebiyle eski anahtarınıza erişemezsiniz. Mevcut anahtar üzerinde işlem yapmak için sağ tıklayabilirsiniz.")}}</p>
+                <p class="text-muted text-center">{{__("Size ait Kişisel Erişim Anahtarları'nın listesini görüntüleyebilirsiniz. Mevcut anahtar üzerinde işlem yapmak için sağ tıklayabilirsiniz.")}}</p>
               </div>
             </div>
         </div>
@@ -29,10 +29,10 @@
                     @include('table',[
                         "value" => user()->accessTokens()->get(),
                         "title" => [
-                            "Adı", "Son Kullanılan Tarih", "Son Kullanan Ip Adresi", "*hidden*"
+                            "Adı", "Token", "Son Kullanılan Tarih", "Son Kullanan Ip Adresi", "*hidden*"
                         ],
                         "display" => [
-                            "name" , "last_used_at", "last_used_ip", "id:token_id"
+                            "name" , "token", "last_used_at", "last_used_ip", "id:token_id"
                         ],
                         "menu" => [
                             "Sil" => [
@@ -50,7 +50,7 @@
     "id"=>"addAccessToken",
     "title" => "Anahtar Oluştur",
     "url" => route('create_access_token'),
-    "next" => "debug",
+    "next" => "reload",
     "inputs" => [
         "İsim" => "name:text"
     ],
