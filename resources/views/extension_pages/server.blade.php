@@ -16,7 +16,7 @@
         @if(count($tokens) > 0)
         <button data-toggle="tooltip" title="Sorgu Oluştur" class="btn btn-primary" onclick="showRequestRecords()"><i class="fa fa-book"></i></button>
         @endif
-        <button data-toggle="tooltip" title="Destek Al" class="btn btn-primary" onclick="location.href = 'mailto:{{env('APP_NOTIFICATION_EMAIL')}}?subject={{env('BRAND_NAME')}} {{extension()->display_name}} {{extension()->version}}'"><i class="fas fa-headset"></i></button>
+        <button data-toggle="tooltip" title="Destek Al" class="btn btn-primary" onclick="location.href = 'mailto:{{env('APP_NOTIFICATION_EMAIL')}}?subject={{env('BRAND_NAME')}} {{getVersion()}} - {{extension()->display_name}} {{extension()->version}}'"><i class="fas fa-headset"></i></button>
 </div>
 @include('errors')    
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Server;
 use App\AdminNotification;
 use App\Certificate;
 use App\Classes\Connector\SSHConnector;
+use App\Classes\Connector\SNMPConnector;
 use App\Classes\Connector\SSHCertificateConnector;
 use App\Classes\Connector\WinRMConnector;
 use App\Http\Controllers\Controller;
@@ -95,6 +96,26 @@ class AddController extends Controller
                 "name" => "clientPassword",
                 "value" => $encryptedPassword,
             ]);
+        }else if(server()->type == "snmp"){
+            $targetValues = [
+                "username","SNMPsecurityLevel","SNMPauthProtocol","SNMPauthPassword","SNMPprivacyProtocol","SNMPprivacyPassword"
+            ];
+            $encKey = env('APP_KEY') . user()->id . server()->id;
+            foreach($targetValues as $target){
+                $encrypted = openssl_encrypt(
+                    Str::random(16) . base64_encode(request($target)),
+                    'aes-256-cfb8',
+                    $encKey,
+                    0,
+                    Str::random(16)
+                );
+                UserSettings::create([
+                    "server_id" => $this->server->id,
+                    "user_id" => user()->id,
+                    "name" => $target,
+                    "value" => $encrypted,
+                ]);
+            }
         }
 
         // Run required function for specific type.
@@ -119,6 +140,9 @@ class AddController extends Controller
             case "linux_certificate":
                 $next = $this->linux_certificate();
                 break;
+            case "snmp":
+                $next = $this->snmp();
+                break;
             default:
                 $next = respond("Sunucu türü bulunamadı.", 404);
                 break;
@@ -140,6 +164,27 @@ class AddController extends Controller
         if (!$flag) {
             $this->server->delete();
             return respond("SSH Hatası", 400);
+        }
+
+        return $this->grantPermissions();
+    }
+
+    private function snmp()
+    {
+        $flag = SNMPConnector::createSnmp(
+            $this->server,
+            request('username'),
+            request('SNMPsecurityLevel'),
+            request('SNMPauthProtocol'),
+            request('SNMPauthPassword'),
+            request('SNMPprivacyProtocol'),
+            request('SNMPprivacyPassword'),
+            user()->id,
+        );
+        
+        if (!$flag) {
+            $this->server->delete();
+            return respond("SNMP Hatası", 400);
         }
 
         return $this->grantPermissions();

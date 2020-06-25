@@ -84,6 +84,7 @@
             @isset($setCurrentVariable)
             var {{$setCurrentVariable}};
             @endisset
+            @if(count($value) > 0)
             $.contextMenu({
                 selector: '#{{$rand}} tbody tr',
                 callback: function (key, options) {
@@ -112,6 +113,7 @@
                     @endforeach
                 }
             });
+            @endif
         </script>
     @endif
 @endif

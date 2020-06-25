@@ -34,7 +34,7 @@ class Server
             $errstr,
             intval(config('liman.server_connection_timeout')) / 1000
         );
-        if (is_resource($status)) {
+        if (is_resource($status) || server()->control_port == -1) {
             return $next($request);
         } else {
             $message = __(":server_name isimli sunucuya erişim sağlanamadı!", [

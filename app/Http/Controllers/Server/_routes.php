@@ -25,8 +25,7 @@ Route::post('/sunucu/isimKontrol', 'Server\MainController@verifyName')
     ->middleware('parameters:server_name');
 
 Route::post('/sunucu/anahtarKontrol', 'Server\MainController@verifyKey')
-    ->name('server_verify_key')
-    ->middleware('parameters:ip_address,username,password,port');
+    ->name('server_verify_key');
 
 // Remove Server Route
 

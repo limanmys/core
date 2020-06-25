@@ -29,7 +29,7 @@ class OneController extends Controller
         }
 
         $outputs = [
-            "hostname" => $server->run("hostname"),
+            "hostname" => $server->getHostname(),
             "version" => $server->getVersion(),
         ];
 
@@ -76,14 +76,18 @@ class OneController extends Controller
     public function serviceCheck()
     {
         if (is_numeric(extension()->service)) {
-            $status = @fsockopen(
-                server()->ip_address,
-                extension()->service,
-                $errno,
-                $errstr,
-                intval(config('liman.server_connection_timeout')) / 1000
-            );
-            $flag = is_resource($status);
+            if(extension()->service == -1){
+                $flag = true;
+            }else{
+                $status = @fsockopen(
+                    server()->ip_address,
+                    extension()->service,
+                    $errno,
+                    $errstr,
+                    intval(config('liman.server_connection_timeout')) / 1000
+                );
+                $flag = is_resource($status);
+            }
         } else {
             $flag = server()->isRunning(extension()->service);
         }
@@ -988,7 +992,8 @@ class OneController extends Controller
         if (
             server()->type == "linux_ssh" ||
             server()->type == "windows_powershell" ||
-            server()->type == "linux_certificate"
+            server()->type == "linux_certificate" ||
+            server()->type == "snmp"
         ) {
             return respond("Bu sunucuda yükseltme yapılamaz.", 201);
         }

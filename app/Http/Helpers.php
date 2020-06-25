@@ -158,11 +158,16 @@ if (!function_exists('settingsModuleButtons')) {
         foreach (searchModuleFiles('settings.blade.php') as $file) {
             $foo = substr($file, 15);
             $name = substr($foo, 0, strpos($foo, "/"));
+            $hrefName = $name;
+            if(is_numeric($name[0])){
+                $hrefName = "l-" . $name;
+            }
+
             $str .=
                 "<li class=\"nav-item\">
-               <a id\"" .
+               <a id=\"" .
                 $name .
-                "tab\" class=\"nav-link\" data-toggle=\"tab\" href=\"#$name\">$name</a>
+                "tab\" class=\"nav-link\" data-toggle=\"tab\" href=\"#$hrefName\">$name</a>
             </li>";
         }
         return $str;
@@ -841,6 +846,9 @@ if (!function_exists('setBaseDn')) {
 if (!function_exists('checkPort')) {
     function checkPort($ip, $port)
     {
+        if($port == -1){
+            return true;
+        }
         $fp = @fsockopen($ip, $port, $errno, $errstr, 0.1);
         if (!$fp) {
             return false;
