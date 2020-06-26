@@ -476,27 +476,64 @@ input(type=\"imtcp\" port=\"514\")";
         return respond("Başarıyla Kaydedildi!");
     }
 
+    public function redirectMarket()
+    {
+        session([
+            "market_auth_started" => true,
+        ]);
+        return redirect(
+            "https://" .
+                env('MARKET_URL') .
+                "/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri=" .
+                urlencode(env('APP_URL') . '/api/market/bagla') .
+                "&client_id=" .
+                env('MARKET_CLIENT_ID')
+        );
+    }
+
     public function connectMarket()
     {
-        $client = new Client(['verify' => false]);
+        if (!session("market_auth_started", false)) {
+            abort(504, "Geçersiz istek!");
+        }
+        session([
+            "market_auth_started" => false,
+        ]);
+        try {
+            $client = new Client(['verify' => false]);
 
-        $params = [
-            "code" => request('code'),
-            "grant_type" => "authorization_code",
-            "redirect_uri" => env('APP_URL') . '/api/market/bagla',
-            "client_id" => env('MARKET_CLIENT_ID'),
-            "client_secret" => env('MARKET_CLIENT_SECRET'),
-        ];
-        $res = $client->request(
-            'POST',
-            'https://' . env('MARKET_URL') . '/connect/token',
-            ["form_params" => $params]
-        );
+            $params = [
+                "code" => request('code'),
+                "grant_type" => "authorization_code",
+                "redirect_uri" => env('APP_URL') . '/api/market/bagla',
+                "client_id" => env('MARKET_CLIENT_ID'),
+                "client_secret" => env('MARKET_CLIENT_SECRET'),
+            ];
+            $res = $client->request(
+                'POST',
+                'https://' . env('MARKET_URL') . '/connect/token',
+                ["form_params" => $params]
+            );
+        } catch (BadResponseException $e) {
+            abort(504, "Market hesabınız bağlanırken bir hata oluştu!");
+        }
+
         $json = json_decode((string) $res->getBody());
+        $requiredScopes = ["user_api", "offline_access"];
+        $currentScopes = explode(" ", $json->scope);
+
+        if ($requiredScopes != $currentScopes) {
+            abort(
+                504,
+                "Gerekli izinleri vermediğiniz için işleminizi gerçekleştiremiyoruz."
+            );
+        }
+
         setEnv([
             "MARKET_ACCESS_TOKEN" => $json->access_token,
             "MARKET_REFRESH_TOKEN" => $json->refresh_token,
         ]);
+
         return redirect(route('settings') . "#limanMarket");
     }
 
