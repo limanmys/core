@@ -122,7 +122,7 @@
                 @if(env('MARKET_CODE'))
                     Var
                 @else
-                    <a href="https://{{env('MARKET_URL')}}/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri={{urlencode(env('APP_URL') . '/market/bagla')}}&client_id={{env('MARKET_CLIENT_ID')}}">Tikla</a>
+                    <a href="https://{{env('MARKET_URL')}}/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri={{urlencode(env('APP_URL') . '/api/market/bagla')}}&client_id={{env('MARKET_CLIENT_ID')}}">Tikla</a>
                 @endif
                     
                 </div>

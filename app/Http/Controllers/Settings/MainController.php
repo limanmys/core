@@ -116,16 +116,16 @@ class MainController extends Controller
                 $data = [
                     [
                         "id" => "view_logs",
-                        "name" => "Sunucu Günlük Kayıtlarını Görüntüleme"
+                        "name" => "Sunucu Günlük Kayıtlarını Görüntüleme",
                     ],
                     [
                         "id" => "add_server",
-                        "name" => "Sunucu Ekleme"
+                        "name" => "Sunucu Ekleme",
                     ],
                     [
                         "id" => "server_services",
-                        "name" => "Sunucu Servislerini Görüntüleme"
-                    ]
+                        "name" => "Sunucu Servislerini Görüntüleme",
+                    ],
                 ];
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
@@ -134,7 +134,7 @@ class MainController extends Controller
                 abort(504, "Tip Bulunamadı");
         }
         return view('l.table', [
-            "value" => (object)$data,
+            "value" => (object) $data,
             "title" => $title,
             "display" => $display,
         ]);
@@ -159,20 +159,25 @@ class MainController extends Controller
         $flag = false;
         $ids = json_decode(request('ids'), true);
 
-        if($ids == []){
-            return respond("Lütfen bir seçim yapın",201);
+        if ($ids == []) {
+            return respond("Lütfen bir seçim yapın", 201);
         }
 
         foreach ($ids as $id) {
-            $flag = Permission::revoke(request('user_id'), request('type'), "id", $id);
+            $flag = Permission::revoke(
+                request('user_id'),
+                request('type'),
+                "id",
+                $id
+            );
         }
         array_push($arr, $id);
         $arr["type"] = request('type');
         $arr["target_user_id"] = request('user_id');
         system_log(7, "PERMISSION_REVOKE", $arr);
-        if($flag){
+        if ($flag) {
             return respond(__("Başarılı"), 200);
-        }else{
+        } else {
             return respond(__("Yetki(ler) silinemedi"), 201);
         }
     }
@@ -374,8 +379,8 @@ class MainController extends Controller
 
     public function addServerGroup()
     {
-        if(!request('name') || strlen(request('name')) < 1){
-            return respond("Lütfen bir grup ismi girin.",201);
+        if (!request('name') || strlen(request('name')) < 1) {
+            return respond("Lütfen bir grup ismi girin.", 201);
         }
         if (ServerGroup::where('name', request('name'))->exists()) {
             return respond("Bu isimle zaten bir grup var.", 201);
@@ -473,22 +478,26 @@ input(type=\"imtcp\" port=\"514\")";
 
     public function connectMarket()
     {
-        $client = new Client(['verify' => false ]);
+        $client = new Client(['verify' => false]);
 
         $params = [
-          "code" => request('code'),
-          "grant_type" => "authorization_code",
-          "redirect_uri " => route('home'),
-          "client_id" => env('MARKET_CLIENT_ID'),
-          "client_secret" => env('MARKET_CLIENT_SECRET')
+            "code" => request('code'),
+            "grant_type" => "authorization_code",
+            "redirect_uri" => env('APP_URL') . '/api/market/bagla',
+            "client_id" => env('MARKET_CLIENT_ID'),
+            "client_secret" => env('MARKET_CLIENT_SECRET'),
         ];
-
         $res = $client->request(
             'POST',
             'https://' . env('MARKET_URL') . '/connect/token',
             ["form_params" => $params]
         );
-        dd("hey jude!");
+        $json = json_decode((string) $res->getBody());
+        setEnv([
+            "MARKET_ACCESS_TOKEN" => $json->access_token,
+            "MARKET_REFRESH_TOKEN" => $json->refresh_token,
+        ]);
+        return redirect(route('settings') . "#limanMarket");
     }
 
     public function getLogSystem()
@@ -527,26 +536,32 @@ input(type=\"imtcp\" port=\"514\")";
     public function restrictedMode()
     {
         $flag = setenv([
-            "LIMAN_RESTRICTED" => request('LIMAN_RESTRICTED') ? 'true' : 'false',
+            "LIMAN_RESTRICTED" => request('LIMAN_RESTRICTED')
+                ? 'true'
+                : 'false',
             "LIMAN_RESTRICTED_SERVER" => request('LIMAN_RESTRICTED_SERVER'),
-            "LIMAN_RESTRICTED_EXTENSION" => request('LIMAN_RESTRICTED_EXTENSION')
+            "LIMAN_RESTRICTED_EXTENSION" => request(
+                'LIMAN_RESTRICTED_EXTENSION'
+            ),
         ]);
-        if($flag){
+        if ($flag) {
             return respond("Kısıtlı mod ayarları başarıyla güncellendi!");
-        }else{
-            return respond("Kısıtlı mod ayarları güncellenemedi!",201);
+        } else {
+            return respond("Kısıtlı mod ayarları güncellenemedi!", 201);
         }
     }
 
     public function getDNSServers()
     {
         $data = `grep nameserver /etc/resolv.conf | grep -v "#"`;
-        $arr = explode("\n",$data);
+        $arr = explode("\n", $data);
         $clean = [];
-        foreach($arr as $ip){
-            if($ip == ""){continue;}
-            $foo = explode(" ",trim($ip));
-            array_push($clean,$foo[1]);
+        foreach ($arr as $ip) {
+            if ($ip == "") {
+                continue;
+            }
+            $foo = explode(" ", trim($ip));
+            array_push($clean, $foo[1]);
         }
         return respond($clean);
     }
@@ -557,8 +572,8 @@ input(type=\"imtcp\" port=\"514\")";
         $str = "
 options rotate timeout:3
 ";
-        foreach([request('dns1'),request('dns2'),request('dns3')] as $ip){
-            if($ip == null){
+        foreach ([request('dns1'), request('dns2'), request('dns3')] as $ip) {
+            if ($ip == null) {
                 continue;
             }
             $str .= "nameserver $ip
@@ -567,11 +582,11 @@ options rotate timeout:3
         $str = trim($str);
         $output = `echo "$str" | sudo tee /etc/resolv.conf`;
         $compare = trim(`cat /etc/resolv.conf`) == $str ? true : false;
-        if($compare){
+        if ($compare) {
             `sudo chattr +i /etc/resolv.conf`;
             return respond("DNS Ayarları güncellendi!");
-        }else{
-            return respond("DNS Ayarları güncellenemedi!",201);
+        } else {
+            return respond("DNS Ayarları güncellenemedi!", 201);
         }
     }
 }

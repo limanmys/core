@@ -159,7 +159,7 @@ if (!function_exists('settingsModuleButtons')) {
             $foo = substr($file, 15);
             $name = substr($foo, 0, strpos($foo, "/"));
             $hrefName = $name;
-            if(is_numeric($name[0])){
+            if (is_numeric($name[0])) {
                 $hrefName = "l-" . $name;
             }
 
@@ -720,6 +720,7 @@ if (!function_exists('setEnv')) {
         if (!file_put_contents($envFile, $str)) {
             return false;
         }
+        Artisan::call('cache:clear');
         return true;
     }
 }
@@ -846,7 +847,7 @@ if (!function_exists('setBaseDn')) {
 if (!function_exists('checkPort')) {
     function checkPort($ip, $port)
     {
-        if($port == -1){
+        if ($port == -1) {
             return true;
         }
         $fp = @fsockopen($ip, $port, $errno, $errstr, 0.1);
