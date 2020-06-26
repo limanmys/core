@@ -5,10 +5,10 @@
     <script>
         window.setTimeout(function () {
             window.location = "{{ $url }}";
-        }, 1000);
+        }(), 1000);
     </script>
     <noscript>
-        <meta http-equiv="refresh" content="1;url={{ $url }}" />
+        <meta http-equiv="refresh" content="0;url={{ $url }}" />
     </noscript>
 </head>
 <body>
