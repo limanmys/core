@@ -175,7 +175,8 @@ if (!function_exists('settingsModuleButtons')) {
 }
 
 if (!function_exists('getLimanHostname')) {
-    function getLimanHostname(){
+    function getLimanHostname()
+    {
         return trim(`hostname`);
     }
 }
@@ -726,7 +727,7 @@ if (!function_exists('setEnv')) {
         if (!file_put_contents($envFile, $str)) {
             return false;
         }
-        Artisan::call('cache:clear');
+        shell_exec('php /liman/server/artisan config:clear');
         return true;
     }
 }
