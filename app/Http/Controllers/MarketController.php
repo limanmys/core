@@ -49,7 +49,7 @@ class MarketController extends Controller
             );
             array_push($params,[
                 "packageName" => "Liman." . $obj["name"],
-                "versionCode" => $obj["version_code"],
+                "versionCode" => array_key_exists("version_code",$obj) ? $obj["version_code"] : 0,
                 "currentVersion" => $obj["version"]
             ]);
         }
