@@ -48,6 +48,8 @@ Route::post('/ayar/log/kaydet', 'Settings\MainController@saveLogSystem')
     ->name('save_log_system')
     ->middleware('admin');
 
+Route::get('/market/baglaAuth','Settings\MainController@connectMarket')->name('connect_market')->middleware('admin');
+
 Route::post('/ayar/log/oku', 'Settings\MainController@getLogSystem')
     ->name('get_log_system')
     ->middleware('admin');

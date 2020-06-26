@@ -25,20 +25,23 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#health" onclick="checkHealth()">{{__("Sağlık Durumu")}}</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#update">{{__("Güncelleme")}}</a>
-                </li>
+                </li> -->
                 <!-- <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#changeLog">{{__("Son Değişiklikler")}}</a>
                 </li> -->
                 <!-- <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#rsyslog" onclick="readLogs()">{{__("Log Yönetimi")}}</a>
                 </li> -->
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#externalNotifications" onclick="">{{__("Dış Bildirimler")}}</a>
-                </li>
+                </li>  -->
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#restrictedMode" onclick="">{{__("Kısıtlı Mod")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#limanMarket" onclick="">{{__("Liman Market")}}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#dnsSettings" onclick="getDNS()">{{__("DNS Ayarları")}}</a>
@@ -114,6 +117,14 @@
                 </div>
                 <div class="tab-pane fade show" id="health" role="tabpanel">
                     <pre id="output"></pre>
+                </div>
+                <div class="tab-pane fade show" id="limanMarket" role="tabpanel">
+                @if(env('MARKET_CODE'))
+                    Var
+                @else
+                    <a href="https://{{env('MARKET_URL')}}/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri={{urlencode(env('APP_URL') . '/market/bagla')}}&client_id={{env('MARKET_CLIENT_ID')}}">Tikla</a>
+                @endif
+                    
                 </div>
                 <div class="tab-pane fade show" id="dnsSettings" role="tabpanel">
                     <p>{{__("Liman'ın sunucu adreslerini çözebilmesi için gerekli DNS sunucularını aşağıdan düzenleyebilirsiniz.")}}</p>

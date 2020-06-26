@@ -14,6 +14,8 @@ use App\RoleMapping;
 use App\RoleUser;
 use App\PermissionData;
 use App\ServerGroup;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 
 class MainController extends Controller
 {
@@ -467,6 +469,26 @@ input(type=\"imtcp\" port=\"514\")";
         shell_exec("sudo systemctl restart rsyslog");
 
         return respond("Başarıyla Kaydedildi!");
+    }
+
+    public function connectMarket()
+    {
+        $client = new Client(['verify' => false ]);
+
+        $params = [
+          "code" => request('code'),
+          "grant_type" => "authorization_code",
+          "redirect_uri " => route('home'),
+          "client_id" => env('MARKET_CLIENT_ID'),
+          "client_secret" => env('MARKET_CLIENT_SECRET')
+        ];
+
+        $res = $client->request(
+            'POST',
+            'https://' . env('MARKET_URL') . '/connect/token',
+            ["form_params" => $params]
+        );
+        dd("hey jude!");
     }
 
     public function getLogSystem()
