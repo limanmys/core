@@ -48,6 +48,7 @@ jobs:
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt install jq -y 1>/dev/null 2>/dev/null
           VERSION=`cat package/liman/server/storage/VERSION`
+          echo $GITHUB_RUN_ID > package/liman/server/storage/VERSION_CODE
           COMMIT="${GITHUB_REF#refs/heads/} : "
           COMMIT+=`git --git-dir=package/liman/server/.git log -1 --pretty=%B`
           COMMIT=`echo $COMMIT | jq -SrR @uri`

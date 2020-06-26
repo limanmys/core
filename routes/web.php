@@ -54,6 +54,13 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     Route::post('/collapse', 'HomeController@collapse')->name('set_collapse');
 
+    // Market Routes
+    
+    Route::post('/market/kontrol', 'MarketController@verifyMarketConnection')->name('verify_market')->middleware('admin');
+
+    Route::post('/market/guncellemeKontrol', 'MarketController@checkMarketUpdates')->name('check_updates_market')->middleware('admin');
+
+
     // Home Route
 
     Route::get('/', 'HomeController@index')->name('home');

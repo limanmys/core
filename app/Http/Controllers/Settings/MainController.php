@@ -482,7 +482,6 @@ input(type=\"imtcp\" port=\"514\")";
             "market_auth_started" => true,
         ]);
         return redirect(
-            "https://" .
                 env('MARKET_URL') .
                 "/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri=" .
                 urlencode(env('APP_URL') . '/api/market/bagla') .
@@ -511,7 +510,7 @@ input(type=\"imtcp\" port=\"514\")";
             ];
             $res = $client->request(
                 'POST',
-                'https://' . env('MARKET_URL') . '/connect/token',
+                env('MARKET_URL') . '/connect/token',
                 ["form_params" => $params]
             );
         } catch (BadResponseException $e) {

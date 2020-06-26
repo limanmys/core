@@ -174,6 +174,12 @@ if (!function_exists('settingsModuleButtons')) {
     }
 }
 
+if (!function_exists('getLimanHostname')) {
+    function getLimanHostname(){
+        return trim(`hostname`);
+    }
+}
+
 if (!function_exists('serverModuleViews')) {
     /**
      * @return mixed

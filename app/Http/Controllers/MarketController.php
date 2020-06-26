@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+
+class MarketController extends Controller
+{
+    public function verifyMarketConnection()
+    {
+        if(!env('MARKET_ACCESS_TOKEN')){
+            return respond("Market'e bağlanmak için bir anahtarınız yok!",201);
+        }
+        $client = self::getClient();
+        try{
+            $response = $client->post(env("MARKET_URL") . '/api/users/me');
+        }catch(\Exception $e){
+            return respond("Anahtarınız ile Market'e bağlanılamadı!",201);
+        }
+        
+        return respond("Market Bağlantısı Başarıyla Sağlandı.");
+    }
+
+    public function checkMarketUpdates()
+    {
+        $client = self::getClient();
+
+        $params = [];
+        $limanCode = trim(file_get_contents(storage_path('VERSION_CODE')));
+
+        array_push($params,[
+            "packageName" => "Liman.Core",
+            "versionCode" => intval($limanCode),
+            "currentVersion" => getVersion()
+        ]);
+
+        
+        foreach(extensions() as $extension){
+            $obj = json_decode(
+                file_get_contents(
+                    "/liman/extensions/" .
+                        strtolower($extension->name) .
+                        DIRECTORY_SEPARATOR .
+                        "db.json"
+                ),
+                true
+            );
+            array_push($params,[
+                "packageName" => "Liman." . $obj["name"],
+                "versionCode" => $obj["version_code"],
+                "currentVersion" => $obj["version"]
+            ]);
+        }
+
+        try{
+            $response = $client->get(env("MARKET_URL") . '/api/application/check_version',[
+                "json" => $params
+            ]);
+        }catch(\Exception $e){
+            return respond($e->getMessage(),201);
+        }
+        $json = json_decode((string) $response->getBody());
+        $collection = collect($json);
+        for($i=0; $i < count($params); $i++){
+            $obj = $collection->where('packageName',$params[$i]["packageName"])->first();
+            if(!$obj){
+                $params[$i]["status"] = "Güncel";
+            }else{
+                $params[$i]["status"] = $obj->version->versionName . " sürümü mevcut";
+            }
+        }
+        return respond($params);
+    }
+
+
+    private function getClient()
+    {
+        return new Client([
+            "headers" => [
+                "Accept" => "application/json",
+                "Authorization" => "Bearer " . env("MARKET_ACCESS_TOKEN")
+            ],
+            "verify" => false
+        ]);
+    }
+}
