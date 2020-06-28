@@ -106,7 +106,7 @@
                         "menu" => [
                             "Güncelle" => [
                                 "target" => "updateCertificate",
-                                "icon" => " context-menu-icon-update"
+                                "icon" => "fa-sync-alt"
                             ],
                             "Sil" => [
                                 "target" => "deleteCertificate",

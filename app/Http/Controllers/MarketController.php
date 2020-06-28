@@ -23,6 +23,19 @@ class MarketController extends Controller
         return respond("Market Bağlantısı Başarıyla Sağlandı.");
     }
 
+    private function checkAccess($hostname, $port = 443)
+    {
+        return is_resource(
+            @fsockopen(
+                $hostname,
+                $port,
+                $errno,
+                $errstr,
+                intval(config('liman.server_connection_timeout'))
+            )
+        );
+    }
+
     public function checkMarketUpdates()
     {
         $client = self::getClient();
@@ -77,6 +90,13 @@ class MarketController extends Controller
 
     private function getClient()
     {
+        if(!self::checkAccess(env("MARKET_URL"))){
+            if(env("MARKET_URL") == null){
+                abort(504,"Market bağlantısı ayarlanmamış.");
+            }
+            abort(504,env("MARKET_URL") . " adresindeki markete bağlanılamadı!");
+        }
+
         return new Client([
             "headers" => [
                 "Accept" => "application/json",

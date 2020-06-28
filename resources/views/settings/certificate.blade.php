@@ -16,18 +16,19 @@
             @if(request('server_id'))
                 <h5>{{server()->name . " " . __("sunucusu talebi.")}}</h5>
             @endif
-            <table class="notDataTable">
-                <tr>
-                    <td>{{__("Hostname")}}</td>
-                    <td><input type="text" name="hostname" class="form-control" id="hostname" value="{{request('hostname')}}"></td>
-                </tr>
-                <tr>
-                    <td>{{__("Port")}}</td>
-                    <td><input type="number" name="port" class="form-control" aria-valuemin="1" aria-valuemax="65555" id="port" value="{{request('port')}}"></td>
-                    <td><button onclick="retrieveCertificate()" class="btn btn-success">{{__("Al")}}</button></td>
-                </tr>
-            </table>
-            <h3>{{__("Sertifika Bilgileri")}}</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="hostname">{{__("Hostname")}}</label>
+                    <input type="text" name="hostname" class="form-control" id="hostname" value="{{request('hostname')}}"></td>
+                </div>
+                <div class="col-md-4">
+                    <label for="port">{{__("Port")}}</label>
+                    <input type="number" name="port" class="form-control" aria-valuemin="1" aria-valuemax="65555" id="port" value="{{request('port')}}">
+                </div>
+                <div class="col-md-4" style="line-height: 95px">
+                    <button onclick="retrieveCertificate()" class="btn btn-success">{{__("Al")}}</button>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-4">
                     <div class="box box-solid">

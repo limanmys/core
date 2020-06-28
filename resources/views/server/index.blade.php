@@ -172,14 +172,14 @@
                                             <option value="SHA">SHA</option>
                                         </select><br>
                                         <h4>{{__("Giriş Parolası")}}</h4>
-                                        <input id="SNMPauthPassword" name="SNMPauthPassword" type="password" class="form-control snmp-input" placeholder="{{__("Giriş Parolası")}}" required disabled><br>
+                                        <input id="SNMPauthPassword" name="SNMPauthPassword" type="password" class="form-control snmp-input" placeholder="{{__("Giriş Parolası")}}" disabled><br>
                                         <h4>{{__("Gizlilik Protokolü")}}</h4>
                                         <select id="SNMPprivacyProtocol" name="SNMPprivacyProtocol" class="select2 snmp-input" disabled>
                                             <option value="DES">DES</option>
                                             <option value="AES">AES</option>
                                         </select><br>
                                         <h4>{{__("Gizlilik Parolası")}}</h4>
-                                        <input id="SNMPprivacyPassword" name="SNMPprivacyPassword" type="password" class="form-control snmp-input" placeholder="{{__("Gizlilik Parolası")}}" required disabled><br>
+                                        <input id="SNMPprivacyPassword" name="SNMPprivacyPassword" type="password" class="form-control snmp-input" placeholder="{{__("Gizlilik Parolası")}}" disabled><br>
                                     </div>
                                     <h4>{{__("Port")}}</h4>
                                     <small>{{__("Eğer bilmiyorsanız varsayılan olarak bırakabilirsiniz.")}}</small>
@@ -268,7 +268,6 @@
         }
         let helper;
         function checkKey(form) {           
-            
             let option = $("#useKey");
             if(option.is(':checked') === false){
                 isKeyOK = true;
