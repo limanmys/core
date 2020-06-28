@@ -21,6 +21,12 @@
             <li class="breadcrumb-item active" aria-current="page">{{cities(request('city'))}}</li>
         </ol>
     </nav>
+    @if(count($servers) == 0)
+    <div class="alert alert-warning" role="alert">
+            Bu eklentiyi kullanan hiçbir sunucu yok, hemen <a href="{{route('servers')}}">sunucular</a> sayfasına gidip mevcut sunucularınızdan birini bu eklentiyi kullanması için ayarlayabilirsiniz.
+        </div>
+    @else
+    
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">{{__(extension()->display_name)}} {{ __('Sunucuları') }}</h3>
@@ -45,4 +51,5 @@
             window.location.href = window.location.href + "/" + server_id
         }
     </script>
+    @endif
 @endsection

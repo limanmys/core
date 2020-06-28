@@ -589,7 +589,7 @@ input(type=\"imtcp\" port=\"514\")";
 
     public function getDNSServers()
     {
-        $data = `grep nameserver /etc/resolv.conf | grep -v "#"`;
+        $data = `grep nameserver /etc/resolv.conf | grep -v "#" | grep nameserver`;
         $arr = explode("\n", $data);
         $clean = [];
         foreach ($arr as $ip) {
@@ -606,7 +606,7 @@ input(type=\"imtcp\" port=\"514\")";
     {
         `sudo chattr -i /etc/resolv.conf`;
         $str = "
-options rotate timeout:3
+options rotate timeout:1 retries:1
 ";
         foreach ([request('dns1'), request('dns2'), request('dns3')] as $ip) {
             if ($ip == null) {
