@@ -397,7 +397,7 @@
             }else{
                 form.append('type',$("input[name=operating_system]:checked").val());
             }
-            request('{{route('server_add')}}',form,"",function (errors) {
+            request('{{route('server_add')}}',form,function (errors) {
                 var json = JSON.parse(errors);
                 if(json["status"] == "202"){
                     showSwal(json["message"],'info');

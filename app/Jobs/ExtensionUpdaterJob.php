@@ -39,7 +39,8 @@ class ExtensionUpdaterJob implements ShouldQueue
     public function handle()
     {
         $downloadPath = "/tmp/" . $this->extension->id . "-" . $this->version_code;
-        if(is_file($downloadPath)){
+        $exists = trim(shell_exec("[ -e '$downloadPath' ] && echo 1 || echo 0"));
+        if($exists == "1"){
             return true;
         }
         $client = new Client([

@@ -49,22 +49,7 @@
             }
             checkNotifications(data ? data.id : null);
     });
-    jQuery(function($) {
-      var path = window.location.href; // because the 'href' property of the DOM element is the absolute path
-      $('nav ul a').each(function() {
-        if (this.href === path) {
-          $(this).addClass('active');
-        }
-      });
-      $('.list-group a').each(function() {
-        if (this.href === path) {
-          $(this).addClass('active');
-        }
-      });
-      if(localStorage.nightMode == "on"){
-          $('body').addClass('skin-dark');
-      }
-    });
+    
 
     function dataTablePresets(type){
         if(type == "normal"){
@@ -148,6 +133,27 @@
             width: 'resolve'
         });
         $(":input").inputmask();
+
+        jQuery(function($) {
+            var path = window.location.href;
+            $('nav ul a').each(function() {
+                if (this.href === path) {
+                    $(this).addClass('active');
+                }else{
+                    $(this).removeClass('active')
+                }
+            });
+            $('.list-group a').each(function() {
+                if (this.href === path) {
+                    $(this).addClass('active');
+                }else{
+                    $(this).removeClass('active')
+                }
+            });
+            if(localStorage.nightMode == "on"){
+                $('body').addClass('skin-dark');
+            }
+        });
     }
 </script>
 </html>

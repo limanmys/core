@@ -129,11 +129,6 @@ class SNMPConnector implements Connector
             'name' => $name,
         ])->first();
         if(!$object){
-            dd([
-                'user_id' => user()->id,
-                'server_id' => server()->id,
-                'name' => $name,
-            ]);
             abort(
                 504,
                 "Bu sunucu için SNMP anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz."
