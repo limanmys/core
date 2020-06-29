@@ -90,7 +90,7 @@ class MarketController extends Controller
 
     private function getClient()
     {
-        if(!self::checkAccess(env("MARKET_URL"))){
+        if(!self::checkAccess(parse_url(env("MARKET_URL"))["host"])){
             if(env("MARKET_URL") == null){
                 abort(504,"Market bağlantısı ayarlanmamış.");
             }
