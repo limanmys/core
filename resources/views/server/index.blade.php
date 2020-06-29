@@ -232,19 +232,19 @@
     </div>
 
     <script>
-        let isNetworkOK = false;
-        let isGeneralOK = false;
-        let isKeyOK = false;
+        var isNetworkOK = false;
+        var isGeneralOK = false;
+        var isKeyOK = false;
         function checkAccess(form) {
             showSwal('{{__("Kontrol Ediliyor...")}}','info');
             return request('{{route('server_check_access')}}',form,function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json["message"],'success',2000);
                 isNetworkOK = true;
                 $("#networkTab").css('color','green');
                 $("#generalTab").click();
             },function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json.message,'error',2000);
                 isNetworkOK = false;
                 $("#networkTab").css('color','red');
@@ -254,39 +254,39 @@
         function checkGeneral(form){
             showSwal('{{__("Kontrol Ediliyor...")}}','info');
             return request('{{route('server_verify_name')}}',form,function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
             showSwal(json["message"],'success',500);
                 isGeneralOK = true;
                 $("#generalTab").css('color','green');
                 $("#keyTab").click();
             },function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json["message"],'error',2000);
                 isGeneralOK = false;
                 $("#generalTab").css('color','red');
             });
         }
-        let helper;
+        var helper;
         function checkKey(form) {           
-            let option = $("#useKey");
+            var option = $("#useKey");
             if(option.is(':checked') === false){
                 isKeyOK = true;
                 $("#keyTab").css('color','green');
                 $("#summaryTab").click();
                 return false;
             }
-            let data = new FormData(form);
+            var data = new FormData(form);
             helper = data;
             data.append('ip_address',$("#serverHostName").val());
             showSwal('{{__("Kontrol Ediliyor...")}}','info');
             return request('{{route('server_verify_key')}}',data,function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json["message"],'success',2000);
                 isKeyOK = true;
                 $("#keyTab").css('color','green');
                 $("#summaryTab").click();
             },function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json["message"],'error',2000);
                 isKeyOK = false;
                 $("#keyTab").css('color','red');
@@ -294,7 +294,7 @@
         }
 
         function keySettingsChanged(){
-            let option = $("#useKey");
+            var option = $("#useKey");
             if(option.is(':checked')){
                 isKeyOK = false;
                 $('#keyDiv').find('input, select').prop('disabled', false);
@@ -309,8 +309,8 @@
         }
         keySettingsChanged();
         function details(element) {
-            let server_id = element.querySelector('#server_id').innerHTML;
-            window.location.href = "/sunucular/" + server_id
+            var server_id = element.querySelector('#server_id').innerHTML;
+            partialPageRequest("/sunucular/" + server_id);
         }
         $("#keyPasswordCert").fadeOut(0);
         $("#certificateInformLabel").fadeOut(0);
@@ -372,7 +372,7 @@
                 return false;
             }
             showSwal('{{__("Sunucu Ekleniyor...")}}','info');
-            let form = new FormData();
+            var form = new FormData();
             form.append("name",$("#server_name").val());
             form.append("ip_address",$("#serverHostName").val());
             form.append("control_port",$("#serverControlPort").val());
@@ -398,7 +398,7 @@
                 form.append('type',$("input[name=operating_system]:checked").val());
             }
             request('{{route('server_add')}}',form,"",function (errors) {
-                let json = JSON.parse(errors);
+                var json = JSON.parse(errors);
                 if(json["status"] == "202"){
                     showSwal(json["message"],'info');
                     $(".modal").modal('hide');
@@ -406,7 +406,7 @@
                     showSwal(json["message"],'error',2000);
                 }
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }

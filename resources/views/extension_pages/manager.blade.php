@@ -1,27 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
-    <nav class="row">
-        <div class="col-sm-6">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ __('Eklenti Yönetimi') }}</li>
-            </ol>
-        </div>
-    </nav>
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card card-primary card-outline">
-              <div class="card-body box-profile">
-                <h3 class="profile-username text-center">{{__("Eklentiler")}}</h3>
-                <p class="text-muted text-center">Bu sayfadan mevcut eklentileri görebilirsiniz. Ayrıca yeni eklenti eklemek için Yükle butonunu kullanabilirsiniz.</p>
-              </div>
-            </div>
-        </div>
-        <div class="col-md-9">
-            <div class="card">
-                <div class="card-body">
-                @include('modal-button',[
+@include('modal-button',[
                         "class" => "btn-primary",
                         "target_id" => "extensionUpload",
                         "text" => "Yükle"
@@ -65,13 +42,8 @@
                                 "icon" => " context-menu-icon-delete"
                             ]
                         ],
-                        "onclick" => env('EXTENSION_DEVELOPER_MODE') ? "details" : ""
+                        "onclick" => env('EXTENSION_DEVELOPER_MODE') ? "extensionDetails" : ""
                     ])
-                </div>
-            </div>
-        </div>
-    </div>
-
     @include('modal',[
         "id"=>"extSettings",
         "title" => "Ayarlar",
@@ -166,7 +138,7 @@
     }
 
     function extensionUploadError(response){
-        let error = JSON.parse(response);
+        var error = JSON.parse(response);
         if(error.status == 203){
             $('#extensionUpload_alert').hide();
             Swal.fire({
@@ -181,13 +153,13 @@
             }).then((result) => {
                 if (result.value) {
                     showSwal('{{__("Yükleniyor...")}}','info');
-                    let data = new FormData(document.querySelector('#extensionUpload_form'))
+                    var data = new FormData(document.querySelector('#extensionUpload_form'))
                     data.append("force", "1");
                     request('{{route('extension_upload')}}',data,function(response){
                         Swal.close();
                         reload();
                     }, function(response){
-                        let error = JSON.parse(response);
+                        var error = JSON.parse(response);
                         Swal.close();
                         $('#extensionUpload_alert').removeClass('alert-danger').removeAttr('hidden').removeClass('alert-success').addClass('alert-danger').html(error.message).fadeIn();
                     });
@@ -197,10 +169,9 @@
     }
 
     @if(env('EXTENSION_DEVELOPER_MODE') == true)
-        function details(element){
-            let extension_id = element.querySelector('#extension_id').innerHTML;
-            window.location.href = "/eklentiler/" + extension_id
+        function extensionDetails(element){
+            var extension_id = element.querySelector('#extension_id').innerHTML;
+            partialPageRequest("/eklentiler/" + extension_id);
         }
     @endif
 </script>
-@endsection

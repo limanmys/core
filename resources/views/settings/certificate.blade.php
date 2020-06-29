@@ -4,7 +4,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-            <li class="breadcrumb-item"><a href="{{route('settings')}}">{{__("Ayarlar")}}</a></li>
+            <li class="breadcrumb-item"><a href="{{route('settings')}}">{{__("Sistem Ayarları")}}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{__("Sertifika Ekle")}}</li>
         </ol>
     </nav>
@@ -98,14 +98,14 @@
         </div>
     </div>
     <script>
-        let path = "";
+        var path = "";
         function retrieveCertificate() {
             showSwal('{{__("Sertifika Alınıyor...")}}','info');
-            let form = new FormData();
+            var form = new FormData();
             form.append('hostname',$("#hostname").val());
             form.append('port',$("#port").val());
             request('{{route('certificate_request')}}',form,function (success) {
-                let json = JSON.parse(success)["message"];
+                var json = JSON.parse(success)["message"];
                 if(json["issuer"]["DC"]){
                     $("#issuerCN").val(json["issuer"]["CN"]);
                 }
@@ -120,7 +120,7 @@
                 path = json["path"];
                 Swal.close();
             },function (errors) {
-                let json = JSON.parse(errors);
+                var json = JSON.parse(errors);
                 showSwal(json["message"],'error',2000);
             });
 
@@ -128,20 +128,20 @@
         
         function verifyCertificate() {
             showSwal('{{__("Sertifika Ekleniyor...")}}','info');
-            let form = new FormData();
+            var form = new FormData();
             form.append('path',path);
             form.append('server_hostname',$("#hostname").val());
             form.append('origin',$("#port").val());
             form.append('notification_id','{{request('notification_id')}}');
             form.append('server_id','{{request('server_id')}}');
             request('{{route('verify_certificate')}}',form,function (success) {
-                let json = JSON.parse(success);
+                var json = JSON.parse(success);
                 showSwal(json["message"],'info',2000);
                 setTimeout(function () {
-                    location.href = "{{route('settings')}}" + "#certificates";
+                    partialPageRequest("{{route('settings')}}" + "#certificates");
                 },1000);
             },function (errors) {
-                let json = JSON.parse(errors);
+                var json = JSON.parse(errors);
                 showSwal(json["message"],"error",2000);
             });
         }

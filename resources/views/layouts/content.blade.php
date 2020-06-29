@@ -1,5 +1,7 @@
 <!-- Content Wrapper. Contains page content -->
+@if(!request('partialRequest'))
 <div class="content-wrapper">
+@endif
     @if(auth()->check() && user()->email == "administrator@liman.dev")
     <div class="alert alert-danger customAlert">
         <b>{{__("Tam yetkili ana yönetici hesabı ile giriş yaptınız, sisteme zarar verebilirsiniz.")}}</b>
@@ -18,5 +20,7 @@
             @yield('content')
         </div>
     </section>
+@if(!request('partialRequest'))
 </div>
+@endif
 <!-- /.content-wrapper -->

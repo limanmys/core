@@ -77,20 +77,10 @@
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Bağlı Liman : ") . getLimanHostname()}}</h5>
                         </div>
                         <div class="card-footer p-0">
-                          <ul class="nav flex-column">
-                            <li class="nav-item">
-                              <a href="{{route('my_profile')}}" class="nav-link text-dark">
-                                {{__("Profil")}}
-                              </a>
-                            </li>
-                            <li class="nav-item">
-                              <a href="{{route('my_access_tokens')}}" class="nav-link text-dark">
-                                {{__("Kişisel Erişim Anahtarları")}}
-                              </a>
-                            </li>
+                          <ul class="nav flex-column" style="cursor:pointer;">
                             <li class="nav-item">
                               <a onclick="request('/cikis',new FormData(),null)" class="nav-link text-dark">
-                                {{__("Çıkış Yap")}}
+                                {{__("Çıkış Yap")}}	&nbsp;<i class="fas fa-sign-out-alt"></i>
                               </a>
                             </li>
                           </ul>

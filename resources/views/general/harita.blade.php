@@ -295,19 +295,19 @@ function svgturkiyeharitasi() {
         function(event) {
             if (event.target.tagName === 'path') {
                 const parent = event.target.parentNode;
-                window.location.href = window.location.href + '/' + (parent.getAttribute('data-plakakodu'));
+                partialPageRequest(window.location.href + '/' + (parent.getAttribute('data-plakakodu')));
             }
         }
     );
 }
 svgturkiyeharitasi();
-let sehirler = "{{$cities}}".split(",");
+var sehirler = "{{$cities}}".split(",");
 sehirler.forEach(function(sehir) {
   $('[data-plakakodu="' + sehir + '"] path').css('fill','#1094F6');
 });
 
 $('g[data-plakakodu]').each(function(){
-  let vm = this;
+  var vm = this;
   $(this).mouseover(function(){
     fillCity($(vm).attr('data-plakakodu'), true);
   });

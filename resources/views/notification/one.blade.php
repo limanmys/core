@@ -58,22 +58,22 @@ if(!$item){
     </div>
     <script>
         $('.mark_read').click(function () {
-            let data = new FormData();
+            var data = new FormData();
             data.append('notification_id', $(this).attr('notification-id'));
             request('{{route('notification_read')}}', data, function (response) {
                 location.reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         });
         $('.delete_not').click(function () {
-            let data = new FormData();
+            var data = new FormData();
             data.append('notification_id', $(this).attr('notification-id'));
             request('{{route('notification_delete')}}', data, function (response) {
-                location.href = "{{route('all_user_notifications')}}";
+                partialPageRequest("{{route('all_user_notifications')}}");
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         });

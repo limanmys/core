@@ -47,8 +47,8 @@
     </div>
     <script>
         function details(element) {
-            let server_id = element.querySelector('#server_id').innerHTML;
-            window.location.href = window.location.href + "/" + server_id
+            var server_id = element.querySelector('#server_id').innerHTML;
+            partialPageRequest(window.location.href + "/" + server_id);
         }
     </script>
     @endif

@@ -55,19 +55,19 @@
 <script>
 
     function userSettings(element){
-        let user_id = element.querySelector('#user_id').innerHTML;
-        window.location.href = "/ayarlar/" + user_id
+        var user_id = element.querySelector('#user_id').innerHTML;
+        partialPageRequest("/ayarlar/" + user_id);
     }
     function update(current,status) {
         showSwal('{{__("Kaydediliyor.")}}','info');
-        let form = new FormData();
+        var form = new FormData();
         form.append('status',status);
         form.append('request_id',current.querySelector('#request_id').innerHTML);
         request('{{route('request_update')}}',form,function () {
             Swal.close();
             location.reload();
         }, function(response){
-            let error = JSON.parse(response);
+            var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
         })
     }

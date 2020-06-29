@@ -7,7 +7,9 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
             <li class="breadcrumb-item" aria-current="page"><a
-                        href="{{route('extensions_settings')}}">{{__("Eklenti Yönetimi")}}</a></li>
+                        href="{{route('settings')}}">{{__("Sistem Ayarları")}}</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a
+                        href="{{route('settings')}}#extensions">{{__("Eklentiler")}}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ $extension["name"] }}</li>
         </ol>
     </nav>
@@ -311,13 +313,13 @@
     </div>
     <script>
         function editPage(element){
-            let page = $(element).find("#name").text();
-            location.href = location.protocol+'//'+location.host+location.pathname + "/" + page;
+            var page = $(element).find("#name").text();
+            partialPageRequest(location.protocol+'//'+location.host+location.pathname + "/" + page);
         }
 
         function updateExtension(type,tableId = null){
             showSwal('{{__("Kaydediliyor...")}}','info');
-            let data = new FormData();
+            var data = new FormData();
             data.append('type',type);
             data.append('name',$("#extensionName").val());
             data.append('icon',$("#icon").val());
@@ -333,7 +335,7 @@
                     location.reload();
                 },1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
@@ -343,7 +345,7 @@
         function getFunctionParameters(function_name){
             showSwal('{{__("Yükleniyor...")}}','info');
 
-            let data = new FormData();
+            var data = new FormData();
             data.append('function_name',function_name);
             activeFunction = function_name;
 
@@ -355,7 +357,7 @@
                     .DataTable(dataTablePresets('normal'));
                 $('#updateFunctionParametersModal').modal('show');
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
@@ -366,7 +368,7 @@
         }
 
         function updateFunctionParameters(row){
-            let function_name = $(row).find("#name").text();
+            var function_name = $(row).find("#name").text();
             getFunctionParameters(function_name);
         }
 
@@ -388,8 +390,8 @@
             }).then((result) => {
                 if (result.value) {
                     showSwal('{{__("Yükleniyor...")}}','info');
-                    let parameter_variable = $(row).find("#variable").text();
-                    let data = new FormData();
+                    var parameter_variable = $(row).find("#variable").text();
+                    var data = new FormData();
                     data.append('parameter_variable',parameter_variable);
                     data.append('function_name',activeFunction);
                     
@@ -397,14 +399,14 @@
                         Swal.close();
                         getFunctionParameters(activeFunction);
                     }, function(response){
-                        let error = JSON.parse(response);
+                        var error = JSON.parse(response);
                         showSwal(error.message,'error',2000);
                     });
                 }
             });
         }
         function updateFunctionModalHandler(element){
-            let modal = $("#updateFunctionModal");
+            var modal = $("#updateFunctionModal");
             modal.find("input[name='name']").val(element.querySelector('#name').innerHTML);
             modal.find("input[name='old']").val(element.querySelector('#name').innerHTML);
             modal.find("input[name='description']").val(element.querySelector('#description').innerHTML);

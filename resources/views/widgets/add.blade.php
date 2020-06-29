@@ -32,14 +32,14 @@
 </div>
 <script>
     function getExtensions(){
-        let form = new FormData();
-        let element = $("#extension_id");
+        var form = new FormData();
+        var element = $("#extension_id");
         element.text('');
         element.attr('disabled','true');
         form.append('server_id',$("#server_id").val());
         request('{{route('widget_get_extensions')}}',form,function(response){
-            let json = JSON.parse(response);
-            for(let k in json) {
+            var json = JSON.parse(response);
+            for(var k in json) {
                 element.append('<option value="'+ k+ '">' + fixer(json[k]) + '</option>');
             }
             if(Object.keys(json).length > 0){
@@ -49,26 +49,26 @@
                 $("#widget_name").text('').addAttr('disabled','');
             }
         }, function(response){
-            let error = JSON.parse(response);
+            var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
         });
     }
 
     function getWidgets(){
         $("#widget_name").text('');
-        let form = new FormData();
+        var form = new FormData();
         form.append('extension_id',$("#extension_id").val());
         request('{{route('widget_list')}}',form,function(response){
-            let json = JSON.parse(response);
-            let element = $("#widget_name");
+            var json = JSON.parse(response);
+            var element = $("#widget_name");
             element.text('');
-            for(let k in json) {
+            for(var k in json) {
                 console.log(json[k]);
                 element.append('<option value="'+ fixer(json[k]["target"]) + ':' + fixer(json[k]["name"]) + ':' + fixer(json[k]["type"]) + ':' + fixer(json[k]["icon"]) +'">' + fixer(json[k]["name"]) + '</option>');
             }
             element.removeAttr('disabled');
         }, function(response){
-            let error = JSON.parse(response);
+            var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
         });
     }

@@ -1183,8 +1183,8 @@ class OneController extends Controller
         $output = trim(
             server()->run(
                 sudo() .
-                    "lsof -i -P -n | grep LISTEN | awk -F' ' '{print $1,$3,$5,$8,$9}'"
-            )
+                    "lsof -i -P -n | grep -v '\-'| awk -F' ' '{print $1,$3,$5,$8,$9}' | sed 1,1d"
+                    )
         );
         $arr = [];
         foreach (explode("\n", $output) as $line) {

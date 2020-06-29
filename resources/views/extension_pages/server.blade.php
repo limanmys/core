@@ -6,13 +6,13 @@
     <li class="breadcrumb-item active"><a href="/l/{{extension()->id}}/{{request('city')}}/{{server()->id}}">{{extension()->display_name . __(" - Ana Sayfa")}}</a></li>
 </ol>
 <div class="right" id="ext_menu" style="float:right;margin-top:-55px">
-        <button data-toggle="tooltip" title="Eklenti Ayarları" class="btn btn-primary" onclick="location.href = '{{route('extension_server_settings_page',[
+        <button data-toggle="tooltip" title="Eklenti Ayarları" class="btn btn-primary" onclick="partialPageRequest('{{route('extension_server_settings_page',[
             "server_id" => server()->id,
             "extension_id" => extension()->id
-        ])}}'"><i class="fa fa-cogs"></i></button>
-        <button data-toggle="tooltip" title="Sunucuya Git" class="btn btn-primary" onclick="location.href = '{{route('server_one',[
+        ])}}')"><i class="fa fa-cogs"></i></button>
+        <button data-toggle="tooltip" title="Sunucuya Git" class="btn btn-primary" onclick="partialPageRequest('{{route('server_one',[
             "server_id" => server()->id,
-        ])}}'"><i class="fa fa-server"></i></button>
+        ])}}')"><i class="fa fa-server"></i></button>
         @if(count($tokens) > 0)
         <button data-toggle="tooltip" title="Sorgu Oluştur" class="btn btn-primary" onclick="showRequestRecords()"><i class="fa fa-book"></i></button>
         @endif
@@ -129,7 +129,7 @@ pre {
 
 <script>
     function toggleRequestRecord(){
-        let element = $("#requestRecordButton");
+        var element = $("#requestRecordButton");
         limanRecordRequests = !limanRecordRequests;
         if(limanRecordRequests == true){
             element.css("backgroundColor","red");
@@ -143,8 +143,8 @@ pre {
             showSwal("Lütfen önce bir sorguyu kaydedin.","error",2000);
             return;
         }
-        let listElement = $("#limanRequestsList");
-        let modalElement = $("#limanRequestsModal");
+        var listElement = $("#limanRequestsList");
+        var modalElement = $("#limanRequestsModal");
         listElement.html("");
         $.each(limanRequestList, function(index, entries) {
             listElement.append("<li onclick='showCurlCommand(this," + index + ")' class='list-group-item liman-request-item'>" + entries["target"] +"</li>")
@@ -166,7 +166,7 @@ pre {
 @endif
 <script>
     $(function(){
-        let list = [];
+        var list = [];
         $("#quickNavBar li>a").each(function(){
             list.push($(this).text());
         });

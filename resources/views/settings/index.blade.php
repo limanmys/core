@@ -4,7 +4,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{__("Ayarlar")}}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{__("Sistem Ayarları")}}</li>
         </ol>
     </nav>
     <div class="card">
@@ -12,6 +12,9 @@
             <ul class="nav nav-tabs" role="tabpanel">
                 <li class="nav-item">
                     <a class="nav-link active" data-toggle="tab" href="#users" aria-selected="true">{{__("Kullanıcı Ayarları")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#extensions" aria-selected="true">{{__("Eklentiler")}}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#roles" onclick="getRoleList()" aria-selected="true">{{__("Rol Grupları")}}</a>
@@ -73,7 +76,7 @@
                                     "icon" => "fa-lock"
                                 ],
                                 "Sil" => [
-                                    "target" => "delete",
+                                    "target" => "deleteUser",
                                     "icon" => " context-menu-icon-delete"
                                 ]
                             ],
@@ -92,7 +95,7 @@
                     </div>
                 </div>
                 <div class="tab-pane fade show" id="certificates" role="tabpanel">
-                    <button class="btn btn-success" onclick="location.href = '{{route('certificate_add_page')}}'"><i
+                    <button class="btn btn-success" onclick="partialPageRequest('{{route('certificate_add_page')}}')"><i
                         class="fa fa-plus"></i> {{__("Sertifika Ekle")}}</button>
                     <br><br>
                     @include('table',[
@@ -117,6 +120,9 @@
                 </div>
                 <div class="tab-pane fade show" id="health" role="tabpanel">
                     <pre id="output"></pre>
+                </div>
+                <div class="tab-pane fade show" id="extensions" role="tabpanel">
+                    @include('extension_pages.manager')
                 </div>
                 <div class="tab-pane fade show" id="limanMarket" role="tabpanel">
                     <div id="marketStatus" class="alert alert-secondary" role="alert">
@@ -146,12 +152,12 @@
                     </div>
                     <script>
                         function checkMarketAccess(){
-                            let status = $("#marketStatus");
+                            var status = $("#marketStatus");
                             $("#marketTableWrapper").fadeOut(0);
                             status.html("Market bağlantısı kontrol ediliyor...");
                             status.attr("class","alert alert-secondary");
                             request("{{route('verify_market')}}",new FormData(),function(success){
-                                let json = JSON.parse(success);
+                                var json = JSON.parse(success);
                                 $("#marketLoading").fadeOut(0);
                                 $("#marketDisabled").fadeOut(0);
                                 $("#marketEnabled").fadeIn();
@@ -161,7 +167,7 @@
                                     checkMarketUpdates();
                                 }, 1000);
                             },function(error){
-                                let json = JSON.parse(error);
+                                var json = JSON.parse(error);
                                 $("#marketLoading").fadeOut(0);
                                 $("#marketEnabled").fadeOut(0);
                                 $("#marketDisabled").fadeIn();
@@ -171,17 +177,17 @@
                         }
 
                         function checkMarketUpdates(){
-                            let status = $("#marketStatus");
+                            var status = $("#marketStatus");
                             status.html("Güncellemeler kontrol ediliyor...");
                             status.attr("class","alert alert-secondary");
                             $("#marketLoading").fadeIn(0);
                             request("{{route('check_updates_market')}}",new FormData(),function(success){
-                                let json = JSON.parse(success);
-                                let table = $("#marketTable").DataTable();
-                                let counter = 1;
+                                var json = JSON.parse(success);
+                                var table = $("#marketTable").DataTable();
+                                var counter = 1;
                                 table.clear();
                                 $.each(json.message,function (index,current) {
-                                    let row = table.row.add([
+                                    var row = table.row.add([
                                         counter++, current["packageName"], current["currentVersion"], current["status"]
                                     ]).draw().node();
                                 });
@@ -191,7 +197,7 @@
                                 $("#marketLoading").fadeOut(0);
                                 $("#marketTableWrapper").fadeIn(0);
                             },function(error){
-                                let json = JSON.parse(error);
+                                var json = JSON.parse(error);
                                 status.html(json.message);
                                 status.attr("class","alert alert-danger");
                             });
@@ -286,13 +292,13 @@
                     <script>
                         function saveRestricted(form){
                             return request('{{route("restricted_mode_update")}}',form,function(success){
-                                let json = JSON.parse(success);
+                                var json = JSON.parse(success);
                                 showSwal(json.message,'success');
                                 setTimeout(() => {
                                     reload();
                                 }, 2000);
                             },function(error){
-                                let json = JSON.parse(error);
+                                var json = JSON.parse(error);
                                 showSwal(json.message,'danger',2000);
                             });
                         }
@@ -416,7 +422,7 @@
     ])
 
     @include('modal',[
-       "id"=>"delete",
+       "id"=>"deleteUser",
        "title" =>"Kullanıcıyı Sil",
        "url" => route('user_remove'),
        "text" => "Kullanıcıyı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
@@ -630,63 +636,63 @@
         
         function saveLogSystem(){
             showSwal('{{__("Kaydediliyor...")}}','info');
-            let data = new FormData(document.querySelector('#logForm'));
+            var data = new FormData(document.querySelector('#logForm'));
             return request("{{route("save_log_system")}}", data, function(res) {
-                let response = JSON.parse(res);
+                var response = JSON.parse(res);
                 showSwal(response.message,'success');
                 reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
 
         function addRoleMapping(){
             showSwal('{{__("Kaydediliyor...")}}','info');
-            let data = new FormData();
+            var data = new FormData();
             data.append('dn', $('#addRoleMapping').find('select[name=dn]').val());
             data.append('role_id', $('#addRoleMapping').find('select[name=role_id]').val());
             request("{{route("add_role_mapping")}}", data, function(res) {
-                let response = JSON.parse(res);
+                var response = JSON.parse(res);
                 showSwal(response.message,'success');
                 reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
 
         function addServerGroup(){
             showSwal('{{__("Ekleniyor...")}}','info');
-            let data = new FormData();
-            let tableData = [];
-            let table = $("#serverGroupServers").DataTable();
+            var data = new FormData();
+            var tableData = [];
+            var table = $("#serverGroupServers").DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 tableData.push(element[3]);
             });
             data.append('name', $('#serverGroupName').val());
             data.append('servers', tableData.join());
             request("{{route("add_server_group")}}", data, function(response) {
-                let res = JSON.parse(response);
+                var res = JSON.parse(response);
                 showSwal(res.message,'success',2000);
                 setTimeout(() => {
                     location.reload();
                 }, 1000);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
         function modifyServerGroupHandler(row){
-            let server_group_id = row.querySelector('#server_group_id').innerHTML;
-            let server_ids = row.querySelector('#servers').innerHTML.split(",");
+            var server_group_id = row.querySelector('#server_group_id').innerHTML;
+            var server_ids = row.querySelector('#servers').innerHTML.split(",");
             current_server_group = server_group_id;
             $('#serverGroupNameModify').val(row.querySelector('#name').innerHTML);
-            let table = $("#modifyServerGroupTable").DataTable();
+            var table = $("#modifyServerGroupTable").DataTable();
             table.rows().deselect();
             table.rows().every(function(){
-                let data = this.data();
-                let current = this;
+                var data = this.data();
+                var current = this;
                 if(server_ids.includes(data[3])){
                     current.select();
                 }
@@ -695,12 +701,12 @@
             $("#modifyServerGroupModal").modal('show');
         }
 
-        let current_server_group = null;
+        var current_server_group = null;
         function modifyServerGroup(){
             showSwal('{{__("Düzenleniyor...")}}','center');
-            let data = new FormData();
-            let tableData = [];
-            let table = $("#modifyServerGroupTable").DataTable();
+            var data = new FormData();
+            var tableData = [];
+            var table = $("#modifyServerGroupTable").DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 tableData.push(element[3]);
             });
@@ -708,13 +714,13 @@
             data.append('servers', tableData.join());
             data.append('server_group_id',current_server_group);
             request("{{route("modify_server_group")}}", data, function(response) {
-                let res = JSON.parse(response);
+                var res = JSON.parse(response);
                 showSwal(res.message,'success',2000);
                 setTimeout(() => {
                     location.reload();
                 }, 1000);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
@@ -723,18 +729,18 @@
             showSwal('{{__("Okunuyor...")}}','info');
             request("{{route("get_log_system")}}", new FormData(), function(res) {
                 Swal.close();
-                let response = JSON.parse(res);
+                var response = JSON.parse(res);
                 $("#logIpAddress").val(response["message"]["ip_address"]);
                 $("#logPort").val(response["message"]["port"]);
                 $("#logInterval").val(response["message"]["interval"]);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
 
         function afterUserAdd(response) {
-            let json = JSON.parse(response);
+            var json = JSON.parse(response);
             $("#add_user button[type='submit']").attr("disabled","true")
             getUserList();
         }
@@ -749,7 +755,7 @@
                 $("#usersTable").html(response);
                 $('#usersTable table').DataTable(dataTablePresets('multiple'));
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
@@ -760,31 +766,31 @@
                 $("#rolesTable").html(response);
                 $('#rolesTable table').DataTable(dataTablePresets('normal'));
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
 
         function roleDetails(row){
-            let role_id = row.querySelector('#role_id').innerHTML;
-            location.href = '/rol/' + role_id;
+            var role_id = row.querySelector('#role_id').innerHTML;
+            partialPageRequest('/rol/' + role_id);
         }
 
         function details(row) {
-            let user_id = row.querySelector('#user_id').innerHTML;
-            location.href = '/ayarlar/' + user_id;
+            var user_id = row.querySelector('#user_id').innerHTML;
+            partialPageRequest('/ayarlar/' + user_id);
         }
 
         function checkHealth() {
             showSwal('{{__("Okunuyor...")}}','info');
             request("{{route('health_check')}}", new FormData(), function (success) {
                 Swal.close();
-                let json = JSON.parse(success);
-                let box = $("#output");
+                var json = JSON.parse(success);
+                var box = $("#output");
                 box.html("");
                 console.log(json["message"]);
-                for (let i = 0; i < json["message"].length; i++) {
-                    let current = json["message"][i];
+                for (var i = 0; i < json["message"].length; i++) {
+                    var current = json["message"][i];
                     box.append("<div class='alert alert-" + current["type"] + "' role='alert'>" +
                         current["message"] +
                         "</div>");
@@ -799,13 +805,13 @@
 
         function saveDNS(form){
             return request('{{route('set_liman_dns_servers')}}',form, function (success){
-                let json = JSON.parse(success);
+                var json = JSON.parse(success);
                 showSwal(json["message"],'success',2000);
                 setTimeout(() => {
                     getDNS();
                 }, 1500);
             }, function(error){
-                let json = JSON.parse(error);
+                var json = JSON.parse(error);
                 showSwal(json.message,'error',2000);
             });
         }
@@ -813,13 +819,13 @@
         function getDNS(){
             showSwal('{{__("Okunuyor")}}','info');
             request('{{route('get_liman_dns_servers')}}',new FormData(),function(success){
-                let json = JSON.parse(success);
+                var json = JSON.parse(success);
                 $("#dns1").val(json["message"][0]);
                 $("#dns2").val(json["message"][1]);
                 $("#dns3").val(json["message"][2]);
                 Swal.close();
             },function(error){
-                let json = JSON.parse(error);
+                var json = JSON.parse(error);
                 showSwal(json.message,'error',2000);
             });
         }

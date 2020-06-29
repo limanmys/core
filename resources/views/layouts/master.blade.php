@@ -23,9 +23,9 @@
     toastr.options.closeButton = true;
     Echo.private('App.User.{{auth()->user()->id}}')
         .notification((notification) => {
-            let data = notification['\u0000*\u0000attributes'];
+            var data = notification['\u0000*\u0000attributes'];
             if(data){
-                let errors = [
+                var errors = [
                     "error" , "health_problem"
                 ];
                 if(errors.includes(data.type)){
@@ -35,7 +35,7 @@
                 }else{
                     toastElement = toastr.success(data.message, data.title, {timeOut: 5000})
                 }
-                let displayedNots = [];
+                var displayedNots = [];
 
                 if(localStorage.displayedNots){
                     displayedNots = JSON.parse(localStorage.displayedNots);
@@ -44,7 +44,7 @@
                 localStorage.displayedNots = JSON.stringify(displayedNots);
                 
                 $(toastElement).click(function(){
-                    location.href = "/bildirim/" + data.id
+                    partialPageRequest("/bildirim/" + data.id);
                 });
             }
             checkNotifications(data ? data.id : null);
@@ -113,20 +113,9 @@
         $(".nav.nav-tabs a").on('click',function () {
             window.location.hash = $(this).attr("href");
         });
+        initialPresets();
         activeTab();
-        $('table').not('.notDataTable').DataTable({
-            autoFill : true,
-            bFilter: true,
-            destroy: true,
-            "language" : {
-                url : "{{asset('turkce.json')}}"
-            }
-        });
-        $('.js-example-basic-multiple,.js-example-basic-single').select2({
-            width: 'resolve'
-        });
-        $(":input").inputmask();
-        let title = $(".breadcrumb-item.active").text();
+        var title = $(".breadcrumb-item.active").text();
         if(title !== undefined){
             document.title = title + " / Liman";
         }
@@ -145,5 +134,20 @@
             }
         });
     };
+
+    function initialPresets(){
+        $('table').not('.notDataTable').DataTable({
+            autoFill : true,
+            bFilter: true,
+            destroy: true,
+            "language" : {
+                url : "{{asset('turkce.json')}}"
+            }
+        });
+        $('.js-example-basic-multiple,.js-example-basic-single').select2({
+            width: 'resolve'
+        });
+        $(":input").inputmask();
+    }
 </script>
 </html>

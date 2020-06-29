@@ -2,7 +2,7 @@
       <!-- Main Sidebar Container -->
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
-        <a href="/" class="brand-link">
+        <a onclick="partialPageRequest('/')" class="brand-link">
         <img src="/images/liman_logo-white.svg" height="30" style="opacity: .8;margin-left: 0.3rem;">
           <span class="right badge badge-success" style="margin-left:10px;">{{getVersion()}}</span>
         </a>
@@ -27,14 +27,14 @@
                     </a>
                     <ul class="nav nav-treeview" @if(request('server_id') == $server->id) style="display: block;" @endif>
                         <li class="nav-item">
-                            <a href="/sunucular/{{$server->id}}" class="nav-link">
+                            <a onclick="partialPageRequest('/sunucular/{{$server->id}}')" class="nav-link">
                                 <i class="fa fa-info nav-icon"></i>
                                 <p>{{__("Sunucu Detayları")}}</p>
                             </a>
                         </li>
                         @foreach ($server->extensions() as $extension)
                         <li class="nav-item">
-                            <a href="/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
+                            <a onclick="partialPageRequest('/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}')" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
                                 <i class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-'.$extension->icon}}"></i>
                                 <p>{{__($extension->display_name)}}</p>
                             </a>
@@ -44,7 +44,7 @@
                 @endforeach
               <li class="nav-header">{{__("Sunucular")}}</li>
               <li class="nav-item">
-                <a href="/sunucular" class="nav-link">
+                <a onclick="partialPageRequest('/sunucular')" class="nav-link">
                     <i class="nav-icon fas fa-server"></i>
                     <p>{{__("Sunucular")}}</p>
                 </a>
@@ -53,7 +53,7 @@
                 <li class="nav-header">{{__("Eklentiler")}}</li>
                 @foreach(extensions() as $extension)
                     <li class="nav-item ext_nav" @if($loop->iteration > getExtensionViewCount())style="display:none;"@endif>
-                        <a href="/l/{{$extension->id}}" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
+                        <a onclick="window.location.href = '/l/{{$extension->id}}'" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
                         @if(empty($extension->icon))
                             <i class="nav-icon fab fa-etsy"></i>
                         @elseif(substr($extension->icon,0,2) == 'fa')  
@@ -75,28 +75,22 @@
               @endif
               @if(auth()->user()->isAdmin())
                 <li class="nav-header">{{__("Yönetim Paneli")}}</li>
-                <li class="nav-item">
-                    <a href="/eklentiler" class="nav-link">
-                        <i class="nav-icon fas fa-plus"></i>
-                        <p>{{__("Eklentiler")}}</p>
-                    </a>
-                </li>
                 @if(\App\Module::exists())
                 <li class="nav-item">
-                    <a href="/modules" class="nav-link">
+                    <a onclick="partialPageRequest('/modules')" class="nav-link">
                         <i class="nav-icon fas fa-puzzle-piece"></i>
                         <p>{{__("Modüller")}}</p>
                     </a>
                 </li>
                 @endif
                 <li class="nav-item">
-                    <a href="/ayarlar" class="nav-link">
+                    <a onclick="partialPageRequest('/ayarlar')" class="nav-link">
                         <i class="nav-icon fas fa-cog"></i>
-                        <p>{{__("Ayarlar")}}</p>
+                        <p>{{__("Sistem Ayarları")}}</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/talepler" class="nav-link">
+                    <a onclick="partialPageRequest('/talepler')" class="nav-link">
                         <i class="nav-icon fas fa-plus"></i>
                         <p>{{__("Yetki Talepleri")}}</p>
                         @if(\App\LimanRequest::where('status',0)->count())
@@ -107,21 +101,33 @@
               @else
                 <li class="nav-header">{{__("Yetki Talebi")}}</li>
                 <li class="nav-item">
-                    <a href="/taleplerim" class="nav-link">
+                    <a onclick="partialPageRequest('/taleplerim')" class="nav-link">
                         <i class="nav-icon fas fa-key"></i>
                         <p>{{__("Taleplerim")}}</p>
                     </a>
                 </li>
               @endif
-              <li class="nav-header">{{__("Ayarlar")}}</li>
+              <li class="nav-header">{{__("Hesabım")}}</li>
               <li class="nav-item">
-                  <a href="/kasa" class="nav-link">
-                      <i class="nav-icon fas fa-key"></i>
+                  <a onclick="partialPageRequest('/profil')" class="nav-link">
+                      <i class="nav-icon fas fa-user"></i>
+                      <p>{{__("Profil")}}</p>
+                  </a>
+              </li>
+              <li class="nav-item">
+                  <a onclick="partialPageRequest('/profil/anahtarlarim')" class="nav-link">
+                      <i class="nav-icon fas fa-user-secret"></i>
+                      <p>{{__("Erişim Anahtarları")}}</p>
+                  </a>
+              </li>
+              <li class="nav-item">
+                  <a onclick="partialPageRequest('/kasa')" class="nav-link">
+                      <i class="nav-icon fas fa-wallet"></i>
                       <p>{{__("Kasa")}}</p>
                   </a>
               </li>
               <li class="nav-item">
-                  <a href="/bilesenler" class="nav-link">
+                  <a onclick="partialPageRequest('/bilesenler')" class="nav-link">
                       <i class="nav-icon fas fa-chart-pie"></i>
                       <p>{{__("Bileşenler")}}</p>
                   </a>

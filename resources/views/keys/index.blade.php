@@ -86,7 +86,7 @@
                 showSwal("{{__("Önbellek temizlendi!")}}",'success',2000);
                 reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }

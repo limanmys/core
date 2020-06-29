@@ -151,7 +151,7 @@
     <script>
         $(".sortable-widget").sortable({
             stop: function(event, ui) {
-                let data = [];
+                var data = [];
                 $(".sortable-widget > div").each(function(i, el){
                     $(el).attr('data-order', $(el).index());
                     data.push({
@@ -159,25 +159,25 @@
                       order:  $(el).index()
                     });
                 });
-                let form = new FormData();
+                var form = new FormData();
                 form.append('widgets', JSON.stringify(data));
                 request('{{route('update_orders')}}', form, function(response){});
             }
         });
         $(".sortable-widget").disableSelection();
-        let intervals = [];
-        let widgets = [];
-        let currentWidget = 0;
+        var intervals = [];
+        var widgets = [];
+        var currentWidget = 0;
 
         $(".limanWidget").each(function(){
-            let element = $(this);
+            var element = $(this);
             widgets.push({
               'element': element,
               'type': 'countBox'
             });
         });
         $('.limanCharts').each(function(){
-            let element = $(this);
+            var element = $(this);
             widgets.push({
               'element': element,
               'type': 'chart'
@@ -202,7 +202,7 @@
         @if(user()->isAdmin())
         function retrieveStats(){
             request('{{route('liman_stats')}}', new FormData(), function(response){
-              let json = JSON.parse(response);
+              var json = JSON.parse(response);
                 $("#ramUsage").text(json.ram);
                 $("#diskUsage").text(json.disk);
                 $("#cpuUsage").text(json.cpu);
@@ -227,13 +227,13 @@
         }
 
         function retrieveWidgets(element, next){
-            let info_box = element.closest('.info-box');
-            let form = new FormData();
+            var info_box = element.closest('.info-box');
+            var form = new FormData();
             form.append('widget_id',element.attr('id'));
             form.append('server_id',element.attr('data-server-id'));
             request('{{route('widget_one')}}', form, function(response){
                 try {
-                  let json = JSON.parse(response);
+                  var json = JSON.parse(response);
                   element.html(json["message"]);
                   info_box.find('.info-box-icon').show();
                   info_box.find('.info-box-content').show();
@@ -247,7 +247,7 @@
                   next();
                 }
             }, function(error) {
-                let json = {};
+                var json = {};
                 try{
                   json = JSON.parse(error);
                 }catch(e){
@@ -264,14 +264,14 @@
         }
 
         function retrieveCharts(element, next){
-            let id = element.attr('id');
-            let form = new FormData();
+            var id = element.attr('id');
+            var form = new FormData();
             form.append('widget_id', id);
             form.append('server_id',element.attr('data-server-id'));
             request('{{route('widget_one')}}', form, function(res){
                 try {
-                  let response =  JSON.parse(res);
-                  let data =  response.message;
+                  var response =  JSON.parse(res);
+                  var data =  response.message;
                   createChart(id+'Chart',data.labels, data.data);
                 } catch(e) {
                   info_box.find('.overlay i').remove();
@@ -282,7 +282,7 @@
                   next();
                 }
             }, function(error) {
-                let json = {};
+                var json = {};
                 try{
                   json = JSON.parse(error);
                 }catch(e){

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
+use App\Jobs\ExtensionUpdaterJob;
 use GuzzleHttp\Exception\BadResponseException;
+use Illuminate\Contracts\Bus\Dispatcher;
 
 class MarketController extends Controller
 {
@@ -63,7 +65,8 @@ class MarketController extends Controller
             array_push($params,[
                 "packageName" => "Liman." . $obj["name"],
                 "versionCode" => array_key_exists("version_code",$obj) ? $obj["version_code"] : 0,
-                "currentVersion" => $obj["version"]
+                "currentVersion" => $obj["version"],
+                "extension_id" => $extension->id
             ]);
         }
 
@@ -81,7 +84,18 @@ class MarketController extends Controller
             if(!$obj){
                 $params[$i]["status"] = "Güncel";
             }else{
-                $params[$i]["status"] = $obj->version->versionName . " sürümü mevcut";
+                $obj = json_decode(json_encode($obj),true);
+                $params[$i]["status"] = $obj["version"]["versionName"] . " sürümü mevcut";
+                if(count($obj["platforms"])){
+                    $job = (new ExtensionUpdaterJob(
+                        $params[$i]["extension_id"],
+                        $obj["version"]["versionCode"],
+                        $obj["platforms"][0]["downloadLink"]
+                    ))->onQueue('system_updater');
+            
+                    // Dispatch job right away.
+                    $job_id = app(Dispatcher::class)->dispatch($job);
+                }
             }
         }
         return respond($params);
