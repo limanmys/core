@@ -48,7 +48,8 @@ class MarketController extends Controller
         array_push($params,[
             "packageName" => "Liman.Core",
             "versionCode" => intval($limanCode),
-            "currentVersion" => getVersion()
+            "currentVersion" => getVersion(),
+            "extension_id" => null
         ]);
 
         
@@ -86,7 +87,7 @@ class MarketController extends Controller
             }else{
                 $obj = json_decode(json_encode($obj),true);
                 $params[$i]["status"] = $obj["version"]["versionName"] . " sürümü mevcut";
-                if(count($obj["platforms"])){
+                if($params[$i]["extension_id"] != null && count($obj["platforms"])){
                     $job = (new ExtensionUpdaterJob(
                         $params[$i]["extension_id"],
                         $obj["version"]["versionCode"],

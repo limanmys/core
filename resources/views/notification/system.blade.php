@@ -36,7 +36,7 @@
             exit();
             break;
         case "extension_update":
-            $url = route('extensions_settings') . "?showUpdates";
+            $url = route('settings') . "#extensions";
             $notification->update([
                 "read" => "true"
             ]);
