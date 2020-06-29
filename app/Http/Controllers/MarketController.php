@@ -80,6 +80,7 @@ class MarketController extends Controller
         }
         $json = json_decode((string) $response->getBody());
         $collection = collect($json);
+        $fileToWrite = [];
         for($i=0; $i < count($params); $i++){
             $obj = $collection->where('packageName',$params[$i]["packageName"])->first();
             if(!$obj){
@@ -96,8 +97,21 @@ class MarketController extends Controller
             
                     // Dispatch job right away.
                     $job_id = app(Dispatcher::class)->dispatch($job);
+
+                    array_push($fileToWrite,[
+                        "name" => substr($params[$i]["packageName"],6),
+                        "currentVersion" => $params[$i]["currentVersion"],
+                        "newVersion" => $obj["version"]["versionName"],
+                        "downloadLink" => $obj["platforms"][0]["downloadLink"],
+                        "versionCode" => $obj["version"]["versionCode"],
+                        "changeLog" => $obj["version"]["versionDescription"],
+                        "extension_id" => $params[$i]["extension_id"]
+                    ]);
                 }
             }
+        }
+        if(count($fileToWrite)){
+            file_put_contents(storage_path("extension_updates"),json_encode($fileToWrite),JSON_PRETTY_PRINT);
         }
         return respond($params);
     }

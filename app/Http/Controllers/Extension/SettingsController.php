@@ -607,4 +607,9 @@ class SettingsController extends Controller
 
         return respond("Fonksiyon Silindi.", 200);
     }
+
+    public function getExtensionUpdates()
+    {
+        return respond(json_decode(file_get_contents(storage_path('extension_updates'))));
+    }
 }

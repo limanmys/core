@@ -47,6 +47,9 @@ class MainController extends Controller
 
     public function API()
     {
+        if(extension()->status == "0"){
+            return respond("Eklenti şu an güncelleniyor, lütfen birazdan tekrar deneyin.",201);
+        }
         $page = request('target_function')
             ? request('target_function')
             : 'index';

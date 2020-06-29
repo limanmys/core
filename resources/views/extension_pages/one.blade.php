@@ -312,6 +312,7 @@
         </div>
     </div>
     <script>
+        customRequestData["extension_id"] = "{{extension()->id}}";
         function editPage(element){
             var page = $(element).find("#name").text();
             partialPageRequest(location.protocol+'//'+location.host+location.pathname + "/" + page);

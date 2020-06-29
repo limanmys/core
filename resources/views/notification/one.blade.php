@@ -7,7 +7,7 @@ if(!$item){
     if(auth()->user()->isAdmin() && \App\AdminNotification::find(request('notification_id'))->exists()){
         header("Location: " . route('system_notification',[
                 "notification_id" => request('notification_id')
-            ]), true);
+        ]), true);
         exit();
     }else{
         return redirect()->back();

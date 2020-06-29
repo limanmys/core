@@ -53,6 +53,20 @@ Route::get(
     ->name('extension_server_settings_page')
     ->middleware(['server', 'extension']);
 
+Route::post(
+    '/ayarlar/eklentiGuncellemeleri',
+    'Extension\SettingsController@getExtensionUpdates'
+)
+    ->name('get_extension_updates')
+    ->middleware('admin');
+
+    Route::post(
+        '/ayarlar/eklentiGuncelle',
+        'Extension\MainController@autoUpdateExtension'
+)
+    ->name('update_extension_auto')
+    ->middleware('admin');
+
 // Extension Server Settings
 Route::post(
     '/ayarlar/{extension_id}/{server_id}',

@@ -14,7 +14,7 @@
                     <a class="nav-link active" data-toggle="tab" href="#users" aria-selected="true">{{__("Kullanıcı Ayarları")}}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#extensions" aria-selected="true">{{__("Eklentiler")}}</a>
+                    <a id="extensionNavLink" class="nav-link" data-toggle="tab" href="#extensions" aria-selected="true">{{__("Eklentiler")}} @if(is_file(storage_path("extension_updates"))) <span style="color:green" class="blinking">*</span> @endif</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#roles" onclick="getRoleList()" aria-selected="true">{{__("Rol Grupları")}}</a>
@@ -389,6 +389,15 @@
             </div>
         </div>
     </div>
+    <style>
+        .blinking {
+            animation: blinker 1s linear infinite;
+        }
+
+        @keyframes blinker {  
+            50% { opacity: 0; }
+        }
+    </style>
     
     @include('modal',[
         "id"=>"add_user",
