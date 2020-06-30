@@ -31,6 +31,10 @@
                 showSwal(json.message,'error',2000);
             },"GET");
         }
+        
+        window.addEventListener('popstate', function (event) {
+            window.location.href = window.location.hash;
+        });
     
     </script>
     @stop
