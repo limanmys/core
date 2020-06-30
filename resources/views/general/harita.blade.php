@@ -295,7 +295,7 @@ function svgturkiyeharitasi() {
         function(event) {
             if (event.target.tagName === 'path') {
                 const parent = event.target.parentNode;
-                partialPageRequest(window.location.href + '/' + (parent.getAttribute('data-plakakodu')));
+                window.location.href = window.location.href + '/' + (parent.getAttribute('data-plakakodu'));
             }
         }
     );
