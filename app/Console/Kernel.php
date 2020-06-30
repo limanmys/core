@@ -5,6 +5,7 @@ namespace App\Console;
 use App\AdminNotification;
 use App\Notification;
 use App\User;
+use App\Http\Controllers\MarketController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
@@ -60,21 +61,33 @@ class Kernel extends ConsoleKernel
         //Check Package Update Every 30 Min
         $schedule
             ->call(function () {
-                shell_exec("sudo apt update");
-                $output = shell_exec("apt list --upgradable");
-                if (!strpos($output, "liman")) {
+                $controller = new MarketController();
+
+                if (!env('MARKET_ACCESS_TOKEN')) {
                     return;
                 }
-                AdminNotification::where('type', 'liman_update')->delete();
-                AdminNotification::create([
-                    "title" => "Liman Güncellemesi Mevcut!",
-                    "type" => "liman_update",
-                    "message" =>
-                        "Yeni bir liman sürümü mevcut ayrıntılı bilgi için tıklayınız.",
-                    "level" => 3,
-                ]);
+                $client = $controller->getClient();
+                try {
+                    $response = $client->post(
+                        env("MARKET_URL") . '/api/users/me'
+                    );
+                } catch (\Exception $e) {
+                    return;
+                }
+                $array = $controller->checkMarketUpdates(true);
+                $collection = collect($array);
+                if (!$collection->where("updateAvailable", 1)->count()) {
+                    AdminNotification::where('type', 'liman_update')->delete();
+                    AdminNotification::create([
+                        "title" => "Liman Güncellemesi Mevcut!",
+                        "type" => "liman_update",
+                        "message" =>
+                            "Yeni bir sistem güncellemesi mevcut, ayrıntılı bilgi için tıklayınız.",
+                        "level" => 3,
+                    ]);
+                }
             })
-            ->everyThirtyMinutes()
+            ->everyMinute()
             ->name('Update Check');
     }
 

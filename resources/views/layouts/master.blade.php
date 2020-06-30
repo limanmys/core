@@ -44,7 +44,7 @@
                 localStorage.displayedNots = JSON.stringify(displayedNots);
                 
                 $(toastElement).click(function(){
-                    partialPageRequest("/bildirim/" + data.id);
+                    window.location.href = "/bildirim/" + data.id;
                 });
             }
             checkNotifications(data ? data.id : null);

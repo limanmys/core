@@ -192,7 +192,7 @@
                                     ]).draw().node();
                                 });
                                 table.draw();
-                                status.html("Güncellemeler başarıyla kontrol edildi...");
+                                status.html("Güncellemeler başarıyla kontrol edildi");
                                 status.attr("class","alert alert-success");
                                 $("#marketLoading").fadeOut(0);
                                 $("#marketTableWrapper").fadeIn(0);
