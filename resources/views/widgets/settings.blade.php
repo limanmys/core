@@ -19,7 +19,7 @@
     <div class="col-md-9">
     <div class="card">
         <div class="card-body">
-            <button class="btn btn-success" onclick="window.location.href = '{{route('widget_add_page')}}'">{{__("Bileşen Ekle")}}</button>
+            <button class="btn btn-success" onclick="partialPageRequest('{{route('widget_add_page')}}')">{{__("Bileşen Ekle")}}</button>
                 <br><br>
                 @include('errors')
                 <?php foreach ($widgets as $widget) {

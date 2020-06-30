@@ -54,7 +54,7 @@
                             <span 
                                 class="badge btn-secondary status_{{$extension->id}}"
                                 style="cursor:pointer;font-size: 18px; margin-bottom: 5px;"
-                                onclick="location.href = '{{route('extension_server',["extension_id" => $extension->id, "city" => $server->city, "server_id" => $server->id])}}'">
+                                onclick="window.location.href = '{{route('extension_server',["extension_id" => $extension->id, "city" => $server->city, "server_id" => $server->id])}}'">
                                 {{$extension->display_name}}
                             </span>
                         @endforeach
@@ -596,7 +596,7 @@
     </div>
     @endcomponent
     <script>
-
+        customRequestData["server_id"] = '{{server()->id}}';
 
         $('#install_extension table').DataTable(dataTablePresets('multiple'));
 
@@ -604,8 +604,8 @@
         function server_extension(){
             showSwal('{{__("Okunuyor...")}}','info');
 
-            let items = [];
-            let table = $("#install_extension table").DataTable();
+            var items = [];
+            var table = $("#install_extension table").DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 items.push(element[2]);
             });
@@ -615,14 +615,14 @@
                 return false;
             }
 
-            let data = new FormData();
+            var data = new FormData();
             data.append("extensions", JSON.stringify(items));
 
             request('{{route('server_extension')}}', data, function (response) {
                 Swal.close();
                 reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -640,14 +640,14 @@
         }
 
         function checkStatus(id) {
-            let data = new FormData();
+            var data = new FormData();
             if (!id) {
                 return false;
             }
             data.append('extension_id', id);
             request('{{route('server_check')}}', data, function (response) {
-                let json = JSON.parse(response);
-                let element = $(".status_" + id);
+                var json = JSON.parse(response);
+                var element = $(".status_" + id);
                 element.removeClass('btn-secondary').removeClass('btn-danger').removeClass('btn-success').addClass(json["message"]);
             });
         }
@@ -704,11 +704,11 @@
                 }
             })
         }
-        let firstStats = true;
+        var firstStats = true;
         function stats() {
-            let form = new FormData();
+            var form = new FormData();
             form.append('server_id', '{{server()->id}}');
-            let time = "{{\Carbon\Carbon::now()->format("H:i:s")}}";
+            var time = "{{\Carbon\Carbon::now()->format("H:i:s")}}";
             request('{{route('server_stats')}}', form, function (response) {
                 data = JSON.parse(response);
                 if(firstStats){
@@ -730,18 +730,18 @@
 
         @endif
         function logDetails(element) {
-            let log_id = element.querySelector('#_id').innerHTML;
-            window.location.href = "/logs/" + log_id
+            var log_id = element.querySelector('#_id').innerHTML;
+            partialPageRequest("/logs/" + log_id);
         }
 
         function favorite(action) {
-            let form = new FormData();
+            var form = new FormData();
             form.append('server_id', '{{server()->id}}');
             form.append('action', action);
             request('{{route('server_favorite')}}', form, function (response) {
                 location.reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -758,7 +758,7 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -776,14 +776,14 @@
             }).then((result) => {
                 if (result.value) {
                     showSwal('{{__("Yükleniyor...")}}','info');
-                    let data = new FormData();
+                    var data = new FormData();
                     data.append('name',$(row).find("#name").text());
                     
                     request('{{route('server_delete_sudoers')}}',data,function(response){
                         Swal.close();
                         getSudoers();
                     }, function(response){
-                        let error = JSON.parse(response);
+                        var error = JSON.parse(response);
                         showSwal(error.message,'error',2000);
                     });
                 }
@@ -801,7 +801,7 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -817,13 +817,13 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
 
-        let activeLocalGroup = "";
-        let activeLocalGroupElement = "";
+        var activeLocalGroup = "";
+        var activeLocalGroupElement = "";
 
         function localGroupDetails(element){
             $('#groups').closest('.col-md-12').removeClass("col-md-12").addClass('col-md-6');
@@ -833,10 +833,10 @@
             $(element).css('backgroundColor','#b0bed9');
             $(element).css('fontWeight','bolder');
             showSwal('{{__("Okunuyor...")}}','info');
-            let group = element.querySelector('#group').innerHTML;
+            var group = element.querySelector('#group').innerHTML;
             activeLocalGroup = group;
             activeLocalGroupElement = element;
-            let data = new FormData();
+            var data = new FormData();
             data.append('group', group);
 
             request('{{route('server_local_group_users_list')}}', data, function (response) {
@@ -847,7 +847,7 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -855,17 +855,17 @@
         function addLocalGroupUser(){
             showSwal('{{__("Okunuyor...")}}','info');
 
-            let form = new FormData();
+            var form = new FormData();
             form.append('group',activeLocalGroup);
             form.append('user',$('#addLocalGroupUserModal').find("input[name=user]").val());
 
             request('{{route('server_add_local_group_user')}}',form,function(response){
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json.message,'info',2000);
                 localGroupDetails(activeLocalGroupElement);
                 $('#addLocalGroupUserModal').modal('hide');
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -880,7 +880,7 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -888,32 +888,32 @@
         function getOpenPorts() {
             showSwal('{{__("Okunuyor...")}}','info');
             request('{{route('server_get_open_ports')}}', new FormData(), function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 $("#openPortsTab").html(json.message);
                 $("#openPortsTab table").DataTable(dataTablePresets('normal'));
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
 
         function statusService(element) {
-            let name = element.querySelector('#name').innerHTML;
+            var name = element.querySelector('#name').innerHTML;
             showSwal('{{__("Okunuyor...")}}','info');
-            let form = new FormData();
+            var form = new FormData();
             form.append('name',name);
             request('{{route('server_service_status')}}', form, function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 $("#serviceStatusWrapper").html(json.message);
                 $("#serviceStatusModal").modal('show');
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -925,34 +925,34 @@
         });
         function getLogs(page = 1) {
             showSwal('{{__("Okunuyor...")}}','info');
-            let form = new FormData();
+            var form = new FormData();
             form.append('page',page);
-            let query = $("#logQueryFilter").val();
+            var query = $("#logQueryFilter").val();
             if(query.length !== 0){
                 form.append('query',query);
             }
             request('{{route('server_get_logs')}}', form, function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 $("#logsWrapper").html(json.message.table);
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
 
         function getLogDetails(element){
-            let log_id = element.querySelector('#id').innerHTML;
+            var log_id = element.querySelector('#id').innerHTML;
             showSwal('{{__("Okunuyor...")}}','info');
-            let form = new FormData();
+            var form = new FormData();
             form.append('log_id',log_id);
             request('{{route('server_get_log_details')}}', form, function (response) {
-                let json = JSON.parse(response);
-                let modal = $("#logDetailModal");
-                let logTitleWrapper = $("#logTitleWrapper");
-                let logContentWrapper = $("#logContentWrapper");
+                var json = JSON.parse(response);
+                var modal = $("#logDetailModal");
+                var logTitleWrapper = $("#logTitleWrapper");
+                var logContentWrapper = $("#logContentWrapper");
                 logTitleWrapper.html("");
                 logContentWrapper.html("");
                 $.each(json.message,function (index,current) {
@@ -965,7 +965,7 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -979,20 +979,20 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
-        let index = 0;
-        let packages = [];
-        let modes = {};
+        var index = 0;
+        var packages = [];
+        var modes = {};
 
         function installPackageButton(){
             if($('#installPackage').find('[href="#fromRepo"]').hasClass('active')){
                 console.log("repo tab");
                 index = 0;
                 packages = [];
-                let package_name = $('#installPackage').find('input[name=package]').val();
+                var package_name = $('#installPackage').find('input[name=package]').val();
                 if(package_name){
                     packages.push(package_name);
                     modes[package_name] = "install";
@@ -1010,7 +1010,7 @@
 
         function onDebUploadSuccess(upload){
             showSwal('{{__("Yükleniyor...")}}','info');
-            let data = new FormData();
+            var data = new FormData();
             data.append('filePath', upload.info.file_path);
             request('{{route('server_upload_deb')}}', data, function (response) {
                 Swal.close();
@@ -1022,7 +1022,7 @@
                     modes[response.message] = "install";
                 }
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
@@ -1032,9 +1032,9 @@
             index = 0;
             $('#updateLogs').find('.updateLogsBody').text("");
             getUpdates(function(package_list){
-                let package_list_tmp = [];
+                var package_list_tmp = [];
                 package_list.forEach(function(pkg){
-                    let package_name = pkg.name.split('/')[0];
+                    var package_name = pkg.name.split('/')[0];
                     package_list_tmp.push(package_name);
                 });
                 packages = package_list_tmp;
@@ -1045,7 +1045,7 @@
         function updateSelectedPackages(){
             index = 0;
             packages = [];
-            let table = $("#updatesTabTable table").DataTable();
+            var table = $("#updatesTabTable table").DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 packages.push(element[1].split('/')[0]);
             });
@@ -1066,9 +1066,9 @@
         function installPackage(){
             updateProgress();
             $('#updateLogs').modal('show');
-            let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
+            var scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
             scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
-            let data = new FormData();
+            var data = new FormData();
             data.append("package_name", packages[index]);
             if(modes[packages[index]]){
                 data.append("mode", modes[packages[index]]);
@@ -1077,14 +1077,14 @@
             request('{{route('server_install_package')}}', data, function (response) {
                 checkPackage();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
 
         function updateProgress(){
             $('#updateLogs').find('.progress-info').text(index+"/"+packages.length+" "+packages[index]+" paketi kuruluyor...");
-            let percent = (index/packages.length)*100;
+            var percent = (index/packages.length)*100;
             $('div[role=progressbar]').attr('aria-valuenow', percent);
             $('div[role=progressbar]').attr('style', 'width: '+percent+'%');
             if(packages.length !== index){
@@ -1097,7 +1097,7 @@
         }
 
         function checkPackage(){
-            let data = new FormData();
+            var data = new FormData();
             data.append("package_name", packages[index]);
             if(modes[packages[index]]){
                 data.append("mode", modes[packages[index]]);
@@ -1106,11 +1106,11 @@
                 response = JSON.parse(response);
                 if(response.message.output){
                     $('#updateLogs').find('.updateLogsBody').append("\n"+response.message.output);
-                    let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
+                    var scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
                     scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
                 }
                 $('#updateLogs').find('.updateLogsBody').append("\n"+response.message.status);
-                let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
+                var scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
                 scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
                 index++;
                 if(packages.length !== index){
@@ -1124,7 +1124,7 @@
                 response = JSON.parse(response);
                 if(response.message.output){
                     $('#updateLogs').find('.updateLogsBody').append("\n"+response.message.output);
-                    let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
+                    var scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
                     scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
                 }
                 setTimeout(function(){
@@ -1136,7 +1136,7 @@
         function getUpdates(getList) {
             showSwal('{{__("Okunuyor...")}}','info');
             request('{{route('server_update_list')}}', new FormData(), function (response) {
-                let updates = JSON.parse(response);
+                var updates = JSON.parse(response);
                 if(getList){
                     getList(updates.list);
                 }
@@ -1156,14 +1156,14 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
 
         function removeExtension(){
-            let data = [];
-            let table = $("#installed_extensions").DataTable();
+            var data = [];
+            var table = $("#installed_extensions").DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[4]);
             });
@@ -1175,8 +1175,8 @@
         }
 
         function removeExtensionFunc() {
-          let data = [];
-          let table = $("#installed_extensions").DataTable();
+          var data = [];
+          var table = $("#installed_extensions").DataTable();
           table.rows( { selected: true } ).data().each(function(element){
               data.push(element[4]);
           });
@@ -1185,16 +1185,16 @@
               return false;
           }
           showSwal('{{__("Siliniyor...")}}','info');
-          let form = new FormData();
+          var form = new FormData();
           form.append('extensions',JSON.stringify(data));
           request('{{route('server_extension_remove')}}', form, function (response) {
-              let json = JSON.parse(response);
+              var json = JSON.parse(response);
               showSwal(json["message"],'success',2000);
               setTimeout(function () {
                       location.reload();
               },2000);
           }, function(response){
-            let error = JSON.parse(response);
+            var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
           });
           return false;

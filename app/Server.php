@@ -4,6 +4,7 @@ namespace App;
 
 use App\Classes\Connector\Connector;
 use App\Classes\Connector\SSHConnector;
+use App\Classes\Connector\SNMPConnector;
 use App\Classes\Connector\SSHCertificateConnector;
 use App\Classes\Connector\WinRMConnector;
 use Illuminate\Database\Eloquent\Model;
@@ -36,12 +37,16 @@ class Server extends Model
     private function connector()
     {
         if ($this->type == "linux_ssh") {
-            return new SSHConnector($this, auth()->id());
+            return new SSHConnector($this, user()->id);
         } elseif ($this->type == "windows_powershell") {
-            return new WinRMConnector($this, auth()->id());
+            return new WinRMConnector($this, user()->id);
         } elseif ($this->type == "linux_certificate") {
-            return new SSHCertificateConnector($this, auth()->id());
-        } else {
+            return new SSHCertificateConnector($this, user()->id);
+        } elseif ($this->type == "snmp") {
+            return new SNMPConnector($this,user()->id);
+        }
+        
+        else {
             abort(
                 504,
                 "Bu sunucuda komut çalıştırmak için bir bağlantınız yok."
@@ -57,7 +62,7 @@ class Server extends Model
     public function run($command, $log = true)
     {
         if (!$this->canRunCommand()) {
-            return false;
+            return respond("Bu sunucuda komut çalıştıramazsınız!",504);
         }
 
         // Execute and return outputs.
@@ -106,6 +111,9 @@ class Server extends Model
     public function isRunning($service_name)
     {
         if ($this->type == "windows" || $this->type == "linux") {
+            if($this->control_port == -1){
+                return true;
+            }
             return is_resource(
                 @fsockopen(
                     $this->ip_address,
@@ -130,6 +138,9 @@ class Server extends Model
      */
     public function isAlive()
     {
+        if($this->control_port == -1){
+            return true;
+        }
         // Simply Check Port If It's Alive
         if (
             is_resource(
@@ -186,7 +197,8 @@ class Server extends Model
     {
         return $this->type == "linux_ssh" ||
             $this->type == "linux_certificate" ||
-            $this->type == "windows_powershell";
+            $this->type == "windows_powershell" || 
+            $this->type == "snmp";
     }
 
     public function isLinux()
@@ -203,8 +215,8 @@ class Server extends Model
 
     public function getVersion()
     {
-        if (!$this->canRunCommand()) {
-            return false;
+        if (!$this->canRunCommand() || $this->type == "snmp") {
+            return "";
         }
 
         if ($this->isLinux()) {
@@ -215,5 +227,14 @@ class Server extends Model
             "|",
             $this->run("(Get-WmiObject Win32_OperatingSystem).name")[0]
         );
+    }
+
+    public function getHostname()
+    {
+        if (!$this->canRunCommand() || $this->type == "snmp") {
+            return "";
+        }
+
+        return $this->run("hostname");
     }
 }

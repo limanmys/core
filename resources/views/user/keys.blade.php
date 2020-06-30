@@ -5,7 +5,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item" aria-current="page"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
             <li class="breadcrumb-item" aria-current="page"><a href="{{route('my_profile')}}">{{__("Profilim")}}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{__("Kişisel Erişim Anahtarlarım")}}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{__("Kişisel Erişim Anahtarları")}}</li>
         </ol>
     </nav>
     @include('errors')
@@ -13,7 +13,7 @@
         <div class="col-md-3">
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
-                <h3 class="profile-username text-center">{{__("Kişisel Erişim Anahtarlarım")}}</h3>
+                <h3 class="profile-username text-center">{{__("Kişisel Erişim Anahtarları")}}</h3>
                 <p class="text-muted text-center">{{__("Size ait Kişisel Erişim Anahtarları'nın listesini görüntüleyebilirsiniz. Mevcut anahtar üzerinde işlem yapmak için sağ tıklayabilirsiniz.")}}</p>
               </div>
             </div>

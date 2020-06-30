@@ -28,6 +28,8 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\ForcePasswordChange::class,
             \App\Http\Middleware\RestrictedMode::class,
         ],
+
+        'api' => ['throttle:60,1', 'bindings'],
     ];
 
     protected $routeMiddleware = [

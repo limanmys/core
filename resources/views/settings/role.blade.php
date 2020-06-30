@@ -4,7 +4,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-            <li class="breadcrumb-item"><a href="{{route('settings')}}">{{__("Ayarlar")}}</a></li>
+            <li class="breadcrumb-item"><a href="{{route('settings')}}">{{__("Sistem Ayarları")}}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{$role->name . __(" rol grubunun ayarları")}}</li>
         </ol>
     </nav>
@@ -163,15 +163,15 @@
 
     <script>
         function getFunctionList(){
-            let extension_id = $("#extensionId :selected").val();
-            let form = new FormData();
+            var extension_id = $("#extensionId :selected").val();
+            var form = new FormData();
             form.append('extension_id', extension_id);
             form.append('user_id','{{$role->id}}');
             request('{{route('extension_function_list')}}', form, function (response) {
                 $(".functionsTable").html(response);
                 $('.functionsTable table').DataTable(dataTablePresets('multiple'));
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
@@ -182,15 +182,15 @@
                 $('#user_modal table').DataTable(dataTablePresets('multiple'));
                 $("#user_modal").modal('show');
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
 
         function addUsers(){
             showSwal('{{__("Güncelleniyor...")}}','info');
-            let data = [];
-            let table = $('#user_modal table').DataTable();
+            var data = [];
+            var table = $('#user_modal table').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[3]);
             });
@@ -198,13 +198,13 @@
                 showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
                 return false;
             }
-            let form = new FormData();
+            var form = new FormData();
             form.append("users",JSON.stringify(data));
             form.append("role_id",'{{$role->id}}');
             request('{{route("add_role_users")}}',form,function(){
                 reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
             return false;
@@ -212,8 +212,8 @@
 
         function removeUsers(){
             showSwal('{{__("Güncelleniyor...")}}','info');
-            let data = [];
-            let table = $('#role_users table').DataTable();
+            var data = [];
+            var table = $('#role_users table').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[3]);
             });
@@ -221,13 +221,13 @@
                 showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
                 return false;
             }
-            let form = new FormData();
+            var form = new FormData();
             form.append("users",JSON.stringify(data));
             form.append("role_id",'{{$role->id}}');
             request('{{route("remove_role_users")}}',form,function(){
                 reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
             return false;
@@ -235,8 +235,8 @@
 
         function addFunctions(){
             showSwal('{{__("Güncelleniyor...")}}','info');
-            let data = [];
-            let table = $('.functionsTable table').DataTable();
+            var data = [];
+            var table = $('.functionsTable table').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[1]);
             });
@@ -244,23 +244,23 @@
                 showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
                 return false;
             }
-            let form = new FormData();
-            let extension_id = $("#extensionId :selected").val();
+            var form = new FormData();
+            var extension_id = $("#extensionId :selected").val();
             form.append("extension_id",extension_id);
             form.append("functions",data);
             form.append("role_id",'{{$role->id}}');
             request('{{route("add_role_function")}}',form,function(){
                 location.reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
 
         function removeFunctions(){
             showSwal('{{__("Güncelleniyor...")}}','info');
-            let data = [];
-            let table = $('#extensionFunctions').DataTable();
+            var data = [];
+            var table = $('#extensionFunctions').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[3]);
             });
@@ -268,23 +268,23 @@
                 showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
                 return false;
             }
-            let form = new FormData();
+            var form = new FormData();
             form.append("functions",data);
             form.append("role_id",'{{$role->id}}');
             request('{{route("remove_role_function")}}',form,function(response){
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json["message"],'success',2000);
                 setTimeout(function () {
                     location.reload();
                 },2000);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
         
         function getList(type) {
-            let form = new FormData();
+            var form = new FormData();
             form.append('type', type);
             form.append('role_id','{{$role->id}}');
             request('{{route('role_permission_list')}}', form, function (response) {
@@ -293,14 +293,14 @@
                 $("#" + type + "_modal table").DataTable(dataTablePresets('multiple'));
                 $("#" + type + "_modal").modal('show');
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
         
         function removePermission(element){
-            let data = [];
-            let table = $("#" + element + "_table").DataTable();
+            var data = [];
+            var table = $("#" + element + "_table").DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[2]);
             });
@@ -312,18 +312,18 @@
             
             showSwal('{{__("Siliniyor...")}}','info');
 
-            let form = new FormData();
+            var form = new FormData();
             form.append('ids',JSON.stringify(data));
             form.append('role_id','{{$role->id}}');
             form.append('type',element);
             request('{{route('remove_role_permission_list')}}', form, function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json["message"],'success',2000);
                 setTimeout(function () {
                         location.reload();
                 },2000);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
             return false;
@@ -331,8 +331,8 @@
 
         function addData(modalElement) {
             showSwal('{{__("Ekleniyor...")}}','info');
-            let data = [];
-            let table = $(modalElement).find('table').DataTable();
+            var data = [];
+            var table = $(modalElement).find('table').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[1]);
             });
@@ -340,18 +340,18 @@
                 showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
                 return false;
             }
-            let form = new FormData();
+            var form = new FormData();
             form.append('ids',JSON.stringify(data));
             form.append('role_id','{{$role->id}}');
             form.append('type',modalElement.getAttribute('id').split('_')[0]);
             request('{{route('add_role_permission_list')}}', form, function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json["message"],'success',2000);
                 setTimeout(function () {
                     location.reload();
                 },2000);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
             return false;

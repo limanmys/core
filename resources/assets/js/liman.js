@@ -1,10 +1,10 @@
-let csrf = document.getElementsByName("csrf-token")[0].getAttribute("content");
-let customRequestData = [];
-let limanRecordRequests = false;
-let limanRequestList = [];
+var csrf = document.getElementsByName("csrf-token")[0].getAttribute("content");
+var customRequestData = [];
+var limanRecordRequests = false;
+var limanRequestList = [];
 
 function showSwal(message, type, timer = false) {
-  let config = {
+  var config = {
     position: "bottom-start",
     type: type,
     title: message,
@@ -17,8 +17,8 @@ function showSwal(message, type, timer = false) {
   Swal.fire(config);
 }
 
-function request(url, data, next, error) {
-  let id = null;
+function request(url, data, next, error,requestType = "POST") {
+  var id = null;
 
   if (data instanceof FormData === false) {
     id =
@@ -34,8 +34,8 @@ function request(url, data, next, error) {
 
   modalData = data;
 
-  let server_id = $("meta[name=server_id]").attr("content");
-  let extension_id = $("meta[name=extension_id]").attr("content");
+  var server_id = $("meta[name=server_id]").attr("content");
+  var extension_id = $("meta[name=extension_id]").attr("content");
 
   server_id != "" && data.append("server_id", server_id);
   extension_id != "" && data.append("extension_id", extension_id);
@@ -45,7 +45,7 @@ function request(url, data, next, error) {
   }
 
   if (limanRecordRequests) {
-    let parsed = {};
+    var parsed = {};
     for (var pair of data.entries()) {
       parsed[pair[0]] = pair[1];
     }
@@ -56,8 +56,8 @@ function request(url, data, next, error) {
     });
   }
 
-  let r = new XMLHttpRequest();
-  r.open("POST", url);
+  var r = new XMLHttpRequest();
+  r.open(requestType, url);
   r.setRequestHeader("X-CSRF-TOKEN", csrf);
   r.setRequestHeader("Accept", "text/json");
   setTimeout(function () {
@@ -84,7 +84,7 @@ function request(url, data, next, error) {
       if (r.getResponseHeader("content-type") !== "application/json") {
         return next(r.responseText);
       }
-      let response = JSON.parse(r.responseText);
+      var response = JSON.parse(r.responseText);
       switch (r.status) {
         case 200:
           return next(r.responseText);
@@ -108,7 +108,7 @@ function request(url, data, next, error) {
 }
 
 function limanRequestBuilder(index, token) {
-  let str = JSON.stringify(limanRequestList[index]["form"]);
+  var str = JSON.stringify(limanRequestList[index]["form"]);
   return (
     "curl -d '" +
     str +
@@ -174,11 +174,11 @@ function back() {
 }
 
 function search() {
-  let search_input = document.getElementById("search_input");
+  var search_input = document.getElementById("search_input");
   if (search_input.value === "") {
     return;
   }
-  let data = new FormData();
+  var data = new FormData();
   data.append("text", search_input.value);
   request("arama", data, function (response) {
     console.log(response);
@@ -187,7 +187,7 @@ function search() {
 
 function checkNotifications(exclude = null) {
   request("/bildirimler", new FormData(), function (response) {
-    let json = JSON.parse(response);
+    var json = JSON.parse(response);
     if (response["admin"] !== "") {
       renderNotifications(
         json["message"]["admin"],
@@ -214,14 +214,14 @@ window.onbeforeunload = function () {
 };
 
 function message(data) {
-  let json = JSON.parse(data);
-  let modal = document.getElementsByClassName("modal fade show")[0];
+  var json = JSON.parse(data);
+  var modal = document.getElementsByClassName("modal fade show")[0];
   if (!modal) {
     return;
   }
-  let modal_id = modal.getAttribute("id");
-  let selector = $("#" + modal_id + "_alert");
-  let color = "alert-info";
+  var modal_id = modal.getAttribute("id");
+  var selector = $("#" + modal_id + "_alert");
+  var color = "alert-info";
   switch (json["status"]) {
     case 200:
       color = "alert-success";
@@ -245,23 +245,23 @@ function message(data) {
 }
 
 function readNotifications(id) {
-  let data = new FormData();
+  var data = new FormData();
   request("/bildirimler/oku", data, function () {
     checkNotifications();
   });
 }
 
 function readSystemNotifications(id) {
-  let data = new FormData();
+  var data = new FormData();
   request("/bildirim/adminOku", data, function () {
     checkNotifications();
   });
 }
 
-let inputs = [];
-let modalData = [];
+var inputs = [];
+var modalData = [];
 
-function updateTable(extraVariableName = null) {
+function updateTable(extravariableName = null) {
   reload();
 }
 
@@ -270,13 +270,13 @@ function addToTable() {
 }
 
 function renderNotifications(data, type, target, exclude) {
-  let element = $("#" + target + " .menu");
+  var element = $("#" + target + " .menu");
   element.html("");
   //Set Count
   $("#" + target + "Count").html(data.length);
   data.forEach((notification) => {
-    let errors = ["error", "health_problem"];
-    let color = errors.includes(notification["type"]) ? "#f56954" : "#00a65a";
+    var errors = ["error", "health_problem"];
+    var color = errors.includes(notification["type"]) ? "#f56954" : "#00a65a";
     element.append(
       "<div class='dropdown-divider'></div><a class='dropdown-item' href='/bildirim/" +
         notification["id"] +
@@ -287,7 +287,7 @@ function renderNotifications(data, type, target, exclude) {
         notification["title"] +
         "</span></a>"
     );
-    let displayedNots = [];
+    var displayedNots = [];
     if (localStorage.displayedNots) {
       displayedNots = JSON.parse(localStorage.displayedNots);
     }
@@ -319,7 +319,7 @@ function renderNotifications(data, type, target, exclude) {
 }
 
 function activeTab() {
-  let element = $('a[href="' + window.location.hash + '"]');
+  var element = $('a[href="' + window.location.hash + '"]');
   if (element) {
     element.click();
   }
@@ -329,7 +329,7 @@ function fixer(val) {
   if (!val) return val;
   return val.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-let currentlyDark =
+var currentlyDark =
   window.localStorage.getItem("dark") == "true" ? true : false;
 
 function toggleDarkMode() {

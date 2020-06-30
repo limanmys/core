@@ -48,6 +48,13 @@ Route::post('/ayar/log/kaydet', 'Settings\MainController@saveLogSystem')
     ->name('save_log_system')
     ->middleware('admin');
 
+Route::get('/market/yonlendir', 'Settings\MainController@redirectMarket')
+    ->name('redirect_market')
+    ->middleware('admin');
+Route::get('/market/baglaAuth', 'Settings\MainController@connectMarket')
+    ->name('connect_market')
+    ->middleware('admin');
+
 Route::post('/ayar/log/oku', 'Settings\MainController@getLogSystem')
     ->name('get_log_system')
     ->middleware('admin');
@@ -59,10 +66,7 @@ Route::post(
     ->name('delete_server_group')
     ->middleware('admin');
 
-Route::post(
-    '/ayar/kisitliMod',
-    'Settings\MainController@restrictedMode'
-)
+Route::post('/ayar/kisitliMod', 'Settings\MainController@restrictedMode')
     ->name('restricted_mode_update')
     ->middleware('admin');
 
@@ -111,10 +115,10 @@ Route::post('/sifreDegistir', 'UserController@forcePasswordChange')
     ->middleware('auth')
     ->name('password_change_save');
 
-Route::post('/dnsOku','Settings\MainController@getDNSServers')
+Route::post('/dnsOku', 'Settings\MainController@getDNSServers')
     ->middleware('admin')
     ->name('get_liman_dns_servers');
 
-Route::post('/dnsYaz','Settings\MainController@setDNSServers')
+Route::post('/dnsYaz', 'Settings\MainController@setDNSServers')
     ->middleware('admin')
     ->name('set_liman_dns_servers');

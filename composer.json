@@ -10,6 +10,7 @@
         "ext-ldap": "*",
         "ext-openssl": "*",
         "ext-posix": "*",
+        "ext-snmp": "*",
         "ext-ssh2": "*",
         "ext-xml": "*",
         "ext-zip": "*",

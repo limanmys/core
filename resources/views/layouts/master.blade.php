@@ -23,9 +23,9 @@
     toastr.options.closeButton = true;
     Echo.private('App.User.{{auth()->user()->id}}')
         .notification((notification) => {
-            let data = notification['\u0000*\u0000attributes'];
+            var data = notification['\u0000*\u0000attributes'];
             if(data){
-                let errors = [
+                var errors = [
                     "error" , "health_problem"
                 ];
                 if(errors.includes(data.type)){
@@ -35,7 +35,7 @@
                 }else{
                     toastElement = toastr.success(data.message, data.title, {timeOut: 5000})
                 }
-                let displayedNots = [];
+                var displayedNots = [];
 
                 if(localStorage.displayedNots){
                     displayedNots = JSON.parse(localStorage.displayedNots);
@@ -44,27 +44,12 @@
                 localStorage.displayedNots = JSON.stringify(displayedNots);
                 
                 $(toastElement).click(function(){
-                    location.href = "/bildirim/" + data.id
+                    window.location.href = "/bildirim/" + data.id;
                 });
             }
             checkNotifications(data ? data.id : null);
     });
-    jQuery(function($) {
-      var path = window.location.href; // because the 'href' property of the DOM element is the absolute path
-      $('nav ul a').each(function() {
-        if (this.href === path) {
-          $(this).addClass('active');
-        }
-      });
-      $('.list-group a').each(function() {
-        if (this.href === path) {
-          $(this).addClass('active');
-        }
-      });
-      if(localStorage.nightMode == "on"){
-          $('body').addClass('skin-dark');
-      }
-    });
+    
 
     function dataTablePresets(type){
         if(type == "normal"){
@@ -113,20 +98,9 @@
         $(".nav.nav-tabs a").on('click',function () {
             window.location.hash = $(this).attr("href");
         });
+        initialPresets();
         activeTab();
-        $('table').not('.notDataTable').DataTable({
-            autoFill : true,
-            bFilter: true,
-            destroy: true,
-            "language" : {
-                url : "{{asset('turkce.json')}}"
-            }
-        });
-        $('.js-example-basic-multiple,.js-example-basic-single').select2({
-            width: 'resolve'
-        });
-        $(":input").inputmask();
-        let title = $(".breadcrumb-item.active").text();
+        var title = $(".breadcrumb-item.active").text();
         if(title !== undefined){
             document.title = title + " / Liman";
         }
@@ -145,5 +119,41 @@
             }
         });
     };
+
+    function initialPresets(){
+        $('table').not('.notDataTable').DataTable({
+            autoFill : true,
+            bFilter: true,
+            destroy: true,
+            "language" : {
+                url : "{{asset('turkce.json')}}"
+            }
+        });
+        $('.js-example-basic-multiple,.js-example-basic-single').select2({
+            width: 'resolve'
+        });
+        $(":input").inputmask();
+
+        jQuery(function($) {
+            var path = window.location.href;
+            $('nav ul a').each(function() {
+                if (this.href === path) {
+                    $(this).addClass('active');
+                }else{
+                    $(this).removeClass('active')
+                }
+            });
+            $('.list-group a').each(function() {
+                if (this.href === path) {
+                    $(this).addClass('active');
+                }else{
+                    $(this).removeClass('active')
+                }
+            });
+            if(localStorage.nightMode == "on"){
+                $('body').addClass('skin-dark');
+            }
+        });
+    }
 </script>
 </html>

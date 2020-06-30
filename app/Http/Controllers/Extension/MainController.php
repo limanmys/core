@@ -13,6 +13,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Validator;
+use App\Jobs\ExtensionUpdaterJob;
+use Illuminate\Contracts\Bus\Dispatcher;
 
 /**
  * Class MainController
@@ -144,6 +146,21 @@ class MainController extends Controller
                 );
             }
         }
+        list($error,$new) = self::setupNewExtension($zipFile);
+
+        if($error){
+            return $error;
+        }
+        
+        system_log(3, "EXTENSION_UPLOAD_SUCCESS", [
+            "extension_id" => $new->id,
+        ]);
+
+        return respond("Eklenti Başarıyla yüklendi.", 200);
+    }
+
+    public function setupNewExtension($zipFile)
+    {
         // Initialize Zip Archive Object to use it later.
         $zip = new ZipArchive();
 
@@ -245,12 +262,7 @@ class MainController extends Controller
                 "db.json;
         "
         );
-
-        system_log(3, "EXTENSION_UPLOAD_SUCCESS", [
-            "extension_id" => $new->id,
-        ]);
-
-        return respond("Eklenti Başarıyla yüklendi.", 200);
+        return [null,$new];
     }
 
     public function newExtension()
@@ -375,5 +387,28 @@ class MainController extends Controller
             ]);
         }
         return respond('Sıralamalar güncellendi', 200);
+    }
+
+    public function autoUpdateExtension()
+    {
+        $json = json_decode(file_get_contents(storage_path('extension_updates')),true);
+        $collection = collect($json);
+        $obj = $collection->where('extension_id',request("extension_id"))->first();
+
+        if(!$obj){
+            return respond("Eklenti Bulunamadı",201);
+        }
+
+        $job = (new ExtensionUpdaterJob(
+            request("extension_id"),
+            $obj["versionCode"],
+            $obj["downloadLink"],
+            true
+        ))->onQueue('system_updater');
+
+        // Dispatch job right away.
+        $job_id = app(Dispatcher::class)->dispatch($job);
+
+        return respond("Talebiniz başarıyla alındı, eklenti güncellendiğinde bildirim alacaksınız.");
     }
 }

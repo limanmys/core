@@ -61,7 +61,7 @@
             @if(isset($sortable) && $sortable)
               $('#{{$rand}}').find('tbody').sortable({
                   stop: function(event, ui) {
-                      let data = [];
+                      var data = [];
                       $('#{{$rand}}').find('tbody').find('tr').each(function(i, el){
                           $(el).attr('data-order', $(el).index());
                           $(el).find('.row-number').text($(el).index()+1);
@@ -71,7 +71,7 @@
                           });
                       });
                       @if(isset($sortUpdateUrl) && $sortUpdateUrl)
-                        let form = new FormData();
+                        var form = new FormData();
                         form.append('data', JSON.stringify(data));
                         request('{{$sortUpdateUrl}}', form, function(response){
                           {{$afterSortFunction}}();
@@ -84,20 +84,21 @@
             @isset($setCurrentVariable)
             var {{$setCurrentVariable}};
             @endisset
+            @if(count($value) > 0)
             $.contextMenu({
                 selector: '#{{$rand}} tbody tr',
                 callback: function (key, options) {
                     @isset($setCurrentVariable)
                     {{$setCurrentVariable}} = options.$trigger[0].getAttribute("id");
                     @endisset
-                    let target = $("#" + key);
+                    var target = $("#" + key);
                     if(target.length === 0){
                         window[key](options.$trigger[0]);
                         return;
                     }
                     inputs =[];
                     $("#" + key + " input , #" + key + ' select').each(function (index, value) {
-                        let element_value = $("#" + options.$trigger[0].getAttribute("id") + " #" + value.getAttribute('name')).text();
+                        var element_value = $("#" + options.$trigger[0].getAttribute("id") + " #" + value.getAttribute('name')).text();
                         if(element_value){
                             inputs.push($("#" + options.$trigger[0].getAttribute("id") + " #" + value.getAttribute('name')));
                             $("#" + key + " select[name='" + value.getAttribute('name') + "']" + " , "
@@ -112,6 +113,7 @@
                     @endforeach
                 }
             });
+            @endif
         </script>
     @endif
 @endif

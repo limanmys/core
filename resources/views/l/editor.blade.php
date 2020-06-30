@@ -45,15 +45,15 @@
 
         function save(){
             showSwal('{{__("Kaydediliyor...")}}','info');
-            let code = JSON.stringify(window.editor.getValue());
-            let data = new FormData();
+            var code = JSON.stringify(window.editor.getValue());
+            var data = new FormData();
             data.append('code',code);
             data.append('page','{{request('page_name')}}');
             data.append('extension_id','{{extension()->_id}}');
             request('{{route('extension_code_update')}}',data,function(response){
                 showSwal("{{__("Başarıyla kaydedildi")}}",'success',2000);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }

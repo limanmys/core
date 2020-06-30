@@ -92,7 +92,8 @@
                                 <h4>{{__("Sunucunuzun Portu")}}</h4>
                                 <h6>{{__("Sunucunuzun açık olup olmadığını algılamak için kontrol edilebilecek bir port girin.")}}</h6>
                                 <pre>{{__("SSH : 22\nWinRM : 5986\nActive Directory, Samba : 636")}}</pre>
-                                <input id="serverControlPort" type="number" name="port" class="form-control" placeholder="{{__("Kontrol Portu Girin (Yalnızca Sayı).")}}" required min="1">
+                                <input id="serverControlPort" type="number" name="port" class="form-control" placeholder="{{__("Kontrol Portu Girin (Yalnızca Sayı).")}}" required min="-1">
+                                <small><i>{{__("Eğer hedefiniz UDP protokolü üzerinden dinliyorsa bu kontrolü atlamak için -1 girebilirsiniz.")}}</i></small>
                             </div>
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-primary">{{__("Bağlantıyı Kontrol Et")}}</button>
@@ -148,6 +149,7 @@
                                             <option value="linux_ssh" selected>{{__("SSH")}}</option>
                                             <option value="linux_certificate">{{__("SSH Anahtarı")}}</option>
                                             <option value="windows_powershell">{{__("WinRM")}}</option>
+                                            <option value="snmp">{{__("SNMP")}}</option>
                                         </select>
                                     </div><hr>
                                     <h4>{{__("Kullanıcı Adı")}}</h4>
@@ -157,9 +159,31 @@
                                     <label id="certificateInformLabel">{{__("Anahtarınızın çalışabilmesi için şifreli olmaması ve sudo komutlarını çalıştırması için sudoers dosyasında NOPASSWD olarak eklenmiş olması gerekmektedir.")}}</label>
                                     <textarea class="form-control" name="password" id="keyPasswordCert" cols="30" rows="10" required disabled></textarea>
                                     <input id="keyPassword" type="password" name="password" class="form-control" placeholder="{{__("Şifre")}}" required disabled><br>
+                                    <div id="snmpWrapper" style="display: none">
+                                        <h4>{{__("Bağlantı Türü")}}</h4>
+                                        <select id="SNMPsecurityLevel" name="SNMPsecurityLevel" class="select2 snmp-input" disabled>
+                                            <option value="noAuthNoPriv">noAuthNoPriv</option>
+                                            <option value="authNoPriv">authNoPriv</option>
+                                            <option value="authPriv" selected>authPriv</option>
+                                        </select><br>
+                                        <h4>{{__("Giriş Protokolü")}}</h4>
+                                        <select id="SNMPauthProtocol" name="SNMPauthProtocol" class="select2 snmp-input" disabled>
+                                            <option value="MD5">MD5</option>
+                                            <option value="SHA">SHA</option>
+                                        </select><br>
+                                        <h4>{{__("Giriş Parolası")}}</h4>
+                                        <input id="SNMPauthPassword" name="SNMPauthPassword" type="password" class="form-control snmp-input" placeholder="{{__("Giriş Parolası")}}" disabled><br>
+                                        <h4>{{__("Gizlilik Protokolü")}}</h4>
+                                        <select id="SNMPprivacyProtocol" name="SNMPprivacyProtocol" class="select2 snmp-input" disabled>
+                                            <option value="DES">DES</option>
+                                            <option value="AES">AES</option>
+                                        </select><br>
+                                        <h4>{{__("Gizlilik Parolası")}}</h4>
+                                        <input id="SNMPprivacyPassword" name="SNMPprivacyPassword" type="password" class="form-control snmp-input" placeholder="{{__("Gizlilik Parolası")}}" disabled><br>
+                                    </div>
                                     <h4>{{__("Port")}}</h4>
                                     <small>{{__("Eğer bilmiyorsanız varsayılan olarak bırakabilirsiniz.")}}</small>
-                                    <input id="port" type="number" name="port" class="form-control" placeholder="{{__("Port")}}" required disabled min="0" value="22"><br>
+                                    <input id="port" type="number" name="port" class="form-control snmp-input" placeholder="{{__("Port")}}" required disabled min="0" value="22"><br>
 
                                 </div>
                             </div>
@@ -208,19 +232,19 @@
     </div>
 
     <script>
-        let isNetworkOK = false;
-        let isGeneralOK = false;
-        let isKeyOK = false;
+        var isNetworkOK = false;
+        var isGeneralOK = false;
+        var isKeyOK = false;
         function checkAccess(form) {
             showSwal('{{__("Kontrol Ediliyor...")}}','info');
             return request('{{route('server_check_access')}}',form,function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json["message"],'success',2000);
                 isNetworkOK = true;
                 $("#networkTab").css('color','green');
                 $("#generalTab").click();
             },function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json.message,'error',2000);
                 isNetworkOK = false;
                 $("#networkTab").css('color','red');
@@ -230,38 +254,39 @@
         function checkGeneral(form){
             showSwal('{{__("Kontrol Ediliyor...")}}','info');
             return request('{{route('server_verify_name')}}',form,function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
             showSwal(json["message"],'success',500);
                 isGeneralOK = true;
                 $("#generalTab").css('color','green');
                 $("#keyTab").click();
             },function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json["message"],'error',2000);
                 isGeneralOK = false;
                 $("#generalTab").css('color','red');
             });
         }
-
-        function checkKey(form) {            
-            let option = $("#useKey");
+        var helper;
+        function checkKey(form) {           
+            var option = $("#useKey");
             if(option.is(':checked') === false){
                 isKeyOK = true;
                 $("#keyTab").css('color','green');
                 $("#summaryTab").click();
                 return false;
             }
-            let data = new FormData(form);
+            var data = new FormData(form);
+            helper = data;
             data.append('ip_address',$("#serverHostName").val());
             showSwal('{{__("Kontrol Ediliyor...")}}','info');
             return request('{{route('server_verify_key')}}',data,function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json["message"],'success',2000);
                 isKeyOK = true;
                 $("#keyTab").css('color','green');
                 $("#summaryTab").click();
             },function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json["message"],'error',2000);
                 isKeyOK = false;
                 $("#keyTab").css('color','red');
@@ -269,7 +294,7 @@
         }
 
         function keySettingsChanged(){
-            let option = $("#useKey");
+            var option = $("#useKey");
             if(option.is(':checked')){
                 isKeyOK = false;
                 $('#keyDiv').find('input, select').prop('disabled', false);
@@ -284,8 +309,8 @@
         }
         keySettingsChanged();
         function details(element) {
-            let server_id = element.querySelector('#server_id').innerHTML;
-            window.location.href = "/sunucular/" + server_id
+            var server_id = element.querySelector('#server_id').innerHTML;
+            partialPageRequest("/sunucular/" + server_id);
         }
         $("#keyPasswordCert").fadeOut(0);
         $("#certificateInformLabel").fadeOut(0);
@@ -294,26 +319,41 @@
         $("#passwordPrompt").fadeIn(0);
         function setPort(select) {
             if(select.value === "windows_powershell"){
-                $("#port").val("5986");
                 $("#keyPasswordCert").fadeOut(0).attr("disabled","true");
                 $("#certificateInformLabel").fadeOut(0);
                 $("#keyPassword").fadeIn(0).removeAttr("disabled");
                 $("#certificatePrompt").fadeOut(0);
                 $("#passwordPrompt").fadeIn(0);
+                $("#snmpWrapper").fadeOut();
+                $(".snmp-input").attr("disabled","true");
+                $("#port").val("5986").removeAttr("disabled");
             }else if(select.value === "linux_ssh"){
-                $("#port").val("22");
                 $("#keyPasswordCert").fadeOut(0).attr("disabled","true");
                 $("#keyPassword").fadeIn(0).removeAttr("disabled");
                 $("#certificateInformLabel").fadeOut(0);
                 $("#passwordPrompt").fadeIn(0);
                 $("#certificatePrompt").fadeOut(0);
+                $("#snmpWrapper").fadeOut();
+                $(".snmp-input").attr("disabled","true");
+                $("#port").val("22").removeAttr("disabled");
             }else if(select.value === "linux_certificate"){
-                $("#port").val("22");
                 $("#keyPasswordCert").fadeIn(0).removeAttr("disabled");
                 $("#certificateInformLabel").fadeIn(0);
                 $("#passwordPrompt").fadeOut(0);
                 $("#keyPassword").fadeOut(0).attr("disabled","true");
                 $("#certificatePrompt").fadeIn(0);
+                $("#snmpWrapper").fadeOut();
+                $(".snmp-input").attr("disabled","true");
+                $("#port").val("22").removeAttr("disabled");
+            }else if(select.value === "snmp"){
+                $("#keyPasswordCert").fadeOut(0).attr("disabled","true");
+                $("#certificateInformLabel").fadeOut(0).attr("disabled","true");
+                $("#passwordPrompt").fadeOut(0).attr("disabled","true");
+                $("#keyPassword").fadeOut(0).attr("disabled","true");
+                $("#certificatePrompt").fadeOut(0).attr("disabled","true");
+                $(".snmp-input").removeAttr("disabled");
+                $("#snmpWrapper").fadeIn();
+                $("#port").val("161").attr("disabled","true");
             }
         }
 
@@ -332,7 +372,7 @@
                 return false;
             }
             showSwal('{{__("Sunucu Ekleniyor...")}}','info');
-            let form = new FormData();
+            var form = new FormData();
             form.append("name",$("#server_name").val());
             form.append("ip_address",$("#serverHostName").val());
             form.append("control_port",$("#serverControlPort").val());
@@ -342,16 +382,23 @@
                 form.append('username',$("#keyUsername").val());
                 if($("#keyType").val() == "linux_certificate"){
                     form.append('password',$("#keyPasswordCert").val());
+                }else if($("#keyType").val() == "snmp"){
+                    form.append("SNMPsecurityLevel",$("#SNMPsecurityLevel").val());
+                    form.append("SNMPauthProtocol",$("#SNMPauthProtocol").val());
+                    form.append("SNMPauthPassword",$("#SNMPauthPassword").val());
+                    form.append("SNMPprivacyProtocol",$("#SNMPprivacyProtocol").val());
+                    form.append("SNMPprivacyPassword",$("#SNMPprivacyPassword").val());
                 }else{
                     form.append('password',$("#keyPassword").val());
                 }
+                
                 form.append('type',$("#keyType").val());
                 form.append('key_port',$("#port").val());
             }else{
                 form.append('type',$("input[name=operating_system]:checked").val());
             }
-            request('{{route('server_add')}}',form,"",function (errors) {
-                let json = JSON.parse(errors);
+            request('{{route('server_add')}}',form,function (errors) {
+                var json = JSON.parse(errors);
                 if(json["status"] == "202"){
                     showSwal(json["message"],'info');
                     $(".modal").modal('hide');
@@ -359,7 +406,7 @@
                     showSwal(json["message"],'error',2000);
                 }
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }

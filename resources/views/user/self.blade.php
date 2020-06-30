@@ -76,8 +76,8 @@
     </div>
     <script>
         $('input[type=password]').keyup(function(){
-            let password = $('input[name=password]').val();
-            let password_confirmation = $('input[name=password_confirmation]').val();
+            var password = $('input[name=password]').val();
+            var password_confirmation = $('input[name=password_confirmation]').val();
             $('.no-match').remove();
             if(password_confirmation!=="" && password !== password_confirmation){
                 $('input[name=password_confirmation]').after('<span style="color: #dd4b39;" class="help-block no-match">Şifreler uyuşmuyor</span>');
@@ -85,10 +85,10 @@
         });
         function saveUser(data) {
             showSwal('{{__("Kaydediliyor...")}}','info');
-            let form = new FormData(data);
+            var form = new FormData(data);
             request('{{route('profile_update')}}',form,function (response) {
                 Swal.close();
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 if(json["status"] === 200){
                     showSwal(json.message,'success',2000);
                     setTimeout(function () {
@@ -96,7 +96,7 @@
                     },1600);
                 }
             },function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json.message,'error',2000);
             });
             return false;
