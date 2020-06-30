@@ -745,6 +745,7 @@ if (!function_exists('checkHealth')) {
             "server" => "0700",
             "webssh" => "0700",
             "modules" => "0700",
+            "packages" => "0700",
         ];
         $messages = [];
 

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Extension;
 use App\Jobs\ExtensionUpdaterJob;
+use App\Jobs\LimanUpdaterJob;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Contracts\Bus\Dispatcher;
 
@@ -121,6 +122,14 @@ class MarketController extends Controller
                         "changeLog" => $obj["version"]["versionDescription"],
                         "extension_id" => $params[$i]["extension_id"],
                     ]);
+                } else {
+                    $job = (new LimanUpdaterJob(
+                        $obj["version"]["versionName"],
+                        $obj["platforms"][0]["downloadLink"]
+                    ))->onQueue('system_updater');
+
+                    // Dispatch job right away.
+                    $job_id = app(Dispatcher::class)->dispatch($job);
                 }
             }
         }

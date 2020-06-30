@@ -149,6 +149,7 @@
     }
     </style>
     <script>
+        var limanEnableWidgets = true;
         $(".sortable-widget").sortable({
             stop: function(event, ui) {
                 var data = [];
@@ -189,6 +190,9 @@
         },{{config('liman.widget_refresh_time')}});
 
         function startQueue(){
+          if(!limanEnableWidgets){
+            return;
+          }
           currentWidget = 0;
           if(currentWidget >= widgets.length || widgets.length === 0){
             return;
@@ -201,6 +205,9 @@
         }
         @if(user()->isAdmin())
         function retrieveStats(){
+          if(!limanEnableWidgets){
+            return;
+          }
             request('{{route('liman_stats')}}', new FormData(), function(response){
               var json = JSON.parse(response);
                 $("#ramUsage").text(json.ram);

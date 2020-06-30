@@ -16,6 +16,9 @@
         
         <script>
         function partialPageRequest(url){
+            if(url != "/"){
+                limanEnableWidgets = false;
+            }
             var form = new FormData();
             var newUrl = url + "?partialRequest=true";
             form.append('partialRequest',true);
