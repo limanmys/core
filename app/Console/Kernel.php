@@ -76,7 +76,7 @@ class Kernel extends ConsoleKernel
                 }
                 $array = $controller->checkMarketUpdates(true);
                 $collection = collect($array);
-                if (!$collection->where("updateAvailable", 1)->count()) {
+                if ($collection->where("updateAvailable", 1)->count()) {
                     AdminNotification::where('type', 'liman_update')->delete();
                     AdminNotification::create([
                         "title" => "Liman Güncellemesi Mevcut!",
@@ -87,7 +87,7 @@ class Kernel extends ConsoleKernel
                     ]);
                 }
             })
-            ->everyMinute()
+            ->hourly()
             ->name('Update Check');
     }
 
