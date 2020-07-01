@@ -65,7 +65,7 @@ else
     systemctl restart cron
 fi
 
-mv /liman/server/nginx.conf /etc/nginx/sites-available/liman.conf
+mv /liman/server/storage/nginx.conf /etc/nginx/sites-available/liman.conf
 ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
 
 # Nginx Auto Redirection

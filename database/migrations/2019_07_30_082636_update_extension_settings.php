@@ -1,6 +1,6 @@
 <?php
 
-use App\Extension;
+use App\Models\Extension;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;

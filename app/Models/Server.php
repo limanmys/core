@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use App\Classes\Connector\Connector;
 use App\Classes\Connector\SSHConnector;
@@ -10,7 +10,7 @@ use App\Classes\Connector\WinRMConnector;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;
-use App\UserFavorites;
+use App\Models\UserFavorites;
 
 class Server extends Model
 {
@@ -43,10 +43,8 @@ class Server extends Model
         } elseif ($this->type == "linux_certificate") {
             return new SSHCertificateConnector($this, user()->id);
         } elseif ($this->type == "snmp") {
-            return new SNMPConnector($this,user()->id);
-        }
-        
-        else {
+            return new SNMPConnector($this, user()->id);
+        } else {
             abort(
                 504,
                 "Bu sunucuda komut çalıştırmak için bir bağlantınız yok."
@@ -62,7 +60,7 @@ class Server extends Model
     public function run($command, $log = true)
     {
         if (!$this->canRunCommand()) {
-            return respond("Bu sunucuda komut çalıştıramazsınız!",504);
+            return respond("Bu sunucuda komut çalıştıramazsınız!", 504);
         }
 
         // Execute and return outputs.
@@ -111,7 +109,7 @@ class Server extends Model
     public function isRunning($service_name)
     {
         if ($this->type == "windows" || $this->type == "linux") {
-            if($this->control_port == -1){
+            if ($this->control_port == -1) {
                 return true;
             }
             return is_resource(
@@ -138,7 +136,7 @@ class Server extends Model
      */
     public function isAlive()
     {
-        if($this->control_port == -1){
+        if ($this->control_port == -1) {
             return true;
         }
         // Simply Check Port If It's Alive
@@ -173,7 +171,10 @@ class Server extends Model
 
     public function extensions()
     {
-        return $this->belongsToMany('\App\Extension', 'server_extensions')
+        return $this->belongsToMany(
+            '\App\Models\Extension',
+            'server_extensions'
+        )
             ->get()
             ->filter(function ($extension) {
                 return Permission::can(
@@ -197,7 +198,7 @@ class Server extends Model
     {
         return $this->type == "linux_ssh" ||
             $this->type == "linux_certificate" ||
-            $this->type == "windows_powershell" || 
+            $this->type == "windows_powershell" ||
             $this->type == "snmp";
     }
 

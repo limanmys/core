@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Extension\Sandbox;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\UserSettings;
-use App\Permission;
-use App\Server;
+use App\Models\UserSettings;
+use App\Models\Permission;
+use App\Models\Server;
 use App\Classes\Sandbox\PHPSandbox;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -47,8 +47,11 @@ class MainController extends Controller
 
     public function API()
     {
-        if(extension()->status == "0"){
-            return respond("Eklenti şu an güncelleniyor, lütfen birazdan tekrar deneyin.",201);
+        if (extension()->status == "0") {
+            return respond(
+                "Eklenti şu an güncelleniyor, lütfen birazdan tekrar deneyin.",
+                201
+            );
         }
         $page = request('target_function')
             ? request('target_function')
@@ -131,7 +134,10 @@ class MainController extends Controller
             return view('extension_pages.server', [
                 "viewName" => "",
                 "view" => $output,
-                "tokens" => user()->accessTokens()->get()->toArray(),
+                "tokens" => user()
+                    ->accessTokens()
+                    ->get()
+                    ->toArray(),
                 "last" => $this->getNavigationServers(),
             ]);
         }

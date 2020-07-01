@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use App\AccessToken;
+use App\Models\AccessToken;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 

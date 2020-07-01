@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Certificate;
+use App\Models\Certificate;
 use Closure;
 
 class Server
@@ -16,10 +16,13 @@ class Server
                 'origin' => server()->control_port,
             ])->exists()
         ) {
-            $message = __(":server_name isimli sunucu için gerekli SSL sertifikası henüz eklenmemiş!", [
-                "server_name" =>
-                    server()->name . "(" . server()->ip_address . ")",
-            ]);
+            $message = __(
+                ":server_name isimli sunucu için gerekli SSL sertifikası henüz eklenmemiş!",
+                [
+                    "server_name" =>
+                        server()->name . "(" . server()->ip_address . ")",
+                ]
+            );
             abort(504, $message);
             return redirect()
                 ->back()

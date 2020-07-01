@@ -1,8 +1,8 @@
 <?php
 
-use App\User;
-use App\Module;
-use App\AdminNotification;
+use App\Models\User;
+use App\Models\Module;
+use App\Models\AdminNotification;
 use Illuminate\Support\Facades\Hash;
 
 Artisan::command('administrator', function () {

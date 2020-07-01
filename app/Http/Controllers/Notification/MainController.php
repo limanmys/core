@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Notification;
 
-use App\AdminNotification;
-use App\Notification;
+use App\Models\AdminNotification;
+use App\Models\Notification;
 use App\Http\Controllers\Controller;
 use App\Notifications\NotificationSent;
-use App\User;
+use App\Models\User;
 
 class MainController extends Controller
 {

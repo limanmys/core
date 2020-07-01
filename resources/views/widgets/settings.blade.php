@@ -23,7 +23,9 @@
                 <br><br>
                 @include('errors')
                 <?php foreach ($widgets as $widget) {
-                    $extension = \App\Extension::find($widget->extension_id);
+                    $extension = \App\Models\Extension::find(
+                        $widget->extension_id
+                    );
                     if ($extension) {
                         $widget->extension_name = $extension->display_name;
                     } else {

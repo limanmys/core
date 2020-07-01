@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
-use App\Notification;
-use App\User;
+use App\Models\Notification;
+use App\Models\User;
 use App\Notifications\NotificationSent;
 
 class NotificationObserver
@@ -19,7 +19,7 @@ class NotificationObserver
     /**
      * Handle the notification "created" event.
      *
-     * @param  \App\Notification  $notification
+     * @param  \App\Models\Notification  $notification
      * @return void
      */
     public function created(Notification $notification)
@@ -30,7 +30,7 @@ class NotificationObserver
     /**
      * Handle the notification "updated" event.
      *
-     * @param  \App\Notification  $notification
+     * @param  \App\Models\Notification  $notification
      * @return void
      */
     public function updated(Notification $notification)
@@ -41,7 +41,7 @@ class NotificationObserver
     /**
      * Handle the notification "deleted" event.
      *
-     * @param  \App\Notification  $notification
+     * @param  \App\Models\Notification  $notification
      * @return void
      */
     public function deleted(Notification $notification)
@@ -52,7 +52,7 @@ class NotificationObserver
     /**
      * Handle the notification "restored" event.
      *
-     * @param  \App\Notification  $notification
+     * @param  \App\Models\Notification  $notification
      * @return void
      */
     public function restored(Notification $notification)
@@ -63,7 +63,7 @@ class NotificationObserver
     /**
      * Handle the notification "force deleted" event.
      *
-     * @param  \App\Notification  $notification
+     * @param  \App\Models\Notification  $notification
      * @return void
      */
     public function forceDeleted(Notification $notification)

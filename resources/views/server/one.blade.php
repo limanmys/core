@@ -81,7 +81,7 @@
                             <a class="nav-link @if(!$firstRendered) active @endif" data-toggle="pill" href="#extensionsTab" role="tab">{{__("Eklentiler")}}</a>
                         </li>
                         @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
-                            @if(\App\Permission::can(user()->id,'liman','id','server_services'))
+                            @if(\App\Models\Permission::can(user()->id,'liman','id','server_services'))
                                 <li class="nav-item">
                                     <a class="nav-link" data-toggle="pill" onclick="getServices()" href="#servicesTab" role="tab">{{__("Servisler")}}</a>
                                 </li>
@@ -112,7 +112,7 @@
                                 </li>
                             @endif
                         @endif
-                        @if(\App\Permission::can(user()->id,'liman','id','view_logs'))
+                        @if(\App\Models\Permission::can(user()->id,'liman','id','view_logs'))
                             <li class="nav-item">
                                 <a class="nav-link" data-toggle="pill" href="#logsTab" onclick="getLogs()" role="tab">{{__("Erişim Kayıtları")}}</a>
                             </li>

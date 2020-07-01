@@ -75,7 +75,7 @@
               @endif
               @if(auth()->user()->isAdmin())
                 <li class="nav-header">{{__("Yönetim Paneli")}}</li>
-                @if(\App\Module::exists())
+                @if(\App\Models\Module::exists())
                 <li class="nav-item">
                     <a href='/modules' onclick="partialPageRequest('/modules');return false;" class="nav-link">
                         <i class="nav-icon fas fa-puzzle-piece"></i>
@@ -93,8 +93,8 @@
                     <a href='/talepler' onclick="partialPageRequest('/talepler');return false;" class="nav-link">
                         <i class="nav-icon fas fa-plus"></i>
                         <p>{{__("Yetki Talepleri")}}</p>
-                        @if(\App\LimanRequest::where('status',0)->count())
-                            <span class="badge badge-info right">{{\App\LimanRequest::where('status',0)->count()}}</span>
+                        @if(\App\Models\LimanRequest::where('status',0)->count())
+                            <span class="badge badge-info right">{{\App\Models\LimanRequest::where('status',0)->count()}}</span>
                         @endif
                     </a>
                 </li>

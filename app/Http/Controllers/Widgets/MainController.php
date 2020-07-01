@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use App\Server;
-use App\Widget;
+use App\Models\Server;
+use App\Models\Widget;
 use App\Http\Controllers\Controller;
 
 class MainController extends Controller

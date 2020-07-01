@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\ExternalNotification;
+use App\Models\ExternalNotification;
 use Illuminate\Support\Str;
 
 class ExternalNotificationController extends Controller

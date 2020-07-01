@@ -3,8 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Server;
-use App\ConnectorToken;
+use App\Models\Server;
+use App\Models\ConnectorToken;
 
 class AddKeyPortToServers extends Migration
 {
@@ -20,12 +20,16 @@ class AddKeyPortToServers extends Migration
         });
 
         //Update current server objects.
-        $servers = Server::whereIn('type',['linux_ssh','linux_certificate','windows_powershell'])->get();
-        foreach($servers as $server){
-            if($server->key_port == null){
-                if($server->type == "windows_powershell"){
+        $servers = Server::whereIn('type', [
+            'linux_ssh',
+            'linux_certificate',
+            'windows_powershell',
+        ])->get();
+        foreach ($servers as $server) {
+            if ($server->key_port == null) {
+                if ($server->type == "windows_powershell") {
                     $server->key_port = 5986;
-                }else{
+                } else {
                     $server->key_port = 22;
                 }
                 $server->save();

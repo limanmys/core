@@ -63,7 +63,7 @@
                     ])<br><br>
                     <div id="usersTable">
                         @include('table',[
-                            "value" => \App\User::all(),
+                            "value" => \App\Models\User::all(),
                             "title" => [
                                 "Kullanıcı Adı" , "Email" , "*hidden*" ,
                             ],
@@ -80,7 +80,7 @@
                                     "icon" => " context-menu-icon-delete"
                                 ]
                             ],
-                            "onclick" => "details"
+                            "onclick" => "userDetails"
                         ])
                     </div>
                 </div>
@@ -99,7 +99,7 @@
                         class="fa fa-plus"></i> {{__("Sertifika Ekle")}}</button>
                     <br><br>
                     @include('table',[
-                        "value" => \App\Certificate::all(),
+                        "value" => \App\Models\Certificate::all(),
                         "title" => [
                             "Sunucu Adresi" , "Servis" , "*hidden*" ,
                         ],
@@ -312,7 +312,7 @@
                         "text" => "Yeni İstemci Ekle"
                     ])<br><br>
                     @include('table',[
-                            "value" => \App\ExternalNotification::all(),
+                            "value" => \App\Models\ExternalNotification::all(),
                             "title" => [
                                 "İsim" , "İp Adresi / Hostname", "Son Erişim Tarihi" , "*hidden*" ,
                             ],
@@ -367,7 +367,7 @@
 
                 <p>{{__("Sunucuları bir gruba ekleyerek eklentiler arası geçişi daha akıcı yapabilirsiniz.")}}</p>
                 @include('table',[
-                            "value" => \App\ServerGroup::all(),
+                            "value" => \App\Models\ServerGroup::all(),
                             "title" => [
                                 "Adı", "*hidden*" , "*hidden*"
                             ],
@@ -785,7 +785,7 @@
             partialPageRequest('/rol/' + role_id);
         }
 
-        function details(row) {
+        function userDetails(row) {
             var user_id = row.querySelector('#user_id').innerHTML;
             partialPageRequest('/ayarlar/' + user_id);
         }

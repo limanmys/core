@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Roles;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Role;
-use App\RoleUser;
-use App\Permission;
-use App\Extension;
-use App\RoleMapping;
-use App\Server;
+use App\Models\Role;
+use App\Models\RoleUser;
+use App\Models\Permission;
+use App\Models\Extension;
+use App\Models\RoleMapping;
+use App\Models\Server;
 use Illuminate\Support\Facades\Validator;
 
 class RoleController extends Controller
@@ -164,16 +164,16 @@ class RoleController extends Controller
                 $data = [
                     [
                         "id" => "view_logs",
-                        "name" => "Sunucu Günlük Kayıtlarını Görüntüleme"
+                        "name" => "Sunucu Günlük Kayıtlarını Görüntüleme",
                     ],
                     [
                         "id" => "add_server",
-                        "name" => "Sunucu Ekleme"
+                        "name" => "Sunucu Ekleme",
                     ],
                     [
                         "id" => "server_services",
-                        "name" => "Sunucu Servislerini Görüntüleme"
-                    ]
+                        "name" => "Sunucu Servislerini Görüntüleme",
+                    ],
                 ];
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];

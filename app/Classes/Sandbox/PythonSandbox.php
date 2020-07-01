@@ -2,9 +2,9 @@
 
 namespace App\Classes\Sandbox;
 
-use App\Permission;
-use App\Token;
-use App\UserSettings;
+use App\Models\Permission;
+use App\Models\Token;
+use App\Models\UserSettings;
 use Illuminate\Support\Str;
 
 class PythonSandbox implements Sandbox

@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
-use App\AdminNotification;
-use App\User;
+use App\Models\AdminNotification;
+use App\Models\User;
 use App\Notifications\NotificationSent;
 
 class AdminNotificationObserver
@@ -18,7 +18,7 @@ class AdminNotificationObserver
     /**
      * Handle the admin notification "created" event.
      *
-     * @param  \App\AdminNotification  $adminNotification
+     * @param  \App\Models\AdminNotification  $adminNotification
      * @return void
      */
     public function created(AdminNotification $adminNotification)
@@ -29,7 +29,7 @@ class AdminNotificationObserver
     /**
      * Handle the admin notification "updated" event.
      *
-     * @param  \App\AdminNotification  $adminNotification
+     * @param  \App\Models\AdminNotification  $adminNotification
      * @return void
      */
     public function updated(AdminNotification $adminNotification)
@@ -40,7 +40,7 @@ class AdminNotificationObserver
     /**
      * Handle the admin notification "deleted" event.
      *
-     * @param  \App\AdminNotification  $adminNotification
+     * @param  \App\Models\AdminNotification  $adminNotification
      * @return void
      */
     public function deleted(AdminNotification $adminNotification)
@@ -51,7 +51,7 @@ class AdminNotificationObserver
     /**
      * Handle the admin notification "restored" event.
      *
-     * @param  \App\AdminNotification  $adminNotification
+     * @param  \App\Models\AdminNotification  $adminNotification
      * @return void
      */
     public function restored(AdminNotification $adminNotification)
@@ -62,7 +62,7 @@ class AdminNotificationObserver
     /**
      * Handle the admin notification "force deleted" event.
      *
-     * @param  \App\AdminNotification  $adminNotification
+     * @param  \App\Models\AdminNotification  $adminNotification
      * @return void
      */
     public function forceDeleted(AdminNotification $adminNotification)

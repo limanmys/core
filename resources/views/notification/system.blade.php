@@ -1,5 +1,5 @@
 <?php
-$notification = \App\AdminNotification::where(
+$notification = \App\Models\AdminNotification::where(
     'id',
     request('notification_id')
 )->first();

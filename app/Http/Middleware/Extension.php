@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\AdminNotification;
-use App\Certificate;
+use App\Models\AdminNotification;
+use App\Models\Certificate;
 use Closure;
 
 class Extension

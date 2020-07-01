@@ -1,14 +1,14 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
-use App\Server;
+use App\Models\Server;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 /**
- * App\User
+ * App\Models\User
  *
  * @property-read mixed $id
  * @method static Builder|User newModelQuery()
@@ -71,27 +71,27 @@ class User extends Authenticatable
 
     public function widgets()
     {
-        return $this->hasMany("\App\Widget");
+        return $this->hasMany("\App\Models\Widget");
     }
 
     public function tokens()
     {
-        return $this->hasMany('\App\Token');
+        return $this->hasMany('\App\Models\Token');
     }
 
     public function settings()
     {
-        return $this->hasMany('\App\UserSettings');
+        return $this->hasMany('\App\Models\UserSettings');
     }
 
     public function notifications()
     {
-        return $this->hasMany('\App\Notification');
+        return $this->hasMany('\App\Models\Notification');
     }
 
     public function favorites()
     {
-        return $this->belongsToMany('\App\Server', 'user_favorites')
+        return $this->belongsToMany('\App\Models\Server', 'user_favorites')
             ->get()
             ->filter(function ($server) {
                 return Permission::can(user()->id, 'server', 'id', $server->id);
@@ -100,16 +100,16 @@ class User extends Authenticatable
 
     public function permissions()
     {
-        return $this->morphMany('App\Permission', 'morph');
+        return $this->morphMany('App\Models\Permission', 'morph');
     }
 
     public function roles()
     {
-        return $this->belongsToMany('App\Role', "role_users");
+        return $this->belongsToMany('App\Models\Role', "role_users");
     }
 
     public function accessTokens()
     {
-        return $this->hasMany('\App\AccessToken');
+        return $this->hasMany('\App\Models\AccessToken');
     }
 }

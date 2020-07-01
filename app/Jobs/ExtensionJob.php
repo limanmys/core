@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Models\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -8,9 +8,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
-use App\Token;
+use App\Models\Token;
 use Illuminate\Support\Str;
-use App\Permission;
+use App\Models\Permission;
 
 class ExtensionJob implements ShouldQueue
 {
@@ -61,9 +61,9 @@ class ExtensionJob implements ShouldQueue
     public function handle()
     {
         $command = $this->sandbox->command($this->function);
-        
+
         $output = shell_exec($command);
-        
+
         system_log(7, "EXTENSION_BACKGROUND_RUN", [
             "extension_id" => $this->extension->id,
             "server_id" => $this->server->id,
