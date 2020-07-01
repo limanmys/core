@@ -4,7 +4,7 @@
     @php($rand = str_random(16))
     @include('extension_pages.server',[
         "viewName" => "",
-        "view" => "<div id='$rand'>Talebiniz isleniyor...</div>",
+        "view" => "<div id='$rand'>Talebiniz yoğunluktan dolayı kuyruğa alındı, lütfen bekleyin...</div>",
         "timestamp" => 0
     ])
     <script>
