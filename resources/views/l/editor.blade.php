@@ -5,7 +5,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
             <li class="breadcrumb-item"><a href="{{route('extensions_settings')}}">{{__("Eklenti Yönetimi")}}</a></li>
-            <li class="breadcrumb-item"><a href="{{route('extension_one',["extension_id" => extension()->_id])}}">{{ extension()->name }}</a></li>
+            <li class="breadcrumb-item"><a href="{{route('extension_one',["extension_id" => extension()->_id])}}">{{ extension()->display_name }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ request('page_name') }}</li>
         </ol>
     </nav>
@@ -45,15 +45,15 @@
 
         function save(){
             showSwal('{{__("Kaydediliyor...")}}','info');
-            let code = JSON.stringify(window.editor.getValue());
-            let data = new FormData();
+            var code = JSON.stringify(window.editor.getValue());
+            var data = new FormData();
             data.append('code',code);
             data.append('page','{{request('page_name')}}');
             data.append('extension_id','{{extension()->_id}}');
             request('{{route('extension_code_update')}}',data,function(response){
                 showSwal("{{__("Başarıyla kaydedildi")}}",'success',2000);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }

@@ -8,11 +8,10 @@ use App\Notifications\NotificationSent;
 
 class AdminNotificationObserver
 {
-
     private function sendBroadcast($adminNotification)
     {
         $adminUsers = User::where('status', 1)->get();
-        foreach($adminUsers as $user){
+        foreach ($adminUsers as $user) {
             $user->notify(new NotificationSent($adminNotification));
         }
     }

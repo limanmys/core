@@ -1,8 +1,16 @@
 #!/bin/bash
 
 # Create Required Folders for Liman
-mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions}
-$(which gpg) --import /liman/server/storage/aciklab.public
+mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions,modules,packages}
+
+# environment creation
+if [ -f "/liman/server/.env" ]; then
+    echo "Upgrading liman."
+else
+    cp /liman/server/.env.example /liman/server/.env
+    php /liman/server/artisan key:generate
+    echo "Installing liman."
+fi
 
 # User Creation
 if getent passwd liman > /dev/null 2>&1; then
@@ -17,6 +25,8 @@ else
     echo "liman     ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
     echo "Liman User Created"
 fi
+
+runuser liman -c '$(which gpg) --import /liman/server/storage/aciklab.public'
 
 # Certificate Creation
 if [ -f "/liman/certs/liman.crt" ]; then
@@ -58,18 +68,6 @@ fi
 mv /liman/server/nginx.conf /etc/nginx/sites-available/liman.conf
 ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
 
-# Fpm Optimizations
-# if grep --quiet LIMAN_OPTIMIZATIONS /etc/php/7.3/fpm/php-fpm.conf; then
-#     echo "Fpm settings already optimized."; 
-# else
-#     echo """
-#     ;LIMAN_OPTIMIZATIONS
-#     emergency_restart_threshold 10
-#     emergency_restart_interval 1m
-#     process_control_timeout 10s
-#     """ >> /etc/php/7.3/fpm/php-fpm.conf
-# fi
-
 # Nginx Auto Redirection
 if grep --quiet LIMAN_OPTIMIZATIONS /etc/nginx/sites-available/default; then
     echo "Nginx https redirection already set up."; 
@@ -87,7 +85,7 @@ fi
 
 #Supervisor Configuration
 if [ -f "/etc/supervisor/conf.d/liman-extension-worker.conf" ]; then
-    echo "Supervisor already created.";
+    echo "Supervisor already created for extension workers.";
 else
         echo """
 #LIMAN_OPTIMIZATIONS
@@ -104,7 +102,27 @@ stdout_logfile=/liman/logs/extension_queue.log
     supervisorctl reread
     supervisorctl update
 fi
-supervisorctl start liman-extension-worker
+
+#Supervisor Configuration for System Updates
+if [ -f "/etc/supervisor/conf.d/liman-system-worker.conf" ]; then
+    echo "Supervisor already created for system updates.";
+else
+        echo """
+#LIMAN_OPTIMIZATIONS
+[program:liman-system-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=system_updater
+autostart=true
+autorestart=true
+user=liman
+numprocs=2
+redirect_stderr=true
+stdout_logfile=/liman/logs/system_update.log
+    """ > /etc/supervisor/conf.d/liman-system-worker.conf
+    supervisorctl reread
+    supervisorctl update
+fi
+supervisorctl start all
 
 #Supervisor Configuration
 if [ -f "/etc/supervisor/conf.d/liman-extension-renderer.conf" ]; then
@@ -143,8 +161,8 @@ rm -rf /tmp/liman
 rm -rf /liman/sandbox/{.git,vendor,views,.gitignore,composer.json,composer.lock,index.php}
 
 # Set Permissions
-chown -R liman:liman /liman/{server,database,certs,sandbox,logs}
-chmod 700 -R /liman/{server,database,certs,logs}
+chown -R liman:liman /liman/{server,database,certs,sandbox,logs,webssh,modules,packages}
+chmod 700 -R /liman/{server,database,certs,logs,webssh,modules,packages}
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
@@ -212,6 +230,7 @@ WantedBy=multi-user.target
 fi
 
 sed -i "s/upload_max_filesize.*/upload_max_filesize = 50M/g" /etc/php/7.3/fpm/php.ini
+sed -i "s/post_max_size.*/post_max_size = 50M/g" /etc/php/7.3/fpm/php.ini
 
 systemctl daemon-reload
 systemctl enable liman
@@ -245,15 +264,6 @@ systemctl daemon-reload
 systemctl enable liman-socket
 systemctl restart liman-socket
 
-# Copy Decoder
-cp /liman/server/storage/decoder.so /usr/lib/php/20180731/liman-decoder.so
-chmod 644 /usr/lib/php/20180731/liman-decoder.so
-
-# Copy libphpcpp
-cp /liman/server/storage/libphpcpp.so.2.2.0 /usr/lib/libphpcpp.so.2.2.0
-ln -f -s /usr/lib/libphpcpp.so.2.2.0 /usr/lib/libphpcpp.so.2.2
-chmod 644 /usr/lib/libphpcpp.so.2.2.0
-
 # Prepare Folders for vnc
 rm -rf /liman/keys/vnc
 mkdir /liman/keys/vnc
@@ -262,18 +272,14 @@ touch /liman/keys/vnc/config
 chown liman:liman /liman/keys/vnc /liman/keys/vnc/config
 chmod 700 /liman/keys/vnc/config
 
-# Modify ini file to use decoder.
-if grep --quiet liman-decoder.so /etc/php/7.3/cli/php.ini; then
-    echo "Decoder already enabled"; 
-else
-    echo "extension=liman-decoder.so" >> /etc/php/7.3/cli/php.ini
-fi
-
 # Restart and enable services.
 systemctl restart nginx
 systemctl enable nginx
 systemctl enable php7.3-fpm
 systemctl restart php7.3-fpm
+
+# Optimize Liman
+php /liman/server/artisan optimize:clear
 
 # Enable Liman
 php /liman/server/artisan up

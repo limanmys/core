@@ -4,7 +4,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{__("Ayarlar")}}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{__("Sistem Ayarları")}}</li>
         </ol>
     </nav>
     <div class="card">
@@ -12,6 +12,9 @@
             <ul class="nav nav-tabs" role="tabpanel">
                 <li class="nav-item">
                     <a class="nav-link active" data-toggle="tab" href="#users" aria-selected="true">{{__("Kullanıcı Ayarları")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a id="extensionNavLink" class="nav-link" data-toggle="tab" href="#extensions" aria-selected="true">{{__("Eklentiler")}} @if(is_file(storage_path("extension_updates"))) <span style="color:green" class="blinking">*</span> @endif</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#roles" onclick="getRoleList()" aria-selected="true">{{__("Rol Grupları")}}</a>
@@ -25,21 +28,28 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#health" onclick="checkHealth()">{{__("Sağlık Durumu")}}</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#update">{{__("Güncelleme")}}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#ldapIntegration">{{__("LDAP Entegrasyonu")}}</a>
-                </li>
-                <li class="nav-item">
+                </li> -->
+                <!-- <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#changeLog">{{__("Son Değişiklikler")}}</a>
-                </li>
+                </li> -->
                 <!-- <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#rsyslog" onclick="readLogs()">{{__("Log Yönetimi")}}</a>
                 </li> -->
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#externalNotifications" onclick="">{{__("Dış Bildirimler")}}</a>
+                </li>  -->
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#restrictedMode" onclick="">{{__("Kısıtlı Mod")}}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#limanMarket" onclick="checkMarketAccess()">{{__("Liman Market")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#dnsSettings" onclick="getDNS()">{{__("DNS Ayarları")}}</a>
+                </li>
+                {!! settingsModuleButtons() !!}
             </ul>
         </div>
         <div class="card-body">
@@ -66,7 +76,7 @@
                                     "icon" => "fa-lock"
                                 ],
                                 "Sil" => [
-                                    "target" => "delete",
+                                    "target" => "deleteUser",
                                     "icon" => " context-menu-icon-delete"
                                 ]
                             ],
@@ -85,7 +95,7 @@
                     </div>
                 </div>
                 <div class="tab-pane fade show" id="certificates" role="tabpanel">
-                    <button class="btn btn-success" onclick="location.href = '{{route('certificate_add_page')}}'"><i
+                    <button class="btn btn-success" onclick="partialPageRequest('{{route('certificate_add_page')}}')"><i
                         class="fa fa-plus"></i> {{__("Sertifika Ekle")}}</button>
                     <br><br>
                     @include('table',[
@@ -99,7 +109,7 @@
                         "menu" => [
                             "Güncelle" => [
                                 "target" => "updateCertificate",
-                                "icon" => " context-menu-icon-update"
+                                "icon" => "fa-sync-alt"
                             ],
                             "Sil" => [
                                 "target" => "deleteCertificate",
@@ -111,12 +121,110 @@
                 <div class="tab-pane fade show" id="health" role="tabpanel">
                     <pre id="output"></pre>
                 </div>
+                <div class="tab-pane fade show" id="extensions" role="tabpanel">
+                    @include('extension_pages.manager')
+                </div>
+                <div class="tab-pane fade show" id="limanMarket" role="tabpanel">
+                    <div id="marketStatus" class="alert alert-secondary" role="alert">
+                        
+                    </div>
+                    <div id="marketLoading">
+                        <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                    </div>
+                    <div id="marketEnabled" style="display:none;">
+                    <div id="marketTableWrapper">
+                        @include('table',[
+                            "id" => "marketTable",
+                            "value" => [],
+                            "title" => [
+                                "Sistem Adı" , "Mevcut Versiyon", "Durumu"
+                            ],
+                            "display" => [
+                                "packageName" , "currentVersion", "status"
+                            ],
+                        ])
+                    </div>
+                    
+                    </div>
+                    <div id="marketDisabled" style="display:none">
+                        <p>{{__("Liman kurulumunuzu Liman Market'e bağlayarak sistemdeki tüm güncellemeleri takip edebilir, güncellemeleri indirebilirsiniz.")}}</p>
+                        <button type="button" class="btn btn-primary btn-lg" onclick="location.href = '{{route('redirect_market')}}'">{{__("Liman Market'i Bağla")}}</button>    
+                    </div>
+                    <script>
+                        function checkMarketAccess(){
+                            var status = $("#marketStatus");
+                            $("#marketTableWrapper").fadeOut(0);
+                            status.html("Market bağlantısı kontrol ediliyor...");
+                            status.attr("class","alert alert-secondary");
+                            request("{{route('verify_market')}}",new FormData(),function(success){
+                                var json = JSON.parse(success);
+                                $("#marketLoading").fadeOut(0);
+                                $("#marketDisabled").fadeOut(0);
+                                $("#marketEnabled").fadeIn();
+                                status.html(json.message);
+                                status.attr("class","alert alert-success");
+                                setTimeout(() => {
+                                    checkMarketUpdates();
+                                }, 1000);
+                            },function(error){
+                                var json = JSON.parse(error);
+                                $("#marketLoading").fadeOut(0);
+                                $("#marketEnabled").fadeOut(0);
+                                $("#marketDisabled").fadeIn();
+                                status.html(json.message);
+                                status.attr("class","alert alert-danger");
+                            });
+                        }
+
+                        function checkMarketUpdates(){
+                            var status = $("#marketStatus");
+                            status.html("Güncellemeler kontrol ediliyor...");
+                            status.attr("class","alert alert-secondary");
+                            $("#marketLoading").fadeIn(0);
+                            request("{{route('check_updates_market')}}",new FormData(),function(success){
+                                var json = JSON.parse(success);
+                                var table = $("#marketTable").DataTable();
+                                var counter = 1;
+                                table.clear();
+                                $.each(json.message,function (index,current) {
+                                    var row = table.row.add([
+                                        counter++, current["packageName"], current["currentVersion"], current["status"]
+                                    ]).draw().node();
+                                });
+                                table.draw();
+                                status.html("Güncellemeler başarıyla kontrol edildi");
+                                status.attr("class","alert alert-success");
+                                $("#marketLoading").fadeOut(0);
+                                $("#marketTableWrapper").fadeIn(0);
+                            },function(error){
+                                var json = JSON.parse(error);
+                                status.html(json.message);
+                                status.attr("class","alert alert-danger");
+                            });
+                        }
+                    </script>
+                    
+                </div>
+                <div class="tab-pane fade show" id="dnsSettings" role="tabpanel">
+                    <p>{{__("Liman'ın sunucu adreslerini çözebilmesi için gerekli DNS sunucularını aşağıdan düzenleyebilirsiniz.")}}</p>
+                    <form onsubmit="return saveDNS(this);">
+                        <label>{{__("Öncelikli DNS Sunucusu")}}</label>
+                        <input type="text" name="dns1" id="dns1" class="form-control">
+                        <label>{{__("Alternatif DNS Sunucusu")}}</label>
+                        <input type="text" name="dns2" id="dns2" class="form-control">
+                        <label>{{__("Alternatif DNS Sunucusu")}}</label>
+                        <input type="text" name="dns3" id="dns3" class="form-control"><br>
+                        <button type="submit" class="btn btn-primary">{{__("Kaydet")}}</button>
+                    </form>
+                </div>
                 <div class="tab-pane fade show" id="servers" role="tabpanel">
                     <?php
-                        $servers = servers();
-                        foreach ($servers as $server){
-                            $server->enabled = ($server->enabled) ? __("Aktif") : __("Pasif");
-                        }
+                    $servers = servers();
+                    foreach ($servers as $server) {
+                        $server->enabled = $server->enabled
+                            ? __("Aktif")
+                            : __("Pasif");
+                    }
                     ?>
                     <button class="btn btn-success" onclick="serverStatus(true)" disabled>{{__("Aktifleştir")}}</button>
                     <button class="btn btn-danger" onchange="serverStatus(false)" disabled>{{__("Pasifleştir")}}</button><br><br>
@@ -134,101 +242,67 @@
                         $("#servers table").DataTable(dataTablePresets('multiple'));
                     </script>
                 </div>
+                {!! settingsModuleViews() !!}
                 <div class="tab-pane fade show" id="update" role="tabpanel">
                     @php($updateOutput = shell_exec("apt list --upgradable | grep 'liman'"))
                     @if($updateOutput)
                         <pre>{{$updateOutput}}</pre>
                     @else
-                        <pre>{{__("Liman Sürümünüz : " . env("APP_VERSION") . " güncel.")}}</pre>
+                        <pre>{{__("Liman Sürümünüz : " . getVersion() . " güncel.")}}</pre>
                     @endif
                 </div>
-                <div class="tab-pane fade show" id="ldapIntegration" role="tabpanel">
-                    <div class="form-group">
-                        <label>{{ __('Ldap Sunucu Adresi') }}</label>
-                        <input type="text" value="{{ env('LDAP_HOST', "") }}" name="ldapAddress" class="form-control" placeholder="{{ __('IP Adresi Girin') }}">
-                    </div>
-                    <div class="form-group">
-                        <label>{{ __('Ldap Object GUID Alanı') }}</label>
-                        <input type="text" value="{{ config('ldap.ldap_guid_column', 'objectguid') }}" name="ldapObjectGUID" class="form-control" placeholder="{{ __('LDAP şemanızdaki objectguid alanının adını yazın.') }}">
-                        <small>{{ __('LDAP şemanızdaki objectguid alanının adını yazın.') }}</small>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" name="ldapStatus" id="ldapStatus" @if(config('ldap.ldap_status', true)) checked @endif>
-                        <label class="form-check-label" for="ldapStatus">
-                          {{ __('Entegrasyonu Aktifleştir') }}
-                        </label>
-                      </div>
-                    <button type="button" onclick="saveLDAPConf()" class="btn btn-primary">{{ __('Kaydet') }}</button>
-                    @if(config('ldap.ldap_host', false))
-                        <ul class="nav nav-pills" role="tablist" style="margin-top: 15px;margin-bottom: 15px;">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#restrictions" data-toggle="tab">{{__("Giriş Kısıtlamaları")}}</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#mappings" data-toggle="tab">{{__("Domain Grup ve Rol Grup Eşleştirmeleri")}}</a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane fade show active" id="restrictions" role="tabpanel">
-                                @include('alert', [
-                                    "title" => "Bilgilendirme",
-                                    "message" => "Bu alana bir kullanıcı veya grup eklediğinizde eklediğiniz kullanıcılar dışındakiler ve eklediğiniz gruplarda olmayan kullanıcılar giriş yapamaz. Herhangi bir kısıt eklemezseniz herkes giriş yapabilir."
-                                ])
-                                @include('modal-button',[
-                                    "class" => "btn-success mb-2",
-                                    "target_id" => "addLdapRestriction",
-                                    "text" => "Ekle"
-                                ])
-                                @include('table',[
-                                    "value" => \App\LdapRestriction::all(),
-                                    "title" => [
-                                        "Tip" , "İsim" , "*hidden*" ,
-                                    ],
-                                    "display" => [
-                                        "type" , "name", "id:ldap_restriction_id" ,
-                                    ],
-                                    "menu" => [
-                                        "Sil" => [
-                                            "target" => "deleteLdapRestriction",
-                                            "icon" => " context-menu-icon-delete"
-                                        ]
-                                    ],
-                                ])
-                            </div>
-                            <div class="tab-pane fade show" id="mappings" role="tabpanel">
-                                @include('modal-button',[
-                                    "class" => "btn-success mb-2",
-                                    "target_id" => "addRoleMapping",
-                                    "text" => "Ekle"
-                                ])
-                                @include('table',[
-                                    "value" => \App\RoleMapping::all()->map(function($item){
-                                        $item->role_name = $item->role->name;
-                                        return $item;
-                                    }),
-                                    "title" => [
-                                        "Domain Grubu" , "Rol Grubu" , "*hidden*" ,
-                                    ],
-                                    "display" => [
-                                        "dn" , "role_name", "id:role_mapping_id" ,
-                                    ],
-                                    "menu" => [
-                                        "Sil" => [
-                                            "target" => "deleteRoleMapping",
-                                            "icon" => " context-menu-icon-delete"
-                                        ]
-                                    ],
-                                ])
-                            </div>
-                        </div>
-                    @endif
-                </div>
+
                 <div class="tab-pane fade show" id="changeLog" role="tabpanel">
                     <ul>
                         @foreach (explode("\n",$changelog) as $line)
                         <li>{{$line}}</li>
                         @endforeach
                     </ul>
+                </div>
+
+                <div class="tab-pane fade show" id="restrictedMode" role="tabpanel">
+                    <p>{{__("Liman'ı kısıtlamak ve kullanıcıların yalnızca bir eklentiyi kullanması için bu modu kullanabilirsiniz. Bu modu kullandığınız taktirde, kullanıcılar varsayılan olarak eklenti ve sunucu yetkisine sahip olacak, ancak fonksiyon yetkilerine sahip olmayacaklardır. Yöneticiler mevcut liman arayüzünü görmeye devam edecek, kullanıcılar ise yalnızca eklenti çerçevesini görüntüleyebilecektir.")}}</p>
+                    <form onsubmit="return saveRestricted(this);">
+                        <div class="form-check">
+                            <input name="LIMAN_RESTRICTED" type="checkbox" class="form-check-input" id="rectricedModeToggle" @if(env("LIMAN_RESTRICTED")) checked @endif>
+                            <label class="form-check-label" for="rectricedModeToggle">{{__("Kısıtlı Modu Aktifleştir.")}}</label>
+                        </div><br>
+
+                        <div class="form-group">
+                            <label for="restrictedServer">{{__("Gösterilecek Sunucu")}}</label>
+                            <select name="LIMAN_RESTRICTED_SERVER" id="restrictedServer" class="form-control select2" required>
+                                <option value="" disabled selected>{{__('Lütfen bir sunucu seçin.')}}</option>
+                                        @foreach(servers() as $server)
+                                            <option value="{{$server->id}}" @if(env("LIMAN_RESTRICTED_SERVER") == $server->id) selected @endif>{{$server->name}}</option>
+                                        @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                        <label for="restrictedExtension">{{__("Gösterilecek Eklenti")}}</label>
+                            <select name="LIMAN_RESTRICTED_EXTENSION" id="restrictedExtension" class="form-control select2" required>
+                                <option value="" disabled selected>{{__('Lütfen bir eklenti seçin.')}}</option>
+                                        @foreach(extensions() as $extension)
+                                            <option value="{{$extension->id}}" @if(env("LIMAN_RESTRICTED_EXTENSION") == $extension->id) selected @endif>{{$extension->display_name}}</option>
+                                        @endforeach
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">{{__("Ayarları Kaydet")}}</button>
+                    </form>
+                    <script>
+                        function saveRestricted(form){
+                            return request('{{route("restricted_mode_update")}}',form,function(success){
+                                var json = JSON.parse(success);
+                                showSwal(json.message,'success');
+                                setTimeout(() => {
+                                    reload();
+                                }, 2000);
+                            },function(error){
+                                var json = JSON.parse(error);
+                                showSwal(json.message,'danger',2000);
+                            });
+                        }
+                    </script>
                 </div>
 
                 <div class="tab-pane fade show" id="externalNotifications" role="tabpanel">
@@ -315,6 +389,15 @@
             </div>
         </div>
     </div>
+    <style>
+        .blinking {
+            animation: blinker 1s linear infinite;
+        }
+
+        @keyframes blinker {  
+            50% { opacity: 0; }
+        }
+    </style>
     
     @include('modal',[
         "id"=>"add_user",
@@ -348,7 +431,7 @@
     ])
 
     @include('modal',[
-       "id"=>"delete",
+       "id"=>"deleteUser",
        "title" =>"Kullanıcıyı Sil",
        "url" => route('user_remove'),
        "text" => "Kullanıcıyı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
@@ -419,80 +502,7 @@
         "submit_text" => "Sunucu Grubunu Sil"
     ])
 
-    @component('modal-component',[
-        "id" => "addLdapRestriction",
-        "title" => "Giriş Kısıtlaması Ekle",
-        "footer" => [
-            "class" => "btn-success",
-            "onclick" => "addLdapRestriction()",
-            "text" => "Ekle"
-        ],
-    ])
 
-    <div class="form-group">
-        <label>{{ __('Kısıtlama Tipi') }}</label>
-        <select name="type" class="form-control" required onchange="restrictionType(this)">
-            <option value="user">{{ __('Kullanıcıya İzin Ver') }}</option>
-            <option value="group">{{ __('Gruba İzin Ver') }}</option>
-        </select>
-    </div>
-    <div class="form-group" id="domainUserSelect">
-        <label>{{ __('Kullanıcı Adı') }}</label>
-        <div class="input-group">
-            <select class="form-control select2" name="username" data-placeholder="{{ __('Kullanıcı Adı Yazınız') }}" data-tags="true">
-            </select>
-            <span class="input-group-append">
-                <button type="button" onclick="fetchDomainUsers()" class="btn btn-primary">{{ __('LDAP\'tan Getir') }}</button>
-            </span>
-        </div>
-    </div>
-    <div class="form-group" id="domainGroupSelect" style="display:none;">
-        <label>{{ __('Domain Grubu (DN)') }}</label>
-        <div class="input-group">
-            <select class="form-control select2" name="dn" data-placeholder="{{ __('DN Yazınız') }}" data-tags="true">
-            </select>
-            <span class="input-group-append">
-                <button type="button" onclick="fetchDomainGroups()" class="btn btn-primary">{{ __('LDAP\'tan Getir') }}</button>
-            </span>
-        </div>
-    </div>
-
-    @endcomponent
-
-    @component('modal-component',[
-        "id" => "addRoleMapping",
-        "title" => "Domain Grup ve Rol Grup Eşleştirmesi",
-        "footer" => [
-            "class" => "btn-success",
-            "onclick" => "addRoleMapping()",
-            "text" => "Ekle"
-        ],
-    ])
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>{{ __('Domain Grubu (DN)') }}</label>
-                <div class="input-group">
-                    <select class="form-control select2" name="dn" data-placeholder="{{ __('DN Yazınız') }}" data-tags="true">
-                    </select>
-                    <span class="input-group-append">
-                        <button type="button" onclick="fetchDomainGroups()" class="btn btn-primary">{{ __('LDAP\'tan Getir') }}</button>
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>{{ __('Rol Grubu') }}</label>
-                <select name="role_id" class="form-control select2" required>
-                    @foreach (\App\Role::all() as $role)
-                        <option value="{{ $role->id }}">{{ $role->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-    </div>
-    @endcomponent
 
 
     @component('modal-component',[
@@ -554,18 +564,6 @@
     ])
 
     @endcomponent
-
-    @include('modal',[
-        "id"=>"deleteLdapRestriction",
-        "title" =>"Kısıtlamayı Sil",
-        "url" => route('delete_ldap_restriction'),
-        "text" => "Kısıtlamayı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-        "next" => "reload",
-        "inputs" => [
-            "Ldap Restriction Id:'null'" => "ldap_restriction_id:hidden"
-        ],
-        "submit_text" => "Kısıtlamayı Sil"
-    ])
 
     @include('modal',[
         "id"=>"deleteRoleMapping",
@@ -630,113 +628,8 @@
         "submit_text" => "Sil"
     ])
 
-    @component('modal-component',[
-        "id" => "ldapAuth",
-        "title" => "Ldap İle Giriş Yap",
-        "notSized" => true,
-        "modalDialogClasses" => "modal-dialog-centered modal-sm",
-        "footer" => [
-            "class" => "btn-success",
-            "onclick" => "ldapLogin()",
-            "text" => "Giriş Yap"
-        ],
-    ])
 
-    <form onsubmit="return ldapLogin()">
-        <div class="form-group">
-            <label for="ldapUsername">{{ __('Kullanıcı Adı') }}</label>
-            <input type="text" name="ldapUsername" class="form-control" id="ldapUsername" placeholder="{{ __('Kullanıcı Adı') }}">
-        </div>
-    
-        <div class="form-group">
-            <label for="ldapPassword">{{ __('Şifre') }}</label>
-            <input type="password" name="ldapPassword" class="form-control" id="ldapPassword" placeholder="{{ __('Şifre') }}">
-        </div>
-        <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" tabindex="-1" />
-    </form>
-
-    @endcomponent
     <script>
-        
-        var ldapAuthNext = null;
-
-        function ldapAuth(next){
-            ldapAuthNext = next;
-            $('#ldapAuth').modal('show');
-        }
-
-        function ldapLogin(){
-            let ldapUsername = $('#ldapAuth').find('input[name=ldapUsername]').val();
-            let ldapPassword = $('#ldapAuth').find('input[name=ldapPassword]').val();
-            if(ldapAuthNext)
-                ldapAuthNext(ldapUsername, ldapPassword);
-            $('#ldapAuth').find('input[name=ldapUsername]').val("");
-            $('#ldapAuth').find('input[name=ldapPassword]').val("");
-            $('#ldapAuth').modal('hide');
-            return false;
-        }
-
-        function fetchDomainUsers(){
-            ldapAuth(function(ldapUsername, ldapPassword){
-                $('select[name=username]').select2({
-                    theme: 'bootstrap4',
-                    ajax: {
-                        type: 'POST',
-                        url: "{{ route('fetch_domain_users') }}",
-                        dataType: 'json',
-                        delay: 250,
-                        headers: {
-                            "X-CSRF-TOKEN" : $('meta[name=csrf-token]').attr("content"),
-                        },
-                        data: function (params) {
-                            return {
-                                query: params.term, // search term
-                                ldapUsername: ldapUsername,
-                                ldapPassword: ldapPassword,
-                            };
-                        },
-                        processResults: function (data, params) {
-                            return {
-                                results: data.message
-                            };
-                        },
-                        cache: true
-                    },
-                });
-                $('select[name=username]').select2('open');
-            });
-        }
-
-        function fetchDomainGroups(){
-            ldapAuth(function(ldapUsername, ldapPassword){
-                $('select[name=dn]').select2({
-                    theme: 'bootstrap4',
-                    ajax: {
-                        type: 'POST',
-                        url: "{{ route('fetch_domain_groups') }}",
-                        dataType: 'json',
-                        delay: 250,
-                        headers: {
-                            "X-CSRF-TOKEN" : $('meta[name=csrf-token]').attr("content"),
-                        },
-                        data: function (params) {
-                            return {
-                                query: params.term, // search term
-                                ldapUsername: ldapUsername,
-                                ldapPassword: ldapPassword,
-                            };
-                        },
-                        processResults: function (data, params) {
-                            return {
-                                results: data.message
-                            };
-                        },
-                        cache: true
-                    },
-                });
-                $('select[name=dn]').select2('open');
-            });
-        }
 
         function restrictionType(element){
             if($(element).val() == "user"){
@@ -748,81 +641,67 @@
             }
         }
 
-        function addLdapRestriction(){
-            showSwal('{{__("Kaydediliyor...")}}','info');
-            let data = new FormData();
-            data.append('dn', $('#addLdapRestriction').find('select[name=dn]').val());
-            data.append('username', $('#addLdapRestriction').find('select[name=username]').val());
-            data.append('type', $('#addLdapRestriction').find('select[name=type]').val());
-            request("{{route("add_ldap_restriction")}}", data, function(res) {
-                let response = JSON.parse(res);
-                showSwal(response.message,'success');
-                reload();
-            }, function(response){
-                let error = JSON.parse(response);
-                showSwal(error.message,'error',2000);
-            });
-        }
+
         
         function saveLogSystem(){
             showSwal('{{__("Kaydediliyor...")}}','info');
-            let data = new FormData(document.querySelector('#logForm'));
+            var data = new FormData(document.querySelector('#logForm'));
             return request("{{route("save_log_system")}}", data, function(res) {
-                let response = JSON.parse(res);
+                var response = JSON.parse(res);
                 showSwal(response.message,'success');
                 reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
 
         function addRoleMapping(){
             showSwal('{{__("Kaydediliyor...")}}','info');
-            let data = new FormData();
+            var data = new FormData();
             data.append('dn', $('#addRoleMapping').find('select[name=dn]').val());
             data.append('role_id', $('#addRoleMapping').find('select[name=role_id]').val());
             request("{{route("add_role_mapping")}}", data, function(res) {
-                let response = JSON.parse(res);
+                var response = JSON.parse(res);
                 showSwal(response.message,'success');
                 reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
 
         function addServerGroup(){
             showSwal('{{__("Ekleniyor...")}}','info');
-            let data = new FormData();
-            let tableData = [];
-            let table = $("#serverGroupServers").DataTable();
+            var data = new FormData();
+            var tableData = [];
+            var table = $("#serverGroupServers").DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 tableData.push(element[3]);
             });
             data.append('name', $('#serverGroupName').val());
             data.append('servers', tableData.join());
             request("{{route("add_server_group")}}", data, function(response) {
-                let res = JSON.parse(response);
+                var res = JSON.parse(response);
                 showSwal(res.message,'success',2000);
                 setTimeout(() => {
                     location.reload();
                 }, 1000);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
         function modifyServerGroupHandler(row){
-            let server_group_id = row.querySelector('#server_group_id').innerHTML;
-            let server_ids = row.querySelector('#servers').innerHTML.split(",");
+            var server_group_id = row.querySelector('#server_group_id').innerHTML;
+            var server_ids = row.querySelector('#servers').innerHTML.split(",");
             current_server_group = server_group_id;
             $('#serverGroupNameModify').val(row.querySelector('#name').innerHTML);
-            let table = $("#modifyServerGroupTable").DataTable();
+            var table = $("#modifyServerGroupTable").DataTable();
             table.rows().deselect();
             table.rows().every(function(){
-                let data = this.data();
-                let current = this;
+                var data = this.data();
+                var current = this;
                 if(server_ids.includes(data[3])){
                     current.select();
                 }
@@ -831,12 +710,12 @@
             $("#modifyServerGroupModal").modal('show');
         }
 
-        let current_server_group = null;
+        var current_server_group = null;
         function modifyServerGroup(){
             showSwal('{{__("Düzenleniyor...")}}','center');
-            let data = new FormData();
-            let tableData = [];
-            let table = $("#modifyServerGroupTable").DataTable();
+            var data = new FormData();
+            var tableData = [];
+            var table = $("#modifyServerGroupTable").DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 tableData.push(element[3]);
             });
@@ -844,13 +723,13 @@
             data.append('servers', tableData.join());
             data.append('server_group_id',current_server_group);
             request("{{route("modify_server_group")}}", data, function(response) {
-                let res = JSON.parse(response);
+                var res = JSON.parse(response);
                 showSwal(res.message,'success',2000);
                 setTimeout(() => {
                     location.reload();
                 }, 1000);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
@@ -859,18 +738,18 @@
             showSwal('{{__("Okunuyor...")}}','info');
             request("{{route("get_log_system")}}", new FormData(), function(res) {
                 Swal.close();
-                let response = JSON.parse(res);
+                var response = JSON.parse(res);
                 $("#logIpAddress").val(response["message"]["ip_address"]);
                 $("#logPort").val(response["message"]["port"]);
                 $("#logInterval").val(response["message"]["interval"]);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
 
         function afterUserAdd(response) {
-            let json = JSON.parse(response);
+            var json = JSON.parse(response);
             $("#add_user button[type='submit']").attr("disabled","true")
             getUserList();
         }
@@ -885,7 +764,7 @@
                 $("#usersTable").html(response);
                 $('#usersTable table').DataTable(dataTablePresets('multiple'));
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
@@ -896,31 +775,31 @@
                 $("#rolesTable").html(response);
                 $('#rolesTable table').DataTable(dataTablePresets('normal'));
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
 
         function roleDetails(row){
-            let role_id = row.querySelector('#role_id').innerHTML;
-            location.href = '/rol/' + role_id;
+            var role_id = row.querySelector('#role_id').innerHTML;
+            partialPageRequest('/rol/' + role_id);
         }
 
         function details(row) {
-            let user_id = row.querySelector('#user_id').innerHTML;
-            location.href = '/ayarlar/' + user_id;
+            var user_id = row.querySelector('#user_id').innerHTML;
+            partialPageRequest('/ayarlar/' + user_id);
         }
 
         function checkHealth() {
             showSwal('{{__("Okunuyor...")}}','info');
             request("{{route('health_check')}}", new FormData(), function (success) {
                 Swal.close();
-                let json = JSON.parse(success);
-                let box = $("#output");
+                var json = JSON.parse(success);
+                var box = $("#output");
                 box.html("");
                 console.log(json["message"]);
-                for (let i = 0; i < json["message"].length; i++) {
-                    let current = json["message"][i];
+                for (var i = 0; i < json["message"].length; i++) {
+                    var current = json["message"][i];
                     box.append("<div class='alert alert-" + current["type"] + "' role='alert'>" +
                         current["message"] +
                         "</div>");
@@ -931,22 +810,35 @@
                 alert("hata");
             });
         }
+        
 
-        function saveLDAPConf(){
-            showSwal('{{__("Kaydediliyor...")}}','info');
-            let data = new FormData();
-            data.append('ldapAddress', $('input[name=ldapAddress]').val());
-            data.append('ldapObjectGUID', $('input[name=ldapObjectGUID]').val());
-            data.append('ldapStatus', $('input[name=ldapStatus]').prop('checked'));
-            request("{{route("save_ldap_conf")}}", data, function(res) {
-                let response = JSON.parse(res);
-                showSwal(response.message,'success');
-                reload();
-            }, function(response){
-                let error = JSON.parse(response);
-                showSwal(error.message,'error',2000);
+        function saveDNS(form){
+            return request('{{route('set_liman_dns_servers')}}',form, function (success){
+                var json = JSON.parse(success);
+                showSwal(json["message"],'success',2000);
+                setTimeout(() => {
+                    getDNS();
+                }, 1500);
+            }, function(error){
+                var json = JSON.parse(error);
+                showSwal(json.message,'error',2000);
             });
         }
+
+        function getDNS(){
+            showSwal('{{__("Okunuyor")}}','info');
+            request('{{route('get_liman_dns_servers')}}',new FormData(),function(success){
+                var json = JSON.parse(success);
+                $("#dns1").val(json["message"][0]);
+                $("#dns2").val(json["message"][1]);
+                $("#dns3").val(json["message"][2]);
+                Swal.close();
+            },function(error){
+                var json = JSON.parse(error);
+                showSwal(json.message,'error',2000);
+            });
+        }
+
 
         $('#add_user').on('shown.bs.modal', function (e) {
             $("#add_user button[type='submit']").removeAttr("disabled");

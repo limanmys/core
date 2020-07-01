@@ -10,7 +10,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class ServerPolicy
 {
     use HandlesAuthorization;
-    
+
     /**
      * Determine whether the user can view any servers.
      *
@@ -31,7 +31,7 @@ class ServerPolicy
      */
     public function view(User $user, Server $server)
     {
-        return Permission::can($user->id,'server','id',$server->id);
+        return Permission::can($user->id, 'server', 'id', $server->id);
     }
 
     /**
@@ -55,7 +55,7 @@ class ServerPolicy
      */
     public function update(User $user, Server $server)
     {
-        return Permission::can($user->id,'server','id',$server->id);
+        return Permission::can($user->id, 'server', 'id', $server->id);
     }
 
     /**
@@ -67,7 +67,7 @@ class ServerPolicy
      */
     public function delete(User $user, Server $server)
     {
-        return Permission::can($user->id,'server','id',$server->id);
+        return Permission::can($user->id, 'server', 'id', $server->id);
     }
 
     /**

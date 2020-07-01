@@ -1,52 +1,44 @@
-<?php return array (
-  'barryvdh/laravel-ide-helper' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Barryvdh\\LaravelIdeHelper\\IdeHelperServiceProvider',
-    ),
-  ),
-  'beyondcode/laravel-websockets' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'BeyondCode\\LaravelWebSockets\\WebSocketsServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'WebSocketRouter' => 'BeyondCode\\LaravelWebSockets\\Facades\\WebSocketRouter',
-    ),
-  ),
-  'facade/ignition' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Facade\\Ignition\\IgnitionServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'Flare' => 'Facade\\Ignition\\Facades\\Flare',
-    ),
-  ),
-  'laravel/tinker' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Laravel\\Tinker\\TinkerServiceProvider',
-    ),
-  ),
-  'nesbot/carbon' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Carbon\\Laravel\\ServiceProvider',
-    ),
-  ),
-  'nunomaduro/collision' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    ),
-  ),
-);
+<?php return [
+    'barryvdh/laravel-ide-helper' => [
+        'providers' => [
+            0 => 'Barryvdh\\LaravelIdeHelper\\IdeHelperServiceProvider',
+        ],
+    ],
+    'beyondcode/laravel-websockets' => [
+        'providers' => [
+            0 => 'BeyondCode\\LaravelWebSockets\\WebSocketsServiceProvider',
+        ],
+        'aliases' => [
+            'WebSocketRouter' =>
+                'BeyondCode\\LaravelWebSockets\\Facades\\WebSocketRouter',
+        ],
+    ],
+    'facade/ignition' => [
+        'providers' => [
+            0 => 'Facade\\Ignition\\IgnitionServiceProvider',
+        ],
+        'aliases' => [
+            'Flare' => 'Facade\\Ignition\\Facades\\Flare',
+        ],
+    ],
+    'laravel/tinker' => [
+        'providers' => [
+            0 => 'Laravel\\Tinker\\TinkerServiceProvider',
+        ],
+    ],
+    'nesbot/carbon' => [
+        'providers' => [
+            0 => 'Carbon\\Laravel\\ServiceProvider',
+        ],
+    ],
+    'nunomaduro/collision' => [
+        'providers' => [
+            0 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
+        ],
+    ],
+    'spatie/laravel-web-tinker' => [
+        'providers' => [
+            0 => 'Spatie\\WebTinker\\WebTinkerServiceProvider',
+        ],
+    ],
+];

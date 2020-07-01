@@ -7,29 +7,63 @@ use App\Token;
 use App\UserSettings;
 use Illuminate\Support\Str;
 
-class PythonSandbox implements Sandbox{
+class PythonSandbox implements Sandbox
+{
     private $path = "/liman/sandbox/python/index.py";
     private $fileExtension = ".html.ninja";
+    private $server, $extension, $user, $request, $logId;
 
-    public function getPath(){
+    public function __construct(
+        $server = null,
+        $extension = null,
+        $user = null,
+        $request = null
+    ) {
+        $this->server = $server ? $server : server();
+        $this->extension = $extension ? $extension : extension();
+        $this->user = $user ? $user : user();
+        $this->request = $request
+            ? $request
+            : request()->except([
+                "permissions",
+                "extension",
+                "server",
+                "script",
+                "server_id",
+            ]);
+    }
+
+    public function getPath()
+    {
         return $this->path;
     }
 
-    public function getFileExtension(){
+    public function setLogId($logId)
+    {
+        $this->logId = $logId;
+    }
+
+    public function getFileExtension()
+    {
         return $this->fileExtension;
     }
 
-    public function command($function){
+    public function command($function, $extensionDb = null)
+    {
         $combinerFile = $this->path;
 
         $settings = UserSettings::where([
-            "user_id" => user()->id,
-            "server_id" => server()->id,
+            "user_id" => $this->user->id,
+            "server_id" => $this->server->id,
         ]);
 
         $extensionDb = [];
         foreach ($settings->get() as $setting) {
-            $key = env('APP_KEY') . user()->id . extension()->id . server()->id;
+            $key =
+                env('APP_KEY') .
+                $this->user->id .
+                $this->extension->id .
+                $this->server->id;
             $decrypted = openssl_decrypt($setting->value, 'aes-256-cfb8', $key);
             $stringToDecode = substr($decrypted, 16);
             $extensionDb[$setting->name] = base64_decode($stringToDecode);
@@ -37,36 +71,47 @@ class PythonSandbox implements Sandbox{
 
         $extensionDb = json_encode($extensionDb);
 
-        $request = request()->all();
-        unset($request["permissions"]);
-        unset($request["extension"]);
-        unset($request["server"]);
-        unset($request["script"]);
-        unset($request["server_id"]);
-        $request = json_encode($request);
+        $request = json_encode($this->request);
 
         $apiRoute = route('extension_server', [
-            "extension_id" => extension()->id,
-            "city" => server()->city,
-            "server_id" => server()->id
+            "extension_id" => $this->extension->id,
+            "city" => $this->server->city,
+            "server_id" => $this->server->id,
         ]);
 
         $navigationRoute = route('extension_server', [
-            "server_id" => server()->id,
-            "extension_id" => extension()->id,
-            "city" => server()->city
+            "server_id" => $this->server->id,
+            "extension_id" => $this->extension->id,
+            "city" => $this->server->city,
         ]);
 
-        $token = Token::create(user()->id);
+        $token = Token::create($this->user->id);
 
-        if (!user()->isAdmin()) {
-            $extensionJson = json_decode(file_get_contents(env("EXTENSIONS_PATH") . strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"), true);
+        if (!$this->user->isAdmin()) {
+            $extensionJson = json_decode(
+                file_get_contents(
+                    "/liman/extensions/" .
+                        strtolower($this->extension->name) .
+                        DIRECTORY_SEPARATOR .
+                        "db.json"
+                ),
+                true
+            );
             $permissions = [];
             if (array_key_exists("functions", $extensionJson)) {
                 foreach ($extensionJson["functions"] as $item) {
-                    if (Permission::can(user()->id, "function", "name", strtolower(extension()->name), $item["name"]) || $item["isActive"] != "true") {
+                    if (
+                        Permission::can(
+                            $this->user->id,
+                            "function",
+                            "name",
+                            strtolower($this->extension->name),
+                            $item["name"]
+                        ) ||
+                        $item["isActive"] != "true"
+                    ) {
                         array_push($permissions, $item["name"]);
-                    };
+                    }
                 }
             }
             $permissions = json_encode($permissions);
@@ -75,41 +120,53 @@ class PythonSandbox implements Sandbox{
         }
 
         $userData = [
-            "id" => user()->id,
-            "name" => user()->name,
-            "email" => user()->email
+            "id" => $this->user->id,
+            "name" => $this->user->name,
+            "email" => $this->user->email,
         ];
 
-        $functionsPath = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/views/functions.py";
+        $functionsPath =
+            "/liman/extensions/" .
+            strtolower($this->extension->name) .
+            "/views/functions.py";
 
-        $publicPath = route('extension_public_folder',[
-            "extension_id" => extension()->id,
-            "path" => ""
+        $publicPath = route('extension_public_folder', [
+            "extension_id" => $this->extension->id,
+            "path" => "",
         ]);
 
         $isAjax = request()->wantsJson() ? true : false;
         $array = [
-            $functionsPath, $function, server()->toArray(), extension()->toArray(), $extensionDb,
-            $request, $apiRoute, $navigationRoute, $token, $permissions, session('locale'), json_encode($userData), $publicPath, $isAjax
+            $functionsPath,
+            $function,
+            $this->server->toArray(),
+            $this->extension->toArray(),
+            $extensionDb,
+            $request,
+            $apiRoute,
+            $navigationRoute,
+            $token,
+            $permissions,
+            session('locale'),
+            json_encode($userData),
+            $publicPath,
+            $isAjax,
+            $this->logId,
         ];
 
-//        $encrypted = openssl_encrypt(
-//            Str::random() . base64_encode(json_encode($array)),
-//            'aes-256-cfb8',
-//            shell_exec('cat ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id),
-//            0,
-//            Str::random()
-//        );
-        $keyPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id;
-        $combinerFile = "/liman/extensions/" . strtolower(extension()->name) . "/views/functions.py";
+        $keyPath = '/liman/keys' . DIRECTORY_SEPARATOR . $this->extension->id;
+        $combinerFile =
+            "/liman/extensions/" .
+            strtolower($this->extension->name) .
+            "/views/functions.py";
         $encrypted = base64_encode(json_encode($array));
-        return "sudo -u " . clean_score(extension()->id) .
+        return "sudo -u " .
+            cleanDash($this->extension->id) .
             " bash -c 'export PYTHONPATH=\$PYTHONPATH:/liman/sandbox/python; timeout 30 /usr/bin/python3 $combinerFile $keyPath $encrypted 2>&1'";
     }
 
-    public function getInitialFiles(){
-        return [
-            "index.blade.php" , "functions.py"
-        ];
+    public function getInitialFiles()
+    {
+        return ["index.blade.php", "functions.py"];
     }
 }

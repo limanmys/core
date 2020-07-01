@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{{__("Liman Sistem Yönetimi")}}</title>
+    <title>{{__("Liman Merkezi Sistem Yönetimi")}}</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{mix('/css/liman.css')}}">
@@ -17,14 +17,15 @@
     var module = { };
 </script>
 <script src="{{mix('/js/liman.js')}}"></script>
+<!-- Admin Password Recovery : https://www.youtube.com/watch?v=dQw4w9WgXcQ -->
 @if(auth()->check())
 <script>
     toastr.options.closeButton = true;
     Echo.private('App.User.{{auth()->user()->id}}')
         .notification((notification) => {
-            let data = notification['\u0000*\u0000attributes'];
+            var data = notification['\u0000*\u0000attributes'];
             if(data){
-                let errors = [
+                var errors = [
                     "error" , "health_problem"
                 ];
                 if(errors.includes(data.type)){
@@ -34,7 +35,7 @@
                 }else{
                     toastElement = toastr.success(data.message, data.title, {timeOut: 5000})
                 }
-                let displayedNots = [];
+                var displayedNots = [];
 
                 if(localStorage.displayedNots){
                     displayedNots = JSON.parse(localStorage.displayedNots);
@@ -43,27 +44,12 @@
                 localStorage.displayedNots = JSON.stringify(displayedNots);
                 
                 $(toastElement).click(function(){
-                    location.href = "/bildirim/" + data.id
+                    window.location.href = "/bildirim/" + data.id;
                 });
             }
             checkNotifications(data ? data.id : null);
     });
-    jQuery(function($) {
-      var path = window.location.href; // because the 'href' property of the DOM element is the absolute path
-      $('nav ul a').each(function() {
-        if (this.href === path) {
-          $(this).addClass('active');
-        }
-      });
-      $('.list-group a').each(function() {
-        if (this.href === path) {
-          $(this).addClass('active');
-        }
-      });
-      if(localStorage.nightMode == "on"){
-          $('body').addClass('skin-dark');
-      }
-    });
+    
 
     function dataTablePresets(type){
         if(type == "normal"){
@@ -112,7 +98,29 @@
         $(".nav.nav-tabs a").on('click',function () {
             window.location.hash = $(this).attr("href");
         });
+        initialPresets();
         activeTab();
+        var title = $(".breadcrumb-item.active").text();
+        if(title !== undefined){
+            document.title = title + " / Liman";
+        }
+        @if(auth()->check())
+            checkNotifications();
+        @endif
+
+        $('.ext_nav').slice({{getExtensionViewCount()}}, $('.ext_nav').length).hide();
+        $('.ext_nav_more_less').click(function(){
+            if ($('.ext_nav').length == $('.ext_nav:visible').length) {
+                $('.ext_nav_more_less').find('p').text("{{__('...daha fazla')}}");
+                $('.ext_nav').slice({{getExtensionViewCount()}}, $('.ext_nav').length).hide();
+            }else{
+                $('.ext_nav_more_less').find('p').text("{{__('daha az...')}}");
+                $('.ext_nav:hidden').show();
+            }
+        });
+    };
+
+    function initialPresets(){
         $('table').not('.notDataTable').DataTable({
             autoFill : true,
             bFilter: true,
@@ -125,24 +133,27 @@
             width: 'resolve'
         });
         $(":input").inputmask();
-        let title = $(".breadcrumb-item.active").text();
-        if(title !== undefined){
-            document.title = title + " / Liman";
-        }
-        @if(auth()->check())
-            checkNotifications();
-        @endif
 
-        $('.ext_nav').slice({{env('NAV_EXTENSION_HIDE_COUNT', 10)}}, $('.ext_nav').length).hide();
-        $('.ext_nav_more_less').click(function(){
-            if ($('.ext_nav').length == $('.ext_nav:visible').length) {
-                $('.ext_nav_more_less').find('p').text("{{__('...daha fazla')}}");
-                $('.ext_nav').slice({{env('NAV_EXTENSION_HIDE_COUNT', 10)}}, $('.ext_nav').length).hide();
-            }else{
-                $('.ext_nav_more_less').find('p').text("{{__('daha az...')}}");
-                $('.ext_nav:hidden').show();
+        jQuery(function($) {
+            var path = window.location.href;
+            $('nav ul a').each(function() {
+                if (this.href === path) {
+                    $(this).addClass('active');
+                }else{
+                    $(this).removeClass('active')
+                }
+            });
+            $('.list-group a').each(function() {
+                if (this.href === path) {
+                    $(this).addClass('active');
+                }else{
+                    $(this).removeClass('active')
+                }
+            });
+            if(localStorage.nightMode == "on"){
+                $('body').addClass('skin-dark');
             }
         });
-    };
+    }
 </script>
 </html>

@@ -32,7 +32,7 @@ class BasicNotification extends Mailable
     {
         return $this->from([
             "address" => env('APP_NOTIFICATION_EMAIL'),
-            "name" => __("Liman Bildiri Sistemi")
+            "name" => __("Liman Bildiri Sistemi"),
         ])->view('emails.basic');
     }
 }

@@ -7,13 +7,19 @@
         <li class="breadcrumb-item active" aria-current="page">{{__("Yetki Talepleri")}}</li>
     </ol>
 </nav>
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">{{__("Yetki Talepleri")}}</h3>
-    </div>
-    <div class="card-body">
-        @include('errors')    
-        @include('table',[
+<div class="row">
+        <div class="col-md-3">
+            <div class="card card-primary card-outline">
+              <div class="card-body box-profile">
+                <h3 class="profile-username text-center">{{__("Yetki Talepleri")}}</h3>
+                <p class="text-muted text-center">Bu sayfadan mevcut yetki taleplerini görebilirsiniz. İşlem yapmak istediğiniz talebe sağ tıklayarak işlem yapabilirsiniz.</p>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                @include('table',[
                 "value" => $requests,
                 "title" => [
                     "Tipi" , "Kullanıcı Adı" , "Not" , "Önem Derecesi", "Durumu", "*hidden*", "*hidden*"
@@ -41,24 +47,27 @@
                 ],
                 "onclick" => "userSettings"
         ])
-    </div>
+                </div>
+            </div>
+        </div>
 </div>
+
 <script>
 
     function userSettings(element){
-        let user_id = element.querySelector('#user_id').innerHTML;
-        window.location.href = "/ayarlar/" + user_id
+        var user_id = element.querySelector('#user_id').innerHTML;
+        partialPageRequest("/ayarlar/" + user_id);
     }
     function update(current,status) {
         showSwal('{{__("Kaydediliyor.")}}','info');
-        let form = new FormData();
+        var form = new FormData();
         form.append('status',status);
         form.append('request_id',current.querySelector('#request_id').innerHTML);
         request('{{route('request_update')}}',form,function () {
             Swal.close();
             location.reload();
         }, function(response){
-            let error = JSON.parse(response);
+            var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
         })
     }

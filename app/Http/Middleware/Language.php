@@ -18,11 +18,10 @@ class Language
     {
         // Check if web session has a locale set for user.
         if (session('locale')) {
-
             // If so, set that locale in to the app to use it later.
             app()->setLocale(session('locale'));
-        }else{
-          \Session::put('locale', app()->getLocale());
+        } else {
+            \Session::put('locale', app()->getLocale());
         }
 
         // Forward request to next target.

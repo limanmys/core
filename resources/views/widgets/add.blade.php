@@ -4,13 +4,13 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-        <li class="breadcrumb-item" aria-current="page"><a href="{{route('widgets')}}">{{__("Widgetlar")}}</a></li>
-        <li class="breadcrumb-item active" aria-current="page">{{__("Widget Ekle")}}</li>
+        <li class="breadcrumb-item" aria-current="page"><a href="{{route('widgets')}}">{{__("Bileşenler")}}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{__("Bileşen Ekle")}}</li>
     </ol>
 </nav>
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">{{__("Widget Ekle")}}</h3>
+        <h3 class="card-title">{{__("Bileşen Ekle")}}</h3>
     </div>
     <div class="card-body">
         @include('errors')
@@ -23,23 +23,23 @@
             </select><br>
             <h4>{{__("Eklenti")}}</h4>
             <select class="form-control" id="extension_id" disabled onchange="getWidgets()" required name="extension_id"></select><br>
-            <h4>{{__("Widget")}}</h4>
+            <h4>{{__("Bileşen")}}</h4>
             <select class="form-control" id="widget_name" disabled="" name="widget_name"></select><br>
             @csrf
-            <button class="btn btn-success" type="submit">{{__("Widget Ekle")}}</button>
+            <button class="btn btn-success" type="submit">{{__("Bileşen Ekle")}}</button>
         </form>
     </div>
 </div>
 <script>
     function getExtensions(){
-        let form = new FormData();
-        let element = $("#extension_id");
+        var form = new FormData();
+        var element = $("#extension_id");
         element.text('');
         element.attr('disabled','true');
         form.append('server_id',$("#server_id").val());
         request('{{route('widget_get_extensions')}}',form,function(response){
-            let json = JSON.parse(response);
-            for(let k in json) {
+            var json = JSON.parse(response);
+            for(var k in json) {
                 element.append('<option value="'+ k+ '">' + fixer(json[k]) + '</option>');
             }
             if(Object.keys(json).length > 0){
@@ -49,26 +49,26 @@
                 $("#widget_name").text('').addAttr('disabled','');
             }
         }, function(response){
-            let error = JSON.parse(response);
+            var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
         });
     }
 
     function getWidgets(){
         $("#widget_name").text('');
-        let form = new FormData();
+        var form = new FormData();
         form.append('extension_id',$("#extension_id").val());
         request('{{route('widget_list')}}',form,function(response){
-            let json = JSON.parse(response);
-            let element = $("#widget_name");
+            var json = JSON.parse(response);
+            var element = $("#widget_name");
             element.text('');
-            for(let k in json) {
+            for(var k in json) {
                 console.log(json[k]);
                 element.append('<option value="'+ fixer(json[k]["target"]) + ':' + fixer(json[k]["name"]) + ':' + fixer(json[k]["type"]) + ':' + fixer(json[k]["icon"]) +'">' + fixer(json[k]["name"]) + '</option>');
             }
             element.removeAttr('disabled');
         }, function(response){
-            let error = JSON.parse(response);
+            var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
         });
     }

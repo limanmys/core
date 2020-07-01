@@ -14,7 +14,10 @@ class AddObjectguidColumn extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('objectguid')->nullable()->after('id');
+            $table
+                ->string('objectguid')
+                ->nullable()
+                ->after('id');
         });
     }
 

@@ -26,7 +26,15 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'status', 'forceChange', 'objectguid', 'auth_type'
+        'name',
+        'email',
+        'password',
+        'status',
+        'forceChange',
+        'objectguid',
+        'auth_type',
+        'last_login_at',
+        'last_login_ip',
     ];
 
     /**
@@ -34,9 +42,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     public function isAdmin()
     {
@@ -46,15 +52,20 @@ class User extends Authenticatable
 
     public function servers()
     {
-        return Server::get()->filter(function($server){
-            return Permission::can(user()->id,'server','id',$server->id);
+        return Server::get()->filter(function ($server) {
+            return Permission::can(user()->id, 'server', 'id', $server->id);
         });
     }
 
     public function extensions()
     {
-        return Extension::get()->filter(function($extension){
-            return Permission::can(user()->id,'extension','id',$extension->id);
+        return Extension::get()->filter(function ($extension) {
+            return Permission::can(
+                user()->id,
+                'extension',
+                'id',
+                $extension->id
+            );
         });
     }
 
@@ -80,9 +91,11 @@ class User extends Authenticatable
 
     public function favorites()
     {
-        return $this->belongsToMany('\App\Server','user_favorites')->get()->filter(function($server){
-            return Permission::can(user()->id,'server','id',$server->id);
-        });
+        return $this->belongsToMany('\App\Server', 'user_favorites')
+            ->get()
+            ->filter(function ($server) {
+                return Permission::can(user()->id, 'server', 'id', $server->id);
+            });
     }
 
     public function permissions()
@@ -93,5 +106,10 @@ class User extends Authenticatable
     public function roles()
     {
         return $this->belongsToMany('App\Role', "role_users");
+    }
+
+    public function accessTokens()
+    {
+        return $this->hasMany('\App\AccessToken');
     }
 }

@@ -8,10 +8,11 @@ use App\Notifications\NotificationSent;
 
 class NotificationObserver
 {
-
     private function sendBroadcast($notification, $user_id = null)
     {
-        $user = User::find(isset($notification->user_id) ? $notification->user_id : $user_id);
+        $user = User::find(
+            isset($notification->user_id) ? $notification->user_id : $user_id
+        );
         $user->notify(new NotificationSent($notification));
     }
 

@@ -10,23 +10,24 @@ use App\User;
 
 class MainController extends Controller
 {
-
     public function all()
     {
         $notifications = Notification::where([
-            "user_id" => auth()->id()
-        ])->orderBy('read')->orderBy('created_at', 'desc')->get();
+            "user_id" => auth()->id(),
+        ])
+            ->orderBy('read')
+            ->orderBy('created_at', 'desc')
+            ->get();
         return response()->view('notification.index', [
             "notifications" => $notifications,
-            "system" => false
+            "system" => false,
         ]);
-
     }
     public function delete()
     {
         $notification = Notification::where([
             "user_id" => auth()->id(),
-            "id" => request('notification_id')
+            "id" => request('notification_id'),
         ])->first();
         $notification->delete();
         return respond("Bildirim silindi.");
@@ -36,7 +37,7 @@ class MainController extends Controller
     {
         Notification::where([
             "user_id" => auth()->id(),
-            "read" => true
+            "read" => true,
         ])->delete();
         return respond("Bildirimler silindi.");
     }
@@ -45,17 +46,25 @@ class MainController extends Controller
     {
         $notifications = Notification::where([
             "user_id" => auth()->id(),
-            "read" => false
-        ])->orderBy('updated_at', 'desc')->get();
+            "read" => false,
+        ])
+            ->orderBy('updated_at', 'desc')
+            ->get();
         $adminNotifications = [];
-        if(auth()->user()->isAdmin()){
+        if (
+            auth()
+                ->user()
+                ->isAdmin()
+        ) {
             $adminNotifications = AdminNotification::where([
-                "read" => "false"
-            ])->orderBy('updated_at', 'desc')->get();
+                "read" => "false",
+            ])
+                ->orderBy('updated_at', 'desc')
+                ->get();
         }
         return respond([
             "user" => $notifications,
-            "admin" => $adminNotifications
+            "admin" => $adminNotifications,
         ]);
     }
 
@@ -63,13 +72,14 @@ class MainController extends Controller
     {
         $notification = Notification::where([
             "user_id" => auth()->id(),
-            "id" => request('notification_id')
+            "id" => request('notification_id'),
         ])->first();
         if (!$notification) {
             return respond("Bildirim Bulunamadi", 201);
         }
-        $notification->read = true;
-        $notification->save();
+        $notification->update([
+            "read" => true,
+        ]);
         return $notification->id;
     }
 
@@ -78,33 +88,36 @@ class MainController extends Controller
         Notification::where([
             "user_id" => auth()->id(),
         ])->update([
-            "read" => true
+            "read" => true,
         ]);
-        auth()->user()->notify(new NotificationSent([]));
+        auth()
+            ->user()
+            ->notify(new NotificationSent([]));
         return respond("Hepsi Okundu", 200);
     }
 
     public function adminRead()
     {
         AdminNotification::where([
-            "read" => "false"
+            "read" => "false",
         ])->update([
-            "read" => "true"
+            "read" => "true",
         ]);
         $adminUsers = User::where('status', 1)->get();
-        foreach($adminUsers as $user){
+        foreach ($adminUsers as $user) {
             $user->notify(new NotificationSent([]));
         }
-        return respond("Hepsi Okundu.",200);
+        return respond("Hepsi Okundu.", 200);
     }
 
     public function allSystem()
     {
-        $notifications = AdminNotification::orderBy('read')->orderBy('created_at', 'desc')->get();
+        $notifications = AdminNotification::orderBy('read')
+            ->orderBy('created_at', 'desc')
+            ->get();
         return response()->view('notification.index', [
             "notifications" => $notifications,
-            "system" => true
+            "system" => true,
         ]);
     }
-
 }

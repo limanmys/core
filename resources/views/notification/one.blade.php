@@ -1,19 +1,27 @@
 <?php
 $item = \App\Notification::where([
     "user_id" => auth()->id(),
-    "id" => request('notification_id')
+    "id" => request('notification_id'),
 ])->first();
-if(!$item){
-    if(auth()->user()->isAdmin() && \App\AdminNotification::find(request('notification_id'))->exists()){
-        header("Location: " . route('system_notification',[
-                "notification_id" => request('notification_id')
-            ]), true);
+if (!$item) {
+    if (
+        auth()
+            ->user()
+            ->isAdmin() &&
+        \App\AdminNotification::find(request('notification_id'))->exists()
+    ) {
+        header(
+            "Location: " .
+                route('system_notification', [
+                    "notification_id" => request('notification_id'),
+                ]),
+            true
+        );
         exit();
-    }else{
+    } else {
         return redirect()->back();
     }
 }
-
 ?>
 
 @extends('layouts.app')
@@ -59,22 +67,22 @@ if(!$item){
     </div>
     <script>
         $('.mark_read').click(function () {
-            let data = new FormData();
+            var data = new FormData();
             data.append('notification_id', $(this).attr('notification-id'));
             request('{{route('notification_read')}}', data, function (response) {
                 location.reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         });
         $('.delete_not').click(function () {
-            let data = new FormData();
+            var data = new FormData();
             data.append('notification_id', $(this).attr('notification-id'));
             request('{{route('notification_delete')}}', data, function (response) {
-                location.href = "{{route('all_user_notifications')}}";
+                partialPageRequest("{{route('all_user_notifications')}}");
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         });

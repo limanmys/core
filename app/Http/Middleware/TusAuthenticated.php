@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Middleware;
 
 use TusPhp\Request;
@@ -8,12 +9,10 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class TusAuthenticated implements TusMiddleware
 {
-
     public function handle(Request $request, Response $response)
     {
-        if (! auth()->check()) {
-            throw new UnauthorizedHttpException('User not authenticated');
+        if (!auth()->check()) {
+            throw new UnauthorizedHttpException('Kullanıcı giriş yapmadı!');
         }
-
     }
 }

@@ -13,7 +13,7 @@ class UpdateServersTable extends Migration
      */
     public function up()
     {
-        Schema::table('servers',function (Blueprint $table){
+        Schema::table('servers', function (Blueprint $table) {
             $table->string("os")->nullable();
         });
     }

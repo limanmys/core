@@ -5,7 +5,8 @@
 @section('body')
     <div class="login-box">
         <div class="login-logo">
-            <a href="{{ route('login') }}"><b>Liman MYS</b></a>
+            <a><b><img src="/images/liman_logo-white.svg" height="50"><br> Merkezi Yönetim Sistemi</b></a>
+            <h5>{{env("BRAND_NAME")}}</h5>
         </div>
         <div class="card">
             <div class="card-body login-card-body">
@@ -27,7 +28,7 @@
                 <form action="{{ route('login')}}" method="post">
                     @csrf
                     <div class="input-group mb-3">
-                        <input type="text" name="liman_email_mert" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" placeholder="{{__("Email Adresi ve Ldap Kullanıcı Adı")}}" value="{{ old('liman_email_mert') }}" required>
+                        <input type="text" name="liman_email_mert" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" placeholder="{{__("Email Adresi")}}" value="{{ old('liman_email_mert') }}" required>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
@@ -35,7 +36,7 @@
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input type="password" name="liman_password_baran" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" placeholder="Password">
+                        <input type="password" name="liman_password_baran" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" placeholder="Parola">
                         <div class="input-group-append">
                             <div class="input-group-text">
                             <span class="fas fa-lock"></span>
@@ -45,10 +46,10 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="icheck-primary">
-                            <input type="checkbox" id="remember" name="remember">
-                            <label for="remember">
-                                {{__("Beni Hatırla")}}
-                            </label>
+                                <input type="checkbox" id="remember" name="remember">
+                                <label for="remember">
+                                    {{__("Beni Hatırla")}}
+                                </label>
                             </div>
                         </div>
                         <div class="col-4">
@@ -58,5 +59,35 @@
                 </form>
             </div>
         </div>
+        <center><h6>Havelsan © 2020 <a href="https://liman.havelsan.com.tr" target="_blank">(İletişim)</a></h6></center>
     </div>
+    <style>
+        .login-page, .card-body {
+            background: linear-gradient(261deg, #007bff, #343a40);
+            background-size: 400% 400%;
+
+            -webkit-animation: AnimationName 0s ease infinite;
+            -moz-animation: AnimationName 0s ease infinite;
+            animation: AnimationName 0s ease infinite;
+        }
+
+        @-webkit-keyframes AnimationName {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+        @-moz-keyframes AnimationName {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+        @keyframes AnimationName {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+        .login-box, .card-body {
+            color:white;
+        }
+    </style>
 @stop

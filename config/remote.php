@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Remote Connection Name
@@ -28,14 +27,14 @@ return [
 
     'connections' => [
         'production' => [
-            'host'      => '',
-            'username'  => '',
-            'password'  => '',
-            'key'       => '',
-            'keytext'   => '',
+            'host' => '',
+            'username' => '',
+            'password' => '',
+            'key' => '',
+            'keytext' => '',
             'keyphrase' => '',
-            'agent'     => '',
-            'timeout'   => 10,
+            'agent' => '',
+            'timeout' => 10,
         ],
     ],
 
@@ -53,5 +52,4 @@ return [
     'groups' => [
         'web' => ['production'],
     ],
-
 ];

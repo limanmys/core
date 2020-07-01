@@ -9,18 +9,19 @@ use App\Http\Controllers\Controller;
 
 class MainController extends Controller
 {
-    public function all(){
+    public function all()
+    {
         $requests = LimanRequest::all();
-        foreach($requests as $request){
+        foreach ($requests as $request) {
             $user = User::find($request->user_id);
-            if(!$user){
+            if (!$user) {
                 $request->user_name = "Kullanici Silinmis";
                 $request->user_id = "";
-            }else{
+            } else {
                 $request->user_name = $user->name;
                 $request->user_id = $user->id;
             }
-            switch ($request->type){
+            switch ($request->type) {
                 case "server":
                     $request->type = __("Sunucu");
                     break;
@@ -32,9 +33,9 @@ class MainController extends Controller
                     break;
                 default:
                     $request->type = __("Bilinmeyen.");
-                    break; 
+                    break;
             }
-            switch ($request->status){
+            switch ($request->status) {
                 case "0":
                     $request->status = __("Talep Alındı");
                     break;
@@ -51,7 +52,7 @@ class MainController extends Controller
                     $request->status = __("Bilinmeyen.");
                     break;
             }
-            switch ($request->speed){
+            switch ($request->speed) {
                 case "normal":
                     $request->speed = __("Normal");
                     break;
@@ -60,47 +61,59 @@ class MainController extends Controller
                     break;
             }
         }
-        system_log(7,"REQUEST_LIST");
+        system_log(7, "REQUEST_LIST");
 
-        return view('permission.list',[
-            "requests" => $requests
+        return view('permission.list', [
+            "requests" => $requests,
         ]);
     }
 
-    public function one(){
-        $request = LimanRequest::where('id',request('permission_id'))->first();
-        $request->user_name = User::where('id',$request->user_id)->first()->name;
+    public function one()
+    {
+        $request = LimanRequest::where('id', request('permission_id'))->first();
+        $request->user_name = User::where(
+            'id',
+            $request->user_id
+        )->first()->name;
 
-        system_log(7,"REQUEST_DETAILS",[
-            "request_id" => $request
+        system_log(7, "REQUEST_DETAILS", [
+            "request_id" => $request,
         ]);
 
-        return view('permission.requests.' . $request->type ,[
-            "request" => $request
+        return view('permission.requests.' . $request->type, [
+            "request" => $request,
         ]);
     }
 
     public function requestUpdate()
     {
-        $request = LimanRequest::where('id',request('request_id'))->first();
+        $request = LimanRequest::where('id', request('request_id'))->first();
 
-        system_log(7,"REQUEST_UPDATE",[
-            "action" => $request
+        system_log(7, "REQUEST_UPDATE", [
+            "action" => $request,
         ]);
-        $text = request("status") == "1" ? "İşleniyor." : (request("status") == "2" ? "Tamamlandı" : "Reddedildi");
+        $text =
+            request("status") == "1"
+                ? __("İşleniyor.")
+                : (request("status") == "2"
+                    ? __("Tamamlandı")
+                    : __("Reddedildi"));
         Notification::send(
             __("Talebiniz güncellendi"),
             "notify",
-            __("Talebiniz \":status\" olarak güncellendi.", ["status" => __($text)]),
+            __("Talebiniz \":status\" olarak güncellendi.", [
+                "status" => $text,
+            ]),
             $request->user_id
         );
-        if(request('status') == "4"){
+        if (request('status') == "4") {
             $request->delete();
-            return respond("Talep Silindi",200);
+            return respond("Talep Silindi", 200);
         }
 
-        $request->status = request('status');
-        $request->save();
-        return respond("Talep Güncellendi",200);
+        $request->update([
+            "status" => request('status'),
+        ]);
+        return respond("Talep Güncellendi", 200);
     }
 }

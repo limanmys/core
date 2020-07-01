@@ -19,20 +19,27 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
-    {
-        View::composer('layouts.header',function($view){
-            $view->with('USER_FAVORITES',user()->favorites());
+    public function boot(
+        \Illuminate\Routing\Router $router,
+        \Illuminate\Contracts\Http\Kernel $kernel
+    ) {
+        View::composer('layouts.header', function ($view) {
+            $view->with('USER_FAVORITES', user()->favorites());
         });
         Carbon::setLocale(app()->getLocale());
         Notification::observe(NotificationObserver::class);
         AdminNotification::observe(AdminNotificationObserver::class);
-
-
         Relation::morphMap([
             'users' => 'App\User',
             'roles' => 'App\Role',
         ]);
+
+        if (request()->headers->has("liman-token") == false) {
+            $router->pushMiddlewareToGroup(
+                "web",
+                \App\Http\Middleware\VerifyCsrfToken::class
+            );
+        }
     }
 
     /**

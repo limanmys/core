@@ -2,28 +2,16 @@
 
 namespace App\Http\Controllers\Extension;
 
-use App\Classes\Connector\SSHTunnelConnector;
-use App\Extension;
-use App\Permission;
-use App\Server;
 use App\Http\Controllers\Controller;
-use App\User;
 use App\UserSettings;
 use Carbon\Carbon;
-use App\Token;
 use function request;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
 use Illuminate\Support\Str;
-use App\ServerLog;
-use App\Jobs\ExtensionJob;
-use App\JobHistory;
-use Illuminate\Contracts\Bus\Dispatcher;
 
 /**
  * Class OneController
@@ -36,83 +24,142 @@ class OneController extends Controller
      */
     public function serverSettings()
     {
-        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
+        $extension = json_decode(
+            file_get_contents(
+                "/liman/extensions/" .
+                    strtolower(extension()->name) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
+            ),
+            true
+        );
         foreach ($extension["database"] as $key) {
-            if($key["type"] == "password" && request($key["variable"]) != request($key["variable"].'_confirmation') ){
-              return redirect(route('extension_server_settings_page', [
-                  "extension_id" => extension()->id,
-                  "server_id" => server()->id,
-                  "city" => server()->city
-              ]))->withInput()->withErrors([
-                  "message" => __("Parola alanları uyuşmuyor!")
-              ]);
+            if (
+                $key["type"] == "password" &&
+                request($key["variable"]) !=
+                    request($key["variable"] . '_confirmation')
+            ) {
+                return redirect(
+                    route('extension_server_settings_page', [
+                        "extension_id" => extension()->id,
+                        "server_id" => server()->id,
+                        "city" => server()->city,
+                    ])
+                )
+                    ->withInput()
+                    ->withErrors([
+                        "message" => __("Parola alanları uyuşmuyor!"),
+                    ]);
             }
         }
         //Check Verification
-        if(array_key_exists("verification",$extension) && $extension["verification"] != null && $extension["verification"] != ""){
-                // Run Function
-                $extensionDb = [];
-                foreach ($extension["database"] as $key){
-                    if(request($key["variable"])){
-                        $extensionDb[$key["variable"]] = request($key["variable"]);
-                    }elseif($setting = UserSettings::where([
+        if (
+            array_key_exists("verification", $extension) &&
+            $extension["verification"] != null &&
+            $extension["verification"] != ""
+        ) {
+            // Run Function
+            $extensionDb = [];
+            foreach ($extension["database"] as $key) {
+                if (request($key["variable"])) {
+                    $extensionDb[$key["variable"]] = request($key["variable"]);
+                } elseif (
+                    $setting = UserSettings::where([
                         "user_id" => user()->id,
                         "server_id" => server()->id,
-                        'name' => $key["variable"]
-                    ])->first()){
-                        $extensionDb[$key["variable"]] = lDecrypt($setting->value);
-                    }else{
-                        return redirect(route('extension_server_settings_page', [
+                        'name' => $key["variable"],
+                    ])->first()
+                ) {
+                    $extensionDb[$key["variable"]] = lDecrypt($setting->value);
+                } else {
+                    return redirect(
+                        route('extension_server_settings_page', [
                             "extension_id" => extension()->id,
                             "server_id" => server()->id,
-                            "city" => server()->city
-                        ]))->withInput()->withErrors([
-                            "message" => "Eksik parametre girildi."
+                            "city" => server()->city,
+                        ])
+                    )
+                        ->withInput()
+                        ->withErrors([
+                            "message" => "Eksik parametre girildi.",
                         ]);
-                    }
                 }
-                $command = generateSandboxCommand(server(), $extension, extension()->id, auth()->id(), "", "null", $extension["verification"],$extensionDb);
-                $output = shell_exec($command);
-                if(is_json($output)){
-                    $message = json_decode($output);
-                    if(isset($message->message)){
-                        $output = $message->message;
-                    }
+            }
+            $extensionDb = json_encode($extensionDb);
+            $command = sandbox()->command(
+                $extension["verification"],
+                $extensionDb
+            );
+            $output = shell_exec($command);
+            if (isJson($output)) {
+                $message = json_decode($output);
+                if (isset($message->message)) {
+                    $output = $message->message;
                 }
+            }
 
-                $sessions = \App\TmpSession::where('session_id', session()->getId())->get();
-                foreach($sessions as $session){
-                    session()->put($session->key, $session->value);
-                    $session->delete();
-                }
+            $sessions = \App\TmpSession::where(
+                'session_id',
+                session()->getId()
+            )->get();
+            foreach ($sessions as $session) {
+                session()->put($session->key, $session->value);
+                $session->delete();
+            }
 
-            if(strtolower($output) != "ok" && strtolower($output) != "ok\n"){
-                return redirect(route('extension_server_settings_page', [
-                    "extension_id" => extension()->id,
-                    "server_id" => server()->id,
-                    "city" => server()->city
-                ]))->withInput()->withErrors([
-                    "message" => $output
-                ]);
+            if (strtolower($output) != "ok" && strtolower($output) != "ok\n") {
+                return redirect(
+                    route('extension_server_settings_page', [
+                        "extension_id" => extension()->id,
+                        "server_id" => server()->id,
+                        "city" => server()->city,
+                    ])
+                )
+                    ->withInput()
+                    ->withErrors([
+                        "message" => $output,
+                    ]);
             }
         }
         foreach ($extension["database"] as $key) {
             $row = DB::table('user_settings')->where([
                 "user_id" => user()->id,
                 "server_id" => server()->id,
-                'name' => $key["variable"]
+                'name' => $key["variable"],
             ]);
-            if(request($key["variable"])){
-                if($row->exists()){
-                    $encKey = env('APP_KEY') . user()->id . extension()->id . server()->id;
-                    $encrypted = openssl_encrypt(Str::random(16) . base64_encode(request($key["variable"])),'aes-256-cfb8',$encKey,0,Str::random(16));
+            if (request($key["variable"])) {
+                if ($row->exists()) {
+                    $encKey =
+                        env('APP_KEY') .
+                        user()->id .
+                        extension()->id .
+                        server()->id;
+                    $encrypted = openssl_encrypt(
+                        Str::random(16) .
+                            base64_encode(request($key["variable"])),
+                        'aes-256-cfb8',
+                        $encKey,
+                        0,
+                        Str::random(16)
+                    );
                     $row->update([
                         "value" => $encrypted,
                         "updated_at" => Carbon::now(),
                     ]);
-                }else{
-                    $encKey = env('APP_KEY') . user()->id . extension()->id . server()->id;
-                    $encrypted = openssl_encrypt(Str::random(16) . base64_encode(request($key["variable"])),'aes-256-cfb8',$encKey,0,Str::random(16));
+                } else {
+                    $encKey =
+                        env('APP_KEY') .
+                        user()->id .
+                        extension()->id .
+                        server()->id;
+                    $encrypted = openssl_encrypt(
+                        Str::random(16) .
+                            base64_encode(request($key["variable"])),
+                        'aes-256-cfb8',
+                        $encKey,
+                        0,
+                        Str::random(16)
+                    );
 
                     DB::table("user_settings")->insert([
                         "id" => Str::uuid(),
@@ -120,23 +167,24 @@ class OneController extends Controller
                         "user_id" => user()->id,
                         "name" => $key["variable"],
                         "value" => $encrypted,
-                        "created_at" =>  Carbon::now(),
+                        "created_at" => Carbon::now(),
                         "updated_at" => Carbon::now(),
                     ]);
                 }
-
             }
         }
-        system_log(7,"EXTENSION_SETTINGS_UPDATE",[
+        system_log(7, "EXTENSION_SETTINGS_UPDATE", [
             "extension_id" => extension()->id,
             "server_id" => server()->id,
         ]);
 
-        return redirect(route('extension_server', [
-            "extension_id" => extension()->id,
-            "server_id" => server()->id,
-            "city" => server()->city
-        ]));
+        return redirect(
+            route('extension_server', [
+                "extension_id" => extension()->id,
+                "server_id" => server()->id,
+                "city" => server()->city,
+            ])
+        );
     }
 
     /**
@@ -144,31 +192,52 @@ class OneController extends Controller
      */
     public function serverSettingsPage()
     {
-        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
-        system_log(7,"EXTENSION_SETTINGS_PAGE",[
-            "extension_id" => extension()->id
+        $extension = json_decode(
+            file_get_contents(
+                "/liman/extensions/" .
+                    strtolower(extension()->name) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
+            ),
+            true
+        );
+        system_log(7, "EXTENSION_SETTINGS_PAGE", [
+            "extension_id" => extension()->id,
         ]);
         $similar = [];
-        foreach ($extension["database"] as $item){
-            if(strpos(strtolower($item["variable"]),"password")){
+        foreach ($extension["database"] as $item) {
+            if (strpos(strtolower($item["variable"]), "password")) {
                 continue;
             }
-            $obj = DB::table("user_settings")->where([
-                "user_id" => user()->id,
-                "name" => $item["variable"],
-                "server_id" => server()->id
-            ])->first();
-            if($obj){
-                $key = env('APP_KEY') . user()->id . extension()->id . server()->id;
-                $decrypted = openssl_decrypt($obj->value,'aes-256-cfb8',$key);
-                $stringToDecode = substr($decrypted,16);
+            $obj = DB::table("user_settings")
+                ->where([
+                    "user_id" => user()->id,
+                    "name" => $item["variable"],
+                    "server_id" => server()->id,
+                ])
+                ->first();
+            if ($obj) {
+                $key =
+                    env('APP_KEY') .
+                    user()->id .
+                    extension()->id .
+                    server()->id;
+                $decrypted = openssl_decrypt($obj->value, 'aes-256-cfb8', $key);
+                $stringToDecode = substr($decrypted, 16);
                 $similar[$item["variable"]] = base64_decode($stringToDecode);
             }
         }
 
+        if (env('LIMAN_RESTRICTED') == true && !user()->isAdmin()) {
+            return response()->view('extension_pages.setup_restricted', [
+                'extension' => $extension,
+                'similar' => $similar,
+            ]);
+        }
+
         return response()->view('extension_pages.setup', [
             'extension' => $extension,
-            'similar' => $similar
+            'similar' => $similar,
         ]);
     }
 
@@ -177,35 +246,55 @@ class OneController extends Controller
      */
     public function remove()
     {
+        hook('extension_delete_attempt', extension());
         try {
-            shell_exec("sudo rm -r " . env('EXTENSIONS_PATH') . strtolower(extension()->name));
-        } catch (Exception $exception) {
+            shell_exec(
+                "sudo rm -r " .
+                    "/liman/extensions/" .
+                    strtolower(extension()->name)
+            );
+        } catch (\Exception $exception) {
         }
 
-        try{
-            shell_exec('sudo userdel ' . clean_score(extension()->id));
-            shell_exec('rm ' . env('KEYS_PATH') . DIRECTORY_SEPARATOR . extension()->id);
+        try {
+            shell_exec(
+                "
+                sudo userdel " .
+                    cleanDash(extension()->id) .
+                    ";
+                rm " .
+                    '/liman/keys/' .
+                    DIRECTORY_SEPARATOR .
+                    extension()->id .
+                    ";
+            "
+            );
             extension()->delete();
-        }catch (Exception $exception){
+        } catch (\Exception $exception) {
         }
 
-        system_log(3,"EXTENSION_REMOVE");
+        hook('extension_delete_successful', [
+            "request" => request()->all(),
+        ]);
+
+        system_log(3, "EXTENSION_REMOVE");
         return respond('Eklenti Başarıyla Silindi');
     }
 
     public function publicFolder()
     {
-        $basePath = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/public/";
+        $basePath =
+            "/liman/extensions/" . strtolower(extension()->name) . "/public/";
 
         $targetPath = $basePath . base64_decode(request('path'));
 
-        if(realpath($targetPath) != $targetPath){
+        if (realpath($targetPath) != $targetPath) {
             abort(404);
         }
 
-        if(is_file($targetPath)){
+        if (is_file($targetPath)) {
             return response()->download($targetPath);
-        }else{
+        } else {
             abort(404);
         }
     }

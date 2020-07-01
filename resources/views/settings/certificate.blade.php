@@ -4,7 +4,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-            <li class="breadcrumb-item"><a href="{{route('settings')}}">{{__("Ayarlar")}}</a></li>
+            <li class="breadcrumb-item"><a href="{{route('settings')}}">{{__("Sistem Ayarları")}}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{__("Sertifika Ekle")}}</li>
         </ol>
     </nav>
@@ -16,18 +16,19 @@
             @if(request('server_id'))
                 <h5>{{server()->name . " " . __("sunucusu talebi.")}}</h5>
             @endif
-            <table class="notDataTable">
-                <tr>
-                    <td>{{__("Hostname")}}</td>
-                    <td><input type="text" name="hostname" class="form-control" id="hostname" value="{{request('hostname')}}"></td>
-                </tr>
-                <tr>
-                    <td>{{__("Port")}}</td>
-                    <td><input type="number" name="port" class="form-control" aria-valuemin="1" aria-valuemax="65555" id="port" value="{{request('port')}}"></td>
-                    <td><button onclick="retrieveCertificate()" class="btn btn-success">{{__("Al")}}</button></td>
-                </tr>
-            </table>
-            <h3>{{__("Sertifika Bilgileri")}}</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="hostname">{{__("Hostname")}}</label>
+                    <input type="text" name="hostname" class="form-control" id="hostname" value="{{request('hostname')}}"></td>
+                </div>
+                <div class="col-md-4">
+                    <label for="port">{{__("Port")}}</label>
+                    <input type="number" name="port" class="form-control" aria-valuemin="1" aria-valuemax="65555" id="port" value="{{request('port')}}">
+                </div>
+                <div class="col-md-4" style="line-height: 95px">
+                    <button onclick="retrieveCertificate()" class="btn btn-success">{{__("Al")}}</button>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-4">
                     <div class="box box-solid">
@@ -97,14 +98,14 @@
         </div>
     </div>
     <script>
-        let path = "";
+        var path = "";
         function retrieveCertificate() {
             showSwal('{{__("Sertifika Alınıyor...")}}','info');
-            let form = new FormData();
+            var form = new FormData();
             form.append('hostname',$("#hostname").val());
             form.append('port',$("#port").val());
             request('{{route('certificate_request')}}',form,function (success) {
-                let json = JSON.parse(success)["message"];
+                var json = JSON.parse(success)["message"];
                 if(json["issuer"]["DC"]){
                     $("#issuerCN").val(json["issuer"]["CN"]);
                 }
@@ -119,7 +120,7 @@
                 path = json["path"];
                 Swal.close();
             },function (errors) {
-                let json = JSON.parse(errors);
+                var json = JSON.parse(errors);
                 showSwal(json["message"],'error',2000);
             });
 
@@ -127,20 +128,20 @@
         
         function verifyCertificate() {
             showSwal('{{__("Sertifika Ekleniyor...")}}','info');
-            let form = new FormData();
+            var form = new FormData();
             form.append('path',path);
             form.append('server_hostname',$("#hostname").val());
             form.append('origin',$("#port").val());
             form.append('notification_id','{{request('notification_id')}}');
             form.append('server_id','{{request('server_id')}}');
             request('{{route('verify_certificate')}}',form,function (success) {
-                let json = JSON.parse(success);
+                var json = JSON.parse(success);
                 showSwal(json["message"],'info',2000);
                 setTimeout(function () {
-                    location.href = "{{route('settings')}}" + "#certificates";
+                    partialPageRequest("{{route('settings')}}" + "#certificates");
                 },1000);
             },function (errors) {
-                let json = JSON.parse(errors);
+                var json = JSON.parse(errors);
                 showSwal(json["message"],"error",2000);
             });
         }

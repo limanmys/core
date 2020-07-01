@@ -8,51 +8,43 @@
             <li class="breadcrumb-item active" aria-current="page">{{$server->name}}</li>
         </ol>
     </nav>
+
     <div class="row mb-2 serverName">
         <div class="col-auto align-self-center">
-            @if(\Illuminate\Support\Facades\DB::table("user_favorites")->where(["user_id" => auth()->user()->id,"server_id" => server()->id])->exists())
+            @if($favorite)
                 <button onclick="favorite('false')" class="btn btn-warning fas fa-star btn-sm" data-toggle="tooltip" title="Favorilerden Çıkar"></button>
             @else
                 <button onclick="favorite('true')" class="btn btn-success far fa-star btn-sm" data-toggle="tooltip" title="Favorilere Ekle"></button>
             @endif
         </div>
         <div class="col-auto align-self-center">
-            <h5>{{server()->name}}</h5>
+            <h5>{{$server->name}}</h5>
         </div>
     </div>
+
     @include('errors')
 
     <div class="row">
         <div class="col-md-3">
             <div class="card card-primary">
             <div class="card-header">
-                <h3 class="card-title">{{ _('Sunucu Bilgileri') }}</h3>
+                <h3 class="card-title">{{ __('Sunucu Bilgileri') }}</h3>
             </div>
             <div class="card-body">
-                @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
-                    <strong>{{ __('Hostname') }}</strong>
-                    <p class="text-muted">
-                        {{$hostname}}
-                    </p>
-                    <hr>
-                    <strong>{{ __('İşletim Sistemi') }}</strong>
-                    <p class="text-muted">
-                        @if(server()->type == "linux_ssh")
-                            {{server()->run("lsb_release -ds")}}
-                        @else
-                            {{ explode("|",server()->run("(Get-WmiObject Win32_OperatingSystem).name"))[0]}}
-                        @endif
-                    </p>
-                    <hr>
-                @endif
+                <strong>{{ __('Hostname') }}</strong>
+                <p class="text-muted">{{$outputs["hostname"]}}</p>
+                <hr>
+                <strong>{{ __('İşletim Sistemi') }}</strong>
+                <p class="text-muted">{{$outputs["version"]}}</p>
+                <hr>
                 <strong>{{ __('IP Adresi') }}</strong>
                 <p class="text-muted">
-                    {{ server()->ip_address }}
+                    {{ $server->ip_address }}
                 </p>
                 <hr>
                 <strong>{{ __('Şehir') }}</strong>
                 <p class="text-muted">
-                    {{ cities(server()->city) }}
+                    {{ cities($server->city) }}
                 </p>
                 <hr>
                 <strong>{{ __('Eklenti Durumları') }}</strong>
@@ -62,8 +54,8 @@
                             <span 
                                 class="badge btn-secondary status_{{$extension->id}}"
                                 style="cursor:pointer;font-size: 18px; margin-bottom: 5px;"
-                                onclick="location.href = '{{route('extension_server',["extension_id" => $extension->id, "city" => $server->city, "server_id" => $server->id])}}'">
-                                {{$extension->name}}
+                                onclick="window.location.href = '{{route('extension_server',["extension_id" => $extension->id, "city" => $server->city, "server_id" => $server->id])}}'">
+                                {{$extension->display_name}}
                             </span>
                         @endforeach
                     @else
@@ -79,7 +71,7 @@
                 <div class="card-header p-2">
                     <ul class="nav nav-tabs" role="tablist">
                         @php($firstRendered = false)
-                        @if(server()->type == "linux_ssh")
+                        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
                             <li class="nav-item">
                                 <a class="nav-link active" data-toggle="pill" href="#usageTab" role="tab" aria-selected="true">{{__("Sistem Durumu")}}</a>
                             </li>
@@ -88,11 +80,13 @@
                         <li class="nav-item">
                             <a class="nav-link @if(!$firstRendered) active @endif" data-toggle="pill" href="#extensionsTab" role="tab">{{__("Eklentiler")}}</a>
                         </li>
-                        @if(server()->type == "linux_ssh")
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="pill" onclick="getServices()" href="#servicesTab" role="tab">{{__("Servisler")}}</a>
-                            </li>
-                            @if(server()->type == "linux_ssh")
+                        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
+                            @if(\App\Permission::can(user()->id,'liman','id','server_services'))
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" onclick="getServices()" href="#servicesTab" role="tab">{{__("Servisler")}}</a>
+                                </li>
+                            @endif
+                            @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
                                 <li class="nav-item">
                                     <a class="nav-link" data-toggle="pill" onclick="getPackages()" href="#packagesTab" role="tab">{{__("Paketler")}}</a>
                                 </li>
@@ -102,9 +96,7 @@
                                         <small class="badge bg-danger updateCount" style="display:none;margin-left: 5px;">0</small>
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="pill" onclick="openTerminal()" href="#terminalTab" role="tab">{{__("Terminal")}}</a>
-                                </li>
+
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
                                       {{ __('Kullanıcı İşlemleri') }} <span class="caret"></span>
@@ -120,9 +112,11 @@
                                 </li>
                             @endif
                         @endif
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="pill" href="#logsTab" onclick="getLogs()" role="tab">{{__("Günlük Kayıtları")}}</a>
-                        </li>
+                        @if(\App\Permission::can(user()->id,'liman','id','view_logs'))
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="pill" href="#logsTab" onclick="getLogs()" role="tab">{{__("Erişim Kayıtları")}}</a>
+                            </li>
+                        @endif
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="pill" href="#settingsTab" role="tab">{{__("Sunucu Ayarları")}}</a>
                         </li>
@@ -131,11 +125,12 @@
                                 <a class="nav-link" data-toggle="pill" href="#extraTab" role="tab">{{__("Ek Özellikler")}}</a>
                             </li>
                         @endif
+                        {!! serverModuleButtons() !!}
                     </ul>
                 </div>
                 <div class="card-body">
                     <div class="tab-content">
-                        @if(server()->type == "linux_ssh")
+                        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
                             <div class="tab-pane fade show active" id="usageTab" role="tabpanel">
                                     <h4>{{__("Kaynak Kullanımı")}}</h4>
                                     <div class="row">
@@ -188,21 +183,27 @@
                             foreach ($available_extensions as $extension) {
                                 $arr = [];
                                 if (isset($extension->install)) {
-                                    foreach ($extension->install as $key => $parameter) {
-                                        $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
+                                    foreach (
+                                        $extension->install
+                                        as $key => $parameter
+                                    ) {
+                                        $arr[$parameter["name"]] =
+                                            $key . ":" . $parameter["type"];
                                     }
                                 }
-                                $arr[$extension->name . ":" . $extension->id] = "extension_id:hidden";
+                                $arr[
+                                    $extension->display_name .
+                                        ":" .
+                                        $extension->id
+                                ] = "extension_id:hidden";
                                 $input_extensions[] = [
-                                    "name" => $extension->name,
-                                    "id" => $extension->id
+                                    "name" => $extension->display_name,
+                                    "id" => $extension->id,
                                 ];
                             }
                             ?>
                         </div>
-                        <div class="tab-pane fade show" id="terminalTab" role="tabpanel">
-                            <iframe id="terminalFrame" src="" style="width: 100%;height: 600px;background: black"></iframe>
-                        </div>
+                            {!! serverModuleViews() !!}
                         <div class="tab-pane fade show" id="filesTab" role="tabpanel">
                             @include('modal-button',[
                                 "class" => "btn-primary fa fa-upload",
@@ -215,73 +216,81 @@
                                 "text" => "İndir"
                             ])
                         </div>
-                        @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
-                            <div class="tab-pane fade show" id="servicesTab" role="tabpanel">
-                                
-                            </div>
+                        @if($server->canRunCommand())
+                            <div class="tab-pane fade show" id="servicesTab" role="tabpanel"></div>
                             <div class="tab-pane fade show right" id="updatesTab" role="tabpanel">
                                 <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateAllPackages" onclick="updateAllPackages()">{{ __('Tümünü Güncelle') }}</button>
                                 <button type="button" style="display: none; margin-bottom: 5px;" class="btn btn-success updateSelectedPackages" onclick="updateSelectedPackages()">{{ __('Seçilenleri Güncelle') }}</button>
                                 <div id="updatesTabTable"></div>
                             </div>
-                        @endif
-                        @if(server()->type == "linux_ssh")
-                            <div class="tab-pane fade show" id="packagesTab" role="tabpanel">
-                                <button type="button" data-toggle="modal" data-target="#installPackage" style="margin-bottom: 5px;" class="btn btn-success">
-                                    <i class="fas fa-upload"></i> {{ __('Paket Kur') }}
-                                </button>
-                                <div id="packages">
 
-                                </div>
-                            </div>
+                            @if($server->isLinux())
+                                    <div class="tab-pane fade show" id="packagesTab" role="tabpanel">
+                                        <button type="button" data-toggle="modal" data-target="#installPackage" style="margin-bottom: 5px;" class="btn btn-success">
+                                            <i class="fas fa-upload"></i> {{ __('Paket Kur') }}
+                                        </button>
+                                        <div id="packages">
 
-                            <div class="tab-pane fade show" id="usersTab" role="tabpanel">
-                                @include('modal-button',[
-                                    "class"     =>  "btn btn-success mb-2",
-                                    "target_id" =>  "addLocalUser",
-                                    "text"      =>  "Kullanıcı Ekle",
-                                    "icon" => "fas fa-plus"
-                                ])
-                                <div id="users"></div>
-                            </div>
-
-                            <div class="tab-pane fade show" id="groupsTab" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        @include('modal-button',[
-                                            "class"     =>  "btn btn-success mb-2",
-                                            "target_id" =>  "addLocalGroup",
-                                            "text"      =>  "Grup Ekle",
-                                            "icon" => "fas fa-plus"
-                                        ])
-                                        <div id="groups"></div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 d-none">
+
+                                    <div class="tab-pane fade show" id="usersTab" role="tabpanel">
                                         @include('modal-button',[
                                             "class"     =>  "btn btn-success mb-2",
-                                            "target_id" =>  "addLocalGroupUserModal",
+                                            "target_id" =>  "addLocalUser",
                                             "text"      =>  "Kullanıcı Ekle",
                                             "icon" => "fas fa-plus"
                                         ])
-                                        <div id="groupUsers"></div>
+                                        <div id="users"></div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade show" id="sudoersTab" role="tabpanel">
-                                @include('modal-button',[
-                                    "class"     =>  "btn btn-success mb-2",
-                                    "target_id" =>  "addSudoers",
-                                    "text"      =>  "Tam Yetkili Kullanıcı Ekle",
-                                    "icon" => "fas fa-plus"
-                                ])
-                                <div id="sudoers"></div>
-                            </div>
+
+                                    <div class="tab-pane fade show" id="groupsTab" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                @include('modal-button',[
+                                                    "class"     =>  "btn btn-success mb-2",
+                                                    "target_id" =>  "addLocalGroup",
+                                                    "text"      =>  "Grup Ekle",
+                                                    "icon" => "fas fa-plus"
+                                                ])
+                                                <div id="groups"></div>
+                                            </div>
+                                            <div class="col-md-6 d-none">
+                                                @include('modal-button',[
+                                                    "class"     =>  "btn btn-success mb-2",
+                                                    "target_id" =>  "addLocalGroupUserModal",
+                                                    "text"      =>  "Kullanıcı Ekle",
+                                                    "icon" => "fas fa-plus"
+                                                ])
+                                                <div id="groupUsers"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade show" id="sudoersTab" role="tabpanel">
+                                        @include('modal-button',[
+                                            "class"     =>  "btn btn-success mb-2",
+                                            "target_id" =>  "addSudoers",
+                                            "text"      =>  "Tam Yetkili Kullanıcı Ekle",
+                                            "icon" => "fas fa-plus"
+                                        ])
+                                        <div id="sudoers"></div>
+                                    </div>
+                            @endif
                         @endif
                         <div class="tab-pane fade show" id="logsTab" role="tabpanel">
-                                
+                            <div class="form-group">
+                                    <label>{{__('Arama Terimi')}}</label>
+                                    <div class="input-group">
+                                        <input id="logQueryFilter" type="text" class="form-control" placeholder="{{__('Arama Terimi')}}">
+                                        <span class="input-group-append">
+                                            <button type="button" class="btn btn-primary btn-flat" onclick="getLogs()"><i class="fa fa-search" aria-hidden="true"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            <div id="logsWrapper">
+                            </div>
                         </div>
-                        <div class="tab-pane fade show" id="openPortsTab" role="tabpanel">
-                                
+                        <div class="tab-pane fade show" id="openPortsTab" role="tabpanel"> 
                         </div>
                         
                         <div class="tab-pane fade show" id="settingsTab" role="tabpanel">
@@ -386,7 +395,7 @@
     @include('modal',[
         "id"=>"delete_extensions",
         "title" => "Eklentileri Sil",
-        "text" => "Secili eklentileri silmek istediginize emin misiniz?",
+        "text" => "Seçili eklentileri silmek istediğinize emin misiniz?",
         "type" => "danger",
         "onsubmit" => "removeExtensionFunc",
         "submit_text" => "Eklentileri Sil"
@@ -447,21 +456,21 @@
 
     @include('modal',[
         "id"=>"startService",
-        "title" => "Servisi Baslat",
-        "text" => "Secili servisi baslatmak istediginize emin misiniz?",
+        "title" => "Servisi Başlat",
+        "text" => "Seçili servisi başlatmak istediğinize emin misiniz?",
         "type" => "danger",
         "next" => "reload",
         "inputs" => [
             "name:-" => "name:hidden",
         ],
         "url" => route('server_start_service'),
-        "submit_text" => "Servisi Baslat"
+        "submit_text" => "Servisi Başlat"
     ])
 
     @include('modal',[
         "id"=>"stopService",
         "title" => "Servisi Durdur",
-        "text" => "Secili servisi durdurmak istediginize emin misiniz?",
+        "text" => "Seçili servisi durdurmak istediğinize emin misiniz?",
         "type" => "danger",
         "next" => "reload",
         "inputs" => [
@@ -473,15 +482,15 @@
 
     @include('modal',[
         "id"=>"restartService",
-        "title" => "Servisi Yeniden Baslat",
-        "text" => "Secili servisi yeniden baslatmak istediginize emin misiniz?",
+        "title" => "Servisi Yeniden Başlat",
+        "text" => "Seçili servisi yeniden başlatmak istediğinize emin misiniz?",
         "type" => "danger",
         "next" => "reload",
         "inputs" => [
             "name:-" => "name:hidden",
         ],
         "url" => route('server_restart_service'),
-        "submit_text" => "Servisi Yeniden Baslat"
+        "submit_text" => "Servisi Yeniden Başlat"
     ])
 
     @include('modal',[
@@ -563,8 +572,31 @@
             </div>
         </div>
     @endcomponent
-    <script>
 
+    @component('modal-component',[
+        "id" => "serviceStatusModal",
+        "title" => "Servis Durumu"
+    ])
+        <pre id="serviceStatusWrapper"></pre>
+    @endcomponent
+
+    @component('modal-component',[
+        "id"=>"logDetailModal",
+        "title" => "Log Detayı"
+    ])
+    <div class="row">
+        <div class="col-4">
+            <div class="list-group" role="tablist" id="logTitleWrapper">
+            </div>
+        </div>
+        <div class="col-8">
+            <div class="tab-content" id="logContentWrapper">
+            </div>
+        </div>
+    </div>
+    @endcomponent
+    <script>
+        customRequestData["server_id"] = '{{server()->id}}';
 
         $('#install_extension table').DataTable(dataTablePresets('multiple'));
 
@@ -572,8 +604,8 @@
         function server_extension(){
             showSwal('{{__("Okunuyor...")}}','info');
 
-            let items = [];
-            let table = $("#install_extension table").DataTable();
+            var items = [];
+            var table = $("#install_extension table").DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 items.push(element[2]);
             });
@@ -583,51 +615,52 @@
                 return false;
             }
 
-            let data = new FormData();
+            var data = new FormData();
             data.append("extensions", JSON.stringify(items));
 
             request('{{route('server_extension')}}', data, function (response) {
                 Swal.close();
                 reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
 
 
-        @if(server()->type == "linux_ssh") //|| server()->type == "windows_powershell")
+        @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
             if(location.hash !== "#updatesTab"){
                 getUpdates();
                 Swal.close();
             }
         @endif
+
         function errorSwal(){
             showSwal('{{__("Ayarlarınız doğrulanamadı!")}}','error',2000);
         }
 
         function checkStatus(id) {
-            let data = new FormData();
+            var data = new FormData();
             if (!id) {
                 return false;
             }
             data.append('extension_id', id);
             request('{{route('server_check')}}', data, function (response) {
-                let json = JSON.parse(response);
-                let element = $(".status_" + id);
+                var json = JSON.parse(response);
+                var element = $(".status_" + id);
                 element.removeClass('btn-secondary').removeClass('btn-danger').removeClass('btn-success').addClass(json["message"]);
             });
         }
 
         @if($installed_extensions->count() > 0)
-        @foreach($installed_extensions as $service)
-        setInterval(function () {
-            checkStatus('{{$service->id}}');
-        }, 3000);
-
-        @endforeach
+            @foreach($installed_extensions as $service)
+            setInterval(function () {
+                checkStatus('{{$service->id}}');
+            }, 3000);
+            @endforeach
         @endif
-        @if(server()->type == "linux_ssh" || server()->type == "windows_powershell")
+
+        @if(server()->type == "linux_ssh" || server()->type == "windows_powershell" || server()->type == "linux_certificate")
         setInterval(function () {
             stats();
         }, 15000);
@@ -671,11 +704,11 @@
                 }
             })
         }
-        let firstStats = true;
+        var firstStats = true;
         function stats() {
-            let form = new FormData();
+            var form = new FormData();
             form.append('server_id', '{{server()->id}}');
-            let time = "{{\Carbon\Carbon::now()->format("H:i:s")}}";
+            var time = "{{\Carbon\Carbon::now()->format("H:i:s")}}";
             request('{{route('server_stats')}}', form, function (response) {
                 data = JSON.parse(response);
                 if(firstStats){
@@ -697,18 +730,18 @@
 
         @endif
         function logDetails(element) {
-            let log_id = element.querySelector('#_id').innerHTML;
-            window.location.href = "/logs/" + log_id
+            var log_id = element.querySelector('#_id').innerHTML;
+            partialPageRequest("/logs/" + log_id);
         }
 
         function favorite(action) {
-            let form = new FormData();
+            var form = new FormData();
             form.append('server_id', '{{server()->id}}');
             form.append('action', action);
             request('{{route('server_favorite')}}', form, function (response) {
                 location.reload();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -725,7 +758,7 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -743,14 +776,14 @@
             }).then((result) => {
                 if (result.value) {
                     showSwal('{{__("Yükleniyor...")}}','info');
-                    let data = new FormData();
+                    var data = new FormData();
                     data.append('name',$(row).find("#name").text());
                     
                     request('{{route('server_delete_sudoers')}}',data,function(response){
                         Swal.close();
                         getSudoers();
                     }, function(response){
-                        let error = JSON.parse(response);
+                        var error = JSON.parse(response);
                         showSwal(error.message,'error',2000);
                     });
                 }
@@ -768,7 +801,7 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -784,13 +817,13 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
 
-        let activeLocalGroup = "";
-        let activeLocalGroupElement = "";
+        var activeLocalGroup = "";
+        var activeLocalGroupElement = "";
 
         function localGroupDetails(element){
             $('#groups').closest('.col-md-12').removeClass("col-md-12").addClass('col-md-6');
@@ -800,10 +833,10 @@
             $(element).css('backgroundColor','#b0bed9');
             $(element).css('fontWeight','bolder');
             showSwal('{{__("Okunuyor...")}}','info');
-            let group = element.querySelector('#group').innerHTML;
+            var group = element.querySelector('#group').innerHTML;
             activeLocalGroup = group;
             activeLocalGroupElement = element;
-            let data = new FormData();
+            var data = new FormData();
             data.append('group', group);
 
             request('{{route('server_local_group_users_list')}}', data, function (response) {
@@ -814,7 +847,7 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -822,17 +855,17 @@
         function addLocalGroupUser(){
             showSwal('{{__("Okunuyor...")}}','info');
 
-            let form = new FormData();
+            var form = new FormData();
             form.append('group',activeLocalGroup);
             form.append('user',$('#addLocalGroupUserModal').find("input[name=user]").val());
 
             request('{{route('server_add_local_group_user')}}',form,function(response){
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 showSwal(json.message,'info',2000);
                 localGroupDetails(activeLocalGroupElement);
                 $('#addLocalGroupUserModal').modal('hide');
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -847,7 +880,7 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -855,28 +888,84 @@
         function getOpenPorts() {
             showSwal('{{__("Okunuyor...")}}','info');
             request('{{route('server_get_open_ports')}}', new FormData(), function (response) {
-                let json = JSON.parse(response);
+                var json = JSON.parse(response);
                 $("#openPortsTab").html(json.message);
                 $("#openPortsTab table").DataTable(dataTablePresets('normal'));
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
 
-        function getLogs() {
+        function statusService(element) {
+            var name = element.querySelector('#name').innerHTML;
             showSwal('{{__("Okunuyor...")}}','info');
-            request('{{route('server_get_logs')}}', new FormData(), function (response) {
-                $("#logsTab").html(response);
-                $("#logsTab table").DataTable(dataTablePresets('normal'));
+            var form = new FormData();
+            form.append('name',name);
+            request('{{route('server_service_status')}}', form, function (response) {
+                var json = JSON.parse(response);
+                $("#serviceStatusWrapper").html(json.message);
+                $("#serviceStatusModal").modal('show');
                 setTimeout(function () {
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
+                showSwal(error.message,'error',2000);
+            })
+        }
+
+        $("#logQueryFilter").on('keyup', function (e) {
+            if (e.keyCode === 13) {
+                getLogs();
+            }
+        });
+        function getLogs(page = 1) {
+            showSwal('{{__("Okunuyor...")}}','info');
+            var form = new FormData();
+            form.append('page',page);
+            var query = $("#logQueryFilter").val();
+            if(query.length !== 0){
+                form.append('query',query);
+            }
+            request('{{route('server_get_logs')}}', form, function (response) {
+                var json = JSON.parse(response);
+                $("#logsWrapper").html(json.message.table);
+                setTimeout(function () {
+                    Swal.close();
+                }, 1500);
+            }, function(response){
+                var error = JSON.parse(response);
+                showSwal(error.message,'error',2000);
+            })
+        }
+
+        function getLogDetails(element){
+            var log_id = element.querySelector('#id').innerHTML;
+            showSwal('{{__("Okunuyor...")}}','info');
+            var form = new FormData();
+            form.append('log_id',log_id);
+            request('{{route('server_get_log_details')}}', form, function (response) {
+                var json = JSON.parse(response);
+                var modal = $("#logDetailModal");
+                var logTitleWrapper = $("#logTitleWrapper");
+                var logContentWrapper = $("#logContentWrapper");
+                logTitleWrapper.html("");
+                logContentWrapper.html("");
+                $.each(json.message,function (index,current) {
+                    current.id =  "a" + Math.random().toString(36).substr(2, 9);
+                    logTitleWrapper.append("<a class='list-group-item list-group-item-action' id='"+ current.id + "_title' href='#" + current.id + "_content' data-toggle='list' role='tab' aria-controls='home'>" + current.title + "</a>");
+                    logContentWrapper.append("<div class='tab-pane fade' id='" + current.id + "_content' role='tabpanel' aria-labelledby='" + current.id +"_title'><pre style='white-space:pre-wrap;'>" + current.message + "</pre></div>");
+                });
+                modal.modal("show");
+                setTimeout(function () {
+                    Swal.close();
+                }, 1500);
+            }, function(response){
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
@@ -890,20 +979,20 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
-        let index = 0;
-        let packages = [];
-        let modes = {};
+        var index = 0;
+        var packages = [];
+        var modes = {};
 
         function installPackageButton(){
             if($('#installPackage').find('[href="#fromRepo"]').hasClass('active')){
                 console.log("repo tab");
                 index = 0;
                 packages = [];
-                let package_name = $('#installPackage').find('input[name=package]').val();
+                var package_name = $('#installPackage').find('input[name=package]').val();
                 if(package_name){
                     packages.push(package_name);
                     modes[package_name] = "install";
@@ -921,7 +1010,7 @@
 
         function onDebUploadSuccess(upload){
             showSwal('{{__("Yükleniyor...")}}','info');
-            let data = new FormData();
+            var data = new FormData();
             data.append('filePath', upload.info.file_path);
             request('{{route('server_upload_deb')}}', data, function (response) {
                 Swal.close();
@@ -933,7 +1022,7 @@
                     modes[response.message] = "install";
                 }
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
@@ -943,9 +1032,9 @@
             index = 0;
             $('#updateLogs').find('.updateLogsBody').text("");
             getUpdates(function(package_list){
-                let package_list_tmp = [];
-                package_list.forEach(function(package){
-                    let package_name = package.name.split('/')[0];
+                var package_list_tmp = [];
+                package_list.forEach(function(pkg){
+                    var package_name = pkg.name.split('/')[0];
                     package_list_tmp.push(package_name);
                 });
                 packages = package_list_tmp;
@@ -956,7 +1045,7 @@
         function updateSelectedPackages(){
             index = 0;
             packages = [];
-            let table = $("#updatesTabTable table").DataTable();
+            var table = $("#updatesTabTable table").DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 packages.push(element[1].split('/')[0]);
             });
@@ -977,9 +1066,9 @@
         function installPackage(){
             updateProgress();
             $('#updateLogs').modal('show');
-            let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
+            var scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
             scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
-            let data = new FormData();
+            var data = new FormData();
             data.append("package_name", packages[index]);
             if(modes[packages[index]]){
                 data.append("mode", modes[packages[index]]);
@@ -988,14 +1077,14 @@
             request('{{route('server_install_package')}}', data, function (response) {
                 checkPackage();
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
 
         function updateProgress(){
             $('#updateLogs').find('.progress-info').text(index+"/"+packages.length+" "+packages[index]+" paketi kuruluyor...");
-            let percent = (index/packages.length)*100;
+            var percent = (index/packages.length)*100;
             $('div[role=progressbar]').attr('aria-valuenow', percent);
             $('div[role=progressbar]').attr('style', 'width: '+percent+'%');
             if(packages.length !== index){
@@ -1008,7 +1097,7 @@
         }
 
         function checkPackage(){
-            let data = new FormData();
+            var data = new FormData();
             data.append("package_name", packages[index]);
             if(modes[packages[index]]){
                 data.append("mode", modes[packages[index]]);
@@ -1017,11 +1106,11 @@
                 response = JSON.parse(response);
                 if(response.message.output){
                     $('#updateLogs').find('.updateLogsBody').append("\n"+response.message.output);
-                    let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
+                    var scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
                     scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
                 }
                 $('#updateLogs').find('.updateLogsBody').append("\n"+response.message.status);
-                let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
+                var scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
                 scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
                 index++;
                 if(packages.length !== index){
@@ -1035,7 +1124,7 @@
                 response = JSON.parse(response);
                 if(response.message.output){
                     $('#updateLogs').find('.updateLogsBody').append("\n"+response.message.output);
-                    let scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
+                    var scroll = $('#updateLogs').find('.updateLogsBody').closest('pre');
                     scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow');
                 }
                 setTimeout(function(){
@@ -1047,7 +1136,7 @@
         function getUpdates(getList) {
             showSwal('{{__("Okunuyor...")}}','info');
             request('{{route('server_update_list')}}', new FormData(), function (response) {
-                let updates = JSON.parse(response);
+                var updates = JSON.parse(response);
                 if(getList){
                     getList(updates.list);
                 }
@@ -1067,21 +1156,14 @@
                     Swal.close();
                 }, 1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
         }
 
-        function openTerminal() {
-            let terminalFrame = $("#terminalFrame");
-            if (terminalFrame.attr("src") === "") {
-                terminalFrame.attr("src", "{{route('server_terminal',["server_id" => $server->id])}}");
-            }
-        }
-
         function removeExtension(){
-            let data = [];
-            let table = $("#installed_extensions").DataTable();
+            var data = [];
+            var table = $("#installed_extensions").DataTable();
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[4]);
             });
@@ -1091,9 +1173,10 @@
             };
             $("#delete_extensions").modal('show');
         }
+
         function removeExtensionFunc() {
-          let data = [];
-          let table = $("#installed_extensions").DataTable();
+          var data = [];
+          var table = $("#installed_extensions").DataTable();
           table.rows( { selected: true } ).data().each(function(element){
               data.push(element[4]);
           });
@@ -1102,16 +1185,16 @@
               return false;
           }
           showSwal('{{__("Siliniyor...")}}','info');
-          let form = new FormData();
+          var form = new FormData();
           form.append('extensions',JSON.stringify(data));
           request('{{route('server_extension_remove')}}', form, function (response) {
-              let json = JSON.parse(response);
+              var json = JSON.parse(response);
               showSwal(json["message"],'success',2000);
               setTimeout(function () {
                       location.reload();
               },2000);
           }, function(response){
-            let error = JSON.parse(response);
+            var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
           });
           return false;

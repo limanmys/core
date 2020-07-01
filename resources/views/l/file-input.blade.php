@@ -46,14 +46,14 @@
     });
 
     $( "#{{ $rand }}-upload" ).click(function() {
-        let selectedFile = $('#{{ $rand }}-upload-file').prop('files');
+        var selectedFile = $('#{{ $rand }}-upload-file').prop('files');
         upload({
             file: selectedFile[0],
             onError: function(error){
                 showSwal(error,'error');
             },
             onProgress: function(bytesUploaded, bytesTotal){
-                let percent = (bytesUploaded/bytesTotal)*100;
+                var percent = (bytesUploaded/bytesTotal)*100;
                 $('#{{ $rand }}-progress').show();
                 $('#{{ $rand }}-progress').addClass('active');
                 $('#{{ $rand }}-progress').find('.progress-bar').attr('aria-valuenow', percent);

@@ -33,26 +33,25 @@ class SSHConnector implements Connector
     {
         if (!ConnectorToken::get($server->id)->exists()) {
             list($username, $password) = self::retrieveCredentials();
-            self::init($username, $password, $server->ip_address);
+            self::init(
+                $username,
+                $password,
+                $server->ip_address,
+                $server->key_port ? $server->key_port : 22
+            );
         }
 
         return true;
     }
 
-    /**
-     * SSHConnector destructor
-     */
-    public function __destruct()
+    public function execute($command, $flag = true)
     {
-    }
-
-
-    public function execute($command,$flag = true)
-    {
-        return trim(self::request('run',[
-            "token" => "cn_". server()->id,
-            "command" => $command
-        ]));
+        return trim(
+            self::request('run', [
+                "token" => "cn_" . server()->id,
+                "command" => $command,
+            ])
+        );
     }
 
     /**
@@ -61,19 +60,19 @@ class SSHConnector implements Connector
      * @param null $extra
      * @return string
      */
-    public function runScript($script, $parameters, $runAsRoot)
+    public function runScript($script, $parameters, $runAsRoot = false)
     {
         $remotePath = "/tmp/" . Str::random();
 
         $this->sendFile($script, $remotePath);
         $output = $this->execute("[ -f '$remotePath' ] && echo 1 || echo 0");
-        if($output != "1"){
-            abort(504,"Betik gönderilemedi");
+        if ($output != "1") {
+            abort(504, "Betik gönderilemedi");
         }
         $this->execute("chmod +x " . $remotePath);
 
         // Run Part Of The Script
-        $query = ($runAsRoot == "yes") ? sudo() : '';
+        $query = $runAsRoot ? sudo() : '';
         $query = $query . $remotePath . " " . $parameters . " 2>&1";
         $output = $this->execute($query);
 
@@ -82,21 +81,21 @@ class SSHConnector implements Connector
 
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
-        $output = self::request('send',[
+        $output = self::request('send', [
             "token" => ConnectorToken::get(server()->id)->first()->token,
             "local_path" => $localPath,
-            "remote_path" => $remotePath
+            "remote_path" => $remotePath,
         ]);
-        $output2 = $this->execute("[ -f '$remotePath' ] && echo 1 || echo 0");
-        if($output2 != "1"){
-            abort(504,"Dosya gönderilemedi");
+        $check = $this->execute("[ -f '$remotePath' ] && echo 1 || echo 0");
+        if ($check != "1") {
+            abort(504, "Dosya gönderilemedi");
         }
         return $output;
     }
 
-    public static function verify($ip_address, $username, $password,$port)
+    public static function verify($ip_address, $username, $password, $port)
     {
-        $token = self::init($username, $password, $ip_address,false);
+        $token = self::init($username, $password, $ip_address, $port, false);
         if ($token) {
             return respond("Kullanıcı adı ve şifre doğrulandı.", 200);
         }
@@ -105,10 +104,10 @@ class SSHConnector implements Connector
 
     public function receiveFile($localPath, $remotePath)
     {
-        return self::request('get',[
+        return self::request('get', [
             "token" => ConnectorToken::get(server()->id)->first()->token,
             "local_path" => $localPath,
-            "remote_path" => $remotePath
+            "remote_path" => $remotePath,
         ]);
     }
 
@@ -120,13 +119,24 @@ class SSHConnector implements Connector
      * @param $key
      * @return bool
      */
-    public static function create(\App\Server $server, $username, $password, $user_id,$key)
-    {
-        $token = self::init($username, $password, $server->ip_address);
+    public static function create(
+        \App\Server $server,
+        $username,
+        $password,
+        $user_id,
+        $key,
+        $port = null
+    ) {
+        $token = self::init(
+            $username,
+            $password,
+            $server->ip_address,
+            $port ? $port : 22
+        );
         if ($token) {
-            return "OK";
+            return true;
         } else {
-            return "NO";
+            return false;
         }
     }
 
@@ -135,44 +145,66 @@ class SSHConnector implements Connector
         $username = UserSettings::where([
             'user_id' => user()->id,
             'server_id' => server()->id,
-            'name' => 'clientUsername'
+            'name' => 'clientUsername',
         ])->first();
         $password = UserSettings::where([
             'user_id' => user()->id,
             'server_id' => server()->id,
-            'name' => 'clientPassword'
+            'name' => 'clientPassword',
         ])->first();
 
         if (!$username || !$password) {
-            abort(504, "Bu sunucu için SSH anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.");
+            abort(
+                504,
+                "Bu sunucu için SSH anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz."
+            );
         }
 
         return [lDecrypt($username["value"]), lDecrypt($password["value"])];
     }
 
-    public static function request($url, $params,$retry = 3)
-    { 
+    public static function request($url, $params, $retry = 3)
+    {
         if (!ConnectorToken::get(server()->id)->exists()) {
             list($username, $password) = self::retrieveCredentials();
-            self::init($username, $password, server()->id);
+            self::init(
+                $username,
+                $password,
+                server()->ip_address,
+                server()->key_port ? server()->key_port : 22
+            );
         }
         // Create Guzzle Object.
         $client = new Client();
         // Make Request.
-        try{
-            $params["token"] = ConnectorToken::get(server()->id)->first()->token;
-            $res = $client->request('POST', env("LIMAN_CONNECTOR_SERVER"). '/' . $url, ["form_params" => $params]);
-        }catch(BadResponseException $e){
+        try {
+            $params["token"] = ConnectorToken::get(
+                server()->id
+            )->first()->token;
+            $res = $client->request('POST', 'http://127.0.0.1:5000/' . $url, [
+                "form_params" => $params,
+            ]);
+        } catch (BadResponseException $e) {
             // In case of error, handle error.
-            $json = json_decode((string) $e->getResponse()->getBody()->getContents());
+            $json = json_decode(
+                (string) $e
+                    ->getResponse()
+                    ->getBody()
+                    ->getContents()
+            );
             // If it's first time, retry after recreating ticket.
-            if($retry){
+            if ($retry) {
                 list($username, $password) = self::retrieveCredentials();
-                self::init($username, $password, server()->ip_address);
-                return self::request($url,$params,$retry -1 );
-            }else{
+                self::init(
+                    $username,
+                    $password,
+                    server()->ip_address,
+                    server()->key_port ? server()->key_port : 22
+                );
+                return self::request($url, $params, $retry - 1);
+            } else {
                 // If nothing works, abort.
-                abort(402,"Anahtarınız ile sunucuya giriş yapılamadı");
+                abort(402, "Anahtarınız ile sunucuya giriş yapılamadı");
             }
         }
         // Simply parse and return output.
@@ -180,31 +212,36 @@ class SSHConnector implements Connector
         return $json->output;
     }
 
-    public static function init($username, $password, $hostname,$putSession = true)
-    {
+    public static function init(
+        $username,
+        $password,
+        $hostname,
+        $port,
+        $putSession = true
+    ) {
         $client = new Client();
-        try{
-            $res = $client->request('POST', env('LIMAN_CONNECTOR_SERVER') . '/new', [
+        try {
+            $res = $client->request('POST', 'http://127.0.0.1:5000/new', [
                 'form_params' => [
                     "username" => $username,
                     "password" => $password,
                     "hostname" => $hostname,
-                    "connection_type" => "ssh"
+                    "port" => $port,
+                    "connection_type" => "ssh",
                 ],
-                'timeout' => 5
+                'timeout' => 5,
             ]);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return null;
         }
-        
         $json = json_decode((string) $res->getBody());
         //Escape For . character in session.
-        if($putSession){
+        if ($putSession) {
             if (auth() && auth()->user()) {
-                ConnectorToken::set($json->token,server()->id);
+                ConnectorToken::set($json->token, server()->id);
             }
         }
-        
+
         return $json->token;
     }
 }

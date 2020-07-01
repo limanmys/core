@@ -8,9 +8,7 @@ class Role extends Model
 {
     use UsesUuid;
 
-    protected $fillable = [
-        "name"
-    ];
+    protected $fillable = ["name"];
 
     public function permissions()
     {

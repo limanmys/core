@@ -301,13 +301,13 @@ function svgturkiyeharitasi() {
     );
 }
 svgturkiyeharitasi();
-let sehirler = "{{$cities}}".split(",");
+var sehirler = "{{$cities}}".split(",");
 sehirler.forEach(function(sehir) {
   $('[data-plakakodu="' + sehir + '"] path').css('fill','#1094F6');
 });
 
 $('g[data-plakakodu]').each(function(){
-  let vm = this;
+  var vm = this;
   $(this).mouseover(function(){
     fillCity($(vm).attr('data-plakakodu'), true);
   });

@@ -19,24 +19,24 @@ class WinRMConnector implements Connector
         return true;
     }
 
-    public function __destruct()
-    { }
-
     public static function retrieveCredentials()
     {
         $username = UserSettings::where([
             'user_id' => user()->id,
             'server_id' => server()->id,
-            'name' => 'clientUsername'
+            'name' => 'clientUsername',
         ])->first();
         $password = UserSettings::where([
             'user_id' => user()->id,
             'server_id' => server()->id,
-            'name' => 'clientPassword'
+            'name' => 'clientPassword',
         ])->first();
 
         if (!$username || !$password) {
-            abort(504, "Bu sunucu için WinRM anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.");
+            abort(
+                504,
+                "Bu sunucu için WinRM anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz."
+            );
         }
 
         $key = env('APP_KEY') . user()->id . server()->id;
@@ -54,15 +54,25 @@ class WinRMConnector implements Connector
     public function execute($command)
     {
         // Prepare Powershell Command
-        $command = "powershell.exe -encodedCommand " . base64_encode(mb_convert_encoding("\$ProgressPreference = \"SilentlyContinue\"; " . $command,"UTF-16LE","UTF-8"));
-        return trim(self::request('run',[
-            "token" => "cn_". server()->id,
-            "command" => $command
-        ]));
+        $command =
+            "powershell.exe -encodedCommand " .
+            base64_encode(
+                mb_convert_encoding(
+                    "\$ProgressPreference = \"SilentlyContinue\"; " . $command,
+                    "UTF-16LE",
+                    "UTF-8"
+                )
+            );
+        return trim(
+            self::request('run', [
+                "token" => "cn_" . server()->id,
+                "command" => $command,
+            ])
+        );
     }
 
-    public static function request($url, $params,$retry = 3)
-    { 
+    public static function request($url, $params, $retry = 3)
+    {
         if (!ConnectorToken::get(server()->id)->exists()) {
             list($username, $password) = self::retrieveCredentials();
             self::init($username, $password, server()->id);
@@ -71,27 +81,34 @@ class WinRMConnector implements Connector
         $client = new Client();
         // Make Request.
 
-        try{
-            $params["token"] = ConnectorToken::get(server()->id)->first()->token;
-            $res = $client->request('POST', env("LIMAN_CONNECTOR_SERVER"). '/' . $url, [
+        try {
+            $params["token"] = ConnectorToken::get(
+                server()->id
+            )->first()->token;
+            $res = $client->request('POST', 'http://127.0.0.1:5000/' . $url, [
                 "form_params" => $params,
-                'timeout' => 5
+                'timeout' => 5,
             ]);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             // In case of error, handle error.
-            $json = json_decode((string) $e->getResponse()->getBody()->getContents());
+            $json = json_decode(
+                (string) $e
+                    ->getResponse()
+                    ->getBody()
+                    ->getContents()
+            );
 
             // If it's first time, retry after recreating ticket.
-            if($retry){
+            if ($retry) {
                 list($username, $password) = self::retrieveCredentials();
                 self::init($username, $password, server()->ip_address);
-                return self::request($url,$params,$retry -1 );
-            }else{
+                return self::request($url, $params, $retry - 1);
+            } else {
                 // If nothing works, abort.
-                abort(402,"Anahtarınız ile sunucuya giriş yapılamadı.");
+                abort(402, "Anahtarınız ile sunucuya giriş yapılamadı.");
             }
         }
-        
+
         // Simply parse and return output.
         $json = json_decode((string) $res->getBody());
         return $json->output;
@@ -99,26 +116,26 @@ class WinRMConnector implements Connector
 
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
-        return self::request('send',[
+        return self::request('send', [
             "token" => ConnectorToken::get(server()->id)->first()->token,
             "local_path" => $localPath,
-            "remote_path" => $remotePath
+            "remote_path" => $remotePath,
         ]);
     }
 
     public function receiveFile($localPath, $remotePath)
     {
-        return self::request('get',[
+        return self::request('get', [
             "token" => ConnectorToken::get(server()->id)->first()->token,
             "local_path" => $localPath,
-            "remote_path" => $remotePath
+            "remote_path" => $remotePath,
         ]);
     }
 
-    public function runScript($script, $parameters, $runAsRoot)
+    public function runScript($script, $parameters, $runAsRoot = false)
     {
         // Find Remote Path
-        $remotePath = "\\Windows\\Temp\\". Str::random() . ".ps1";
+        $remotePath = "\\Windows\\Temp\\" . Str::random() . ".ps1";
 
         $flag = $this->sendFile($script, $remotePath);
 
@@ -132,52 +149,61 @@ class WinRMConnector implements Connector
         $output = $this->execute($query);
 
         return $output;
-        
     }
 
     public static function verify($ip_address, $username, $password, $port)
     {
-        $token = self::init($username, $password, $ip_address,false);
+        $token = self::init($username, $password, $ip_address, false);
         if ($token) {
             return respond("Kullanıcı adı ve şifre doğrulandı.", 200);
         }
         return respond("Bu Kullanıcı adı ve şifre ile bağlanılamadı.", 201);
     }
 
-    public static function init($username, $password, $hostname,$putSession = true)
-    {
+    public static function init(
+        $username,
+        $password,
+        $hostname,
+        $putSession = true
+    ) {
         $client = new Client();
-        try{
-            $res = $client->request('POST', env('LIMAN_CONNECTOR_SERVER') . '/new', [
+        try {
+            $res = $client->request('POST', 'http://127.0.0.1:5000/new', [
                 'form_params' => [
                     "username" => $username,
                     "password" => $password,
                     "hostname" => $hostname,
-                    "connection_type" => "winrm"
+                    "connection_type" => "winrm",
                 ],
-                'timeout' => 5
+                'timeout' => 5,
             ]);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return null;
         }
-        
+
         $json = json_decode((string) $res->getBody());
-        if($putSession){
+        if ($putSession) {
             if (auth() && auth()->user()) {
-                ConnectorToken::set($json->token,server()->id);
+                ConnectorToken::set($json->token, server()->id);
             }
         }
-        
+
         return $json->token;
     }
 
-    public static function create(Server $server, $username, $password, $user_id, $key)
-    {
+    public static function create(
+        Server $server,
+        $username,
+        $password,
+        $user_id,
+        $key,
+        $port = null
+    ) {
         $token = self::init($username, $password, $server->ip_address);
         if ($token) {
-            return "OK";
+            return true;
         } else {
-            return "NO";
+            return false;
         }
     }
 }

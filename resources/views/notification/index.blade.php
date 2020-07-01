@@ -56,40 +56,40 @@
 </div>
 <script>
     $('#read_all').click(function(){
-        let data = new FormData();
+        var data = new FormData();
         request('{{route('notifications_read')}}', data, function(response){
             location.reload();
         }, function(response){
-            let error = JSON.parse(response);
+            var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
         });
     });
     $('#delete_read').click(function(){
-        let data = new FormData();
+        var data = new FormData();
         request('{{route('notification_delete_read')}}', data, function(response){
             location.reload();
         }, function(response){
-            let error = JSON.parse(response);
+            var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
         });
     });
     $('.mark_read').click(function(){
-        let data = new FormData();
+        var data = new FormData();
         data.append('notification_id', $(this).attr('notification-id'));
         request('{{route('notification_read')}}', data, function(response){
             location.reload();
         }, function(response){
-            let error = JSON.parse(response);
+            var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
         });
     });
     $('.delete_not').click(function(){
-        let data = new FormData();
+        var data = new FormData();
         data.append('notification_id', $(this).attr('notification-id'));
         request('{{route('notification_delete')}}', data, function(response){
             location.reload();
         }, function(response){
-            let error = JSON.parse(response);
+            var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
         });
     });

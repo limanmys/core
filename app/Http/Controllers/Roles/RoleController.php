@@ -16,47 +16,61 @@ class RoleController extends Controller
 {
     public function one(Role $role)
     {
-        return view('settings.role',[
+        return view('settings.role', [
             "role" => $role,
-            "servers" => Server::find($role->permissions->where('type','server')->pluck('value')->toArray()),
-            "extensions" => Extension::find($role->permissions->where('type','extension')->pluck('value')->toArray())
+            "servers" => Server::find(
+                $role->permissions
+                    ->where('type', 'server')
+                    ->pluck('value')
+                    ->toArray()
+            ),
+            "extensions" => Extension::find(
+                $role->permissions
+                    ->where('type', 'extension')
+                    ->pluck('value')
+                    ->toArray()
+            ),
         ]);
     }
 
     public function list()
     {
-        return view('table',[
+        return view('table', [
             "value" => Role::all(),
-            "title" => [
-                "Rol Grubu Adı", "*hidden*" ,
-            ],
-            "display" => [
-                "name", "id:role_id" ,
-            ],
+            "title" => ["Rol Grubu Adı", "*hidden*"],
+            "display" => ["name", "id:role_id"],
             "menu" => [
                 "Sil" => [
                     "target" => "deleteRole",
-                    "icon" => " context-menu-icon-delete"
-                ]
+                    "icon" => " context-menu-icon-delete",
+                ],
             ],
-            "onclick" => "roleDetails"
+            "onclick" => "roleDetails",
         ]);
     }
 
     public function add()
     {
+        hook('role_group_add_attempt', [
+            "request" => request()->all(),
+        ]);
+
         $flag = Validator::make(request()->all(), [
             'name' => ['required', 'string', 'max:255', 'unique:roles'],
         ]);
 
-        try{
+        try {
             $flag->validate();
-        }catch (\Exception $exception){
-            return respond("Lütfen geçerli veri giriniz.",201);
+        } catch (\Exception $exception) {
+            return respond("Lütfen geçerli veri giriniz.", 201);
         }
 
-        Role::create([
-            "name" => request('name')
+        $role = Role::create([
+            "name" => request('name'),
+        ]);
+
+        hook('role_group_add_successful', [
+            "role" => $role,
         ]);
 
         return respond("Rol grubu başarıyla eklendi.");
@@ -77,42 +91,44 @@ class RoleController extends Controller
 
     public function addRoleUsers()
     {
-        foreach(json_decode(request('users')) as $user){
+        foreach (json_decode(request('users')) as $user) {
             RoleUser::firstOrCreate([
                 "user_id" => $user,
-                "role_id" => request('role_id')
+                "role_id" => request('role_id'),
             ]);
         }
-        return respond(__("Grup üyeleri başarıyla eklendi."),200);
+        return respond(__("Grup üyeleri başarıyla eklendi."), 200);
     }
 
     public function addRolesToUser()
     {
-        foreach(json_decode(request('ids')) as $role){
+        foreach (json_decode(request('ids')) as $role) {
             RoleUser::firstOrCreate([
                 "user_id" => request('user_id'),
-                "role_id" => $role
+                "role_id" => $role,
             ]);
         }
-        return respond(__("Rol grupları kullanıcıya başarıyla eklendi."),200);
+        return respond(__("Rol grupları kullanıcıya başarıyla eklendi."), 200);
     }
 
     public function removeRolesToUser()
     {
         RoleUser::whereIn("role_id", json_decode(request('ids')))
-        ->where([
-            "user_id" => request('user_id')
-        ])->delete();
-        return respond(__("Rol grupları başarıyla silindi."),200);
+            ->where([
+                "user_id" => request('user_id'),
+            ])
+            ->delete();
+        return respond(__("Rol grupları başarıyla silindi."), 200);
     }
 
     public function removeRoleUsers()
     {
         RoleUser::whereIn("user_id", json_decode(request('users')))
             ->where([
-                "role_id" => request('role_id')
-            ])->delete();
-        return respond(__("Grup üyeleri başarıyla silindi."),200);
+                "role_id" => request('role_id'),
+            ])
+            ->delete();
+        return respond(__("Grup üyeleri başarıyla silindi."), 200);
     }
 
     public function getList()
@@ -121,22 +137,51 @@ class RoleController extends Controller
         $data = [];
         $title = [];
         $display = [];
-        switch (request('type')){
+        switch (request('type')) {
             case "server":
-                $data = Server::whereNotIn('id',$role->permissions->where('type','server')->pluck('value')->toArray())->get();
-                $title = ["*hidden*", "İsim" , "Türü", "İp Adresi"];
-                $display = ["id:id", "name" , "type", "ip_address"];
+                $data = Server::whereNotIn(
+                    'id',
+                    $role->permissions
+                        ->where('type', 'server')
+                        ->pluck('value')
+                        ->toArray()
+                )->get();
+                $title = ["*hidden*", "İsim", "Türü", "İp Adresi"];
+                $display = ["id:id", "name", "type", "ip_address"];
                 break;
             case "extension":
-                $data = Extension::whereNotIn('id',$role->permissions->where('type','extension')->pluck('value')->toArray())->get();
+                $data = Extension::whereNotIn(
+                    'id',
+                    $role->permissions
+                        ->where('type', 'extension')
+                        ->pluck('value')
+                        ->toArray()
+                )->get();
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
                 break;
             case "liman":
+                $data = [
+                    [
+                        "id" => "view_logs",
+                        "name" => "Sunucu Günlük Kayıtlarını Görüntüleme",
+                    ],
+                    [
+                        "id" => "add_server",
+                        "name" => "Sunucu Ekleme",
+                    ],
+                    [
+                        "id" => "server_services",
+                        "name" => "Sunucu Servislerini Görüntüleme",
+                    ],
+                ];
+                $title = ["*hidden*", "İsim"];
+                $display = ["id:id", "name"];
+                break;
             default:
-                abort(504,"Tip Bulunamadı");
+                abort(504, "Tip Bulunamadı");
         }
-        return view('l.table',[
+        return view('l.table', [
             "value" => $data,
             "title" => $title,
             "display" => $display,
@@ -145,31 +190,47 @@ class RoleController extends Controller
 
     public function addList()
     {
-        foreach(json_decode(request('ids'),true) as $id){
-            Permission::grant(request('role_id'),request('type'),"id",$id, null, "roles");
+        foreach (json_decode(request('ids'), true) as $id) {
+            Permission::grant(
+                request('role_id'),
+                request('type'),
+                "id",
+                $id,
+                null,
+                "roles"
+            );
         }
-        return respond(__("Başarılı"),200);
+        return respond(__("Başarılı"), 200);
     }
 
     public function removeFromList()
     {
-        foreach(json_decode(request('ids'),true) as $id){
-            Permission::revoke(request('role_id'),request('type'),"id",$id);
+        foreach (json_decode(request('ids'), true) as $id) {
+            Permission::revoke(request('role_id'), request('type'), "id", $id);
         }
-        return respond(__("Başarılı"),200);
+        return respond(__("Başarılı"), 200);
     }
 
-    public function addFunctionPermissions(){
-        foreach(explode(",",request('functions')) as $function){
-            Permission::grant(request('role_id'),"function","name",strtolower(extension()->name),$function, "roles");
+    public function addFunctionPermissions()
+    {
+        foreach (explode(",", request('functions')) as $function) {
+            Permission::grant(
+                request('role_id'),
+                "function",
+                "name",
+                strtolower(extension()->name),
+                $function,
+                "roles"
+            );
         }
-        return respond(__("Başarılı"),200);
+        return respond(__("Başarılı"), 200);
     }
 
-    public function removeFunctionPermissions(){
-        foreach(explode(",",request('functions')) as $function){
-             Permission::find($function)->delete();
+    public function removeFunctionPermissions()
+    {
+        foreach (explode(",", request('functions')) as $function) {
+            Permission::find($function)->delete();
         }
-        return respond(__("Başarılı"),200);
+        return respond(__("Başarılı"), 200);
     }
 }

@@ -13,6 +13,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Validator;
+use App\Jobs\ExtensionUpdaterJob;
+use Illuminate\Contracts\Bus\Dispatcher;
 
 /**
  * Class MainController
@@ -30,18 +32,20 @@ class MainController extends Controller
 
         // Extract Cities of the Servers.
         $cities = array_values(objectToArray($servers, "city", "city"));
-        system_log(7,"EXTENSION_SERVERS_INDEX",[
-            "extension_id" => extension()->id
+        system_log(7, "EXTENSION_SERVERS_INDEX", [
+            "extension_id" => extension()->id,
         ]);
-        if(count($cities) == 1){
-            return redirect(route("extension_city",[
-                "extension_id" => extension()->id,
-                "city" => $cities[0]
-            ]));
+        if (count($cities) == 1) {
+            return redirect(
+                route("extension_city", [
+                    "extension_id" => extension()->id,
+                    "city" => $cities[0],
+                ])
+            );
         }
         // Render View with Cities
         return view('extension_pages.index', [
-            "cities" => implode(',', $cities)
+            "cities" => implode(',', $cities),
         ]);
     }
 
@@ -51,18 +55,23 @@ class MainController extends Controller
     public function download()
     {
         // Generate Extension Folder Path
-        $path = env("EXTENSIONS_PATH") . strtolower(extension()->name);
+        $path = "/liman/extensions/" . strtolower(extension()->name);
         $tempPath = "/tmp/" . Str::random() . ".zip";
 
         // Zip the current extension
         shell_exec("cd $path && zip -r $tempPath .");
 
-        system_log(6,"EXTENSION_DOWNLOAD",[
-            "extension_id" => extension()->id
+        system_log(6, "EXTENSION_DOWNLOAD", [
+            "extension_id" => extension()->id,
         ]);
 
         // Return zip as download and delete it after sent.
-        return response()->download($tempPath, extension()->name . "-" . extension()->version . ".lmne")->deleteFileAfterSend();
+        return response()
+            ->download(
+                $tempPath,
+                extension()->name . "-" . extension()->version . ".lmne"
+            )
+            ->deleteFileAfterSend();
     }
 
     /**
@@ -71,37 +80,93 @@ class MainController extends Controller
      */
     public function upload()
     {
-        $flag = Validator::make(request()->all(), [
-            'extension' => 'required | max:5000000'
+        hook('extension_upload_attempt', [
+            "request" => request()->all(),
         ]);
-        try{
+
+        $flag = Validator::make(request()->all(), [
+            'extension' => 'required | max:5000000',
+        ]);
+        try {
             $flag->validate();
-        }catch (\Exception $exception){
-            return respond("Lütfen geçerli bir eklenti giriniz.",201);
+        } catch (\Exception $exception) {
+            return respond("Lütfen geçerli bir eklenti giriniz.", 201);
         }
 
         $zipFile = request()->file('extension');
-        if(endsWith(request()->file('extension')->getClientOriginalName(), ".signed")){
-            $verify = trim(shell_exec("gpg --verify --status-fd 1 ".request()->file('extension')->path()." | grep GOODSIG || echo 0"));
-            if(!(bool) $verify){
-                return respond("Eklenti dosyanız doğrulanamadı.",201);
+        if (
+            endsWith(
+                request()
+                    ->file('extension')
+                    ->getClientOriginalName(),
+                ".signed"
+            )
+        ) {
+            $verify = trim(
+                shell_exec(
+                    "gpg --verify --status-fd 1 " .
+                        request()
+                            ->file('extension')
+                            ->path() .
+                        " | grep GOODSIG || echo 0"
+                )
+            );
+            if (!(bool) $verify) {
+                return respond("Eklenti dosyanız doğrulanamadı.", 201);
             }
-            $decrypt =  trim(shell_exec("gpg --status-fd 1 -d -o '/tmp/".request()->file('extension')->getClientOriginalName()."' ".request()->file('extension')->path()." | grep FAILURE > /dev/null && echo 0 || echo 1"));
-            if(!(bool) $decrypt){
-                return respond("Eklenti dosyası doğrulanırken bir hata oluştu!.",201);
+            $decrypt = trim(
+                shell_exec(
+                    "gpg --status-fd 1 -d -o '/tmp/" .
+                        request()
+                            ->file('extension')
+                            ->getClientOriginalName() .
+                        "' " .
+                        request()
+                            ->file('extension')
+                            ->path() .
+                        " | grep FAILURE > /dev/null && echo 0 || echo 1"
+                )
+            );
+            if (!(bool) $decrypt) {
+                return respond(
+                    "Eklenti dosyası doğrulanırken bir hata oluştu!.",
+                    201
+                );
             }
-            $zipFile = "/tmp/".request()->file('extension')->getClientOriginalName();
-        }else{
-            if(!request()->has('force')){
-                return respond("Bu eklenti imzalanmamış bir eklenti, yine de kurmak istediğinize emin misiniz?",203);
+            $zipFile =
+                "/tmp/" .
+                request()
+                    ->file('extension')
+                    ->getClientOriginalName();
+        } else {
+            if (!request()->has('force')) {
+                return respond(
+                    "Bu eklenti imzalanmamış bir eklenti, yine de kurmak istediğinize emin misiniz?",
+                    203
+                );
             }
         }
+        list($error, $new) = self::setupNewExtension($zipFile);
+
+        if ($error) {
+            return $error;
+        }
+
+        system_log(3, "EXTENSION_UPLOAD_SUCCESS", [
+            "extension_id" => $new->id,
+        ]);
+
+        return respond("Eklenti Başarıyla yüklendi.", 200);
+    }
+
+    public function setupNewExtension($zipFile)
+    {
         // Initialize Zip Archive Object to use it later.
-        $zip = new ZipArchive;
+        $zip = new ZipArchive();
 
         // Try to open zip file.
         if (!$zip->open($zipFile)) {
-            system_log(7,"EXTENSION_UPLOAD_FAILED_CORRUPTED");
+            system_log(7, "EXTENSION_UPLOAD_FAILED_CORRUPTED");
             return respond("Eklenti Dosyası Açılamıyor.", 201);
         }
 
@@ -120,9 +185,13 @@ class MainController extends Controller
 
         $json = json_decode($file, true);
 
-        if(isset($verify)){
+        // if(array_key_exists("supportedLiman",$json) && version_compare(getVersion(),$json["supportedLiman"]) < 0){
+        //     return respond("Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum sürüm " . $json["supportedLiman"],201);
+        // }
+
+        if (isset($verify)) {
             $json["issuer"] = explode(" ", $verify, 4)[3];
-        }else{
+        } else {
             $json["issuer"] = "";
         }
 
@@ -131,7 +200,7 @@ class MainController extends Controller
 
         if ($extension) {
             if ($extension->version == $json["version"]) {
-                system_log(7,"EXTENSION_UPLOAD_FAILED_ALREADY_INSTALLED");
+                system_log(7, "EXTENSION_UPLOAD_FAILED_ALREADY_INSTALLED");
                 return respond("Eklentinin bu sürümü zaten yüklü", 201);
             }
         }
@@ -146,58 +215,79 @@ class MainController extends Controller
         $new->save();
 
         // Add User if not exists
-        if ((intval(shell_exec("grep -c '^" . clean_score($new->id) . "' /etc/passwd"))) ? false : true) {
-            shell_exec('sudo useradd -r -s /bin/sh ' . clean_score($new->id));
+        if (
+            intval(
+                shell_exec("grep -c '^" . cleanDash($new->id) . "' /etc/passwd")
+            )
+                ? false
+                : true
+        ) {
+            shell_exec('sudo useradd -r -s /bin/sh ' . cleanDash($new->id));
         }
 
-        $extension_folder = env('EXTENSIONS_PATH') . strtolower($json["name"]);
-        $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $new->id;
-        file_put_contents($passPath,Str::random(32));
-        shell_exec("sudo chown liman:" . clean_score($new->id) . " " . $passPath);
-        shell_exec("sudo chmod 640 " . $passPath);
+        $extension_folder = "/liman/extensions/" . strtolower($json["name"]);
+        $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $new->id;
+        file_put_contents($passPath, Str::random(32));
 
-        shell_exec("sudo mkdir -p $extension_folder");
-
-        shell_exec("sudo cp -r " . $path . "/* " . $extension_folder . DIRECTORY_SEPARATOR);
-
-        shell_exec('sudo chown ' . clean_score($new->id) . ':liman ' . $extension_folder);
-        shell_exec('sudo chmod 770 ' . $extension_folder);
-
-        shell_exec("sudo chown -R " . clean_score($new->id) . ':liman "' . $extension_folder. '"');
-        shell_exec("sudo chmod -R 770 \"" . $extension_folder ."\"");
-
-        shell_exec("sudo chown liman:". clean_score($new->id) . " " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
-        shell_exec("sudo chmod 640 " . $extension_folder . DIRECTORY_SEPARATOR . "db.json");
-
-        system_log(3,"EXTENSION_UPLOAD_SUCCESS",[
-            "extension_id" => $new->id
-        ]);
-
-        return respond("Eklenti Başarıyla yüklendi.",200);
+        shell_exec(
+            "
+            sudo chown liman:" .
+                cleanDash($new->id) .
+                " $passPath;
+            sudo chmod 640 $passPath;
+            sudo mkdir -p $extension_folder;
+            sudo cp -r " .
+                $path .
+                "/* " .
+                $extension_folder .
+                DIRECTORY_SEPARATOR .
+                ";
+            sudo chown " .
+                cleanDash($new->id) .
+                ":liman $extension_folder;
+            sudo chmod 770 $extension_folder;
+            sudo chown -R " .
+                cleanDash($new->id) .
+                ":liman $extension_folder;
+            sudo chmod -R 770 $extension_folder;
+            sudo chown liman:" .
+                cleanDash($new->id) .
+                " " .
+                $extension_folder .
+                DIRECTORY_SEPARATOR .
+                "db.json;
+            sudo chmod 640 " .
+                $extension_folder .
+                DIRECTORY_SEPARATOR .
+                "db.json;
+        "
+        );
+        return [null, $new];
     }
-
 
     public function newExtension()
     {
         $name = trim(request('name'));
-        $folder = env('EXTENSIONS_PATH') . strtolower($name);
-        
-        preg_match('/[A-Za-z]+/',request("name"),$output);
-        if(empty($output) || $output[0] != $name){
-            return respond("Eklenti isminde yalnızca harflere izin verilmektedir.",201);
+        $folder = "/liman/extensions/" . strtolower($name);
+
+        preg_match('/[A-Za-z-]+/', request("name"), $output);
+        if (empty($output) || $output[0] != $name) {
+            return respond(
+                "Eklenti isminde yalnızca harflere izin verilmektedir.",
+                201
+            );
         }
 
-        if(Extension::where("name",request("name"))->exists()){
-            return respond("Bu isimle zaten bir eklenti var.",201);
+        if (Extension::where("name", request("name"))->exists()) {
+            return respond("Bu isimle zaten bir eklenti var.", 201);
         }
-        $ext = new Extension([
+        $ext = Extension::create([
             "name" => request("name"),
             "version" => "0.0.1",
             "icon" => "",
             "service" => "",
-            "language" => request('language')
+            "language" => request('language'),
         ]);
-        $ext->save();
 
         $json = [
             "name" => $name,
@@ -208,73 +298,141 @@ class MainController extends Controller
             "views" => [
                 [
                     "name" => "index",
-                    "scripts" => ""
-                ]
+                    "scripts" => "",
+                ],
             ],
             "language" => request('language'),
             "status" => 0,
             "service" => "",
+            "supportedLiman" => file_get_contents(storage_path('VERSION')),
             "support" => auth()->user()->email,
-            "icon" => ""
+            "icon" => "",
         ];
 
-        shell_exec("mkdir " . $folder);
-        shell_exec("mkdir " . $folder . DIRECTORY_SEPARATOR . "views");
-        shell_exec("mkdir " . $folder . DIRECTORY_SEPARATOR . "scripts");
+        shell_exec(
+            "
+            mkdir $folder;
+            mkdir $folder" .
+                DIRECTORY_SEPARATOR .
+                "views;
+            mkdir $folder" .
+                DIRECTORY_SEPARATOR .
+                "scripts;
+        "
+        );
 
         touch($folder . DIRECTORY_SEPARATOR . "db.json");
 
-        file_put_contents($folder . DIRECTORY_SEPARATOR . "db.json",json_encode($json, JSON_PRETTY_PRINT));
+        file_put_contents(
+            $folder . DIRECTORY_SEPARATOR . "db.json",
+            json_encode($json, JSON_PRETTY_PRINT)
+        );
 
-        if ((intval(shell_exec("grep -c '^" . clean_score($ext->id) . "' /etc/passwd"))) ? false : true) {
-            shell_exec('sudo useradd -r -s /bin/sh ' . clean_score($ext->id));
+        if (
+            intval(
+                shell_exec("grep -c '^" . cleanDash($ext->id) . "' /etc/passwd")
+            )
+                ? false
+                : true
+        ) {
+            shell_exec('sudo useradd -r -s /bin/sh ' . cleanDash($ext->id));
         }
 
-        $passPath = env('KEYS_PATH') . DIRECTORY_SEPARATOR . $ext->id;
-        file_put_contents($passPath,Str::random(32));
-        shell_exec("sudo chown liman:" . clean_score($ext->id) . " " . $passPath);
-        shell_exec("sudo chmod 640 " . $passPath);
+        $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $ext->id;
+        file_put_contents($passPath, Str::random(32));
+        shell_exec(
+            "
+            sudo chown liman:" .
+                cleanDash($ext->id) .
+                " $passPath;
+            sudo chmod 640 $passPath;
+        "
+        );
 
-        foreach(sandbox(request('language'))->getInitialFiles() as $file){
+        request()->request->add(['server' => "none"]);
+        request()->request->add(['extension_id' => $ext->id]);
+
+        foreach (sandbox(request('language'))->getInitialFiles() as $file) {
             touch($folder . "/views/$file");
         }
 
-        shell_exec('sudo chown -R ' . clean_score($ext->id) . ':liman ' . $folder);
-        shell_exec('sudo chmod -R 770 ' . $folder);
+        shell_exec(
+            "
+            sudo chown -R " .
+                cleanDash($ext->id) .
+                ":liman $folder;
+            sudo chmod -R 770 $folder;
+            sudo chown liman:" .
+                cleanDash($ext->id) .
+                " $folder" .
+                DIRECTORY_SEPARATOR .
+                "db.json;
+            sudo chmod 640  $folder" .
+                DIRECTORY_SEPARATOR .
+                "db.json;
+        "
+        );
 
-        shell_exec("sudo chown liman:". clean_score($ext->id) . " " . $folder . DIRECTORY_SEPARATOR . "db.json");
-        shell_exec("sudo chmod 640 " . $folder . DIRECTORY_SEPARATOR . "db.json");
-
-        system_log(6,"EXTENSION_CREATE",[
-            "extension_id" => $ext->id
+        system_log(6, "EXTENSION_CREATE", [
+            "extension_id" => $ext->id,
         ]);
         return respond(route('extension_one', $ext->id), 300);
     }
 
     public function updateExtOrders()
     {
-      foreach (json_decode(request('data')) as $extension) {
-        $data = Extension::find($extension->id);
-        $data->order = $extension->order;
-        $data->save();
-      }
-      return respond('Sıralamalar güncellendi',200);
+        foreach (json_decode(request('data')) as $extension) {
+            Extension::where('id', $extension->id)->update([
+                "order" => $extension->order,
+            ]);
+        }
+        return respond('Sıralamalar güncellendi', 200);
+    }
+
+    public function autoUpdateExtension()
+    {
+        $json = json_decode(
+            file_get_contents(storage_path('extension_updates')),
+            true
+        );
+        $collection = collect($json);
+        $obj = $collection
+            ->where('extension_id', request("extension_id"))
+            ->first();
+
+        if (!$obj) {
+            return respond("Eklenti Bulunamadı", 201);
+        }
+
+        $job = (new ExtensionUpdaterJob(
+            request("extension_id"),
+            $obj["versionCode"],
+            $obj["downloadLink"],
+            true
+        ))->onQueue('system_updater');
+
+        // Dispatch job right away.
+        $job_id = app(Dispatcher::class)->dispatch($job);
+
+        return respond(
+            "Talebiniz başarıyla alındı, eklenti güncellendiğinde bildirim alacaksınız."
+        );
     }
 
     public function observeAPI()
     {
         $file = storage_path("extension_cache/") . request('job_id');
-        if(is_file($file)){
+        if (is_file($file)) {
             $response = respond([
                 "result" => file_get_contents($file),
-                "finished" => true
+                "finished" => true,
             ]);
             unlink($file);
             return $response;
         }
         return respond([
             "result" => null,
-            "finished" => false
+            "finished" => false,
         ]);
     }
 }

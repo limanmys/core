@@ -1,13 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-    @php($extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true))
+    @php($extension = json_decode(file_get_contents("/liman/extensions/" .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true))
 
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
             <li class="breadcrumb-item" aria-current="page"><a
-                        href="{{route('extensions_settings')}}">{{__("Eklenti Yönetimi")}}</a></li>
+                        href="{{route('settings')}}">{{__("Sistem Ayarları")}}</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a
+                        href="{{route('settings')}}#extensions">{{__("Eklentiler")}}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ $extension["name"] }}</li>
         </ol>
     </nav>
@@ -22,7 +24,7 @@
                     <a class="nav-link" data-toggle="pill" href="#tab_2" role="tab" >{{__("Eklenti Veritabanı")}}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="pill" href="#tab_3" role="tab">{{__("Widgetlar")}}</a>
+                    <a class="nav-link" data-toggle="pill" href="#tab_3" role="tab">{{__("Bileşenler")}}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#tab_4" role="tab">{{__("Fonksiyonlar")}}</a>
@@ -33,28 +35,30 @@
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="tab_1" role="tabpanel">
                         <h3>{{__("Eklenti Adı")}}</h3>
-                        <input id="extensionName" type="text" class="form-control" value="{{$extension['name']}}" disabled required>
+                        <input id="extensionName" type="text" class="form-control" value="{{$extension['name']}}" disabled required><br>
                         <h3>{{__("Yayınlayan")}}</h3>
-                        <input type="text" name="name" class="form-control" value="{{$extension['publisher']}}" disabled required>
+                        <input type="text" name="name" class="form-control" value="{{$extension['publisher']}}" disabled required><br>
                         <h3>{{__("Yazılım Dili")}}</h3>
-                        <select name="programmingLanguage" class="form-control" value="{{$extension['language']}}" autocomplete="off" disabled>
+                        <select name="programmingLanguage" class="form-control" value="{{$extension['language']}}" autocomplete="off" disabled><br>
                             <option value="php" @if($extension["language"] == "php") selected='true' @endif >PHP 7.3</option>
                             <option value="python" @if($extension["language"] == "python") selected='true' @endif>Python 3</option>
-                        </select>
+                        </select><br>
                         <h3>{{__("Destek Email'i")}}</h3>
-                        <input id="support" type="text" name="email" class="form-control" value="{{$extension["support"]}}" required>
+                        <input id="support" type="text" name="email" class="form-control" value="{{$extension["support"]}}" required><br>
                         <h3>{{__("Logo (Font Awesome Ikon)")}}</h3>
-                        <input id="icon" type="text" name="icon" class="form-control" value="{{$extension["icon"]}}" required>
+                        <input id="icon" type="text" name="icon" class="form-control" value="{{$extension["icon"]}}" required><br>
+                        <h3>{{__("Gerekli Minimum Liman Sürümü")}}</h3>
+                        <input id="supportedLiman" type="text" name="icon" class="form-control" value="{{array_key_exists("supportedLiman",$extension) ? $extension["supportedLiman"] : getVersion()}}" required><br>
                         <h3>{{__("Versiyon")}}</h3>
-                        <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}" required>
+                        <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}" required><br>
                         <h3>{{__("Ayar Doğrulama Fonksiyonu/Betiği")}}</h3>
-                        <input id="verification" type="text" name="verification" class="form-control" value="{{array_key_exists("verification",$extension) ? $extension["verification"] : ""}}" required>
+                        <input id="verification" type="text" name="verification" class="form-control" value="{{array_key_exists("verification",$extension) ? $extension["verification"] : ""}}" required><br>
                         <h3>{{__("Servis Adı yada Kontrol Etmek için Port")}}</h3>
-                        <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}" required>
+                        <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}" required><br>
                         <h3>{{__("SSL Sertifikası Eklenecek Portlar")}}</h3>
-                        <small>{{__("Birden fazla port yazmak için aralarında virgül bırakabilirsiniz.")}}</small>
+                        <small>{{__("Birden fazla port yazmak için aralarında virgül bırakabilirsiniz.")}}</small><br>
                         <input id="sslPorts" type="text" name="service" class="form-control" value="{{array_key_exists("sslPorts",$extension) ? $extension["sslPorts"] : ""}}" required><br>
-                        <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button>
+                        <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button><br>
                     </div>
                     <div class="tab-pane fade show" id="tab_2" role="tabpanel">
                         @include('modal-button',[
@@ -214,10 +218,10 @@
                         @include('table',[
                             "value" => array_key_exists("functions",$extension) ? $extension["functions"] : [],
                             "title" => [
-                                "Fonksiyon Adı" , "Çeviri Key'i", "Yetki Sistemi" ,"*hidden*"
+                                "Fonksiyon Adı" , "Çeviri Key'i", "Yetki Sistemi", "Logu Görüntüle" ,"*hidden*"
                             ],
                             "display" => [
-                                "name" , "description", "isActive", "name:old"
+                                "name" , "description", "isActive", "displayLog", "name:old"
                             ],
                             "menu" => [
                                 "İzin Parametreleri" => [
@@ -225,7 +229,7 @@
                                     "icon" => "fa-cog"
                                 ],
                                 "Ayarları Düzenle" => [
-                                    "target" => "updateFunctionModal",
+                                    "target" => "updateFunctionModalHandler",
                                     "icon" => " context-menu-icon-edit"
                                 ],
                                 "Sil" => [
@@ -244,6 +248,7 @@
                                 "Fonksiyon Adı" => "name:text",
                                 "Açıklama (Çeviri Key)" => "description:text",
                                 "Yetki Sistemine Dahil Et" => "isActive:checkbox",
+                                "Sunucu Loglarında Görüntüle" => "displayLog:checkbox",
                             ],
                             "submit_text" => "Fonksiyon Ekle"
                         ])
@@ -257,6 +262,7 @@
                                 "Fonksiyon Adı" => "name:text",
                                 "Açıklama (Çeviri Key)" => "description:text",
                                 "Yetki Sistemine Dahil Et" => "isActive:checkbox",
+                                "Sunucu Loglarında Görüntüle" => "displayLog:checkbox",
                                 "-:-" => "old:hidden"
                             ],
                             "submit_text" => "Fonksiyon Duzenle"
@@ -306,14 +312,15 @@
         </div>
     </div>
     <script>
+        customRequestData["extension_id"] = "{{extension()->id}}";
         function editPage(element){
-            let page = $(element).find("#name").text();
-            location.href = location.protocol+'//'+location.host+location.pathname + "/" + page;
+            var page = $(element).find("#name").text();
+            partialPageRequest(location.protocol+'//'+location.host+location.pathname + "/" + page);
         }
 
         function updateExtension(type,tableId = null){
             showSwal('{{__("Kaydediliyor...")}}','info');
-            let data = new FormData();
+            var data = new FormData();
             data.append('type',type);
             data.append('name',$("#extensionName").val());
             data.append('icon',$("#icon").val());
@@ -321,6 +328,7 @@
             data.append('version',$("#version").val());
             data.append('service',$("#service").val());
             data.append('sslPorts',$("#sslPorts").val());
+            data.append('supportedLiman',$("#supportedLiman").val());
             data.append('verification',$("#verification").val());
             request('{{route('extension_settings_update')}}',data,function(){
                 showSwal("{{__("Başarıyla kaydedildi")}}",'success');
@@ -328,7 +336,7 @@
                     location.reload();
                 },1500);
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
@@ -338,7 +346,7 @@
         function getFunctionParameters(function_name){
             showSwal('{{__("Yükleniyor...")}}','info');
 
-            let data = new FormData();
+            var data = new FormData();
             data.append('function_name',function_name);
             activeFunction = function_name;
 
@@ -350,7 +358,7 @@
                     .DataTable(dataTablePresets('normal'));
                 $('#updateFunctionParametersModal').modal('show');
             }, function(response){
-                let error = JSON.parse(response);
+                var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
         }
@@ -361,7 +369,7 @@
         }
 
         function updateFunctionParameters(row){
-            let function_name = $(row).find("#name").text();
+            var function_name = $(row).find("#name").text();
             getFunctionParameters(function_name);
         }
 
@@ -383,8 +391,8 @@
             }).then((result) => {
                 if (result.value) {
                     showSwal('{{__("Yükleniyor...")}}','info');
-                    let parameter_variable = $(row).find("#variable").text();
-                    let data = new FormData();
+                    var parameter_variable = $(row).find("#variable").text();
+                    var data = new FormData();
                     data.append('parameter_variable',parameter_variable);
                     data.append('function_name',activeFunction);
                     
@@ -392,11 +400,25 @@
                         Swal.close();
                         getFunctionParameters(activeFunction);
                     }, function(response){
-                        let error = JSON.parse(response);
+                        var error = JSON.parse(response);
                         showSwal(error.message,'error',2000);
                     });
                 }
             });
+        }
+        function updateFunctionModalHandler(element){
+            var modal = $("#updateFunctionModal");
+            modal.find("input[name='name']").val(element.querySelector('#name').innerHTML);
+            modal.find("input[name='old']").val(element.querySelector('#name').innerHTML);
+            modal.find("input[name='description']").val(element.querySelector('#description').innerHTML);
+            if(element.querySelector('#isActive') && element.querySelector('#isActive').innerHTML == "true"){
+                modal.find("input[name='isActive']").prop("checked",true);
+            }
+            if(element.querySelector('#displayLog') && element.querySelector('#displayLog').innerHTML == "true"){
+                modal.find("input[name='displayLog']").prop("checked",true);
+            }
+            
+            modal.modal('show');
         }
     </script>
 @endsection

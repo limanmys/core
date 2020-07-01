@@ -4,52 +4,59 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-        <li class="breadcrumb-item active" aria-current="page">{{__("Widgetlar")}}</li>
+        <li class="breadcrumb-item active" aria-current="page">{{__("Bileşenler")}}</li>
     </ol>
 </nav>
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">{{__("Widgetlar")}}</h3>
+<div class="row">
+    <div class="col-md-3">
+        <div class="card card-primary card-outline">
+            <div class="card-body box-profile">
+                <h3 class="profile-username text-center">{{__("Bileşenler")}}</h3>
+                <p class="text-muted text-center">Bu sayfadan mevcut bileşenleri görebilirsiniz. Ayrıca yeni bileşen eklemek için Bileşen Ekle butonunu kullanabilirsiniz.</p>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <button class="btn btn-success" onclick="window.location.href = '{{route('widget_add_page')}}'">{{__("Widget Ekle")}}</button>
-        <br><br>
-        @include('errors')
-        <?php
-            foreach($widgets as $widget){
-                $extension = \App\Extension::find($widget->extension_id);
-                if($extension){
-                    $widget->extension_name = $extension->name;
-                }else{
-                    $widget->extension_name = "Eklenti Silinmiş";
-                }
-            }
-        ?>
-        @include('table',[
-            "value" => $widgets,
-            "title" => [
-                "Sunucu" , "Başlık" , "Eklenti", "*hidden*"
-            ],
-            "display" => [
-                "server_name" , "title" ,"extension_name", "id:widget_id"
-            ],
-            "menu" => [
-                "Düzenle" => [
-                    "target" => "edit",
-                    "icon" => " context-menu-icon-edit"
-                ],
-                "Sil" => [
-                    "target" => "delete",
-                    "icon" => " context-menu-icon-delete"
-                ]
-            ]
-        ])
+    <div class="col-md-9">
+    <div class="card">
+        <div class="card-body">
+            <button class="btn btn-success" onclick="partialPageRequest('{{route('widget_add_page')}}')">{{__("Bileşen Ekle")}}</button>
+                <br><br>
+                @include('errors')
+                <?php foreach ($widgets as $widget) {
+                    $extension = \App\Extension::find($widget->extension_id);
+                    if ($extension) {
+                        $widget->extension_name = $extension->display_name;
+                    } else {
+                        $widget->extension_name = "Eklenti Silinmiş";
+                    }
+                } ?>
+                @include('table',[
+                    "value" => $widgets,
+                    "title" => [
+                        "Sunucu" , "Başlık" , "Eklenti", "*hidden*"
+                    ],
+                    "display" => [
+                        "server_name" , "title" ,"extension_name", "id:widget_id"
+                    ],
+                    "menu" => [
+                        "Düzenle" => [
+                            "target" => "edit",
+                            "icon" => " context-menu-icon-edit"
+                        ],
+                        "Sil" => [
+                            "target" => "delete",
+                            "icon" => " context-menu-icon-delete"
+                        ]
+                    ]
+                ])
+            </div>
+        </div>
     </div>
 </div>
 
 @include('modal',[
     "id"=>"add_server",
-    "title" => "Widget Ekle",
+    "title" => "Bileşen Ekle",
     "url" => route('widget_add'),
     "next" => "addToTable",
     "inputs" => [
@@ -64,7 +71,7 @@
 
 @include('modal',[
     "id"=>"edit",
-    "title" => "Widget Düzenle",
+    "title" => "Bileşen Düzenle",
     "url" => route('widget_update'),
     "next" => "updateTable",
     "inputs" => [
@@ -80,13 +87,13 @@
 
 @include('modal',[
     "id"=>"delete",
-    "title" =>"Widget'ı Sil",
+    "title" =>"Bileşeni Sil",
     "url" => route('widget_remove'),
-    "text" => "Widget'ı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+    "text" => "Bileşeni silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
     "next" => "reload",
     "inputs" => [
-        "Widget Id:'null'" => "widget_id:hidden"
+        "Bileşen Id:'null'" => "widget_id:hidden"
     ],
-    "submit_text" => "Widget'ı Sil"
+    "submit_text" => "Bileşeni Sil"
 ])
 @endsection

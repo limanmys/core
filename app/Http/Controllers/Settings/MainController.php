@@ -14,10 +14,11 @@ use App\RoleMapping;
 use App\RoleUser;
 use App\PermissionData;
 use App\ServerGroup;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 
 class MainController extends Controller
 {
-
     public function __construct()
     {
         // Specifiy that this controller requires admin middleware in all functions.
@@ -26,43 +27,51 @@ class MainController extends Controller
 
     public function index()
     {
-        $changelog = is_file(storage_path('changelog')) ? file_get_contents(storage_path('changelog')) : "";
-        return view('settings.index',[
+        $changelog = is_file(storage_path('changelog'))
+            ? file_get_contents(storage_path('changelog'))
+            : "";
+        return view('settings.index', [
             "users" => User::all(),
-            "changelog" => $changelog
+            "changelog" => $changelog,
         ]);
     }
 
     public function one(User $user)
     {
-        return view('settings.one',[
+        return view('settings.one', [
             "user" => $user,
-            "servers" => Server::find($user->permissions->where('type','server')->pluck('value')->toArray()),
-            "extensions" => Extension::find($user->permissions->where('type','extension')->pluck('value')->toArray())
+            "servers" => Server::find(
+                $user->permissions
+                    ->where('type', 'server')
+                    ->pluck('value')
+                    ->toArray()
+            ),
+            "extensions" => Extension::find(
+                $user->permissions
+                    ->where('type', 'extension')
+                    ->pluck('value')
+                    ->toArray()
+            ),
         ]);
     }
 
     public function getUserList()
     {
-        return view('l.table',[
+        return view('l.table', [
             "value" => \App\User::all(),
-            "title" => [
-                "Kullanıcı Adı" , "Email" , "*hidden*" ,
-            ],
-            "display" => [
-                "name" , "email", "id:user_id" ,
-            ],
+            "title" => ["Kullanıcı Adı", "Email", "*hidden*"],
+            "display" => ["name", "email", "id:user_id"],
             "menu" => [
                 "Parolayı Sıfırla" => [
                     "target" => "passwordReset",
-                    "icon" => "fa-lock"
+                    "icon" => "fa-lock",
                 ],
                 "Sil" => [
                     "target" => "delete",
-                    "icon" => " context-menu-icon-delete"
-                ]
+                    "icon" => " context-menu-icon-delete",
+                ],
             ],
-            "onclick" => "details"
+            "onclick" => "details",
         ]);
     }
 
@@ -72,28 +81,60 @@ class MainController extends Controller
         $data = [];
         $title = [];
         $display = [];
-        switch (request('type')){
+        switch (request('type')) {
             case "server":
-                $data = Server::whereNotIn('id',$user->permissions->where('type','server')->pluck('value')->toArray())->get();
-                $title = ["*hidden*", "İsim" , "Türü", "İp Adresi"];
-                $display = ["id:id", "name" , "type", "ip_address"];
+                $data = Server::whereNotIn(
+                    'id',
+                    $user->permissions
+                        ->where('type', 'server')
+                        ->pluck('value')
+                        ->toArray()
+                )->get();
+                $title = ["*hidden*", "İsim", "Türü", "İp Adresi"];
+                $display = ["id:id", "name", "type", "ip_address"];
                 break;
             case "extension":
-                $data = Extension::whereNotIn('id',$user->permissions->where('type','extension')->pluck('value')->toArray())->get();
+                $data = Extension::whereNotIn(
+                    'id',
+                    $user->permissions
+                        ->where('type', 'extension')
+                        ->pluck('value')
+                        ->toArray()
+                )->get();
                 $title = ["*hidden*", "İsim"];
-                $display = ["id:id", "name"];
+                $display = ["id:id", "display_name"];
                 break;
             case "role":
-                $data = Role::whereNotIn('id',$user->roles->pluck('id')->toArray())->get();
+                $data = Role::whereNotIn(
+                    'id',
+                    $user->roles->pluck('id')->toArray()
+                )->get();
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
                 break;
             case "liman":
+                $data = [
+                    [
+                        "id" => "view_logs",
+                        "name" => "Sunucu Günlük Kayıtlarını Görüntüleme",
+                    ],
+                    [
+                        "id" => "add_server",
+                        "name" => "Sunucu Ekleme",
+                    ],
+                    [
+                        "id" => "server_services",
+                        "name" => "Sunucu Servislerini Görüntüleme",
+                    ],
+                ];
+                $title = ["*hidden*", "İsim"];
+                $display = ["id:id", "name"];
+                break;
             default:
-                abort(504,"Tip Bulunamadı");
+                abort(504, "Tip Bulunamadı");
         }
-        return view('l.table',[
-            "value" => $data,
+        return view('l.table', [
+            "value" => (object) $data,
             "title" => $title,
             "display" => $display,
         ]);
@@ -102,113 +143,164 @@ class MainController extends Controller
     public function addList()
     {
         $arr = [];
-        foreach(json_decode(request('ids'),true) as $id){
-            array_push($arr,$id);
-            Permission::grant(request('user_id'),request('type'),"id",$id);
+        foreach (json_decode(request('ids'), true) as $id) {
+            array_push($arr, $id);
+            Permission::grant(request('user_id'), request('type'), "id", $id);
         }
         $arr["type"] = request('type');
         $arr["target_user_id"] = request('user_id');
-        system_log(7,"PERMISSION_GRANT",$arr);
-        return respond(__("Başarılı"),200);
+        system_log(7, "PERMISSION_GRANT", $arr);
+        return respond(__("Başarılı"), 200);
     }
 
     public function removeFromList()
     {
         $arr = [];
-        foreach(json_decode(request('ids'),true) as $id){
-            Permission::revoke(request('user_id'),request('type'),"id",$id);
+        $flag = false;
+        $ids = json_decode(request('ids'), true);
+
+        if ($ids == []) {
+            return respond("Lütfen bir seçim yapın", 201);
         }
-        array_push($arr,$id);
+
+        foreach ($ids as $id) {
+            $flag = Permission::revoke(
+                request('user_id'),
+                request('type'),
+                "id",
+                $id
+            );
+        }
+        array_push($arr, $id);
         $arr["type"] = request('type');
         $arr["target_user_id"] = request('user_id');
-        system_log(7,"PERMISSION_REVOKE",$arr);
-        return respond(__("Başarılı"),200);
+        system_log(7, "PERMISSION_REVOKE", $arr);
+        if ($flag) {
+            return respond(__("Başarılı"), 200);
+        } else {
+            return respond(__("Yetki(ler) silinemedi"), 201);
+        }
     }
 
     public function getExtensionFunctions()
     {
-        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(extension()->name) . DIRECTORY_SEPARATOR . "db.json"),true);
-        $functions = array_key_exists("functions",$extension) ? $extension["functions"] : [];
+        $extension = json_decode(
+            file_get_contents(
+                "/liman/extensions/" .
+                    strtolower(extension()->name) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
+            ),
+            true
+        );
+        $functions = array_key_exists("functions", $extension)
+            ? $extension["functions"]
+            : [];
         $lang = session('locale');
-        $file = env('EXTENSIONS_PATH') . strtolower(extension()->name) . "/lang/" . $lang . ".json";
+        $file =
+            "/liman/extensions/" .
+            strtolower(extension()->name) .
+            "/lang/" .
+            $lang .
+            ".json";
 
         //Translate Items.
         $cleanFunctions = [];
-        if(is_file($file)){
-            $json = json_decode(file_get_contents($file),true);
-            for($i = 0; $i < count($functions); $i++){
-                if(array_key_exists("isActive",$functions[$i]) && $functions[$i]["isActive"] == "false"){
+        if (is_file($file)) {
+            $json = json_decode(file_get_contents($file), true);
+            for ($i = 0; $i < count($functions); $i++) {
+                if (
+                    array_key_exists("isActive", $functions[$i]) &&
+                    $functions[$i]["isActive"] == "false"
+                ) {
                     continue;
                 }
-                $description = (array_key_exists($functions[$i]["description"],$json)) 
-                    ? $json[$functions[$i]["description"]] : $functions[$i]["description"];
-                array_push($cleanFunctions,[
+                $description = array_key_exists(
+                    $functions[$i]["description"],
+                    $json
+                )
+                    ? $json[$functions[$i]["description"]]
+                    : $functions[$i]["description"];
+                array_push($cleanFunctions, [
                     "name" => $functions[$i]["name"],
-                    "description" => $description
+                    "description" => $description,
                 ]);
-                
             }
         }
-        
-        return view('l.table',[
+
+        return view('l.table', [
             "value" => $cleanFunctions,
-            "title" => [
-                "*hidden*" , "Aciklama"
-            ],
-            "display" => [
-                "name:name", "description"
-            ]
+            "title" => ["*hidden*", "Aciklama"],
+            "display" => ["name:name", "description"],
         ]);
     }
 
-    public function addFunctionPermissions(){
-        foreach(explode(",",request('functions')) as $function){
-             Permission::grant(request('user_id'),"function","name",strtolower(extension()->name),$function);
+    public function addFunctionPermissions()
+    {
+        foreach (explode(",", request('functions')) as $function) {
+            Permission::grant(
+                request('user_id'),
+                "function",
+                "name",
+                strtolower(extension()->name),
+                $function
+            );
         }
-        return respond(__("Başarılı"),200);
+        return respond(__("Başarılı"), 200);
     }
 
-    public function removeFunctionPermissions(){
-        foreach(explode(",",request('functions')) as $function){
-             Permission::find($function)->delete();
+    public function removeFunctionPermissions()
+    {
+        foreach (explode(",", request('functions')) as $function) {
+            Permission::find($function)->delete();
         }
-        return respond(__("Başarılı"),200);
+        return respond(__("Başarılı"), 200);
     }
 
     public function health()
     {
-        return respond(checkHealth(),200);
+        return respond(checkHealth(), 200);
     }
 
     public function saveLDAPConf()
     {
         $cert = Certificate::where([
             'server_hostname' => request('ldapAddress'),
-            'origin' => 636
+            'origin' => 636,
         ])->first();
-        if(!$cert){
-            list($flag, $message) = retrieveCertificate(request('ldapAddress'),636);
-            if($flag){
-                addCertificate(request('ldapAddress'),636,$message["path"]);
-                $notification = new AdminNotification();
-                $notification->title = "Yeni Sertifika Eklendi";
-                $notification->type = "new_cert";
-                $notification->message = "Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.<br><br><a href='" . route('settings') . "#certificates'>Detaylar</a>";
-                $notification->level = 3;
-                $notification->save();
+        if (!$cert) {
+            list($flag, $message) = retrieveCertificate(
+                request('ldapAddress'),
+                636
+            );
+            if ($flag) {
+                addCertificate(request('ldapAddress'), 636, $message["path"]);
+                AdminNotification::create([
+                    "title" => "Yeni Sertifika Eklendi",
+                    "type" => "new_cert",
+                    "message" =>
+                        "Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.<br><br><a href='" .
+                        route('settings') .
+                        "#certificates'>Detaylar</a>",
+                    "level" => 3,
+                ]);
             }
         }
-        if(!setBaseDn(request('ldapAddress'))){
+        if (!setBaseDn(request('ldapAddress'))) {
             return respond('Sunucuya bağlanırken bir hata oluştu!', 201);
         }
-        if(request('ldapAddress') !== config('ldap.ldap_host')){
+        if (request('ldapAddress') !== config('ldap.ldap_host')) {
             RoleMapping::truncate();
-            User::where("auth_type", "ldap")->get()->map(function($item){
-                $item->permissions()->delete();
-            });
-            User::where("auth_type", "ldap")->get()->map(function($item){
-                RoleUser::where("user_id", $item->id)->delete();
-            });
+            User::where("auth_type", "ldap")
+                ->get()
+                ->map(function ($item) {
+                    $item->permissions()->delete();
+                });
+            User::where("auth_type", "ldap")
+                ->get()
+                ->map(function ($item) {
+                    RoleUser::where("user_id", $item->id)->delete();
+                });
             User::where("auth_type", "ldap")->delete();
         }
         setEnv([
@@ -216,37 +308,50 @@ class MainController extends Controller
             "LDAP_GUID_COLUMN" => request('ldapObjectGUID'),
             "LDAP_STATUS" => request('ldapStatus'),
         ]);
-        return respond(__("Kaydedildi!"),200);
+        return respond(__("Kaydedildi!"), 200);
     }
 
     public function getPermisssionData()
     {
+        $extension = json_decode(
+            file_get_contents(
+                "/liman/extensions/" .
+                    strtolower(request('extension_name')) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
+            ),
+            true
+        );
+        $function = collect($extension['functions'])
+            ->where('name', request('function_name'))
+            ->first();
 
-        $extension = json_decode(file_get_contents(env("EXTENSIONS_PATH") .strtolower(request('extension_name')) . DIRECTORY_SEPARATOR . "db.json"),true);
-        $function = collect($extension['functions'])->where('name', request('function_name'))->first();
-
-        if(!$function){
+        if (!$function) {
             return respond("Fonksiyon bulunamadı!", 201);
         }
 
-        $parameters = isset($function['parameters']) ? $function['parameters'] : null;
-        if(!$parameters){
+        $parameters = isset($function['parameters'])
+            ? $function['parameters']
+            : null;
+        if (!$parameters) {
             return respond("Fonksiyon parametresi bulunamadı!", 201);
         }
-        
-        $data = PermissionData::where('permission_id',request('id'))->first();
+
+        $data = PermissionData::where('permission_id', request('id'))->first();
         $data = $data ? json_decode($data->data) : (object) [];
-        foreach($parameters as $key => $parameter){
-            $parameters[$key]["value"] = isset($data->{$parameter["variable"]}) ? $data->{$parameter["variable"]} : "";
+        foreach ($parameters as $key => $parameter) {
+            $parameters[$key]["value"] = isset($data->{$parameter["variable"]})
+                ? $data->{$parameter["variable"]}
+                : "";
         }
 
         $parameters = collect(cleanArray($parameters));
         $inputs = view("inputs", [
-            "inputs" => $parameters->mapWithKeys(function($item){
+            "inputs" => $parameters->mapWithKeys(function ($item) {
                 return [
-                    $item["name"] => $item["variable"].":".$item["type"]
+                    $item["name"] => $item["variable"] . ":" . $item["type"],
                 ];
-            })
+            }),
         ])->render();
 
         return respond([
@@ -257,56 +362,63 @@ class MainController extends Controller
 
     public function writePermisssionData()
     {
-        $data = PermissionData::where('permission_id',request('id'))->first();
-        if($data){
+        $data = PermissionData::where('permission_id', request('id'))->first();
+        if ($data) {
             $data->update([
-                "data" => request('data')
+                "data" => request('data'),
             ]);
             return respond("Başarıyla eklendi!");
         }
-        
-        $obj = new PermissionData();
-        $obj->data = request('data');
-        $obj->permission_id = request('id');
-        $obj->save();
+
+        PermissionData::create([
+            "data" => request('data'),
+            "permission_id" => request('id'),
+        ]);
         return respond("Başarıyla eklendi!");
     }
 
     public function addServerGroup()
     {
-        if(ServerGroup::where('name',request('name'))->exists()){
-            return respond("Bu isimle zaten bir grup var.",201);
+        if (!request('name') || strlen(request('name')) < 1) {
+            return respond("Lütfen bir grup ismi girin.", 201);
         }
-        $group = new ServerGroup([
+        if (ServerGroup::where('name', request('name'))->exists()) {
+            return respond("Bu isimle zaten bir grup var.", 201);
+        }
+        $flag = ServerGroup::create([
             "name" => request('name'),
-            "servers" => request('servers')
+            "servers" => request('servers'),
         ]);
-        $flag = $group->save();
-        return ($flag) ? respond("Grup başarıyla eklendi!") : respond("Grup Eklenemedi!",201);
+        return $flag
+            ? respond("Grup başarıyla eklendi!")
+            : respond("Grup Eklenemedi!", 201);
     }
 
     public function modifyServerGroup()
     {
         $group = ServerGroup::find(request('server_group_id'));
-        if(!$group){
-            return respond("Grup bulunamadı!",201);
+        if (!$group) {
+            return respond("Grup bulunamadı!", 201);
         }
-        $group->update([
+        $flag = $group->update([
             "name" => request('name'),
-            "servers" => request('servers')
+            "servers" => request('servers'),
         ]);
-        $flag = $group->save();
-        return ($flag) ? respond("Grup başarıyla düzenlendi!") : respond("Grup Düzenlenemedi!",201);
+        return $flag
+            ? respond("Grup başarıyla düzenlendi!")
+            : respond("Grup Düzenlenemedi!", 201);
     }
 
     public function deleteServerGroup()
     {
         $group = ServerGroup::find(request('server_group_id'));
-        if(!$group){
-            return respond("Grup bulunamadı!",201);
+        if (!$group) {
+            return respond("Grup bulunamadı!", 201);
         }
         $flag = $group->delete();
-        return ($flag) ? respond("Grup başarıyla silindi!") : respond("Grup Silinemedi!",201);
+        return $flag
+            ? respond("Grup başarıyla silindi!")
+            : respond("Grup Silinemedi!", 201);
     }
 
     public function saveLogSystem()
@@ -314,18 +426,27 @@ class MainController extends Controller
         $flag = request()->validate([
             'targetHostname' => 'required|min:3',
             'targetPort' => 'required|numeric|between:1,65535',
-            'logInterval' => 'required|numeric'
+            'logInterval' => 'required|numeric',
         ]);
-        if(!$flag){
-            return respond("Girdiğiniz veriler geçerli değil!",201);
+        if (!$flag) {
+            return respond("Girdiğiniz veriler geçerli değil!", 201);
         }
 
-        $text = "
-*.*     @@" . request('targetHostname') . ":" . request('targetPort') . "
+        $text =
+            "
+*.*     @@" .
+            request('targetHostname') .
+            ":" .
+            request('targetPort') .
+            "
 \\\$ModLoad imfile
-\\\$InputFilePollInterval " . request('logInterval') . "
+\\\$InputFilePollInterval " .
+            request('logInterval') .
+            "
 \\\$PrivDropToGroup adm
-\\\$InputFileName " . env('LOG_PATH')  . "
+\\\$InputFileName " .
+            env('LOG_PATH') .
+            "
 \\\$InputFileTag LimanApp
 \\\$InputFileStateFile Stat-APP
 \\\$InputFileSeverity Info
@@ -336,8 +457,12 @@ class MainController extends Controller
 
         shell_exec("sudo sed -i '/module(load=\"imudp\")/d' /etc/rsyslog.conf");
         shell_exec("sudo sed -i '/module(load=\"imtcp\")/d' /etc/rsyslog.conf");
-        shell_exec("sudo sed -i '/input(type=\"imudp\" port=\"514\")/d' /etc/rsyslog.conf");
-        shell_exec("sudo sed -i '/input(type=\"imtcp\" port=\"514\")/d' /etc/rsyslog.conf");
+        shell_exec(
+            "sudo sed -i '/input(type=\"imudp\" port=\"514\")/d' /etc/rsyslog.conf"
+        );
+        shell_exec(
+            "sudo sed -i '/input(type=\"imtcp\" port=\"514\")/d' /etc/rsyslog.conf"
+        );
 
         $text = "
 module(load=\"imudp\")
@@ -347,33 +472,157 @@ input(type=\"imtcp\" port=\"514\")";
 
         shell_exec("echo '$text' | sudo tee -a /etc/rsyslog.conf");
         shell_exec("sudo systemctl restart rsyslog");
-        
+
         return respond("Başarıyla Kaydedildi!");
+    }
+
+    public function redirectMarket()
+    {
+        session([
+            "market_auth_started" => true,
+        ]);
+        return redirect(
+            env('MARKET_URL') .
+                "/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri=" .
+                urlencode(env('APP_URL') . '/api/market/bagla') .
+                "&client_id=" .
+                env('MARKET_CLIENT_ID')
+        );
+    }
+
+    public function connectMarket()
+    {
+        if (!session("market_auth_started", false)) {
+            abort(504, "Geçersiz istek!");
+        }
+        session([
+            "market_auth_started" => false,
+        ]);
+        try {
+            $client = new Client(['verify' => false]);
+
+            $params = [
+                "code" => request('code'),
+                "grant_type" => "authorization_code",
+                "redirect_uri" => env('APP_URL') . '/api/market/bagla',
+                "client_id" => env('MARKET_CLIENT_ID'),
+                "client_secret" => env('MARKET_CLIENT_SECRET'),
+            ];
+            $res = $client->request(
+                'POST',
+                env('MARKET_URL') . '/connect/token',
+                ["form_params" => $params]
+            );
+        } catch (BadResponseException $e) {
+            abort(504, "Market hesabınız bağlanırken bir hata oluştu!");
+        }
+
+        $json = json_decode((string) $res->getBody());
+        $requiredScopes = ["user_api", "offline_access"];
+        $currentScopes = explode(" ", $json->scope);
+
+        if ($requiredScopes != $currentScopes) {
+            abort(
+                504,
+                "Gerekli izinleri vermediğiniz için işleminizi gerçekleştiremiyoruz."
+            );
+        }
+
+        setEnv([
+            "MARKET_ACCESS_TOKEN" => $json->access_token,
+            "MARKET_REFRESH_TOKEN" => $json->refresh_token,
+        ]);
+
+        return redirect(route('settings') . "#limanMarket");
     }
 
     public function getLogSystem()
     {
-        $status = trim(shell_exec("systemctl is-active rsyslog.service")) == "active" ? true : false;
+        $status =
+            trim(shell_exec("systemctl is-active rsyslog.service")) == "active"
+                ? true
+                : false;
 
-        $data = trim(shell_exec("cat /etc/rsyslog.d/liman.conf | grep 'InputFilePollInterval' | cut -d' ' -f2"));
+        $data = trim(
+            shell_exec(
+                "cat /etc/rsyslog.d/liman.conf | grep 'InputFilePollInterval' | cut -d' ' -f2"
+            )
+        );
         $interval = $data == "" ? "10" : $data;
 
         $ip_address = "";
         $port = "";
 
         $data = trim(shell_exec("cat /etc/rsyslog.d/liman.conf | grep '@@**'"));
-        if($data != ""){
-            $arr = explode("@@",$data);
-            $ip_port = explode(":",$arr[1]);
+        if ($data != "") {
+            $arr = explode("@@", $data);
+            $ip_port = explode(":", $arr[1]);
             $ip_address = $ip_port[0];
-            $port =$ip_port[1];
+            $port = $ip_port[1];
         }
-        
+
         return respond([
             "status" => $status,
             "ip_address" => $ip_address != "" ? $ip_address : "",
             "port" => $port != "" ? $port : "514",
-            "interval" => $interval != "" ? $interval : "10"
+            "interval" => $interval != "" ? $interval : "10",
         ]);
+    }
+
+    public function restrictedMode()
+    {
+        $flag = setenv([
+            "LIMAN_RESTRICTED" => request('LIMAN_RESTRICTED')
+                ? 'true'
+                : 'false',
+            "LIMAN_RESTRICTED_SERVER" => request('LIMAN_RESTRICTED_SERVER'),
+            "LIMAN_RESTRICTED_EXTENSION" => request(
+                'LIMAN_RESTRICTED_EXTENSION'
+            ),
+        ]);
+        if ($flag) {
+            return respond("Kısıtlı mod ayarları başarıyla güncellendi!");
+        } else {
+            return respond("Kısıtlı mod ayarları güncellenemedi!", 201);
+        }
+    }
+
+    public function getDNSServers()
+    {
+        $data = `grep nameserver /etc/resolv.conf | grep -v "#" | grep nameserver`;
+        $arr = explode("\n", $data);
+        $clean = [];
+        foreach ($arr as $ip) {
+            if ($ip == "") {
+                continue;
+            }
+            $foo = explode(" ", trim($ip));
+            array_push($clean, $foo[1]);
+        }
+        return respond($clean);
+    }
+
+    public function setDNSServers()
+    {
+        `sudo chattr -i /etc/resolv.conf`;
+        $str = "
+options rotate timeout:1 retries:1
+";
+        foreach ([request('dns1'), request('dns2'), request('dns3')] as $ip) {
+            if ($ip == null) {
+                continue;
+            }
+            $str .= "nameserver $ip
+";
+        }
+        $str = trim($str);
+        $output = `echo "$str" | sudo tee /etc/resolv.conf`;
+        $compare = trim(`cat /etc/resolv.conf`) == $str ? true : false;
+        if ($compare) {
+            `sudo chattr +i /etc/resolv.conf`;
+            return respond("DNS Ayarları güncellendi!");
+        } else {
+            return respond("DNS Ayarları güncellenemedi!", 201);
+        }
     }
 }

@@ -19,9 +19,9 @@
         <small class="form-text text-muted">{{__(explode(":", $name,3)[2])}}</small>
         @endisset
     @else
-        @php
-            $placeholder = isset(explode(":", $input,3)[2]) ? explode(":", $input,3)[2] : "";
-        @endphp
+        <?php $placeholder = isset(explode(":", $input, 3)[2])
+            ? explode(":", $input, 3)[2]
+            : ""; ?>
         @if(explode(":", $input)[1] == "hidden")
             @if(explode(":", $input)[1] == "checkbox")
                 <div class="form-check">

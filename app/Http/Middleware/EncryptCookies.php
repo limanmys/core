@@ -12,8 +12,7 @@ class EncryptCookies extends Middleware
      * @var array
      */
     protected $except = [
-
         // We are using this in order to allow WebSSH to read unencrypted xsrf cookie.
-        "_xsrf"
+        "_xsrf",
     ];
 }
