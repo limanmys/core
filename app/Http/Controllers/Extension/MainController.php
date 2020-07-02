@@ -185,9 +185,16 @@ class MainController extends Controller
 
         $json = json_decode($file, true);
 
-        // if(array_key_exists("supportedLiman",$json) && version_compare(getVersion(),$json["supportedLiman"]) < 0){
-        //     return respond("Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum sürüm " . $json["supportedLiman"],201);
-        // }
+        if (
+            array_key_exists("supportedLiman", $json) &&
+            getVersionCode() < intval($json["supportedLiman"])
+        ) {
+            return respond(
+                "Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu" .
+                    $json["supportedLiman"],
+                201
+            );
+        }
 
         if (isset($verify)) {
             $json["issuer"] = explode(" ", $verify, 4)[3];

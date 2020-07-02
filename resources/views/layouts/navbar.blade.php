@@ -1,9 +1,8 @@
 @if(env('LIMAN_RESTRICTED') == true && !user()->isAdmin())
 <nav class="main-header navbar navbar-expand navbar-dark" style="margin-left:0px;max-height:60px">
-<ul class="navbar-nav"  style="line-height:45px;">
-<a href="/" class="brand-link">
-        <img src="/images/liman_logo-white.svg" height="30" style="opacity: .8;margin-left: 0.3rem;">
-          <span class="right badge badge-success" style="margin-left:10px;">{{getVersion()}}</span>
+<ul class="navbar-nav"  style="line-height:60px;">
+        <a onclick="partialPageRequest('/')" class="brand-link">
+            <img src="/images/limanlogo.png" height="30" style="opacity: .8;cursor:pointer;" title="Versiyon {{getVersion()}}">
         </a>
 <li class="nav-item d-none d-sm-inline-block">
               <a href="/" class="nav-link">{{__("Ana Sayfa")}}</a>
@@ -30,6 +29,14 @@
 	}
 </script>
         </ul>
+<div style="line-height:58.86px;">
+  <form class="navbar-form navbar-left" role="search">
+    <div class="form-group">
+      <input type="text" class="form-control" id="navbar-search-input" placeholder="Search">
+    </div>
+  </form>
+</div>
+        
         <!-- Right navbar links -->
         <ul class="navbar-nav ml-auto">
           <li class="nav-item dropdown">
@@ -70,7 +77,7 @@
 
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                     <div class="card card-widget widget-user-2" style="margin-bottom: 0px;">
-                        <div class="widget-user-header bg-warning" style="color:black">
+                        <div class="widget-user-header bg-secondary" style="color:white">
                           <h3 class="widget-user-username" style="margin-left: 0px;">{{user()->name}}</h3>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Son Giriş Tarihi : ") . user()->last_login_at}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Giriş Yapılan Son Ip : ") . user()->last_login_ip}}</h5>

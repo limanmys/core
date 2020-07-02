@@ -45,7 +45,7 @@ class MarketController extends Controller
         $client = self::getClient();
 
         $params = [];
-        $limanCode = trim(file_get_contents(storage_path('VERSION_CODE')));
+        $limanCode = getVersionCode();
 
         array_push($params, [
             "packageName" => "Liman.Core",

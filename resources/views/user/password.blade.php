@@ -1,20 +1,20 @@
 <?php
-    if(user()->forceChange != true){
-        header('Location: '.route('home'));
-        die();
-    }
-?>
+if (user()->forceChange != true) {
+    header('Location: ' . route('home'));
+    die();
+} ?>
 
 @extends('layouts.app')
 
 @section('body_class', 'login-page')
-<div style="position: absolute;top: 0px;right:0px;">
+<div style="position: absolute;top: 0px;right:0px;cursor:pointer;">
     <a onclick="request('/cikis',new FormData(),null)" class="btn btn-default btn-flat">{{__("Çıkış Yap")}}</a>
 </div>
 @section('body')
     <div class="login-box">
         <div class="login-logo">
-            <b>Liman</b>
+            <a><b><img src="/images/limanlogo.png" height="50"><br></b></a>
+            <h5>{{env("BRAND_NAME")}}</h5>
         </div>
         @if ($errors->count() > 0 )
         <div class="alert alert-danger">
@@ -57,4 +57,34 @@
             </div>
         </div>
     </div>
+
+    <style>
+        .login-page, .card-body {
+            background: linear-gradient(261deg, #007bff, #343a40);
+            background-size: 400% 400%;
+
+            -webkit-animation: AnimationName 0s ease infinite;
+            -moz-animation: AnimationName 0s ease infinite;
+            animation: AnimationName 0s ease infinite;
+        }
+
+        @-webkit-keyframes AnimationName {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+        @-moz-keyframes AnimationName {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+        @keyframes AnimationName {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+        .login-box, .card-body {
+            color:white;
+        }
+    </style>
 @stop

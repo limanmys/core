@@ -3,8 +3,7 @@
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a onclick="partialPageRequest('/')" class="brand-link">
-        <img src="/images/liman_logo-white.svg" height="30" style="opacity: .8;margin-left: 0.3rem;">
-          <span class="right badge badge-success" style="margin-left:10px;">{{getVersion()}}</span>
+            <img src="/images/limanlogo.png" height="30" style="opacity: .8;margin-left: 0.3rem;cursor:pointer;" title="Versiyon {{getVersion()}}">
         </a>
         <!-- Sidebar -->
         <div class="sidebar">  
@@ -34,7 +33,7 @@
                         </li>
                         @foreach ($server->extensions() as $extension)
                         <li class="nav-item">
-                            <a onclick="partialPageRequest('/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}')" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
+                            <a onclick="window.location.href = '/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}'" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
                                 <i class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-'.$extension->icon}}"></i>
                                 <p>{{__($extension->display_name)}}</p>
                             </a>
@@ -107,7 +106,7 @@
                     </a>
                 </li>
               @endif
-              <li class="nav-header">{{__("Hesabım")}}</li>
+              <li class="nav-header">{{__("Hesap")}}</li>
               <li class="nav-item">
                   <a href='/profil' onclick="partialPageRequest('/profil');return false;" class="nav-link">
                       <i class="nav-icon fas fa-user"></i>

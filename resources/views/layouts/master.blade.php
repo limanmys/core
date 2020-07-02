@@ -99,6 +99,7 @@
             window.location.hash = $(this).attr("href");
         });
         initialPresets();
+        navigateButtons();
         activeTab();
         var title = $(".breadcrumb-item.active").text();
         if(title !== undefined){
@@ -133,7 +134,9 @@
             width: 'resolve'
         });
         $(":input").inputmask();
+    }
 
+    function navigateButtons(){
         jQuery(function($) {
             var path = window.location.href;
             $('nav ul a').each(function() {

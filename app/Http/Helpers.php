@@ -230,6 +230,16 @@ if (!function_exists('getVersion')) {
     }
 }
 
+if (!function_exists('getVersionCode')) {
+    /**
+     * @return mixed
+     */
+    function getVersionCode()
+    {
+        return intval(file_get_contents(storage_path('VERSION_CODE')));
+    }
+}
+
 if (!function_exists('notifications')) {
     /**
      * @return mixed
