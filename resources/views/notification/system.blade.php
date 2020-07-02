@@ -59,7 +59,7 @@ switch ($notification->type) {
 @extends('layouts.app')
 
 @section('content')
-    <div class="row">
+    <div class="row pt-3">
         <div class="col-md-12">
             @include('errors')
             <div class="timeline">
