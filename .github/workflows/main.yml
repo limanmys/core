@@ -10,13 +10,6 @@ jobs:
         with:
           path: package/liman/server
 
-      - name: Checking code format
-        run: |
-          sudo apt install npm -y
-          cd package/liman/server/
-          npm install
-          npm run check
-
       - name: Getting Liman' PHP Sandbox
         uses: actions/checkout@v2
         with:
@@ -40,7 +33,7 @@ jobs:
       - name: Get Composer Cache Directory
         id: composer-cache
         run: |
-          echo "::set-output name=dir::$(composer config package/liman/server)"
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
       - uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
