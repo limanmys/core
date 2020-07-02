@@ -1,15 +1,26 @@
 <?php
-$item = \App\Notification::where([
+$item = \App\Models\Notification::where([
     "user_id" => auth()->id(),
-    "id" => request('notification_id')
+    "id" => request('notification_id'),
 ])->first();
-if(!$item){
-    if(auth()->user()->isAdmin() && \App\AdminNotification::find(request('notification_id'))->exists()){
-        header("Location: " . route('system_notification',[
-                "notification_id" => request('notification_id')
-        ]), true);
+if (!$item) {
+    if (
+        auth()
+            ->user()
+            ->isAdmin() &&
+        \App\Models\AdminNotification::find(
+            request('notification_id')
+        )->exists()
+    ) {
+        header(
+            "Location: " .
+                route('system_notification', [
+                    "notification_id" => request('notification_id'),
+                ]),
+            true
+        );
         exit();
-    }else{
+    } else {
         return redirect()->back();
     }
 }

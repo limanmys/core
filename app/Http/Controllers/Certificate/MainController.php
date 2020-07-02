@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Certificate;
 
-use App\AdminNotification;
-use App\Certificate;
-use App\Server;
+use App\Models\AdminNotification;
+use App\Models\Certificate;
+use App\Models\Server;
 use App\Http\Controllers\Controller;
 
 class MainController extends Controller
@@ -32,14 +32,15 @@ class MainController extends Controller
             ".crt";
         $cert = file_get_contents('/tmp/' . request('path'));
         shell_exec(
-            "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . strtolower($file)
+            "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" .
+                strtolower($file)
         );
         shell_exec("sudo update-ca-certificates");
 
         // Create Certificate Object.
         $cert = Certificate::create([
             "server_hostname" => strtolower(request('server_hostname')),
-            "origin" => request('origin')
+            "origin" => request('origin'),
         ]);
 
         // Update Admin Notification

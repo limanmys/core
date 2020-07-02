@@ -2,11 +2,11 @@
 
 namespace App\Classes\Connector;
 
-use App\Server;
-use App\UserSettings;
+use App\Models\Server;
+use App\Models\UserSettings;
 use GuzzleHttp\Client;
 use Illuminate\Support\Str;
-use App\ConnectorToken;
+use App\Models\ConnectorToken;
 
 class WinRMConnector implements Connector
 {
@@ -85,14 +85,10 @@ class WinRMConnector implements Connector
             $params["token"] = ConnectorToken::get(
                 server()->id
             )->first()->token;
-            $res = $client->request(
-                'POST',
-                'http://127.0.0.1:5000/' . $url,
-                [
-                    "form_params" => $params,
-                    'timeout' => 5,
-                ]
-            );
+            $res = $client->request('POST', 'http://127.0.0.1:5000/' . $url, [
+                "form_params" => $params,
+                'timeout' => 5,
+            ]);
         } catch (\Exception $e) {
             // In case of error, handle error.
             $json = json_decode(
@@ -172,19 +168,15 @@ class WinRMConnector implements Connector
     ) {
         $client = new Client();
         try {
-            $res = $client->request(
-                'POST',
-                'http://127.0.0.1:5000/new',
-                [
-                    'form_params' => [
-                        "username" => $username,
-                        "password" => $password,
-                        "hostname" => $hostname,
-                        "connection_type" => "winrm",
-                    ],
-                    'timeout' => 5,
-                ]
-            );
+            $res = $client->request('POST', 'http://127.0.0.1:5000/new', [
+                'form_params' => [
+                    "username" => $username,
+                    "password" => $password,
+                    "hostname" => $hostname,
+                    "connection_type" => "winrm",
+                ],
+                'timeout' => 5,
+            ]);
         } catch (\Exception $e) {
             return null;
         }

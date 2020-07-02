@@ -55,11 +55,17 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
     Route::post('/collapse', 'HomeController@collapse')->name('set_collapse');
 
     // Market Routes
-    
-    Route::post('/market/kontrol', 'MarketController@verifyMarketConnection')->name('verify_market')->middleware('admin');
 
-    Route::post('/market/guncellemeKontrol', 'MarketController@checkMarketUpdates')->name('check_updates_market')->middleware('admin');
+    Route::post('/market/kontrol', 'MarketController@verifyMarketConnection')
+        ->name('verify_market')
+        ->middleware('admin');
 
+    Route::post(
+        '/market/guncellemeKontrol',
+        'MarketController@checkMarketUpdates'
+    )
+        ->name('check_updates_market')
+        ->middleware('admin');
 
     // Home Route
 
@@ -173,7 +179,7 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 Route::any('/upload/{any?}', function () {
     $server = app('tus-server');
     $extension_id = request("extension_id");
-    $extension = \App\Extension::find($extension_id);
+    $extension = \App\Models\Extension::find($extension_id);
     if ($extension) {
         $path = "/liman/extensions/" . strtolower($extension->name);
     } else {

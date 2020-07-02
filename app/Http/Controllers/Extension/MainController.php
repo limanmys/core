@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Extension;
 
-use App\Extension;
+use App\Models\Extension;
 use App\Http\Controllers\Controller;
 use Exception;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -146,12 +146,12 @@ class MainController extends Controller
                 );
             }
         }
-        list($error,$new) = self::setupNewExtension($zipFile);
+        list($error, $new) = self::setupNewExtension($zipFile);
 
-        if($error){
+        if ($error) {
             return $error;
         }
-        
+
         system_log(3, "EXTENSION_UPLOAD_SUCCESS", [
             "extension_id" => $new->id,
         ]);
@@ -185,9 +185,16 @@ class MainController extends Controller
 
         $json = json_decode($file, true);
 
-        // if(array_key_exists("supportedLiman",$json) && version_compare(getVersion(),$json["supportedLiman"]) < 0){
-        //     return respond("Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum sürüm " . $json["supportedLiman"],201);
-        // }
+        if (
+            array_key_exists("supportedLiman", $json) &&
+            getVersionCode() < intval($json["supportedLiman"])
+        ) {
+            return respond(
+                "Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu" .
+                    $json["supportedLiman"],
+                201
+            );
+        }
 
         if (isset($verify)) {
             $json["issuer"] = explode(" ", $verify, 4)[3];
@@ -262,7 +269,7 @@ class MainController extends Controller
                 "db.json;
         "
         );
-        return [null,$new];
+        return [null, $new];
     }
 
     public function newExtension()
@@ -391,12 +398,17 @@ class MainController extends Controller
 
     public function autoUpdateExtension()
     {
-        $json = json_decode(file_get_contents(storage_path('extension_updates')),true);
+        $json = json_decode(
+            file_get_contents(storage_path('extension_updates')),
+            true
+        );
         $collection = collect($json);
-        $obj = $collection->where('extension_id',request("extension_id"))->first();
+        $obj = $collection
+            ->where('extension_id', request("extension_id"))
+            ->first();
 
-        if(!$obj){
-            return respond("Eklenti Bulunamadı",201);
+        if (!$obj) {
+            return respond("Eklenti Bulunamadı", 201);
         }
 
         $job = (new ExtensionUpdaterJob(
@@ -409,6 +421,8 @@ class MainController extends Controller
         // Dispatch job right away.
         $job_id = app(Dispatcher::class)->dispatch($job);
 
-        return respond("Talebiniz başarıyla alındı, eklenti güncellendiğinde bildirim alacaksınız.");
+        return respond(
+            "Talebiniz başarıyla alındı, eklenti güncellendiğinde bildirim alacaksınız."
+        );
     }
 }

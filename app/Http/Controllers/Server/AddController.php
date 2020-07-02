@@ -2,30 +2,30 @@
 
 namespace App\Http\Controllers\Server;
 
-use App\AdminNotification;
-use App\Certificate;
+use App\Models\AdminNotification;
+use App\Models\Certificate;
 use App\Classes\Connector\SSHConnector;
 use App\Classes\Connector\SNMPConnector;
 use App\Classes\Connector\SSHCertificateConnector;
 use App\Classes\Connector\WinRMConnector;
 use App\Http\Controllers\Controller;
-use App\Permission;
-use App\Server;
+use App\Models\Permission;
+use App\Models\Server;
 use Illuminate\Support\Str;
-use App\Notification;
-use App\UserSettings;
+use App\Models\Notification;
+use App\Models\UserSettings;
 
 class AddController extends Controller
 {
     /**
-     * @var \App\Server
+     * @var \App\Models\Server
      */
     public $server;
 
     public function main()
     {
-        if(!Permission::can(user()->id,'liman','id','add_server')){
-            return respond("Bu işlemi yapmak için yetkiniz yok!",201);
+        if (!Permission::can(user()->id, 'liman', 'id', 'add_server')) {
+            return respond("Bu işlemi yapmak için yetkiniz yok!", 201);
         }
 
         hook('server_add_attempt', [
@@ -46,7 +46,9 @@ class AddController extends Controller
         $this->server = new Server();
         $this->server->fill(request()->all());
         $this->server->user_id = auth()->id();
-        request('key_port') ? $this->server->key_port = request('key_port') : null;
+        request('key_port')
+            ? ($this->server->key_port = request('key_port'))
+            : null;
         // Check if Server is online or not.
         if (!$this->server->isAlive()) {
             return respond("Sunucuyla bağlantı kurulamadı.", 406);
@@ -96,12 +98,17 @@ class AddController extends Controller
                 "name" => "clientPassword",
                 "value" => $encryptedPassword,
             ]);
-        }else if(server()->type == "snmp"){
+        } elseif (server()->type == "snmp") {
             $targetValues = [
-                "username","SNMPsecurityLevel","SNMPauthProtocol","SNMPauthPassword","SNMPprivacyProtocol","SNMPprivacyPassword"
+                "username",
+                "SNMPsecurityLevel",
+                "SNMPauthProtocol",
+                "SNMPauthPassword",
+                "SNMPprivacyProtocol",
+                "SNMPprivacyPassword",
             ];
             $encKey = env('APP_KEY') . user()->id . server()->id;
-            foreach($targetValues as $target){
+            foreach ($targetValues as $target) {
                 $encrypted = openssl_encrypt(
                     Str::random(16) . base64_encode(request($target)),
                     'aes-256-cfb8',
@@ -158,7 +165,7 @@ class AddController extends Controller
             request('password'),
             auth()->id(),
             null,
-            $this->server->key_port,
+            $this->server->key_port
         );
 
         if (!$flag) {
@@ -179,9 +186,9 @@ class AddController extends Controller
             request('SNMPauthPassword'),
             request('SNMPprivacyProtocol'),
             request('SNMPprivacyPassword'),
-            user()->id,
+            user()->id
         );
-        
+
         if (!$flag) {
             $this->server->delete();
             return respond("SNMP Hatası", 400);

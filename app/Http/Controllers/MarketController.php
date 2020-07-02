@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
-use App\Extension;
+use App\Models\Extension;
 use App\Jobs\ExtensionUpdaterJob;
 use App\Jobs\LimanUpdaterJob;
 use GuzzleHttp\Exception\BadResponseException;
@@ -45,7 +45,7 @@ class MarketController extends Controller
         $client = self::getClient();
 
         $params = [];
-        $limanCode = trim(file_get_contents(storage_path('VERSION_CODE')));
+        $limanCode = getVersionCode();
 
         array_push($params, [
             "packageName" => "Liman.Core",

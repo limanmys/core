@@ -2,9 +2,8 @@
       <!-- Main Sidebar Container -->
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
-        <a onclick="partialPageRequest('/')" class="brand-link">
-        <img src="/images/liman_logo-white.svg" height="30" style="opacity: .8;margin-left: 0.3rem;">
-          <span class="right badge badge-success" style="margin-left:10px;">{{getVersion()}}</span>
+        <a href="/" onclick="partialPageRequest('/');return false;" class="brand-link">
+            <img src="/images/limanlogo.png" height="30" style="opacity: .8;margin-left: 0.3rem;cursor:pointer;" title="Versiyon {{getVersion()}}">
         </a>
         <!-- Sidebar -->
         <div class="sidebar">  
@@ -34,7 +33,7 @@
                         </li>
                         @foreach ($server->extensions() as $extension)
                         <li class="nav-item">
-                            <a onclick="partialPageRequest('/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}')" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
+                            <a onclick="window.location.href = '/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}'" class="nav-link @if(request('extension_id') == $extension->id) active @endif">
                                 <i class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-'.$extension->icon}}"></i>
                                 <p>{{__($extension->display_name)}}</p>
                             </a>
@@ -75,7 +74,7 @@
               @endif
               @if(auth()->user()->isAdmin())
                 <li class="nav-header">{{__("Yönetim Paneli")}}</li>
-                @if(\App\Module::exists())
+                @if(\App\Models\Module::exists())
                 <li class="nav-item">
                     <a href='/modules' onclick="partialPageRequest('/modules');return false;" class="nav-link">
                         <i class="nav-icon fas fa-puzzle-piece"></i>
@@ -93,8 +92,8 @@
                     <a href='/talepler' onclick="partialPageRequest('/talepler');return false;" class="nav-link">
                         <i class="nav-icon fas fa-plus"></i>
                         <p>{{__("Yetki Talepleri")}}</p>
-                        @if(\App\LimanRequest::where('status',0)->count())
-                            <span class="badge badge-info right">{{\App\LimanRequest::where('status',0)->count()}}</span>
+                        @if(\App\Models\LimanRequest::where('status',0)->count())
+                            <span class="badge badge-info right">{{\App\Models\LimanRequest::where('status',0)->count()}}</span>
                         @endif
                     </a>
                 </li>
@@ -107,7 +106,7 @@
                     </a>
                 </li>
               @endif
-              <li class="nav-header">{{__("Hesabım")}}</li>
+              <li class="nav-header">{{__("Hesap")}}</li>
               <li class="nav-item">
                   <a href='/profil' onclick="partialPageRequest('/profil');return false;" class="nav-link">
                       <i class="nav-icon fas fa-user"></i>

@@ -24,14 +24,16 @@ class RestrictedMode
             "logout",
             "password_change",
             "password_change_save",
-            "set_locale"
+            "set_locale",
         ];
         if (env('LIMAN_RESTRICTED') == true && user() && !user()->isAdmin()) {
             $request->request->add([
                 'server_id' => env('LIMAN_RESTRICTED_SERVER'),
                 'extension_id' => env('LIMAN_RESTRICTED_EXTENSION'),
-                "server" => \App\Server::find(env('LIMAN_RESTRICTED_SERVER')),
-                "extension" => \App\Extension::find(
+                "server" => \App\Models\Server::find(
+                    env('LIMAN_RESTRICTED_SERVER')
+                ),
+                "extension" => \App\Models\Extension::find(
                     env('LIMAN_RESTRICTED_EXTENSION')
                 ),
             ]);

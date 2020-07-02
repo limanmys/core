@@ -10,13 +10,6 @@ jobs:
         with:
           path: package/liman/server
 
-      - name: Checking code format
-        run: |
-          sudo apt install npm -y
-          cd package/liman/server/
-          npm install
-          npm run check
-
       - name: Getting Liman' PHP Sandbox
         uses: actions/checkout@v2
         with:
@@ -37,7 +30,17 @@ jobs:
           repository: mertcelen/webssh
           path: package/liman/webssh
           token: ${{ secrets.CI_TOKEN }}
-
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          cd package/liman/server
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
       - name: Set up Liman Environment
         uses: shivammathur/setup-php@v2
         with:
@@ -48,12 +51,11 @@ jobs:
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt install jq -y 1>/dev/null 2>/dev/null
           VERSION=`cat package/liman/server/storage/VERSION`
-          echo $GITHUB_RUN_ID > package/liman/server/storage/VERSION_CODE
+          echo $GITHUB_RUN_NUMBER > package/liman/server/storage/VERSION_CODE
           COMMIT="${GITHUB_REF#refs/heads/} : "
           COMMIT+=`git --git-dir=package/liman/server/.git log -1 --pretty=%B`
           COMMIT=`echo $COMMIT | jq -SrR @uri`
           DATE=$(date)
-          composer clearcache
           composer install --no-dev -d package/liman/server
           git --git-dir=package/liman/server/.git log -30 --pretty=format:"%s%x09%ad" > package/liman/server/storage/changelog
           rm -rf package/liman/server/.git package/liman/sandbox/php/.git package/liman/sandbox/python/.git
@@ -71,8 +73,8 @@ jobs:
           chmod 775 DEBIAN/postinst
 
           echo """Package: Liman
-          Version: $VERSION-$GITHUB_RUN_ID
-          Installed-Size: 29892
+          Version: $VERSION-$GITHUB_RUN_NUMBER
+          Installed-Size: 77892
           Maintainer: Mert CELEN <mcelen@havelsan.com.tr>
           Section: admin
           Date : $DATE
@@ -84,5 +86,5 @@ jobs:
           cd ../
           dpkg-deb -Zgzip --build package
           [ "$GITHUB_REF" == "refs/heads/master" ] && CHANNEL="liman-release" || CHANNEL="liman-dev-release"
-          [ "$GITHUB_REF" == "refs/heads/master" ] && FILE_NAME="liman-$VERSION-$GITHUB_RUN_ID.deb" || FILE_NAME="liman-${GITHUB_REF#refs/heads/}-$VERSION-$GITHUB_RUN_ID.deb"
+          [ "$GITHUB_REF" == "refs/heads/master" ] && FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER.deb" || FILE_NAME="liman-${GITHUB_REF#refs/heads/}-$VERSION-$GITHUB_RUN_NUMBER.deb"
           curl -F "file=@/home/runner/work/liman/liman/package.deb" "https://slack.com/api/files.upload?token=xoxb-474187933397-695167035444-NFLf9tgYahuMsmeT7rwp5wnD&channels=$CHANNEL&filename=$FILE_NAME&pretty=1&initial_comment=$COMMIT" || echo

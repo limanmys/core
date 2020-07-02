@@ -6,14 +6,14 @@ use App\Classes\Connector\SSHConnector;
 use App\Classes\Connector\SNMPConnector;
 use App\Classes\Connector\SSHCertificateConnector;
 use App\Classes\Connector\WinRMConnector;
-use App\Server;
+use App\Models\Server;
 use App\Http\Controllers\Controller;
 
 class MainController extends Controller
 {
     public function checkAccess()
     {
-        if(request('port') == -1){
+        if (request('port') == -1) {
             return respond("Sunucuya başarıyla erişim sağlandı.", 200);
         }
         $status = @fsockopen(
@@ -72,7 +72,7 @@ class MainController extends Controller
                 request('password'),
                 request('port')
             );
-        } elseif( request('key_type') == "snmp"){
+        } elseif (request('key_type') == "snmp") {
             return SNMPConnector::verifySnmp(
                 request('ip_address'),
                 request('username'),
@@ -80,7 +80,7 @@ class MainController extends Controller
                 request('SNMPauthProtocol'),
                 request('SNMPauthPassword'),
                 request('SNMPprivacyProtocol'),
-                request('SNMPprivacyPassword'),
+                request('SNMPprivacyPassword')
             );
         }
         return respond("Bu anahtara göre bir yapı bulunamadı.", 201);

@@ -1,8 +1,8 @@
 <?php
 
-use App\User;
-use App\Module;
-use App\AdminNotification;
+use App\Models\User;
+use App\Models\Module;
+use App\Models\AdminNotification;
 use Illuminate\Support\Facades\Hash;
 
 Artisan::command('administrator', function () {
@@ -95,23 +95,42 @@ Artisan::command('scan:translations', function () {
 
 Artisan::command('module:add {module_name}', function ($module_name) {
     // Check if files are exists.
-    if (!is_dir("/liman/modules/$module_name")) {
-        return $this->error("Modul klasoru bulunamadi!");
+    $basePath = "/liman/modules/$module_name";
+
+    if (!is_dir($basePath) || !is_file($basePath . "/db.json")) {
+        return $this->error("Modül okunamadı!");
     }
 
-    if (Module::where(["name" => $module_name])->exists()) {
-        return $this->error("Boyle bir modul zaten var!");
+    //Check if module supported or not.
+    $json = json_decode(file_get_contents($basePath . "/db.json"), true);
+    if (getVersionCode() < intval(trim($json["minLimanSupported"]))) {
+        return $this->error(
+            "Bu modülü yüklemek için önce liman'ı güncellemelisiniz!"
+        );
     }
-    $module = Module::create(["name" => $module_name, "enabled" => true]);
 
-    $notification = new AdminNotification([
-        "title" => "Yeni Modül Eklendi",
-        "type" => "new_module",
-        "message" => "$module->name isminde bir modül sisteme eklendi.",
-        "level" => 3,
-    ]);
+    $flag = Module::where(["name" => $module_name])->exists();
+
+    if (!$flag) {
+        $module = Module::create(["name" => $module_name, "enabled" => true]);
+
+        $notification = new AdminNotification([
+            "title" => "Yeni Modül Eklendi",
+            "type" => "new_module",
+            "message" => "$module_name isminde bir modül sisteme eklendi.",
+            "level" => 3,
+        ]);
+    } else {
+        $notification = new AdminNotification([
+            "title" => $module_name . " modülü güncellendi.",
+            "type" => "new_module",
+            "message" => "$module_name isminde bir modül güncellendi.",
+            "level" => 3,
+        ]);
+    }
+
     $notification->save();
-    $this->info("Modul basariyla yuklendi.");
+    $this->info("Modül başarıyla yüklendi.");
 })->describe("New module add");
 
 Artisan::command('module:remove {module_name}', function ($module_name) {

@@ -5,7 +5,7 @@
 @section('body')
     <div class="login-box">
         <div class="login-logo">
-            <a><b><img src="/images/liman_logo-white.svg" height="50"><br> Merkezi Yönetim Sistemi</b></a>
+            <a><b><img src="/images/limanlogo.png" height="50"><br></b></a>
             <h5>{{env("BRAND_NAME")}}</h5>
         </div>
         <div class="card">
@@ -59,7 +59,7 @@
                 </form>
             </div>
         </div>
-        <center><h6>Havelsan © 2020 <a href="https://liman.havelsan.com.tr" target="_blank">(İletişim)</a></h6></center>
+        <center><a href="https://liman.havelsan.com.tr" target="_blank"><img src="/images/havelsan-aciklab.png" height="50"></a></center>
     </div>
     <style>
         .login-page, .card-body {

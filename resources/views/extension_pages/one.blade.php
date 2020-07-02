@@ -47,8 +47,9 @@
                         <input id="support" type="text" name="email" class="form-control" value="{{$extension["support"]}}" required><br>
                         <h3>{{__("Logo (Font Awesome Ikon)")}}</h3>
                         <input id="icon" type="text" name="icon" class="form-control" value="{{$extension["icon"]}}" required><br>
-                        <h3>{{__("Gerekli Minimum Liman Sürümü")}}</h3>
-                        <input id="supportedLiman" type="text" name="icon" class="form-control" value="{{array_key_exists("supportedLiman",$extension) ? $extension["supportedLiman"] : getVersion()}}" required><br>
+                        <h3>{{__("Gerekli Minimum Liman Sürüm Kodu")}}</h3>
+                        <span style="cursor:pointer;" onclick="$('#supportedLiman').val('{{getVersionCode()}}')">{{__("Mevcut Liman Sürüm Kodunu Al")}}</span>
+                        <input id="supportedLiman" type="text" name="icon" class="form-control" value="{{array_key_exists("supportedLiman",$extension) ? $extension["supportedLiman"] : getVersionCode()}}" required><br>
                         <h3>{{__("Versiyon")}}</h3>
                         <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}" required><br>
                         <h3>{{__("Ayar Doğrulama Fonksiyonu/Betiği")}}</h3>

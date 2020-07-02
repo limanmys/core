@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,6 +12,6 @@ class RoleMapping extends Model
 
     public function role()
     {
-        return $this->belongsTo('App\Role');
+        return $this->belongsTo('App\Models\Role');
     }
 }

@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Server;
-use App\LdapRestriction;
-use App\UserSettings;
+use App\Models\Server;
+use App\Models\LdapRestriction;
+use App\Models\UserSettings;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use App\User;
-use App\RoleMapping;
-use App\RoleUser;
+use App\Models\User;
+use App\Models\RoleMapping;
+use App\Models\RoleUser;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;

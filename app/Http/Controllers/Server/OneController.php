@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Server;
 
 use App\Classes\Connector\SSHConnector;
 use App\Classes\Connector\WinRMConnector;
-use App\ConnectorToken;
-use App\Extension;
+use App\Models\ConnectorToken;
+use App\Models\Extension;
 use App\Http\Controllers\Controller;
-use App\Notification;
-use App\User;
-use App\Permission;
+use App\Models\Notification;
+use App\Models\User;
+use App\Models\Permission;
 use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Cookie\CookieJar;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use View;
 use GuzzleHttp\Client;
-use App\UserSettings;
+use App\Models\UserSettings;
 
 class OneController extends Controller
 {
@@ -76,9 +76,9 @@ class OneController extends Controller
     public function serviceCheck()
     {
         if (is_numeric(extension()->service)) {
-            if(extension()->service == -1){
+            if (extension()->service == -1) {
                 $flag = true;
-            }else{
+            } else {
                 $status = @fsockopen(
                     server()->ip_address,
                     extension()->service,
@@ -1184,7 +1184,7 @@ class OneController extends Controller
             server()->run(
                 sudo() .
                     "lsof -i -P -n | grep -v '\-'| awk -F' ' '{print $1,$3,$5,$8,$9}' | sed 1,1d"
-                    )
+            )
         );
         $arr = [];
         foreach (explode("\n", $output) as $line) {

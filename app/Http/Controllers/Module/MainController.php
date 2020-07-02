@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Module;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Module;
+use App\Models\Module;
 
 class MainController extends Controller
 {

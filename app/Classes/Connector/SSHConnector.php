@@ -4,9 +4,9 @@ namespace App\Classes\Connector;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
-use App\UserSettings;
+use App\Models\UserSettings;
 use Illuminate\Support\Str;
-use App\ConnectorToken;
+use App\Models\ConnectorToken;
 
 /**
  * Class SSHConnector
@@ -26,14 +26,19 @@ class SSHConnector implements Connector
 
     /**
      * SSHConnector constructor.
-     * @param \App\Server $server
+     * @param \App\Models\Server $server
      * @param null $user_id
      */
-    public function __construct(\App\Server $server, $user_id)
+    public function __construct(\App\Models\Server $server, $user_id)
     {
         if (!ConnectorToken::get($server->id)->exists()) {
             list($username, $password) = self::retrieveCredentials();
-            self::init($username, $password, $server->ip_address,$server->key_port ? $server->key_port : 22);
+            self::init(
+                $username,
+                $password,
+                $server->ip_address,
+                $server->key_port ? $server->key_port : 22
+            );
         }
 
         return true;
@@ -107,7 +112,7 @@ class SSHConnector implements Connector
     }
 
     /**
-     * @param \App\Server $server
+     * @param \App\Models\Server $server
      * @param $username
      * @param $password
      * @param $user_id
@@ -115,14 +120,19 @@ class SSHConnector implements Connector
      * @return bool
      */
     public static function create(
-        \App\Server $server,
+        \App\Models\Server $server,
         $username,
         $password,
         $user_id,
         $key,
         $port = null
     ) {
-        $token = self::init($username, $password, $server->ip_address,$port ? $port : 22);
+        $token = self::init(
+            $username,
+            $password,
+            $server->ip_address,
+            $port ? $port : 22
+        );
         if ($token) {
             return true;
         } else {
@@ -157,7 +167,12 @@ class SSHConnector implements Connector
     {
         if (!ConnectorToken::get(server()->id)->exists()) {
             list($username, $password) = self::retrieveCredentials();
-            self::init($username, $password, server()->ip_address,server()->key_port ? server()->key_port : 22);
+            self::init(
+                $username,
+                $password,
+                server()->ip_address,
+                server()->key_port ? server()->key_port : 22
+            );
         }
         // Create Guzzle Object.
         $client = new Client();
@@ -166,11 +181,9 @@ class SSHConnector implements Connector
             $params["token"] = ConnectorToken::get(
                 server()->id
             )->first()->token;
-            $res = $client->request(
-                'POST',
-                'http://127.0.0.1:5000/' . $url,
-                ["form_params" => $params]
-            );
+            $res = $client->request('POST', 'http://127.0.0.1:5000/' . $url, [
+                "form_params" => $params,
+            ]);
         } catch (BadResponseException $e) {
             // In case of error, handle error.
             $json = json_decode(
@@ -182,7 +195,12 @@ class SSHConnector implements Connector
             // If it's first time, retry after recreating ticket.
             if ($retry) {
                 list($username, $password) = self::retrieveCredentials();
-                self::init($username, $password, server()->ip_address,server()->key_port ? server()->key_port : 22);
+                self::init(
+                    $username,
+                    $password,
+                    server()->ip_address,
+                    server()->key_port ? server()->key_port : 22
+                );
                 return self::request($url, $params, $retry - 1);
             } else {
                 // If nothing works, abort.
@@ -203,20 +221,16 @@ class SSHConnector implements Connector
     ) {
         $client = new Client();
         try {
-            $res = $client->request(
-                'POST',
-                'http://127.0.0.1:5000/new',
-                [
-                    'form_params' => [
-                        "username" => $username,
-                        "password" => $password,
-                        "hostname" => $hostname,
-                        "port" => $port,
-                        "connection_type" => "ssh",
-                    ],
-                    'timeout' => 5,
-                ]
-            );
+            $res = $client->request('POST', 'http://127.0.0.1:5000/new', [
+                'form_params' => [
+                    "username" => $username,
+                    "password" => $password,
+                    "hostname" => $hostname,
+                    "port" => $port,
+                    "connection_type" => "ssh",
+                ],
+                'timeout' => 5,
+            ]);
         } catch (\Exception $e) {
             return null;
         }

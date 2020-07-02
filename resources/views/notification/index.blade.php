@@ -3,7 +3,7 @@
 @php($notifications = $notifications->groupBy(function ($date) {
     return \Carbon\Carbon::parse($date->created_at)->format("d.m.Y");
 }))
-<div class="row">
+<div class="row pt-3">
     <div class="col-md-12">
         @if($system)
             <button type="button" onclick="readSystemNotifications();reload();" style="margin-bottom: 5px;" class="btn btn-default btn-flat">{{__('Tümünü Okundu Olarak İşaretle')}}</button>

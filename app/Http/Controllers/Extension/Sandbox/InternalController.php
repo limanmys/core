@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Extension\Sandbox;
 
 use App\Classes\Connector\SSHTunnelConnector;
-use App\Extension;
+use App\Models\Extension;
 use App\Http\Controllers\Controller;
-use App\JobHistory;
+use App\Models\JobHistory;
 use App\Jobs\ExtensionJob;
-use App\Notification;
-use App\Permission;
-use App\Server;
-use App\Token;
+use App\Models\Notification;
+use App\Models\Permission;
+use App\Models\Server;
+use App\Models\Token;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;

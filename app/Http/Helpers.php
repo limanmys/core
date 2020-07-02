@@ -1,12 +1,12 @@
 <?php
 
-use App\AdminNotification;
-use App\Extension;
-use App\Notification;
-use App\Permission;
-use App\Server;
-use App\Certificate;
-use App\Module;
+use App\Models\AdminNotification;
+use App\Models\Extension;
+use App\Models\Notification;
+use App\Models\Permission;
+use App\Models\Server;
+use App\Models\Certificate;
+use App\Models\Module;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
@@ -230,6 +230,16 @@ if (!function_exists('getVersion')) {
     }
 }
 
+if (!function_exists('getVersionCode')) {
+    /**
+     * @return mixed
+     */
+    function getVersionCode()
+    {
+        return intval(file_get_contents(storage_path('VERSION_CODE')));
+    }
+}
+
 if (!function_exists('notifications')) {
     /**
      * @return mixed
@@ -411,7 +421,7 @@ if (!function_exists('system_log')) {
 
 if (!function_exists('server')) {
     /**
-     * @return \App\Server
+     * @return \App\Models\Server
      */
     function server()
     {
@@ -644,11 +654,11 @@ if (!function_exists('cleanArray')) {
 
 if (!function_exists('serverKey')) {
     /**
-     * @return App\Key
+     * @return App\Models\Key
      */
     function serverKey()
     {
-        return App\Key::where('server_id', server()->id)->first();
+        return App\Models\Key::where('server_id', server()->id)->first();
     }
 }
 
