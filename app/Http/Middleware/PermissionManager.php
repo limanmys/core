@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Permission;
+use App\Models\Permission;
 use Closure;
 use Illuminate\Support\Facades\Gate;
 

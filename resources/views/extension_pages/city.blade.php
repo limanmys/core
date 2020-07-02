@@ -1,14 +1,14 @@
 <?php
-    $servers = extension()->servers(request('city'));
-    if($servers->count() == 1){
-        $url = route('extension_server',[
-            "extension_id" => extension()->id,
-            "city" => request('city'),
-            "server_id" => $servers->first()->id
-        ]);
-        header("Location: $url", true);
-        exit();
-    }
+$servers = extension()->servers(request('city'));
+if ($servers->count() == 1) {
+    $url = route('extension_server', [
+        "extension_id" => extension()->id,
+        "city" => request('city'),
+        "server_id" => $servers->first()->id,
+    ]);
+    header("Location: $url", true);
+    exit();
+}
 ?>
 
 @extends('layouts.app')
@@ -48,7 +48,7 @@
     <script>
         function details(element) {
             var server_id = element.querySelector('#server_id').innerHTML;
-            partialPageRequest(window.location.href + "/" + server_id);
+            window.location.href = window.location.href + "/" + server_id;
         }
     </script>
     @endif

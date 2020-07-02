@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Permission;
 
-use App\LimanRequest;
-use App\Notification;
-use App\User;
+use App\Models\LimanRequest;
+use App\Models\Notification;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 
 class MainController extends Controller

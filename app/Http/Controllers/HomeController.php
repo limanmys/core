@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\LimanRequest;
-use App\Server;
-use App\Widget;
+use App\Models\LimanRequest;
+use App\Models\Server;
+use App\Models\Widget;
 
 class HomeController extends Controller
 {

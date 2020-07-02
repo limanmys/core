@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Extension;
 
 use App\Http\Controllers\Controller;
-use App\UserSettings;
+use App\Models\UserSettings;
 use Carbon\Carbon;
 use function request;
 use Illuminate\Http\JsonResponse;
@@ -98,7 +98,7 @@ class OneController extends Controller
                 }
             }
 
-            $sessions = \App\TmpSession::where(
+            $sessions = \App\Models\TmpSession::where(
                 'session_id',
                 session()->getId()
             )->get();
@@ -227,8 +227,8 @@ class OneController extends Controller
                 $similar[$item["variable"]] = base64_decode($stringToDecode);
             }
         }
-        
-        if(env('LIMAN_RESTRICTED') == true && !user()->isAdmin()){
+
+        if (env('LIMAN_RESTRICTED') == true && !user()->isAdmin()) {
             return response()->view('extension_pages.setup_restricted', [
                 'extension' => $extension,
                 'similar' => $similar,

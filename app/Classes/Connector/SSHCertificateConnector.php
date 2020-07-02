@@ -4,9 +4,9 @@ namespace App\Classes\Connector;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
-use App\UserSettings;
+use App\Models\UserSettings;
 use Illuminate\Support\Str;
-use App\ConnectorToken;
+use App\Models\ConnectorToken;
 use phpseclib\Net\SSH2;
 use phpseclib\Crypt\RSA;
 use phpseclib\Net\SFTP;
@@ -24,13 +24,18 @@ class SSHCertificateConnector implements Connector
     private $sftp = null;
     /**
      * SSHCertificateConnector constructor.
-     * @param \App\Server $server
+     * @param \App\Models\Server $server
      * @param null $user_id
      */
-    public function __construct(\App\Server $server, $user_id)
+    public function __construct(\App\Models\Server $server, $user_id)
     {
         list($username, $password) = self::retrieveCredentials();
-        self::init($username, $password, $server->ip_address,$server->key_port ? $server->key_port : 22);
+        self::init(
+            $username,
+            $password,
+            $server->ip_address,
+            $server->key_port ? $server->key_port : 22
+        );
         return true;
     }
 
@@ -67,7 +72,7 @@ class SSHCertificateConnector implements Connector
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
         if ($this->sftp == null) {
-            $sftp = new SFTP(server()->ip_address,server()->key_port);
+            $sftp = new SFTP(server()->ip_address, server()->key_port);
             list($username, $password) = self::retrieveCredentials();
             if (!$sftp->login($username, $password)) {
                 return false;
@@ -113,7 +118,7 @@ class SSHCertificateConnector implements Connector
     }
 
     public static function create(
-        \App\Server $server,
+        \App\Models\Server $server,
         $username,
         $password,
         $user_id,
@@ -146,9 +151,14 @@ class SSHCertificateConnector implements Connector
         return [lDecrypt($username["value"]), lDecrypt($password["value"])];
     }
 
-    public function init($username, $password, $hostname, $port = 22, $putSession = true)
-    {
-        $ssh = new SSH2($hostname,$port);
+    public function init(
+        $username,
+        $password,
+        $hostname,
+        $port = 22,
+        $putSession = true
+    ) {
+        $ssh = new SSH2($hostname, $port);
         $key = new RSA();
         $key->loadKey($password);
         if (!$ssh->login($username, $key)) {

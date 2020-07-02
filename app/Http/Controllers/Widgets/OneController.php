@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use App\Extension;
-use App\Permission;
-use App\Server;
-use App\Token;
-use App\Widget;
+use App\Models\Extension;
+use App\Models\Permission;
+use App\Models\Server;
+use App\Models\Token;
+use App\Models\Widget;
 use Illuminate\Http\Request;
-use App\UserSettings;
+use App\Models\UserSettings;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;

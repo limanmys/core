@@ -20,7 +20,7 @@
         <div class="col-md-9">
             <div class="card">
                 <div class="card-body">
-                        @if(\App\Permission::can(user()->id,'liman','id','add_server'))
+                        @if(\App\Models\Permission::can(user()->id,'liman','id','add_server'))
                         <button href="#tab_1" type="button" class="btn btn-success" data-toggle="modal" data-target="#add_server">{{__("Sunucu Ekle")}}</button><br><br>
                     @endif
                     

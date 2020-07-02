@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Roles;
 
 use App\Http\Controllers\Controller;
-use App\LdapRestriction;
+use App\Models\LdapRestriction;
 use Illuminate\Http\Request;
-use App\Role;
-use App\RoleMapping;
+use App\Models\Role;
+use App\Models\RoleMapping;
 use Illuminate\Support\Facades\Validator;
 
 class RoleMappingController extends Controller

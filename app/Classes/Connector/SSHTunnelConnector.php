@@ -2,7 +2,7 @@
 
 namespace App\Classes\Connector;
 
-use App\TunnelToken;
+use App\Models\TunnelToken;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 
@@ -56,11 +56,9 @@ class SSHTunnelConnector
         $client = new Client();
         // Make Request.
         try {
-            $res = $client->request(
-                'POST',
-                'http://127.0.0.1:5000/' . $url,
-                ["form_params" => $params]
-            );
+            $res = $client->request('POST', 'http://127.0.0.1:5000/' . $url, [
+                "form_params" => $params,
+            ]);
         } catch (BadResponseException $e) {
             // In case of error, handle error.
             $json = json_decode(

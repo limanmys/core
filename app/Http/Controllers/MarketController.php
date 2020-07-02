@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
-use App\Extension;
+use App\Models\Extension;
 use App\Jobs\ExtensionUpdaterJob;
 use App\Jobs\LimanUpdaterJob;
 use GuzzleHttp\Exception\BadResponseException;

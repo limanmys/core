@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Permission;
-use App\RoleUser;
-use App\User;
-use App\UserSettings;
-use App\AccessToken;
-use App\Server;
+use App\Models\Permission;
+use App\Models\RoleUser;
+use App\Models\User;
+use App\Models\UserSettings;
+use App\Models\AccessToken;
+use App\Models\Server;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
-use App\ConnectorToken;
+use App\Models\ConnectorToken;
 
 class UserController extends Controller
 {

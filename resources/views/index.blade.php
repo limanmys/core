@@ -8,7 +8,7 @@
             <span class="info-box-icon bg-info"><i class="fas fa-users"></i></span>
             <div class="info-box-content">
               <span class="info-box-text">{{__("Limandaki Sunucu Sayısı")}}</span>
-              <span class="info-box-number">{{\App\Server::all()->count()}}</span>
+              <span class="info-box-number">{{\App\Models\Server::all()->count()}}</span>
             </div>
           </div>
       </div>
@@ -17,7 +17,7 @@
             <span class="info-box-icon bg-info"><i class="fas fa-plus"></i></span>
             <div class="info-box-content">
               <span class="info-box-text">{{__("Limandaki Eklenti Sayısı")}}</span>
-              <span class="info-box-number">{{\App\Extension::all()->count()}}</span>
+              <span class="info-box-number">{{\App\Models\Extension::all()->count()}}</span>
             </div>
           </div>
       </div>
@@ -26,7 +26,7 @@
             <span class="info-box-icon bg-info"><i class="fas fa-user"></i></span>
             <div class="info-box-content">
               <span class="info-box-text">{{__("Limandaki Kullanıcı Sayısı")}}</span>
-              <span class="info-box-number">{{\App\User::all()->count()}}</span>
+              <span class="info-box-number">{{\App\Models\User::all()->count()}}</span>
             </div>
           </div>
       </div>
@@ -35,7 +35,7 @@
             <span class="info-box-icon bg-info"><i class="fas fa-cog"></i></span>
             <div class="info-box-content">
               <span class="info-box-text">{{__("Limandaki Ayar Sayısı")}}</span>
-              <span class="info-box-number">{{\App\UserSettings::all()->count()}}</span>
+              <span class="info-box-number">{{\App\Models\UserSettings::all()->count()}}</span>
             </div>
           </div>
       </div>

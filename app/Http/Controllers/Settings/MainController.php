@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\Settings;
 
-use App\Extension;
-use App\Permission;
-use App\Server;
-use App\User;
-use App\Role;
+use App\Models\Extension;
+use App\Models\Permission;
+use App\Models\Server;
+use App\Models\User;
+use App\Models\Role;
 use App\Http\Controllers\Controller;
-use App\AdminNotification;
-use App\Certificate;
-use App\RoleMapping;
-use App\RoleUser;
-use App\PermissionData;
-use App\ServerGroup;
+use App\Models\AdminNotification;
+use App\Models\Certificate;
+use App\Models\RoleMapping;
+use App\Models\RoleUser;
+use App\Models\PermissionData;
+use App\Models\ServerGroup;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 
@@ -58,7 +58,7 @@ class MainController extends Controller
     public function getUserList()
     {
         return view('l.table', [
-            "value" => \App\User::all(),
+            "value" => \App\Models\User::all(),
             "title" => ["Kullanıcı Adı", "Email", "*hidden*"],
             "display" => ["name", "email", "id:user_id"],
             "menu" => [
@@ -482,7 +482,7 @@ input(type=\"imtcp\" port=\"514\")";
             "market_auth_started" => true,
         ]);
         return redirect(
-                env('MARKET_URL') .
+            env('MARKET_URL') .
                 "/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri=" .
                 urlencode(env('APP_URL') . '/api/market/bagla') .
                 "&client_id=" .
