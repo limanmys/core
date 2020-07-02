@@ -40,8 +40,7 @@ jobs:
       - name: Get Composer Cache Directory
         id: composer-cache
         run: |
-          cd package/liman/server
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+          echo "::set-output name=dir::$(composer config package/liman/server)"
       - uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
