@@ -20,3 +20,4 @@ vendor/*
 /public/sqlite.php
 .env
 config/liman.php
+storage/extension_updates

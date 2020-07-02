@@ -56,7 +56,6 @@ jobs:
           COMMIT+=`git --git-dir=package/liman/server/.git log -1 --pretty=%B`
           COMMIT=`echo $COMMIT | jq -SrR @uri`
           DATE=$(date)
-          composer clearcache
           composer install --no-dev -d package/liman/server
           git --git-dir=package/liman/server/.git log -30 --pretty=format:"%s%x09%ad" > package/liman/server/storage/changelog
           rm -rf package/liman/server/.git package/liman/sandbox/php/.git package/liman/sandbox/python/.git
