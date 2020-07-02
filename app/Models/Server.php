@@ -223,11 +223,10 @@ class Server extends Model
         if ($this->isLinux()) {
             return $this->run("lsb_release -ds");
         }
-
         return explode(
             "|",
-            $this->run("(Get-WmiObject Win32_OperatingSystem).name")[0]
-        );
+            $this->run("(Get-WmiObject Win32_OperatingSystem).name")
+        )[0];
     }
 
     public function getHostname()
