@@ -2,7 +2,7 @@
       <!-- Main Sidebar Container -->
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
-        <a onclick="partialPageRequest('/')" class="brand-link">
+        <a href="/" onclick="partialPageRequest('/');return false;" class="brand-link">
             <img src="/images/limanlogo.png" height="30" style="opacity: .8;margin-left: 0.3rem;cursor:pointer;" title="Versiyon {{getVersion()}}">
         </a>
         <!-- Sidebar -->
