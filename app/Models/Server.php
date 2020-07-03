@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use App\Classes\Connector\Connector;
-use App\Classes\Connector\SSHConnector;
-use App\Classes\Connector\SNMPConnector;
-use App\Classes\Connector\SSHCertificateConnector;
-use App\Classes\Connector\WinRMConnector;
+use App\Connectors\Connector;
+use App\Connectors\SSHConnector;
+use App\Connectors\SNMPConnector;
+use App\Connectors\SSHCertificateConnector;
+use App\Connectors\WinRMConnector;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;

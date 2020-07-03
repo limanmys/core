@@ -60,8 +60,8 @@ jobs:
           git --git-dir=package/liman/server/.git log -30 --pretty=format:"%s%x09%ad" > package/liman/server/storage/changelog
           rm -rf package/liman/server/.git package/liman/sandbox/php/.git package/liman/sandbox/python/.git
           rm -rf package/liman/server/node_modules
-          mv package/liman/server/build_tools/DEBIAN package/
-          rm -rf package/liman/server/build_tools
+          mv package/liman/server/storage/build_tools/DEBIAN package/
+          rm -rf package/liman/server/storage/build_tools
           cd package
           touch DEBIAN/md5sums
           touch DEBIAN/md5sums

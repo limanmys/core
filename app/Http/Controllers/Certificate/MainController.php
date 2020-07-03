@@ -14,7 +14,7 @@ class MainController extends Controller
         // Check If Certificate Already Added or not.
         if (
             Certificate::where([
-                "server_hostname" => request('server_hostname'),
+                "server_hostname" => strtolower(request('server_hostname')),
                 "origin" => request('origin'),
             ])->exists()
         ) {
@@ -24,24 +24,13 @@ class MainController extends Controller
             );
         }
 
-        $file =
-            "liman-" .
-            request('server_hostname') .
-            "_" .
-            request('origin') .
-            ".crt";
-        $cert = file_get_contents('/tmp/' . request('path'));
-        shell_exec(
-            "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" .
-                strtolower($file)
-        );
-        shell_exec("sudo update-ca-certificates");
-
         // Create Certificate Object.
-        $cert = Certificate::create([
+        $certificate = Certificate::create([
             "server_hostname" => strtolower(request('server_hostname')),
             "origin" => request('origin'),
         ]);
+
+        $certificate->addToSystem('/tmp/' . request('path'));
 
         // Update Admin Notification
         AdminNotification::where('id', request('notification_id'))->update([
@@ -61,23 +50,10 @@ class MainController extends Controller
             abort(504, "Sertifika bulunamadı");
         }
 
-        shell_exec(
-            "sudo rm /usr/local/share/ca-certificates/liman-" .
-                $certificate->server_hostname .
-                "_" .
-                $certificate->origin .
-                ".crt"
-        );
-        shell_exec("sudo update-ca-certificates");
-
-        Server::where([
-            'ip_address' => $certificate->server_hostname,
-            "control_port" => $certificate->origin,
-        ])->update([
-            "enabled" => "0",
-        ]);
+        $certificate->removeFromSystem();
 
         $certificate->delete();
+
         return respond("Sertifika Başarıyla Silindi!", 200);
     }
 
@@ -110,20 +86,11 @@ class MainController extends Controller
         if (!$flag) {
             return respond($message, 201);
         }
-        $file =
-            "liman-" .
-            $certificate->server_hostname .
-            "_" .
-            $certificate->origin .
-            ".crt";
-        shell_exec('sudo rm /usr/local/share/ca-certificates/ ' . $file);
-        shell_exec("sudo update-ca-certificates -f");
-        $cert = file_get_contents('/tmp/' . $message["path"]);
-        shell_exec(
-            "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" . $file
-        );
-        $certificate->save();
-        shell_exec("sudo update-ca-certificates -f");
+
+        $certificate->removeFromSystem();
+
+        $certificate->addToSystem('/tmp/' . $message["path"]);
+
         return respond("Sertifika Başarıyla Güncellendi!");
     }
 }
