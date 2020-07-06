@@ -16,6 +16,7 @@ use App\Models\PermissionData;
 use App\Models\ServerGroup;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use Illuminate\Support\Str;
 
 class MainController extends Controller
 {
@@ -478,13 +479,14 @@ input(type=\"imtcp\" port=\"514\")";
 
     public function redirectMarket()
     {
+        $auth_code = Str::random(15);
         session([
-            "market_auth_started" => true,
+            "market_auth" => $auth_code,
         ]);
         return redirect(
             env('MARKET_URL') .
                 "/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri=" .
-                urlencode(env('APP_URL') . '/api/market/bagla') .
+                urlencode(env('APP_URL') . '/api/market/bagla?auth='.$auth_code) .
                 "&client_id=" .
                 env('MARKET_CLIENT_ID')
         );
@@ -492,11 +494,14 @@ input(type=\"imtcp\" port=\"514\")";
 
     public function connectMarket()
     {
-        if (!session("market_auth_started", false)) {
+        if (session("market_auth") != request('auth')) {
+            session([
+                "market_auth" => false,
+            ]);
             abort(504, "Geçersiz istek!");
         }
         session([
-            "market_auth_started" => false,
+            "market_auth" => false,
         ]);
         try {
             $client = new Client(['verify' => false]);
@@ -504,7 +509,7 @@ input(type=\"imtcp\" port=\"514\")";
             $params = [
                 "code" => request('code'),
                 "grant_type" => "authorization_code",
-                "redirect_uri" => env('APP_URL') . '/api/market/bagla',
+                "redirect_uri" => env('APP_URL') . '/api/market/bagla?auth='.request('auth'),
                 "client_id" => env('MARKET_CLIENT_ID'),
                 "client_secret" => env('MARKET_CLIENT_SECRET'),
             ];
