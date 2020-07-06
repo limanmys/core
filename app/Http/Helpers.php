@@ -539,7 +539,7 @@ if (!function_exists('getExtensionJson')) {
         return json_decode(
             file_get_contents(
                 "/liman/extensions/" .
-                    strtolower($extension->name) .
+                    strtolower($extension_name) .
                     DIRECTORY_SEPARATOR .
                     "db.json"
             ),

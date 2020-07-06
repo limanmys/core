@@ -54,7 +54,7 @@
     "inputs" => [
         "İsim" => "name:text"
     ],
-    "submit_text" => "Anahtarı Sil"
+    "submit_text" => "Anahtar Ekle"
 ])
 
 
