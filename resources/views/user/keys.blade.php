@@ -27,7 +27,7 @@
                     "text" => "Oluştur"
                 ])<br><br>
                     @include('table',[
-                        "value" => user()->accessTokens()->get(),
+                        "value" => $access_tokens,
                         "title" => [
                             "Adı", "Token", "Son Kullanılan Tarih", "Son Kullanan Ip Adresi", "*hidden*"
                         ],

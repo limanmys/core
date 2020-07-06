@@ -521,7 +521,7 @@ if (!function_exists('magicView')) {
      */
     function magicView($view, $data = [])
     {
-        if (request()->wantsJson()) {
+        if (request()->wantsJson() && !request()->has('partialRequest')) {
             return response()->json($data);
         } else {
             return response()->view($view, $data);

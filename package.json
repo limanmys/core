@@ -9,7 +9,8 @@
         "watch-poll": "npm run watch -- --watch-poll",
         "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
         "prod": "npm run production",
-        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "docs": "node_modules/apidoc/bin/apidoc -o storage/docs -e vendor -e node_modules -e resources/ -e public/"
     },
     "pre-commit": [
         "pre-commit"
@@ -29,6 +30,7 @@
         "webpack-cli": "^3.3.7"
     },
     "dependencies": {
+        "apidoc": "^0.23.0",
         "cross-env": "^5.2.1",
         "laravel-echo": "^1.6.1",
         "pusher-js": "^5.0.2"

@@ -23,7 +23,12 @@ jobs:
           repository: mertcelen/liman-sandbox-python
           path: package/liman/sandbox/python
           token: ${{ secrets.CI_TOKEN }}
-
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Getting Liman' WebSSH
         uses: actions/checkout@v2
         with:
@@ -41,6 +46,22 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
+      - name: Create Docs
+        run: |
+          sudo apt install npm -y
+          cd package/liman/server/
+          npm install
+          npm run docs
+
+      - name: Push Docs to APIDOCS Repository
+        uses: cpina/github-action-push-to-another-repository@master
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.CI_TOKEN }}
+        with:
+          source-directory: 'package/liman/server/storage/docs'
+          destination-github-username: 'limanmys'
+          destination-repository-name: 'apidocs'
+          user-email: mcelen94@gmail.com
       - name: Set up Liman Environment
         uses: shivammathur/setup-php@v2
         with:

@@ -9,6 +9,17 @@ use App\Http\Controllers\Controller;
 
 class MainController extends Controller
 {
+    /**
+     * @api {post} /sunucu/sertifikaOnayi Add SSL Sertificate
+     * @apiName Add SSL Sertificate
+     * @apiGroup Certificate
+     *
+     * @apiParam {String} server_hostname Server's hostname.
+     * @apiParam {String} origin Target port to retrieve certificate.
+     * @apiParam {String} notification_id Request Notification Id (OPTIONAL)
+     *
+     * @apiSuccess {JSON} message Message with status.
+     */
     public function verifyCert()
     {
         // Check If Certificate Already Added or not.
@@ -40,6 +51,15 @@ class MainController extends Controller
         return respond("Sertifika Başarıyla Eklendi!", 200);
     }
 
+    /**
+     * @api {post} /sunucu/sertifikaSil Remove SSL Sertificate
+     * @apiName Remove SSL Sertificate
+     * @apiGroup Certificate
+     *
+     * @apiParam {String} certificate_id Certificate Id.
+     *
+     * @apiSuccess {JSON} message Message with status.
+     */
     public function removeCert()
     {
         $certificate = Certificate::where(
@@ -57,6 +77,16 @@ class MainController extends Controller
         return respond("Sertifika Başarıyla Silindi!", 200);
     }
 
+    /**
+     * @api {post} /sunucu/sertifikaTalep Request SSL Sertificate
+     * @apiName Request SSL Sertificate
+     * @apiGroup Certificate
+     *
+     * @apiParam {String} hostname Target Server' Hostname.
+     * @apiParam {String} port Target Server' Port.
+     *
+     * @apiSuccess {Array} array Requested certificate information..
+     */
     public function requestCert()
     {
         list($flag, $message) = retrieveCertificate(
@@ -70,6 +100,15 @@ class MainController extends Controller
         }
     }
 
+    /**
+     * @api {post} /sunucu/sertifikaGuncelle Renew SSL Sertificate
+     * @apiName Renew SSL Sertificate
+     * @apiGroup Certificate
+     *
+     * @apiParam {String} certificate_id Certificate id to renew.
+     *
+     * @apiSuccess {JSON} message Message with status.
+     */
     public function updateCert()
     {
         $certificate = Certificate::where(
