@@ -52,7 +52,7 @@ jobs:
           cd package/liman/server/
           npm install
           npm run docs
-
+          echo "api.liman.dev" > storage/docs/CNAME
       - name: Push Docs to APIDOCS Repository
         uses: cpina/github-action-push-to-another-repository@master
         env:
