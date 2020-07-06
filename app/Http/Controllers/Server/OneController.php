@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Server;
 
-use App\Classes\Connector\SSHConnector;
-use App\Classes\Connector\WinRMConnector;
+use App\Connectors\SSHConnector;
+use App\Connectors\WinRMConnector;
 use App\Models\ConnectorToken;
 use App\Models\Extension;
 use App\Http\Controllers\Controller;
