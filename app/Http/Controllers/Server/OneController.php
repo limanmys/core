@@ -33,12 +33,31 @@ class OneController extends Controller
             "version" => $server->getVersion(),
         ];
 
-        return view('server.one', [
+        $input_extensions = [];
+        $available_extensions = $this->availableExtensions();
+
+        foreach ($available_extensions as $extension) {
+            $arr = [];
+            if (isset($extension->install)) {
+                foreach ($extension->install as $key => $parameter) {
+                    $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
+                }
+            }
+            $arr[$extension->display_name . ":" . $extension->id] =
+                "extension_id:hidden";
+            $input_extensions[] = [
+                "name" => $extension->display_name,
+                "id" => $extension->id,
+            ];
+        }
+
+        return view('server.one.main', [
             "server" => $server,
             "favorite" => $server->isFavorite(),
             "outputs" => $outputs,
             "installed_extensions" => $this->installedExtensions(),
-            "available_extensions" => $this->availableExtensions(),
+            "available_extensions" => $available_extensions,
+            "input_extensions" => $input_extensions,
         ]);
     }
 
@@ -370,7 +389,7 @@ class OneController extends Controller
                 }
             }
         }
-        return view('table', [
+        return magicView('table', [
             "value" => $users,
             "title" => ["Kullanıcı Adı"],
             "display" => ["user"],
@@ -422,7 +441,7 @@ class OneController extends Controller
                 $groups = array_reverse($groups);
             }
         }
-        return view('table', [
+        return magicView('table', [
             "value" => $groups,
             "title" => ["Grup Adı"],
             "display" => ["group"],
@@ -448,7 +467,7 @@ class OneController extends Controller
                 }, explode(",", $output));
             }
         }
-        return view('table', [
+        return magicView('table', [
             "value" => $users,
             "title" => ["Kullanıcı Adı"],
             "display" => ["name"],
@@ -517,7 +536,7 @@ class OneController extends Controller
                 }, explode("\n", $output));
             }
         }
-        return view('table', [
+        return magicView('table', [
             "value" => $sudoers,
             "title" => ["İsim", "Yetki"],
             "display" => ["name", "access"],
@@ -629,7 +648,7 @@ class OneController extends Controller
         } else {
             return respond("Bu sunucudaki servisleri goremezsiniz.", 403);
         }
-        return view('table', [
+        return magicView('table', [
             "id" => "servicesTable",
             "value" => $services,
             "title" => ["Servis Adı", "Aciklamasi", "Durumu"],
@@ -980,7 +999,7 @@ class OneController extends Controller
         } else {
             return respond("Bu sunucudaki paketleri goremezsiniz.", 403);
         }
-        return view('l.table', [
+        return magicView('l.table', [
             "value" => $packages,
             "title" => ["Paket Adı", "Versiyon", "Tip", "Durumu"],
             "display" => ["name", "version", "type", "status"],

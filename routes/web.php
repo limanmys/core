@@ -86,10 +86,6 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
     // Add Key Route
     Route::post('/kasa/ekle', 'UserController@addKey')->name('key_add');
 
-    // User Details Route
-
-    Route::get('/kullanici/{user_id}', 'UserController@one')->name('user');
-
     // My Requests Route
 
     Route::get('/taleplerim', 'HomeController@all')->name('request_permission');

@@ -15,14 +15,6 @@ use App\Models\ConnectorToken;
 
 class UserController extends Controller
 {
-    public function one()
-    {
-        $user = User::where('id', auth()->id())->first();
-        return view('users.one', [
-            "user" => $user,
-        ]);
-    }
-
     /**
      * @api {post} /kullanici/ekle Add Liman User
      * @apiName Add Liman User
@@ -469,7 +461,7 @@ class UserController extends Controller
                 : __("Sunucu Silinmiş.");
         }
 
-        return view('keys.index', [
+        return magicView('keys.index', [
             "servers" => objectToArray($servers, "name", "id"),
             "settings" => json_decode(json_encode($settings), true),
         ]);

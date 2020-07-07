@@ -30,7 +30,7 @@
                                 <select class="form-control" name="{{$item["variable"]}}" @if(!isset($item["required"]) || $item["required"] === true) required @endif>
                                     <option>{{$item["name"]}}</option>
                                     @foreach(extensions() as $extension)
-                                        <option value="{{$extension->id}}" @if($extension->id == old($item["variable"], extensionDb($item["variable"]))) selected @endif >{{$extension->display_name}}</option>
+                                        <option value="{{$extension->id}}" @if($extension->id == old($item["variable"], $extensionDb[$item["variable"]])) selected @endif >{{$extension->display_name}}</option>
                                     @endforeach
                                 </select>
                             </div>                    
@@ -40,7 +40,7 @@
                                 <select class="form-control" name="{{$item["variable"]}}" @if(!isset($item["required"]) || $item["required"] === true) required @endif>
                                     <option>{{$item["name"]}}</option>
                                     @foreach(servers() as $server)
-                                        <option value="{{$server->id}}" @if($server->id == old($item["variable"], extensionDb($item["variable"]))) selected @endif>{{$server->name}}</option>
+                                        <option value="{{$server->id}}" @if($server->id == old($item["variable"], $extensionDb[$item["variable"]])) selected @endif>{{$server->name}}</option>
                                     @endforeach
                                 </select>
                             </div>                    
@@ -50,8 +50,8 @@
                                 <input @if(!isset($item["required"]) || $item["required"] === true) required @endif class="form-control" type="{{$item["type"]}}"
                                     name="{{$item["variable"]}}" placeholder="{{__($item["name"])}}"
                                     @if($item["type"] != "password")
-                                        @if(extensionDb($item["variable"]))
-                                            value="{{old($item["variable"], extensionDb($item["variable"]))}}"
+                                        @if($extensionDb[$item["variable"]])
+                                            value="{{old($item["variable"], $extensionDb[$item["variable"]])}}"
                                         @elseif(array_key_exists($item["variable"],$similar))
                                             value="{{old($item["variable"], $similar[$item["variable"]])}}"
                                         @endif

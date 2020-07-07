@@ -44,7 +44,7 @@ class MainController extends Controller
             );
         }
         // Render View with Cities
-        return view('extension_pages.index', [
+        return magicView('extension_pages.index', [
             "cities" => implode(',', $cities),
         ]);
     }

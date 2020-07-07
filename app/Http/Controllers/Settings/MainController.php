@@ -31,9 +31,19 @@ class MainController extends Controller
         $changelog = is_file(storage_path('changelog'))
             ? file_get_contents(storage_path('changelog'))
             : "";
+
+        $updateAvailable = is_file(storage_path("extension_updates"));
+        $extensions = extensions()->map(function ($item) {
+            if (!$item["issuer"]) {
+                $item["issuer"] = __('Güvenli olmayan üretici!');
+            }
+            return $item;
+        });
         return view('settings.index', [
             "users" => User::all(),
             "changelog" => $changelog,
+            "updateAvailable" => $updateAvailable,
+            "extensions" => $extensions,
         ]);
     }
 
@@ -486,7 +496,9 @@ input(type=\"imtcp\" port=\"514\")";
         return redirect(
             env('MARKET_URL') .
                 "/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri=" .
-                urlencode(env('APP_URL') . '/api/market/bagla?auth='.$auth_code) .
+                urlencode(
+                    env('APP_URL') . '/api/market/bagla?auth=' . $auth_code
+                ) .
                 "&client_id=" .
                 env('MARKET_CLIENT_ID')
         );
@@ -509,7 +521,10 @@ input(type=\"imtcp\" port=\"514\")";
             $params = [
                 "code" => request('code'),
                 "grant_type" => "authorization_code",
-                "redirect_uri" => env('APP_URL') . '/api/market/bagla?auth='.request('auth'),
+                "redirect_uri" =>
+                    env('APP_URL') .
+                    '/api/market/bagla?auth=' .
+                    request('auth'),
                 "client_id" => env('MARKET_CLIENT_ID'),
                 "client_secret" => env('MARKET_CLIENT_SECRET'),
             ];

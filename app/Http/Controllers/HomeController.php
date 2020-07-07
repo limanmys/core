@@ -142,11 +142,6 @@ class HomeController extends Controller
         return respond('Tema Guncellendi.');
     }
 
-    public function new()
-    {
-        return view('permission.request');
-    }
-
     /**
      * @api {get} /taleplerim Personal Liman Requests List
      * @apiName Personal Liman Requests List

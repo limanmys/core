@@ -521,7 +521,11 @@ if (!function_exists('magicView')) {
      */
     function magicView($view, $data = [])
     {
-        if (request()->wantsJson() && !request()->has('partialRequest')) {
+        if (
+            request()->wantsJson() &&
+            !request()->has('partialRequest') &&
+            !request()->has('limanJSRequest')
+        ) {
             return response()->json($data);
         } else {
             return response()->view($view, $data);
@@ -566,7 +570,7 @@ if (!function_exists('extensionDb')) {
      * @param $key
      * @return String
      */
-    function extensionDb($key)
+    function extensionDb($key = "*")
     {
         $target = DB::table("user_settings")
             ->where([
