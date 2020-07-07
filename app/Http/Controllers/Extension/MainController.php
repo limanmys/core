@@ -167,7 +167,7 @@ class MainController extends Controller
         // Try to open zip file.
         if (!$zip->open($zipFile)) {
             system_log(7, "EXTENSION_UPLOAD_FAILED_CORRUPTED");
-            return respond("Eklenti Dosyası Açılamıyor.", 201);
+            return [respond("Eklenti Dosyası Açılamıyor.", 201), null];
         }
 
         // Determine a random tmp folder to extract files
@@ -189,11 +189,14 @@ class MainController extends Controller
             array_key_exists("supportedLiman", $json) &&
             getVersionCode() < intval($json["supportedLiman"])
         ) {
-            return respond(
-                "Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu" .
-                    $json["supportedLiman"],
-                201
-            );
+            return [
+                respond(
+                    "Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu" .
+                        $json["supportedLiman"],
+                    201
+                ),
+                null,
+            ];
         }
 
         if (isset($verify)) {
@@ -208,7 +211,7 @@ class MainController extends Controller
         if ($extension) {
             if ($extension->version == $json["version"]) {
                 system_log(7, "EXTENSION_UPLOAD_FAILED_ALREADY_INSTALLED");
-                return respond("Eklentinin bu sürümü zaten yüklü", 201);
+                return [respond("Eklentinin bu sürümü zaten yüklü", 201), null];
             }
         }
 
