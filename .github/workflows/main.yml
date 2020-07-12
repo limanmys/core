@@ -81,7 +81,7 @@ jobs:
           Architecture: amd64
           Priority: important
           Description: Liman MYS
-          Depends: zip, unzip, dnsutils, nginx, php7.3-fpm | php7.4-fpm, php-curl, php, php-sqlite3, php-ldap, php-snmp, php-mbstring, php-xml, php-zip, php-ssh2, php-posix, libnginx-mod-http-headers-more-filter, krb5-user, smbclient, libssl1.1, acl, novnc, supervisor, expect, php-mongodb, php-gd, rsyslog
+          Depends: zip, unzip, dnsutils, nginx, php-fpm, php-curl, php, php-sqlite3, php-ldap, php-snmp, php-mbstring, php-xml, php-zip, php-ssh2, php-posix, libnginx-mod-http-headers-more-filter, krb5-user, smbclient, libssl1.1, acl, novnc, supervisor, expect, php-mongodb, php-gd, rsyslog
           """ > DEBIAN/control
           cd ../
           dpkg-deb -Zgzip --build package
