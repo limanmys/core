@@ -12,6 +12,13 @@ else
     echo "Installing liman."
 fi
 
+# Get PHP Version
+if [[ `php -r "echo phpversion();"` == 7.4*  ]] ; then
+    PHPVERSION="7.4"
+else
+    PHPVERSION="7.3"
+fi
+
 # User Creation
 if getent passwd liman > /dev/null 2>&1; then
     sed -i '/liman/d' /etc/sudoers
@@ -53,7 +60,7 @@ else
 fi
 
 # Update Php and Fpm to run as liman user.
-sed -i "s/www-data/liman/g" /etc/php/7.3/fpm/pool.d/www.conf
+sed -i "s/www-data/liman/g" /etc/php/$PHPVERSION/fpm/pool.d/www.conf
 sed -i "s/www-data/liman/g" /etc/nginx/nginx.conf
 
 # Crontab Setting
@@ -125,7 +132,7 @@ fi
 supervisorctl start all
 
 #Increase Php-Fpm Memory
-sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php/7.3/fpm/php.ini
+sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php/$PHPVERSION/fpm/php.ini
 
 # Run Database Migration
 php /liman/server/artisan migrate --force
@@ -208,8 +215,8 @@ WantedBy=multi-user.target
     """ > /etc/systemd/system/liman-vnc.service
 fi
 
-sed -i "s/upload_max_filesize.*/upload_max_filesize = 50M/g" /etc/php/7.3/fpm/php.ini
-sed -i "s/post_max_size.*/post_max_size = 50M/g" /etc/php/7.3/fpm/php.ini
+sed -i "s/upload_max_filesize.*/upload_max_filesize = 50M/g" /etc/php/$PHPVERSION/fpm/php.ini
+sed -i "s/post_max_size.*/post_max_size = 50M/g" /etc/php/$PHPVERSION/fpm/php.ini
 
 systemctl daemon-reload
 systemctl enable liman
@@ -218,7 +225,7 @@ systemctl enable liman-webssh
 systemctl restart liman
 systemctl restart liman-vnc
 systemctl restart liman-webssh
-systemctl reload php7.3-fpm.service
+systemctl reload php$PHPVERSION-fpm.service
 # Create Socket Service
 if [ -f "/etc/systemd/system/liman-socket.service" ]; then
     echo "Liman Socket Service Already Added.";
@@ -254,8 +261,8 @@ chmod 700 /liman/keys/vnc/config
 # Restart and enable services.
 systemctl restart nginx
 systemctl enable nginx
-systemctl enable php7.3-fpm
-systemctl restart php7.3-fpm
+systemctl enable php$PHPVERSION-fpm
+systemctl restart php$PHPVERSION-fpm
 
 # Optimize Liman
 php /liman/server/artisan optimize:clear
