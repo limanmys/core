@@ -74,7 +74,7 @@ fi
 
 mv /liman/server/storage/nginx.conf /etc/nginx/sites-available/liman.conf
 ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
-
+sed -i "s/7.3/$PHPVERSION/g" /etc/nginx/nginx.conf
 # Nginx Auto Redirection
 if grep --quiet LIMAN_OPTIMIZATIONS /etc/nginx/sites-available/default; then
     echo "Nginx https redirection already set up."; 
