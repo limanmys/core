@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\UserSettings;
 use App\Models\Permission;
 use App\Models\Server;
-use App\Classes\Sandbox\PHPSandbox;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -26,22 +25,12 @@ class MainController extends Controller
 
     public function initializeClass()
     {
-        $this->extension = json_decode(
-            file_get_contents(
-                "/liman/extensions/" .
-                    strtolower(extension()->name) .
-                    DIRECTORY_SEPARATOR .
-                    "db.json"
-            ),
-            true
-        );
+        $this->extension = getExtensionJson(extension()->name);
 
-        list($result, $redirect) = $this->checkForMissingSettings();
-        if (!$result) {
-            return $redirect;
-        }
+        $this->checkForMissingSettings();
 
         $this->checkPermissions();
+
         $this->sandbox = sandbox();
     }
 
@@ -167,7 +156,6 @@ class MainController extends Controller
                 );
             }
         }
-        return [true, null];
     }
 
     private function checkPermissions()

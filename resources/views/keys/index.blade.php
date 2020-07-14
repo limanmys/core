@@ -49,7 +49,7 @@
         "url" => route('key_add'),
         "next" => "reload",
         "inputs" => [
-            "Sunucu:server_id" => objectToArray(servers(),"name", "id"),
+            "Sunucu:server_id" => $servers,
             "Kullanıcı Adı" => "username:text",
             "Şifre" => "password:password",
         ],

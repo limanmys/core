@@ -8,6 +8,13 @@ use App\Models\Module;
 
 class MainController extends Controller
 {
+    /**
+     * @api {get} /modules Get Modules List
+     * @apiName Get Modules List
+     * @apiGroup Module
+     *
+     * @apiSuccess {Array} modules List of modules array.
+     */
     public function index()
     {
         $modules = Module::all();
@@ -16,7 +23,7 @@ class MainController extends Controller
                 ? "Aktif"
                 : "İzin Verilmemiş";
         });
-        return view('modules.index', [
+        return magicView('modules.index', [
             "modules" => $modules,
         ]);
     }

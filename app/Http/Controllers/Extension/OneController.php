@@ -229,15 +229,17 @@ class OneController extends Controller
         }
 
         if (env('LIMAN_RESTRICTED') == true && !user()->isAdmin()) {
-            return response()->view('extension_pages.setup_restricted', [
+            return magicView('extension_pages.setup_restricted', [
                 'extension' => $extension,
                 'similar' => $similar,
+                'extensionDb' => extensionDb(),
             ]);
         }
 
-        return response()->view('extension_pages.setup', [
+        return magicView('extension_pages.setup', [
             'extension' => $extension,
             'similar' => $similar,
+            'extensionDb' => extensionDb(),
         ]);
     }
 

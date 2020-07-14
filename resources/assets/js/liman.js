@@ -17,7 +17,7 @@ function showSwal(message, type, timer = false) {
   Swal.fire(config);
 }
 
-function request(url, data, next, error,requestType = "POST") {
+function request(url, data, next, error, requestType = "POST") {
   var id = null;
 
   if (data instanceof FormData === false) {
@@ -43,7 +43,7 @@ function request(url, data, next, error,requestType = "POST") {
   for (const [key, value] of Object.entries(customRequestData)) {
     data.append(key, value);
   }
-
+  data.append("limanJSRequest", true);
   if (limanRecordRequests) {
     var parsed = {};
     for (var pair of data.entries()) {

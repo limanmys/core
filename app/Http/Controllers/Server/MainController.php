@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Server;
 
-use App\Classes\Connector\SSHConnector;
-use App\Classes\Connector\SNMPConnector;
-use App\Classes\Connector\SSHCertificateConnector;
-use App\Classes\Connector\WinRMConnector;
+use App\Connectors\SSHConnector;
+use App\Connectors\SNMPConnector;
+use App\Connectors\SSHCertificateConnector;
+use App\Connectors\WinRMConnector;
 use App\Models\Server;
 use App\Http\Controllers\Controller;
 

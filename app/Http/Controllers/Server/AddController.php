@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Server;
 
 use App\Models\AdminNotification;
 use App\Models\Certificate;
-use App\Classes\Connector\SSHConnector;
-use App\Classes\Connector\SNMPConnector;
-use App\Classes\Connector\SSHCertificateConnector;
-use App\Classes\Connector\WinRMConnector;
+use App\Connectors\SSHConnector;
+use App\Connectors\SNMPConnector;
+use App\Connectors\SSHCertificateConnector;
+use App\Connectors\WinRMConnector;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Server;

@@ -1,154 +1,151 @@
 @include('modal-button',[
-                        "class" => "btn-primary",
-                        "target_id" => "extensionUpload",
-                        "text" => "Yükle"
-                    ])
-                @if(env('EXTENSION_DEVELOPER_MODE') == true)
-                        @include('modal-button',[
-                            "class" => "btn-secondary",
-                            "target_id" => "extensionExport",
-                            "text" => "İndir"
-                        ])
-                        @include('modal-button',[
-                            "class" => "btn-info",
-                            "target_id" => "newExtension",
-                            "text" => "Yeni"
-                        ])
-                @endif
-                @if(is_file(storage_path("extension_updates"))) 
-                    <button class="btn btn-warning" onclick=showExtensionUpdates()>{{__("Güncellemeleri Yükle")}}</button>
-                @endif
-                        <div class="float-sm-right">
-                            <button data-toggle="tooltip" title="Ayarlar" class="btn btn-primary" onclick="openSettingsModal()"><i class="fa fa-cogs"></i></button>
-                        </div><br><br>
-                    @include('errors')    
-
-                    @include('table',[
-                        "value" => extensions()->map(function($item){
-                            if(!$item["issuer"]){
-                                $item["issuer"] = __('Güvenli olmayan üretici!');
-                            }
-                            return $item;
-                        }),
-                        "sortable" => true,
-                        "sortUpdateUrl" => route('update_ext_orders'),
-                        "afterSortFunction" => 'location.reload',
-                        "title" => [
-                            "Eklenti Adı" , "Versiyon", "İmzalayan", "Son Güncelleme Tarihi", "*hidden*"
-                        ],
-                        "display" => [
-                            "name" , "version", "issuer", "updated_at", "id:extension_id"
-                        ],
-                        "menu" => [
-                            "Sil" => [
-                                "target" => "delete",
-                                "icon" => " context-menu-icon-delete"
-                            ]
-                        ],
-                        "onclick" => env('EXTENSION_DEVELOPER_MODE') ? "extensionDetails" : ""
-                    ])
-    @include('modal',[
-        "id"=>"extSettings",
-        "title" => "Ayarlar",
-        "url" => route('save_settings'),
-        "next" => "reload",
-        "inputs" => [
-            "Sol menüde kaç eklenti gözüksün?" => "ext_count:number",
-        ],
-        "submit_text" => "Kaydet"
+    "class" => "btn-primary",
+    "target_id" => "extensionUpload",
+    "text" => "Yükle"
+])
+@if(env('EXTENSION_DEVELOPER_MODE') == true)
+    @include('modal-button',[
+        "class" => "btn-secondary",
+        "target_id" => "extensionExport",
+        "text" => "İndir"
     ])
-
-    @component('modal-component',[
-        "id" => "extensionUpdatesModal",
-        "title" => "Eklenti Güncellemeleri"
+    @include('modal-button',[
+        "class" => "btn-info",
+        "target_id" => "newExtension",
+        "text" => "Yeni"
     ])
-    <div id="extensionUpdatesWrapper">
+@endif
+@if($updateAvailable)
+    <button class="btn btn-warning" onclick=showExtensionUpdates()>{{__("Güncellemeleri Yükle")}}</button>
+@endif
+<div class="float-sm-right">
+    <button data-toggle="tooltip" title="Ayarlar" class="btn btn-primary" onclick="openSettingsModal()"><i
+            class="fa fa-cogs"></i></button>
+</div><br><br>
+@include('errors')
+
+@include('table',[
+    "value" => $extensions,
+    "sortable" => true,
+    "sortUpdateUrl" => route('update_ext_orders'),
+    "afterSortFunction" => 'location.reload',
+    "title" => [
+        "Eklenti Adı" , "Versiyon", "İmzalayan", "Son Güncelleme Tarihi", "*hidden*"
+    ],
+    "display" => [
+        "name" , "version", "issuer", "updated_at", "id:extension_id"
+    ],
+    "menu" => [
+        "Sil" => [
+            "target" => "delete",
+            "icon" => " context-menu-icon-delete"
+    ]
+    ],
+    "onclick" => env('EXTENSION_DEVELOPER_MODE') ? "extensionDetails" : ""
+])
+@include('modal',[
+    "id"=>"extSettings",
+    "title" => "Ayarlar",
+    "url" => route('save_settings'),
+    "next" => "reload",
+    "inputs" => [
+        "Sol menüde kaç eklenti gözüksün?" => "ext_count:number",
+    ],
+    "submit_text" => "Kaydet"
+])
+
+@component('modal-component',[
+    "id" => "extensionUpdatesModal",
+    "title" => "Eklenti Güncellemeleri"
+])
+<div id="extensionUpdatesWrapper">
     <div class="row">
         <div class="col-md-3">
             <ul class="list-group" id="extensionUpdatesList">
             </ul>
         </div>
         <div class="col-md-9">
-        <div class="row">
-            <div class="col-md-9">
-                <h3 id="extensionUpdateName"></h3>
+            <div class="row">
+                <div class="col-md-9">
+                    <h3 id="extensionUpdateName"></h3>
+                </div>
+                <div class="col-md-3">
+                    <h2 id="extensionNewVersion"></h2>
+                </div>
             </div>
-            <div class="col-md-3">
-                <h2 id="extensionNewVersion"></h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12" id="extensionChangeLogWrapper">
-            </div>
-        </div><br>
-        <button class="btn btn-success" onclick="requestExtensionUpdate()">{{__("Şimdi Güncelle")}}</button>
+            <div class="row">
+                <div class="col-md-12" id="extensionChangeLogWrapper">
+                </div>
+            </div><br>
+            <button class="btn btn-success" onclick="requestExtensionUpdate()">{{__("Şimdi Güncelle")}}</button>
         </div>
     </div>
-        
-    </div>
-    @endcomponent
 
-    @include('modal',[
-        "id"=>"extensionUpload",
-        "title" => "Eklenti Yükle",
-        "url" => route('extension_upload'),
-        "next" => "reload",
-        "error" => "extensionUploadError",
-        "inputs" => [
-            "Lütfen Eklenti Dosyasını(.lmne) Seçiniz" => "extension:file",
-        ],
-        "submit_text" => "Yükle"
-    ])
-    @if(env('EXTENSION_DEVELOPER_MODE') == true)
-        <?php
-        $input_extensions = [];
-        foreach (extensions() as $extension) {
-            $input_extensions[$extension->display_name] = $extension->id;
-        }
-        ?>
+</div>
+@endcomponent
 
-        @include('modal',[
-            "id"=>"extensionExport",
-            "onsubmit" => "downloadFile",
-            "title" => "Eklenti İndir",
-            "next" => "",
-            "inputs" => [
-                "Eklenti Seçin:extension_id" => $input_extensions
-            ],
-            "submit_text" => "İndir"
-        ])
+@include('modal',[
+    "id"=>"extensionUpload",
+    "title" => "Eklenti Yükle",
+    "url" => route('extension_upload'),
+    "next" => "reload",
+    "error" => "extensionUploadError",
+    "inputs" => [
+        "Lütfen Eklenti Dosyasını(.lmne) Seçiniz" => "extension:file",
+    ],
+    "submit_text" => "Yükle"
+])
+@if(env('EXTENSION_DEVELOPER_MODE') == true)
+<?php
+$input_extensions = [];
+foreach ($extensions as $extension) {
+    $input_extensions[$extension->display_name] = $extension->id;
+}
+?>
+
+@include('modal',[
+    "id"=>"extensionExport",
+    "onsubmit" => "downloadFile",
+    "title" => "Eklenti İndir",
+    "next" => "",
+    "inputs" => [
+        "Eklenti Seçin:extension_id" => $input_extensions
+    ],
+    "submit_text" => "İndir"
+])
 
 
-        @include('modal',[
-            "id"=>"newExtension",
-            "url" => route('extension_new'),
-            "next" => "debug",
-            "title" => "Yeni Eklenti Oluştur",
-            "selects" => [
-                "PHP 7.3:php" => [
-                    "-:php" => "language:hidden"
-                ],
-                "Python 3.7(BETA):python" => [
-                    "-:python" => "language:hidden"
-                ]
-            ],
-            "inputs" => [
-                "Eklenti Adı" => "name:text",
-            ],
-            "submit_text" => "Oluştur"
-        ])
-    @endif
-    @include('modal',[
-       "id"=>"delete",
-       "title" =>"Eklentiyi Sil",
-       "url" => route('extension_remove'),
-       "text" => "Eklentiyi silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-       "next" => "reload",
-       "inputs" => [
-           "Extension Id:'null'" => "extension_id:hidden"
-       ],
-       "submit_text" => "Eklentiyi Sil"
-   ])
+@include('modal',[
+    "id"=>"newExtension",
+    "url" => route('extension_new'),
+    "next" => "debug",
+    "title" => "Yeni Eklenti Oluştur",
+    "selects" => [
+    "PHP 7.3:php" => [
+        "-:php" => "language:hidden"
+    ],
+    "Python 3.7(BETA):python" => [
+        "-:python" => "language:hidden"
+    ]
+    ],
+    "inputs" => [
+        "Eklenti Adı" => "name:text",
+    ],
+    "submit_text" => "Oluştur"
+])
+@endif
+
+@include('modal',[
+    "id"=>"delete",
+    "title" =>"Eklentiyi Sil",
+    "url" => route('extension_remove'),
+    "text" => "Eklentiyi silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+    "next" => "reload",
+    "inputs" => [
+        "Extension Id:'null'" => "extension_id:hidden"
+    ],
+    "submit_text" => "Eklentiyi Sil"
+])
 
 <script>
     $('input[name=ext_count]').val('{{getExtensionViewCount()}}');

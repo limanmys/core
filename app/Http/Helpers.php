@@ -261,7 +261,7 @@ if (!function_exists('knownPorts')) {
      */
     function knownPorts()
     {
-        return ["5986", "636"];
+        return ["5986", "636", "443"];
     }
 }
 
@@ -432,16 +432,6 @@ if (!function_exists('server')) {
     }
 }
 
-if (!function_exists('script')) {
-    /**
-     * @return mixed
-     */
-    function script()
-    {
-        return request('script');
-    }
-}
-
 if (!function_exists('servers')) {
     /**
      * @return Server|Builder
@@ -462,22 +452,6 @@ if (!function_exists('extensions')) {
     function extensions($filter = [])
     {
         return Extension::getAll($filter);
-    }
-}
-
-if (!function_exists('extensionRoute')) {
-    /**
-     * @param string $route
-     * @return string
-     */
-    function extensionRoute($route)
-    {
-        return route('extension_server_route', [
-            "extension_id" => request()->route('extension_id'),
-            "server_id" => request()->route('server_id'),
-            "city" => request()->route('city'),
-            "unique_code" => $route,
-        ]);
     }
 }
 
@@ -509,7 +483,7 @@ if (!function_exists('user')) {
 if (!function_exists('sandbox')) {
     /**
      * @param null $id
-     * @return App\Classes\Sandbox\Sandbox
+     * @return App\Sandboxes\Sandbox
      */
     function sandbox($language = null)
     {
@@ -518,11 +492,11 @@ if (!function_exists('sandbox')) {
         }
         switch ($language) {
             case "python":
-                return new App\Classes\Sandbox\PythonSandbox();
+                return new App\Sandboxes\PythonSandbox();
                 break;
             case "php":
             default:
-                return new App\Classes\Sandbox\PHPSandbox();
+                return new App\Sandboxes\PHPSandbox();
                 break;
         }
     }
@@ -540,18 +514,50 @@ if (!function_exists('hook')) {
     }
 }
 
+if (!function_exists('magicView')) {
+    /**
+     * @param $extension
+     * @return Array
+     */
+    function magicView($view, $data = [])
+    {
+        if (
+            request()->wantsJson() &&
+            !request()->has('partialRequest') &&
+            !request()->has('limanJSRequest')
+        ) {
+            return response()->json($data);
+        } else {
+            return response()->view($view, $data);
+        }
+    }
+}
+
+if (!function_exists('getExtensionJson')) {
+    /**
+     * @param $extension
+     * @return Array
+     */
+    function getExtensionJson($extension_name)
+    {
+        return json_decode(
+            file_get_contents(
+                "/liman/extensions/" .
+                    strtolower($extension_name) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
+            ),
+            true
+        );
+    }
+}
+
 if (!function_exists('redirect_now')) {
     function redirect_now($url, $code = 302)
     {
         try {
             \App::abort($code, '', ['Location' => $url]);
         } catch (\Exception $exception) {
-            // the blade compiler catches exceptions and rethrows them
-            // as ErrorExceptions :(
-            //
-            // also the __toString() magic method cannot throw exceptions
-            // in that case also we need to manually call the exception
-            // handler
             $previousErrorHandler = set_exception_handler(function () {});
             restore_error_handler();
             call_user_func($previousErrorHandler, $exception);
@@ -564,7 +570,7 @@ if (!function_exists('extensionDb')) {
      * @param $key
      * @return String
      */
-    function extensionDb($key)
+    function extensionDb($key = "*")
     {
         $target = DB::table("user_settings")
             ->where([
@@ -649,16 +655,6 @@ if (!function_exists('cleanArray')) {
             $newArray[] = $row;
         }
         return $newArray;
-    }
-}
-
-if (!function_exists('serverKey')) {
-    /**
-     * @return App\Models\Key
-     */
-    function serverKey()
-    {
-        return App\Models\Key::where('server_id', server()->id)->first();
     }
 }
 

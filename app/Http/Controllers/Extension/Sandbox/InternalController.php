@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Extension\Sandbox;
 
-use App\Classes\Connector\SSHTunnelConnector;
+use App\Connectors\SSHTunnelConnector;
 use App\Models\Extension;
 use App\Http\Controllers\Controller;
 use App\Models\JobHistory;

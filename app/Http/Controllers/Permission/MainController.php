@@ -9,6 +9,13 @@ use App\Http\Controllers\Controller;
 
 class MainController extends Controller
 {
+    /**
+     * @api {get} /talepler Get System Requests
+     * @apiName Get System Requests
+     * @apiGroup Notification
+     *
+     * @apiSuccess {JSON} message Message with randomly notification token.
+     */
     public function all()
     {
         $requests = LimanRequest::all();
@@ -63,11 +70,20 @@ class MainController extends Controller
         }
         system_log(7, "REQUEST_LIST");
 
-        return view('permission.list', [
+        return magicView('permission.list', [
             "requests" => $requests,
         ]);
     }
 
+    /**
+     * @api {get} /talep/{permission_id} Get Request
+     * @apiName Get Request
+     * @apiGroup Notification
+     *
+     * @apiParam {String} permission_id ID of the permission
+     *
+     * @apiSuccess {JSON} message Message with randomly notification token.
+     */
     public function one()
     {
         $request = LimanRequest::where('id', request('permission_id'))->first();
@@ -80,11 +96,21 @@ class MainController extends Controller
             "request_id" => $request,
         ]);
 
-        return view('permission.requests.' . $request->type, [
+        return magicView('permission.requests.' . $request->type, [
             "request" => $request,
         ]);
     }
 
+    /**
+     * @api {post} /talep/guncelle Update System Request
+     * @apiName Update System Request
+     * @apiGroup Notification
+     *
+     * @apiParam {String} request_id ID of the request
+     * @apiParam {String} status 1:In Progress, 2:Completed, 3:Deny, 4:Delete
+     *
+     * @apiSuccess {JSON} message Message with randomly notification token.
+     */
     public function requestUpdate()
     {
         $request = LimanRequest::where('id', request('request_id'))->first();

@@ -96,7 +96,7 @@
                     <button onclick="removePermission('liman')" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "liman_table",
-                        "value" => getLimanPermissions($role->id),
+                        "value" => $limanPermissions,
                         "title" => [
                             "Adı" , "*hidden*"
                         ],

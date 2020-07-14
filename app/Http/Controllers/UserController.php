@@ -15,14 +15,16 @@ use App\Models\ConnectorToken;
 
 class UserController extends Controller
 {
-    public function one()
-    {
-        $user = User::where('id', auth()->id())->first();
-        return view('users.one', [
-            "user" => $user,
-        ]);
-    }
-
+    /**
+     * @api {post} /kullanici/ekle Add Liman User
+     * @apiName Add Liman User
+     * @apiGroup Users
+     *
+     * @apiParam {String} name User name
+     * @apiParam {String} email User Email
+     *
+     * @apiSuccess {JSON} message Message with randomly created user password.
+     */
     public function add()
     {
         hook('user_add_attempt', [
@@ -87,6 +89,15 @@ class UserController extends Controller
         );
     }
 
+    /**
+     * @api {post} /kullanici/sil Remove Liman User
+     * @apiName Remove Liman User
+     * @apiGroup Users
+     *
+     * @apiParam {String} user_id User's ID
+     *
+     * @apiSuccess {JSON} message
+     */
     public function remove()
     {
         hook('user_delete_attempt', [
@@ -110,6 +121,15 @@ class UserController extends Controller
         return respond("Kullanıcı Başarıyla Silindi!", 200);
     }
 
+    /**
+     * @api {post} /kullanici/parola/sifirla Reset Liman User' Password
+     * @apiName Reset Liman User' Password
+     * @apiGroup Users
+     *
+     * @apiParam {String} user_id User's ID
+     *
+     * @apiSuccess {JSON} message Message with new random password.
+     */
     public function passwordReset()
     {
         hook('user_password_reset_attempt', [
@@ -148,6 +168,17 @@ class UserController extends Controller
         return respond("Yeni Parola : " . $password, 200);
     }
 
+    /**
+     * @api {post} /profil Update Self Password
+     * @apiName Update Self Password
+     * @apiGroup Users
+     *
+     * @apiParam {String} old_password User' old password
+     * @apiParam {String} password New Password
+     * @apiParam {String} password_confirmation New Password Confirmation
+     *
+     * @apiSuccess {JSON} message Message with status.
+     */
     public function selfUpdate()
     {
         if (user()->auth_type == "ldap") {
@@ -209,6 +240,17 @@ class UserController extends Controller
         return respond('Kullanıcı Başarıyla Güncellendi', 200);
     }
 
+    /**
+     * @api {post} /user/update Update User Data
+     * @apiName Update User Data
+     * @apiGroup Users
+     *
+     * @apiParam {String} username User' new username
+     * @apiParam {String} email User' new email
+     * @apiParam {String} status User' new status, 0 for regular, 1 for administrator.
+     *
+     * @apiSuccess {JSON} message Message with status.
+     */
     public function adminUpdate()
     {
         $validations = [
@@ -244,6 +286,15 @@ class UserController extends Controller
         return respond('Kullanıcı Güncellendi.', 200);
     }
 
+    /**
+     * @api {post} /user/setting/delete Delete Vault Key
+     * @apiName Delete Vault Key
+     * @apiGroup Vault
+     *
+     * @apiParam {String} setting_id Target setting to delete.
+     *
+     * @apiSuccess {JSON} message Message with status.
+     */
     public function removeSetting()
     {
         $first = UserSettings::where([
@@ -280,6 +331,16 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * @api {post} /user/setting/update Update Vault Key
+     * @apiName Update Vault Key
+     * @apiGroup Vault
+     *
+     * @apiParam {String} setting_id Target setting to update.
+     * @apiParam {String} new_value New Value of the setting.
+     *
+     * @apiSuccess {JSON} message Message with status.
+     */
     public function updateSetting()
     {
         $setting = UserSettings::where("id", request("setting_id"))->first();
@@ -372,6 +433,14 @@ class UserController extends Controller
             );
     }
 
+    /**
+     * @api {get} /kasa Get Vault Keys
+     * @apiName Get Vault Keys
+     * @apiGroup Vault
+     *
+     * @apiSuccess {Array} settings User's Settings/Keys
+     * @apiSuccess {Array} servers User's granted servers list.
+     */
     public function userKeyList()
     {
         $settings = UserSettings::where("user_id", user()->id)->get();
@@ -392,12 +461,22 @@ class UserController extends Controller
                 : __("Sunucu Silinmiş.");
         }
 
-        return view('keys.index', [
+        return magicView('keys.index', [
             "servers" => objectToArray($servers, "name", "id"),
             "settings" => json_decode(json_encode($settings), true),
         ]);
     }
 
+    /**
+     * @api {post} /kasa/ekle Add Key
+     * @apiName Add Key
+     * @apiGroup Vault
+     *
+     * @apiParam {String} username Key Username.
+     * @apiParam {String} password New Password.
+     *
+     * @apiSuccess {JSON} message Message with status.
+     */
     public function addKey()
     {
         UserSettings::where([
@@ -449,11 +528,31 @@ class UserController extends Controller
         return respond("Önbellek temizlendi.");
     }
 
+    /**
+     * @api {get} /profil/anahtarlarim User' Access Tokens
+     * @apiName User' Access Tokens
+     * @apiGroup Access Tokens
+     *
+     * @apiSuccess {Array} access_tokens User's access tokens.
+     */
     public function myAccessTokens()
     {
-        return view("user.keys");
+        return magicView('user.keys', [
+            "access_tokens" => user()
+                ->accessTokens()
+                ->get(),
+        ]);
     }
 
+    /**
+     * @api {post} /profil/anahtarlarim/ekle Create Access Tokens
+     * @apiName Create Access Tokens
+     * @apiGroup Access Tokens
+     *
+     * @apiParam {String} name Name of the access token.
+     *
+     * @apiSuccess {JSON} message Message with status.
+     */
     public function createAccessToken()
     {
         $token = Str::random(64);
@@ -465,6 +564,15 @@ class UserController extends Controller
         return respond("Anahtar Başarıyla Oluşturuldu.");
     }
 
+    /**
+     * @api {post} /profil/anahtarlarim/sil Delete Access Tokens
+     * @apiName Delete Access Tokens
+     * @apiGroup Access Tokens
+     *
+     * @apiParam {String} token_id ID of the token.
+     *
+     * @apiSuccess {JSON} message Message with status.
+     */
     public function revokeAccessToken()
     {
         $token = AccessToken::find(request("token_id"));

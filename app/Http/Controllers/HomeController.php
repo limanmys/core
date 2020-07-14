@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\LimanRequest;
 use App\Models\Server;
+use App\Models\User;
+use App\Models\UserSettings;
+use App\Models\Extension;
 use App\Models\Widget;
 
 class HomeController extends Controller
@@ -19,10 +22,17 @@ class HomeController extends Controller
     }
 
     /**
-     * Show the application dashboard.
+     * @api {get} / Homepage
+     * @apiName HomePage
+     * @apiDescription Liman' database stats.
+     * @apiGroup General
      *
-     * @return \Illuminate\Http\Response
+     * @apiSuccess {Integer} server_count Count of the servers in Liman.
+     * @apiSuccess {Integer} extension_count Count of the extensions in Liman.
+     * @apiSuccess {Integer} user_count Count of the users in Liman.
+     * @apiSuccess {Integer} settings_count Count of the settings in Liman.
      */
+
     public function index()
     {
         system_log(7, "HOMEPAGE");
@@ -35,12 +45,26 @@ class HomeController extends Controller
                 $widget->server_id
             )->first()->name;
         }
-
-        return view('index', [
+        return magicView('index', [
             "widgets" => $widgets,
+            "server_count" => Server::all()->count(),
+            "extension_count" => Extension::all()->count(),
+            "user_count" => User::all()->count(),
+            "settings_count" => UserSettings::all()->count(),
         ]);
     }
 
+    /**
+     * @api {post} / Liman Stats
+     * @apiName Liman Stats
+     * @apiDescription Hardware stats of Liman.
+     * @apiGroup General
+     *
+     * @apiSuccess {String} cpu CPU Usage of Liman.
+     * @apiSuccess {String} ram Ram Usage of Liman.
+     * @apiSuccess {String} disk Disk Usage of Liman.
+     * @apiSuccess {String} network Network Usage of Liman.
+     */
     public function getLimanStats()
     {
         $cpuUsage = shell_exec(
@@ -118,11 +142,13 @@ class HomeController extends Controller
         return respond('Tema Guncellendi.');
     }
 
-    public function new()
-    {
-        return view('permission.request');
-    }
-
+    /**
+     * @api {get} /taleplerim Personal Liman Requests List
+     * @apiName Personal Liman Requests List
+     * @apiGroup General
+     *
+     * @apiSuccess {Array} requests Array of request objects.
+     */
     public function all()
     {
         $requests = LimanRequest::where('user_id', auth()->id())->get();
@@ -145,11 +171,21 @@ class HomeController extends Controller
                     break;
             }
         }
-        return view('permission.all', [
+        return magicView('permission.all', [
             "requests" => $requests,
         ]);
     }
 
+    /**
+     * @api {post} /talep Send Personal Liman Request
+     * @apiName Send Personal Liman Request
+     * @apiGroup General
+     *
+     * @apiParam {String} note Note of the request
+     * @apiParam {String} type server,extension,other
+     * @apiParam {String} speed normal,urgent
+     *
+     */
     public function request()
     {
         LimanRequest::create([

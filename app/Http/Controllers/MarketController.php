@@ -12,6 +12,14 @@ use Illuminate\Contracts\Bus\Dispatcher;
 
 class MarketController extends Controller
 {
+    /**
+     * @api {post} /market/kontrol Check Market Access
+     * @apiName Check Market Access
+     * @apiGroup Updates
+     *
+     * @apiSuccess {JSON} message Status of the connection.
+     *
+     */
     public function verifyMarketConnection()
     {
         if (!env('MARKET_ACCESS_TOKEN')) {
@@ -40,6 +48,14 @@ class MarketController extends Controller
         );
     }
 
+    /**
+     * @api {post} /market/guncellemeKontrol Check Liman Updates
+     * @apiName Check Liman Updates
+     * @apiGroup Updates
+     *
+     * @apiSuccess {Array} array all components of the liman with update statuses.
+     *
+     */
     public function checkMarketUpdates($returnRaw = false)
     {
         $client = self::getClient();

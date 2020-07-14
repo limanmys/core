@@ -17,7 +17,18 @@ class SettingsController extends Controller
     public function settings_all()
     {
         system_log(7, "EXTENSION_LIST");
-        return view('extension_pages.manager');
+        $updateAvailable = is_file(storage_path("extension_updates"));
+        $extensions = extensions()->map(function ($item) {
+            if (!$item["issuer"]) {
+                $item["issuer"] = __('Güvenli olmayan üretici!');
+            }
+            return $item;
+        });
+
+        return magicView('extension_pages.manager', [
+            "updateAvailable" => $updateAvailable,
+            "extensions" => $extensions,
+        ]);
     }
 
     public function saveSettings()
@@ -68,8 +79,9 @@ class SettingsController extends Controller
             );
         }
         // Return view with required parameters.
-        return view('extension_pages.one', [
+        return magicView('extension_pages.one', [
             "files" => $files,
+            "extension" => getExtensionJson(extension()->name),
         ]);
     }
 
@@ -301,7 +313,7 @@ class SettingsController extends Controller
             ? $function['parameters']
             : [];
 
-        return view('table', [
+        return magicView('table', [
             "value" => $parameters,
             "title" => ["Parametre Adı", "Değişken Adı", "Tipi"],
             "display" => ["name", "variable", "type"],
@@ -610,6 +622,8 @@ class SettingsController extends Controller
 
     public function getExtensionUpdates()
     {
-        return respond(json_decode(file_get_contents(storage_path('extension_updates'))));
+        return respond(
+            json_decode(file_get_contents(storage_path('extension_updates')))
+        );
     }
 }

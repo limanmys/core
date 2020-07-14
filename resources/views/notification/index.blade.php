@@ -1,8 +1,7 @@
 @extends('layouts.app')
+
 @section('content')
-@php($notifications = $notifications->groupBy(function ($date) {
-    return \Carbon\Carbon::parse($date->created_at)->format("d.m.Y");
-}))
+
 <div class="row pt-3">
     <div class="col-md-12">
         @if($system)
@@ -28,8 +27,7 @@
                             <i class="fas fa-bell @if($item->type=="error") bg-red @else bg-blue @endif"></i>
                         @endif
                         <div class="timeline-item">
-                            <span class="time"><i class="fa fa-clock-o"></i> {{\Carbon\Carbon::parse($item->created_at)->format("h:i:s")}}</span>
-                
+                            <span class="time"><i class="fa fa-clock-o"></i> {{$item->created_at}}</span>
                             <h3 class="timeline-header">
                                 @if(!$item->read)<a href="javascript:void(0)">@endif
                                     {{$item->title}}

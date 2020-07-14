@@ -21,3 +21,5 @@ vendor/*
 .env
 config/liman.php
 storage/extension_updates
+storage/docs
+public/docs
