@@ -6,7 +6,7 @@ use App\Models\AdminNotification;
 use App\Models\Notification;
 use App\Http\Controllers\Controller;
 use App\Notifications\NotificationSent;
-use App\Models\User;
+use App\User;
 
 class MainController extends Controller
 {

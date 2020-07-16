@@ -1,14 +1,17 @@
 <?php
 
-namespace App\Models;
+namespace App;
 
+use App\Models\Extension;
+use App\Models\Permission;
 use App\Models\Server;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\UsesUuid;
 
 /**
- * App\Models\User
+ * App\User
  *
  * @property-read mixed $id
  * @method static Builder|User newModelQuery()

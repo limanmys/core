@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
-use App\Models\User;
+use App\User;
 use App\Models\Role;
 use App\Http\Controllers\Controller;
 use App\Models\AdminNotification;
@@ -69,7 +69,7 @@ class MainController extends Controller
     public function getUserList()
     {
         return view('l.table', [
-            "value" => \App\Models\User::all(),
+            "value" => \App\User::all(),
             "title" => ["Kullanıcı Adı", "Email", "*hidden*"],
             "display" => ["name", "email", "id:user_id"],
             "menu" => [
@@ -618,7 +618,7 @@ input(type=\"imtcp\" port=\"514\")";
                 continue;
             }
             $foo = explode(" ", trim($ip));
-            if(count($foo) == 1){
+            if (count($foo) == 1) {
                 continue;
             }
             array_push($clean, $foo[1]);
@@ -629,7 +629,11 @@ input(type=\"imtcp\" port=\"514\")";
     public function setDNSServers()
     {
         $system = rootSystem();
-        $flag = $system->dnsUpdate(request('dns1'),request('dns2'),request('dns3'));
+        $flag = $system->dnsUpdate(
+            request('dns1'),
+            request('dns2'),
+            request('dns3')
+        );
         if ($flag) {
             return respond("DNS Ayarları güncellendi!");
         } else {

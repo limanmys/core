@@ -8,7 +8,7 @@ use App\Models\ConnectorToken;
 use App\Models\Extension;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
-use App\Models\User;
+use App\User;
 use App\Models\Permission;
 use Carbon\Carbon;
 use Exception;

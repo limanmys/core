@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Permission;
 use App\Models\RoleUser;
-use App\Models\User;
+use App\User;
 use App\Models\UserSettings;
 use App\Models\AccessToken;
 use App\Models\Server;

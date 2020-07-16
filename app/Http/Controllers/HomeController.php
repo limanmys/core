@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\LimanRequest;
 use App\Models\Server;
-use App\Models\User;
+use App\User;
 use App\Models\UserSettings;
 use App\Models\Extension;
 use App\Models\Widget;

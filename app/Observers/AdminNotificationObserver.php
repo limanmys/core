@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\AdminNotification;
-use App\Models\User;
+use App\User;
 use App\Notifications\NotificationSent;
 
 class AdminNotificationObserver

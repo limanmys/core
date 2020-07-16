@@ -5,7 +5,7 @@ namespace App\Sandboxes;
 use App\Models\Permission;
 use App\Models\Token;
 use Illuminate\Support\Str;
-use App\Models\UserSettings;
+use App\UserSettings;
 
 class PHPSandbox implements Sandbox
 {

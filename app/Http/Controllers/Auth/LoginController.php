@@ -9,7 +9,7 @@ use App\Models\UserSettings;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\User;
 use App\Models\RoleMapping;
 use App\Models\RoleUser;
 use Illuminate\Support\Facades\Event;

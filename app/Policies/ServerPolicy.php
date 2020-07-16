@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Permission;
-use App\Models\User;
+use App\User;
 use App\Models\Server;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -14,7 +14,7 @@ class ServerPolicy
     /**
      * Determine whether the user can view any servers.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\User  $user
      * @return mixed
      */
     public function viewAny(User $user)
@@ -25,7 +25,7 @@ class ServerPolicy
     /**
      * Determine whether the user can view the server.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\User  $user
      * @param  \App\Models\Server  $server
      * @return mixed
      */
@@ -37,7 +37,7 @@ class ServerPolicy
     /**
      * Determine whether the user can create servers.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\User  $user
      * @return mixed
      */
     public function create(User $user)
@@ -49,7 +49,7 @@ class ServerPolicy
     /**
      * Determine whether the user can update the server.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\User  $user
      * @param  \App\Models\Server  $server
      * @return mixed
      */
@@ -61,7 +61,7 @@ class ServerPolicy
     /**
      * Determine whether the user can delete the server.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\User  $user
      * @param  \App\Models\Server  $server
      * @return mixed
      */
@@ -73,7 +73,7 @@ class ServerPolicy
     /**
      * Determine whether the user can restore the server.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\User  $user
      * @param  \App\Models\Server  $server
      * @return mixed
      */
@@ -85,7 +85,7 @@ class ServerPolicy
     /**
      * Determine whether the user can permanently delete the server.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\User  $user
      * @param  \App\Models\Server  $server
      * @return mixed
      */

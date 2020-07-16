@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\User;
 use App\Models\Module;
 use App\Models\AdminNotification;
 use Illuminate\Support\Facades\Hash;

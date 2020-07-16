@@ -63,7 +63,7 @@
                     ])<br><br>
                     <div id="usersTable">
                         @include('table',[
-                            "value" => \App\Models\User::all(),
+                            "value" => \App\User::all(),
                             "title" => [
                                 "Kullanıcı Adı" , "Email" , "*hidden*" ,
                             ],

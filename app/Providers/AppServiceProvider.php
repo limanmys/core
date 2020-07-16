@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
         Notification::observe(NotificationObserver::class);
         AdminNotification::observe(AdminNotificationObserver::class);
         Relation::morphMap([
-            'users' => 'App\Models\User',
+            'users' => 'App\User',
             'roles' => 'App\Models\Role',
         ]);
 
