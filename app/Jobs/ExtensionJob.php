@@ -62,7 +62,7 @@ class ExtensionJob implements ShouldQueue
     {
         $command = $this->sandbox->command($this->function);
 
-        $output = shell_exec($command);
+        $output = rootSystem()->runCommand($command);
 
         system_log(7, "EXTENSION_BACKGROUND_RUN", [
             "extension_id" => $this->extension->id,

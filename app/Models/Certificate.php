@@ -12,22 +12,12 @@ class Certificate extends Model
 
     public function addToSystem($tmpCertLocation)
     {
-        $file =
-            "liman-" . $this->server_hostname . "_" . $this->origin . ".crt";
-        $contents = file_get_contents($tmpCertLocation);
-        shell_exec(
-            "echo '$contents'| sudo tee /usr/local/share/ca-certificates/" .
-                strtolower($file)
-        );
-        shell_exec("sudo update-ca-certificates");
+        rootSystem()->addCertificate($tmpCertLocation, "liman-" . $this->server_hostname . "_" . $this->origin);
     }
 
     public function removeFromSystem()
     {
-        $file =
-            "liman-" . $this->server_hostname . "_" . $this->origin . ".crt";
-        shell_exec('sudo rm /usr/local/share/ca-certificates/ ' . $file);
-        shell_exec("sudo update-ca-certificates -f");
+        rootSystem()->removeCertificate("liman-" . $this->server_hostname . "_" . $this->origin);
         $this->save();
     }
 }
