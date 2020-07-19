@@ -762,7 +762,7 @@
         function getUserList(){
             request('{{route('get_user_list_admin')}}', new FormData(), function (response) {
                 $("#usersTable").html(response);
-                $('#usersTable table').DataTable(dataTablePresets('multiple'));
+                $('#usersTable table').DataTable();
             }, function(response){
                 var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
