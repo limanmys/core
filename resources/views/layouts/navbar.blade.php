@@ -1,7 +1,7 @@
 @if(env('LIMAN_RESTRICTED') == true && !user()->isAdmin())
 <nav class="main-header navbar navbar-expand navbar-dark" style="margin-left:0px;max-height:60px">
 <ul class="navbar-nav"  style="line-height:60px;">
-        <a href="/" onclick="partialPageRequest('/');return false;" class="brand-link">
+        <a href="/" class="brand-link">
             <img src="/images/limanlogo.png" height="30" style="opacity: .8;cursor:pointer;" title="Versiyon {{getVersion()}}">
         </a>
 <li class="nav-item d-none d-sm-inline-block">

@@ -134,7 +134,7 @@
     @endif
     function logDetails(element) {
         var log_id = element.querySelector('#_id').innerHTML;
-        partialPageRequest("/logs/" + log_id);
+        window.location.href = "/logs/" + log_id;
     }
 
     function favorite(action) {

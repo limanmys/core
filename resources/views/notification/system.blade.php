@@ -107,7 +107,7 @@ switch ($notification->type) {
             var data = new FormData();
             data.append('notification_id', $(this).attr('notification-id'));
             request('{{route('notification_delete')}}', data, function (response) {
-                partialPageRequest("{{route('all_user_notifications')}}");
+                window.location.href = "{{route('all_user_notifications')}}";
             }, function(response){
                 var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);

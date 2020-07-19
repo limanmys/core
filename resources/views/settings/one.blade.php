@@ -456,7 +456,7 @@
 
         function roleDetails(row){
             var role_id = row.querySelector('#role_id').innerHTML;
-            partialPageRequest('/rol/' + role_id);
+            window.location.href = '/rol/' + role_id;
         }
         var currentPermissionId = null;
         function permissionData(row){

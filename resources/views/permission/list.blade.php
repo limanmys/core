@@ -56,7 +56,7 @@
 
     function userSettings(element){
         var user_id = element.querySelector('#user_id').innerHTML;
-        partialPageRequest("/ayarlar/" + user_id);
+        window.location.href = "/ayarlar/" + user_id;
     }
     function update(current,status) {
         showSwal('{{__("Kaydediliyor.")}}','info');

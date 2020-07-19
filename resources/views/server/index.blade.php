@@ -310,7 +310,7 @@
         keySettingsChanged();
         function details(element) {
             var server_id = element.querySelector('#server_id').innerHTML;
-            partialPageRequest("/sunucular/" + server_id);
+            window.location.href = "/sunucular/" + server_id;
         }
         $("#keyPasswordCert").fadeOut(0);
         $("#certificateInformLabel").fadeOut(0);

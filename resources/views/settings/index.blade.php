@@ -95,7 +95,7 @@
                     </div>
                 </div>
                 <div class="tab-pane fade show" id="certificates" role="tabpanel">
-                    <button class="btn btn-success" onclick="partialPageRequest('{{route('certificate_add_page')}}')"><i
+                    <button class="btn btn-success" onclick="window.location.href = '{{route('certificate_add_page')}}'"><i
                         class="fa fa-plus"></i> {{__("Sertifika Ekle")}}</button>
                     <br><br>
                     @include('table',[
@@ -782,12 +782,12 @@
 
         function roleDetails(row){
             var role_id = row.querySelector('#role_id').innerHTML;
-            partialPageRequest('/rol/' + role_id);
+            window.location.href = '/rol/' + role_id;
         }
 
         function userDetails(row) {
             var user_id = row.querySelector('#user_id').innerHTML;
-            partialPageRequest('/ayarlar/' + user_id);
+            window.location.href = '/ayarlar/' + user_id;
         }
 
         function checkHealth() {
