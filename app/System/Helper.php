@@ -110,18 +110,21 @@ class Helper {
         return true;
     }
 
-    public function runCommand($command)
+    public function runCommand($user_id, $command,$background = true, $handler = null)
     {
         try{
             $response = $this->client->get('/extensionRun',[
                 'query' => [
                     'liman_token' => $this->authKey,
                     'command' => $command,
+                    'background' => $background ? "true" : "false",
+                    'user_id' => $user_id,
+                    'handler' => $handler
                 ]
             ]);
         }catch(\Exception $e){
-            return "Unknown System Error";
+            return __("Liman Sistem Servisine Erişilemiyor!");
         }
-        return $response->getBody();
+        return $response->getBody()->getContents();
     }
 }

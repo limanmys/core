@@ -29,7 +29,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::define('viewWebSocketsDashboard', function ($user = null) {
-            return false;
+            return true;
         });
     }
 }

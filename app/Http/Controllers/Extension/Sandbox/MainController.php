@@ -50,7 +50,7 @@ class MainController extends Controller
 
         $this->sandbox->setLogId($logId);
 
-        list($output, $timestamp) = $this->executeSandbox($page);
+        $handler = $this->executeSandbox($page);
 
         // Find the function in file. TODO find better solution here.
         $extension = json_decode(
@@ -82,47 +82,20 @@ class MainController extends Controller
             "log_id" => $logId,
             "display" => $display,
         ]);
-        if (trim($output) == "") {
-            abort(504, "İstek zaman aşımına uğradı!");
-        }
+
         if (request()->wantsJson()) {
-            $code = 200;
-            try {
-                $json = json_decode($output, true);
-                if (array_key_exists("status", $json)) {
-                    $code = intval($json["status"]);
-                }
-            } catch (\Exception $exception) {
-            }
-            if (isJson($output)) {
-                return response()->json(json_decode($output), $code);
-            }
-            return response($output, $code);
+            return respond($handler, 254);
         } else {
-            // Let's check output is json or not.
-            $json = json_decode($output, true);
-            if (json_last_error() == JSON_ERROR_NONE && is_array($json)) {
-                $output = view('l.alert', [
-                    "title" => extension()->name,
-                    "message" => array_key_exists("message", $json)
-                        ? $json["message"]
-                        : "Bilinmeyen bir hata oluştu, lütfen eklenti geliştiricisi ile iletişime geçiniz.",
-                    "type" =>
-                        array_key_exists("status", $json) &&
-                        intval($json["status"]) > 200
-                            ? "danger"
-                            : "info",
-                ]);
-            }
 
             if (env('LIMAN_RESTRICTED') == true && !user()->isAdmin()) {
                 return view('extension_pages.server_restricted', [
                     "view" => $output,
                 ]);
             }
+
             return view('extension_pages.server', [
                 "viewName" => "",
-                "view" => $output,
+                "view" => $handler,
                 "tokens" => user()
                     ->accessTokens()
                     ->get()
@@ -220,9 +193,9 @@ class MainController extends Controller
         }
         $command = $this->sandbox->command($function);
 
-        $before = Carbon::now();
-        $output = rootSystem()->runCommand($command);
-        return [$output, $before->diffInMilliseconds(Carbon::now()) / 1000];
+        $random = str_random(16);
+        rootSystem()->runCommand(user()->id,$command,true,$random);
+        return $random;
     }
 
     private function getNavigationServers()

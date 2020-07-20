@@ -90,7 +90,7 @@ class OneController extends Controller
                 $extension["verification"],
                 $extensionDb
             );
-            $output = rootSystem()->runCommand($command);
+            $output = rootSystem()->runCommand(user()->id,$command,false);
             if (isJson($output)) {
                 $message = json_decode($output);
                 if (isset($message->message)) {

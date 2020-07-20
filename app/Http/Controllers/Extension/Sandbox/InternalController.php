@@ -15,6 +15,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Events\ExtensionRendered;
 
 class InternalController extends Controller
 {
@@ -346,6 +347,16 @@ class InternalController extends Controller
         );
     }
 
+    public function extensionRenderedListener()
+    {
+        $data = [
+            "output" => request("output"),
+            "handler" => request("handler")
+        ];
+        $result = event(new ExtensionRendered($data,request('user_id')));
+        return "🤓";
+    }
+
     /**
      * @api {post} /lmn/private/reverseProxyRequest Add Vnc Proxy Config
      * @apiName SandboxAddVncProxyConfig
@@ -373,6 +384,10 @@ class InternalController extends Controller
 
     private function checkPermissions()
     {
+        if(request('system_token') == file_get_contents("/liman/keys/service.key") && $_SERVER['REMOTE_ADDR'] == "127.0.0.1"){
+            return;
+        }
+        
         if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
             system_log(5, "EXTENSION_INTERNAL_NO_PERMISSION", [
                 "extension_id" => extension()->id,

@@ -59,8 +59,8 @@
     @endif
     <div class="card-body">
         <div class="tab-content">
-            <div class="tab-pane fade show active" role="tabpanel">
-                {!!$view!!}
+            <div class="tab-pane fade show active" role="tabpanel" id="mainExtensionWrapper">
+                <div class="spinner-grow text-primary"></div>
             </div>
         </div>
     </div>
@@ -183,5 +183,16 @@ pre {
             "server_id" => server()->id,
         ])}}/" + target;
     }
+
+    function f{{$view}}(output) {
+        $("#mainExtensionWrapper").html(output);
+    }
+
+    Echo.private('extension_renderer_{{auth()->user()->id}}').listen("ExtensionRendered", function(response){
+        if (typeof window["f" + response.data.handler] === "function") {
+            window["f" + response.data.handler](response.data.output);
+            handlerCleanup("f" + response.data.handler);
+        }
+    });
 </script>
 @endsection

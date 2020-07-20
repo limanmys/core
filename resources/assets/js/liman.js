@@ -92,6 +92,9 @@ function request(url, data, next, error, requestType = "POST") {
         case 201:
           if (error) return error(r.responseText);
           break;
+        case 254:
+          registerExtensionHandler(r.responseText,next,error);
+          break;
         case 300:
           return (window.location = response["message"]);
           break;
@@ -105,6 +108,55 @@ function request(url, data, next, error, requestType = "POST") {
     }
   };
   return false;
+}
+
+function registerExtensionHandler(response,next,error) {
+  let json = JSON.parse(response);
+  window["f" + json.message] = function(socketResponse) {
+    handlerCleanup("f" + json.message);
+    return next(socketResponse);
+    if(isJson(socketResponse)){
+      let json = JSON.parse(socketResponse);
+      console.log(json.status);
+      switch (json.status) {
+        case 200:
+          return next(socketResponse);
+          break;
+        case 201:
+          if (error) return error(socketResponse);
+          break;
+        case 254:
+          break;
+        case 300:
+          return (window.location = json.message);
+          break;
+        case 403:
+          showSwal(json.message, "error", 2000);
+          break;
+        default:
+          if (error) return error(socketResponse);
+          break;
+      }
+    }else {
+      return next(socketResponse);
+    }
+  };
+}
+
+function handlerCleanup(name) {
+  setTimeout(() => {
+    window[name] = undefined;
+    delete window[name];
+  }, 1000);
+}
+
+function isJson(str) {
+  try {
+      JSON.parse(str);
+  } catch (e) {
+      return false;
+  }
+  return true;
 }
 
 function limanRequestBuilder(index, token) {

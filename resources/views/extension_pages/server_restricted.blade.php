@@ -16,5 +16,9 @@
             "server_id" => server()->id,
         ])}}/" + target;
     }
+
+    Echo.private('extension_renderer_{{auth()->user()->id}}').listen("ExtensionRendered", function(response){
+        console.log(response);
+    });
 </script>
 @stop

@@ -49,7 +49,6 @@
             }
             checkNotifications(data ? data.id : null);
     });
-    
 
     function dataTablePresets(type){
         if(type == "normal"){
@@ -131,7 +130,8 @@
             }
         });
         $('.js-example-basic-multiple,.js-example-basic-single').select2({
-            width: 'resolve'
+            width: 'resolve',
+            theme: 'bootstrap4',
         });
         $(":input").inputmask();
     }

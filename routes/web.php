@@ -186,3 +186,10 @@ Route::post('/upload_info', function () {
 })->middleware(['auth', 'permissions']);
 
 registerModuleRoutes();
+
+
+// System Service.
+Route::post(
+    '/lmn/private/extensionRenderedHandler',
+    'Extension\Sandbox\InternalController@extensionRenderedListener'
+);
