@@ -122,6 +122,6 @@ class Helper {
         }catch(\Exception $e){
             return "Unknown System Error";
         }
-        return $response->getBody();
+        return $response->getBody()->getContents();
     }
 }
