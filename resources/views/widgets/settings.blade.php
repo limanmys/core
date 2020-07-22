@@ -40,17 +40,13 @@
                     "display" => [
                         "server_name" , "title" ,"extension_name", "id:widget_id"
                     ],
-                    "menu" => [
-                        "Düzenle" => [
-                            "target" => "edit",
-                            "icon" => " context-menu-icon-edit"
-                        ],
+                    "menu" => 
                         "Sil" => [
                             "target" => "delete",
                             "icon" => " context-menu-icon-delete"
                         ]
                     ]
-                ])
+                ])1
             </div>
         </div>
     </div>
@@ -71,21 +67,6 @@
     "submit_text" => "Ekle"
 ])
 
-@include('modal',[
-    "id"=>"edit",
-    "title" => "Bileşen Düzenle",
-    "url" => route('widget_update'),
-    "next" => "updateTable",
-    "inputs" => [
-        "Sunucu Seçin:server_id" => objectToArray(servers(),"name","id"),
-        "Eklenti Seçin:extension_id" => objectToArray(extensions(),"name","id"),
-        "Başlık" => "title:text",
-        "type:-" => "type:hidden",
-        "display_type:-" => "display_type:hidden",
-        "widget_id:widget_id" => "widget_id:hidden"
-    ],
-    "submit_text" => "Düzenle"
-])
 
 @include('modal',[
     "id"=>"delete",
