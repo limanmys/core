@@ -221,7 +221,7 @@ class MainController extends Controller
         $command = $this->sandbox->command($function);
 
         $before = Carbon::now();
-        $output = shell_exec($command);
+        $output = rootSystem()->runCommand($command);
         return [$output, $before->diffInMilliseconds(Carbon::now()) / 1000];
     }
 

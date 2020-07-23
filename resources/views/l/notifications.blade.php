@@ -17,12 +17,12 @@
                 @case('error')
                 @case('health_problem')
                 @case('liman_update')
-                <a onclick="partialPageRequest('/bildirim/{{$notification->id}}'); return false;" href="/bildirim/{{$notification->id}}" class="dropdown-item" style="color: #f56954;width: 100%">
+                <a onclick="window.location.href = '/bildirim/{{$notification->id}}'" href="/bildirim/{{$notification->id}}" class="dropdown-item" style="color: #f56954;width: 100%">
                     {{$notification->title}}
                 </a>
                 @break
                 @default
-                <a onclick="partialPageRequest('/bildirim/{{$notification->id}}'); return false;" href="/bildirim/{{$notification->id}}" class="dropdown-item" style="color: #00a65a;width: 100%">
+                <a onclick="window.location.href = '/bildirim/{{$notification->id}}'" href="/bildirim/{{$notification->id}}" class="dropdown-item" style="color: #00a65a;width: 100%">
                     {{$notification->title}}
                 </a>
                 @break

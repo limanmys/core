@@ -134,7 +134,7 @@
     @endif
     function logDetails(element) {
         var log_id = element.querySelector('#_id').innerHTML;
-        partialPageRequest("/logs/" + log_id);
+        window.location.href = "/logs/" + log_id;
     }
 
     function favorite(action) {
@@ -310,7 +310,15 @@
         form.append('name',name);
         request('{{route('server_service_status')}}', form, function (response) {
             var json = JSON.parse(response);
-            $("#serviceStatusWrapper").html(json.message);
+            let wrapper = $("#serviceStatusWrapper");
+            wrapper.html(json.message);
+            if(json.message.includes("Active: active (running)")) {
+                wrapper.css("color","green");
+            }else if(json.message.includes("Active: inactive (dead)")) {
+                wrapper.css("color","grey");
+            }else if(json.message.includes("Active: failed")) {
+                wrapper.css("color","red");
+            }
             $("#serviceStatusModal").modal('show');
             setTimeout(function () {
                 Swal.close();

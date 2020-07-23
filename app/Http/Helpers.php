@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Jenssegers\Blade\Blade;
-
+use App\System\Helper;
 if (!function_exists('respond')) {
     /**
      * @param $message
@@ -63,6 +63,13 @@ if (!function_exists('strposX')) {
                 'Error: Value for parameter $number is out of range'
             );
         }
+    }
+}
+
+if (!function_exists('rootSystem')) {
+    function rootSystem()
+    {
+        return new Helper();
     }
 }
 
@@ -363,19 +370,23 @@ if (!function_exists('addCertificate')) {
      */
     function addCertificate($hostname, $port, $path)
     {
-        $file = "liman-" . $hostname . "_" . $port . ".crt";
-        $cert = file_get_contents('/tmp/' . $path);
-        shell_exec(
-            "echo '$cert'| sudo tee /usr/local/share/ca-certificates/" .
-                strtolower($file)
-        );
-        shell_exec("sudo update-ca-certificates");
+        rootSystem()->addCertificate('/tmp/' . $path, "liman-" . $hostname . "_" . $port);
 
         // Create Certificate Object.
         return Certificate::create([
             "server_hostname" => strtolower($hostname),
             "origin" => $port,
         ]);
+    }
+}
+
+if (!function_exists('getLimanId')) {
+    /**
+     * @return mixed
+     */
+    function getLimanId()
+    {
+        return md5("l1m@ns3cur1ty".trim(shell_exec("ls /dev/disk/by-uuid -1"))).PHP_EOL;
     }
 }
 

@@ -244,7 +244,7 @@ foreach ($extensions as $extension) {
     @if(env('EXTENSION_DEVELOPER_MODE') == true)
         function extensionDetails(element){
             var extension_id = element.querySelector('#extension_id').innerHTML;
-            partialPageRequest("/eklentiler/" + extension_id);
+            window.location.href = "/eklentiler/" + extension_id;
         }
     @endif
 </script>

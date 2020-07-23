@@ -155,14 +155,7 @@ Route::any('/upload/{any?}', function () {
     }
     if (!file_exists($path . "/uploads")) {
         mkdir($path . "/uploads");
-        shell_exec(
-            "sudo chown " .
-                cleanDash($extension_id) .
-                ":liman " .
-                $path .
-                "/uploads"
-        );
-        shell_exec("sudo chmod 770 " . $path . "/uploads");
+        rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
     }
     $server->setUploadDir($path . "/uploads");
     $response = $server->serve();
@@ -179,6 +172,7 @@ Route::post('/upload_info', function () {
     $server = app('tus-server');
     $info = $server->getCache()->get($key);
     $extension_id = request("extension_id");
+    $extension = \App\Models\Extension::find($extension_id);
     if ($extension_id) {
         $extension_path = explode("/uploads/", $info['file_path'], 2)[0];
         $info['file_path'] = str_replace(
@@ -186,13 +180,7 @@ Route::post('/upload_info', function () {
             '',
             $info['file_path']
         );
-        shell_exec(
-            "sudo chown " .
-                cleanDash($extension_id) .
-                ":liman " .
-                $info['file_path']
-        );
-        shell_exec("sudo chmod 770 " . $info['file_path']);
+        rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
     }
     return $info;
 })->middleware(['auth', 'permissions']);

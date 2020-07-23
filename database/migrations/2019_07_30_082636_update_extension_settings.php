@@ -19,13 +19,6 @@ class UpdateExtensionSettings extends Migration
         foreach ($extensions as $extension) {
             $passPath = '/liman/keys/' . DIRECTORY_SEPARATOR . $extension->id;
             file_put_contents($passPath, Str::random(32));
-            shell_exec(
-                "sudo chown liman:" .
-                    cleanDash($extension->id) .
-                    " " .
-                    $passPath
-            );
-            shell_exec("sudo chmod 640 " . $passPath);
         }
 
         // Encrypt Values in Database

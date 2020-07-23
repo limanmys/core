@@ -90,7 +90,7 @@ class OneController extends Controller
                 $extension["verification"],
                 $extensionDb
             );
-            $output = shell_exec($command);
+            $output = rootSystem()->runCommand($command);
             if (isJson($output)) {
                 $message = json_decode($output);
                 if (isset($message->message)) {
@@ -251,7 +251,7 @@ class OneController extends Controller
         hook('extension_delete_attempt', extension());
         try {
             shell_exec(
-                "sudo rm -r " .
+                "rm -rf " .
                     "/liman/extensions/" .
                     strtolower(extension()->name)
             );
@@ -259,18 +259,7 @@ class OneController extends Controller
         }
 
         try {
-            shell_exec(
-                "
-                sudo userdel " .
-                    cleanDash(extension()->id) .
-                    ";
-                rm " .
-                    '/liman/keys/' .
-                    DIRECTORY_SEPARATOR .
-                    extension()->id .
-                    ";
-            "
-            );
+            rootSystem()->userRemove(extension()->id);
             extension()->delete();
         } catch (\Exception $exception) {
         }

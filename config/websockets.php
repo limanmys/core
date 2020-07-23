@@ -29,7 +29,7 @@ return [
             'path' => env('PUSHER_APP_PATH'),
             'capacity' => null,
             'enable_client_messages' => true,
-            'enable_statistics' => true,
+            'enable_statistics' => false,
         ],
     ],
 

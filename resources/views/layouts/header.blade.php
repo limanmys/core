@@ -2,8 +2,8 @@
       <!-- Main Sidebar Container -->
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
-        <a href="/" onclick="partialPageRequest('/');return false;" class="brand-link">
-            <img src="/images/limanlogo.png" height="30" style="opacity: .8;margin-left: 0.3rem;cursor:pointer;" title="Versiyon {{getVersion()}}">
+        <a href="/" class="brand-link">
+            <img src="/images/limanlogo.png" height="30" style="opacity: .8;margin-left: 0.3rem;cursor:pointer;" title="Versiyon {{getVersion() . ' Build : ' . getVersionCode()}}">
         </a>
         <!-- Sidebar -->
         <div class="sidebar">  
@@ -26,7 +26,7 @@
                     </a>
                     <ul class="nav nav-treeview" @if(request('server_id') == $server->id) style="display: block;" @endif>
                         <li class="nav-item">
-                            <a onclick="partialPageRequest('/sunucular/{{$server->id}}')" class="nav-link">
+                            <a href="/sunucular/{{$server->id}}" class="nav-link">
                                 <i class="fa fa-info nav-icon"></i>
                                 <p>{{__("Sunucu Detayları")}}</p>
                             </a>
@@ -43,7 +43,7 @@
                 @endforeach
               <li class="nav-header">{{__("Sunucular")}}</li>
               <li class="nav-item">
-                <a href='/sunucular' onclick="partialPageRequest('/sunucular');return false;" class="nav-link">
+                <a href='/sunucular' class="nav-link">
                     <i class="nav-icon fas fa-server"></i>
                     <p>{{__("Sunucular")}}</p>
                 </a>
@@ -76,20 +76,20 @@
                 <li class="nav-header">{{__("Yönetim Paneli")}}</li>
                 @if(\App\Models\Module::exists())
                 <li class="nav-item">
-                    <a href='/modules' onclick="partialPageRequest('/modules');return false;" class="nav-link">
+                    <a href='/modules' class="nav-link">
                         <i class="nav-icon fas fa-puzzle-piece"></i>
                         <p>{{__("Modüller")}}</p>
                     </a>
                 </li>
                 @endif
                 <li class="nav-item">
-                    <a href='/ayarlar' onclick="partialPageRequest('/ayarlar');return false;" class="nav-link">
+                    <a href='/ayarlar' class="nav-link">
                         <i class="nav-icon fas fa-cog"></i>
                         <p>{{__("Sistem Ayarları")}}</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href='/talepler' onclick="partialPageRequest('/talepler');return false;" class="nav-link">
+                    <a href='/talepler' class="nav-link">
                         <i class="nav-icon fas fa-plus"></i>
                         <p>{{__("Yetki Talepleri")}}</p>
                         @if(\App\Models\LimanRequest::where('status',0)->count())
@@ -100,7 +100,7 @@
               @else
                 <li class="nav-header">{{__("Yetki Talebi")}}</li>
                 <li class="nav-item">
-                    <a href='/taleplerim' onclick="partialPageRequest('/taleplerim');return false;" class="nav-link">
+                    <a href='/taleplerim' class="nav-link">
                         <i class="nav-icon fas fa-key"></i>
                         <p>{{__("Taleplerim")}}</p>
                     </a>
@@ -108,25 +108,25 @@
               @endif
               <li class="nav-header">{{__("Hesap")}}</li>
               <li class="nav-item">
-                  <a href='/profil' onclick="partialPageRequest('/profil');return false;" class="nav-link">
+                  <a href='/profil' class="nav-link">
                       <i class="nav-icon fas fa-user"></i>
                       <p>{{__("Profil")}}</p>
                   </a>
               </li>
               <li class="nav-item">
-                  <a href='/profil/anahtarlarim' onclick="partialPageRequest('/profil/anahtarlarim');return false" class="nav-link">
+                  <a href='/profil/anahtarlarim' class="nav-link">
                       <i class="nav-icon fas fa-user-secret"></i>
                       <p>{{__("Erişim Anahtarları")}}</p>
                   </a>
               </li>
               <li class="nav-item">
-                  <a href='/kasa' onclick="partialPageRequest('/kasa');return false;" class="nav-link">
+                  <a href='/kasa' class="nav-link">
                       <i class="nav-icon fas fa-wallet"></i>
                       <p>{{__("Kasa")}}</p>
                   </a>
               </li>
               <li class="nav-item">
-                  <a href='/bilesenler' onclick="partialPageRequest('/bilesenler');return false;" class="nav-link">
+                  <a href='/bilesenler' class="nav-link">
                       <i class="nav-icon fas fa-chart-pie"></i>
                       <p>{{__("Bileşenler")}}</p>
                   </a>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Jobs;
+namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -62,13 +62,13 @@ class ExtensionJob implements ShouldQueue
     {
         $command = $this->sandbox->command($this->function);
 
-        $output = shell_exec($command);
+        $output = rootSystem()->runCommand($command);
 
-        system_log(7, "EXTENSION_BACKGROUND_RUN", [
-            "extension_id" => $this->extension->id,
-            "server_id" => $this->server->id,
-            "target_name" => $this->function,
-        ]);
+        // system_log(7, "EXTENSION_BACKGROUND_RUN", [
+        //     "extension_id" => $this->extension->id,
+        //     "server_id" => $this->server->id,
+        //     "target_name" => $this->function,
+        // ]);
 
         $code = 200;
         try {

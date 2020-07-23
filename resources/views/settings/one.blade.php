@@ -220,7 +220,7 @@
        "title" =>"Kullanıcıyı Sil",
        "url" => route('user_remove'),
        "text" => "Kullanıcıyı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-       "next" => "redirect",
+       "next" => "redirectToSettings",
        "inputs" => [
            "Kullanici Id:'null'" => "user_id:hidden"
        ],
@@ -327,6 +327,10 @@
                 var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
+        }
+
+        function redirectToSettings() {
+            window.location.href = "{{route('settings')}}";
         }
         function removeRole(element){
             var data = [];
@@ -456,7 +460,7 @@
 
         function roleDetails(row){
             var role_id = row.querySelector('#role_id').innerHTML;
-            partialPageRequest('/rol/' + role_id);
+            window.location.href = '/rol/' + role_id;
         }
         var currentPermissionId = null;
         function permissionData(row){

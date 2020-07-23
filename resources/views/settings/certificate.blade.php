@@ -138,7 +138,7 @@
                 var json = JSON.parse(success);
                 showSwal(json["message"],'info',2000);
                 setTimeout(function () {
-                    partialPageRequest("{{route('settings')}}" + "#certificates");
+                    window.location.href = "{{route('settings')}}" + "#certificates";
                 },1000);
             },function (errors) {
                 var json = JSON.parse(errors);

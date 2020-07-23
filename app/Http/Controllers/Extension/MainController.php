@@ -92,7 +92,7 @@ class MainController extends Controller
         } catch (\Exception $exception) {
             return respond("Lütfen geçerli bir eklenti giriniz.", 201);
         }
-
+        $verify = false;
         $zipFile = request()->file('extension');
         if (
             endsWith(
@@ -146,7 +146,7 @@ class MainController extends Controller
                 );
             }
         }
-        list($error, $new) = self::setupNewExtension($zipFile);
+        list($error, $new) = self::setupNewExtension($zipFile,$verify);
 
         if ($error) {
             return $error;
@@ -159,7 +159,7 @@ class MainController extends Controller
         return respond("Eklenti Başarıyla yüklendi.", 200);
     }
 
-    public function setupNewExtension($zipFile)
+    public function setupNewExtension($zipFile, $verify = false)
     {
         // Initialize Zip Archive Object to use it later.
         $zip = new ZipArchive();
@@ -199,7 +199,7 @@ class MainController extends Controller
             ];
         }
 
-        if (isset($verify)) {
+        if ($verify) {
             $json["issuer"] = explode(" ", $verify, 4)[3];
         } else {
             $json["issuer"] = "";
@@ -223,55 +223,21 @@ class MainController extends Controller
         }
         $new->fill($json);
         $new->save();
+        
+        $system = rootSystem();
 
-        // Add User if not exists
-        if (
-            intval(
-                shell_exec("grep -c '^" . cleanDash($new->id) . "' /etc/passwd")
-            )
-                ? false
-                : true
-        ) {
-            shell_exec('sudo useradd -r -s /bin/sh ' . cleanDash($new->id));
-        }
+        $system->userAdd($new->id);
 
-        $extension_folder = "/liman/extensions/" . strtolower($json["name"]);
         $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $new->id;
         file_put_contents($passPath, Str::random(32));
 
-        shell_exec(
-            "
-            sudo chown liman:" .
-                cleanDash($new->id) .
-                " $passPath;
-            sudo chmod 640 $passPath;
-            sudo mkdir -p $extension_folder;
-            sudo cp -r " .
-                $path .
-                "/* " .
-                $extension_folder .
-                DIRECTORY_SEPARATOR .
-                ";
-            sudo chown " .
-                cleanDash($new->id) .
-                ":liman $extension_folder;
-            sudo chmod 770 $extension_folder;
-            sudo chown -R " .
-                cleanDash($new->id) .
-                ":liman $extension_folder;
-            sudo chmod -R 770 $extension_folder;
-            sudo chown liman:" .
-                cleanDash($new->id) .
-                " " .
-                $extension_folder .
-                DIRECTORY_SEPARATOR .
-                "db.json;
-            sudo chmod 640 " .
-                $extension_folder .
-                DIRECTORY_SEPARATOR .
-                "db.json;
-        "
-        );
+        $extension_folder = "/liman/extensions/" . strtolower($json["name"]);
+
+        `mkdir -p $extension_folder`;
+        `cp -r $path/* $extension_folder/.`;
+        
+        $system->fixExtensionPermissions($new->id, $new->name);
+
         return [null, $new];
     }
 
@@ -338,26 +304,12 @@ class MainController extends Controller
             json_encode($json, JSON_PRETTY_PRINT)
         );
 
-        if (
-            intval(
-                shell_exec("grep -c '^" . cleanDash($ext->id) . "' /etc/passwd")
-            )
-                ? false
-                : true
-        ) {
-            shell_exec('sudo useradd -r -s /bin/sh ' . cleanDash($ext->id));
-        }
+        $system = rootSystem();
+        
+        $system->userAdd($ext->id);
 
         $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $ext->id;
         file_put_contents($passPath, Str::random(32));
-        shell_exec(
-            "
-            sudo chown liman:" .
-                cleanDash($ext->id) .
-                " $passPath;
-            sudo chmod 640 $passPath;
-        "
-        );
 
         request()->request->add(['server' => "none"]);
         request()->request->add(['extension_id' => $ext->id]);
@@ -366,22 +318,7 @@ class MainController extends Controller
             touch($folder . "/views/$file");
         }
 
-        shell_exec(
-            "
-            sudo chown -R " .
-                cleanDash($ext->id) .
-                ":liman $folder;
-            sudo chmod -R 770 $folder;
-            sudo chown liman:" .
-                cleanDash($ext->id) .
-                " $folder" .
-                DIRECTORY_SEPARATOR .
-                "db.json;
-            sudo chmod 640  $folder" .
-                DIRECTORY_SEPARATOR .
-                "db.json;
-        "
-        );
+        $system->fixExtensionPermissions($ext->id, $ext->name);
 
         system_log(6, "EXTENSION_CREATE", [
             "extension_id" => $ext->id,

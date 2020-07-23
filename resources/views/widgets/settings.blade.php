@@ -19,7 +19,7 @@
     <div class="col-md-9">
     <div class="card">
         <div class="card-body">
-            <button class="btn btn-success" onclick="partialPageRequest('{{route('widget_add_page')}}')">{{__("Bileşen Ekle")}}</button>
+            <button class="btn btn-success" onclick="window.location.href = '{{route('widget_add_page')}}'">{{__("Bileşen Ekle")}}</button>
                 <br><br>
                 @include('errors')
                 <?php foreach ($widgets as $widget) {
@@ -41,10 +41,6 @@
                         "server_name" , "title" ,"extension_name", "id:widget_id"
                     ],
                     "menu" => [
-                        "Düzenle" => [
-                            "target" => "edit",
-                            "icon" => " context-menu-icon-edit"
-                        ],
                         "Sil" => [
                             "target" => "delete",
                             "icon" => " context-menu-icon-delete"
@@ -71,21 +67,6 @@
     "submit_text" => "Ekle"
 ])
 
-@include('modal',[
-    "id"=>"edit",
-    "title" => "Bileşen Düzenle",
-    "url" => route('widget_update'),
-    "next" => "updateTable",
-    "inputs" => [
-        "Sunucu Seçin:server_id" => objectToArray(servers(),"name","id"),
-        "Eklenti Seçin:extension_id" => objectToArray(extensions(),"name","id"),
-        "Başlık" => "title:text",
-        "type:-" => "type:hidden",
-        "display_type:-" => "display_type:hidden",
-        "widget_id:widget_id" => "widget_id:hidden"
-    ],
-    "submit_text" => "Düzenle"
-])
 
 @include('modal',[
     "id"=>"delete",

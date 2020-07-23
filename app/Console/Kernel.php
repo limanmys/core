@@ -4,7 +4,7 @@ namespace App\Console;
 
 use App\Models\AdminNotification;
 use App\Models\Notification;
-use App\Models\User;
+use App\User;
 use App\Http\Controllers\MarketController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;

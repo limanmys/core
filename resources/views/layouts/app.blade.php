@@ -13,33 +13,5 @@
             @endauth
             @include('layouts.content')
         </div>
-        
-        <script>
-        function partialPageRequest(url){
-            if(url != "/"){
-                limanEnableWidgets = false;
-            }
-            navigateButtons();
-            history.pushState({}, null, url);
-            var form = new FormData();
-            var newUrl = url + "?partialRequest=true";
-            form.append('partialRequest',true);
-            request(newUrl,form, function(success){
-                $(".content-wrapper").html(success);
-                initialPresets();
-            },function(error){
-                var json = JSON.parse(error);
-                showSwal(json.message,'error',2000);
-                setTimeout(() => {
-                    history.go(-1);
-                }, 1500);
-            },"GET");
-        }
-        
-        window.addEventListener('popstate', function (event) {
-            window.location.href = window.location.hash;
-        });
-    
-    </script>
     @stop
 @endif
