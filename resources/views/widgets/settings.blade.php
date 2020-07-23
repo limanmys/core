@@ -40,13 +40,13 @@
                     "display" => [
                         "server_name" , "title" ,"extension_name", "id:widget_id"
                     ],
-                    "menu" => 
+                    "menu" => [
                         "Sil" => [
                             "target" => "delete",
                             "icon" => " context-menu-icon-delete"
                         ]
                     ]
-                ])1
+                ])
             </div>
         </div>
     </div>
