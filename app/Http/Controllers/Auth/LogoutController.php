@@ -20,11 +20,14 @@ class LogoutController extends Controller
         hook('logout_attempt', [
             "user" => user(),
         ]);
-        //Logout User
-        Auth::logout();
-        session()->flush();
+        Auth::guard()->logout();
+        request()
+            ->session()
+            ->invalidate();
+        request()
+            ->session()
+            ->regenerateToken();
         hook('logout_successful');
-        //Redirect User
-        return respond(route('login'), 300);
+        return redirect(route('login'));
     }
 }
