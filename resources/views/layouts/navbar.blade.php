@@ -79,10 +79,13 @@
                         </div>
                         <div class="card-footer p-0">
                           <ul class="nav flex-column" style="cursor:pointer;">
-                            <li class="nav-item">
-                              <a onclick="request('/cikis',new FormData(),null)" class="nav-link text-dark">
+                          <li class="nav-item">
+                              <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-link text-dark">
                                 {{__("Çıkış Yap")}}	&nbsp;<i class="fas fa-sign-out-alt"></i>
                               </a>
+                              <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                  @csrf
+                              </form>
                             </li>
                           </ul>
                         </div>
