@@ -18,6 +18,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Jenssegers\Blade\Blade;
 use App\System\Helper;
+use mervick\aesEverywhere\AES256;
+
 if (!function_exists('respond')) {
     /**
      * @param $message
@@ -582,9 +584,7 @@ if (!function_exists('extensionDb')) {
             ->first();
         if ($target) {
             $key = env('APP_KEY') . auth()->user()->id . server()->id;
-            $decrypted = openssl_decrypt($target->value, 'aes-256-cfb8', $key);
-            $stringToDecode = substr($decrypted, 16);
-            return base64_decode($stringToDecode);
+            return AES256::decrypt($target->value,$key);
         }
         return null;
     }
@@ -815,9 +815,7 @@ if (!function_exists('lDecrypt')) {
     function lDecrypt($data)
     {
         $key = env('APP_KEY') . user()->id . server()->id;
-        $decrypted = openssl_decrypt($data, 'aes-256-cfb8', $key);
-        $stringToDecode = substr($decrypted, 16);
-        return base64_decode($stringToDecode);
+        return AES256::decrypt($data,$key);
     }
 }
 

@@ -72,31 +72,17 @@ class AddController extends Controller
             server()->type == "linux_certificate"
         ) {
             $encKey = env('APP_KEY') . user()->id . server()->id;
-            $encryptedUsername = openssl_encrypt(
-                Str::random(16) . base64_encode(request('username')),
-                'aes-256-cfb8',
-                $encKey,
-                0,
-                Str::random(16)
-            );
-            $encryptedPassword = openssl_encrypt(
-                Str::random(16) . base64_encode(request('password')),
-                'aes-256-cfb8',
-                $encKey,
-                0,
-                Str::random(16)
-            );
             UserSettings::create([
                 "server_id" => $this->server->id,
                 "user_id" => user()->id,
                 "name" => "clientUsername",
-                "value" => $encryptedUsername,
+                "value" => AES256::encrypt(request('username'),$encKey),
             ]);
             UserSettings::create([
                 "server_id" => $this->server->id,
                 "user_id" => user()->id,
                 "name" => "clientPassword",
-                "value" => $encryptedPassword,
+                "value" => AES256::encrypt(request('password'),$encKey),
             ]);
         } elseif (server()->type == "snmp") {
             $targetValues = [
@@ -109,18 +95,11 @@ class AddController extends Controller
             ];
             $encKey = env('APP_KEY') . user()->id . server()->id;
             foreach ($targetValues as $target) {
-                $encrypted = openssl_encrypt(
-                    Str::random(16) . base64_encode(request($target)),
-                    'aes-256-cfb8',
-                    $encKey,
-                    0,
-                    Str::random(16)
-                );
                 UserSettings::create([
                     "server_id" => $this->server->id,
                     "user_id" => user()->id,
                     "name" => $target,
-                    "value" => $encrypted,
+                    "value" => AES256::encrypt(request($target),$encKey),
                 ]);
             }
         }

@@ -7,6 +7,7 @@ use App\Models\UserSettings;
 use GuzzleHttp\Client;
 use Illuminate\Support\Str;
 use App\Models\ConnectorToken;
+use mervick\aesEverywhere\AES256;
 
 class WinRMConnector implements Connector
 {
@@ -40,15 +41,7 @@ class WinRMConnector implements Connector
         }
 
         $key = env('APP_KEY') . user()->id . server()->id;
-        $decrypted = openssl_decrypt($username["value"], 'aes-256-cfb8', $key);
-        $stringToDecode = substr($decrypted, 16);
-        $username = base64_decode($stringToDecode);
-
-        $key = env('APP_KEY') . user()->id . server()->id;
-        $decrypted = openssl_decrypt($password["value"], 'aes-256-cfb8', $key);
-        $stringToDecode = substr($decrypted, 16);
-        $password = base64_decode($stringToDecode);
-        return [$username, $password];
+        return [AES256::decrypt($username["value"],$key), AES256::decrypt($password["value"],$key)];
     }
 
     public function execute($command)

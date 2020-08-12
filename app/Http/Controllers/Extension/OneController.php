@@ -12,6 +12,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use mervick\aesEverywhere\AES256;
 
 /**
  * Class OneController
@@ -129,44 +130,25 @@ class OneController extends Controller
             ]);
             if (request($key["variable"])) {
                 if ($row->exists()) {
-                    $encKey =
+                    $key =
                         env('APP_KEY') .
                         user()->id .
-                        extension()->id .
                         server()->id;
-                    $encrypted = openssl_encrypt(
-                        Str::random(16) .
-                            base64_encode(request($key["variable"])),
-                        'aes-256-cfb8',
-                        $encKey,
-                        0,
-                        Str::random(16)
-                    );
                     $row->update([
-                        "value" => $encrypted,
+                        "value" => AES256::encrypt(request($key["variable"]),$key),
                         "updated_at" => Carbon::now(),
                     ]);
                 } else {
                     $encKey =
                         env('APP_KEY') .
                         user()->id .
-                        extension()->id .
                         server()->id;
-                    $encrypted = openssl_encrypt(
-                        Str::random(16) .
-                            base64_encode(request($key["variable"])),
-                        'aes-256-cfb8',
-                        $encKey,
-                        0,
-                        Str::random(16)
-                    );
-
                     DB::table("user_settings")->insert([
                         "id" => Str::uuid(),
                         "server_id" => server()->id,
                         "user_id" => user()->id,
                         "name" => $key["variable"],
-                        "value" => $encrypted,
+                        "value" => AES256::encrypt(request($key["variable"]),$key),
                         "created_at" => Carbon::now(),
                         "updated_at" => Carbon::now(),
                     ]);
@@ -218,13 +200,8 @@ class OneController extends Controller
                 ->first();
             if ($obj) {
                 $key =
-                    env('APP_KEY') .
-                    user()->id .
-                    extension()->id .
-                    server()->id;
-                $decrypted = openssl_decrypt($obj->value, 'aes-256-cfb8', $key);
-                $stringToDecode = substr($decrypted, 16);
-                $similar[$item["variable"]] = base64_decode($stringToDecode);
+                    env('APP_KEY') . user()->id . server()->id;
+                $similar[$item["variable"]] = AES256::decrypt($obj->value,$key);
             }
         }
 

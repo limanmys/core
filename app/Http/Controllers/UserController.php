@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use App\Models\ConnectorToken;
+use mervick\aesEverywhere\AES256;
 
 class UserController extends Controller
 {
@@ -362,14 +363,9 @@ class UserController extends Controller
             }
         }
 
-        $encKey = env('APP_KEY') . $setting->user_id . $setting->server_id;
-        $encrypted = openssl_encrypt(
-            Str::random(16) . base64_encode(request('new_value')),
-            'aes-256-cfb8',
-            $encKey,
-            0,
-            Str::random(16)
-        );
+        $key = env('APP_KEY') . $setting->user_id . $setting->server_id;
+        $encrypted = AES256::encrypt(request('new_value'),$key);
+
         $flag = $setting->update([
             "value" => $encrypted,
         ]);
@@ -492,31 +488,17 @@ class UserController extends Controller
         ])->delete();
 
         $encKey = env('APP_KEY') . user()->id . server()->id;
-        $encryptedUsername = openssl_encrypt(
-            Str::random(16) . base64_encode(request('username')),
-            'aes-256-cfb8',
-            $encKey,
-            0,
-            Str::random(16)
-        );
-        $encryptedPassword = openssl_encrypt(
-            Str::random(16) . base64_encode(request('password')),
-            'aes-256-cfb8',
-            $encKey,
-            0,
-            Str::random(16)
-        );
         UserSettings::create([
             "server_id" => server()->id,
             "user_id" => user()->id,
             "name" => "clientUsername",
-            "value" => $encryptedUsername,
+            "value" => AES256::encrypt(request('username'),$encKey),
         ]);
         UserSettings::create([
             "server_id" => server()->id,
             "user_id" => user()->id,
             "name" => "clientPassword",
-            "value" => $encryptedPassword,
+            "value" => AES256::encrypt(request('password'),$encKey),
         ]);
         ConnectorToken::clear();
         return respond("Başarıyla eklendi.");

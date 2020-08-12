@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Token;
 use Illuminate\Support\Str;
 use App\Models\Permission;
+use mervick\aesEverywhere\AES256;
 
 class ExtensionJob implements ShouldQueue
 {
@@ -118,14 +119,8 @@ class ExtensionJob implements ShouldQueue
             $extensionDb = [];
             foreach ($settings->get() as $setting) {
                 $key =
-                    env('APP_KEY') . $user_id . $extension_id . $serverObj->id;
-                $decrypted = openssl_decrypt(
-                    $setting->value,
-                    'aes-256-cfb8',
-                    $key
-                );
-                $stringToDecode = substr($decrypted, 16);
-                $extensionDb[$setting->name] = base64_decode($stringToDecode);
+                    env('APP_KEY') . $user_id . $serverObj->id;
+                $extensionDb[$setting->name] = AES256::decrypt($setting->value,$key);
             }
         }
 
