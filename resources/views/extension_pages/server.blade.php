@@ -177,22 +177,15 @@ pre {
 
     function API(target)
     {
-        return "{{route('extension_server', [
-            "extension_id" => extension()->id,
-            "city" => server()->city,
-            "server_id" => server()->id,
-        ])}}/" + target;
+        return "{{route('home')}}/extensionRun/" + target;
     }
+    customRequestData["token"] = "{{ $auth_token }}";
 
-    function f{{$view}}(output) {
-        $("#mainExtensionWrapper").html(output);
-    }
-
-    Echo.private('extension_renderer_{{auth()->user()->id}}').listen("ExtensionRendered", function(response){
-        if (typeof window["f" + response.data.handler] === "function") {
-            window["f" + response.data.handler](response.data.output);
-            handlerCleanup("f" + response.data.handler);
-        }
+    request(API('index'),new FormData(), function (success){
+        $("#mainExtensionWrapper").html(success);
+    },function (error){
+        let json = JSON.parse(error);
+        showSwal(json.message,'error',2000);
     });
 </script>
 @endsection

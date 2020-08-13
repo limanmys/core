@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\UserSettings;
 use App\Models\Permission;
 use App\Models\Server;
+use App\Models\Token;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -46,7 +47,7 @@ class MainController extends Controller
             ? request('target_function')
             : 'index';
 
-        $logId = (string) Str::uuid();
+        /*$logId = (string) Str::uuid();
 
         $this->sandbox->setLogId($logId);
 
@@ -102,7 +103,17 @@ class MainController extends Controller
                     ->toArray(),
                 "last" => $this->getNavigationServers(),
             ]);
-        }
+        }*/
+
+        $token = Token::create(user()->id);
+        return view('extension_pages.server', [
+            "auth_token" => $token,
+            "tokens" => user()
+                ->accessTokens()
+                ->get()
+                ->toArray(),
+            "last" => $this->getNavigationServers(),
+        ]);
     }
 
     private function checkForMissingSettings()

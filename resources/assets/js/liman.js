@@ -33,6 +33,10 @@ function request(url, data, next, error, requestType = "POST") {
   }
 
   modalData = data;
+  if (url.startsWith(window.location.origin + "/extensionRun/") || url.startsWith("/extensionRun/")) {
+    data.append('target',url.split("/extensionRun/")[1])
+    url = window.location.origin + "/extensionRun/";
+  }
 
   var server_id = $("meta[name=server_id]").attr("content");
   var extension_id = $("meta[name=extension_id]").attr("content");
@@ -92,9 +96,6 @@ function request(url, data, next, error, requestType = "POST") {
         case 201:
           if (error) return error(r.responseText);
           break;
-        case 254:
-          registerExtensionHandler(r.responseText,next,error);
-          break;
         case 300:
           return (window.location = response["message"]);
           break;
@@ -110,38 +111,6 @@ function request(url, data, next, error, requestType = "POST") {
   return false;
 }
 
-function registerExtensionHandler(response,next,error) {
-  let json = JSON.parse(response);
-  window["f" + json.message] = function(socketResponse) {
-    handlerCleanup("f" + json.message);
-    return next(socketResponse);
-    if(isJson(socketResponse)){
-      let json = JSON.parse(socketResponse);
-      console.log(json.status);
-      switch (json.status) {
-        case 200:
-          return next(socketResponse);
-          break;
-        case 201:
-          if (error) return error(socketResponse);
-          break;
-        case 254:
-          break;
-        case 300:
-          return (window.location = json.message);
-          break;
-        case 403:
-          showSwal(json.message, "error", 2000);
-          break;
-        default:
-          if (error) return error(socketResponse);
-          break;
-      }
-    }else {
-      return next(socketResponse);
-    }
-  };
-}
 
 function handlerCleanup(name) {
   setTimeout(() => {
