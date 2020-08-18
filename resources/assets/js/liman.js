@@ -54,7 +54,7 @@ function request(url, data, next, error, requestType = "POST") {
       parsed[pair[0]] = pair[1];
     }
     limanRequestList.push({
-      target: url.substring(url.lastIndexOf("/") + 1),
+      target: data.get('target'),
       url: url,
       form: parsed,
     });
