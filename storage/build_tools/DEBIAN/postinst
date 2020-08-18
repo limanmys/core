@@ -189,6 +189,27 @@ WantedBy=multi-user.target
 fi
 
 # Create Systemd Service
+if [ -f "/etc/systemd/system/liman-render.service" ]; then
+    echo "Liman Connector Service Already Added.";
+else
+    echo """
+[Unit]
+Description=Liman System Service & Extension Renderer
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/liman/server/storage/liman_render
+
+[Install]
+WantedBy=multi-user.target
+    """ > /etc/systemd/system/liman-render.service
+fi
+
+# Create Systemd Service
 if [ -f "/etc/systemd/system/liman-webssh.service" ]; then
     echo "Liman WebSSH Service Already Added.";
 else
@@ -272,6 +293,7 @@ systemctl stop liman 2>/dev/null
 systemctl enable liman-vnc 2>/dev/null
 systemctl enable liman-webssh 2>/dev/null
 systemctl enable liman-system 2>/dev/null
+systemctl enable liman-render 2>/dev/null
 systemctl enable liman-connector 2>/dev/null
 systemctl enable liman-socket 2>/dev/null
 systemctl enable nginx 2>/dev/null
@@ -279,6 +301,7 @@ systemctl enable php7.3-fpm 2>/dev/null
 
 systemctl restart liman-connector
 systemctl restart liman-system
+systemctl restart liman-render
 systemctl restart liman-vnc
 systemctl restart liman-webssh
 systemctl restart liman-socket
