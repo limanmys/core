@@ -16,7 +16,7 @@ jobs:
           repository: mertcelen/liman-sandbox
           path: package/liman/sandbox/php
           token: ${{ secrets.CI_TOKEN }}
-          ref: ${GITHUB_REF#refs/heads/}
+          ref: "1.3-dev"
 
       - name: Getting Liman' Python Sandbox
         uses: actions/checkout@v2
