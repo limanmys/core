@@ -124,9 +124,9 @@ foreach ($extensions as $extension) {
     "PHP 7.3:php" => [
         "-:php" => "language:hidden"
     ],
-    "Python 3.7(BETA):python" => [
+    /*"Python 3.7(BETA):python" => [
         "-:python" => "language:hidden"
-    ]
+    ]*/
     ],
     "inputs" => [
         "Eklenti Adı" => "name:text",

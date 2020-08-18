@@ -174,16 +174,15 @@ pre {
             
         }
     })
-
     function API(target)
     {
         return "{{route('home')}}/extensionRun/" + target;
     }
     customRequestData["token"] = "{{ $auth_token }}";
 
-    request(API('index'),new FormData(), function (success){
+    request(API('{{request('target_function') ? request('target_function') : 'index'}}'),new FormData(), function (success){
         $("#mainExtensionWrapper").html(success);
-    },function (error){
+    },function (error){ 
         let json = JSON.parse(error);
         showSwal(json.message,'error',2000);
     });

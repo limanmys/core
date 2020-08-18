@@ -13,6 +13,8 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use mervick\aesEverywhere\AES256;
+use GuzzleHttp\Client;
+use App\Models\Token;
 
 /**
  * Class OneController
@@ -53,89 +55,22 @@ class OneController extends Controller
                     ]);
             }
         }
-        //Check Verification
-        if (
-            array_key_exists("verification", $extension) &&
-            $extension["verification"] != null &&
-            $extension["verification"] != ""
-        ) {
-            // Run Function
-            $extensionDb = [];
-            foreach ($extension["database"] as $key) {
-                if (request($key["variable"])) {
-                    $extensionDb[$key["variable"]] = request($key["variable"]);
-                } elseif (
-                    $setting = UserSettings::where([
-                        "user_id" => user()->id,
-                        "server_id" => server()->id,
-                        'name' => $key["variable"],
-                    ])->first()
-                ) {
-                    $extensionDb[$key["variable"]] = lDecrypt($setting->value);
-                } else {
-                    return redirect(
-                        route('extension_server_settings_page', [
-                            "extension_id" => extension()->id,
-                            "server_id" => server()->id,
-                            "city" => server()->city,
-                        ])
-                    )
-                        ->withInput()
-                        ->withErrors([
-                            "message" => "Eksik parametre girildi.",
-                        ]);
-                }
-            }
-            $extensionDb = json_encode($extensionDb);
-            $command = sandbox()->command(
-                $extension["verification"],
-                $extensionDb
-            );
-            $output = rootSystem()->runCommand(user()->id,$command,false);
-            if (isJson($output)) {
-                $message = json_decode($output);
-                if (isset($message->message)) {
-                    $output = $message->message;
-                }
-            }
 
-            $sessions = \App\Models\TmpSession::where(
-                'session_id',
-                session()->getId()
-            )->get();
-            foreach ($sessions as $session) {
-                session()->put($session->key, $session->value);
-                $session->delete();
-            }
-
-            if (strtolower($output) != "ok" && strtolower($output) != "ok\n") {
-                return redirect(
-                    route('extension_server_settings_page', [
-                        "extension_id" => extension()->id,
-                        "server_id" => server()->id,
-                        "city" => server()->city,
-                    ])
-                )
-                    ->withInput()
-                    ->withErrors([
-                        "message" => $output,
-                    ]);
-            }
-        }
         foreach ($extension["database"] as $key) {
             $row = DB::table('user_settings')->where([
                 "user_id" => user()->id,
                 "server_id" => server()->id,
                 'name' => $key["variable"],
             ]);
-            if (request($key["variable"])) {
+            $variable = request($key["variable"]);
+            if ($variable) {
                 if ($row->exists()) {
-                    $key =
+                    $encKey =
                         env('APP_KEY') .
                         user()->id .
                         server()->id;
                     $row->update([
-                        "value" => AES256::encrypt(request($key["variable"]),$key),
+                        "value" => AES256::encrypt($variable,$encKey),
                         "updated_at" => Carbon::now(),
                     ]);
                 } else {
@@ -148,12 +83,58 @@ class OneController extends Controller
                         "server_id" => server()->id,
                         "user_id" => user()->id,
                         "name" => $key["variable"],
-                        "value" => AES256::encrypt(request($key["variable"]),$key),
+                        "value" => AES256::encrypt($variable,$encKey),
                         "created_at" => Carbon::now(),
                         "updated_at" => Carbon::now(),
                     ]);
                 }
             }
+        }
+
+        //Check Verification
+        if (
+            array_key_exists("verification", $extension) &&
+            $extension["verification"] != null &&
+            $extension["verification"] != ""
+        ) {
+            $client = new Client();
+            $result = "";
+            try {
+                $res = $client->request('POST', 'http://127.0.0.1:5454/', [
+                    'form_params' => [
+                        "target" => $extension["verification"],
+                        "extension_id" => extension()->id,
+                        "server_id" => server()->id,
+                        "token" => Token::create(user()->id),
+                    ],
+                    'timeout' => 5,
+                ]);
+                $output = (string) $res->getBody();
+                if (isJson($output)) {
+                    $message = json_decode($output);
+                    if (isset($message->message)) {
+                        $result = $message->message;
+                    }
+                } else {
+                    $result = $output;
+                }
+            } catch (\Exception $e) {
+                $result = $e->getMessage();
+            }
+            if (trim($result != "ok")) {
+                return redirect(
+                    route('extension_server_settings_page', [
+                        "extension_id" => extension()->id,
+                        "server_id" => server()->id,
+                        "city" => server()->city,
+                    ])
+                )
+                    ->withInput()
+                    ->withErrors([
+                        "message" => $result,
+                ]);
+            }
+            
         }
         system_log(7, "EXTENSION_SETTINGS_UPDATE", [
             "extension_id" => extension()->id,
