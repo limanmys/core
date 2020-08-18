@@ -14,6 +14,7 @@ use App\Models\Server;
 use Illuminate\Support\Str;
 use App\Models\Notification;
 use App\Models\UserSettings;
+use mervick\aesEverywhere\AES256;
 
 class AddController extends Controller
 {
