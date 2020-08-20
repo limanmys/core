@@ -36,6 +36,10 @@
         "name" , "version", "issuer", "updated_at", "id:extension_id"
     ],
     "menu" => [
+        "Lisans Ekle" => [
+            "target" => "addLicenseToExtension",
+            "icon" => " context-menu-icon-add"
+        ],
         "Sil" => [
             "target" => "delete",
             "icon" => " context-menu-icon-delete"
@@ -43,6 +47,19 @@
     ],
     "onclick" => env('EXTENSION_DEVELOPER_MODE') ? "extensionDetails" : ""
 ])
+@include('modal',[
+    "id"=>"addLicenseToExtension",
+    "title" => "Lisans Ekle",
+    "text" => "Varsa mevcut lisansınızın üzerine yazılacaktır.",
+    "url" => route('add_extension_license'),
+    "next" => "reload",
+    "inputs" => [
+        "Lisans" => "license:text",
+        "extension_id:extension_id" => "extension_id:hidden"
+    ],
+    "submit_text" => "Ekle"
+])
+
 @include('modal',[
     "id"=>"extSettings",
     "title" => "Ayarlar",

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Extension;
 
 use App\Http\Controllers\Controller;
+use App\Models\License;
 
 /**
  * Class SettingsController
@@ -38,6 +39,19 @@ class SettingsController extends Controller
             return respond('Ayarlar başarıyla kaydedildi.');
         } else {
             return respond('Bu ayar minimum 1 olmalıdır.', 201);
+        }
+    }
+
+    public function addLicense()
+    {
+        $license = License::updateOrCreate(
+            ['extension_id' => extension()->id],
+            ['data' => request('license')]
+        );
+        if ($license) {
+            return respond("Lisans Eklendi");
+        } else{
+            return respond("Lisans Eklenemiyor!",201);
         }
     }
 
