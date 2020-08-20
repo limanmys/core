@@ -47,7 +47,9 @@ function request(url, data, next, error, requestType = "POST") {
   for (const [key, value] of Object.entries(customRequestData)) {
     data.append(key, value);
   }
+  data.append("lmnbaseurl",window.location.origin);
   data.append("limanJSRequest", true);
+
   if (limanRecordRequests) {
     var parsed = {};
     for (var pair of data.entries()) {
