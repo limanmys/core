@@ -34,7 +34,7 @@ function request(url, data, next, error, requestType = "POST") {
 
   modalData = data;
   if (url.startsWith(window.location.origin + "/extensionRun/") || url.startsWith("/extensionRun/")) {
-    data.append('target',url.split("/extensionRun/")[1])
+    data.append('lmntargetFunction',url.split("/extensionRun/")[1])
     url = window.location.origin + "/extensionRun/";
   }
 

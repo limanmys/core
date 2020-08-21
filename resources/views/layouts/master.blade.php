@@ -129,7 +129,7 @@
                 url : "{{asset('turkce.json')}}"
             }
         });
-        $('.js-example-basic-multiple,.js-example-basic-single').select2({
+        $('.js-example-basic-multiple,.js-example-basic-single,.select2').select2({
             width: 'resolve',
             theme: 'bootstrap4',
         });
