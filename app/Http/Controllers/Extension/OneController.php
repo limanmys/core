@@ -102,7 +102,7 @@ class OneController extends Controller
             try {
                 $res = $client->request('POST', 'http://127.0.0.1:5454/', [
                     'form_params' => [
-                        "target" => $extension["verification"],
+                        "lmntargetFunction" => $extension["verification"],
                         "extension_id" => extension()->id,
                         "server_id" => server()->id,
                         "token" => Token::create(user()->id),

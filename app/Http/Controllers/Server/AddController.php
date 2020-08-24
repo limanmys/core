@@ -43,6 +43,10 @@ class AddController extends Controller
             return respond("Bu sunucu ismiyle bir sunucu zaten var.", 201);
         }
 
+        if (strlen(request('name')) > 24) {
+            return respond("Lütfen daha kısa bir sunucu adı girin.",201);
+        }
+
         // Create object with parameters.
         $this->server = new Server();
         $this->server->fill(request()->all());

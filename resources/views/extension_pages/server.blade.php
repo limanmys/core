@@ -179,7 +179,7 @@ pre {
         return "{{route('home')}}/extensionRun/" + target;
     }
     customRequestData["token"] = "{{ $auth_token }}";
-
+    customRequestData["locale"] = "{{session()->get('locale')}}";
     request(API('{{request('target_function') ? request('target_function') : 'index'}}'),new FormData(), function (success){
         $("#mainExtensionWrapper").html(success);
         initialPresets();

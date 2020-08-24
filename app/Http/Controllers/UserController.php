@@ -31,7 +31,7 @@ class UserController extends Controller
         hook('user_add_attempt', [
             "request" => request()->all(),
         ]);
-
+        request()->request->add(['email' => strtolower(request('email'))]);
         $flag = Validator::make(request()->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -46,7 +46,7 @@ class UserController extends Controller
         try {
             $flag->validate();
         } catch (\Exception $exception) {
-            return respond("Lütfen geçerli veri giriniz.", 201);
+            return respond("Lütfen geçerli veri giriniz. " . $exception->getMessage(), 201);
         }
 
         // Check If user already exists.
@@ -73,7 +73,7 @@ class UserController extends Controller
         // Create And Fill User Data
         $user = User::create([
             'name' => request('name'),
-            'email' => request('email'),
+            'email' => strtolower(request('email')),
             'password' => Hash::make($password),
             'status' => request('type') == "administrator" ? "1" : "0",
             'forceChange' => true,

@@ -174,6 +174,10 @@ class OneController extends Controller
 
     public function update()
     {
+        if (strlen(request('name')) > 24) {
+            return respond("Lütfen daha kısa bir sunucu adı girin.",201);
+        }
+        
         if (server()->name !== request('name')) {
             Notification::new(
                 __("Server Adı Güncellemesi"),

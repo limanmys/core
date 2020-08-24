@@ -32,6 +32,9 @@ class MainController extends Controller
 
     public function verifyName()
     {
+        if (strlen(request('server_name')) > 24) {
+            return respond("Lütfen daha kısa bir sunucu adı girin.",201);
+        }
         if (!Server::where('name', request('server_name'))->exists()) {
             return respond("İsim Onaylandı.", 200);
         } else {
