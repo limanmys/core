@@ -382,6 +382,16 @@ if (!function_exists('addCertificate')) {
     }
 }
 
+if (!function_exists('getLimanId')) {
+    /**
+     * @return mixed
+     */
+    function getLimanId()
+    {
+        return md5("l1m@ns3cur1ty".trim(shell_exec("ls /dev/disk/by-uuid -1"))).PHP_EOL;
+    }
+}
+
 if (!function_exists('system_log')) {
     /**
      * @param $level

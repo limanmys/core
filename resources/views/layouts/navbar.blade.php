@@ -75,10 +75,11 @@
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Son Giriş Tarihi : ") . user()->last_login_at}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Giriş Yapılan Son Ip : ") . user()->last_login_ip}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Bağlı Liman : ") . getLimanHostname()}}</h5>
+                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 11px;">{{__("Liman ID: ") . getLimanId()}}</h5>
                         </div>
                         <div class="card-footer p-0">
                           <ul class="nav flex-column" style="cursor:pointer;">
-                            <li class="nav-item">
+                          <li class="nav-item">
                               <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-link text-dark">
                                 {{__("Çıkış Yap")}}	&nbsp;<i class="fas fa-sign-out-alt"></i>
                               </a>

@@ -220,7 +220,7 @@
        "title" =>"Kullanıcıyı Sil",
        "url" => route('user_remove'),
        "text" => "Kullanıcıyı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-       "next" => "redirect",
+       "next" => "redirectToSettings",
        "inputs" => [
            "Kullanici Id:'null'" => "user_id:hidden"
        ],
@@ -327,6 +327,10 @@
                 var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             })
+        }
+
+        function redirectToSettings() {
+            window.location.href = "{{route('settings')}}";
         }
         function removeRole(element){
             var data = [];

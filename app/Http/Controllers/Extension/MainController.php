@@ -92,7 +92,7 @@ class MainController extends Controller
         } catch (\Exception $exception) {
             return respond("Lütfen geçerli bir eklenti giriniz.", 201);
         }
-
+        $verify = false;
         $zipFile = request()->file('extension');
         if (
             endsWith(
@@ -146,7 +146,7 @@ class MainController extends Controller
                 );
             }
         }
-        list($error, $new) = self::setupNewExtension($zipFile);
+        list($error, $new) = self::setupNewExtension($zipFile,$verify);
 
         if ($error) {
             return $error;
@@ -159,7 +159,7 @@ class MainController extends Controller
         return respond("Eklenti Başarıyla yüklendi.", 200);
     }
 
-    public function setupNewExtension($zipFile)
+    public function setupNewExtension($zipFile, $verify = false)
     {
         // Initialize Zip Archive Object to use it later.
         $zip = new ZipArchive();
@@ -199,7 +199,7 @@ class MainController extends Controller
             ];
         }
 
-        if (isset($verify)) {
+        if ($verify) {
             $json["issuer"] = explode(" ", $verify, 4)[3];
         } else {
             $json["issuer"] = "";

@@ -8,41 +8,49 @@
         </ol>
     </nav>
     @include('errors')
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">{{__("Kasa")}}</h3>
-        </div>
-        <div class="card-body">
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add_settings"><i class="fa fa-key "></i> {{__("Anahtar Ekle")}}</button>
-            <button type="button" class="btn btn-secondary" onclick="cleanSessions()">{{__("Önbelleği Temizle")}}</button>
-            <div class="tab-pane active" id="settings" style="margin-top: 15px;">
-                <div class="alert alert-info alert-dismissible">
-                    <h5><i class="icon fas fa-info"></i> {{ __('Bilgilendirme!') }}</h5>
-                    {{__("Güvenliğiniz için varolan verileriniz gösterilmemektedir.")}}
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card card-primary card-outline">
+                <div class="card-body box-profile">
+                    <h3 class="profile-username text-center">{{__("Kasa")}}</h3>
+                    <p class="text-muted text-center">Bu sayfadan mevcut verilerini görebilirsiniz. Buradaki veriler, eklentiler tarafından kullanılmaktadır.</p>
                 </div>
-                @include('table',[
-                "value" => $settings,
-                    "title" => [
-                        "Ayar Adı" , "Sunucu" , "*hidden*"
-                    ],
-                    "display" => [
-                        "name" , "server_name", "id:setting_id"
-                    ],
-                    "menu" => [
-                        "Güncelle" => [
-                            "target" => "update_settings",
-                            "icon" => " context-menu-icon-edit"
-                        ],
-                        "Sil" => [
-                            "target" => "delete_settings",
-                            "icon" => " context-menu-icon-delete"
-                        ]
-                    ]
-                ])
             </div>
         </div>
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-body">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add_settings"><i class="fa fa-key "></i> {{__("Anahtar Ekle")}}</button>
+                <button type="button" class="btn btn-secondary" onclick="cleanSessions()">{{__("Önbelleği Temizle")}}</button>
+                <div class="tab-pane active" id="settings" style="margin-top: 15px;">
+                    <div class="alert alert-info alert-dismissible">
+                        <h5><i class="icon fas fa-info"></i> {{ __('Bilgilendirme!') }}</h5>
+                        {{__("Güvenliğiniz için varolan verileriniz gösterilmemektedir.")}}
+                    </div>
+                    @include('table',[
+                    "value" => $settings,
+                        "title" => [
+                            "Ayar Adı" , "Sunucu" , "*hidden*"
+                        ],
+                        "display" => [
+                            "name" , "server_name", "id:setting_id"
+                        ],
+                        "menu" => [
+                            "Güncelle" => [
+                                "target" => "update_settings",
+                                "icon" => " context-menu-icon-edit"
+                            ],
+                            "Sil" => [
+                                "target" => "delete_settings",
+                                "icon" => " context-menu-icon-delete"
+                            ]
+                        ]
+                    ])
+                </div>
+            </div>
+        </div>
+        </div>
     </div>
-
 @include('modal',[
         "id"=>"add_settings",
         "title" => "Anahtar Ekle",
