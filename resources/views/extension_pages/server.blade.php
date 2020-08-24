@@ -82,7 +82,9 @@
         </ul>
         </div>
         <div class="col-md-8">
-            <p>{{__("Aşağıdaki komut ile Liman MYS'ye dışarıdan istek gönderebilirsiniz.")}}</p>
+            <p>{{__("Aşağıdaki komut ile Liman MYS'ye dışarıdan istek gönderebilirsiniz.Eğer SSL sertifikanız yoksa, komutun sonuna --insecure ekleyebilirsiniz.")}}</p>
+            <b>{{__("Bu sorgu içerisinde ve(ya) sonucunda kurumsal veriler bulunabilir, sorumluluk size aittir.")}}</b>
+
             <div class="row">
                 <div class="col-md-4" style="line-height: 2.25rem;">{{__("Kullanılacak Kişisel Erişim Anahtarı")}}</div>
                 <div class="col-md-8">

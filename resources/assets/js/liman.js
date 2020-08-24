@@ -33,8 +33,11 @@ function request(url, data, next, error, requestType = "POST") {
   }
 
   modalData = data;
-  if (url.startsWith(window.location.origin + "/extensionRun/") || url.startsWith("/extensionRun/")) {
-    data.append('lmntargetFunction',url.split("/extensionRun/")[1])
+  if (
+    url.startsWith(window.location.origin + "/extensionRun/") ||
+    url.startsWith("/extensionRun/")
+  ) {
+    data.append("lmntargetFunction", url.split("/extensionRun/")[1]);
     url = window.location.origin + "/extensionRun/";
   }
 
@@ -47,7 +50,7 @@ function request(url, data, next, error, requestType = "POST") {
   for (const [key, value] of Object.entries(customRequestData)) {
     data.append(key, value);
   }
-  data.append("lmnbaseurl",window.location.origin);
+  data.append("lmnbaseurl", window.location.origin);
   data.append("limanJSRequest", true);
 
   if (limanRecordRequests) {
@@ -56,7 +59,7 @@ function request(url, data, next, error, requestType = "POST") {
       parsed[pair[0]] = pair[1];
     }
     limanRequestList.push({
-      target: data.get('target'),
+      target: data.get("lmntargetFunction"),
       url: url,
       form: parsed,
     });
@@ -113,7 +116,6 @@ function request(url, data, next, error, requestType = "POST") {
   return false;
 }
 
-
 function handlerCleanup(name) {
   setTimeout(() => {
     window[name] = undefined;
@@ -123,19 +125,22 @@ function handlerCleanup(name) {
 
 function isJson(str) {
   try {
-      JSON.parse(str);
+    JSON.parse(str);
   } catch (e) {
-      return false;
+    return false;
   }
   return true;
 }
 
 function limanRequestBuilder(index, token) {
-  var str = JSON.stringify(limanRequestList[index]["form"]);
+  var str = "curl";
+  $.each(limanRequestList[index]["form"], function (index, value) {
+    str += " -F '" + index + "=" + value + "'";
+  });
+
   return (
-    "curl -d '" +
     str +
-    '\' -H "Content-Type: application/json" -H "Accept: application/json" -H "liman-token: ' +
+    ' -H "Content-Type: multipart/form-data" -H "Accept: application/json" -H "liman-token: ' +
     token +
     '" -X POST ' +
     limanRequestList[index]["url"]
