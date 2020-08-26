@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Events\ExtensionRendered;
+use GuzzleHttp\Client;
 
 class InternalController extends Controller
 {
@@ -272,8 +273,11 @@ class InternalController extends Controller
         );
 
         // Update Permissions
-        rootSystem()->fixExtensionPermissions(extension()->id, extension()->name);
-        
+        rootSystem()->fixExtensionPermissions(
+            extension()->id,
+            extension()->name
+        );
+
         system_log(7, "EXTENSION_INTERNAL_RECEIVE_FILE", [
             "extension_id" => extension()->id,
             "server_id" => server()->id,
@@ -338,22 +342,25 @@ class InternalController extends Controller
 
     public function sendLog()
     {
-        Log::channel('extension')->info(
-            json_encode([
-                "log_id" => request('log_id'),
-                "message" => base64_encode(request('message')),
-                "title" => base64_encode(request('title')),
-            ])
-        );
+        $client = new Client();
+        $client->request('POST', 'http://127.0.0.1:5454/sendLog', [
+            'form_params' => [
+                'log_id' => request('log_id'),
+                'message' => base64_encode(request('message')),
+                'title' => base64_encode(request('title')),
+                'token' => Token::create(user()->id),
+            ],
+        ]);
+        return "🤓";
     }
 
     public function extensionRenderedListener()
     {
         $data = [
             "output" => request("output"),
-            "handler" => request("handler")
+            "handler" => request("handler"),
         ];
-        $result = event(new ExtensionRendered($data,request('user_id')));
+        $result = event(new ExtensionRendered($data, request('user_id')));
         return "🤓";
     }
 
@@ -384,10 +391,14 @@ class InternalController extends Controller
 
     private function checkPermissions()
     {
-        if(request('system_token') == file_get_contents("/liman/keys/service.key") && $_SERVER['REMOTE_ADDR'] == "127.0.0.1"){
+        if (
+            request('system_token') ==
+                file_get_contents("/liman/keys/service.key") &&
+            $_SERVER['REMOTE_ADDR'] == "127.0.0.1"
+        ) {
             return;
         }
-        
+
         if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
             system_log(5, "EXTENSION_INTERNAL_NO_PERMISSION", [
                 "extension_id" => extension()->id,
