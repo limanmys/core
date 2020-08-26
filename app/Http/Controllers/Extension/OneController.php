@@ -65,25 +65,19 @@ class OneController extends Controller
             $variable = request($key["variable"]);
             if ($variable) {
                 if ($row->exists()) {
-                    $encKey =
-                        env('APP_KEY') .
-                        user()->id .
-                        server()->id;
+                    $encKey = env('APP_KEY') . user()->id . server()->id;
                     $row->update([
-                        "value" => AES256::encrypt($variable,$encKey),
+                        "value" => AES256::encrypt($variable, $encKey),
                         "updated_at" => Carbon::now(),
                     ]);
                 } else {
-                    $encKey =
-                        env('APP_KEY') .
-                        user()->id .
-                        server()->id;
+                    $encKey = env('APP_KEY') . user()->id . server()->id;
                     DB::table("user_settings")->insert([
                         "id" => Str::uuid(),
                         "server_id" => server()->id,
                         "user_id" => user()->id,
                         "name" => $key["variable"],
-                        "value" => AES256::encrypt($variable,$encKey),
+                        "value" => AES256::encrypt($variable, $encKey),
                         "created_at" => Carbon::now(),
                         "updated_at" => Carbon::now(),
                     ]);
@@ -121,7 +115,7 @@ class OneController extends Controller
             } catch (\Exception $e) {
                 $result = $e->getMessage();
             }
-            if (trim($result != "ok")) {
+            if (trim($result) != "ok") {
                 return redirect(
                     route('extension_server_settings_page', [
                         "extension_id" => extension()->id,
@@ -132,9 +126,8 @@ class OneController extends Controller
                     ->withInput()
                     ->withErrors([
                         "message" => $result,
-                ]);
+                    ]);
             }
-            
         }
         system_log(7, "EXTENSION_SETTINGS_UPDATE", [
             "extension_id" => extension()->id,
@@ -180,9 +173,11 @@ class OneController extends Controller
                 ])
                 ->first();
             if ($obj) {
-                $key =
-                    env('APP_KEY') . user()->id . server()->id;
-                $similar[$item["variable"]] = AES256::decrypt($obj->value,$key);
+                $key = env('APP_KEY') . user()->id . server()->id;
+                $similar[$item["variable"]] = AES256::decrypt(
+                    $obj->value,
+                    $key
+                );
             }
         }
 
@@ -209,9 +204,7 @@ class OneController extends Controller
         hook('extension_delete_attempt', extension());
         try {
             shell_exec(
-                "rm -rf " .
-                    "/liman/extensions/" .
-                    strtolower(extension()->name)
+                "rm -rf " . "/liman/extensions/" . strtolower(extension()->name)
             );
         } catch (\Exception $exception) {
         }
