@@ -81653,6 +81653,9 @@ function request(e, t, i, n, o = "POST") {
   if (
     (t.append("lmnbaseurl", window.location.origin),
     t.append("limanJSRequest", !0),
+    new URLSearchParams(window.location.search).forEach(function (e, i) {
+      t.append(i, e);
+    }),
     limanRecordRequests)
   ) {
     var l = {};

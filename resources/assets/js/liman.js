@@ -52,6 +52,10 @@ function request(url, data, next, error, requestType = "POST") {
   }
   data.append("lmnbaseurl", window.location.origin);
   data.append("limanJSRequest", true);
+  var urlParams = new URLSearchParams(window.location.search);
+  urlParams.forEach(function (value, key) {
+    data.append(key, value);
+  });
 
   if (limanRecordRequests) {
     var parsed = {};
