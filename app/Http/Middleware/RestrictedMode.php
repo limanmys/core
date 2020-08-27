@@ -25,6 +25,8 @@ class RestrictedMode
             "password_change",
             "password_change_save",
             "set_locale",
+            "notifications_read",
+            "user_notifications",
         ];
         if (env('LIMAN_RESTRICTED') == true && user() && !user()->isAdmin()) {
             $request->request->add([

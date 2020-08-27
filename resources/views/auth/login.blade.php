@@ -68,7 +68,7 @@
                 <a href="https://www.github.com/limanmys" target="_blank"><i class="fab fa-github" style="color:white;font-size:50px;"></i></a>
             </div>
             <div class="col-md-2">
-                <a href="https://limanmys.slack.com" target="_blank"><i class="fab fa-slack" style="color:white;font-size:50px;"></i></a>
+                <a href="https://discord.gg/RMBFABn" target="_blank"><i class="fab fa-discord" style="color:white;font-size:50px;"></i></a>
             </div>
         <!-- Space for new icons -->
             <div class="col-md-2"></div>

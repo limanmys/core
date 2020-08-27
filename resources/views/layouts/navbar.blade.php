@@ -1,17 +1,17 @@
 @if(env('LIMAN_RESTRICTED') == true && !user()->isAdmin())
-<nav class="main-header navbar navbar-expand navbar-dark" style="margin-left:0px;max-height:60px">
+<nav class="main-header navbar navbar-expand navbar-dark" style="margin-left:0px;height:58.86px;border:0px;">
 <ul class="navbar-nav"  style="line-height:60px;">
         <a href="/" class="brand-link">
             <img src="/images/limanlogo.png" height="30" style="opacity: .8;cursor:pointer;" title="Versiyon {{getVersion()}}">
         </a>
 <li class="nav-item d-none d-sm-inline-block">
-              <a href="/" class="nav-link">{{__("Ana Sayfa")}}</a>
+              <a href="/" class="nav-link" style="padding-top: 0px;">{{__("Ana Sayfa")}}</a>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
-              <a href="/ayarlar/{{request('extension_id')}}/{{request('server_id')}}" class="nav-link">{{__("Ayarlar")}}</a>
+              <a href="/ayarlar/{{request('extension_id')}}/{{request('server_id')}}" class="nav-link" style="padding-top: 0px;">{{__("Ayarlar")}}</a>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
-              <a href="mailto:{{env('APP_NOTIFICATION_EMAIL')}}?subject={{env('BRAND_NAME')}} {{extension()->display_name}} {{extension()->version}}" class="nav-link">{{__("Destek Al")}}</a>
+              <a href="mailto:{{env('APP_NOTIFICATION_EMAIL')}}?subject={{env('BRAND_NAME')}} {{extension()->display_name}} {{extension()->version}}" class="nav-link" style="padding-top: 0px;">{{__("Destek Al")}}</a>
             </li>
 @else
 <nav class="main-header navbar navbar-expand navbar-dark" style="height:58.86px;border:0px;"> <!-- exactly 58.86 :) -->
@@ -24,7 +24,7 @@
           </li>
 @endif
 <script>
-	if(currentlyDark == true){
+	if(typeof currentlyDark != "undefined" && currentlyDark == true){
 		setDarkMode();
 	}
 </script>
