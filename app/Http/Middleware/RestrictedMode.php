@@ -37,7 +37,10 @@ class RestrictedMode
                     env('LIMAN_RESTRICTED_EXTENSION')
                 ),
             ]);
-            if (!in_array(\Request::route()->getName(), $safeRoutes)) {
+            if (
+                !in_array(\Request::route()->getName(), $safeRoutes) &&
+                substr(\Request::route()->uri(), 0, 11) != "lmn/private"
+            ) {
                 return redirect()->route("extension_server", [
                     "extension_id" => env('LIMAN_RESTRICTED_EXTENSION'),
                     "server_id" => env('LIMAN_RESTRICTED_SERVER'),

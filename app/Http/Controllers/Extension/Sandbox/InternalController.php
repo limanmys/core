@@ -411,7 +411,10 @@ class InternalController extends Controller
 
         ($server = Server::find(request('server_id'))) or
             abort(404, 'Sunucu Bulunamadi');
-        if (!Permission::can($token->user_id, 'server', 'id', $server->id)) {
+        if (
+            !Permission::can($token->user_id, 'server', 'id', $server->id) &&
+            env('LIMAN_RESTRICTED') != true
+        ) {
             system_log(7, "EXTENSION_NO_PERMISSION_SERVER", [
                 "extension_id" => extension()->id,
                 "server_id" => request('server_id'),
@@ -421,7 +424,13 @@ class InternalController extends Controller
         ($extension = Extension::find(request('extension_id'))) or
             abort(404, 'Eklenti Bulunamadi');
         if (
-            !Permission::can($token->user_id, 'extension', 'id', $extension->id)
+            !Permission::can(
+                $token->user_id,
+                'extension',
+                'id',
+                $extension->id
+            ) &&
+            env('LIMAN_RESTRICTED') != true
         ) {
             system_log(7, "EXTENSION_NO_PERMISSION_SERVER", [
                 "extension_id" => extension()->id,
