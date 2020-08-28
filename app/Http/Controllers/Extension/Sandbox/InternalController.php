@@ -354,16 +354,6 @@ class InternalController extends Controller
         return "🤓";
     }
 
-    public function extensionRenderedListener()
-    {
-        $data = [
-            "output" => request("output"),
-            "handler" => request("handler"),
-        ];
-        $result = event(new ExtensionRendered($data, request('user_id')));
-        return "🤓";
-    }
-
     /**
      * @api {post} /lmn/private/reverseProxyRequest Add Vnc Proxy Config
      * @apiName SandboxAddVncProxyConfig
