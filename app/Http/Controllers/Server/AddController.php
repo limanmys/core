@@ -14,6 +14,7 @@ use App\Models\Server;
 use Illuminate\Support\Str;
 use App\Models\Notification;
 use App\Models\UserSettings;
+use mervick\aesEverywhere\AES256;
 
 class AddController extends Controller
 {
@@ -40,6 +41,10 @@ class AddController extends Controller
             ])->exists()
         ) {
             return respond("Bu sunucu ismiyle bir sunucu zaten var.", 201);
+        }
+
+        if (strlen(request('name')) > 24) {
+            return respond("Lütfen daha kısa bir sunucu adı girin.",201);
         }
 
         // Create object with parameters.
@@ -72,31 +77,17 @@ class AddController extends Controller
             server()->type == "linux_certificate"
         ) {
             $encKey = env('APP_KEY') . user()->id . server()->id;
-            $encryptedUsername = openssl_encrypt(
-                Str::random(16) . base64_encode(request('username')),
-                'aes-256-cfb8',
-                $encKey,
-                0,
-                Str::random(16)
-            );
-            $encryptedPassword = openssl_encrypt(
-                Str::random(16) . base64_encode(request('password')),
-                'aes-256-cfb8',
-                $encKey,
-                0,
-                Str::random(16)
-            );
             UserSettings::create([
                 "server_id" => $this->server->id,
                 "user_id" => user()->id,
                 "name" => "clientUsername",
-                "value" => $encryptedUsername,
+                "value" => AES256::encrypt(request('username'),$encKey),
             ]);
             UserSettings::create([
                 "server_id" => $this->server->id,
                 "user_id" => user()->id,
                 "name" => "clientPassword",
-                "value" => $encryptedPassword,
+                "value" => AES256::encrypt(request('password'),$encKey),
             ]);
         } elseif (server()->type == "snmp") {
             $targetValues = [
@@ -109,18 +100,11 @@ class AddController extends Controller
             ];
             $encKey = env('APP_KEY') . user()->id . server()->id;
             foreach ($targetValues as $target) {
-                $encrypted = openssl_encrypt(
-                    Str::random(16) . base64_encode(request($target)),
-                    'aes-256-cfb8',
-                    $encKey,
-                    0,
-                    Str::random(16)
-                );
                 UserSettings::create([
                     "server_id" => $this->server->id,
                     "user_id" => user()->id,
                     "name" => $target,
-                    "value" => $encrypted,
+                    "value" => AES256::encrypt(request($target),$encKey),
                 ]);
             }
         }

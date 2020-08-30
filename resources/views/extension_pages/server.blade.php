@@ -59,8 +59,8 @@
     @endif
     <div class="card-body">
         <div class="tab-content">
-            <div class="tab-pane fade show active" role="tabpanel">
-                {!!$view!!}
+            <div class="tab-pane fade show active" role="tabpanel" id="mainExtensionWrapper">
+                <div class="spinner-grow text-primary"></div>
             </div>
         </div>
     </div>
@@ -82,7 +82,9 @@
         </ul>
         </div>
         <div class="col-md-8">
-            <p>{{__("Aşağıdaki komut ile Liman MYS'ye dışarıdan istek gönderebilirsiniz.")}}</p>
+            <p>{{__("Aşağıdaki komut ile Liman MYS'ye dışarıdan istek gönderebilirsiniz.Eğer SSL sertifikanız yoksa, komutun sonuna --insecure ekleyebilirsiniz.")}}</p>
+            <b>{{__("Bu sorgu içerisinde ve(ya) sonucunda kurumsal veriler bulunabilir, sorumluluk size aittir.")}}</b>
+
             <div class="row">
                 <div class="col-md-4" style="line-height: 2.25rem;">{{__("Kullanılacak Kişisel Erişim Anahtarı")}}</div>
                 <div class="col-md-8">
@@ -174,14 +176,18 @@ pre {
             
         }
     })
-
     function API(target)
     {
-        return "{{route('extension_server', [
-            "extension_id" => extension()->id,
-            "city" => server()->city,
-            "server_id" => server()->id,
-        ])}}/" + target;
+        return "{{route('home')}}/extensionRun/" + target;
     }
+    customRequestData["token"] = "{{ $auth_token }}";
+    customRequestData["locale"] = "{{session()->get('locale')}}";
+    request(API('{{request('target_function') ? request('target_function') : 'index'}}'),new FormData(), function (success){
+        $("#mainExtensionWrapper").html(success);
+        initialPresets();
+    },function (error){ 
+        let json = JSON.parse(error);
+        showSwal(json.message,'error',2000);
+    });
 </script>
 @endsection

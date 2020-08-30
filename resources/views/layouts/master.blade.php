@@ -49,7 +49,6 @@
             }
             checkNotifications(data ? data.id : null);
     });
-    
 
     function dataTablePresets(type){
         if(type == "normal"){
@@ -130,8 +129,9 @@
                 url : "{{asset('turkce.json')}}"
             }
         });
-        $('.js-example-basic-multiple,.js-example-basic-single').select2({
-            width: 'resolve'
+        $('.js-example-basic-multiple,.js-example-basic-single,.select2').select2({
+            width: 'resolve',
+            theme: 'bootstrap4',
         });
         $(":input").inputmask();
     }

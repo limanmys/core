@@ -81641,16 +81641,27 @@ function request(e, t, i, n, o = "POST") {
       (t = new FormData(t)))
     : (r = t.has("id") ? t.get("id") : null),
     null != r && showSwal("Yükleniyor...", "info"),
-    (modalData = t);
+    (modalData = t),
+    (e.startsWith(window.location.origin + "/extensionRun/") ||
+      e.startsWith("/extensionRun/")) &&
+      (t.append("lmntargetFunction", e.split("/extensionRun/")[1]),
+      (e = window.location.origin + "/extensionRun/"));
   var s = $("meta[name=server_id]").attr("content"),
     a = $("meta[name=extension_id]").attr("content");
   "" != s && t.append("server_id", s), "" != a && t.append("extension_id", a);
   for (const [e, i] of Object.entries(customRequestData)) t.append(e, i);
-  if ((t.append("limanJSRequest", !0), limanRecordRequests)) {
+  if (
+    (t.append("lmnbaseurl", window.location.origin),
+    t.append("limanJSRequest", !0),
+    new URLSearchParams(window.location.search).forEach(function (e, i) {
+      t.append(i, e);
+    }),
+    limanRecordRequests)
+  ) {
     var l = {};
     for (var c of t.entries()) l[c[0]] = c[1];
     limanRequestList.push({
-      target: e.substring(e.lastIndexOf("/") + 1),
+      target: t.get("lmntargetFunction"),
       url: e,
       form: l,
     });
@@ -81699,14 +81710,30 @@ function request(e, t, i, n, o = "POST") {
     !1
   );
 }
+function handlerCleanup(e) {
+  setTimeout(() => {
+    (window[e] = void 0), delete window[e];
+  }, 1e3);
+}
+function isJson(e) {
+  try {
+    JSON.parse(e);
+  } catch (e) {
+    return !1;
+  }
+  return !0;
+}
 function limanRequestBuilder(e, t) {
+  var i = "curl";
   return (
-    "curl -d '" +
-    JSON.stringify(limanRequestList[e].form) +
-    '\' -H "Content-Type: application/json" -H "Accept: application/json" -H "liman-token: ' +
-    t +
-    '" -X POST ' +
-    limanRequestList[e].url
+    $.each(limanRequestList[e].form, function (e, t) {
+      i += " -F '" + e + "=" + t + "'";
+    }),
+    i +
+      ' -H "Content-Type: multipart/form-data" -H "Accept: application/json" -H "liman-token: ' +
+      t +
+      '" -X POST ' +
+      limanRequestList[e].url
   );
 }
 function reload() {

@@ -6,6 +6,7 @@ use App\Models\Permission;
 use App\Models\Token;
 use Illuminate\Support\Str;
 use App\Models\UserSettings;
+use mervick\aesEverywhere\AES256;
 
 class PHPSandbox implements Sandbox
 {
@@ -62,15 +63,8 @@ class PHPSandbox implements Sandbox
                 $key =
                     env('APP_KEY') .
                     $this->user->id .
-                    $this->extension->id .
                     $this->server->id;
-                $decrypted = openssl_decrypt(
-                    $setting->value,
-                    'aes-256-cfb8',
-                    $key
-                );
-                $stringToDecode = substr($decrypted, 16);
-                $extensionDb[$setting->name] = base64_decode($stringToDecode);
+                $extensionDb[$setting->name] = AES256::decrypt($setting->value,$key);
             }
 
             $extensionDb = json_encode($extensionDb);
@@ -152,10 +146,10 @@ class PHPSandbox implements Sandbox
             $navigationRoute,
             $token,
             $permissions,
-            session('locale'),
-            json_encode($userData),
+            // session('locale'),
+            // json_encode($userData),
             $publicPath,
-            $isAjax,
+            // $isAjax,
             $this->logId,
         ];
 

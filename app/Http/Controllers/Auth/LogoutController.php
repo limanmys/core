@@ -29,6 +29,5 @@ class LogoutController extends Controller
             ->regenerateToken();
         hook('logout_successful');
         return redirect(route('login'));
-
     }
 }

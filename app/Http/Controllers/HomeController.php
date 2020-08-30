@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\LimanRequest;
 use App\Models\Server;
 use App\User;
+use App\Models\Token;
 use App\Models\UserSettings;
 use App\Models\Extension;
 use App\Models\Widget;
@@ -46,6 +47,7 @@ class HomeController extends Controller
             )->first()->name;
         }
         return magicView('index', [
+            "token" => Token::create(user()->id),
             "widgets" => $widgets,
             "server_count" => Server::all()->count(),
             "extension_count" => Extension::all()->count(),

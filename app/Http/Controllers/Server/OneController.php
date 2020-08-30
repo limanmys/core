@@ -174,6 +174,10 @@ class OneController extends Controller
 
     public function update()
     {
+        if (strlen(request('name')) > 24) {
+            return respond("Lütfen daha kısa bir sunucu adı girin.",201);
+        }
+        
         if (server()->name !== request('name')) {
             Notification::new(
                 __("Server Adı Güncellemesi"),
@@ -1062,13 +1066,6 @@ class OneController extends Controller
 
         // Add credentials
         $encKey = env('APP_KEY') . user()->id . server()->id;
-        $encrypted = openssl_encrypt(
-            Str::random(16) . base64_encode(request('username')),
-            'aes-256-cfb8',
-            $encKey,
-            0,
-            Str::random(16)
-        );
         UserSettings::updateOrCreate(
             [
                 "user_id" => user()->id,
@@ -1076,17 +1073,10 @@ class OneController extends Controller
                 "name" => "clientUsername",
             ],
             [
-                "value" => $encrypted,
+                "value" => AES256::encrypt(request('username'),$encKey),
             ]
         );
 
-        $encrypted = openssl_encrypt(
-            Str::random(16) . base64_encode(request('password')),
-            'aes-256-cfb8',
-            $encKey,
-            0,
-            Str::random(16)
-        );
         UserSettings::updateOrCreate(
             [
                 "user_id" => user()->id,
@@ -1094,7 +1084,7 @@ class OneController extends Controller
                 "name" => "clientPassword",
             ],
             [
-                "value" => $encrypted,
+                "value" => AES256::encrypt(request('password'),$encKey),
             ]
         );
 

@@ -6,24 +6,26 @@ use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ExtensionRendered implements ShouldBroadcast
+class ExtensionRendered implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use SerializesModels,InteractsWithSockets, Dispatchable;
     
-    public $output;
+    private $data;
+    private $user_id;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($output)
+    public function __construct($data, $user_id)
     {
-        $this->output = $output;
+        $this->data = $data;
+        $this->user_id = $user_id;
     }
 
     /**
@@ -33,6 +35,11 @@ class ExtensionRendered implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('channel-name');
+        return new PrivateChannel('extension_renderer_' . $this->user_id);
+    }
+
+    public function broadcastWith()
+    {
+        return ['data' => $this->data];
     }
 }

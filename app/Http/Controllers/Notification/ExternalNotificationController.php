@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Notification;
 use Illuminate\Http\Request;
 use App\Models\ExternalNotification;
 use Illuminate\Support\Str;
+use App\Http\Controllers\Controller;
 
 class ExternalNotificationController extends Controller
 {

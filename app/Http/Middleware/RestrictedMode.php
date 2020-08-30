@@ -25,6 +25,8 @@ class RestrictedMode
             "password_change",
             "password_change_save",
             "set_locale",
+            "notifications_read",
+            "user_notifications",
         ];
         if (env('LIMAN_RESTRICTED') == true && user() && !user()->isAdmin()) {
             $request->request->add([
@@ -37,7 +39,10 @@ class RestrictedMode
                     env('LIMAN_RESTRICTED_EXTENSION')
                 ),
             ]);
-            if (!in_array(\Request::route()->getName(), $safeRoutes)) {
+            if (
+                !in_array(\Request::route()->getName(), $safeRoutes) &&
+                substr(\Request::route()->uri(), 0, 11) != "lmn/private"
+            ) {
                 return redirect()->route("extension_server", [
                     "extension_id" => env('LIMAN_RESTRICTED_EXTENSION'),
                     "server_id" => env('LIMAN_RESTRICTED_SERVER'),

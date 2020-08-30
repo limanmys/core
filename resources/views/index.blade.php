@@ -237,8 +237,9 @@
             var info_box = element.closest('.info-box');
             var form = new FormData();
             form.append('widget_id',element.attr('id'));
+            form.append('token',"{{$token}}");
             form.append('server_id',element.attr('data-server-id'));
-            request('{{route('widget_one')}}', form, function(response){
+            request(API('widget_one'), form, function(response){
                 try {
                   var json = JSON.parse(response);
                   element.html(json["message"]);
@@ -275,7 +276,8 @@
             var form = new FormData();
             form.append('widget_id', id);
             form.append('server_id',element.attr('data-server-id'));
-            request('{{route('widget_one')}}', form, function(res){
+            form.append('token',"{{$token}}");
+            request(API('widget_one'), form, function(response){
                 try {
                   var response =  JSON.parse(res);
                   var data =  response.message;
@@ -311,6 +313,11 @@
            tmp.innerHTML = html;
            return tmp.textContent || tmp.innerText || "";
         }
+
+        function API(target)
+    {
+        return "{{route('home')}}/extensionRun/" + target;
+    }
 
         function createChart(element, labels, data) {
           $("#" + element + ' .overlay').remove();
