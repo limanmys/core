@@ -277,15 +277,16 @@
             form.append('widget_id', id);
             form.append('server_id',element.attr('data-server-id'));
             form.append('token',"{{$token}}");
-            request(API('widget_one'), form, function(response){
+            request(API('widget_one'), form, function(res){
                 try {
                   var response =  JSON.parse(res);
                   var data =  response.message;
                   createChart(id+'Chart',data.labels, data.data);
                 } catch(e) {
-                  info_box.find('.overlay i').remove();
-                  info_box.find('.overlay span').remove();
-                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+e.message+'</span>');
+                  element.find('.overlay .spinner-border').remove();
+                  element.find('.overlay i').remove();
+                  element.find('.overlay span').remove();
+                  element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+e.message+'</span>');
                 }
                 if(next){
                   next();
