@@ -22,17 +22,17 @@
         ]
     },
     "devDependencies": {
-        "@prettier/plugin-php": "^0.14.0",
-        "laravel-mix": "^4.0.7",
-        "lint-staged": "^10.2.2",
+        "@prettier/plugin-php": "^0.14.3",
+        "laravel-mix": "^4.1.4",
+        "lint-staged": "^10.3.0",
         "pre-commit": "^1.2.2",
-        "prettier": "^2.0.5",
-        "webpack-cli": "^3.3.7"
+        "prettier": "^2.1.1",
+        "webpack-cli": "^3.3.12"
     },
     "dependencies": {
         "apidoc": "^0.23.0",
         "cross-env": "^5.2.1",
-        "laravel-echo": "^1.6.1",
-        "pusher-js": "^5.0.2"
+        "laravel-echo": "^1.8.1",
+        "pusher-js": "^5.1.1"
     }
 }
