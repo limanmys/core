@@ -1,27 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-<ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
-    <li class="breadcrumb-item active"><a href="/l/{{extension()->id}}/{{request('city')}}/{{server()->id}}">{{extension()->display_name . __(" - Ana Sayfa")}}</a></li>
-</ol>
-<div class="right" id="ext_menu" style="float:right;margin-top:-55px">
-        <button data-toggle="tooltip" title="Eklenti Ayarları" class="btn btn-primary" onclick="window.location.href = '{{route('extension_server_settings_page',[
-            "server_id" => server()->id,
-            "extension_id" => extension()->id
-        ])}}'"><i class="fa fa-cogs"></i></button>
-        <button data-toggle="tooltip" title="Sunucuya Git" class="btn btn-primary" onclick="window.location.href = '{{route('server_one',[
-            "server_id" => server()->id,
-        ])}}'"><i class="fa fa-server"></i></button>
-        @if(count($tokens) > 0)
-        <button data-toggle="tooltip" title="Sorgu Oluştur" class="btn btn-primary" onclick="showRequestRecords()"><i class="fa fa-book"></i></button>
-        @endif
-        <button data-toggle="tooltip" title="Destek Al" class="btn btn-primary" onclick="location.href = 'mailto:{{env('APP_NOTIFICATION_EMAIL')}}?subject={{env('BRAND_NAME')}} {{getVersion()}} - {{extension()->display_name}} {{extension()->version}}'"><i class="fas fa-headset"></i></button>
-</div>
+
 @include('errors')    
 
 <div class="card">
-    @if(count($last) > 1)
+    @if(count($last) > 0)
     <div class="card-header">
             <ul id="quickNavBar" class="nav nav-tabs" role="tablist">
                 
@@ -51,10 +35,18 @@
                         </li>
                         
                     @endif
-                @endforeach
-                
-                    
+                @endforeach 
             </ul>
+            <div class="right" id="ext_menu" style="float:right;margin-top:-40px">
+        <button data-toggle="tooltip" title="Eklenti Ayarları" class="btn btn-primary" onclick="window.location.href = '{{route('extension_server_settings_page',[
+            "server_id" => server()->id,
+            "extension_id" => extension()->id
+        ])}}'"><i class="fa fa-cogs"></i></button>
+        @if(count($tokens) > 0)
+        <button data-toggle="tooltip" title="Sorgu Oluştur" class="btn btn-primary" onclick="showRequestRecords()"><i class="fa fa-book"></i></button>
+        @endif
+        <button data-toggle="tooltip" title="Destek Al" class="btn btn-primary" onclick="location.href = 'mailto:{{env('APP_NOTIFICATION_EMAIL')}}?subject={{env('BRAND_NAME')}} {{getVersion()}} - {{extension()->display_name}} {{extension()->version}}'"><i class="fas fa-headset"></i></button>
+</div>  
     </div>
     @endif
     <div class="card-body">
