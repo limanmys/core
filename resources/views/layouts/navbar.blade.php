@@ -29,9 +29,15 @@
 	}
 </script>
         </ul>
-        
+@if(request('server') != null)
+<ul class="mx-auto order-0 navbar-nav text-white">
+        <li style="font-weight:bolder;font-size:20px;cursor:pointer;" data-toggle="tooltip" data-original-title="{{server()->ip_address}}" onclick="window.location.href = '{{route('server_one',[
+            "server_id" => server()->id,
+        ])}}'">{{server()->name}}</li>
+    </ul>
+@endif
         <!-- Right navbar links -->
-        <ul class="navbar-nav ml-auto">
+        <ul class="navbar-nav @if(request('server') == null) ml-auto @endif">
           <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
               @if (session('locale') === "tr")
