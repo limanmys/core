@@ -161,9 +161,13 @@ class OneController extends Controller
             "extension_id" => extension()->id,
         ]);
         $similar = [];
-        foreach ($extension["database"] as $item) {
-            if (strpos(strtolower($item["variable"]), "password")) {
-                continue;
+        $flag = server()->key();
+        foreach ($extension["database"] as $key => $item) {
+            if (
+                ($flag != null && $item["variable"] == "clientUsername") ||
+                ($flag != null && $item["variable"] == "clientPassword")
+            ) {
+                unset($extension["database"][$key]);
             }
             $obj = DB::table("user_settings")
                 ->where([

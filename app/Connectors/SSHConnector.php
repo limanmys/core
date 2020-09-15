@@ -142,25 +142,19 @@ class SSHConnector implements Connector
 
     public static function retrieveCredentials()
     {
-        $username = UserSettings::where([
-            'user_id' => user()->id,
-            'server_id' => server()->id,
-            'name' => 'clientUsername',
-        ])->first();
-        $password = UserSettings::where([
-            'user_id' => user()->id,
-            'server_id' => server()->id,
-            'name' => 'clientPassword',
-        ])->first();
-
-        if (!$username || !$password) {
+        if (server()->key() == null) {
             abort(
                 504,
                 "Bu sunucu için SSH anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz."
             );
         }
+        $data = json_decode(server()->key()->data);
 
-        return [lDecrypt($username["value"]), lDecrypt($password["value"])];
+        return [
+            lDecrypt($data["clientUsername"]),
+            lDecrypt($data["clientPassword"]),
+            $data["key_port"],
+        ];
     }
 
     public static function request($url, $params, $retry = 3)

@@ -24,8 +24,9 @@ Route::post('/sunucu/isimKontrol', 'Server\MainController@verifyName')
     ->name('server_verify_name')
     ->middleware('parameters:server_name');
 
-Route::post('/sunucu/anahtarKontrol', 'Server\MainController@verifyKey')
-    ->name('server_verify_key');
+Route::post('/sunucu/anahtarKontrol', 'Server\MainController@verifyKey')->name(
+    'server_verify_key'
+);
 
 // Remove Server Route
 
@@ -175,10 +176,6 @@ Route::group(['middleware' => ['server']], function () {
 
     Route::post('/sunucu/paketler', 'Server\OneController@packageList')->name(
         'server_package_list'
-    );
-
-    Route::post('/sunucu/yukselt', 'Server\OneController@upgradeServer')->name(
-        'server_upgrade'
     );
 
     Route::post(

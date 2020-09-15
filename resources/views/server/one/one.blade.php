@@ -3,7 +3,7 @@
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
                 @php($firstRendered = false)
-                @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
+                @if(server()->canRunCommand() && server()->isLinux())
                     <li class="nav-item">
                         <a class="nav-link active" data-toggle="pill" href="#usageTab" role="tab" aria-selected="true">{{__("Sistem Durumu")}}</a>
                     </li>
@@ -12,13 +12,13 @@
                 <li class="nav-item">
                     <a class="nav-link @if(!$firstRendered) active @endif" data-toggle="pill" href="#extensionsTab" role="tab">{{__("Eklentiler")}}</a>
                 </li>
-                @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
+                @if(server()->canRunCommand() && server()->isLinux())
                     @if(\App\Models\Permission::can(user()->id,'liman','id','server_services'))
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="pill" onclick="getServices()" href="#servicesTab" role="tab">{{__("Servisler")}}</a>
                         </li>
                     @endif
-                    @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
+                    @if(server()->canRunCommand() && server()->isLinux())
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="pill" onclick="getPackages()" href="#packagesTab" role="tab">{{__("Paketler")}}</a>
                         </li>
@@ -52,17 +52,12 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#settingsTab" role="tab">{{__("Sunucu Ayarları")}}</a>
                 </li>
-                @if(server()->type == "linux" || server()->type == "windows")
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="pill" href="#extraTab" role="tab">{{__("Ek Özellikler")}}</a>
-                    </li>
-                @endif
                 {!! serverModuleButtons() !!}
             </ul>
         </div>
         <div class="card-body">
             <div class="tab-content">
-                @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
+                @if(server()->canRunCommand() && server()->isLinux())
                     <div class="tab-pane fade show active" id="usageTab" role="tabpanel">
                             <h4>{{__("Kaynak Kullanımı")}}</h4>
                             <div class="row">
@@ -223,22 +218,6 @@
                             </td>
                         </tr>
                     </table>
-                </div>
-                <div class="tab-pane fade show" id="extraTab" role="tabpanel">
-                    @if(server()->type == "linux")
-                        <p>{{__("Linux Sunucunuza SSH anahtarı ekleyerek Liman üzerindeki ekstra özelliklere erişebilirsiniz.")}}</p>
-                    @elseif(server()->type == "windows")
-                        <p>{{__("Windows Sunucunuza WinRM anahtarı ekleyerek Liman üzerindeki ekstra özelliklere erişebilirsiniz.")}}</p>
-                    @endif
-                    <form id="upgrade_form" onsubmit="return request('{{route('server_upgrade')}}',this,reload,errorSwal)" target="#">
-                            <h5>{{__("Kullanıcı Adı")}}</h5>
-                            <input type="text" name="username" placeholder="{{__("Kullanıcı Adı")}}" class="form-control " required=""
-                                    value=""><br>
-                            <h5>{{__("Parola")}}</h5>
-                            <input type="password" name="password" placeholder="{{__("Parola")}}" class="form-control "
-                                    required="" value=""><br>
-                            <button type="submit" class="btn btn-success">{{__("Yükselt")}}</button>
-                    </form>
                 </div>
             </div>
         </div>

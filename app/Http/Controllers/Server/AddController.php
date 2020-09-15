@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Server;
 use App\Models\AdminNotification;
 use App\Models\Certificate;
 use App\Connectors\SSHConnector;
+use App\Models\ServerKey;
 use App\Connectors\SNMPConnector;
 use App\Connectors\SSHCertificateConnector;
 use App\Connectors\WinRMConnector;
@@ -44,7 +45,7 @@ class AddController extends Controller
         }
 
         if (strlen(request('name')) > 24) {
-            return respond("Lütfen daha kısa bir sunucu adı girin.",201);
+            return respond("Lütfen daha kısa bir sunucu adı girin.", 201);
         }
 
         // Create object with parameters.
@@ -71,77 +72,55 @@ class AddController extends Controller
         // Add Server to request object to use it later.
         request()->request->add(["server" => $this->server]);
 
-        if (
-            server()->type == "windows_powershell" ||
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
+        if (request('type')) {
             $encKey = env('APP_KEY') . user()->id . server()->id;
-            UserSettings::create([
-                "server_id" => $this->server->id,
-                "user_id" => user()->id,
-                "name" => "clientUsername",
-                "value" => AES256::encrypt(request('username'),$encKey),
-            ]);
-            UserSettings::create([
-                "server_id" => $this->server->id,
-                "user_id" => user()->id,
-                "name" => "clientPassword",
-                "value" => AES256::encrypt(request('password'),$encKey),
-            ]);
-        } elseif (server()->type == "snmp") {
-            $targetValues = [
-                "username",
-                "SNMPsecurityLevel",
-                "SNMPauthProtocol",
-                "SNMPauthPassword",
-                "SNMPprivacyProtocol",
-                "SNMPprivacyPassword",
+            $data = [
+                "clientUsername" => AES256::encrypt(
+                    request('username'),
+                    $encKey
+                ),
+                "clientPassword" => AES256::encrypt(
+                    request('password'),
+                    $encKey
+                ),
             ];
-            $encKey = env('APP_KEY') . user()->id . server()->id;
-            foreach ($targetValues as $target) {
-                UserSettings::create([
-                    "server_id" => $this->server->id,
-                    "user_id" => user()->id,
-                    "name" => $target,
-                    "value" => AES256::encrypt(request($target),$encKey),
-                ]);
-            }
+            $data["key_port"] = request('key_port');
+
+            ServerKey::updateOrCreate(
+                ["server_id" => server()->id, "user_id" => user()->id],
+                ["type" => request('type'), "data" => json_encode($data)]
+            );
         }
 
         // Run required function for specific type.
         $next = null;
-        switch ($this->server->type) {
-            case "linux":
-                $next = $this->linux();
+        switch (request('type')) {
+            case "ssh":
+                $next = $this->ssh();
                 break;
 
-            case "linux_ssh":
-                $next = $this->linux_ssh();
+            case "ssh_certificate":
+                $next = $this->ssh_certificate();
                 break;
 
-            case "windows":
-                $next = $this->windows();
+            case "winrm":
+                $next = $this->winrm();
                 break;
 
-            case "windows_powershell":
-                $next = $this->windows_powershell();
-                break;
-
-            case "linux_certificate":
-                $next = $this->linux_certificate();
+            case "winrm_certificate":
+                $next = $this->winrm();
                 break;
             case "snmp":
                 $next = $this->snmp();
                 break;
             default:
-                $next = respond("Sunucu türü bulunamadı.", 404);
+                $next = $this->grantPermissions();
                 break;
         }
         return $next;
     }
 
-    private function linux_ssh()
+    private function ssh()
     {
         $flag = SSHConnector::create(
             $this->server,
@@ -181,7 +160,7 @@ class AddController extends Controller
         return $this->grantPermissions();
     }
 
-    private function linux_certificate()
+    private function ssh_certificate()
     {
         $flag = SSHCertificateConnector::create(
             $this->server,
@@ -199,17 +178,7 @@ class AddController extends Controller
         return $this->grantPermissions();
     }
 
-    private function linux()
-    {
-        return $this->grantPermissions();
-    }
-
-    private function windows()
-    {
-        return $this->grantPermissions();
-    }
-
-    private function windows_powershell()
+    private function winrm()
     {
         $flag = WinRMConnector::create(
             $this->server,

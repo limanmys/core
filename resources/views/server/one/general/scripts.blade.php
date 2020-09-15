@@ -31,7 +31,7 @@
     }
 
 
-    @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
+    @if(server()->canRunCommand() && server()->isLinux())
         if(location.hash !== "#updatesTab"){
             getUpdates();
             Swal.close();
@@ -63,7 +63,7 @@
         @endforeach
     @endif
 
-    @if(server()->type == "linux_ssh" || server()->type == "windows_powershell" || server()->type == "linux_certificate")
+    @if(server()->canRunCommand())
     setInterval(function () {
         stats();
     }, 15000);

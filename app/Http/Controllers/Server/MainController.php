@@ -33,7 +33,7 @@ class MainController extends Controller
     public function verifyName()
     {
         if (strlen(request('server_name')) > 24) {
-            return respond("Lütfen daha kısa bir sunucu adı girin.",201);
+            return respond("Lütfen daha kısa bir sunucu adı girin.", 201);
         }
         if (!Server::where('name', request('server_name'))->exists()) {
             return respond("İsim Onaylandı.", 200);
@@ -54,21 +54,21 @@ class MainController extends Controller
             ],
         ]);
 
-        if (request('key_type') == "linux_ssh") {
+        if (request('key_type') == "ssh") {
             return SSHConnector::verify(
                 request('ip_address'),
                 request('username'),
                 request('password'),
                 request('port')
             );
-        } elseif (request('key_type') == "windows_powershell") {
+        } elseif (request('key_type') == "winrm") {
             return WinRMConnector::verify(
                 request('ip_address'),
                 request('username'),
                 request('password'),
                 request('port')
             );
-        } elseif (request('key_type') == "linux_certificate") {
+        } elseif (request('key_type') == "ssh_certificate") {
             return SSHCertificateConnector::verify(
                 request('ip_address'),
                 request('username'),
@@ -79,11 +79,7 @@ class MainController extends Controller
             return SNMPConnector::verifySnmp(
                 request('ip_address'),
                 request('username'),
-                request('SNMPsecurityLevel'),
-                request('SNMPauthProtocol'),
-                request('SNMPauthPassword'),
-                request('SNMPprivacyProtocol'),
-                request('SNMPprivacyPassword')
+                request('password')
             );
         }
         return respond("Bu anahtara göre bir yapı bulunamadı.", 201);

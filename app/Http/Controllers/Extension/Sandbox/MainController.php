@@ -8,6 +8,7 @@ use App\Models\UserSettings;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\Token;
+use App\Models\ServerKey;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -47,7 +48,7 @@ class MainController extends Controller
             ? request('target_function')
             : 'index';
         $view = "extension_pages.server";
-        
+
         if (env('LIMAN_RESTRICTED') == true && !user()->isAdmin()) {
             $view = "extension_pages.server_restricted";
         }
@@ -64,11 +65,20 @@ class MainController extends Controller
 
     private function checkForMissingSettings()
     {
+        $key = ServerKey::where([
+            "server_id" => server()->id,
+            "user_id" => user()->id,
+        ])->first();
+        $extra = [];
+        if ($key) {
+            $extra = ["clientUsername", "clientPassword"];
+        }
         foreach ($this->extension["database"] as $setting) {
             if (isset($setting["required"]) && $setting["required"] === false) {
                 continue;
             }
             if (
+                !in_array($setting["variable"], $extra) &&
                 !UserSettings::where([
                     "user_id" => user()->id,
                     "server_id" => server()->id,
@@ -141,18 +151,6 @@ class MainController extends Controller
             }
         }
         return true;
-    }
-
-    private function executeSandbox($function)
-    {
-        if (!isset($this->sandbox)) {
-            $this->initializeClass();
-        }
-        $command = $this->sandbox->command($function);
-
-        $random = str_random(16);
-        rootSystem()->runCommand(user()->id,$command,true,$random);
-        return $random;
     }
 
     private function getNavigationServers()

@@ -22,26 +22,19 @@ class WinRMConnector implements Connector
 
     public static function retrieveCredentials()
     {
-        $username = UserSettings::where([
-            'user_id' => user()->id,
-            'server_id' => server()->id,
-            'name' => 'clientUsername',
-        ])->first();
-        $password = UserSettings::where([
-            'user_id' => user()->id,
-            'server_id' => server()->id,
-            'name' => 'clientPassword',
-        ])->first();
-
-        if (!$username || !$password) {
+        if (server()->key() == null) {
             abort(
                 504,
                 "Bu sunucu için WinRM anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz."
             );
         }
+        $data = json_decode(server()->key()->data);
 
-        $key = env('APP_KEY') . user()->id . server()->id;
-        return [AES256::decrypt($username["value"],$key), AES256::decrypt($password["value"],$key)];
+        return [
+            lDecrypt($data["clientUsername"]),
+            lDecrypt($data["clientPassword"]),
+            $data["key_port"],
+        ];
     }
 
     public function execute($command)
