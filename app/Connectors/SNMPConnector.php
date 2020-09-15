@@ -140,12 +140,14 @@ class SNMPConnector implements Connector
                 "Bu sunucu için SNMP anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz."
             );
         }
-        $data = json_decode(server()->key()->data);
+        $data = json_decode(server()->key()->data, true);
 
         return [
             lDecrypt($data["clientUsername"]),
             lDecrypt($data["clientPassword"]),
-            $data["key_port"],
+            array_key_exists("key_port", $data)
+                ? intval($data["key_port"])
+                : 161,
         ];
     }
 }
