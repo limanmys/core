@@ -4,11 +4,7 @@ namespace App\Http\Controllers\Server;
 
 use App\Models\AdminNotification;
 use App\Models\Certificate;
-use App\Connectors\SSHConnector;
 use App\Models\ServerKey;
-use App\Connectors\SNMPConnector;
-use App\Connectors\SSHCertificateConnector;
-use App\Connectors\WinRMConnector;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Server;
@@ -90,107 +86,6 @@ class AddController extends Controller
                 ["server_id" => server()->id, "user_id" => user()->id],
                 ["type" => request('type'), "data" => json_encode($data)]
             );
-        }
-
-        // Run required function for specific type.
-        $next = null;
-        switch (request('type')) {
-            case "ssh":
-                $next = $this->ssh();
-                break;
-
-            case "ssh_certificate":
-                $next = $this->ssh_certificate();
-                break;
-
-            case "winrm":
-                $next = $this->winrm();
-                break;
-
-            case "winrm_certificate":
-                $next = $this->winrm();
-                break;
-            case "snmp":
-                $next = $this->snmp();
-                break;
-            default:
-                $next = $this->grantPermissions();
-                break;
-        }
-        return $next;
-    }
-
-    private function ssh()
-    {
-        $flag = SSHConnector::create(
-            $this->server,
-            request('username'),
-            request('password'),
-            auth()->id(),
-            null,
-            $this->server->key_port
-        );
-
-        if (!$flag) {
-            $this->server->delete();
-            return respond("SSH Hatası", 400);
-        }
-
-        return $this->grantPermissions();
-    }
-
-    private function snmp()
-    {
-        $flag = SNMPConnector::createSnmp(
-            $this->server,
-            request('username'),
-            request('SNMPsecurityLevel'),
-            request('SNMPauthProtocol'),
-            request('SNMPauthPassword'),
-            request('SNMPprivacyProtocol'),
-            request('SNMPprivacyPassword'),
-            user()->id
-        );
-
-        if (!$flag) {
-            $this->server->delete();
-            return respond("SNMP Hatası", 400);
-        }
-
-        return $this->grantPermissions();
-    }
-
-    private function ssh_certificate()
-    {
-        $flag = SSHCertificateConnector::create(
-            $this->server,
-            request('username'),
-            request('certificateText'),
-            auth()->id(),
-            null
-        );
-
-        if (!$flag) {
-            $this->server->delete();
-            return respond("SSH Hatası", 400);
-        }
-
-        return $this->grantPermissions();
-    }
-
-    private function winrm()
-    {
-        $flag = WinRMConnector::create(
-            $this->server,
-            request('username'),
-            request('password'),
-            auth()->id(),
-            null
-        );
-
-        if (!$flag) {
-            $this->server->delete();
-            return respond("WinRM Hatası", 400);
         }
 
         return $this->grantPermissions();

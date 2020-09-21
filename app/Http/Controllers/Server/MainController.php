@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\Server;
 
-use App\Connectors\SSHConnector;
+use App\Connectors\GenericConnector;
 use App\Connectors\SNMPConnector;
-use App\Connectors\SSHCertificateConnector;
-use App\Connectors\WinRMConnector;
 use App\Models\Server;
 use App\Http\Controllers\Controller;
 
@@ -54,34 +52,27 @@ class MainController extends Controller
             ],
         ]);
 
-        if (request('key_type') == "ssh") {
-            return SSHConnector::verify(
-                request('ip_address'),
-                request('username'),
-                request('password'),
-                request('port')
-            );
-        } elseif (request('key_type') == "winrm") {
-            return WinRMConnector::verify(
-                request('ip_address'),
-                request('username'),
-                request('password'),
-                request('port')
-            );
-        } elseif (request('key_type') == "ssh_certificate") {
-            return SSHCertificateConnector::verify(
-                request('ip_address'),
-                request('username'),
-                request('password'),
-                request('port')
-            );
-        } elseif (request('key_type') == "snmp") {
-            return SNMPConnector::verifySnmp(
+        if (request('key_type') == "snmp") {
+            $output = SNMPConnector::verifySnmp(
                 request('ip_address'),
                 request('username'),
                 request('password')
             );
+        } else {
+            $connector = new GenericConnector();
+            $output = $connector->verify(
+                request('ip_address'),
+                request('username'),
+                request('password'),
+                request('port'),
+                request('key_type')
+            );
         }
-        return respond("Bu anahtara göre bir yapı bulunamadı.", 201);
+
+        if ($output == "ok") {
+            return respond("Anahtarınız doğrulandı!");
+        } else {
+            return respond("Anahtarınız doğrulanamadı!", 201);
+        }
     }
 }

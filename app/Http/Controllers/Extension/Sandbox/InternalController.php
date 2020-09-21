@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Extension\Sandbox;
 
-use App\Connectors\SSHTunnelConnector;
 use App\Models\Extension;
 use App\Http\Controllers\Controller;
 use App\Models\JobHistory;
@@ -283,50 +282,6 @@ class InternalController extends Controller
         return $output ? "ok" : "no";
     }
 
-    /**
-     * @api {post} /lmn/private/openTunnel OpenSSH Tunnel Request
-     * @apiName SandboxOpenSSHTunnel
-     * @apiGroup Sandbox
-     *
-     * @apiParam {String} remote_host server host you wish to tunnel.
-     * @apiParam {String} remote_port server port you wish to tunnel.
-     * @apiParam {String} username server username you wish to tunnel.
-     * @apiParam {String} password server password you wish to tunnel.
-     * @apiParam {String} server_id Target Server Id
-     * @apiParam {String} extension_id Target Extension Id
-     * @apiParam {String} token Authenticated User Token
-     *
-     * @apiSuccess {String} token Tunnel token to close later on.
-     */
-    public function openTunnel()
-    {
-        return SSHTunnelConnector::new(
-            request('remote_host'),
-            request('remote_port'),
-            request('username'),
-            request('password')
-        );
-    }
-
-    /**
-     * @api {post} /lmn/private/stopTunnel Close OpenSSH Tunnel
-     * @apiName SandboxStopSSHTunnel
-     * @apiGroup Sandbox
-     *
-     * @apiParam {String} remote_host server host you wish to tunnel.
-     * @apiParam {String} remote_port server port you wish to tunnel.
-     * @apiParam {String} server_id Target Server Id
-     * @apiParam {String} extension_id Target Extension Id
-     * @apiParam {String} token Authenticated User Token
-     */
-    public function stopTunnel()
-    {
-        return SSHTunnelConnector::stop(
-            request('remote_host'),
-            request('remote_port')
-        );
-    }
-
     public function sendNotification()
     {
         Notification::new(
@@ -338,8 +293,10 @@ class InternalController extends Controller
 
     public function sendLog()
     {
-        $client = new Client();
-        $client->request('POST', 'http://127.0.0.1:5454/sendLog', [
+        $client = new Client([
+            'verify' => false,
+        ]);
+        $client->request('POST', 'https://127.0.0.1:5454/sendLog', [
             'form_params' => [
                 'log_id' => request('log_id'),
                 'message' => base64_encode(request('message')),

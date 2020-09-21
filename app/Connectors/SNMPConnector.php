@@ -123,13 +123,9 @@ class SNMPConnector implements Connector
         }
 
         if (isset($flag)) {
-            return respond("SNMP bağlantısı doğrulandı.", 200);
+            return "ok";
         }
-        return respond(
-            "$username,$securityLevel,$authProtocol,$authPassword,$privacyProtocol,$privacyPassword,$ip_address",
-            201
-        );
-        return isset($flag);
+        return "nok";
     }
 
     public static function retrieveCredentials()
