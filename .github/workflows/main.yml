@@ -48,15 +48,6 @@ jobs:
           npm install
           npm run docs
           echo "api.liman.dev" > storage/docs/CNAME
-      - name: Push Docs to APIDOCS Repository
-        uses: cpina/github-action-push-to-another-repository@master
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.CI_TOKEN }}
-        with:
-          source-directory: 'package/liman/server/storage/docs'
-          destination-github-username: 'limanmys'
-          destination-repository-name: 'apidocs'
-          user-email: mcelen94@gmail.com
       - name: Set up Liman Environment
         uses: shivammathur/setup-php@v2
         with:
