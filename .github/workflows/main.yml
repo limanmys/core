@@ -41,13 +41,6 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
-      - name: Create Docs
-        run: |
-          sudo apt install npm -y
-          cd package/liman/server/
-          npm install
-          npm run docs
-          echo "api.liman.dev" > storage/docs/CNAME
       - name: Set up Liman Environment
         uses: shivammathur/setup-php@v2
         with:
