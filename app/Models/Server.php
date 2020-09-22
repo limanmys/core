@@ -2,11 +2,8 @@
 
 namespace App\Models;
 
-use App\Connectors\Connector;
-use App\Connectors\SSHConnector;
+use App\Connectors\GenericConnector;
 use App\Connectors\SNMPConnector;
-use App\Connectors\SSHCertificateConnector;
-use App\Connectors\WinRMConnector;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;
@@ -43,17 +40,10 @@ class Server extends Model
                 "Bu sunucuda komut çalıştırmak için bir bağlantınız yok."
             );
         }
-        $type = $this->key()->type;
-        if ($type == "ssh") {
-            return new SSHConnector($this, user()->id);
-        } elseif ($type == "winrm") {
-            return new WinRMConnector($this, user()->id);
-        } elseif ($type == "ssh_certificate") {
-            return new SSHCertificateConnector($this, user()->id);
-        } elseif ($type == "snmp") {
+        if ($this->key()->type == "snmp") {
             return new SNMPConnector($this, user()->id);
-        } else {
         }
+        return new GenericConnector($this, user());
     }
 
     /**

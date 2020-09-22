@@ -5,6 +5,7 @@ namespace App\Connectors;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Models\UserSettings;
+use App\Models\Token;
 use Illuminate\Support\Str;
 use App\Models\ConnectorToken;
 
@@ -31,24 +32,13 @@ class SSHConnector implements Connector
      */
     public function __construct(\App\Models\Server $server, $user_id)
     {
-        if (!ConnectorToken::get($server->id)->exists()) {
-            list($username, $password) = self::retrieveCredentials();
-            self::init(
-                $username,
-                $password,
-                $server->ip_address,
-                $server->key_port ? $server->key_port : 22
-            );
-        }
-
         return true;
     }
 
     public function execute($command, $flag = true)
     {
         return trim(
-            self::request('run', [
-                "token" => "cn_" . server()->id,
+            self::request('runCommand', [
                 "command" => $command,
             ])
         );
@@ -81,16 +71,12 @@ class SSHConnector implements Connector
 
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
-        $output = self::request('send', [
-            "token" => ConnectorToken::get(server()->id)->first()->token,
-            "local_path" => $localPath,
-            "remote_path" => $remotePath,
-        ]);
-        $check = $this->execute("[ -f '$remotePath' ] && echo 1 || echo 0");
-        if ($check != "1") {
-            abort(504, "Dosya gönderilemedi");
-        }
-        return $output;
+        return trim(
+            self::request('putFile', [
+                "localPath" => $localPath,
+                "remotePath" => $remotePath,
+            ])
+        );
     }
 
     public static function verify($ip_address, $username, $password, $port)
@@ -104,11 +90,12 @@ class SSHConnector implements Connector
 
     public function receiveFile($localPath, $remotePath)
     {
-        return self::request('get', [
-            "token" => ConnectorToken::get(server()->id)->first()->token,
-            "local_path" => $localPath,
-            "remote_path" => $remotePath,
-        ]);
+        return trim(
+            self::request('getFile', [
+                "localPath" => $localPath,
+                "remotePath" => $remotePath,
+            ])
+        );
     }
 
     /**
@@ -140,70 +127,23 @@ class SSHConnector implements Connector
         }
     }
 
-    public static function retrieveCredentials()
-    {
-        if (server()->key() == null) {
-            abort(
-                504,
-                "Bu sunucu için SSH anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz."
-            );
-        }
-        $data = json_decode(server()->key()->data, true);
-
-        return [
-            lDecrypt($data["clientUsername"]),
-            lDecrypt($data["clientPassword"]),
-            array_key_exists("key_port", $data)
-                ? intval($data["key_port"])
-                : 22,
-        ];
-    }
-
     public static function request($url, $params, $retry = 3)
     {
-        if (!ConnectorToken::get(server()->id)->exists()) {
-            list($username, $password) = self::retrieveCredentials();
-            self::init(
-                $username,
-                $password,
-                server()->ip_address,
-                server()->key_port ? server()->key_port : 22
-            );
-        }
-        // Create Guzzle Object.
-        $client = new Client();
-        // Make Request.
+        $client = new Client(['verify' => false]);
+        $params["server_id"] = server()->id;
+        $params["token"] = Token::create(user()->id);
         try {
-            $params["token"] = ConnectorToken::get(
-                server()->id
-            )->first()->token;
-            $res = $client->request('POST', 'http://127.0.0.1:5000/' . $url, [
-                "form_params" => $params,
-            ]);
-        } catch (BadResponseException $e) {
-            // In case of error, handle error.
-            $json = json_decode(
-                (string) $e
-                    ->getResponse()
-                    ->getBody()
-                    ->getContents()
+            $response = $client->request(
+                'POST',
+                "https://127.0.0.1:5454/$url",
+                [
+                    "form_params" => $params,
+                ]
             );
-            // If it's first time, retry after recreating ticket.
-            if ($retry) {
-                list($username, $password) = self::retrieveCredentials();
-                self::init(
-                    $username,
-                    $password,
-                    server()->ip_address,
-                    server()->key_port ? server()->key_port : 22
-                );
-                return self::request($url, $params, $retry - 1);
-            } else {
-                // If nothing works, abort.
-                abort(402, "Anahtarınız ile sunucuya giriş yapılamadı");
-            }
+            return $response->getBody()->getContents();
+        } catch (GuzzleException $exception) {
+            return $exception->getMessage();
         }
-        // Simply parse and return output.
         $json = json_decode((string) $res->getBody());
         return $json->output;
     }
