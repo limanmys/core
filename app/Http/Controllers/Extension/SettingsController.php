@@ -50,8 +50,8 @@ class SettingsController extends Controller
         );
         if ($license) {
             return respond("Lisans Eklendi");
-        } else{
-            return respond("Lisans Eklenemiyor!",201);
+        } else {
+            return respond("Lisans Eklenemiyor!", 201);
         }
     }
 
@@ -160,6 +160,7 @@ class SettingsController extends Controller
             $extension["icon"] = request("icon");
             $extension["service"] = request("service");
             $extension["version"] = request("version");
+            $extension["require_key"] = request("require_key");
             $extension["verification"] = request("verification");
             $extension["sslPorts"] = request("sslPorts");
             $extension["supportedLiman"] = request("supportedLiman");

@@ -44,6 +44,14 @@ class MainController extends Controller
                 201
             );
         }
+
+        if (extension()->require_key == "true" && server()->key() == null) {
+            return respond(
+                "Bu eklentiyi kullanabilmek için bir anahtara ihtiyacınız var, lütfen kasa üzerinden bir anahtar ekleyin.",
+                201
+            );
+        }
+
         $page = request('target_function')
             ? request('target_function')
             : 'index';
