@@ -491,14 +491,14 @@ class UserController extends Controller
         UserSettings::where([
             "server_id" => server()->id,
             "user_id" => user()->id,
-        ])
-            ->orWhere([
-                "name" => "clientUsername",
-            ])
-            ->orWhere([
-                "name" => "clientPassword",
-            ])
-            ->delete();
+            "name" => "clientUsername",
+        ])->delete();
+        UserSettings::where([
+            "server_id" => server()->id,
+            "user_id" => user()->id,
+            "name" => "clientPassword",
+        ])->delete();
+
         $data = [
             "clientUsername" => AES256::encrypt(request('username'), $encKey),
             "clientPassword" => AES256::encrypt(request('password'), $encKey),
