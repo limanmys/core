@@ -355,6 +355,7 @@ class MainController extends Controller
             request("extension_id"),
             $obj["versionCode"],
             $obj["downloadLink"],
+            $obj["hashSHA512"],
             true
         ))->onQueue('system_updater');
 

@@ -638,7 +638,7 @@ class SettingsController extends Controller
     public function getExtensionUpdates()
     {
         return respond(
-            json_decode(file_get_contents(storage_path('extension_updates')))
+            array_values(json_decode(file_get_contents(storage_path('extension_updates')),true))
         );
     }
 }
