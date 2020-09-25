@@ -5,6 +5,8 @@ namespace App\Observers;
 use App\Models\AdminNotification;
 use App\User;
 use App\Notifications\NotificationSent;
+use App\Mail\BasicNotification;
+use Illuminate\Support\Facades\Mail;
 
 class AdminNotificationObserver
 {
@@ -13,6 +15,9 @@ class AdminNotificationObserver
         $adminUsers = User::where('status', 1)->get();
         foreach ($adminUsers as $user) {
             $user->notify(new NotificationSent($adminNotification));
+            if (env('MAIL_ENABLED') == true && $adminNotification->type == "external_notification"){
+                Mail::to($user)->send(new BasicNotification($adminNotification));
+            }
         }
     }
     /**
