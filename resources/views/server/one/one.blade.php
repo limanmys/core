@@ -1,11 +1,11 @@
 <div class="col-md-9">
-    <div class="card charts-card">
+    <div class="card">
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
                 @php($firstRendered = false)
                 @if(server()->canRunCommand() && server()->isLinux())
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="pill" href="#usageTab" role="tab" aria-selected="true">{{__("Sistem Durumu")}}</a>
+                        <a class="nav-link active" data-toggle="pill" onclick="getDashboard()" href="#usageTab" role="tab">{{__("Sistem Durumu")}}</a>
                     </li>
                     @php($firstRendered = true)
                 @endif
@@ -59,24 +59,35 @@
             <div class="tab-content">
                 @if(server()->canRunCommand() && server()->isLinux())
                     <div class="tab-pane fade show active" id="usageTab" role="tabpanel">
-                        <div class="row justify-content-center">
-                            <div class="col-md-3">
-                                <canvas id="cpuChart"></canvas>
+                        <div class="card card-primary charts-card">
+                            <div class="card-header" style="background-color: #007bff; color: #fff;">
+                                <h3 class="card-title">{{ __('Kaynak Kullanımı') }}</h3>
                             </div>
-                            <div class="col-md-3">
-                                <canvas id="ramChart"></canvas>
+                            <div class="card-body">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-3">
+                                        <canvas id="cpuChart"></canvas>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <canvas id="ramChart"></canvas>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <canvas id="diskChart"></canvas>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <canvas id="networkChart"></canvas>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <canvas id="ioChart"></canvas>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-3">
-                                <canvas id="diskChart"></canvas>
-                            </div>
-                            <div class="col-md-3">
-                                <canvas id="networkChart"></canvas>
-                            </div>
-                            <div class="col-md-3">
-                                <canvas id="ioChart"></canvas>
+                            <div class="overlay">
+                                <div class="spinner-border" role="status">
+                                    <span class="sr-only">{{ __('Yükleniyor...') }}</span>
+                                </div>
                             </div>
                         </div>
-                        <hr>
                         <div class="row">
                             <div class="col-md-4">
                                 @include('table-card', [
@@ -232,11 +243,6 @@
                         </tr>
                     </table>
                 </div>
-            </div>
-        </div>
-        <div class="overlay" style="display: none;">
-            <div class="spinner-border" role="status">
-                <span class="sr-only">{{ __('Yükleniyor...') }}</span>
             </div>
         </div>
     </div>

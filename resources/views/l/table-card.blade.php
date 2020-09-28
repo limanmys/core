@@ -36,7 +36,6 @@
             }
         );
     }
-    func_{{ $random }}();
     function func_{{ $random }}(noSpinner = false)
     {
         !noSpinner && $('#card-{{ $random }}').find('.overlay').show();

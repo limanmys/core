@@ -65,7 +65,6 @@
 
     @if(server()->canRunCommand())
 
-    stats();
     function resourceChart(title, chart, time, data, prefix=true, postfix="")
     {
         if(!window[`${chart}-element`]){
@@ -218,11 +217,15 @@
             }
         })
     }
+    function getDashboard()
+    {
+        stats();
+        $('.table-card').find('.refresh-button').click();
+    }
+
     var firstStats = true;
     function stats(noSpinner = false) {
-        if($("a[href=\"#usageTab\"]").hasClass("active")){
-            !noSpinner && $('.charts-card').find('.overlay').show();
-        }
+        !noSpinner && $('.charts-card').find('.overlay').show();
         var form = new FormData();
         form.append('server_id', '{{server()->id}}');
         var time = "{{\Carbon\Carbon::now()->format("H:i:s")}}";
