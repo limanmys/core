@@ -1,5 +1,5 @@
 <div class="col-md-9">
-    <div class="card">
+    <div class="card charts-card">
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
                 @php($firstRendered = false)
@@ -59,31 +59,44 @@
             <div class="tab-content">
                 @if(server()->canRunCommand() && server()->isLinux())
                     <div class="tab-pane fade show active" id="usageTab" role="tabpanel">
-                            <h4>{{__("Kaynak Kullanımı")}}</h4>
-                            <div class="row">
-                                <div class="col-md-4">
-                                <h5>{{__("Cpu Kullanımı")}}</h5>
-                                <span id="cpuText" style="text-align: center;font-weight: bold">
-                                    {{__("Yükleniyor...")}}
-                                </span><br>
-                                <canvas id="cpu" width="400px" height="200px" style="float:left"></canvas>
-                                </div>
-                                <div class="col-md-4">
-                                <h5>{{__("Disk Kullanımı")}}</h5>
-                                <span id="diskText" style="text-align: center;font-weight: bold">
-                                    {{__("Yükleniyor...")}}
-                                </span><br>
-                                <canvas id="disk" width="400px" height="200px" style="float:left"></canvas>
-                                </div>
-                                <div class="col-md-4">
-                                <h5>{{__("Ram Kullanımı")}}</h5>
-                                <span id="ramText" style="text-align: center;font-weight: bold">
-                                    {{__("Yükleniyor...")}}
-                                </span><br>
-                                <canvas id="ram" width="400px" height="200px" style="float:left;"></canvas>
-                                </div>
+                        <div class="row justify-content-center">
+                            <div class="col-md-3">
+                                <canvas id="cpuChart"></canvas>
                             </div>
-                            <hr>
+                            <div class="col-md-3">
+                                <canvas id="ramChart"></canvas>
+                            </div>
+                            <div class="col-md-3">
+                                <canvas id="diskChart"></canvas>
+                            </div>
+                            <div class="col-md-3">
+                                <canvas id="networkChart"></canvas>
+                            </div>
+                            <div class="col-md-3">
+                                <canvas id="ioChart"></canvas>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-4">
+                                @include('table-card', [
+                                    "title" => "CPU Kullanımı",
+                                    "api" => "top_cpu_processes"
+                                ])
+                            </div>
+                            <div class="col-md-4">
+                                @include('table-card', [
+                                    "title" => "Ram Kullanımı",
+                                    "api" => "top_memory_processes"
+                                ])
+                            </div>
+                            <div class="col-md-4">
+                                @include('table-card', [
+                                    "title" => "Disk Kullanımı",
+                                    "api" => "top_disk_usage"
+                                ])
+                            </div>
+                        </div>
                     </div>
                 @endif
                 <div class="tab-pane fade show @if(!$firstRendered) active @endif" id="extensionsTab" role="tabpanel">
@@ -219,6 +232,11 @@
                         </tr>
                     </table>
                 </div>
+            </div>
+        </div>
+        <div class="overlay" style="display: none;">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">{{ __('Yükleniyor...') }}</span>
             </div>
         </div>
     </div>

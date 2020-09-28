@@ -95,6 +95,21 @@ Route::group(['middleware' => ['server']], function () {
         'server_stats'
     );
 
+    Route::post(
+        '/sunucu/bellek_durum',
+        'Server\OneController@topMemoryProcesses'
+    )->name('top_memory_processes');
+
+    Route::post(
+        '/sunucu/islemci_durum',
+        'Server\OneController@topCpuProcesses'
+    )->name('top_cpu_processes');
+
+    Route::post(
+        '/sunucu/disk_durum',
+        'Server\OneController@topDiskUsage'
+    )->name('top_disk_usage');
+
     Route::post('/sunucu/servis/', 'Server\OneController@serviceList')->name(
         'server_service_list'
     );
