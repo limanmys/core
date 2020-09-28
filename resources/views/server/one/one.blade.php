@@ -5,7 +5,7 @@
                 @php($firstRendered = false)
                 @if(server()->canRunCommand() && server()->isLinux())
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="pill" href="#usageTab" role="tab" aria-selected="true">{{__("Sistem Durumu")}}</a>
+                        <a class="nav-link active" data-toggle="pill" onclick="getDashboard()" href="#usageTab" role="tab">{{__("Sistem Durumu")}}</a>
                     </li>
                     @php($firstRendered = true)
                 @endif
