@@ -70,19 +70,19 @@ class HomeController extends Controller
     public function getLimanStats()
     {
         $cpuUsage = shell_exec(
-            "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print \"%\" usage}'"
+            "ps -eo %cpu --no-headers | grep -v 0.0 | awk '{s+=$1} END {print s/NR*10}'"
         );
-        $cpuUsage = substr($cpuUsage, 0, 5);
+        $cpuUsage = round($cpuUsage, 0, 2);
         $ramUsage = shell_exec("free -t | awk 'NR == 2 {printf($3/$2*100)}'");
-        $ramUsage = substr($ramUsage, 0, 5);
-        $disk = shell_exec('df -h / | grep /');
-        preg_match("/(\d+)%/", $disk, $diskUsage);
+        $ramUsage = round($ramUsage, 0, 2);
+        $diskUsage = shell_exec("df --output=pcent / | tr -dc '0-9'");
+        $diskUsage = round($diskUsage, 0, 2);
 
-        $firstDown = self::calculateNetworkBytes();
-        $firstUp = self::calculateNetworkBytes(false);
+        $firstDown = $this->calculateNetworkBytes();
+        $firstUp = $this->calculateNetworkBytes(false);
         sleep(1);
-        $secondDown = self::calculateNetworkBytes();
-        $secondUp = self::calculateNetworkBytes(false);
+        $secondDown = $this->calculateNetworkBytes();
+        $secondUp = $this->calculateNetworkBytes(false);
 
         $network =
             strval(intval(($secondDown - $firstDown) / 1024 / 1024) / 2) .
@@ -90,9 +90,9 @@ class HomeController extends Controller
             strval(intval(($secondUp - $firstUp) / 1024 / 1024) / 2) .
             " mb/sn ↑";
         return response([
-            "cpu" => $cpuUsage,
+            "cpu" => "%" . $cpuUsage,
             "ram" => "%" . $ramUsage,
-            "disk" => "%" . $diskUsage[1],
+            "disk" => "%" . $diskUsage,
             "network" => $network,
         ]);
     }
