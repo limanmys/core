@@ -106,15 +106,11 @@ stdout_logfile=/liman/logs/extension_queue.log
     supervisorctl update
 fi
 
-#Supervisor Configuration for System Updates
-if [ -f "/etc/supervisor/conf.d/liman-system-worker.conf" ]; then
-    echo "Supervisor already created for system updates.";
-else
-        echo """
+echo """
 #LIMAN_OPTIMIZATIONS
 [program:liman-system-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=system_updater
+command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=system_updater --timeout=0
 autostart=true
 autorestart=true
 user=liman
@@ -122,9 +118,8 @@ numprocs=2
 redirect_stderr=true
 stdout_logfile=/liman/logs/system_update.log
     """ > /etc/supervisor/conf.d/liman-system-worker.conf
-    supervisorctl reread
-    supervisorctl update
-fi
+supervisorctl reread
+supervisorctl update
 supervisorctl start all
 
 #Increase Php-Fpm Memory

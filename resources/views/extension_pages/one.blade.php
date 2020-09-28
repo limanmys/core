@@ -58,6 +58,9 @@
                         <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}" required><br>
                         <h3>{{__("Ayar Doğrulama Fonksiyonu/Betiği")}}</h3>
                         <input id="verification" type="text" name="verification" class="form-control" value="{{array_key_exists("verification",$extension) ? $extension["verification"] : ""}}" required><br>
+                        <h3>{{__("Paket bağımlılıkları")}}</h3>
+                        <input id="dependencies" type="text" name="dependencies" class="form-control" value="{{array_key_exists("dependencies",$extension) ? $extension["dependencies"] : ""}}" required><br>
+                        <small>{{__("Birden fazla paket yazmak için aralarında boşluk bırakabilirsiniz.")}}</small><br>
                         <h3>{{__("Servis Adı yada Kontrol Etmek için Port")}}</h3>
                         <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}" required><br>
                         <h3>{{__("SSL Sertifikası Eklenecek Portlar")}}</h3>
@@ -340,6 +343,7 @@
             data.append('sslPorts',$("#sslPorts").val());
             data.append('supportedLiman',$("#supportedLiman").val());
             data.append('verification',$("#verification").val());
+            data.append('dependencies',$("#dependencies").val());
             request('{{route('extension_settings_update')}}',data,function(){
                 showSwal("{{__("Başarıyla kaydedildi")}}",'success');
                 setTimeout(function(){

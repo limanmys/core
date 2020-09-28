@@ -162,6 +162,7 @@ class SettingsController extends Controller
             $extension["version"] = request("version");
             $extension["require_key"] = request("require_key");
             $extension["verification"] = request("verification");
+            $extension["dependencies"] = request("dependencies");
             $extension["sslPorts"] = request("sslPorts");
             $extension["supportedLiman"] = request("supportedLiman");
         } else {
