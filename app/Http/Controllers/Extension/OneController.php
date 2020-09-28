@@ -91,10 +91,10 @@ class OneController extends Controller
             $extension["verification"] != null &&
             $extension["verification"] != ""
         ) {
-            $client = new Client();
+            $client = new Client(['verify' => false]);
             $result = "";
             try {
-                $res = $client->request('POST', 'http://127.0.0.1:5454/', [
+                $res = $client->request('POST', 'https://127.0.0.1:5454/', [
                     'form_params' => [
                         "lmntargetFunction" => $extension["verification"],
                         "extension_id" => extension()->id,

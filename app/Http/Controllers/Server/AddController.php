@@ -48,6 +48,9 @@ class AddController extends Controller
         $this->server = new Server();
         $this->server->fill(request()->all());
         $this->server->user_id = auth()->id();
+        if (request('type') == null ){
+            $this->server->type = "none";
+        }
         request('key_port')
             ? ($this->server->key_port = request('key_port'))
             : null;

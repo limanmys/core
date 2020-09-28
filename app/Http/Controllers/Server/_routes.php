@@ -8,7 +8,7 @@ Route::view('/sunucular', 'server.index')->name('servers');
 
 Route::post('/sunucu/ekle', 'Server\AddController@main')
     ->name('server_add')
-    ->middleware('parameters:name,ip_address,control_port,type,city');
+    ->middleware('parameters:name,ip_address,control_port,city');
 
 // Server Update Route
 
