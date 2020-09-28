@@ -308,21 +308,32 @@ class OneController extends Controller
     public function stats()
     {
         if (server()->isLinux()) {
-            $disk = server()->run('df -h / | grep /', false);
-            preg_match("/(\d+)%/", $disk, $test);
-            $disk = $test[1];
-            $ram = server()->run(
-                "free -t | awk 'NR == 2 {printf($3/$2*100)}'",
-                false
+            $cpuPercent = server()->run(
+                "ps -eo %cpu --no-headers | grep -v 0.0 | awk '{s+=$1} END {print s/NR*10}'"
             );
-            $cpu = substr(
-                server()->run(
-                    "awk '{u=$2+$4; t=$2+$4+$5; if (NR==1){u1=u; t1=t;} else print ($2+$4-u1) * 100 / (t-t1); }' <(grep 'cpu ' /proc/stat) <(sleep 1;grep 'cpu ' /proc/stat)",
-                    false
-                ),
-                0,
-                7
+            $ramPercent = server()->run(
+                "free | grep Mem | awk '{print $3/$2 * 100.0}'"
             );
+            $diskPercent = server()->run("df --output=pcent / | tr -dc '0-9'");
+            $ioPercent = server()->run(
+                "iostat -d | tail -n +4 | head -n -1 | awk '{s+=$2} END {print s}'"
+            );
+            $firstDown = $this->calculateNetworkBytes();
+            $firstUp = $this->calculateNetworkBytes(false);
+            sleep(1);
+            $secondDown = $this->calculateNetworkBytes();
+            $secondUp = $this->calculateNetworkBytes(false);
+            return [
+                'cpuPercent' => round($cpuPercent, 2),
+                'ramPercent' => round($ramPercent, 2),
+                'diskPercent' => round($diskPercent, 2),
+                'ioPercent' => round($ioPercent, 2),
+                'network' => [
+                    'down' => round(($secondDown - $firstDown) / 1024 / 2, 2),
+                    'up' => round(($secondUp - $firstUp) / 1024 / 2, 2),
+                ],
+                'time' => \Carbon\Carbon::now()->format('H:i:s'),
+            ];
         } elseif (server()->isWindows()) {
             $cpu = substr(
                 server()->run(
@@ -363,6 +374,93 @@ class OneController extends Controller
             "cpu" => $cpu,
             "time" => Carbon::now()->format("H:i:s"),
         ];
+    }
+
+    private function parsePsOutput($output)
+    {
+        $data = [];
+        foreach (explode("\n", $output) as $row) {
+            $row = explode('*-*', $row);
+            $row[3] = str_replace('\\', '/', $row[3]);
+            $fetch = explode('/', $row[3]);
+            $data[] = [
+                'pid' => $row[0],
+                'percent' => $row[1],
+                'user' => $row[2],
+                'cmd' => end($fetch),
+            ];
+        }
+        return $data;
+    }
+
+    private function parseDfOutput($output)
+    {
+        $data = [];
+        foreach (explode("\n", $output) as $row) {
+            $row = explode('*-*', $row);
+            $row[1] = str_replace('\\', '/', $row[1]);
+            $fetch = explode('/', $row[1]);
+            $data[] = [
+                'percent' => $row[0],
+                'source' => end($fetch),
+                'size' => $row[2],
+                'used' => $row[3],
+            ];
+        }
+        return $data;
+    }
+
+    public function topMemoryProcesses()
+    {
+        $output = trim(
+            server()->run(
+                "ps -eo pid,%mem,user,cmd --sort=-%mem --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
+            )
+        );
+        return view('table', [
+            'value' => $this->parsePsOutput($output),
+            'title' => ['Kullanıcı', 'İşlem', '%'],
+            'display' => ['user', 'cmd', 'percent'],
+        ]);
+    }
+
+    public function topCpuProcesses()
+    {
+        $output = trim(
+            server()->run(
+                "ps -eo pid,%cpu,user,cmd --sort=-%cpu --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
+            )
+        );
+        return view('table', [
+            'value' => $this->parsePsOutput($output),
+            'title' => ['Kullanıcı', 'İşlem', '%'],
+            'display' => ['user', 'cmd', 'percent'],
+        ]);
+    }
+
+    public function topDiskUsage()
+    {
+        $output = trim(
+            server()->run(
+                "df --output=pcent,source,size,used -hl -x squashfs -x tmpfs -x devtmpfs | sed -n '1!p' | head -n 5 | sort -hr | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
+            )
+        );
+        return view('table', [
+            'value' => $this->parseDfOutput($output),
+            'title' => ['Disk', 'Boyut', 'Dolu', '%'],
+            'display' => ['source', 'size', 'used', 'percent'],
+        ]);
+    }
+
+    private function calculateNetworkBytes($download = true)
+    {
+        $text = $download ? 'rx_bytes' : 'tx_bytes';
+        $count = 0;
+        $raw = server()->run("cat /sys/class/net/*/statistics/$text");
+        foreach (explode("\n", trim($raw)) as $data) {
+            $count += intval($data);
+        }
+        return $count;
     }
 
     public function getLocalUsers()
