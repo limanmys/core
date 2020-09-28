@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Validator;
 use App\Jobs\ExtensionUpdaterJob;
+use App\Jobs\ExtensionDependenciesJob;
 use Illuminate\Contracts\Bus\Dispatcher;
 
 /**
@@ -224,6 +225,16 @@ class MainController extends Controller
         $new->fill($json);
         $new->save();
         
+        if (array_key_exists("dependencies",$json) && $json["dependencies"] != ""){
+            $job = (new ExtensionDependenciesJob(
+                $new,
+                $json["dependencies"]
+            ))->onQueue('system_updater');
+    
+            // Dispatch job right away.
+            $job_id = app(Dispatcher::class)->dispatch($job);
+        }
+
         $system = rootSystem();
 
         $system->userAdd($new->id);
