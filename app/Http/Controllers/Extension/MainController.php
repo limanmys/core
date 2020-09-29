@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Jobs\ExtensionUpdaterJob;
 use App\Jobs\ExtensionDependenciesJob;
 use Illuminate\Contracts\Bus\Dispatcher;
+use App\Models\AdminNotification;
 
 /**
  * Class MainController
@@ -233,6 +234,20 @@ class MainController extends Controller
     
             // Dispatch job right away.
             $job_id = app(Dispatcher::class)->dispatch($job);
+
+            AdminNotification::create([
+                "title" =>
+                    $new->display_name . " eklentisinin bağımlılıkları yükleniyor!",
+                "type" => "",
+                "message" =>
+                    $new->display_name .
+                    " eklentisinin bağımlılıkları yükleniyor, bu süre içerisinde eklentiyi kullanamazsınız.",
+                "level" => 3,
+            ]);
+            $new->update([
+                "status" == "0"
+            ]);
+            $new->save();
         }
 
         $system = rootSystem();

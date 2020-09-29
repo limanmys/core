@@ -205,6 +205,7 @@ class OneController extends Controller
      */
     public function remove()
     {
+        $ext_name = extension()->name;
         hook('extension_delete_attempt', extension());
         try {
             shell_exec(
@@ -223,6 +224,16 @@ class OneController extends Controller
             "request" => request()->all(),
         ]);
 
+        if(is_file(storage_path("extension_updates"))){
+            $json = json_decode(file_get_contents(storage_path("extension_updates")),true);
+            for($i = 0; $i < count($json); $i++){
+                if($json[$i]["name"] == $ext_name){
+                    unset($json[$i]);
+                }
+            }
+            file_put_contents(storage_path("extension_updates"),json_encode($json));
+        }
+        
         system_log(3, "EXTENSION_REMOVE");
         return respond('Eklenti Başarıyla Silindi');
     }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Extension\Sandbox;
 use App\Models\Extension;
 use App\Http\Controllers\Controller;
 use App\Models\JobHistory;
-use App\Jobs\ExtensionJob;
 use App\Models\Notification;
 use App\Models\Permission;
 use App\Models\Server;
@@ -14,7 +13,6 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Events\ExtensionRendered;
 use GuzzleHttp\Client;
 
 class InternalController extends Controller

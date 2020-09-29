@@ -32,8 +32,6 @@ class MainController extends Controller
         $this->checkForMissingSettings();
 
         $this->checkPermissions();
-
-        $this->sandbox = sandbox();
     }
 
     public function API()

@@ -50,6 +50,7 @@ class ExtensionDependenciesJob implements ShouldQueue
             $this->extension->update([
                 "status" => "1"
             ]);
+            $this->extension->save();
 
             AdminNotification::create([
                 "title" =>
