@@ -13,7 +13,7 @@
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
                 <h3 class="profile-username text-center">{{__("Sunucular")}}</h3>
-                <p class="text-muted text-center">Bu sayfadan mevcut sunucularını görebilirsiniz. Ayrıca yeni sunucu eklemek için Sunucu Ekle butonunu kullanabilirsiniz.</p>
+                <p class="text-muted text-center">{{__("Bu sayfadan mevcut sunucularını görebilirsiniz. Ayrıca yeni sunucu eklemek için Sunucu Ekle butonunu kullanabilirsiniz.")}}</p>
               </div>
             </div>
         </div>
