@@ -744,6 +744,7 @@
 
     $(function () {
         $("#installed_extensions").DataTable(dataTablePresets('multiple'));
+        getDashboard();
     });
 
     
