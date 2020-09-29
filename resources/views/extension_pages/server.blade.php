@@ -176,7 +176,7 @@ pre {
     customRequestData["locale"] = "{{session()->get('locale')}}";
     request(API('{{request('target_function') ? request('target_function') : 'index'}}'),new FormData(), function (success){
         $("#mainExtensionWrapper").html(success);
-        initialPresets();
+        window.onload();
     },function (error){ 
         let json = JSON.parse(error);
         showSwal(json.message,'error',2000);
