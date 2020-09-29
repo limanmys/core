@@ -37,7 +37,7 @@ class ExtensionDependenciesJob implements ShouldQueue
     {
         $package = $this->dependencies;
         $tmp = "/tmp/" . str_random(16);
-        $installCommand = "if [ -z '\$(find /var/cache/apt/pkgcache.bin -mmin -60)' ]; then sudo apt-get update; fi;DEBIAN_FRONTEND=noninteractive sudo apt-get install -o Dpkg::Use-Pty=0 -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' $package -qqy --allow >" . $tmp . " 2>&1";
+        $installCommand = "if [ -z '\$(find /var/cache/apt/pkgcache.bin -mmin -60)' ]; then sudo apt-get update; fi;DEBIAN_FRONTEND=noninteractive sudo apt-get install -o Dpkg::Use-Pty=0 -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' $package -qqy --force-yes >" . $tmp . " 2>&1";
         rootSystem()->runCommand($installCommand);
         $checkCommand = "dpkg --get-selections | grep -v deinstall | awk '{print $1}' | grep -xE '" . str_replace(" ","|", $package) ."'";
         $installed = rootSystem()->runCommand($checkCommand);
