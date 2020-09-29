@@ -154,7 +154,7 @@
                         function checkMarketAccess(){
                             var status = $("#marketStatus");
                             $("#marketTableWrapper").fadeOut(0);
-                            status.html("Market bağlantısı kontrol ediliyor...");
+                            status.html("{{__('Market bağlantısı kontrol ediliyor...')}}");
                             status.attr("class","alert alert-secondary");
                             request("{{route('verify_market')}}",new FormData(),function(success){
                                 var json = JSON.parse(success);
@@ -178,7 +178,7 @@
 
                         function checkMarketUpdates(){
                             var status = $("#marketStatus");
-                            status.html("Güncellemeler kontrol ediliyor...");
+                            status.html("{{__('Güncellemeler kontrol ediliyor...')}}");
                             status.attr("class","alert alert-secondary");
                             $("#marketLoading").fadeIn(0);
                             request("{{route('check_updates_market')}}",new FormData(),function(success){
@@ -192,7 +192,7 @@
                                     ]).draw().node();
                                 });
                                 table.draw();
-                                status.html("Güncellemeler başarıyla kontrol edildi");
+                                status.html("{{__('Güncellemeler başarıyla kontrol edildi')}}");
                                 status.attr("class","alert alert-success");
                                 $("#marketLoading").fadeOut(0);
                                 $("#marketTableWrapper").fadeIn(0);
@@ -581,7 +581,7 @@
         "id"=>"addNewNotificationSource",
         "title" => "Yeni Bildirim İstemcisi Ekle",
         "url" => route('add_notification_channel'),
-        "text" => "İp Adresi bölümüne izin vermek istediğiniz bir subnet adresini ya da ip adresini yazarak erişimi kısıtlayabilirsiniz. Örneğin : 192.168.1.0/24 ",
+        "text" => "İp Adresi bölümüne izin vermek istediğiniz bir subnet adresini ya da ip adresini yazarak erişimi kısıtlayabilirsiniz. Örneğin : 192.168.1.0/24",
         "next" => "debug",
         "inputs" => [
             "Adı" => "name:text",
@@ -594,7 +594,7 @@
         "id"=>"editExternalNotificationToken",
         "title" =>"İstemciyi Düzenle",
         "url" => route('edit_notification_channel'),
-        "text" => "İp Adresi bölümüne izin vermek istediğiniz bir subnet adresini ya da ip adresini yazarak erişimi kısıtlayabilirsiniz. Örneğin : 192.168.1.0/24 ",
+        "text" => "İp Adresi bölümüne izin vermek istediğiniz bir subnet adresini ya da ip adresini yazarak erişimi kısıtlayabilirsiniz. Örneğin : 192.168.1.0/24",
         "next" => "reload",
         "inputs" => [
             "Adı" => "name:text",

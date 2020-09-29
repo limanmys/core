@@ -91,19 +91,19 @@
                         <div class="row">
                             <div class="col-md-4">
                                 @include('table-card', [
-                                    "title" => "CPU Kullanımı",
+                                    "title" => __("Cpu Kullanımı"),
                                     "api" => "top_cpu_processes"
                                 ])
                             </div>
                             <div class="col-md-4">
                                 @include('table-card', [
-                                    "title" => "Ram Kullanımı",
+                                    "title" => __("Ram Kullanımı"),
                                     "api" => "top_memory_processes"
                                 ])
                             </div>
                             <div class="col-md-4">
                                 @include('table-card', [
-                                    "title" => "Disk Kullanımı",
+                                    "title" => __("Disk Kullanımı"),
                                     "api" => "top_disk_usage"
                                 ])
                             </div>

@@ -38,14 +38,14 @@ class MainController extends Controller
     {
         if (extension()->status == "0") {
             return respond(
-                "Eklenti şu an güncelleniyor, lütfen birazdan tekrar deneyin.",
+                __("Eklenti şu an güncelleniyor, lütfen birazdan tekrar deneyin."),
                 201
             );
         }
 
         if (extension()->require_key == "true" && server()->key() == null) {
             return respond(
-                "Bu eklentiyi kullanabilmek için bir anahtara ihtiyacınız var, lütfen kasa üzerinden bir anahtar ekleyin.",
+                __("Bu eklentiyi kullanabilmek için bir anahtara ihtiyacınız var, lütfen kasa üzerinden bir anahtar ekleyin."),
                 201
             );
         }

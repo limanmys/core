@@ -419,7 +419,7 @@ class OneController extends Controller
         );
         return view('table', [
             'value' => $this->parsePsOutput($output),
-            'title' => ['Kullanıcı', 'İşlem', '%'],
+            'title' => [__('Kullanıcı'), __('İşlem'), '%'],
             'display' => ['user', 'cmd', 'percent'],
         ]);
     }
@@ -433,7 +433,7 @@ class OneController extends Controller
         );
         return view('table', [
             'value' => $this->parsePsOutput($output),
-            'title' => ['Kullanıcı', 'İşlem', '%'],
+            'title' => [__('Kullanıcı'), __('İşlem'), '%'],
             'display' => ['user', 'cmd', 'percent'],
         ]);
     }
@@ -447,7 +447,7 @@ class OneController extends Controller
         );
         return view('table', [
             'value' => $this->parseDfOutput($output),
-            'title' => ['Disk', 'Boyut', 'Dolu', '%'],
+            'title' => [__('Disk'), __('Boyut'), __('Dolu'), '%'],
             'display' => ['source', 'size', 'used', 'percent'],
         ]);
     }
@@ -695,7 +695,7 @@ class OneController extends Controller
         return magicView('table', [
             "id" => "servicesTable",
             "value" => $services,
-            "title" => ["Servis Adı", "Aciklamasi", "Durumu"],
+            "title" => ["Servis Adı", "Açıklama", "Durumu"],
             "display" => ["name", "description", "status"],
             "menu" => [
                 "Detaylar" => [

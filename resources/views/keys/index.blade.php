@@ -56,7 +56,7 @@
     "title" => "Anahtar Ekle"
 ])
 <div class="modal-body">
-    <h3>Sunucu</h3>
+    <h3>{{__("Sunucu")}}</h3>
     <select name="targetServer" id="targetServer" class="select2 form-control" onchange="setIPAdress()">
     @foreach(servers() as $server)
         <option value="{{$server->ip_address . ':' . $server->id}}">{{$server->name}}</option>
@@ -85,7 +85,7 @@
        "id"=>"delete_settings",
        "title" =>"Veriyi Sil",
        "url" => route('user_setting_remove'),
-       "text" => "Veriyi silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+       "text" => "Veri'yi silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
        "next" => "reload",
        "inputs" => [
            "Setting Id:'null'" => "id:hidden",
@@ -110,7 +110,7 @@
         function updateSetting(element){
             var type = element.querySelector('#type').innerHTML;
             if(type == "key"){
-                showSwal("Sunucu anahtarını güncellemek için yeniden anahtar eklemelisiniz.","info",2000);
+                showSwal("{{__('Sunucu anahtarını güncellemek için yeniden anahtar eklemelisiniz.')}}","info",2000);
                 $("#add_settings").modal('show');
             }else{
                 $("#update_settings").modal('show');
@@ -144,7 +144,7 @@
                 showSwal(json.message,'error',2000);
             });
         }
-        $("#keySubmitButton").text("Anahtarı Ekle");
+        $("#keySubmitButton").text("{{__('Anahtarı Ekle')}}");
         setIPAdress();
    </script>
 @endsection

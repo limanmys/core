@@ -18,13 +18,13 @@
             </div>
             <div class="card card-primary">
               <div class="card-header">
-                <h3 class="card-title">{{ _('Bilgiler') }}</h3>
+                <h3 class="card-title">{{ __('Bilgiler') }}</h3>
               </div>
               <div class="card-body">
-                <strong>{{ _('Son Giriş Yapılan IP') }}</strong>
+                <strong>{{ __('Son Giriş Yapılan IP') }}</strong>
                 <p class="text-muted">{{auth()->user()->last_login_ip}}</p>
                 <hr>
-                <strong>{{ _('Son Giriş Tarihi') }}</strong>
+                <strong>{{ __('Son Giriş Tarihi') }}</strong>
                 <p class="text-muted">{{auth()->user()->last_login_at}}</p>
               </div>
             </div>

@@ -109,12 +109,12 @@ class MarketController extends Controller
                 ->where('packageName', $params[$i]["packageName"])
                 ->first();
             if (!$obj) {
-                $params[$i]["status"] = "Güncel";
+                $params[$i]["status"] = __("Güncel");
                 $params[$i]["updateAvailable"] = 0;
             } else {
                 $obj = json_decode(json_encode($obj), true);
                 $params[$i]["status"] =
-                    $obj["version"]["versionName"] . " sürümü mevcut";
+                    $obj["version"]["versionName"] . __(" sürümü mevcut");
                 $params[$i]["updateAvailable"] = 1;
                 if (
                     $params[$i]["extension_id"] != null &&

@@ -15,7 +15,7 @@
         <thead>
         <tr>
             @if(isset($sortable) && $sortable)
-              <th scope="col">Taşı</th>
+              <th scope="col">{{__("Taşı")}}</th>
             @endif
             <th scope="col">#</th>
             @foreach($title as $i)
@@ -45,7 +45,6 @@
                         @if(is_array($k))
                             <td id="{{$item}}">{{array_key_exists($item,$k) ? $k[$item] : ""}}</td>
                         @else
-                        <!-- Find Optimal Solution for objects. -->
                             <td id="{{$item}}">{{$k->__get($item)}}</td>
                         @endif
                     @endif
@@ -109,7 +108,7 @@
                 },
                 items: {
                     @foreach($menu as $name=>$config)
-                        "{{$config['target']}}" : {name: "{{$name}}" , icon: "{{$config['icon']}}"},
+                        "{{$config['target']}}" : {name: "{{__($name)}}" , icon: "{{$config['icon']}}"},
                     @endforeach
                 }
             });

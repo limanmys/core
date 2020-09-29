@@ -232,11 +232,11 @@
         request('{{route('server_stats')}}', form, function (response) {
             data = JSON.parse(response);
             @if(server()->isLinux())
-                resourceChart("CPU Kullanımı", "cpuChart", data.time, data.cpuPercent);
-                resourceChart("Ram Kullanımı", "ramChart", data.time, data.ramPercent);
-                resourceChart("Disk Kullanımı", "diskChart", data.time, data.diskPercent);
-                resourceChart("Disk I/O", "ioChart", data.time, data.ioPercent);
-                networkChart("Network", "networkChart", data.time, data.network);
+                resourceChart('{{__("Cpu Kullanımı")}}', "cpuChart", data.time, data.cpuPercent);
+                resourceChart('{{__("Ram Kullanımı")}}', "ramChart", data.time, data.ramPercent);
+                resourceChart('{{__("Disk Kullanımı")}}', "diskChart", data.time, data.diskPercent);
+                resourceChart('{{__("Disk I/O")}}', "ioChart", data.time, data.ioPercent);
+                networkChart('{{__("Network")}}', "networkChart", data.time, data.network);
             @else
                 if(firstStats){
                     firstStats = false;

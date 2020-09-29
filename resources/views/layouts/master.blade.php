@@ -55,7 +55,7 @@
             return {
                 bFilter: true,
                 "language" : {
-                    url : "/turkce.json"
+                    url : "{{__("/turkce.json")}}"
                 }
             };
         }else if(type == "multiple"){
@@ -75,7 +75,7 @@
                     }
                 },
                 language: {
-                    url : "/turkce.json",
+                    url : "{{__("/turkce.json")}}",
                     buttons: {
                         selectAll: "{{ __('Tümünü Seç') }}",
                         selectNone: "{{ __('Tümünü Kaldır') }}"
@@ -126,7 +126,7 @@
             bFilter: true,
             destroy: true,
             "language" : {
-                url : "{{asset('turkce.json')}}"
+                url : "{{asset(__('/turkce.json'))}}"
             }
         });
         $('.js-example-basic-multiple,.js-example-basic-single,.select2').select2({

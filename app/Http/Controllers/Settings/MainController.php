@@ -241,7 +241,7 @@ class MainController extends Controller
 
         return view('l.table', [
             "value" => $cleanFunctions,
-            "title" => ["*hidden*", "Aciklama"],
+            "title" => ["*hidden*", "Açıklama"],
             "display" => ["name:name", "description"],
         ]);
     }
