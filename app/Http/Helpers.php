@@ -597,6 +597,15 @@ if (!function_exists('extensionDb')) {
                 "name" => $key,
             ])
             ->first();
+        if ($key == "clientPassword" || $key == "clientUsername"){
+            $serverKey = server()->key();
+            if ($serverKey == null){
+                return null;
+            }
+            $data = json_decode($serverKey->data,true);
+            $encKey = env('APP_KEY') . auth()->user()->id . server()->id;
+            return AES256::decrypt($data[$key], $encKey);
+        }
         if ($target) {
             $key = env('APP_KEY') . auth()->user()->id . server()->id;
             return AES256::decrypt($target->value, $key);
