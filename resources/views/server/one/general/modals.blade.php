@@ -71,7 +71,7 @@
         "url" => route('server_add_sudoers'),
         "next" => "getSudoers",
         "inputs" => [
-            "İsim" => "name:text:Grup veya kullanıcı ekleyebilirsiniz. Örneğin: kullaniciadi veya %grupadi"
+            "İsim" => "name:text:Grup veya kullanıcı ekleyebilirsiniz. Örneğin: kullanıcı adı veya %grupadı"
         ],
         "submit_text" => "Grup Ekle"
     ])

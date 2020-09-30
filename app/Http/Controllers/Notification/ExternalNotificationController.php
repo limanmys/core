@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Notification;
 
 use Illuminate\Http\Request;
 use App\Models\ExternalNotification;
+use App\Models\AdminNotification;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
-
+use Validator;
+use Carbon\Carbon;
 class ExternalNotificationController extends Controller
 {
     /**
@@ -105,7 +107,57 @@ class ExternalNotificationController extends Controller
         }
     }
 
-    public function accept()
+    public function accept(Request $request)
     {
+        $channel = ExternalNotification::where('token', request("token"))->first();
+        if(!$channel){
+            return response()->json([
+                "Not authorized, token missing"
+            ],403);
+        }
+        if (self::ip_in_range($request->ip(),$channel->ip) == false) {
+            return response()->json([
+                "Not authorized, unacceptable ip block"
+            ],403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|max:120', 
+            'message' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "Not Acceptable, inputs invalid"
+            ],406);
+        }
+
+        AdminNotification::create([
+            "title" => "Dış Bildirim -> " . $request->get('title'),
+            "type" => "external_notification",
+            "message" => $request->get('message'),
+            "level" => 3,
+        ]);
+
+        $channel->update([
+            "last_used" => Carbon::now()
+        ]);
+
+        return response()->json([
+            "OK"
+        ]);
+    }
+
+    private function ip_in_range( $ip, $range ) {
+        if ( strpos( $range, '/' ) == false ) {
+            $range .= '/32';
+        }
+        // $range is in IP/CIDR format eg 127.0.0.1/24
+        list( $range, $netmask ) = explode( '/', $range, 2 );
+        $range_decimal = ip2long( $range );
+        $ip_decimal = ip2long( $ip );
+        $wildcard_decimal = pow( 2, ( 32 - $netmask ) ) - 1;
+        $netmask_decimal = ~ $wildcard_decimal;
+        return ( ( $ip_decimal & $netmask_decimal ) == ( $range_decimal & $netmask_decimal ) );
     }
 }

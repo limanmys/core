@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\Notification;
+use App\Models\AdminNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -17,10 +17,9 @@ class BasicNotification extends Mailable
      *
      * @return void
      */
-    public function __construct(Notification $notification)
+    public function __construct(AdminNotification $notification)
     {
         $this->notification = $notification;
-        $this->user = \Auth::user();
     }
 
     /**
@@ -33,6 +32,6 @@ class BasicNotification extends Mailable
         return $this->from([
             "address" => env('APP_NOTIFICATION_EMAIL'),
             "name" => __("Liman Bildiri Sistemi"),
-        ])->view('emails.basic');
+        ])->view('email.external_notification');
     }
 }

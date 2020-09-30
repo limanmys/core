@@ -22,6 +22,8 @@ class Extension extends Model
         "language",
         "support",
         "displays",
+        "require_key",
+        "status"
     ];
 
     protected $casts = [

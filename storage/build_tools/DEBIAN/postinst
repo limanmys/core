@@ -88,33 +88,14 @@ fi
 
 #Supervisor Configuration
 if [ -f "/etc/supervisor/conf.d/liman-extension-worker.conf" ]; then
-    echo "Supervisor already created for extension workers.";
-else
-        echo """
-#LIMAN_OPTIMIZATIONS
-[program:liman-extension-worker]
-process_name=%(program_name)s_%(process_num)02d
-command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=extension_queue
-autostart=true
-autorestart=true
-user=liman
-numprocs=8
-redirect_stderr=true
-stdout_logfile=/liman/logs/extension_queue.log
-    """ > /etc/supervisor/conf.d/liman-extension-worker.conf
-    supervisorctl reread
-    supervisorctl update
+    rm /etc/supervisor/conf.d/liman-extension-worker.conf;
 fi
 
-#Supervisor Configuration for System Updates
-if [ -f "/etc/supervisor/conf.d/liman-system-worker.conf" ]; then
-    echo "Supervisor already created for system updates.";
-else
-        echo """
+echo """
 #LIMAN_OPTIMIZATIONS
 [program:liman-system-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=system_updater
+command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=system_updater --timeout=0
 autostart=true
 autorestart=true
 user=liman
@@ -122,9 +103,8 @@ numprocs=2
 redirect_stderr=true
 stdout_logfile=/liman/logs/system_update.log
     """ > /etc/supervisor/conf.d/liman-system-worker.conf
-    supervisorctl reread
-    supervisorctl update
-fi
+supervisorctl reread
+supervisorctl update
 supervisorctl start all
 
 #Increase Php-Fpm Memory
@@ -148,28 +128,12 @@ chmod 755 /{liman,liman/extensions,liman/keys}
 
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman-connector.service" ]; then
-    echo "Liman Connector Service Already Added.";
-else
-    echo """
-[Unit]
-Description=Liman Connector Service
-After=network.target
-StartLimitIntervalSec=0
-[Service]
-Type=simple
-Restart=always
-RestartSec=1
-User=root
-ExecStart=/liman/server/storage/connector
-
-[Install]
-WantedBy=multi-user.target
-    """ > /etc/systemd/system/liman-connector.service
+    rm /etc/systemd/system/liman-connector.service
 fi
 
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman-system.service" ]; then
-    echo "Liman Connector Service Already Added.";
+    echo "Liman System Service Already Added.";
 else
     echo """
 [Unit]
@@ -190,7 +154,7 @@ fi
 
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman-render.service" ]; then
-    echo "Liman Connector Service Already Added.";
+    echo "Liman Render Service Already Added.";
 else
     echo """
 [Unit]
@@ -232,7 +196,7 @@ fi
 
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman-vnc.service" ]; then
-    echo "Liman Connector Service Already Added.";
+    echo "Liman VNC Service Already Added.";
 else
     echo """
 [Unit]
@@ -301,12 +265,12 @@ systemctl enable liman-vnc 2>/dev/null
 systemctl enable liman-webssh 2>/dev/null
 systemctl enable liman-system 2>/dev/null
 systemctl enable liman-render 2>/dev/null
-systemctl enable liman-connector 2>/dev/null
+systemctl disable liman-connector 2>/dev/null
 systemctl enable liman-socket 2>/dev/null
 systemctl enable nginx 2>/dev/null
 systemctl enable php7.3-fpm 2>/dev/null
 
-systemctl restart liman-connector
+systemctl stop liman-connector
 systemctl restart liman-system
 systemctl restart liman-render
 systemctl restart liman-vnc

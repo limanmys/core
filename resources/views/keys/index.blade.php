@@ -30,14 +30,14 @@
                     @include('table',[
                     "value" => $settings,
                         "title" => [
-                            "Ayar Adı" , "Sunucu" , "*hidden*"
+                            "Veri Adı" , "Sunucu" , "*hidden*", "*hidden*"
                         ],
                         "display" => [
-                            "name" , "server_name", "id:setting_id"
+                            "name" , "server_name", "id:id", "type:type"
                         ],
                         "menu" => [
                             "Güncelle" => [
-                                "target" => "update_settings",
+                                "target" => "updateSetting",
                                 "icon" => " context-menu-icon-edit"
                             ],
                             "Sil" => [
@@ -51,44 +51,52 @@
         </div>
         </div>
     </div>
-@include('modal',[
-        "id"=>"add_settings",
-        "title" => "Anahtar Ekle",
-        "url" => route('key_add'),
-        "next" => "reload",
-        "inputs" => [
-            "Sunucu:server_id" => $servers,
-            "Kullanıcı Adı" => "username:text",
-            "Şifre" => "password:password",
-        ],
-        "submit_text" => "Ekle"
-    ])
+@component('modal-component',[
+    "id" => "add_settings",
+    "title" => "Anahtar Ekle"
+])
+<div class="modal-body">
+    <h3>{{__("Sunucu")}}</h3>
+    <select name="targetServer" id="targetServer" class="select2 form-control" onchange="setIPAdress()">
+    @foreach(servers() as $server)
+        <option value="{{$server->ip_address . ':' . $server->id}}">{{$server->name}}</option>
+    @endforeach
+    </select>
+    <input type="text" id="serverHostName" hidden>
+</div>
+@include('keys.add',["success" => "addServerKey()"])
+
+@endcomponent
 
     @include('modal',[
         "id"=>"update_settings",
-        "title" => "Ayarı Güncelle",
+        "title" => "Veriyi Güncelle",
         "url" => route('user_setting_update'),
         "next" => "reload",
         "inputs" => [
             "Yeni Değer" => "new_value:password",
-            "-:-" => "setting_id:hidden",
+            "-:-" => "id:hidden",
+            "-:-" => "type:hidden"
         ],
-        "submit_text" => "Ekle"
+        "submit_text" => "Veriyi Güncelle"
     ])
 
     @include('modal',[
        "id"=>"delete_settings",
-       "title" =>"Ayarı Sil",
+       "title" =>"Veriyi Sil",
        "url" => route('user_setting_remove'),
-       "text" => "Ayarı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
+       "text" => "Veri'yi silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
        "next" => "reload",
        "inputs" => [
-           "Setting Id:'null'" => "setting_id:hidden"
+           "Setting Id:'null'" => "id:hidden",
+           "-:-" => "type:hidden"
        ],
-       "submit_text" => "Sunucuyu Sil"
+       "submit_text" => "Veriyi Sil"
    ])
 
    <script>
+        $("#useKeyLabel").fadeOut();
+        keySettingsChanged();
         function cleanSessions(){
             request('{{route('clean_sessions')}}', new FormData(), function(response){
                 showSwal("{{__("Önbellek temizlendi!")}}",'success',2000);
@@ -98,5 +106,45 @@
                 showSwal(error.message,'error',2000);
             });
         }
+
+        function updateSetting(element){
+            var type = element.querySelector('#type').innerHTML;
+            if(type == "key"){
+                showSwal("{{__('Sunucu anahtarını güncellemek için yeniden anahtar eklemelisiniz.')}}","info",2000);
+                $("#add_settings").modal('show');
+            }else{
+                $("#update_settings").modal('show');
+            }
+        }
+
+        function setIPAdress(){
+            $("#serverHostName").val($("#targetServer").val().split(":")[0]);
+        }
+
+        function addServerKey(){
+            if(isKeyOK == false){
+                showSwal("Lütfen önce anahtarınızı doğrulayın!",'error',2000);
+                return;
+            }
+            showSwal("Ekleniyor...","info");
+            let form = new FormData();
+            form.append('username',$("#keyUsername").val());
+            form.append('password',$("#keyPassword").val());
+            form.append('type',$("#keyType").val());
+            form.append('key_port',$("#port").val());
+            form.append('server_id',$("#targetServer").val().split(":")[1]);
+            request("{{route('key_add')}}",form,function(success){
+                let json = JSON.parse(success);
+                showSwal(json.message,'success','2000');
+                setTimeout(() => {
+                    reload();
+                }, 1500);
+            },function(error){
+                let json = JSON.parse(error);
+                showSwal(json.message,'error',2000);
+            });
+        }
+        $("#keySubmitButton").text("{{__('Anahtarı Ekle')}}");
+        setIPAdress();
    </script>
 @endsection

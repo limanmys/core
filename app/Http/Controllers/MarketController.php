@@ -109,12 +109,12 @@ class MarketController extends Controller
                 ->where('packageName', $params[$i]["packageName"])
                 ->first();
             if (!$obj) {
-                $params[$i]["status"] = "Güncel";
+                $params[$i]["status"] = __("Güncel");
                 $params[$i]["updateAvailable"] = 0;
             } else {
                 $obj = json_decode(json_encode($obj), true);
                 $params[$i]["status"] =
-                    $obj["version"]["versionName"] . " sürümü mevcut";
+                    $obj["version"]["versionName"] . __(" sürümü mevcut");
                 $params[$i]["updateAvailable"] = 1;
                 if (
                     $params[$i]["extension_id"] != null &&
@@ -123,7 +123,8 @@ class MarketController extends Controller
                     $job = (new ExtensionUpdaterJob(
                         $params[$i]["extension_id"],
                         $obj["version"]["versionCode"],
-                        $obj["platforms"][0]["downloadLink"]
+                        $obj["platforms"][0]["downloadLink"],
+                        $obj["platforms"][0]["hashSHA512"]
                     ))->onQueue('system_updater');
 
                     // Dispatch job right away.
@@ -134,6 +135,7 @@ class MarketController extends Controller
                         "currentVersion" => $params[$i]["currentVersion"],
                         "newVersion" => $obj["version"]["versionName"],
                         "downloadLink" => $obj["platforms"][0]["downloadLink"],
+                        "hashSHA512" => $obj["platforms"][0]["hashSHA512"],
                         "versionCode" => $obj["version"]["versionCode"],
                         "changeLog" => $obj["version"]["versionDescription"],
                         "extension_id" => $params[$i]["extension_id"],

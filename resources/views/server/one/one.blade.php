@@ -3,22 +3,22 @@
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
                 @php($firstRendered = false)
-                @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
+                @if(server()->canRunCommand() && server()->isLinux())
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="pill" href="#usageTab" role="tab" aria-selected="true">{{__("Sistem Durumu")}}</a>
+                        <a class="nav-link active" data-toggle="pill" onclick="getDashboard()" href="#usageTab" role="tab">{{__("Sistem Durumu")}}</a>
                     </li>
                     @php($firstRendered = true)
                 @endif
                 <li class="nav-item">
                     <a class="nav-link @if(!$firstRendered) active @endif" data-toggle="pill" href="#extensionsTab" role="tab">{{__("Eklentiler")}}</a>
                 </li>
-                @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
+                @if(server()->canRunCommand() && server()->isLinux())
                     @if(\App\Models\Permission::can(user()->id,'liman','id','server_services'))
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="pill" onclick="getServices()" href="#servicesTab" role="tab">{{__("Servisler")}}</a>
                         </li>
                     @endif
-                    @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
+                    @if(server()->canRunCommand() && server()->isLinux())
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="pill" onclick="getPackages()" href="#packagesTab" role="tab">{{__("Paketler")}}</a>
                         </li>
@@ -52,43 +52,62 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#settingsTab" role="tab">{{__("Sunucu Ayarları")}}</a>
                 </li>
-                @if(server()->type == "linux" || server()->type == "windows")
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="pill" href="#extraTab" role="tab">{{__("Ek Özellikler")}}</a>
-                    </li>
-                @endif
                 {!! serverModuleButtons() !!}
             </ul>
         </div>
         <div class="card-body">
             <div class="tab-content">
-                @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
+                @if(server()->canRunCommand() && server()->isLinux())
                     <div class="tab-pane fade show active" id="usageTab" role="tabpanel">
-                            <h4>{{__("Kaynak Kullanımı")}}</h4>
-                            <div class="row">
-                                <div class="col-md-4">
-                                <h5>{{__("Cpu Kullanımı")}}</h5>
-                                <span id="cpuText" style="text-align: center;font-weight: bold">
-                                    {{__("Yükleniyor...")}}
-                                </span><br>
-                                <canvas id="cpu" width="400px" height="200px" style="float:left"></canvas>
-                                </div>
-                                <div class="col-md-4">
-                                <h5>{{__("Disk Kullanımı")}}</h5>
-                                <span id="diskText" style="text-align: center;font-weight: bold">
-                                    {{__("Yükleniyor...")}}
-                                </span><br>
-                                <canvas id="disk" width="400px" height="200px" style="float:left"></canvas>
-                                </div>
-                                <div class="col-md-4">
-                                <h5>{{__("Ram Kullanımı")}}</h5>
-                                <span id="ramText" style="text-align: center;font-weight: bold">
-                                    {{__("Yükleniyor...")}}
-                                </span><br>
-                                <canvas id="ram" width="400px" height="200px" style="float:left;"></canvas>
+                        <div class="card card-primary charts-card">
+                            <div class="card-header" style="background-color: #007bff; color: #fff;">
+                                <h3 class="card-title">{{ __('Kaynak Kullanımı') }}</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-3">
+                                        <canvas id="cpuChart"></canvas>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <canvas id="ramChart"></canvas>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <canvas id="diskChart"></canvas>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <canvas id="networkChart"></canvas>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <canvas id="ioChart"></canvas>
+                                    </div>
                                 </div>
                             </div>
-                            <hr>
+                            <div class="overlay">
+                                <div class="spinner-border" role="status">
+                                    <span class="sr-only">{{ __('Yükleniyor...') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                @include('table-card', [
+                                    "title" => __("Cpu Kullanımı"),
+                                    "api" => "top_cpu_processes"
+                                ])
+                            </div>
+                            <div class="col-md-4">
+                                @include('table-card', [
+                                    "title" => __("Ram Kullanımı"),
+                                    "api" => "top_memory_processes"
+                                ])
+                            </div>
+                            <div class="col-md-4">
+                                @include('table-card', [
+                                    "title" => __("Disk Kullanımı"),
+                                    "api" => "top_disk_usage"
+                                ])
+                            </div>
+                        </div>
                     </div>
                 @endif
                 <div class="tab-pane fade show @if(!$firstRendered) active @endif" id="extensionsTab" role="tabpanel">
@@ -223,22 +242,6 @@
                             </td>
                         </tr>
                     </table>
-                </div>
-                <div class="tab-pane fade show" id="extraTab" role="tabpanel">
-                    @if(server()->type == "linux")
-                        <p>{{__("Linux Sunucunuza SSH anahtarı ekleyerek Liman üzerindeki ekstra özelliklere erişebilirsiniz.")}}</p>
-                    @elseif(server()->type == "windows")
-                        <p>{{__("Windows Sunucunuza WinRM anahtarı ekleyerek Liman üzerindeki ekstra özelliklere erişebilirsiniz.")}}</p>
-                    @endif
-                    <form id="upgrade_form" onsubmit="return request('{{route('server_upgrade')}}',this,reload,errorSwal)" target="#">
-                            <h5>{{__("Kullanıcı Adı")}}</h5>
-                            <input type="text" name="username" placeholder="{{__("Kullanıcı Adı")}}" class="form-control " required=""
-                                    value=""><br>
-                            <h5>{{__("Parola")}}</h5>
-                            <input type="password" name="password" placeholder="{{__("Parola")}}" class="form-control "
-                                    required="" value=""><br>
-                            <button type="submit" class="btn btn-success">{{__("Yükselt")}}</button>
-                    </form>
                 </div>
             </div>
         </div>

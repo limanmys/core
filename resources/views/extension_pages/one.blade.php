@@ -42,6 +42,11 @@
                             <option value="php" @if($extension["language"] == "php") selected='true' @endif >PHP 7.3</option>
                             <option value="python" @if($extension["language"] == "python") selected='true' @endif>Python 3</option>
                         </select><br>
+                        <h3>{{__("Anahtar'ı Zorunlu Kıl")}}</h3>
+                        <select id="require_key" class="form-control" autocomplete="off" enabled><br>
+                            <option value="true" @if(array_key_exists("require_key",$extension) && $extension["require_key"] == "true") selected='true' @endif >Evet</option>
+                            <option value="false" @if(!array_key_exists("require_key",$extension) || $extension["require_key"] != "true") selected='true' @endif>Hayır</option>
+                        </select><br>
                         <h3>{{__("Destek Email'i")}}</h3>
                         <input id="support" type="text" name="email" class="form-control" value="{{$extension["support"]}}" required><br>
                         <h3>{{__("Logo (Font Awesome Ikon)")}}</h3>
@@ -53,6 +58,9 @@
                         <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}" required><br>
                         <h3>{{__("Ayar Doğrulama Fonksiyonu/Betiği")}}</h3>
                         <input id="verification" type="text" name="verification" class="form-control" value="{{array_key_exists("verification",$extension) ? $extension["verification"] : ""}}" required><br>
+                        <h3>{{__("Paket bağımlılıkları")}}</h3>
+                        <input id="dependencies" type="text" name="dependencies" class="form-control" value="{{array_key_exists("dependencies",$extension) ? $extension["dependencies"] : ""}}" required><br>
+                        <small>{{__("Birden fazla paket yazmak için aralarında boşluk bırakabilirsiniz.")}}</small><br>
                         <h3>{{__("Servis Adı yada Kontrol Etmek için Port")}}</h3>
                         <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}" required><br>
                         <h3>{{__("SSL Sertifikası Eklenecek Portlar")}}</h3>
@@ -319,6 +327,10 @@
         }
 
         function updateExtension(type,tableId = null){
+            if ($("#icon").val() == ""){
+                showSwal("Lütfen bir ikon ekleyin!","error",2000);
+                return;
+            }
             showSwal('{{__("Kaydediliyor...")}}','info');
             var data = new FormData();
             data.append('type',type);
@@ -327,9 +339,11 @@
             data.append('support',$("#support").val());
             data.append('version',$("#version").val());
             data.append('service',$("#service").val());
+            data.append('require_key',$("#require_key").val());
             data.append('sslPorts',$("#sslPorts").val());
             data.append('supportedLiman',$("#supportedLiman").val());
             data.append('verification',$("#verification").val());
+            data.append('dependencies',$("#dependencies").val());
             request('{{route('extension_settings_update')}}',data,function(){
                 showSwal("{{__("Başarıyla kaydedildi")}}",'success');
                 setTimeout(function(){

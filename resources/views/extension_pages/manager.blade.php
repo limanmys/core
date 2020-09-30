@@ -19,7 +19,7 @@
     <button class="btn btn-warning" onclick=showExtensionUpdates()>{{__("Güncellemeleri Yükle")}}</button>
 @endif
 <div class="float-sm-right">
-    <button data-toggle="tooltip" title="Ayarlar" class="btn btn-primary" onclick="openSettingsModal()"><i
+    <button data-toggle="tooltip" title="{{__('Ayarlar')}}" class="btn btn-primary" onclick="openSettingsModal()"><i
             class="fa fa-cogs"></i></button>
 </div><br><br>
 @include('errors')

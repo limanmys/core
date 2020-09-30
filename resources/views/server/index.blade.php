@@ -13,7 +13,7 @@
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
                 <h3 class="profile-username text-center">{{__("Sunucular")}}</h3>
-                <p class="text-muted text-center">Bu sayfadan mevcut sunucularını görebilirsiniz. Ayrıca yeni sunucu eklemek için Sunucu Ekle butonunu kullanabilirsiniz.</p>
+                <p class="text-muted text-center">{{__("Bu sayfadan mevcut sunucularını görebilirsiniz. Ayrıca yeni sunucu eklemek için Sunucu Ekle butonunu kullanabilirsiniz.")}}</p>
               </div>
             </div>
         </div>
@@ -133,64 +133,7 @@
                         </form>
                     </div>
                     <div class="tab-pane fade" id="key" role="tabpanel" aria-labelledby="keyTab">
-                        <form onsubmit="return checkKey(this)">
-                            <div class="modal-body">
-                                <p>{{__("Liman üzerindeki sunucuların eklentileri servisler üzerinden kullanabileceğiniz gibi, bazı eklentileri sunucuya bağlantı kurmadan kullanamazsınız.")}}</p>
-                                <p>{{__("Bu sebeple, bir anahtar eklemek istiyorsanız öncelikle konuşma protokolünü seçin.")}}</p>
-                                <label>
-                                    <input id="useKey" type="checkbox" onchange="keySettingsChanged()" checked>
-                                    {{__("Bir Anahtar Kullanmak İstiyorum")}}
-                                </label>
-                                <div id="keyDiv" style="display: none;">
-                                    <br>
-                                    <div class="form-group">
-                                        <label><h4>{{__("Anahtar Türü")}}</h4></label>
-                                        <select name="key_type" class="form-control" disabled onchange="setPort(this)" id="keyType">
-                                            <option value="linux_ssh" selected>{{__("SSH")}}</option>
-                                            <option value="linux_certificate">{{__("SSH Anahtarı")}}</option>
-                                            <option value="windows_powershell">{{__("WinRM")}}</option>
-                                            <option value="snmp">{{__("SNMP")}}</option>
-                                        </select>
-                                    </div><hr>
-                                    <h4>{{__("Kullanıcı Adı")}}</h4>
-                                    <input id="keyUsername" type="text" name="username" class="form-control" placeholder="{{__("Kullanıcı Adı")}}" required disabled><br>
-                                    <h4 id="passwordPrompt">{{__("Şifre")}}</h4>
-                                    <h4 id="certificatePrompt">{{__("SSH Private Key")}}</h4>
-                                    <label id="certificateInformLabel">{{__("Anahtarınızın çalışabilmesi için şifreli olmaması ve sudo komutlarını çalıştırması için sudoers dosyasında NOPASSWD olarak eklenmiş olması gerekmektedir.")}}</label>
-                                    <textarea class="form-control" name="password" id="keyPasswordCert" cols="30" rows="10" required disabled></textarea>
-                                    <input id="keyPassword" type="password" name="password" class="form-control" placeholder="{{__("Şifre")}}" required disabled><br>
-                                    <div id="snmpWrapper" style="display: none">
-                                        <h4>{{__("Bağlantı Türü")}}</h4>
-                                        <select id="SNMPsecurityLevel" name="SNMPsecurityLevel" class="select2 snmp-input" disabled>
-                                            <option value="noAuthNoPriv">noAuthNoPriv</option>
-                                            <option value="authNoPriv">authNoPriv</option>
-                                            <option value="authPriv" selected>authPriv</option>
-                                        </select><br>
-                                        <h4>{{__("Giriş Protokolü")}}</h4>
-                                        <select id="SNMPauthProtocol" name="SNMPauthProtocol" class="select2 snmp-input" disabled>
-                                            <option value="MD5">MD5</option>
-                                            <option value="SHA">SHA</option>
-                                        </select><br>
-                                        <h4>{{__("Giriş Parolası")}}</h4>
-                                        <input id="SNMPauthPassword" name="SNMPauthPassword" type="password" class="form-control snmp-input" placeholder="{{__("Giriş Parolası")}}" disabled><br>
-                                        <h4>{{__("Gizlilik Protokolü")}}</h4>
-                                        <select id="SNMPprivacyProtocol" name="SNMPprivacyProtocol" class="select2 snmp-input" disabled>
-                                            <option value="DES">DES</option>
-                                            <option value="AES">AES</option>
-                                        </select><br>
-                                        <h4>{{__("Gizlilik Parolası")}}</h4>
-                                        <input id="SNMPprivacyPassword" name="SNMPprivacyPassword" type="password" class="form-control snmp-input" placeholder="{{__("Gizlilik Parolası")}}" disabled><br>
-                                    </div>
-                                    <h4>{{__("Port")}}</h4>
-                                    <small>{{__("Eğer bilmiyorsanız varsayılan olarak bırakabilirsiniz.")}}</small>
-                                    <input id="port" type="number" name="port" class="form-control snmp-input" placeholder="{{__("Port")}}" required disabled min="0" value="22"><br>
-
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">{{__("Ayarları Onayla")}}</button>
-                            </div>
-                        </form>
+                        @include('keys.add')
                     </div>
                     <div class="tab-pane fade" id="summary" role="tabpanel" aria-labelledby="summaryTab">
                         <div class="modal-body">
@@ -234,7 +177,7 @@
     <script>
         var isNetworkOK = false;
         var isGeneralOK = false;
-        var isKeyOK = false;
+        
         function checkAccess(form) {
             showSwal('{{__("Kontrol Ediliyor...")}}','info');
             return request('{{route('server_check_access')}}',form,function (response) {
@@ -267,95 +210,12 @@
             });
         }
         var helper;
-        function checkKey(form) {           
-            var option = $("#useKey");
-            if(option.is(':checked') === false){
-                isKeyOK = true;
-                $("#keyTab").css('color','green');
-                $("#summaryTab").click();
-                return false;
-            }
-            var data = new FormData(form);
-            helper = data;
-            data.append('ip_address',$("#serverHostName").val());
-            showSwal('{{__("Kontrol Ediliyor...")}}','info');
-            return request('{{route('server_verify_key')}}',data,function (response) {
-                var json = JSON.parse(response);
-                showSwal(json["message"],'success',2000);
-                isKeyOK = true;
-                $("#keyTab").css('color','green');
-                $("#summaryTab").click();
-            },function (response) {
-                var json = JSON.parse(response);
-                showSwal(json["message"],'error',2000);
-                isKeyOK = false;
-                $("#keyTab").css('color','red');
-            });
-        }
-
-        function keySettingsChanged(){
-            var option = $("#useKey");
-            if(option.is(':checked')){
-                isKeyOK = false;
-                $('#keyDiv').find('input, select').prop('disabled', false);
-                $("#keyDiv").fadeIn(0);
-            }else{
-                isKeyOK = true;
-                $("#keyTab").css('color','green');
-                $("#summaryTab").click();
-                $("#keyDiv").fadeOut(0);
-                $('#keyDiv').find('input, select').prop('disabled', true);
-            }
-        }
-        keySettingsChanged();
+        
         function details(element) {
             var server_id = element.querySelector('#server_id').innerHTML;
             window.location.href = "/sunucular/" + server_id;
         }
-        $("#keyPasswordCert").fadeOut(0);
-        $("#certificateInformLabel").fadeOut(0);
-        $("#keyPassword").fadeIn(0);
-        $("#certificatePrompt").fadeOut(0);
-        $("#passwordPrompt").fadeIn(0);
-        function setPort(select) {
-            if(select.value === "windows_powershell"){
-                $("#keyPasswordCert").fadeOut(0).attr("disabled","true");
-                $("#certificateInformLabel").fadeOut(0);
-                $("#keyPassword").fadeIn(0).removeAttr("disabled");
-                $("#certificatePrompt").fadeOut(0);
-                $("#passwordPrompt").fadeIn(0);
-                $("#snmpWrapper").fadeOut();
-                $(".snmp-input").attr("disabled","true");
-                $("#port").val("5986").removeAttr("disabled");
-            }else if(select.value === "linux_ssh"){
-                $("#keyPasswordCert").fadeOut(0).attr("disabled","true");
-                $("#keyPassword").fadeIn(0).removeAttr("disabled");
-                $("#certificateInformLabel").fadeOut(0);
-                $("#passwordPrompt").fadeIn(0);
-                $("#certificatePrompt").fadeOut(0);
-                $("#snmpWrapper").fadeOut();
-                $(".snmp-input").attr("disabled","true");
-                $("#port").val("22").removeAttr("disabled");
-            }else if(select.value === "linux_certificate"){
-                $("#keyPasswordCert").fadeIn(0).removeAttr("disabled");
-                $("#certificateInformLabel").fadeIn(0);
-                $("#passwordPrompt").fadeOut(0);
-                $("#keyPassword").fadeOut(0).attr("disabled","true");
-                $("#certificatePrompt").fadeIn(0);
-                $("#snmpWrapper").fadeOut();
-                $(".snmp-input").attr("disabled","true");
-                $("#port").val("22").removeAttr("disabled");
-            }else if(select.value === "snmp"){
-                $("#keyPasswordCert").fadeOut(0).attr("disabled","true");
-                $("#certificateInformLabel").fadeOut(0).attr("disabled","true");
-                $("#passwordPrompt").fadeOut(0).attr("disabled","true");
-                $("#keyPassword").fadeOut(0).attr("disabled","true");
-                $("#certificatePrompt").fadeOut(0).attr("disabled","true");
-                $(".snmp-input").removeAttr("disabled");
-                $("#snmpWrapper").fadeIn();
-                $("#port").val("161").attr("disabled","true");
-            }
-        }
+        
 
         function setSummary(){
             $("#tableServerHostname").text($("#serverHostName").val());
@@ -380,23 +240,17 @@
 
             if($("#useKey").is(':checked') === true){
                 form.append('username',$("#keyUsername").val());
-                if($("#keyType").val() == "linux_certificate"){
+                form.append('keyType',$("#keyType").val());
+                if($("#keyType").val() == "ssh_certificate"){
                     form.append('password',$("#keyPasswordCert").val());
-                }else if($("#keyType").val() == "snmp"){
-                    form.append("SNMPsecurityLevel",$("#SNMPsecurityLevel").val());
-                    form.append("SNMPauthProtocol",$("#SNMPauthProtocol").val());
-                    form.append("SNMPauthPassword",$("#SNMPauthPassword").val());
-                    form.append("SNMPprivacyProtocol",$("#SNMPprivacyProtocol").val());
-                    form.append("SNMPprivacyPassword",$("#SNMPprivacyPassword").val());
                 }else{
                     form.append('password',$("#keyPassword").val());
                 }
                 
                 form.append('type',$("#keyType").val());
                 form.append('key_port',$("#port").val());
-            }else{
-                form.append('type',$("input[name=operating_system]:checked").val());
             }
+            form.append('os',$("input[name=operating_system]:checked").val());
             request('{{route('server_add')}}',form,function (errors) {
                 var json = JSON.parse(errors);
                 if(json["status"] == "202"){

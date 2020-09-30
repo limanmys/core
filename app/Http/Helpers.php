@@ -372,7 +372,10 @@ if (!function_exists('addCertificate')) {
      */
     function addCertificate($hostname, $port, $path)
     {
-        rootSystem()->addCertificate('/tmp/' . $path, "liman-" . $hostname . "_" . $port);
+        rootSystem()->addCertificate(
+            '/tmp/' . $path,
+            "liman-" . $hostname . "_" . $port
+        );
 
         // Create Certificate Object.
         return Certificate::create([
@@ -388,7 +391,9 @@ if (!function_exists('getLimanId')) {
      */
     function getLimanId()
     {
-        return md5("l1m@ns3cur1ty".trim(shell_exec("ls /dev/disk/by-uuid -1"))).PHP_EOL;
+        return md5(
+            "l1m@ns3cur1ty" . trim(shell_exec("ls /dev/disk/by-uuid -1"))
+        ) . PHP_EOL;
     }
 }
 
@@ -400,7 +405,7 @@ if (!function_exists('system_log')) {
      */
     function system_log($level, $message, $array = [])
     {
-        $array["user_id"] = user()->id;
+        $array["user_id"] = user() ? user()->id : "";
         $array["ip_address"] = request()->ip();
 
         switch ($level) {
@@ -592,9 +597,18 @@ if (!function_exists('extensionDb')) {
                 "name" => $key,
             ])
             ->first();
+        if ($key == "clientPassword" || $key == "clientUsername"){
+            $serverKey = server()->key();
+            if ($serverKey == null){
+                return null;
+            }
+            $data = json_decode($serverKey->data,true);
+            $encKey = env('APP_KEY') . auth()->user()->id . server()->id;
+            return AES256::decrypt($data[$key], $encKey);
+        }
         if ($target) {
             $key = env('APP_KEY') . auth()->user()->id . server()->id;
-            return AES256::decrypt($target->value,$key);
+            return AES256::decrypt($target->value, $key);
         }
         return null;
     }
@@ -603,7 +617,7 @@ if (!function_exists('extensionDb')) {
 if (!function_exists('sudo')) {
     function sudo()
     {
-        if (server()->type == "linux_certificate") {
+        if (server()->key()->type == "ssh_certificate") {
             return "sudo ";
         }
         $pass64 = base64_encode(extensionDb("clientPassword") . "\n");
@@ -813,7 +827,7 @@ if (!function_exists('checkHealth')) {
         if (empty($messages)) {
             array_push($messages, [
                 "type" => "success",
-                "message" => "Herşey Yolunda, sıkıntı yok!",
+                "message" => __("Herşey Yolunda, sıkıntı yok!"),
             ]);
         }
 
@@ -825,7 +839,7 @@ if (!function_exists('lDecrypt')) {
     function lDecrypt($data)
     {
         $key = env('APP_KEY') . user()->id . server()->id;
-        return AES256::decrypt($data,$key);
+        return AES256::decrypt($data, $key);
     }
 }
 

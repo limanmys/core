@@ -8,7 +8,7 @@ Route::view('/sunucular', 'server.index')->name('servers');
 
 Route::post('/sunucu/ekle', 'Server\AddController@main')
     ->name('server_add')
-    ->middleware('parameters:name,ip_address,control_port,type,city');
+    ->middleware('parameters:name,ip_address,control_port,city');
 
 // Server Update Route
 
@@ -24,8 +24,9 @@ Route::post('/sunucu/isimKontrol', 'Server\MainController@verifyName')
     ->name('server_verify_name')
     ->middleware('parameters:server_name');
 
-Route::post('/sunucu/anahtarKontrol', 'Server\MainController@verifyKey')
-    ->name('server_verify_key');
+Route::post('/sunucu/anahtarKontrol', 'Server\MainController@verifyKey')->name(
+    'server_verify_key'
+);
 
 // Remove Server Route
 
@@ -93,6 +94,21 @@ Route::group(['middleware' => ['server']], function () {
     Route::post('/sunucu/durum', 'Server\OneController@stats')->name(
         'server_stats'
     );
+
+    Route::post(
+        '/sunucu/bellek_durum',
+        'Server\OneController@topMemoryProcesses'
+    )->name('top_memory_processes');
+
+    Route::post(
+        '/sunucu/islemci_durum',
+        'Server\OneController@topCpuProcesses'
+    )->name('top_cpu_processes');
+
+    Route::post(
+        '/sunucu/disk_durum',
+        'Server\OneController@topDiskUsage'
+    )->name('top_disk_usage');
 
     Route::post('/sunucu/servis/', 'Server\OneController@serviceList')->name(
         'server_service_list'
@@ -175,10 +191,6 @@ Route::group(['middleware' => ['server']], function () {
 
     Route::post('/sunucu/paketler', 'Server\OneController@packageList')->name(
         'server_package_list'
-    );
-
-    Route::post('/sunucu/yukselt', 'Server\OneController@upgradeServer')->name(
-        'server_upgrade'
     );
 
     Route::post(

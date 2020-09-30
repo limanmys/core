@@ -2,11 +2,8 @@
 
 namespace App\Models;
 
-use App\Connectors\Connector;
-use App\Connectors\SSHConnector;
+use App\Connectors\GenericConnector;
 use App\Connectors\SNMPConnector;
-use App\Connectors\SSHCertificateConnector;
-use App\Connectors\WinRMConnector;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;
@@ -25,6 +22,7 @@ class Server extends Model
         'city',
         'type',
         'control_port',
+        'os',
     ];
     /**
      * @var
@@ -36,20 +34,16 @@ class Server extends Model
      */
     private function connector()
     {
-        if ($this->type == "linux_ssh") {
-            return new SSHConnector($this, user()->id);
-        } elseif ($this->type == "windows_powershell") {
-            return new WinRMConnector($this, user()->id);
-        } elseif ($this->type == "linux_certificate") {
-            return new SSHCertificateConnector($this, user()->id);
-        } elseif ($this->type == "snmp") {
-            return new SNMPConnector($this, user()->id);
-        } else {
+        if ($this->key() == null) {
             abort(
                 504,
                 "Bu sunucuda komut çalıştırmak için bir bağlantınız yok."
             );
         }
+        if ($this->key()->type == "snmp") {
+            return new SNMPConnector($this, user()->id);
+        }
+        return new GenericConnector($this, user());
     }
 
     /**
@@ -108,7 +102,7 @@ class Server extends Model
      */
     public function isRunning($service_name)
     {
-        if ($this->type == "windows" || $this->type == "linux") {
+        if (!$this->canRunCommand()) {
             if ($this->control_port == -1) {
                 return true;
             }
@@ -196,27 +190,22 @@ class Server extends Model
 
     public function canRunCommand()
     {
-        return $this->type == "linux_ssh" ||
-            $this->type == "linux_certificate" ||
-            $this->type == "windows_powershell" ||
-            $this->type == "snmp";
+        return $this->key() != null ? true : false;
     }
 
     public function isLinux()
     {
-        return $this->type == "linux_ssh" ||
-            $this->type == "linux_certificate" ||
-            $this->type == "linux";
+        return $this->os == "linux";
     }
 
     public function isWindows()
     {
-        return $this->type == "windows" || $this->type == "windows_powershell";
+        return $this->os == "windows";
     }
 
     public function getVersion()
     {
-        if (!$this->canRunCommand() || $this->type == "snmp") {
+        if (!$this->canRunCommand()) {
             return "";
         }
 
@@ -231,10 +220,19 @@ class Server extends Model
 
     public function getHostname()
     {
-        if (!$this->canRunCommand() || $this->type == "snmp") {
+        if (!$this->canRunCommand()) {
             return "";
         }
 
         return $this->run("hostname");
+    }
+
+    public function key()
+    {
+        return $this->hasOne(
+            '\App\Models\ServerKey',
+            'server_id',
+            'id'
+        )->first();
     }
 }

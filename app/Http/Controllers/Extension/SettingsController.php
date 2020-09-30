@@ -50,8 +50,8 @@ class SettingsController extends Controller
         );
         if ($license) {
             return respond("Lisans Eklendi");
-        } else{
-            return respond("Lisans Eklenemiyor!",201);
+        } else {
+            return respond("Lisans Eklenemiyor!", 201);
         }
     }
 
@@ -62,11 +62,6 @@ class SettingsController extends Controller
      */
     public function settings_one()
     {
-        // Go through all files and list them as tree style in array.
-        $files = $this->tree(
-            "/liman/extensions/" . strtolower(extension()->name)
-        );
-
         system_log(7, "EXTENSION_SETTINGS_PAGE", [
             "extension_id" => extension()->_id,
         ]);
@@ -94,52 +89,8 @@ class SettingsController extends Controller
         }
         // Return view with required parameters.
         return magicView('extension_pages.one', [
-            "files" => $files,
             "extension" => getExtensionJson(extension()->name),
         ]);
-    }
-
-    // Search through folders and extract pages.
-
-    /**
-     * @param $path
-     * @return array
-     */
-    private function tree($path)
-    {
-        // If file is not path, simply return.
-        if (!is_dir($path)) {
-            return [];
-        }
-
-        // List files under path
-        $files = scandir($path);
-
-        // Ignore linux filesystem' '.' and '..' files.
-        unset($files[0]);
-        unset($files[1]);
-
-        // Remake array because of corrupted index.
-        $files = array_values($files);
-
-        // Loop through each files
-        foreach ($files as $file) {
-            // Create full path of file.
-            $newPath = $path . DIRECTORY_SEPARATOR . $file;
-
-            // If new path is directory, go through same process recursively.
-            if (is_dir($newPath)) {
-                // Run same process.
-                $files[$file] = $this->tree(
-                    $path . DIRECTORY_SEPARATOR . $file
-                );
-
-                // Delete item from array since that's array not a file.
-                $index = array_search($file, $files);
-                unset($files[$index]);
-            }
-        }
-        return $files;
     }
 
     public function update()
@@ -160,7 +111,9 @@ class SettingsController extends Controller
             $extension["icon"] = request("icon");
             $extension["service"] = request("service");
             $extension["version"] = request("version");
+            $extension["require_key"] = request("require_key");
             $extension["verification"] = request("verification");
+            $extension["dependencies"] = request("dependencies");
             $extension["sslPorts"] = request("sslPorts");
             $extension["supportedLiman"] = request("supportedLiman");
         } else {
@@ -637,7 +590,7 @@ class SettingsController extends Controller
     public function getExtensionUpdates()
     {
         return respond(
-            json_decode(file_get_contents(storage_path('extension_updates')))
+            array_values(json_decode(file_get_contents(storage_path('extension_updates')),true))
         );
     }
 }

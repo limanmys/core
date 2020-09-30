@@ -17,7 +17,7 @@
         </div>
         <div class="modal-footer justify-content-right">
             @isset($footer)
-                <button class="btn {{$footer["class"]}}" onclick="{{$footer["onclick"]}}">{{$footer["text"]}}</button>
+                <button class="btn {{$footer["class"]}}" onclick="{{$footer["onclick"]}}">{{__($footer["text"])}}</button>
             @endisset
         </div>
         </div>

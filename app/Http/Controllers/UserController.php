@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Permission;
+use App\Models\ServerKey;
 use App\Models\RoleUser;
 use App\User;
 use App\Models\UserSettings;
@@ -46,7 +47,10 @@ class UserController extends Controller
         try {
             $flag->validate();
         } catch (\Exception $exception) {
-            return respond("Lütfen geçerli veri giriniz. " . $exception->getMessage(), 201);
+            return respond(
+                "Lütfen geçerli veri giriniz. " . $exception->getMessage(),
+                201
+            );
         }
 
         // Check If user already exists.
@@ -298,10 +302,11 @@ class UserController extends Controller
      */
     public function removeSetting()
     {
-        $first = UserSettings::where([
-            'user_id' => user()->id,
-            'id' => request('setting_id'),
-        ])->first();
+        if (request('type') == "key") {
+            $first = ServerKey::find(request('id'));
+        } else {
+            $first = UserSettings::find(request('id'));
+        }
 
         if (!$first) {
             return respond("Ayar bulunamadi", 201);
@@ -320,10 +325,7 @@ class UserController extends Controller
             }
         }
 
-        $flag = UserSettings::where([
-            'user_id' => auth()->user()->id,
-            'id' => request('setting_id'),
-        ])->delete();
+        $flag = $first->delete();
 
         if ($flag) {
             return respond("Başarıyla silindi", 200);
@@ -364,7 +366,7 @@ class UserController extends Controller
         }
 
         $key = env('APP_KEY') . $setting->user_id . $setting->server_id;
-        $encrypted = AES256::encrypt(request('new_value'),$key);
+        $encrypted = AES256::encrypt(request('new_value'), $key);
 
         $flag = $setting->update([
             "value" => $encrypted,
@@ -446,20 +448,30 @@ class UserController extends Controller
 
         foreach ($settings as $setting) {
             $server = $servers->find($setting->server_id);
-            if ($setting->name == "clientUsername") {
-                $setting->name = __("Anahtar - Kullanıcı Adı");
-            }
-            if ($setting->name == "clientPassword") {
-                $setting->name = __("Anahtar - Şifre");
-            }
             $setting->server_name = $server
                 ? $server->name
                 : __("Sunucu Silinmiş.");
+            $setting->type = "setting";
+        }
+
+        $keys = user()->keys;
+
+        foreach ($keys as $key) {
+            $server = $servers->find($key->server_id);
+            $key->server_name = $server
+                ? $server->name
+                : __("Sunucu Silinmiş.");
+            $key->name = "Sunucu Anahtarı";
+            $key->type = "key";
         }
 
         return magicView('keys.index', [
-            "servers" => objectToArray($servers, "name", "id"),
-            "settings" => json_decode(json_encode($settings), true),
+            "settings" => json_decode(
+                json_encode(
+                    array_merge($settings->toArray(), $keys->toArray())
+                ),
+                true
+            ),
         ]);
     }
 
@@ -475,31 +487,29 @@ class UserController extends Controller
      */
     public function addKey()
     {
-        UserSettings::where([
-            "server_id" => server()->id,
-            "user_id" => user()->id,
-            "name" => "clientUsername",
-        ])->delete();
-
-        UserSettings::where([
-            "server_id" => server()->id,
-            "user_id" => user()->id,
-            "name" => "clientPassword",
-        ])->delete();
-
         $encKey = env('APP_KEY') . user()->id . server()->id;
-        UserSettings::create([
+        UserSettings::where([
             "server_id" => server()->id,
             "user_id" => user()->id,
             "name" => "clientUsername",
-            "value" => AES256::encrypt(request('username'),$encKey),
-        ]);
-        UserSettings::create([
+        ])->delete();
+        UserSettings::where([
             "server_id" => server()->id,
             "user_id" => user()->id,
             "name" => "clientPassword",
-            "value" => AES256::encrypt(request('password'),$encKey),
-        ]);
+        ])->delete();
+
+        $data = [
+            "clientUsername" => AES256::encrypt(request('username'), $encKey),
+            "clientPassword" => AES256::encrypt(request('password'), $encKey),
+            "key_port" => request('key_port'),
+        ];
+
+        ServerKey::updateOrCreate(
+            ["server_id" => server()->id, "user_id" => user()->id],
+            ["type" => request('type'), "data" => json_encode($data)]
+        );
+
         ConnectorToken::clear();
         return respond("Başarıyla eklendi.");
     }

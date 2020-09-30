@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\Server;
 
-use App\Connectors\SSHConnector;
+use App\Connectors\GenericConnector;
 use App\Connectors\SNMPConnector;
-use App\Connectors\SSHCertificateConnector;
-use App\Connectors\WinRMConnector;
 use App\Models\Server;
 use App\Http\Controllers\Controller;
 
@@ -33,7 +31,7 @@ class MainController extends Controller
     public function verifyName()
     {
         if (strlen(request('server_name')) > 24) {
-            return respond("Lütfen daha kısa bir sunucu adı girin.",201);
+            return respond("Lütfen daha kısa bir sunucu adı girin.", 201);
         }
         if (!Server::where('name', request('server_name'))->exists()) {
             return respond("İsim Onaylandı.", 200);
@@ -54,38 +52,27 @@ class MainController extends Controller
             ],
         ]);
 
-        if (request('key_type') == "linux_ssh") {
-            return SSHConnector::verify(
+        if (request('key_type') == "snmp") {
+            $output = SNMPConnector::verifySnmp(
+                request('ip_address'),
+                request('username'),
+                request('password')
+            );
+        } else {
+            $connector = new GenericConnector();
+            $output = $connector->verify(
                 request('ip_address'),
                 request('username'),
                 request('password'),
-                request('port')
-            );
-        } elseif (request('key_type') == "windows_powershell") {
-            return WinRMConnector::verify(
-                request('ip_address'),
-                request('username'),
-                request('password'),
-                request('port')
-            );
-        } elseif (request('key_type') == "linux_certificate") {
-            return SSHCertificateConnector::verify(
-                request('ip_address'),
-                request('username'),
-                request('password'),
-                request('port')
-            );
-        } elseif (request('key_type') == "snmp") {
-            return SNMPConnector::verifySnmp(
-                request('ip_address'),
-                request('username'),
-                request('SNMPsecurityLevel'),
-                request('SNMPauthProtocol'),
-                request('SNMPauthPassword'),
-                request('SNMPprivacyProtocol'),
-                request('SNMPprivacyPassword')
+                request('port'),
+                request('key_type')
             );
         }
-        return respond("Bu anahtara göre bir yapı bulunamadı.", 201);
+
+        if ($output == "ok") {
+            return respond("Anahtarınız doğrulandı!");
+        } else {
+            return respond("Anahtarınız doğrulanamadı!", 201);
+        }
     }
 }

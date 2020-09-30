@@ -20,7 +20,9 @@ class ExtensionUpdaterJob implements ShouldQueue
     private $download;
     private $version_code;
     private $forceUpdate;
-
+    private $hash;
+    private $retry = 3;
+    private $signed = false;
     /**
      * Create a new job instance.
      *
@@ -30,12 +32,14 @@ class ExtensionUpdaterJob implements ShouldQueue
         $extension_id,
         $version_code,
         $download,
+        $hash,
         $forceUpdate = false
     ) {
         $this->extension = Extension::find($extension_id);
         $this->version_code = $version_code;
         $this->download = $download;
         $this->forceUpdate = $forceUpdate;
+        $this->hash = $hash;
     }
 
     /**
@@ -51,12 +55,12 @@ class ExtensionUpdaterJob implements ShouldQueue
             shell_exec("[ -e '$downloadPath' ] && echo 1 || echo 0")
         );
         $flag = true;
-
-        if ($exists != "1") {
+        $fileHash = trim(shell_exec("sha512sum $downloadPath 2>/dev/null | cut -d ' ' -f 1"));
+        if ($exists != "1" || $fileHash != $this->hash) {
             $flag = self::downloadFile($downloadPath);
         }
 
-        if ($this->forceUpdate) {
+        if ($flag && $this->forceUpdate) {
             $controller = new MainController();
             list($flag, $extension) = $controller->setupNewExtension(
                 $downloadPath
@@ -88,20 +92,43 @@ class ExtensionUpdaterJob implements ShouldQueue
             "verify" => false,
         ]);
         $resource = fopen($downloadPath, 'w');
-        $client->request('GET', $this->download, ['sink' => $resource]);
-        if (is_file($downloadPath)) {
+        $response = $client->request('GET', $this->download, ['sink' => $resource]);
+        try{
+            $str = $response->getHeaders()["Content-Disposition"][0];
+            $arr = explode(";",$str);
+            if (substr($arr[1],-7) == 'signed"') {
+                $this->signed = true;
+            }
+        }catch(\Exception $e){
+            return false;
+        }
+
+        $fileHash = trim(shell_exec("sha512sum $downloadPath | cut -d ' ' -f 1"));
+        if (is_file($downloadPath) && $fileHash == $this->hash) {
+            if ($this->signed) {
+                $tmp2 = "/tmp/" . str_random();
+                shell_exec(
+                    "gpg --status-fd 1 -d -o '" . $tmp2 . "' " . $downloadPath . " >/dev/null 2>/dev/null"
+                );
+                shell_exec("mv " . $tmp2 . " " . $downloadPath);
+            }
             return true;
         } else {
-            return false;
+            $this->retry = $this->retry -1;
+            if($this->retry < 0 ){
+                return false;
+            } else{
+                return self::downloadFile($downloadPath);
+            }
         }
     }
 
     private function updateUpdatesFile()
     {
-        $json = json_decode(
+        $json = array_values(json_decode(
             file_get_contents(storage_path('extension_updates')),
             true
-        );
+        ));
         for ($i = 0; $i < count($json); $i++) {
             if ($json[$i]["extension_id"] = $this->extension->id) {
                 unset($json[$i]);

@@ -31,7 +31,7 @@
     }
 
 
-    @if(server()->type == "linux_ssh" || server()->type == "linux_certificate")
+    @if(server()->canRunCommand() && server()->isLinux())
         if(location.hash !== "#updatesTab"){
             getUpdates();
             Swal.close();
@@ -63,12 +63,122 @@
         @endforeach
     @endif
 
-    @if(server()->type == "linux_ssh" || server()->type == "windows_powershell" || server()->type == "linux_certificate")
-    setInterval(function () {
-        stats();
-    }, 15000);
+    @if(server()->canRunCommand())
 
-    stats();
+    function resourceChart(title, chart, time, data, prefix=true, postfix="")
+    {
+        if(!window[`${chart}-element`]){
+            window[`${chart}-element`] = new Chart($(`#${chart}`), {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        data: [data, data],
+                        steppedLine: false,
+                        borderColor: 'rgb(255, 159, 64)',
+                        backgroundColor: 'rgba(255, 159, 64, .5)',
+                        fill: true,
+                        pointRadius: 0
+                    }],
+                    labels: [time, time]
+                },
+                options: {
+                    responsive: true,
+                    legend: false,
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
+                    title: {
+						display: true,
+						text: `${title} ` + (prefix ? `%${data} ${postfix}` : `${data} ${postfix}`),
+					},
+                    scales: {
+                        xAxes: [{
+                            display: false 
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    },
+                }
+            });
+        }else{
+            window[`${chart}-element`].options.title.text = `${title} ` + (prefix ? `%${data} ${postfix}` : `${data} ${postfix}`);
+            window[`${chart}-element`].data.labels.push(time);
+            window[`${chart}-element`].data.datasets.forEach((dataset) => {
+                dataset.data.push(data);
+            });
+            window[`${chart}-element`].update();
+        }
+    }
+
+    function networkChart(title, chart, time, data)
+    {
+        if(!window[`${chart}-element`]){
+            window[`${chart}-element`] = new Chart($(`#${chart}`), {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: '{{__('Download')}}',
+                        data: [data.down, data.down],
+                        steppedLine: false,
+                        borderColor: 'rgb(255, 159, 64)',
+                        backgroundColor: 'rgba(255, 159, 64, .5)',
+                        fill: true,
+                        pointRadius: 0
+                    },{
+                        label: '{{__('Upload')}}',
+                        data: [data.up, data.up],
+                        steppedLine: false,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, .5)',
+                        fill: true,
+                        pointRadius: 0
+                    }],
+                    labels: [time, time]
+                },
+                options: {
+                    responsive: true,
+                    legend: false,
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
+                    title: {
+						display: true,
+						text: `${title} Down: ${data.down} mb/s Up: ${data.up} mb/s`,
+					},
+                    scales: {
+                        xAxes: [{
+                            display: false 
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    },
+                }
+            });
+        }else{
+            window[`${chart}-element`].options.title.text = `${title} Down: ${data.down} kb/s Up: ${data.up} kb/s`;
+            window[`${chart}-element`].data.labels.push(time);
+            window[`${chart}-element`].data.datasets[0].data.push(data.down);
+            window[`${chart}-element`].data.datasets[1].data.push(data.up);
+            window[`${chart}-element`].update();
+        }
+    }
+
     function updateChart(element, time, data) {
         // First, Update Text
         $("#" + element + "Text").text("%" + data);
@@ -107,22 +217,43 @@
             }
         })
     }
+    function getDashboard()
+    {
+        stats();
+        $('.table-card').find('.refresh-button').click();
+    }
+
     var firstStats = true;
-    function stats() {
+    function stats(noSpinner = false) {
+        !noSpinner && $('.charts-card').find('.overlay').show();
         var form = new FormData();
         form.append('server_id', '{{server()->id}}');
         var time = "{{\Carbon\Carbon::now()->format("H:i:s")}}";
         request('{{route('server_stats')}}', form, function (response) {
             data = JSON.parse(response);
-            if(firstStats){
-                firstStats = false;
-                createChart("ram", time, [data['ram']]);
-                createChart("cpu", time, [data['cpu']]);
-                createChart("disk", time, [data['disk']]);
-            }
-            updateChart("disk", data['time'], data['disk']);
-            updateChart("ram", data['time'], data['ram']);
-            updateChart("cpu", data['time'], data['cpu']);
+            @if(server()->isLinux())
+                resourceChart('{{__("Cpu Kullanımı")}}', "cpuChart", data.time, data.cpuPercent);
+                resourceChart('{{__("Ram Kullanımı")}}', "ramChart", data.time, data.ramPercent);
+                resourceChart('{{__("Disk Kullanımı")}}', "diskChart", data.time, data.diskPercent);
+                resourceChart('{{__("Disk I/O")}}', "ioChart", data.time, data.ioPercent);
+                networkChart('{{__("Network")}}', "networkChart", data.time, data.network);
+            @else
+                if(firstStats){
+                    firstStats = false;
+                    createChart("ram", time, [data['ram']]);
+                    createChart("cpu", time, [data['cpu']]);
+                    createChart("disk", time, [data['disk']]);
+                }
+                updateChart("disk", data['time'], data['disk']);
+                updateChart("ram", data['time'], data['ram']);
+                updateChart("cpu", data['time'], data['cpu']);
+            @endif
+            !noSpinner && $('.charts-card').find('.overlay').hide();
+            setTimeout(function(){
+                if($("a[href=\"#usageTab\"]").hasClass("active")){
+                    stats(true);
+                }
+            }, 500);
         })
     }
 
@@ -613,6 +744,7 @@
 
     $(function () {
         $("#installed_extensions").DataTable(dataTablePresets('multiple'));
+        getDashboard();
     });
 
     

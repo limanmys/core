@@ -34,13 +34,14 @@ class SNMPConnector implements Connector
      */
     public function __construct(\App\Models\Server $server, $user_id)
     {
+        list($username, $password, $port) = self::retrieveCredentials();
         $this->server = $server;
-        $this->username = $this->getCredential("username");
-        $this->securityLevel = $this->getCredential("SNMPsecurityLevel");
-        $this->authProtocol = $this->getCredential("SNMPauthProtocol");
-        $this->authPassword = $this->getCredential("SNMPauthPassword");
-        $this->privacyProtocol = $this->getCredential("SNMPprivacyProtocol");
-        $this->privacyPassword = $this->getCredential("SNMPprivacyPassword");
+        $this->username = $username;
+        $this->securityLevel = 'authPriv';
+        $this->authProtocol = 'SHA';
+        $this->authPassword = $password;
+        $this->privacyProtocol = 'AES';
+        $this->privacyPassword = $password;
     }
 
     public function execute($command, $flag = true)
@@ -102,25 +103,18 @@ class SNMPConnector implements Connector
         return true;
     }
 
-    public static function verifySnmp(
-        $ip_address,
-        $username,
-        $securityLevel,
-        $authProtocol,
-        $authPassword,
-        $privacyProtocol,
-        $privacyPassword
-    ) {
+    public static function verifySnmp($ip_address, $username, $authPassword)
+    {
         foreach (SNMPConnector::$verifyCommands as $command) {
             try {
                 $flag = snmp3_get(
                     $ip_address,
                     $username,
-                    $securityLevel,
-                    $authProtocol,
+                    'authPriv',
+                    'SHA',
                     $authPassword,
-                    $privacyProtocol,
-                    $privacyPassword,
+                    'DES',
+                    $authPassword,
                     $command
                 );
             } catch (\Exception $e) {
@@ -129,28 +123,27 @@ class SNMPConnector implements Connector
         }
 
         if (isset($flag)) {
-            return respond("SNMP bağlantısı doğrulandı.", 200);
+            return "ok";
         }
-        return respond(
-            "$username,$securityLevel,$authProtocol,$authPassword,$privacyProtocol,$privacyPassword,$ip_address",
-            201
-        );
-        return isset($flag);
+        return "nok";
     }
 
-    private function getCredential($name)
+    public static function retrieveCredentials()
     {
-        $object = UserSettings::where([
-            'user_id' => user()->id,
-            'server_id' => server()->id,
-            'name' => $name,
-        ])->first();
-        if (!$object) {
+        if (server()->key() == null) {
             abort(
                 504,
                 "Bu sunucu için SNMP anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz."
             );
         }
-        return lDecrypt($object["value"]);
+        $data = json_decode(server()->key()->data, true);
+
+        return [
+            lDecrypt($data["clientUsername"]),
+            lDecrypt($data["clientPassword"]),
+            array_key_exists("key_port", $data)
+                ? intval($data["key_port"])
+                : 161,
+        ];
     }
 }

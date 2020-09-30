@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{{__("Liman Merkezi Sistem Yönetimi")}}</title>
+    <title>{{__("Liman Merkezi Yönetim Sistemi")}}</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{mix('/css/liman.css')}}">
@@ -55,7 +55,7 @@
             return {
                 bFilter: true,
                 "language" : {
-                    url : "/turkce.json"
+                    url : "{{__("/turkce.json")}}"
                 }
             };
         }else if(type == "multiple"){
@@ -75,7 +75,7 @@
                     }
                 },
                 language: {
-                    url : "/turkce.json",
+                    url : "{{__("/turkce.json")}}",
                     buttons: {
                         selectAll: "{{ __('Tümünü Seç') }}",
                         selectNone: "{{ __('Tümünü Kaldır') }}"
@@ -92,7 +92,7 @@
 <script>
     window.onload = function () {
         $(".dropdown-menu").on('click', 'a.dropdown-item', function(){
-            $(this).closest('.dropdown').find('.dropdown-toggle').html($(this).text() + '<span class="caret"></span>');
+            $(this).closest('.dropdown').find('.dropdown-toggle').html($(this).html() + '<span class="caret"></span>');
         });
         $(".nav.nav-tabs a").on('click',function () {
             window.location.hash = $(this).attr("href");
@@ -126,7 +126,7 @@
             bFilter: true,
             destroy: true,
             "language" : {
-                url : "{{asset('turkce.json')}}"
+                url : "{{asset(__('/turkce.json'))}}"
             }
         });
         $('.js-example-basic-multiple,.js-example-basic-single,.select2').select2({

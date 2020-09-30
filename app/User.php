@@ -87,6 +87,11 @@ class User extends Authenticatable
         return $this->hasMany('\App\Models\UserSettings');
     }
 
+    public function keys()
+    {
+        return $this->hasMany('\App\Models\ServerKey');
+    }
+
     public function notifications()
     {
         return $this->hasMany('\App\Models\Notification');

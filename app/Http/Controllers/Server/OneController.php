@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\Server;
 
-use App\Connectors\SSHConnector;
-use App\Connectors\WinRMConnector;
 use App\Models\ConnectorToken;
 use App\Models\Extension;
 use App\Http\Controllers\Controller;
@@ -175,9 +173,9 @@ class OneController extends Controller
     public function update()
     {
         if (strlen(request('name')) > 24) {
-            return respond("Lütfen daha kısa bir sunucu adı girin.",201);
+            return respond("Lütfen daha kısa bir sunucu adı girin.", 201);
         }
-        
+
         if (server()->name !== request('name')) {
             Notification::new(
                 __("Server Adı Güncellemesi"),
@@ -309,28 +307,34 @@ class OneController extends Controller
 
     public function stats()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $disk = server()->run('df -h / | grep /', false);
-            preg_match("/(\d+)%/", $disk, $test);
-            $disk = $test[1];
-            $ram = server()->run(
-                "free -t | awk 'NR == 2 {printf($3/$2*100)}'",
-                false
+        if (server()->isLinux()) {
+            $cpuPercent = server()->run(
+                "ps -eo %cpu --no-headers | grep -v 0.0 | awk '{s+=$1} END {print s/NR*10}'"
             );
-            $cpu = substr(
-                server()->run(
-                    "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'",
-                    false
-                ),
-                0,
-                7
+            $ramPercent = server()->run(
+                "free | grep Mem | awk '{print $3/$2 * 100.0}'"
             );
-            // $cpu = server()->run("vmstat 1 1|tail -1|awk '{print $15}'", false);
-            // $cpu = 100 - intval($cpu);
-        } elseif (server()->type == "windows_powershell") {
+            $diskPercent = server()->run("df --output=pcent / | tr -dc '0-9'");
+            $ioPercent = server()->run(
+                "iostat -d | tail -n +4 | head -n -1 | awk '{s+=$2} END {print s}'"
+            );
+            $firstDown = $this->calculateNetworkBytes();
+            $firstUp = $this->calculateNetworkBytes(false);
+            sleep(1);
+            $secondDown = $this->calculateNetworkBytes();
+            $secondUp = $this->calculateNetworkBytes(false);
+            return [
+                'cpuPercent' => round($cpuPercent, 2),
+                'ramPercent' => round($ramPercent, 2),
+                'diskPercent' => round($diskPercent, 2),
+                'ioPercent' => round($ioPercent, 2),
+                'network' => [
+                    'down' => round(($secondDown - $firstDown) / 1024 / 2, 2),
+                    'up' => round(($secondUp - $firstUp) / 1024 / 2, 2),
+                ],
+                'time' => \Carbon\Carbon::now()->format('H:i:s'),
+            ];
+        } elseif (server()->isWindows()) {
             $cpu = substr(
                 server()->run(
                     "Get-WmiObject win32_processor | Measure-Object -property LoadPercentage -Average | Select Average"
@@ -372,25 +376,107 @@ class OneController extends Controller
         ];
     }
 
+    private function parsePsOutput($output)
+    {
+        $data = [];
+        foreach (explode("\n", $output) as $row) {
+            $row = explode('*-*', $row);
+            $row[3] = str_replace('\\', '/', $row[3]);
+            $fetch = explode('/', $row[3]);
+            $data[] = [
+                'pid' => $row[0],
+                'percent' => $row[1],
+                'user' => $row[2],
+                'cmd' => end($fetch),
+            ];
+        }
+        return $data;
+    }
+
+    private function parseDfOutput($output)
+    {
+        $data = [];
+        foreach (explode("\n", $output) as $row) {
+            $row = explode('*-*', $row);
+            $row[1] = str_replace('\\', '/', $row[1]);
+            $fetch = explode('/', $row[1]);
+            $data[] = [
+                'percent' => $row[0],
+                'source' => end($fetch),
+                'size' => $row[2],
+                'used' => $row[3],
+            ];
+        }
+        return $data;
+    }
+
+    public function topMemoryProcesses()
+    {
+        $output = trim(
+            server()->run(
+                "ps -eo pid,%mem,user,cmd --sort=-%mem --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
+            )
+        );
+        return view('table', [
+            'value' => $this->parsePsOutput($output),
+            'title' => [__('Kullanıcı'), __('İşlem'), '%'],
+            'display' => ['user', 'cmd', 'percent'],
+        ]);
+    }
+
+    public function topCpuProcesses()
+    {
+        $output = trim(
+            server()->run(
+                "ps -eo pid,%cpu,user,cmd --sort=-%cpu --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
+            )
+        );
+        return view('table', [
+            'value' => $this->parsePsOutput($output),
+            'title' => [__('Kullanıcı'), __('İşlem'), '%'],
+            'display' => ['user', 'cmd', 'percent'],
+        ]);
+    }
+
+    public function topDiskUsage()
+    {
+        $output = trim(
+            server()->run(
+                "df --output=pcent,source,size,used -hl -x squashfs -x tmpfs -x devtmpfs | sed -n '1!p' | head -n 5 | sort -hr | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
+            )
+        );
+        return view('table', [
+            'value' => $this->parseDfOutput($output),
+            'title' => [__('Disk'), __('Boyut'), __('Dolu'), '%'],
+            'display' => ['source', 'size', 'used', 'percent'],
+        ]);
+    }
+
+    private function calculateNetworkBytes($download = true)
+    {
+        $text = $download ? 'rx_bytes' : 'tx_bytes';
+        $count = 0;
+        $raw = server()->run("cat /sys/class/net/*/statistics/$text");
+        foreach (explode("\n", trim($raw)) as $data) {
+            $count += intval($data);
+        }
+        return $count;
+    }
+
     public function getLocalUsers()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $output = server()->run(
-                "cut -d: -f1,3 /etc/passwd | egrep ':[0-9]{4}$' | cut -d: -f1"
-            );
-            $output = trim($output);
-            if (empty($output)) {
-                $users = [];
-            } else {
-                $output = explode("\n", $output);
-                foreach ($output as $user) {
-                    $users[] = [
-                        "user" => $user,
-                    ];
-                }
+        $output = server()->run(
+            "cut -d: -f1,3 /etc/passwd | egrep ':[0-9]{4}$' | cut -d: -f1"
+        );
+        $output = trim($output);
+        if (empty($output)) {
+            $users = [];
+        } else {
+            $output = explode("\n", $output);
+            foreach ($output as $user) {
+                $users[] = [
+                    "user" => $user,
+                ];
             }
         }
         return magicView('table', [
@@ -402,48 +488,38 @@ class OneController extends Controller
 
     public function addLocalUser()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $user_name = request("user_name");
-            $user_password = request("user_password");
-            $user_password_confirmation = request("user_password_confirmation");
-            if ($user_password !== $user_password_confirmation) {
-                return respond("Şifreler uyuşmuyor!", 201);
-            }
-            $output = trim(
-                server()->run(
-                    sudo() .
-                        "bash -c 'useradd --no-user-group -p $(openssl passwd -1 $user_password) $user_name -s \"/bin/bash\"' &> /dev/null && echo 1 || echo 0"
-                )
-            );
-            if ($output == "0") {
-                return respond("Kullanıcı eklenemedi!", 201);
-            }
-            return respond("Kullanıcı başarıyla eklendi!", 200);
+        $user_name = request("user_name");
+        $user_password = request("user_password");
+        $user_password_confirmation = request("user_password_confirmation");
+        if ($user_password !== $user_password_confirmation) {
+            return respond("Şifreler uyuşmuyor!", 201);
         }
+        $output = trim(
+            server()->run(
+                sudo() .
+                    "bash -c 'useradd --no-user-group -p $(openssl passwd -1 $user_password) $user_name -s \"/bin/bash\"' &> /dev/null && echo 1 || echo 0"
+            )
+        );
+        if ($output == "0") {
+            return respond("Kullanıcı eklenemedi!", 201);
+        }
+        return respond("Kullanıcı başarıyla eklendi!", 200);
     }
 
     public function getLocalGroups()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $output = server()->run("getent group | cut -d ':' -f1");
-            $output = trim($output);
-            if (empty($output)) {
-                $groups = [];
-            } else {
-                $output = explode("\n", $output);
-                foreach ($output as $group) {
-                    $groups[] = [
-                        "group" => $group,
-                    ];
-                }
-                $groups = array_reverse($groups);
+        $output = server()->run("getent group | cut -d ':' -f1");
+        $output = trim($output);
+        if (empty($output)) {
+            $groups = [];
+        } else {
+            $output = explode("\n", $output);
+            foreach ($output as $group) {
+                $groups[] = [
+                    "group" => $group,
+                ];
             }
+            $groups = array_reverse($groups);
         }
         return magicView('table', [
             "value" => $groups,
@@ -455,21 +531,16 @@ class OneController extends Controller
 
     public function getLocalGroupDetails()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $group = request("group");
-            $output = trim(
-                server()->run(sudo() . "getent group $group | cut -d ':' -f4")
-            );
+        $group = request("group");
+        $output = trim(
+            server()->run(sudo() . "getent group $group | cut -d ':' -f4")
+        );
 
-            $users = [];
-            if (!empty($output)) {
-                $users = array_map(function ($value) {
-                    return ["name" => $value];
-                }, explode(",", $output));
-            }
+        $users = [];
+        if (!empty($output)) {
+            $users = array_map(function ($value) {
+                return ["name" => $value];
+            }, explode(",", $output));
         }
         return magicView('table', [
             "value" => $users,
@@ -480,65 +551,49 @@ class OneController extends Controller
 
     public function addLocalGroup()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $group_name = request("group_name");
-            $output = trim(
-                server()->run(
-                    sudo() .
-                        "groupadd $group_name &> /dev/null && echo 1 || echo 0"
-                )
-            );
-            if ($output == "0") {
-                return respond("Grup eklenemedi!", 201);
-            }
-            return respond("Grup başarıyla eklendi!", 200);
+        $group_name = request("group_name");
+        $output = trim(
+            server()->run(
+                sudo() . "groupadd $group_name &> /dev/null && echo 1 || echo 0"
+            )
+        );
+        if ($output == "0") {
+            return respond("Grup eklenemedi!", 201);
         }
+        return respond("Grup başarıyla eklendi!", 200);
     }
 
     public function addLocalGroupUser()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $group = request("group");
-            $user = request("user");
-            $output = trim(
-                server()->run(
-                    sudo() .
-                        "usermod -a -G $group $user &> /dev/null && echo 1 || echo 0"
-                )
-            );
-            if ($output != "1") {
-                return respond("Kullanıcı gruba eklenemedi!", 201);
-            }
-            return respond("Kullanıcı gruba başarıyla eklendi!");
+        $group = request("group");
+        $user = request("user");
+        $output = trim(
+            server()->run(
+                sudo() .
+                    "usermod -a -G $group $user &> /dev/null && echo 1 || echo 0"
+            )
+        );
+        if ($output != "1") {
+            return respond("Kullanıcı gruba eklenemedi!", 201);
         }
+        return respond("Kullanıcı gruba başarıyla eklendi!");
     }
 
     public function getSudoers()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $output = trim(
-                server()->run(
-                    sudo() .
-                        "cat /etc/sudoers /etc/sudoers.d/* | grep -v '^#\|^Defaults' | sed '/^$/d' | awk '{ print $1 \"*-*\" $2 \" \" $3 }'"
-                )
-            );
+        $output = trim(
+            server()->run(
+                sudo() .
+                    "cat /etc/sudoers /etc/sudoers.d/* | grep -v '^#\|^Defaults' | sed '/^$/d' | awk '{ print $1 \"*-*\" $2 \" \" $3 }'"
+            )
+        );
 
-            $sudoers = [];
-            if (!empty($output)) {
-                $sudoers = array_map(function ($value) {
-                    $fetch = explode("*-*", $value);
-                    return ["name" => $fetch[0], "access" => $fetch[1]];
-                }, explode("\n", $output));
-            }
+        $sudoers = [];
+        if (!empty($output)) {
+            $sudoers = array_map(function ($value) {
+                $fetch = explode("*-*", $value);
+                return ["name" => $fetch[0], "access" => $fetch[1]];
+            }, explode("\n", $output));
         }
         return magicView('table', [
             "value" => $sudoers,
@@ -555,51 +610,40 @@ class OneController extends Controller
 
     public function addSudoers()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $name = request("name");
-            $name = str_replace(" ", "\\x20", $name);
-            $checkFile = server()->run(
-                "[ -f '/etc/sudoers.d/$name' ] && echo 1 || echo 0"
-            );
-            if ($checkFile == "1") {
-                return respond("Bu isimde bir kullanıcı zaten ekli!", 201);
-            }
-            $output = trim(
-                server()->run(
-                    sudo() .
-                        "bash -c 'echo \"$name ALL=(ALL:ALL) ALL\" | tee /etc/sudoers.d/$name' &> /dev/null && echo 1 || echo 0"
-                )
-            );
-            if ($output == "0") {
-                return respond("Tam yetkili kullanıcı eklenemedi!", 201);
-            }
-            return respond("Tam yetkili kullanıcı başarıyla eklendi!", 200);
+        $name = request("name");
+        $name = str_replace(" ", "\\x20", $name);
+        $checkFile = server()->run(
+            "[ -f '/etc/sudoers.d/$name' ] && echo 1 || echo 0"
+        );
+        if ($checkFile == "1") {
+            return respond("Bu isimde bir kullanıcı zaten ekli!", 201);
         }
+        $output = trim(
+            server()->run(
+                sudo() .
+                    "bash -c 'echo \"$name ALL=(ALL:ALL) ALL\" | tee /etc/sudoers.d/$name' &> /dev/null && echo 1 || echo 0"
+            )
+        );
+        if ($output == "0") {
+            return respond("Tam yetkili kullanıcı eklenemedi!", 201);
+        }
+        return respond("Tam yetkili kullanıcı başarıyla eklendi!", 200);
     }
 
     public function deleteSudoers()
     {
-        //TODO: check here for bugs
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $name = request("name");
-            $name = str_replace(" ", "\\x20", $name);
-            $output = trim(
-                server()->run(
-                    sudo() .
-                        "bash -c 'if [ -f \"/etc/sudoers.d/$name\" ]; then rm /etc/sudoers.d/$name && echo 1 || echo 0; else echo 0; fi'"
-                )
-            );
-            if ($output == "0") {
-                return respond("Tam yetkili kullanıcı silinemedi!", 201);
-            }
-            return respond("Tam yetkili kullanıcı başarıyla silindi!", 200);
+        $name = request("name");
+        $name = str_replace(" ", "\\x20", $name);
+        $output = trim(
+            server()->run(
+                sudo() .
+                    "bash -c 'if [ -f \"/etc/sudoers.d/$name\" ]; then rm /etc/sudoers.d/$name && echo 1 || echo 0; else echo 0; fi'"
+            )
+        );
+        if ($output == "0") {
+            return respond("Tam yetkili kullanıcı silinemedi!", 201);
         }
+        return respond("Tam yetkili kullanıcı başarıyla silindi!", 200);
     }
 
     public function serviceList()
@@ -608,10 +652,7 @@ class OneController extends Controller
             return respond("Bu işlemi yapmak için yetkiniz yok!", 201);
         }
         $services = [];
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
+        if (server()->isLinux()) {
             $raw = server()->run(
                 "systemctl list-units | grep service | awk '{print $1 \":\"$2\" \"$3\" \"$4\":\"$5\" \"$6\" \"$7\" \"$8\" \"$9\" \"$10}'",
                 false
@@ -630,7 +671,7 @@ class OneController extends Controller
                 } catch (Exception $exception) {
                 }
             }
-        } elseif (server()->type == "windows_powershell") {
+        } else {
             $rawServices = server()->run(
                 "(Get-WmiObject win32_service | select Name, DisplayName, State, StartMode) -replace '\s\s+',':'"
             );
@@ -649,13 +690,12 @@ class OneController extends Controller
                 } catch (Exception $exception) {
                 }
             }
-        } else {
-            return respond("Bu sunucudaki servisleri goremezsiniz.", 403);
         }
+
         return magicView('table', [
             "id" => "servicesTable",
             "value" => $services,
-            "title" => ["Servis Adı", "Aciklamasi", "Durumu"],
+            "title" => ["Servis Adı", "Açıklama", "Durumu"],
             "display" => ["name", "description", "status"],
             "menu" => [
                 "Detaylar" => [
@@ -798,10 +838,7 @@ class OneController extends Controller
 
     public function installPackage()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
+        if (server()->isLinux()) {
             $package = request("package_name");
             $raw = server()->run(
                 sudo() .
@@ -812,7 +849,7 @@ class OneController extends Controller
             system_log(7, "Paket Güncelleme", [
                 'package_name' => request("package_name"),
             ]);
-        } elseif (server()->type == "windows_powershell") {
+        } else {
             $raw = "";
         }
         return $raw;
@@ -820,98 +857,86 @@ class OneController extends Controller
 
     public function checkPackage()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $mode = request("mode") ? request("mode") : 'update';
-            $output = trim(
-                server()->run(
-                    "ps aux | grep \"apt \|dpkg \" | grep -v grep 2>/dev/null 1>/dev/null && echo '1' || echo '0'"
-                )
-            );
-            $command_output = server()->run(
-                sudo() .
-                    'cat "/tmp/' .
-                    basename(request("package_name")) .
-                    '.txt" 2> /dev/null | base64'
-            );
-            $command_output = base64_decode($command_output);
+        $mode = request("mode") ? request("mode") : 'update';
+        $output = trim(
             server()->run(
-                sudo() .
-                    'truncate -s 0 /tmp/' .
-                    basename(request("package_name")) .
-                    '.txt'
-            );
-            if ($output === "0") {
-                $list_method =
-                    $mode == "install" ? "--installed" : "--upgradable";
-                $package = request("package_name");
-                if (endsWith($package, ".deb")) {
-                    $package = server()->run(
-                        sudo() .
-                            'dpkg -I ' .
-                            $package .
-                            ' | grep Package: | cut -d\':\' -f2 | tr -d \'[:space:]\''
-                    );
-                }
-                $output = server()->run(
+                "ps aux | grep \"apt \|dpkg \" | grep -v grep 2>/dev/null 1>/dev/null && echo '1' || echo '0'"
+            )
+        );
+        $command_output = server()->run(
+            sudo() .
+                'cat "/tmp/' .
+                basename(request("package_name")) .
+                '.txt" 2> /dev/null | base64'
+        );
+        $command_output = base64_decode($command_output);
+        server()->run(
+            sudo() .
+                'truncate -s 0 /tmp/' .
+                basename(request("package_name")) .
+                '.txt'
+        );
+        if ($output === "0") {
+            $list_method = $mode == "install" ? "--installed" : "--upgradable";
+            $package = request("package_name");
+            if (endsWith($package, ".deb")) {
+                $package = server()->run(
                     sudo() .
-                        'apt list ' .
-                        $list_method .
-                        ' 2>/dev/null | grep ' .
+                        'dpkg -I ' .
                         $package .
-                        ' && echo 1 || echo 0'
-                );
-                if (
-                    ($mode == "update" && $output == "0") ||
-                    ($mode == "install" && $output != "0")
-                ) {
-                    system_log(7, "Paket Güncelleme Başarılı", [
-                        'package_name' => request("package_name"),
-                    ]);
-                    return respond([
-                        "status" => __(
-                            ":package_name paketi başarıyla kuruldu.",
-                            ['package_name' => request("package_name")]
-                        ),
-                        "output" => trim($command_output),
-                    ]);
-                } else {
-                    system_log(7, "Paket Güncelleme Başarısız", [
-                        'package_name' => request("package_name"),
-                    ]);
-                    return respond([
-                        "status" => __(":package_name paketi kurulamadı.", [
-                            'package_name' => request("package_name"),
-                        ]),
-                        "output" => trim($command_output),
-                    ]);
-                }
-            } else {
-                return respond(
-                    [
-                        "status" => __(
-                            ":package_name paketinin kurulum işlemi henüz bitmedi.",
-                            ['package_name' => request("package_name")]
-                        ),
-                        "output" => trim($command_output),
-                    ],
-                    400
+                        ' | grep Package: | cut -d\':\' -f2 | tr -d \'[:space:]\''
                 );
             }
-        } elseif (server()->type == "windows_powershell") {
-            $output = "";
+            $output = server()->run(
+                sudo() .
+                    'apt list ' .
+                    $list_method .
+                    ' 2>/dev/null | grep ' .
+                    $package .
+                    ' && echo 1 || echo 0'
+            );
+            if (
+                ($mode == "update" && $output == "0") ||
+                ($mode == "install" && $output != "0")
+            ) {
+                system_log(7, "Paket Güncelleme Başarılı", [
+                    'package_name' => request("package_name"),
+                ]);
+                return respond([
+                    "status" => __(":package_name paketi başarıyla kuruldu.", [
+                        'package_name' => request("package_name"),
+                    ]),
+                    "output" => trim($command_output),
+                ]);
+            } else {
+                system_log(7, "Paket Güncelleme Başarısız", [
+                    'package_name' => request("package_name"),
+                ]);
+                return respond([
+                    "status" => __(":package_name paketi kurulamadı.", [
+                        'package_name' => request("package_name"),
+                    ]),
+                    "output" => trim($command_output),
+                ]);
+            }
+        } else {
+            return respond(
+                [
+                    "status" => __(
+                        ":package_name paketinin kurulum işlemi henüz bitmedi.",
+                        ['package_name' => request("package_name")]
+                    ),
+                    "output" => trim($command_output),
+                ],
+                400
+            );
         }
         return $output;
     }
 
     public function uploadDebFile()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
+        if (server()->isLinux()) {
             $filePath = request('filePath');
             if (!$filePath) {
                 return respond("Dosya yolu zorunludur.", 403);
@@ -926,35 +951,27 @@ class OneController extends Controller
 
     public function updateList()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $updates = [];
-            $raw = server()->run(
+        $updates = [];
+        $raw = server()->run(
+            sudo() .
+                "apt-get -qq update 2> /dev/null > /dev/null; " .
                 sudo() .
-                    "apt-get -qq update 2> /dev/null > /dev/null; " .
-                    sudo() .
-                    "apt list --upgradable 2>/dev/null | sed '1,1d'"
-            );
-            foreach (explode("\n", $raw) as $package) {
-                if ($package == "" || strpos($package, 'List') !== false) {
-                    continue;
-                }
-                $row = explode(" ", $package, 4);
-                try {
-                    array_push($updates, [
-                        "name" => $row[0],
-                        "version" => $row[1],
-                        "type" => $row[2],
-                        "status" => $row[3],
-                    ]);
-                } catch (\Exception $exception) {
-                }
+                "apt list --upgradable 2>/dev/null | sed '1,1d'"
+        );
+        foreach (explode("\n", $raw) as $package) {
+            if ($package == "" || strpos($package, 'List') !== false) {
+                continue;
             }
-        } elseif (server()->type == "windows_powershell") {
-        } else {
-            return respond("Bu sunucudaki güncellemeleri goremezsiniz.", 403);
+            $row = explode(" ", $package, 4);
+            try {
+                array_push($updates, [
+                    "name" => $row[0],
+                    "version" => $row[1],
+                    "type" => $row[2],
+                    "status" => $row[3],
+                ]);
+            } catch (\Exception $exception) {
+            }
         }
         return [
             "count" => count($updates),
@@ -976,119 +993,31 @@ class OneController extends Controller
 
     public function packageList()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
-            $raw = server()->run(
-                sudo() . "apt list --installed 2>/dev/null | sed '1,1d'",
-                false
-            );
-            $packages = [];
-            foreach (explode("\n", $raw) as $package) {
-                if ($package == "") {
-                    continue;
-                }
-                $row = explode(" ", $package);
-                try {
-                    array_push($packages, [
-                        "name" => $row[0],
-                        "version" => $row[1],
-                        "type" => $row[2],
-                        "status" => $row[3],
-                    ]);
-                } catch (Exception $exception) {
-                }
+        $raw = server()->run(
+            sudo() . "apt list --installed 2>/dev/null | sed '1,1d'",
+            false
+        );
+        $packages = [];
+        foreach (explode("\n", $raw) as $package) {
+            if ($package == "") {
+                continue;
             }
-        } else {
-            return respond("Bu sunucudaki paketleri goremezsiniz.", 403);
+            $row = explode(" ", $package);
+            try {
+                array_push($packages, [
+                    "name" => $row[0],
+                    "version" => $row[1],
+                    "type" => $row[2],
+                    "status" => $row[3],
+                ]);
+            } catch (Exception $exception) {
+            }
         }
         return magicView('l.table', [
             "value" => $packages,
             "title" => ["Paket Adı", "Versiyon", "Tip", "Durumu"],
             "display" => ["name", "version", "type", "status"],
         ]);
-    }
-
-    public function upgradeServer()
-    {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "windows_powershell" ||
-            server()->type == "linux_certificate" ||
-            server()->type == "snmp"
-        ) {
-            return respond("Bu sunucuda yükseltme yapılamaz.", 201);
-        }
-
-        // Init key with parameters.
-        if (server()->type == "linux") {
-            try {
-                $flag = SSHConnector::create(
-                    server(),
-                    request('username'),
-                    request('password'),
-                    auth()->id(),
-                    null
-                );
-            } catch (\Exception $exception) {
-                $flag = "Sunucuya bağlanılamadı.";
-            }
-        }
-
-        if (server()->type == "windows") {
-            try {
-                $flag = WinRMConnector::create(
-                    server(),
-                    request('username'),
-                    request('password'),
-                    auth()->id(),
-                    null
-                );
-            } catch (\Exception $exception) {
-                $flag = "Sunucuya bağlanılamadı.";
-            }
-        }
-
-        if (!$flag) {
-            return respond($flag, 201);
-        }
-
-        if (server()->type == "linux") {
-            server()->update([
-                "type" => "linux_ssh",
-            ]);
-        } else {
-            server()->update([
-                "type" => "windows_powershell",
-            ]);
-        }
-
-        // Add credentials
-        $encKey = env('APP_KEY') . user()->id . server()->id;
-        UserSettings::updateOrCreate(
-            [
-                "user_id" => user()->id,
-                "server_id" => server()->id,
-                "name" => "clientUsername",
-            ],
-            [
-                "value" => AES256::encrypt(request('username'),$encKey),
-            ]
-        );
-
-        UserSettings::updateOrCreate(
-            [
-                "user_id" => user()->id,
-                "server_id" => server()->id,
-                "name" => "clientPassword",
-            ],
-            [
-                "value" => AES256::encrypt(request('password'),$encKey),
-            ]
-        );
-
-        return respond("Sunucu Başarıyla Yükseltildi.");
     }
 
     public function removeExtension()
@@ -1123,10 +1052,7 @@ class OneController extends Controller
 
     public function startService()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
+        if (server()->isLinux()) {
             $command = sudo() . "systemctl start " . request('name');
         } else {
             $command = "Start-Service " . request("name");
@@ -1137,10 +1063,7 @@ class OneController extends Controller
 
     public function stopService()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
+        if (server()->isLinux()) {
             $command = sudo() . "systemctl stop " . request('name');
         } else {
             $command = "Stop-Service " . request("name");
@@ -1151,10 +1074,7 @@ class OneController extends Controller
 
     public function restartService()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
+        if (server()->isLinux()) {
             $command = sudo() . "systemctl restart " . request('name');
         } else {
             $command = "Restart-Service " . request("name");
@@ -1165,10 +1085,7 @@ class OneController extends Controller
 
     public function statusService()
     {
-        if (
-            server()->type == "linux_ssh" ||
-            server()->type == "linux_certificate"
-        ) {
+        if (server()->isLinux()) {
             $command = sudo() . "systemctl status " . request('name');
         } else {
             return respond(
@@ -1182,10 +1099,7 @@ class OneController extends Controller
 
     public function getOpenPorts()
     {
-        if (
-            server()->type != "linux_ssh" &&
-            server()->type != "linux_certificate"
-        ) {
+        if (server()->os != "linux") {
             return respond("Bu sunucuda portları kontrol edemezsiniz!", 201);
         }
 

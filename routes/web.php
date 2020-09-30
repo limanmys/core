@@ -186,3 +186,6 @@ Route::post('/upload_info', function () {
 })->middleware(['auth', 'permissions']);
 
 registerModuleRoutes();
+
+
+Route::get('/bildirimYolla','Notification\ExternalNotificationController@accept');

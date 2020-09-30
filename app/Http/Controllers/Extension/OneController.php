@@ -91,10 +91,10 @@ class OneController extends Controller
             $extension["verification"] != null &&
             $extension["verification"] != ""
         ) {
-            $client = new Client();
+            $client = new Client(['verify' => false]);
             $result = "";
             try {
-                $res = $client->request('POST', 'http://127.0.0.1:5454/', [
+                $res = $client->request('POST', 'https://127.0.0.1:5454/', [
                     'form_params' => [
                         "lmntargetFunction" => $extension["verification"],
                         "extension_id" => extension()->id,
@@ -161,9 +161,13 @@ class OneController extends Controller
             "extension_id" => extension()->id,
         ]);
         $similar = [];
-        foreach ($extension["database"] as $item) {
-            if (strpos(strtolower($item["variable"]), "password")) {
-                continue;
+        $flag = server()->key();
+        foreach ($extension["database"] as $key => $item) {
+            if (
+                ($flag != null && $item["variable"] == "clientUsername") ||
+                ($flag != null && $item["variable"] == "clientPassword")
+            ) {
+                unset($extension["database"][$key]);
             }
             $obj = DB::table("user_settings")
                 ->where([
@@ -201,6 +205,7 @@ class OneController extends Controller
      */
     public function remove()
     {
+        $ext_name = extension()->name;
         hook('extension_delete_attempt', extension());
         try {
             shell_exec(
@@ -219,6 +224,16 @@ class OneController extends Controller
             "request" => request()->all(),
         ]);
 
+        if(is_file(storage_path("extension_updates"))){
+            $json = json_decode(file_get_contents(storage_path("extension_updates")),true);
+            for($i = 0; $i < count($json); $i++){
+                if($json[$i]["name"] == $ext_name){
+                    unset($json[$i]);
+                }
+            }
+            file_put_contents(storage_path("extension_updates"),json_encode($json));
+        }
+        
         system_log(3, "EXTENSION_REMOVE");
         return respond('Eklenti Başarıyla Silindi');
     }

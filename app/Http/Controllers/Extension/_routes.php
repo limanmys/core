@@ -8,12 +8,6 @@ Route::match(
     ->name('extension_server')
     ->middleware(['server', 'extension']);
 
-// Extension' Server' Home Route
-// Route::get('/l/{extension_id}/{city}/{server_id}/{page?}', 'Extension\Sandbox\MainController@getAPI')->name('extension_server')->middleware(['server','extension']);
-
-// Extension Function Api
-// Route::post('/eklenti2/{extension_id}/{function_name?}', 'Extension\Sandbox\MainController@postAPI')->name('extension_function_api')->middleware('server_api');
-
 // Extension Management Route
 Route::post('/extension/run/{unique_code}', 'Extension\OneController@route')
     ->name('extension_api')
@@ -60,9 +54,9 @@ Route::post(
     ->name('get_extension_updates')
     ->middleware('admin');
 
-    Route::post(
-        '/ayarlar/eklentiGuncelle',
-        'Extension\MainController@autoUpdateExtension'
+Route::post(
+    '/ayarlar/eklentiGuncelle',
+    'Extension\MainController@autoUpdateExtension'
 )
     ->name('update_extension_auto')
     ->middleware('admin');
@@ -82,8 +76,8 @@ Route::post('/yukle/eklenti/', 'Extension\MainController@upload')
 
 // Extension Upload Page
 Route::post('/ayarlar/eklentilisans', 'Extension\SettingsController@addLicense')
-->name('add_extension_license')
-->middleware('admin');
+    ->name('add_extension_license')
+    ->middleware('admin');
 
 Route::post(
     '/ayarlar/eklenti',
