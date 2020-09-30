@@ -223,7 +223,9 @@ class MainController extends Controller
         } else {
             $new = new Extension();
         }
+        
         $new->fill($json);
+        $new->status = "1";
         $new->save();
         
         if (array_key_exists("dependencies",$json) && $json["dependencies"] != ""){
