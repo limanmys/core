@@ -92,7 +92,7 @@
 <script>
     window.onload = function () {
         $(".dropdown-menu").on('click', 'a.dropdown-item', function(){
-            $(this).closest('.dropdown').find('.dropdown-toggle').html($(this).text() + '<span class="caret"></span>');
+            $(this).closest('.dropdown').find('.dropdown-toggle').html($(this).html() + '<span class="caret"></span>');
         });
         $(".nav.nav-tabs a").on('click',function () {
             window.location.hash = $(this).attr("href");
