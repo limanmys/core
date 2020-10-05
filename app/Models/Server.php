@@ -117,7 +117,7 @@ class Server extends Model
             );
         }
         // Check if services are alive or not.
-        $query = sudo() . "systemctl is-failed " . $service_name;
+        $query = "systemctl is-failed " . $service_name;
 
         // Execute and return outputs.
         return $this->connector()->execute($query, false) == "active"
