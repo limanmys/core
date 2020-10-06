@@ -16,7 +16,6 @@ jobs:
           repository: limanmys/php-sandbox
           path: package/liman/sandbox/php
           token: ${{ secrets.CI_TOKEN }}
-          ref: "1.4-dev"
 
       - uses: actions/cache@v2
         with:
