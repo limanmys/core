@@ -59,7 +59,7 @@ Artisan::command('scan:translations', function () {
             mkdir(dirname($output));
         }
         if (is_file($output)) {
-            $translations = array_merge(
+            $translations = (object) array_merge(
                 $translations,
                 (array) json_decode(file_get_contents($output))
             );
