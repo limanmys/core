@@ -36,13 +36,15 @@
             }
         );
     }
+    var var_{{ $random }}Timeout;
     function func_{{ $random }}(noSpinner = false)
     {
         !noSpinner && $('#card-{{ $random }}').find('.overlay').show();
         request("{{route($api)}}", new FormData(), function(response) {
             $('#{{ $random }}').html(response).find('table').DataTable(dataTableCustomTablePreset());
             !noSpinner && $('#card-{{ $random }}').find('.overlay').hide();
-            setTimeout(function(){
+            var_{{ $random }}Timeout && clearTimeout(var_{{ $random }}Timeout);
+            var_{{ $random }}Timeout = setTimeout(function(){
                 if($("a[href=\"#usageTab\"]").hasClass("active")){
                     func_{{ $random }}(true);
                 }
@@ -50,7 +52,8 @@
         }, function(response){
             let error = JSON.parse(response);
             showSwal(error.message, 'error', 2000);
-            setTimeout(function(){
+            var_{{ $random }}Timeout && clearTimeout(var_{{ $random }}Timeout);
+            var_{{ $random }}Timeout = setTimeout(function(){
                 if($("a[href=\"#usageTab\"]").hasClass("active")){
                     func_{{ $random }}(true);
                 }

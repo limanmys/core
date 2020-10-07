@@ -224,6 +224,7 @@
     }
 
     var firstStats = true;
+    var statTimeout;
     function stats(noSpinner = false) {
         !noSpinner && $('.charts-card').find('.overlay').show();
         var form = new FormData();
@@ -249,7 +250,8 @@
                 updateChart("cpu", data['time'], data['cpu']);
             @endif
             !noSpinner && $('.charts-card').find('.overlay').hide();
-            setTimeout(function(){
+            statTimeout && clearTimeout(statTimeout);
+            statTimeout = setTimeout(function(){
                 if($("a[href=\"#usageTab\"]").hasClass("active")){
                     stats(true);
                 }
