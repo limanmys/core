@@ -117,8 +117,8 @@ class GenericConnector
                 ]
             );
             return $response->getBody()->getContents();
-        } catch (GuzzleException $exception) {
-            return $exception->getMessage();
+        } catch (\Exception $exception) {
+            abort(504,$exception->getMessage());
         }
         $json = json_decode((string) $res->getBody());
         return $json->output;
