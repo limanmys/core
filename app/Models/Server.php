@@ -229,10 +229,9 @@ class Server extends Model
 
     public function key()
     {
-        return $this->hasOne(
-            '\App\Models\ServerKey',
-            'server_id',
-            'id'
-        )->first();
+        return ServerKey::where([
+            "server_id" => $this->id,
+            "user_id" => user()->id
+        ])->first();
     }
 }
