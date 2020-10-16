@@ -29,10 +29,10 @@
                     @include('table',[
                         "value" => $access_tokens,
                         "title" => [
-                            "Adı", "Token", "Son Kullanılan Tarih", "Son Kullanan Ip Adresi", "*hidden*"
+                            "Adı", "Token", "İp Adresi / Hostname","*hidden*"
                         ],
                         "display" => [
-                            "name" , "token", "last_used_at", "last_used_ip", "id:token_id"
+                            "name" , "token", "ip_range" ,"id:token_id"
                         ],
                         "menu" => [
                             "Sil" => [
@@ -51,8 +51,10 @@
     "title" => "Anahtar Oluştur",
     "url" => route('create_access_token'),
     "next" => "reload",
+    "text" => "İp Adresi bölümüne izin vermek istediğiniz bir subnet adresini ya da ip adresini yazarak erişimi kısıtlayabilirsiniz. Örneğin : 192.168.1.0/24. Ayrıca, bu kısıtı kaldırmak için adres yerine -1 yazabilirsiniz.",
     "inputs" => [
-        "İsim" => "name:text"
+        "İsim" => "name:text",
+        "İp Adresi / Hostname" => "ip_range:text",
     ],
     "submit_text" => "Anahtar Ekle"
 ])

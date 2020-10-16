@@ -25,6 +25,11 @@ class APILogin
             if (!$obj) {
                 abort(403, "Token Geçersiz!");
             }
+
+            if ($obj->ip_range != "-1" && !ip_in_range($request->ip(),$obj->ip_range,)){
+                abort(403, "Bu token'i bu ip adresinden kullanamazsınız!");
+            }
+
             $obj->update([
                 "last_used_at" => Carbon::now()->toDateTimeString(),
                 "last_used_ip" => $request->ip(),

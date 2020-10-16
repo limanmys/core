@@ -552,6 +552,7 @@ class UserController extends Controller
             "user_id" => user()->id,
             "name" => request("name"),
             "token" => $token,
+            "ip_range" => request("ip_range")
         ]);
         return respond("Anahtar Başarıyla Oluşturuldu.");
     }

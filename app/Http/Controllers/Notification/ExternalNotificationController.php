@@ -115,7 +115,7 @@ class ExternalNotificationController extends Controller
                 "Not authorized, token missing"
             ],403);
         }
-        if (self::ip_in_range($request->ip(),$channel->ip) == false) {
+        if (ip_in_range($request->ip(),$channel->ip) == false) {
             return response()->json([
                 "Not authorized, unacceptable ip block"
             ],403);
@@ -146,18 +146,5 @@ class ExternalNotificationController extends Controller
         return response()->json([
             "OK"
         ]);
-    }
-
-    private function ip_in_range( $ip, $range ) {
-        if ( strpos( $range, '/' ) == false ) {
-            $range .= '/32';
-        }
-        // $range is in IP/CIDR format eg 127.0.0.1/24
-        list( $range, $netmask ) = explode( '/', $range, 2 );
-        $range_decimal = ip2long( $range );
-        $ip_decimal = ip2long( $ip );
-        $wildcard_decimal = pow( 2, ( 32 - $netmask ) ) - 1;
-        $netmask_decimal = ~ $wildcard_decimal;
-        return ( ( $ip_decimal & $netmask_decimal ) == ( $range_decimal & $netmask_decimal ) );
     }
 }
