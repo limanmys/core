@@ -111,16 +111,15 @@ class GenericConnector
         try {
             $response = $client->request(
                 'POST',
-                "https://127.0.0.1:5454/$url",
+                env("RENDER_ENGINE_ADDRESS"). "/$url",
                 [
                     "form_params" => $params,
                 ]
             );
             return $response->getBody()->getContents();
         } catch (\Exception $exception) {
-            abort(504,$exception->getMessage());
+            abort(504,"Liman Go Servisinde bir sorun oluştu, lütfen yöneticinizle iletişime geçin.");
+            return null;
         }
-        $json = json_decode((string) $res->getBody());
-        return $json->output;
     }
 }
