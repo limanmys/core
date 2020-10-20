@@ -26,7 +26,7 @@ class APILogin
                 abort(403, "Token Geçersiz!");
             }
 
-            if ($obj->ip_range != "-1" && !ip_in_range($request->ip(),$obj->ip_range,)){
+            if ($obj->ip_range != "-1" && !ip_in_range($request->ip(),$obj->ip_range)){
                 abort(403, "Bu token'i bu ip adresinden kullanamazsınız!");
             }
 
