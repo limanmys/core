@@ -14,5 +14,6 @@ class AccessToken extends Model
         "name",
         "last_used_at",
         "last_used_ip",
+        "ip_range"
     ];
 }
