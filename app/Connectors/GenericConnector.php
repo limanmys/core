@@ -111,14 +111,14 @@ class GenericConnector
         try {
             $response = $client->request(
                 'POST',
-                env("RENDER_ENGINE_ADDRESS"). "/$url",
+                env("RENDER_ENGINE_ADDRESS","https://127.0.0.1:5454"). "/$url",
                 [
                     "form_params" => $params,
                 ]
             );
             return $response->getBody()->getContents();
         } catch (\Exception $exception) {
-            abort(504,"Liman Go Servisinde bir sorun oluştu, lütfen yöneticinizle iletişime geçin.");
+            abort(504,"Liman Go Servisinde bir sorun oluştu, lütfen yöneticinizle iletişime geçin." . $exception->getMessage());
             return null;
         }
     }
