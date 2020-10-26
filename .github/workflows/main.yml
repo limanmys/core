@@ -112,7 +112,7 @@ jobs:
           FILE_URL=https://limanmys.zulipchat.com$(curl -sSX POST https://limanmys.zulipchat.com/api/v1/user_uploads \
             -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
             -F "filename=@$MAIN_FILE" | jq -r ".uri")
-          ECHO FILE_URL
+          echo $FILE_URL
           curl -X POST https://limanmys.zulipchat.com/api/v1/messages \
             -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
             -d "type=stream" \
