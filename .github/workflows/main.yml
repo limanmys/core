@@ -106,15 +106,16 @@ jobs:
           COMMIT_DATE=`echo $COMMIT_DATE | jq -SrR @uri`
           FILE_HASH=$(sha256sum $MAIN_FILE | cut -d " " -f 1)
           curl -sSX POST https://limanmys.zulipchat.com/api/v1/users/me/subscriptions \
-          -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
-          --data-urlencode subscriptions="[{\"description\": \"Created by Liman BOT\", \"name\": \"$CHANNEL_NAME\"}]" \
-          -d "accounce=true" -d "stream_post_policy:2"
+            -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
+            --data-urlencode subscriptions="[{\"description\": \"Created by Liman BOT\", \"name\": \"$CHANNEL_NAME\"}]" \
+            -d "accounce=true" -d "stream_post_policy:2"
           FILE_URL=https://limanmys.zulipchat.com$(curl -sSX POST https://limanmys.zulipchat.com/api/v1/user_uploads \
-          -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
-          -F "filename=@$MAIN_FILE" | jq -r ".uri")
+            -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
+            -F "filename=@$MAIN_FILE" | jq -r ".uri")
+          ECHO FILE_URL
           curl -X POST https://limanmys.zulipchat.com/api/v1/messages \
-          -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
-          -d "type=stream" \
-          -d "to=$CHANNEL_NAME" \
-          -d "topic=${GITHUB_REF#refs/heads/}" \
-          --data "content=%0ABranch: ${GITHUB_REF#refs/heads/}%0A%0ACommiter: ${SENDER}%0ADate: ${COMMIT_DATE}%0A%0AMessage: ${COMMIT}%0AVersion: ${VERSION}%0A%0ADownload Link: ${FILE_URL}%0A%0AFile Hash: ${FILE_HASH}"
+            -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
+            -d "type=stream" \
+            -d "to=$CHANNEL_NAME" \
+            -d "topic=${GITHUB_REF#refs/heads/}" \
+            --data "content=%0ABranch: ${GITHUB_REF#refs/heads/}%0A%0ACommiter: ${SENDER}%0ADate: ${COMMIT_DATE}%0A%0AMessage: ${COMMIT}%0AVersion: ${VERSION}%0A%0ADownload Link: ${FILE_URL}%0A%0AFile Hash: ${FILE_HASH}"
