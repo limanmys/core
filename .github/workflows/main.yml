@@ -48,7 +48,7 @@ jobs:
           extensions : ssh2, curl, sqlite3, ldap, mbstring, xml, zip, posix, smbclient, mongodb, gd
       - name: Build Liman Package
         env:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          ZULIP_KEY: ${{ secrets.ZULIP_KEY }}
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt install jq -y 1>/dev/null 2>/dev/null
           VERSION=`cat package/liman/server/storage/VERSION`
@@ -88,7 +88,33 @@ jobs:
           """ > DEBIAN/control
           cd ../
           dpkg-deb -Zgzip --build package
-          ls -lah
-          [ "$GITHUB_REF" == "refs/heads/master" ] && CHANNEL="liman-release" || CHANNEL="liman-dev-release"
-          [ "$GITHUB_REF" == "refs/heads/master" ] && FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER.deb" || FILE_NAME="liman-${GITHUB_REF#refs/heads/}-$VERSION-$GITHUB_RUN_NUMBER.deb"
-          curl -F "file=@package.deb" "https://slack.com/api/files.upload?token=$SLACK_TOKEN&channels=$CHANNEL&filename=$FILE_NAME&pretty=1&initial_comment=$COMMIT" || echo
+
+          FILE_NAME="liman-${GITHUB_REF#refs/heads/}-$GITHUB_RUN_NUMBER.deb"
+          mv package.deb $FILE_NAME
+
+          DEBIAN_FRONTEND=noninteractive sudo apt install jq -y 1>/dev/null 2>/dev/null
+          CHANNEL_NAME="liman-release"
+          MAIN_FILE=$FILE_NAME
+          GIT_DIR=".git"
+          VERSION=$GITHUB_RUN_NUMBER
+
+          COMMIT=`git --git-dir=$GIT_DIR log -1 --pretty=%B`
+          COMMIT=`echo $COMMIT | jq -SrR @uri`
+          SENDER=`git --git-dir=$GIT_DIR log -1 --pretty=%cN`
+          SENDER=`echo $SENDER | jq -SrR @uri`
+          COMMIT_DATE=`git --git-dir=$GIT_DIR log -1 --pretty=%ai`
+          COMMIT_DATE=`echo $COMMIT_DATE | jq -SrR @uri`
+          FILE_HASH=$(sha256sum $MAIN_FILE | cut -d " " -f 1)
+          curl -sSX POST https://limanmys.zulipchat.com/api/v1/users/me/subscriptions \
+          -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
+          --data-urlencode subscriptions="[{\"description\": \"Created by Liman BOT\", \"name\": \"$CHANNEL_NAME\"}]" \
+          -d "accounce=true" -d "stream_post_policy:2"
+          FILE_URL=https://limanmys.zulipchat.com$(curl -sSX POST https://limanmys.zulipchat.com/api/v1/user_uploads \
+          -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
+          -F "filename=@$MAIN_FILE" | jq -r ".uri")
+          curl -X POST https://limanmys.zulipchat.com/api/v1/messages \
+          -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
+          -d "type=stream" \
+          -d "to=$CHANNEL_NAME" \
+          -d "topic=${GITHUB_REF#refs/heads/}" \
+          --data "content=%0ABranch: ${GITHUB_REF#refs/heads/}%0A%0ACommiter: ${SENDER}%0ADate: ${COMMIT_DATE}%0A%0AMessage: ${COMMIT}%0AVersion: ${VERSION}%0A%0ADownload Link: ${FILE_URL}%0A%0AFile Hash: ${FILE_HASH}"
