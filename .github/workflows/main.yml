@@ -70,7 +70,8 @@ jobs:
           touch DEBIAN/control
 
           find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum  1>/dev/null 2>/dev/null || true
-
+          find . \( -name ".git" -o -name ".gitignore" -o -name ".gitmodules" -o -name ".gitattributes" \) -exec rm -rf -- {} + 1>/dev/null 2>/dev/null || true
+          
           chmod 775 DEBIAN/preinst
           chmod 775 DEBIAN/postinst
 
