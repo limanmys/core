@@ -109,6 +109,10 @@ jobs:
             -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
             --data-urlencode subscriptions="[{\"description\": \"Created by Liman BOT\", \"name\": \"$CHANNEL_NAME\"}]" \
             -d "accounce=true" -d "stream_post_policy:2"
+          echo $MAIN_FILE
+          curl -sSX POST https://limanmys.zulipchat.com/api/v1/user_uploads \
+            -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
+            -F "filename=@$MAIN_FILE"
           FILE_URL=https://limanmys.zulipchat.com$(curl -sSX POST https://limanmys.zulipchat.com/api/v1/user_uploads \
             -u github-releaser-bot@zulipchat.com:$ZULIP_KEY \
             -F "filename=@$MAIN_FILE" | jq -r ".uri")
