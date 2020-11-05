@@ -142,7 +142,7 @@
             $('nav ul a').each(function() {
                 if (this.href === path) {
                     $(this).addClass('active');
-                }else{
+                }else if(!$(this).hasClass("extension-link")){
                     $(this).removeClass('active')
                 }
             });
@@ -153,7 +153,7 @@
                     $(this).removeClass('active')
                 }
             });
-            if(localStorage.nightMode == "on"){
+            if(localStorage.nightMode === "on"){
                 $('body').addClass('skin-dark');
             }
         });

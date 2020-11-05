@@ -52,7 +52,12 @@
                 <li class="nav-header">{{__("Eklentiler")}}</li>
                 @foreach(extensions() as $extension)
                     <li class="nav-item ext_nav" @if($loop->iteration > getExtensionViewCount())style="display:none;"@endif>
-                        <a href='/l/{{$extension->id}}' class="nav-link @if(request('extension_id') == $extension->id) active @endif">
+                        @if(request('extension_id') == $extension->id)
+                            <a href='/l/{{$extension->id}}' class="nav-link extension-link active">
+                        @else
+                            <a href='/l/{{$extension->id}}' class="nav-link extension-link">
+                        @endif
+
                         @if(empty($extension->icon))
                             <i class="nav-icon fab fa-etsy"></i>
                         @elseif(substr($extension->icon,0,2) == 'fa')  
