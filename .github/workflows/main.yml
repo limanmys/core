@@ -10,7 +10,7 @@ jobs:
         with:
           path: package/liman/server
 
-    - name: Getting Liman' Extension Templates
+      - name: Getting Liman' Extension Templates
         uses: actions/checkout@v2
         with:
           repository: limanmys/extension_templates
