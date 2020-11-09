@@ -923,6 +923,14 @@ if (!function_exists('endsWith')) {
     }
 }
 
+if (!function_exists('fetchExtensionTemplates')) {
+    function fetchExtensionTemplates()
+    {
+        $path = storage_path('extension_templates/templates.json');
+        return json_decode(file_get_contents($path));
+    }
+}
+
 if (!function_exists('scanTranslations')) {
     function scanTranslations($directory)
     {

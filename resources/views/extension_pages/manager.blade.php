@@ -131,22 +131,20 @@ foreach ($extensions as $extension) {
     "submit_text" => "İndir"
 ])
 
+@php
+    $templates = fetchExtensionTemplates();
+@endphp
 
 @include('modal',[
     "id"=>"newExtension",
     "url" => route('extension_new'),
     "next" => "debug",
     "title" => "Yeni Eklenti Oluştur",
-    "selects" => [
-    "PHP 7.3:php" => [
-        "-:php" => "language:hidden"
-    ],
-    /*"Python 3.7(BETA):python" => [
-        "-:python" => "language:hidden"
-    ]*/
-    ],
     "inputs" => [
         "Eklenti Adı" => "name:text",
+        "Tipi:template" => collect($templates->templates)->mapWithKeys(function($value, $key){
+            return [$value => $key];
+        })->toArray()
     ],
     "submit_text" => "Oluştur"
 ])
@@ -165,6 +163,7 @@ foreach ($extensions as $extension) {
 ])
 
 <script>
+    $('#newExtension').find('select[name=template]').val('{{ $templates->default }}');
     $('input[name=ext_count]').val('{{getExtensionViewCount()}}');
        var extensionUpdates = [];
        function showExtensionUpdates(){
