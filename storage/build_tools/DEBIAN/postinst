@@ -252,7 +252,7 @@ if (systemctl -q is-active systemd-resolved.service); then
     systemctl disable systemd-resolved
     systemctl stop systemd-resolved
     rm /etc/resolv.conf
-    /usr/bin/python3 /liman/server/storage/smb-dhcp-client 2> /dev/null | grep "Domain Name Server(s)" | cut -d : -f 2 |  xargs  | sed 's/ /\n/g' |sed 's/......./nameserver &/g' > /etc/resolv.conf
+    /usr/bin/python3 /liman/server/storage/smb-dhcp-client 2> /dev/null | grep "Domain Name Server(s)" | cut -d : -f 2 |  xargs  | sed 's/ /\n/g' |sed 's/.*\..*\..*\..*/nameserver &/g' > /etc/resolv.conf
 fi
 
 sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/7.3/fpm/php.ini

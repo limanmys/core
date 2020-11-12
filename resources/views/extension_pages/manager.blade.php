@@ -148,6 +148,10 @@ foreach ($extensions as $extension) {
     ],
     "submit_text" => "Oluştur"
 ])
+<script>
+    $('#newExtension').find('select[name=template]').val('{{ $templates->default }}');
+</script>
+
 @endif
 
 @include('modal',[
@@ -163,7 +167,6 @@ foreach ($extensions as $extension) {
 ])
 
 <script>
-    $('#newExtension').find('select[name=template]').val('{{ $templates->default }}');
     $('input[name=ext_count]').val('{{getExtensionViewCount()}}');
        var extensionUpdates = [];
        function showExtensionUpdates(){
