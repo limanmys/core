@@ -16,13 +16,13 @@ jobs:
           repository: limanmys/extension_templates
           path: package/liman/server/storage/extension_templates
           token: ${{ secrets.CI_TOKEN }}
-
       - name: Getting Liman' PHP Sandbox
         uses: actions/checkout@v2
         with:
           repository: limanmys/php-sandbox
           path: package/liman/sandbox/php
           token: ${{ secrets.CI_TOKEN }}
+          ref: "1.5-dev"
       - name: Getting Liman' Render Engine
         uses: actions/checkout@v2
         with:
