@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
+use App\Models\CronMail;
 use App\User;
 use App\Models\Role;
 use App\Http\Controllers\Controller;
@@ -45,6 +46,56 @@ class MainController extends Controller
             "updateAvailable" => $updateAvailable,
             "extensions" => $extensions,
         ]);
+    }
+
+    public function getLimanTweaks()
+    {
+        return respond([
+            "APP_DEBUG" => env("APP_DEBUG") ? "true" : "false",
+            "BRAND_NAME" => env("BRAND_NAME"),
+            "APP_NOTIFICATION_EMAIL" => env("APP_NOTIFICATION_EMAIL"),
+            "LOG_LEVEL" => env("LOG_LEVEL"),
+            "APP_URL" => env("APP_URL"),
+            "MAIL_ENABLED" => env("MAIL_ENABLED") ? "true" : "false",
+            "MAIL_HOST" => env("MAIL_HOST"),
+            "MAIL_PORT" => env("MAIL_PORT"),
+            "MAIL_USERNAME" => env("MAIL_USERNAME"),
+            "MARKET_URL" => env("MARKET_URL"),
+            "MARKET_CLIENT_ID" => env("MARKET_CLIENT_ID"),
+            "MARKET_CLIENT_SECRET" => env("MARKET_CLIENT_SECRET"),
+            "EXTENSION_DEVELOPER_MODE" => env("EXTENSION_DEVELOPER_MODE") ? "true" : "false",
+        ]);
+    }
+
+    public function setLimanTweaks()
+    {
+        $flag = setEnv([
+            "APP_DEBUG" => request("APP_DEBUG"),
+            "BRAND_NAME" => "\"" . request("BRAND_NAME") . "\"",
+            "APP_NOTIFICATION_EMAIL" => request("APP_NOTIFICATION_EMAIL"),
+            "LOG_LEVEL" => request("LOG_LEVEL"),
+            "APP_URL" => request("APP_URL"),
+            "MAIL_ENABLED" => request("MAIL_ENABLED"),
+            "MAIL_HOST" => request("MAIL_HOST"),
+            "MAIL_PORT" => request("MAIL_PORT"),
+            "MAIL_USERNAME" => request("MAIL_USERNAME"),
+            "MARKET_URL" => request("MARKET_URL"),
+            "MARKET_CLIENT_ID" => request("MARKET_CLIENT_ID"),
+            "MARKET_CLIENT_SECRET" => request("MARKET_CLIENT_SECRET"),
+            "EXTENSION_DEVELOPER_MODE" => request("EXTENSION_DEVELOPER_MODE"),
+        ]);
+
+        if(request()->has("MAIL_PASSWORD")) {
+            $flag = setEnv([
+               "MAIL_PASSWORD" => request("MAIL_PASSWORD")
+            ]);
+        }
+
+        if($flag){
+            return respond("Ayarlar başarıyla kaydedildi!");
+        }else{
+            return respond("Ayarlar kaydedılemedı!",201);
+        }
     }
 
     public function one(User $user)
@@ -145,7 +196,7 @@ class MainController extends Controller
                 abort(504, "Tip Bulunamadı");
         }
         return view('l.table', [
-            "value" => (object) $data,
+            "value" => (object)$data,
             "title" => $title,
             "display" => $display,
         ]);
@@ -198,9 +249,9 @@ class MainController extends Controller
         $extension = json_decode(
             file_get_contents(
                 "/liman/extensions/" .
-                    strtolower(extension()->name) .
-                    DIRECTORY_SEPARATOR .
-                    "db.json"
+                strtolower(extension()->name) .
+                DIRECTORY_SEPARATOR .
+                "db.json"
             ),
             true
         );
@@ -327,9 +378,9 @@ class MainController extends Controller
         $extension = json_decode(
             file_get_contents(
                 "/liman/extensions/" .
-                    strtolower(request('extension_name')) .
-                    DIRECTORY_SEPARATOR .
-                    "db.json"
+                strtolower(request('extension_name')) .
+                DIRECTORY_SEPARATOR .
+                "db.json"
             ),
             true
         );
@@ -349,7 +400,7 @@ class MainController extends Controller
         }
 
         $data = PermissionData::where('permission_id', request('id'))->first();
-        $data = $data ? json_decode($data->data) : (object) [];
+        $data = $data ? json_decode($data->data) : (object)[];
         foreach ($parameters as $key => $parameter) {
             $parameters[$key]["value"] = isset($data->{$parameter["variable"]})
                 ? $data->{$parameter["variable"]}
@@ -495,12 +546,12 @@ input(type=\"imtcp\" port=\"514\")";
         ]);
         return redirect(
             env('MARKET_URL') .
-                "/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri=" .
-                urlencode(
-                    env('APP_URL') . '/api/market/bagla?auth=' . $auth_code
-                ) .
-                "&client_id=" .
-                env('MARKET_CLIENT_ID')
+            "/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri=" .
+            urlencode(
+                env('APP_URL') . '/api/market/bagla?auth=' . $auth_code
+            ) .
+            "&client_id=" .
+            env('MARKET_CLIENT_ID')
         );
     }
 
@@ -537,7 +588,7 @@ input(type=\"imtcp\" port=\"514\")";
             abort(504, "Market hesabınız bağlanırken bir hata oluştu!");
         }
 
-        $json = json_decode((string) $res->getBody());
+        $json = json_decode((string)$res->getBody());
         $requiredScopes = ["user_api", "offline_access"];
         $currentScopes = explode(" ", $json->scope);
 

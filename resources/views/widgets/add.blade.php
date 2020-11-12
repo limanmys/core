@@ -63,7 +63,6 @@
             var element = $("#widget_name");
             element.text('');
             for(var k in json) {
-                console.log(json[k]);
                 element.append('<option value="'+ fixer(json[k]["target"]) + ':' + fixer(json[k]["name"]) + ':' + fixer(json[k]["type"]) + ':' + fixer(json[k]["icon"]) +'">' + fixer(json[k]["name"]) + '</option>');
             }
             element.removeAttr('disabled');

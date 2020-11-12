@@ -6,7 +6,7 @@ use App\Models\Notification;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\Certificate;
-use App\Models\Module;
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
@@ -88,6 +88,13 @@ if (!function_exists('rootSystem')) {
     function rootSystem()
     {
         return new Helper();
+    }
+}
+
+if (!function_exists('users')) {
+    function users()
+    {
+        return User::all();
     }
 }
 

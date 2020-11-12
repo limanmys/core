@@ -3,12 +3,12 @@
 namespace App\Console;
 
 use App\Models\AdminNotification;
-use App\Models\Notification;
-use App\User;
 use App\Http\Controllers\MarketController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\CronEmailCheckJob;
+use Illuminate\Contracts\Bus\Dispatcher;
 
 class Kernel extends ConsoleKernel
 {
@@ -89,6 +89,16 @@ class Kernel extends ConsoleKernel
             })
             ->hourly()
             ->name('Update Check');
+
+        // Mail System.
+        $schedule
+            ->call(function () {
+                $job = (new CronEmailCheckJob())->onQueue('cron_mail');
+
+                $job_id = app(Dispatcher::class)->dispatch($job);
+            })
+            ->everyMinute()
+            ->name('Mail Check');
     }
 
     /**

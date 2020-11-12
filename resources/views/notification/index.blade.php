@@ -49,6 +49,7 @@
                     </div>
                 @endforeach
             @endforeach
+            {!! $links !!}
         </div>
     </div>
 </div>

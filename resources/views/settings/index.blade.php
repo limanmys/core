@@ -39,7 +39,7 @@
                 </li> -->
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#externalNotifications" onclick="">{{__("Dış Bildirimler")}}</a>
-                </li> 
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#restrictedMode" onclick="">{{__("Kısıtlı Mod")}}</a>
                 </li>
@@ -48,6 +48,12 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#dnsSettings" onclick="getDNS()">{{__("DNS Ayarları")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#mailSettings" onclick="getCronMails()">{{__("Mail Ayarları")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#limanTweaks" onclick="getLimanTweaks()">{{__("İnce Ayarlar")}}</a>
                 </li>
                 {!! settingsModuleButtons() !!}
             </ul>
@@ -91,7 +97,7 @@
                         "text" => "Rol Grubu Ekle"
                     ])<br><br>
                     <div id="rolesTable">
-                        
+
                     </div>
                 </div>
                 <div class="tab-pane fade show" id="certificates" role="tabpanel">
@@ -126,7 +132,7 @@
                 </div>
                 <div class="tab-pane fade show" id="limanMarket" role="tabpanel">
                     <div id="marketStatus" class="alert alert-secondary" role="alert">
-                        
+
                     </div>
                     <div id="marketLoading">
                         <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
@@ -144,11 +150,11 @@
                             ],
                         ])
                     </div>
-                    
+
                     </div>
                     <div id="marketDisabled" style="display:none">
                         <p>{{__("Liman kurulumunuzu Liman Market'e bağlayarak sistemdeki tüm güncellemeleri takip edebilir, güncellemeleri indirebilirsiniz.")}}</p>
-                        <button type="button" class="btn btn-primary btn-lg" onclick="location.href = '{{route('redirect_market')}}'">{{__("Liman Market'i Bağla")}}</button>    
+                        <button type="button" class="btn btn-primary btn-lg" onclick="location.href = '{{route('redirect_market')}}'">{{__("Liman Market'i Bağla")}}</button>
                     </div>
                     <script>
                         function checkMarketAccess(){
@@ -203,7 +209,7 @@
                             });
                         }
                     </script>
-                    
+
                 </div>
                 <div class="tab-pane fade show" id="dnsSettings" role="tabpanel">
                     <p>{{__("Liman'ın sunucu adreslerini çözebilmesi için gerekli DNS sunucularını aşağıdan düzenleyebilirsiniz.")}}</p>
@@ -386,6 +392,26 @@
                             ],
                         ])
                 </div>
+                <div class="tab-pane fade show" id="mailSettings" role="tabpanel">
+                    <div id="mailWrapper"></div>
+                    <script>
+                        function getCronMails(){
+                            showSwal("Okunuyor...","info");
+                            request("{{route('cron_mail_get')}}",new FormData(),function (success){
+                                $("#mailWrapper").html(success);
+                                $("#mailWrapper table").DataTable();
+                                Swal.close();
+                            },function(error){
+                                let json = JSON.parse(error);
+                                showSwal(json.message,'error',2000);
+                            });
+
+                        }
+                    </script>
+                </div>
+                <div class="tab-pane fade show" id="limanTweaks" role="tabpanel">
+                    @include("settings.tweaks")
+                </div>
             </div>
         </div>
     </div>
@@ -394,11 +420,11 @@
             animation: blinker 1s linear infinite;
         }
 
-        @keyframes blinker {  
+        @keyframes blinker {
             50% { opacity: 0; }
         }
     </style>
-    
+
     @include('modal',[
         "id"=>"add_user",
         "title" => "Kullanıcı Ekle",
@@ -642,7 +668,7 @@
         }
 
 
-        
+
         function saveLogSystem(){
             showSwal('{{__("Kaydediliyor...")}}','info');
             var data = new FormData(document.querySelector('#logForm'));
@@ -797,7 +823,6 @@
                 var json = JSON.parse(success);
                 var box = $("#output");
                 box.html("");
-                console.log(json["message"]);
                 for (var i = 0; i < json["message"].length; i++) {
                     var current = json["message"][i];
                     box.append("<div class='alert alert-" + current["type"] + "' role='alert'>" +
@@ -810,7 +835,7 @@
                 alert("hata");
             });
         }
-        
+
 
         function saveDNS(form){
             return request('{{route('set_liman_dns_servers')}}',form, function (success){

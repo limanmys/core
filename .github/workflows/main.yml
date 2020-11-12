@@ -23,8 +23,12 @@ jobs:
           repository: limanmys/php-sandbox
           path: package/liman/sandbox/php
           token: ${{ secrets.CI_TOKEN }}
-          ref: "1.5-dev"
-
+      - name: Getting Liman' Render Engine
+        uses: actions/checkout@v2
+        with:
+          repository: limanmys/go
+          path: render_engine
+          token: ${{ secrets.CI_TOKEN }}
       - uses: actions/cache@v2
         with:
           path: ~/.npm
@@ -72,6 +76,7 @@ jobs:
           rm -rf package/liman/webssh/.git
           rm -rf package/liman/server/node_modules
           mv package/liman/server/storage/build_tools/DEBIAN package/
+          mv render_engine/liman_render package/liman/server/storage/liman_render
           rm -rf package/liman/server/storage/build_tools
           cd package
           touch DEBIAN/md5sums

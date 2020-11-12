@@ -103,6 +103,19 @@ numprocs=1
 redirect_stderr=true
 stdout_logfile=/liman/logs/system_update.log
     """ > /etc/supervisor/conf.d/liman-system-worker.conf
+
+echo """
+#LIMAN_OPTIMIZATIONS
+[program:liman-cron_mail-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=cron_mail --timeout=0
+autostart=true
+autorestart=true
+user=liman
+numprocs=8
+redirect_stderr=true
+stdout_logfile=/liman/logs/mail.log
+    """ > /etc/supervisor/conf.d/liman-cron-mail.conf
 supervisorctl reread
 supervisorctl update
 supervisorctl start all
@@ -233,6 +246,13 @@ ExecStart=/usr/bin/php /liman/server/artisan websockets:serve --host=127.0.0.1
 [Install]
 WantedBy=multi-user.target
     """ > /etc/systemd/system/liman-socket.service
+fi
+
+if (systemctl -q is-active systemd-resolved.service); then
+    systemctl disable systemd-resolved
+    systemctl stop systemd-resolved
+    rm /etc/resolv.conf
+    /usr/bin/python3 /liman/server/storage/smb-dhcp-client 2> /dev/null | grep "Domain Name Server(s)" | cut -d : -f 2 |  xargs  | sed 's/ /\n/g' |sed 's/......./nameserver &/g' > /etc/resolv.conf
 fi
 
 sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/7.3/fpm/php.ini

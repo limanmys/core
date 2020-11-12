@@ -9,6 +9,20 @@ use App\Http\Controllers\Controller;
 
 class MainController extends Controller
 {
+    public function all()
+    {
+        if(request()->wantsJson()){
+            return response()->json(servers());
+        }else{
+            return view("server.index");
+        }
+    }
+
+    public function oneData()
+    {
+        return response()->json(server());
+    }
+
     public function checkAccess()
     {
         if (request('port') == -1) {

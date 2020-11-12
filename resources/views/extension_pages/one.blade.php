@@ -28,6 +28,9 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#tab_4" role="tab">{{__("Fonksiyonlar")}}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#tab_5" role="tab">{{__("Mail Tagleri")}}</a>
+                </li>
             </ul>
         </div>
         <div class="card-body">
@@ -96,7 +99,7 @@
                                 ]
                             ]
                         ])
-            
+
                         @include('modal',[
                             "id"=>"add_database",
                             "title" => "Veri Ekle",
@@ -111,7 +114,7 @@
                             ],
                             "submit_text" => "Veri Ekle"
                         ])
-            
+
                         @include('modal',[
                             "id"=>"edit_database",
                             "title" => "Veri Düzenle",
@@ -246,7 +249,7 @@
                                 ]
                             ]
                         ])
-            
+
                         @include('modal',[
                             "id"=>"addFunctionModal",
                             "title" => "Fonksiyon Ekle",
@@ -260,7 +263,7 @@
                             ],
                             "submit_text" => "Fonksiyon Ekle"
                         ])
-            
+
                         @include('modal',[
                             "id"=>"updateFunctionModal",
                             "title" => "Fonksiyon Duzenle",
@@ -303,7 +306,7 @@
                             ],
                             "submit_text" => "Kaydet"
                         ])
-            
+
                         @include('modal',[
                             "id"=>"removeFunctionModal",
                             "title" => "Fonksiyonu Sil",
@@ -314,6 +317,27 @@
                                 "-:-" => "name:hidden"
                             ],
                             "submit_text" => "Fonksiyonu Sil"
+                        ])
+                    </div>
+                    <div class="tab-pane fade show" id="tab_5" role="tabpanel">
+                        @include('table',[
+                            "value" => array_key_exists("mail_tags",$extension) ? $extension["mail_tags"] : [],
+                            "title" => [
+                                "Tag Açıklaması" , "Tag"
+                            ],
+                            "display" => [
+                                "description" , "tag"
+                            ],
+                            "menu" => [
+                                "Ayarları Düzenle" => [
+                                    "target" => "updateFunctionModalHandler",
+                                    "icon" => " context-menu-icon-edit"
+                                ],
+                                "Sil" => [
+                                    "target" => "removeFunctionModal",
+                                    "icon" => " context-menu-icon-delete"
+                                ]
+                            ]
                         ])
                     </div>
                 </div>
@@ -409,7 +433,7 @@
                     var data = new FormData();
                     data.append('parameter_variable',parameter_variable);
                     data.append('function_name',activeFunction);
-                    
+
                     request('{{route('extension_remove_function_parameters')}}',data,function(response){
                         Swal.close();
                         getFunctionParameters(activeFunction);
@@ -431,7 +455,7 @@
             if(element.querySelector('#displayLog') && element.querySelector('#displayLog').innerHTML == "true"){
                 modal.find("input[name='displayLog']").prop("checked",true);
             }
-            
+
             modal.modal('show');
         }
     </script>

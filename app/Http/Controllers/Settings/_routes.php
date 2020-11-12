@@ -119,6 +119,14 @@ Route::post('/dnsOku', 'Settings\MainController@getDNSServers')
     ->middleware('admin')
     ->name('get_liman_dns_servers');
 
+Route::post('/inceAyarlar/oku', 'Settings\MainController@getLimanTweaks')
+    ->middleware('admin')
+    ->name('get_liman_tweaks');
+
+Route::post('/inceAyarlar/yaz', 'Settings\MainController@setLimanTweaks')
+    ->middleware('admin')
+    ->name('set_liman_tweaks');
+
 Route::post('/dnsYaz', 'Settings\MainController@setDNSServers')
     ->middleware('admin')
     ->name('set_liman_dns_servers');
