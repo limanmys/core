@@ -252,8 +252,9 @@
                   info_box.find('.overlay').remove();
                 } catch(e) {
                   info_box.find('.overlay i').remove();
+                  info_box.find('.overlay .spinner-border').remove();
                   info_box.find('.overlay span').remove();
-                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+e.message+'</span>');
+                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip("Bir Hata Oluştu!")+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+"Bir Hata Oluştu!"+'</span>');
                 }
                 if(next){
                   next();
@@ -268,7 +269,7 @@
                 info_box.find('.overlay .spinner-border').remove();
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
-                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+json.message+'</span>');
+                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip("Bir Hata Oluştu!")+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+"Bir Hata Oluştu!"+'</span>');
                 if(next){
                   next();
                 }
@@ -290,7 +291,7 @@
                   element.find('.overlay .spinner-border').remove();
                   element.find('.overlay i').remove();
                   element.find('.overlay span').remove();
-                  element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+e.message+'</span>');
+                  element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip("Bir Hata Oluştu!")+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+"Bir Hata Oluştu!"+'</span>');
                 }
                 if(next){
                   next();
@@ -305,7 +306,7 @@
                 element.find('.overlay .spinner-border').remove();
                 element.find('.overlay i').remove();
                 element.find('.overlay span').remove();
-                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+json.message+'</span>');
+                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip("Bir Hata Oluştu!")+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+"Bir Hata Oluştu!"+'</span>');
                 if(next){
                   next();
                 }
@@ -320,9 +321,9 @@
         }
 
         function API(target)
-    {
-        return "{{route('home')}}/extensionRun/" + target;
-    }
+        {
+            return "{{route('home')}}/extensionRun/" + target;
+        }
 
         function createChart(element, labels, data) {
           $("#" + element + ' .overlay').remove();
