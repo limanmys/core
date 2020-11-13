@@ -177,6 +177,9 @@ pre {
     request(API('{{request('target_function') ? request('target_function') : 'index'}}'),new FormData(), function (success){
         $("#mainExtensionWrapper").html(success);
         window.onload();
+        $('.modal').on('shown.bs.modal', function () {
+            $(this).find(".alert").fadeOut();
+        });
     },function (error){ 
         let json = JSON.parse(error);
         showSwal(json.message,'error',2000);
