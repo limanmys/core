@@ -33,6 +33,16 @@ Route::post(
     'Extension\SettingsController@allServersApi'
 )->name('extensions_api');
 
+Route::post(
+    '/ayarlar/eklenti/zorlaBagimlilikKur',
+    'Extension\OneController@forceDepInstall'
+)->name('extension_force_dep_install')->middleware("admin");
+
+Route::post(
+    '/ayarlar/eklenti/zorlaAktiflestir',
+    'Extension\OneController@forceEnableExtension'
+)->name('extension_force_enable')->middleware("admin");
+
 // Extension Details Route
 Route::get(
     '/eklentiler/{extension_id}',

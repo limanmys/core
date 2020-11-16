@@ -15,6 +15,9 @@ use Illuminate\Support\Str;
 use mervick\aesEverywhere\AES256;
 use GuzzleHttp\Client;
 use App\Models\Token;
+use App\Jobs\ExtensionDependenciesJob;
+use Illuminate\Contracts\Bus\Dispatcher;
+use App\Models\AdminNotification;
 
 /**
  * Class OneController
@@ -198,6 +201,63 @@ class OneController extends Controller
             'similar' => $similar,
             'extensionDb' => extensionDb(),
         ]);
+    }
+
+    public function forceEnableExtension()
+    {
+        $flag =extension()->update([
+            "status" => "1"
+        ]);
+
+        if($flag){
+            return respond("Eklenti başarıyla aktifleştirildi!");
+        }else{
+            return respond("Eklenti aktifleştirilirken bir hata oluştu!",201);
+        }
+    }
+
+    public function forceDepInstall()
+    {
+        $flag =extension()->update([
+            "status" => "0"
+        ]);
+        
+
+        $file = file_get_contents("/liman/extensions/" .strtolower(extension()->name) . "/db.json");
+        $json = json_decode($file,true);
+        if(json_last_error() != JSON_ERROR_NONE){
+            return respond("Eklenti dosyası okunurken bir hata oluştu!",201);
+        }
+
+        if (array_key_exists("dependencies",$json) && $json["dependencies"] != ""){
+            $job = (new ExtensionDependenciesJob(
+                extension(),
+                $json["dependencies"]
+            ))->onQueue('system_updater');
+    
+            // Dispatch job right away.
+            $job_id = app(Dispatcher::class)->dispatch($job);$job = (new ExtensionDependenciesJob(
+                extension(),
+                $json["dependencies"]
+            ))->onQueue('system_updater');
+    
+            // Dispatch job right away.
+            $job_id = app(Dispatcher::class)->dispatch($job);
+
+            AdminNotification::create([
+                "title" =>
+                    extension()->display_name . " eklentisinin bağımlılıkları yükleniyor!",
+                "type" => "",
+                "message" =>
+                    extension()->display_name .
+                    " eklentisinin bağımlılıkları yükleniyor, bu süre içerisinde eklentiyi kullanamazsınız.",
+                "level" => 3,
+            ]);
+
+            return respond("İşlem başlatıldı!");
+        }else{
+            return respond("Bu eklentinin hiçbir bağımlılığı yok!",201);
+        }
     }
 
     /**
