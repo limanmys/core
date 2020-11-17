@@ -60,6 +60,7 @@ class MainController extends Controller
             "MAIL_HOST" => env("MAIL_HOST"),
             "MAIL_PORT" => env("MAIL_PORT"),
             "MAIL_USERNAME" => env("MAIL_USERNAME"),
+            "MAIL_ENCRYPTION" => env("MAIL_ENCRYPTION"),
             "MARKET_URL" => env("MARKET_URL"),
             "MARKET_CLIENT_ID" => env("MARKET_CLIENT_ID"),
             "MARKET_CLIENT_SECRET" => env("MARKET_CLIENT_SECRET"),
@@ -79,22 +80,23 @@ class MainController extends Controller
             "MAIL_HOST" => request("MAIL_HOST"),
             "MAIL_PORT" => request("MAIL_PORT"),
             "MAIL_USERNAME" => request("MAIL_USERNAME"),
+            "MAIL_ENCRYPTION" => request("MAIL_ENCRYPTION"),
             "MARKET_URL" => request("MARKET_URL"),
             "MARKET_CLIENT_ID" => request("MARKET_CLIENT_ID"),
             "MARKET_CLIENT_SECRET" => request("MARKET_CLIENT_SECRET"),
             "EXTENSION_DEVELOPER_MODE" => request("EXTENSION_DEVELOPER_MODE"),
         ]);
 
-        if(request()->has("MAIL_PASSWORD")) {
+        if (request()->has("MAIL_PASSWORD")) {
             $flag = setEnv([
                "MAIL_PASSWORD" => request("MAIL_PASSWORD")
             ]);
         }
 
-        if($flag){
+        if ($flag) {
             return respond("Ayarlar başarıyla kaydedildi!");
-        }else{
-            return respond("Ayarlar kaydedılemedı!",201);
+        } else {
+            return respond("Ayarlar kaydedılemedı!", 201);
         }
     }
 
