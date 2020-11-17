@@ -148,7 +148,7 @@ class MainController extends Controller
                 );
             }
         }
-        list($error, $new) = self::setupNewExtension($zipFile,$verify);
+        list($error, $new) = self::setupNewExtension($zipFile, $verify);
 
         if ($error) {
             return $error;
@@ -228,7 +228,7 @@ class MainController extends Controller
         $new->status = "1";
         $new->save();
         
-        if (array_key_exists("dependencies",$json) && $json["dependencies"] != ""){
+        if (array_key_exists("dependencies", $json) && $json["dependencies"] != "") {
             $job = (new ExtensionDependenciesJob(
                 $new,
                 $json["dependencies"]
@@ -294,7 +294,7 @@ class MainController extends Controller
         $template_folder = storage_path('extension_templates/'.$template.'/');
 
         shell_exec("cp -r $template_folder $folder");
-        foreach(glob("$folder/*.json") as $file){
+        foreach (glob("$folder/*.json") as $file) {
             $content = file_get_contents($file);
             $content = str_replace([
                 "<NAME>",

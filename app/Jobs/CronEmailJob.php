@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Mail\CronMail as CronMailObj;
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -38,13 +37,19 @@ class CronEmailJob implements ShouldQueue
      */
     public function handle()
     {
-        if($this->obj->type == "extension"){
+        if (!$this->doubleCheckTime()) {
+            return;
+        }
+        if ($this->obj->type == "extension") {
             $filePath = env("LOG_EXTENSION_PATH");
-        }else{
+        } else {
             $filePath = env("LOG_PATH");
         }
+        if (!is_file($filePath)) {
+            return;
+        }
         $now = Carbon::now();
-        switch ($this->obj->cron_type){
+        switch ($this->obj->cron_type) {
             case "hourly":
                 $before = Carbon::now()->subHour();
                 break;
@@ -64,10 +69,43 @@ class CronEmailJob implements ShouldQueue
         $command = "$time | grep '" . $encoded . "' | grep '" . $this->obj->user_id . "' | wc -l";
         $count = trim(shell_exec($command));
 
-        Mail::to($this->obj->to)->send(new CronMailObj($this->obj,$count,$before,$now));
+        Mail::to($this->obj->to)->send(new CronMailObj($this->obj, $count, $before, $now));
 
         $this->obj->update([
            "last" => Carbon::now()
         ]);
+    }
+
+    public function doubleCheckTime()
+    {
+        $now = Carbon::now();
+        $flag = false;
+        switch ($this->obj->cron_type) {
+                case "hourly":
+                    $before = $now->subHour();
+                    if ($before->greaterThan($this->obj->last)) {
+                        $flag = true;
+                    }
+                    break;
+                case "daily":
+                    $before = $now->subDay();
+                    if ($before->greaterThan($this->obj->last)) {
+                        $flag = true;
+                    }
+                    break;
+                case "weekly":
+                    $before = $now->subWeek();
+                    if ($before->greaterThan($this->obj->last)) {
+                        $flag = true;
+                    }
+                    break;
+                case "monthly":
+                    $before = $now->subMonth();
+                    if ($before->greaterThan($this->obj->last)) {
+                        $flag = true;
+                    }
+                    break;
+        }
+        return $flag;
     }
 }

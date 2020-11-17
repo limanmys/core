@@ -9,27 +9,28 @@ use App\Models\Extension;
 use App\Models\Server;
 use App\User;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Carbon\Carbon;
 
 class MainController extends Controller
 {
     public function getMailTags()
     {
         $path = "/liman/extensions/" . strtolower(extension()->name) . "/db.json";
-        if(!is_file($path)){
-            return respond("Bu eklentinin bir veritabanı yok!",201);
+        if (!is_file($path)) {
+            return respond("Bu eklentinin bir veritabanı yok!", 201);
         }
 
         $file = file_get_contents($path);
 
-        $json = json_decode($file,true);
+        $json = json_decode($file, true);
 
-        if(json_last_error() != JSON_ERROR_NONE){
-            return respond("Eklenti veritabanı okunamıyor.",201);
+        if (json_last_error() != JSON_ERROR_NONE) {
+            return respond("Eklenti veritabanı okunamıyor.", 201);
         }
 
-        if(array_key_exists("mail_tags",$json)){
+        if (array_key_exists("mail_tags", $json)) {
             return respond($json["mail_tags"]);
-        }else{
+        } else {
             return respond([]);
         }
     }
@@ -37,11 +38,11 @@ class MainController extends Controller
     public function addCronMail()
     {
         $obj = new CronMail(request()->all());
-        $obj->last = 0;
-        if ($obj->save()){
+        $obj->last = Carbon::now()->subMonths(3);
+        if ($obj->save()) {
             return respond("Mail ayarı başarıyla eklendi");
-        }else{
-            return respond("Mail ayarı eklenemedi!",201);
+        } else {
+            return respond("Mail ayarı eklenemedi!", 201);
         }
     }
 
@@ -49,34 +50,35 @@ class MainController extends Controller
     {
         $obj = CronMail::find(request("cron_id"));
 
-        if($obj == null){
+        if ($obj == null) {
             return respond("Bu mail ayarı bulunamadı!");
         }
 
-        if ($obj->delete()){
+        if ($obj->delete()) {
             return respond("Mail ayarı başarıyla silindi");
-        }else{
-            return respond("Mail ayarı silinemedi!",201);
+        } else {
+            return respond("Mail ayarı silinemedi!", 201);
         }
     }
 
     private $tagTexts = [];
 
-    private function getTagText($key,$extension_name){
-        if(!array_key_exists($extension_name,$this->tagTexts)){
-            $file = file_get_contents("/liman/extensions/" . strtolower($extension_name) . "/db.json" );
-            $json = json_decode($file,true);
-            if(json_last_error() != JSON_ERROR_NONE){
+    private function getTagText($key, $extension_name)
+    {
+        if (!array_key_exists($extension_name, $this->tagTexts)) {
+            $file = file_get_contents("/liman/extensions/" . strtolower($extension_name) . "/db.json");
+            $json = json_decode($file, true);
+            if (json_last_error() != JSON_ERROR_NONE) {
                 return $key;
             }
             $this->tagTexts[$extension_name] = $json;
         }
 
-        if(!array_key_exists("mail_tags",$this->tagTexts[$extension_name])){
+        if (!array_key_exists("mail_tags", $this->tagTexts[$extension_name])) {
             return $key;
         }
-        foreach($this->tagTexts[$extension_name]["mail_tags"] as $obj){
-            if($obj["tag"] == $key){
+        foreach ($this->tagTexts[$extension_name]["mail_tags"] as $obj) {
+            if ($obj["tag"] == $key) {
                 return $obj["description"];
             }
         }
@@ -85,15 +87,34 @@ class MainController extends Controller
 
     public function getCronMail()
     {
-        $mails = CronMail::all()->map(function($obj){
+        $mails = CronMail::all()->map(function ($obj) {
             $ext = Extension::find($obj->extension_id);
-            $obj->extension_name = $ext->display_name;
-            $obj->username = User::find($obj->user_id)->name;
-            $obj->server_name = Server::find($obj->server_id)->name;
-            $obj->tag_string = $this->getTagText($obj->target,$ext->name);
+            if ($ext) {
+                $obj->extension_name = $ext->display_name;
+                $obj->tag_string = $this->getTagText($obj->target, $ext->name);
+            } else {
+                $obj->extension_name = "Bu eklenti silinmiş!";
+                $obj->tag_string = "Bu eklenti silinmiş!";
+            }
+
+            $srv = Server::find($obj->server_id);
+            if ($srv) {
+                $obj->server_name = $srv->name;
+            } else {
+                $obj->server_name = "Bu sunucu silinmiş!";
+            }
+
+            $usr = User::find($obj->user_id);
+            if ($usr) {
+                $obj->username = $usr->name;
+            } else {
+                $obj->username = "Bu kullanıcı silinmiş!";
+            }
+
+            
             return $obj;
         });
-        return view("settings.mail",[
+        return view("settings.mail", [
             "cronMails" => $mails
         ]);
     }
@@ -102,12 +123,12 @@ class MainController extends Controller
     {
         $obj = CronMail::find(request("cron_id"));
 
-        if($obj == null){
-            return respond("Bu mail ayarı bulunamadı!");
+        if ($obj == null) {
+            return respond("Bu mail ayarı bulunamadı!", 201);
         }
 
         $obj->update([
-            "last" => 0
+            "last" => Carbon::now()->subDecade()->format("Y-m-d H:i:sO")
         ]);
 
         $job = (new CronEmailJob(

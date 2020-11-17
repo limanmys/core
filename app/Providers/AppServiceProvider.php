@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('USER_FAVORITES', user()->favorites());
         });
         Carbon::setLocale(app()->getLocale());
+        Carbon::setToStringFormat("Y-m-d H:i:sO");
         Notification::observe(NotificationObserver::class);
         AdminNotification::observe(AdminNotificationObserver::class);
         Relation::morphMap([
