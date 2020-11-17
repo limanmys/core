@@ -7,8 +7,10 @@ use App\Http\Controllers\MarketController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
-use App\Jobs\CronEmailCheckJob;
+use App\Models\CronMail;
+use App\Jobs\CronEmailJob;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Carbon\Carbon;
 
 class Kernel extends ConsoleKernel
 {
@@ -93,9 +95,43 @@ class Kernel extends ConsoleKernel
         // Mail System.
         $schedule
             ->call(function () {
-                $job = (new CronEmailCheckJob())->onQueue('cron_mail');
-
-                $job_id = app(Dispatcher::class)->dispatch($job);
+                $objects = CronMail::all();
+                foreach ($objects as $object) {
+                    $now = Carbon::now();
+                    $flag = false;
+                    switch ($object->cron_type) {
+                        case "hourly":
+                            $before = $now->subHour();
+                            if ($before->greaterThan($object->last)) {
+                                $flag = true;
+                            }
+                            break;
+                        case "daily":
+                            $before = $now->subDay();
+                            if ($before->greaterThan($object->last)) {
+                                $flag = true;
+                            }
+                            break;
+                        case "weekly":
+                            $before = $now->subWeek();
+                            if ($before->greaterThan($object->last)) {
+                                $flag = true;
+                            }
+                            break;
+                        case "monthly":
+                            $before = $now->subMonth();
+                            if ($before->greaterThan($object->last)) {
+                                $flag = true;
+                            }
+                            break;
+                    }
+                    if ($flag) {
+                        $job = (new CronEmailJob(
+                            $object
+                        ))->onQueue('cron_mail');
+                        app(Dispatcher::class)->dispatch($job);
+                    }
+                }
             })
             ->everyMinute()
             ->name('Mail Check');
