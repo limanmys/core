@@ -27,7 +27,6 @@ class AppServiceProvider extends ServiceProvider
             $view->with('USER_FAVORITES', user()->favorites());
         });
         Carbon::setLocale(app()->getLocale());
-        Carbon::setToStringFormat("Y-m-d H:i:sO");
         Notification::observe(NotificationObserver::class);
         AdminNotification::observe(AdminNotificationObserver::class);
         Relation::morphMap([

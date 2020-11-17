@@ -2,4 +2,4 @@ LOAD DATABASE
 	FROM sqlite:///liman/database/liman.sqlite
 	INTO postgresql:///liman
 WITH include drop, create tables, create indexes,quote identifiers
-CAST type datetime to timestamptz;
+CAST type datetime to timestamp;

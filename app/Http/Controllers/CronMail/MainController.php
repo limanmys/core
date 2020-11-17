@@ -38,7 +38,7 @@ class MainController extends Controller
     public function addCronMail()
     {
         $obj = new CronMail(request()->all());
-        $obj->last = Carbon::now()->subMonths(3);
+        $obj->last = Carbon::now()->subDecade();
         if ($obj->save()) {
             return respond("Mail ayarı başarıyla eklendi");
         } else {
@@ -128,7 +128,7 @@ class MainController extends Controller
         }
 
         $obj->update([
-            "last" => Carbon::now()->subDecade()->format("Y-m-d H:i:sO")
+            "last" => Carbon::now()->subDecade()
         ]);
 
         $job = (new CronEmailJob(

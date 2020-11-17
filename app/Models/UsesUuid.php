@@ -24,9 +24,4 @@ trait UsesUuid
     {
         return 'string';
     }
-
-    public function getDateFormat()
-    {
-        return 'Y-m-d H:i:sO';
-    }
 }

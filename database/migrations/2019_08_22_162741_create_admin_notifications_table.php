@@ -19,7 +19,7 @@ class CreateAdminNotificationsTable extends Migration
             $table->string("type");
             $table->string("message");
             $table->integer("level");
-            $table->boolean("read")->default("false");
+            $table->boolean("read")->default(false);
             $table->timestamps();
         });
     }

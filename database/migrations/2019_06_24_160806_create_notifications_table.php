@@ -37,7 +37,7 @@ class CreateNotificationsTable extends Migration
                 ->on("extensions")
                 ->onDelete("cascade");
             $table->integer("level");
-            $table->boolean("read")->default("false");
+            $table->boolean("read")->default(false);
             $table->timestamps();
         });
     }

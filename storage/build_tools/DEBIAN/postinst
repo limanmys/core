@@ -51,6 +51,8 @@ DB_EXISTS=$(sudo -u liman psql -lqt | cut -d \| -f 1 | grep "liman" >/dev/null 2
 
 # Database Creation
 if [ -f "/liman/database/liman.sqlite" ]; then
+    php /liman/server/artisan migrate --path=/liman/server/database/migrations/2020_11_17_134057_update_admin_notifications_table.php
+    php /liman/server/artisan migrate --path=/liman/server/database/migrations/2020_11_17_134154_update_notifications_table.php
     sudo -u postgres createuser liman
     sudo -u postgres createdb liman -O liman
     RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
