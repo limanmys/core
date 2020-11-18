@@ -14,7 +14,7 @@ class DeleteForeignFromPermissionsTable extends Migration
     public function up()
     {
         Schema::table('permissions', function (Blueprint $table) {
-            $table->dropForeign('permissions_morph_id_foreign');
+            $table->dropForeign('permissions_user_id_foreign');
         });
     }
 
