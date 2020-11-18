@@ -55,7 +55,6 @@ if [ -f "/liman/database/liman.sqlite" ]; then
     printf "\nDB_CONNECTION=sqlite\n" | tee -a /liman/server/.env
     php /liman/server/artisan migrate --path=database/migrations/2020_11_17_134057_update_admin_notifications_table.php --force
     php /liman/server/artisan migrate --path=database/migrations/2020_11_17_134154_update_notifications_table.php --force
-    php /liman/server/artisan migrate --path=database/migrations/2020_11_18_155520_delete_foreign_from_permissions_table.php --force
 
     sudo -u postgres createuser liman
     sudo -u postgres createdb liman -O liman
