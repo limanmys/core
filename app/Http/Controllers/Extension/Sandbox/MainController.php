@@ -161,11 +161,9 @@ class MainController extends Controller
 
     private function getNavigationServers()
     {
-        $navServers = DB::select(
-            "SELECT * FROM \"server_groups\" WHERE \"servers\" LIKE \"%" .
-                server()->id .
-                "%\""
-        );
+        $navServers = DB::table('server_groups')
+            ->where('servers', 'like', '%' . server()->id . '%')
+            ->get();
         $cleanServers = [];
         foreach ($navServers as $rawServers) {
             $servers = explode(",", $rawServers->servers);
