@@ -12,14 +12,15 @@ use App\Models\AdminNotification;
 class ExtensionDependenciesJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    private $extension,$dependencies;
+    private $extension;
+    private $dependencies;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($extension,$dependencies = "")
+    public function __construct($extension, $dependencies = "")
     {
         $this->extension = $extension;
         $this->dependencies = $dependencies;
@@ -37,16 +38,16 @@ class ExtensionDependenciesJob implements ShouldQueue
     {
         $package = $this->dependencies;
         $tmp = "/tmp/" . str_random(16);
-        $installCommand = "if [ -z '\$(find /var/cache/apt/pkgcache.bin -mmin -60)' ]; then sudo apt-get update; fi;DEBIAN_FRONTEND=noninteractive sudo apt-get install -o Dpkg::Use-Pty=0 -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' $package -qqy --allow >" . $tmp . " 2>&1";
+        $installCommand = "if [ -z '\$(find /var/cache/apt/pkgcache.bin -mmin -60)' ]; then sudo apt-get update; fi;DEBIAN_FRONTEND=noninteractive sudo apt-get install -o Dpkg::Use-Pty=0 -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' $package -qqy --force-yes >" . $tmp . " 2>&1";
         rootSystem()->runCommand($installCommand);
-        $checkCommand = "dpkg --get-selections | grep -v deinstall | awk '{print $1}' | grep -xE '" . str_replace(" ","|", $package) ."'";
+        $checkCommand = "dpkg --get-selections | grep -v deinstall | awk '{print $1}' | grep -xE '" . str_replace(" ", "|", $package) ."'";
         $installed = rootSystem()->runCommand($checkCommand);
-        $dep = explode(" ",$this->dependencies);
+        $dep = explode(" ", $this->dependencies);
         sort($dep);
-        $installed = explode("\n",trim($installed));
+        $installed = explode("\n", trim($installed));
         sort($installed);
 
-        if ($dep == $installed){
+        if ($dep == $installed) {
             $this->extension->update([
                 "status" => "1"
             ]);
@@ -61,7 +62,7 @@ class ExtensionDependenciesJob implements ShouldQueue
                     " eklentisinin bağımlılıkları başarıyla yüklendi, hemen kullanmaya başlayabilirsiniz.",
                 "level" => 3,
             ]);
-        }else{
+        } else {
             AdminNotification::create([
                 "title" =>
                     $this->extension->display_name . " eklentisi kurulamadı!",
