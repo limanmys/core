@@ -38,8 +38,8 @@
           <div class="info-box">
             <span class="info-box-icon bg-info"><i class="fas fa-cog"></i></span>
             <div class="info-box-content">
-              <span class="info-box-text">{{__("Limandaki Ayar Sayısı")}}</span>
-              <span class="info-box-number">{{$settings_count}}</span>
+              <span class="info-box-text">{{__("Liman Versiyonu")}}</span>
+              <span class="info-box-number">{{$version}}</span>
             </div>
           </div>
       </div>
