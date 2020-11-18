@@ -51,8 +51,12 @@ DB_EXISTS=$(sudo -u liman psql -lqt | cut -d \| -f 1 | grep "liman" >/dev/null 2
 
 # Database Creation
 if [ -f "/liman/database/liman.sqlite" ]; then
+    sed -i '/DB_CONNECTION/d' /liman/server/.env
+    printf "\nDB_CONNECTION=sqlite\n" | tee -a /liman/server/.env
     php /liman/server/artisan migrate --path=/liman/server/database/migrations/2020_11_17_134057_update_admin_notifications_table.php --force
     php /liman/server/artisan migrate --path=/liman/server/database/migrations/2020_11_17_134154_update_notifications_table.php --force
+    php /liman/server/artisan migrate --path=/liman/server/database/migrations/2020_11_18_155520_delete_foreign_from_permissions_table.php --force
+
     sudo -u postgres createuser liman
     sudo -u postgres createdb liman -O liman
     RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
@@ -61,6 +65,8 @@ if [ -f "/liman/database/liman.sqlite" ]; then
     printf "\nDB_PASSWORD=$RANDOM_PASSWORD\n" | tee -a /liman/server/.env
     sudo -u liman /usr/bin/pgloader /liman/server/storage/migration.load
     mv /liman/database/liman.sqlite /liman/database/liman.sqlite.bak
+    sed -i '/DB_CONNECTION/d' /liman/server/.env
+    printf "\nDB_CONNECTION=pgsql\n" | tee -a /liman/server/.env
 elif [ $DB_EXISTS == "0" ]; then
     sudo -u postgres createuser liman
     sudo -u postgres createdb liman -O liman
