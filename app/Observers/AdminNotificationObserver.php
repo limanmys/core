@@ -42,7 +42,7 @@ class AdminNotificationObserver
      */
     public function updated(AdminNotification $adminNotification)
     {
-        $this->sendBroadcast($adminNotification);
+        $this->sendBroadcast([]);
     }
 
     /**
@@ -53,7 +53,7 @@ class AdminNotificationObserver
      */
     public function deleted(AdminNotification $adminNotification)
     {
-        $this->sendBroadcast($adminNotification);
+        $this->sendBroadcast([]);
     }
 
     /**
@@ -64,7 +64,7 @@ class AdminNotificationObserver
      */
     public function restored(AdminNotification $adminNotification)
     {
-        $this->sendBroadcast($adminNotification);
+        $this->sendBroadcast([]);
     }
 
     /**
