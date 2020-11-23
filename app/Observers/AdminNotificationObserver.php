@@ -12,10 +12,13 @@ class AdminNotificationObserver
 {
     private function sendBroadcast($adminNotification)
     {
+        if (!$adminNotification) {
+            return;
+        }
         $adminUsers = User::where('status', 1)->get();
         foreach ($adminUsers as $user) {
             $user->notify(new NotificationSent($adminNotification));
-            if (env('MAIL_ENABLED') == true && $adminNotification->type == "external_notification"){
+            if (env('MAIL_ENABLED') == true && $adminNotification->type == "external_notification") {
                 Mail::to($user)->send(new BasicNotification($adminNotification));
             }
         }
@@ -39,7 +42,7 @@ class AdminNotificationObserver
      */
     public function updated(AdminNotification $adminNotification)
     {
-        $this->sendBroadcast([]);
+        $this->sendBroadcast($adminNotification);
     }
 
     /**
@@ -50,7 +53,7 @@ class AdminNotificationObserver
      */
     public function deleted(AdminNotification $adminNotification)
     {
-        $this->sendBroadcast([]);
+        $this->sendBroadcast($adminNotification);
     }
 
     /**
