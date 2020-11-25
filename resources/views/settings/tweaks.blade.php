@@ -70,6 +70,14 @@
                         <label for="MAIL_PASSWORD">{{__("Mail Parolası")}}</label><br>
                         <input type="password" class="form-control" id="MAIL_PASSWORD">
                     </div>
+                    <div class="form-group">
+                        <label for="MAIL_ENCRYPTION">{{__("Mail Şifreleme Methodu")}}</label><br>
+                        <select id="MAIL_ENCRYPTION" class="select2 liman_env">
+                            <option value="tls">{{__("TLS")}}</option>
+                            <option value="ssl">{{__("SSL")}}</option>
+                            <option value="null">{{__("Hiçbiri")}}</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="tab-pane fade" id="advanced" role="tabpanel" aria-labelledby="vert-tabs-settings-tab">

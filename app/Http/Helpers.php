@@ -382,7 +382,7 @@ if (!function_exists('adminNotifications')) {
     function adminNotifications()
     {
         return AdminNotification::where([
-            "read" => "false",
+            "read" => false,
         ])
             ->orderBy('updated_at', 'desc')
             ->get();
@@ -782,6 +782,7 @@ if (!function_exists('setEnv')) {
             return false;
         }
         shell_exec('php /liman/server/artisan config:clear');
+        shell_exec("sed -i -e :a -e '/^\n*$/{\$d;N;ba' -e '}' /liman/server/.env");
         return true;
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Mail\CronMail as CronMailObj;
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -46,10 +45,16 @@ class CronEmailJob implements ShouldQueue
      */
     public function handle()
     {
+        if (!$this->doubleCheckTime()) {
+            return;
+        }
         if ($this->obj->type == "extension") {
             $filePath = env("LOG_EXTENSION_PATH");
         } else {
             $filePath = env("LOG_PATH");
+        }
+        if (!is_file($filePath)) {
+            return;
         }
         $now = Carbon::now();
         switch ($this->obj->cron_type) {
@@ -121,5 +126,38 @@ class CronEmailJob implements ShouldQueue
             }
         }
         return $key;
+    }
+
+    public function doubleCheckTime()
+    {
+        $now = Carbon::now();
+        $flag = false;
+        switch ($this->obj->cron_type) {
+                case "hourly":
+                    $before = $now->subHour();
+                    if ($before->greaterThan($this->obj->last)) {
+                        $flag = true;
+                    }
+                    break;
+                case "daily":
+                    $before = $now->subDay();
+                    if ($before->greaterThan($this->obj->last)) {
+                        $flag = true;
+                    }
+                    break;
+                case "weekly":
+                    $before = $now->subWeek();
+                    if ($before->greaterThan($this->obj->last)) {
+                        $flag = true;
+                    }
+                    break;
+                case "monthly":
+                    $before = $now->subMonth();
+                    if ($before->greaterThan($this->obj->last)) {
+                        $flag = true;
+                    }
+                    break;
+        }
+        return $flag;
     }
 }

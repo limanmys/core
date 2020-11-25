@@ -9,6 +9,7 @@ use App\Models\Extension;
 use App\Models\Server;
 use App\User;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Carbon\Carbon;
 
 class MainController extends Controller
 {
@@ -37,7 +38,7 @@ class MainController extends Controller
     public function addCronMail()
     {
         $obj = new CronMail(request()->all());
-        $obj->last = 0;
+        $obj->last = Carbon::now()->subDecade();
         if ($obj->save()) {
             return respond("Mail ayarı başarıyla eklendi");
         } else {
@@ -123,11 +124,11 @@ class MainController extends Controller
         $obj = CronMail::find(request("cron_id"));
 
         if ($obj == null) {
-            return respond("Bu mail ayarı bulunamadı!");
+            return respond("Bu mail ayarı bulunamadı!", 201);
         }
 
         $obj->update([
-            "last" => 0
+            "last" => Carbon::now()->subDecade()
         ]);
 
         $job = (new CronEmailJob(

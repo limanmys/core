@@ -40,6 +40,14 @@
             "target" => "addLicenseToExtension",
             "icon" => " context-menu-icon-add"
         ],
+        "Bağımlılıkları Yükle" => [
+            "target" => "forceInstallDepencencies",
+            "icon" => "fa-box-open"
+        ],
+        "Zorla Aktifleştir" => [
+            "target" => "forceActivateExtension",
+            "icon" => "fa-check-double"
+        ],
         "Sil" => [
             "target" => "delete",
             "icon" => " context-menu-icon-delete"
@@ -58,6 +66,30 @@
         "extension_id:extension_id" => "extension_id:hidden"
     ],
     "submit_text" => "Ekle"
+])
+
+@include('modal',[
+    "id"=>"forceActivateExtension",
+    "title" => "Zorla Aktifleştir",
+    "text" => "Bu eklentiyi zorla aktifleştirmek istediğinize emin misiniz?",
+    "url" => route('extension_force_enable'),
+    "next" => "reload",
+    "inputs" => [
+        "extension_id:extension_id" => "extension_id:hidden"
+    ],
+    "submit_text" => "Aktifleştir"
+])
+
+@include('modal',[
+    "id"=>"forceInstallDepencencies",
+    "title" => "Bağımlılıkları Yükle",
+    "text" => "Bu eklentinin bağımlılıklarını tekrar yüklemek istediğinize emin misiniz?",
+    "url" => route('extension_force_dep_install'),
+    "next" => "reload",
+    "inputs" => [
+        "extension_id:extension_id" => "extension_id:hidden"
+    ],
+    "submit_text" => "Yükle"
 ])
 
 @include('modal',[
