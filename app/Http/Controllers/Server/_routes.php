@@ -5,7 +5,7 @@
 Route::get('/sunucular', 'Server\MainController@all')->name('servers');
 
 //Server IP Route
-Route::get('/sunucu/{server_id}', 'Server\MainController@oneData')->name('server_get_ip');
+Route::get('/sunucuDetayi/{server_id}', 'Server\MainController@oneData')->name('server_get_ip');
 
 // Add Server Route
 

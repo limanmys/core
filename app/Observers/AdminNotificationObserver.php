@@ -15,11 +15,12 @@ class AdminNotificationObserver
         $adminUsers = User::where('status', 1)->get();
         foreach ($adminUsers as $user) {
             $user->notify(new NotificationSent($adminNotification));
-            if (env('MAIL_ENABLED') == true && $adminNotification->type == "external_notification"){
+            if (env('MAIL_ENABLED') == true && $adminNotification && $adminNotification->type == "external_notification") {
                 Mail::to($user)->send(new BasicNotification($adminNotification));
             }
         }
     }
+
     /**
      * Handle the admin notification "created" event.
      *
@@ -61,7 +62,7 @@ class AdminNotificationObserver
      */
     public function restored(AdminNotification $adminNotification)
     {
-        $this->sendBroadcast($adminNotification);
+        $this->sendBroadcast([]);
     }
 
     /**
