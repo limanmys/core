@@ -12,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\CronMail;
 use App\Models\Server;
 use App\Models\Extension;
+use App\User;
 use Illuminate\Support\Facades\Mail;
 
 class CronEmailJob implements ShouldQueue
