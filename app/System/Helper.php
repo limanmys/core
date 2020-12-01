@@ -77,6 +77,9 @@ class Helper {
         $contents = $tmpPath;
         if(is_file($tmpPath)){
             $contents = file_get_contents($tmpPath);
+        }else{
+            $tmpPath = "/tmp/" . str_random(16);
+            file_put_contents($tmpPath,$contents);
         }
         $arr = [
             "certificate" => $contents,
