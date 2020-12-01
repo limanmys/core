@@ -3,10 +3,12 @@
 use App\Models\AdminNotification;
 use App\Models\Extension;
 use App\Models\Notification;
+use App\Models\SystemSettings;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\Certificate;
-use App\User;
+use App\Models\Liman;
+use App\Models\Module;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +21,120 @@ use Illuminate\Support\Str;
 use Jenssegers\Blade\Blade;
 use App\System\Helper;
 use mervick\aesEverywhere\AES256;
+use phpseclib\Crypt\RSA;
+
+if (!function_exists('updateSystemSettings')) {
+    function updateSystemSettings()
+    {
+        SystemSettings::updateOrCreate(
+            ['key' => 'APP_KEY'],
+            ['data' => env('APP_KEY')]
+        );
+
+        SystemSettings::updateOrCreate(
+            ['key' => 'LIMAN_RESTRICTED'],
+            ['data' => env('LIMAN_RESTRICTED',false)]
+        );
+
+        SystemSettings::updateOrCreate(
+            ['key' => 'SSL_PUBLIC_KEY'],
+            ['data' => file_get_contents("/liman/certs/liman.crt")]
+        );
+
+        SystemSettings::updateOrCreate(
+            ['key' => 'SSL_PRIVATE_KEY'],
+            ['data' => file_get_contents("/liman/certs/liman.key")]
+        );
+        $sshPublic = SystemSettings::where([
+            "key" => "SSH_PUBLIC"
+        ])->first();
+        if(!$sshPublic){
+            $rsa = new RSA();
+            $rsa->setPublicKeyFormat(RSA::PUBLIC_FORMAT_OPENSSH);
+            extract($rsa->createKey());
+            `mkdir -p /home/liman/.ssh`;
+            file_put_contents("/home/liman/.ssh/authorized_keys",$publickey);
+            file_put_contents("/home/liman/.ssh/liman_pub",$publickey);
+            file_put_contents("/home/liman/.ssh/liman_priv",$privatekey);
+            
+            chmod("/home/liman/.ssh/liman_pub",0600);
+            chmod("/home/liman/.ssh/liman_priv",0600);
+
+            SystemSettings::create([
+                "key" => "SSH_PUBLIC",
+                "data" => $publickey
+            ]);
+
+            SystemSettings::updateOrCreate(
+                ['key' => 'SSH_PRIVATE_KEY'],
+                ['data' => $privatekey]
+            );
+        }
+    }
+}
+
+if (!function_exists('receiveSystemSettings')) {
+    function receiveSystemSettings()
+    {
+        $app_key = SystemSettings::where([
+            "key" => "APP_KEY"
+        ])->first();
+
+        if($app_key){
+            setEnv([
+                "APP_KEY" => $app_key->data
+            ]);
+        }
+        
+        $restricted = SystemSettings::where([
+            "key" => "LIMAN_RESTRICTED"
+        ])->first();
+
+        if($restricted){
+            setEnv([
+                "LIMAN_RESTRICTED" => $restricted->data
+            ]);
+        }
+
+        $public_key = SystemSettings::where([
+            "key" => "SSL_PUBLIC_KEY"
+        ])->first();
+
+        if($public_key){
+            file_put_contents("/liman/certs/liman.crt",$public_key->data);
+        }
+
+        $private_key = SystemSettings::where([
+            "key" => "SSL_PRIVATE_KEY"
+        ])->first();
+
+        if($private_key){
+            file_put_contents("/liman/certs/liman.key",$private_key->data);
+        }
+
+        $sshPublic = SystemSettings::where([
+            "key" => "SSH_PUBLIC"
+        ])->first();
+
+        if ($sshPublic) {
+            `mkdir -p /home/liman/.ssh`;
+            file_put_contents("/home/liman/.ssh/authorized_keys",$sshPublic->data);
+            file_put_contents("/home/liman/.ssh/liman_pub",$sshPublic->data);            
+            chmod("/home/liman/.ssh/liman_pub",0600);
+        }
+
+        $sshPrivate = SystemSettings::where([
+            "key" => "SSH_PRIVATE_KEY"
+        ])->first();
+
+        if ($sshPrivate) {
+            `mkdir -p /home/liman/.ssh`;
+            file_put_contents("/home/liman/.ssh/liman_priv",$sshPrivate->data);            
+            chmod("/home/liman/.ssh/liman_priv",0600);
+        }
+
+    }
+}
 
 if (!function_exists('respond')) {
     /**
