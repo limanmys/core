@@ -188,6 +188,10 @@ if (!function_exists('syncFiles')) {
             array_push($names,strtolower($extension->name));
             $root->userAdd($extension->id);
             $root->fixExtensionPermissions($extension->id,$extension->name);
+            $json = getExtensionJson($extension->name);
+            if(array_key_exists("dependencies",$json) && $json["dependencies"] != ""){
+                $root->installPackages($json["dependencies"]);
+            }
         }
 
         $scan = scandir('/liman/extensions/');
