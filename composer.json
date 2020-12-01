@@ -7,9 +7,11 @@
     "require": {
         "php": "^7.3",
         "ext-json": "*",
+        "ext-ldap": "*",
         "ext-openssl": "*",
         "ext-posix": "*",
         "ext-snmp": "*",
+        "ext-ssh2": "*",
         "ext-xml": "*",
         "ext-zip": "*",
         "ankitpokhrel/tus-php": "^1.0",

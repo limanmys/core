@@ -2,7 +2,6 @@
 
 namespace App\System;
 
-use App\Models\SystemSettings;
 use GuzzleHttp\Client;
 
 class Helper {
@@ -61,51 +60,11 @@ class Helper {
         }catch(\Exception $e){
             return false;
         }
-
-        SystemSettings::updateOrCreate(
-            ['key' => 'SYSTEM_DNS'],
-            ['data' => json_encode([
-                $server1, $server2, $server3
-            ])]
-        );
-
         return true;
     }
 
     public function addCertificate($tmpPath, $targetName)
     {
-        $arr = [
-            "certificate" => file_get_contents($tmpPath),
-            "targetName" => $targetName
-        ];
-        
-        $current = SystemSettings::where("key", "SYSTEM_CERTIFICATES")->first();
-
-        if ($current) {
-            $foo = json_decode($current->data, true);
-            $flag = true;
-            for ($i = 0; $i < count($foo); $i++) {
-                if ($foo[$i]["targetName"] == $targetName) {
-                    $foo[$i]["certificate"] = $arr["certificate"];
-                    $flag = false;
-                    break;
-                }
-            }
-            
-            if ($flag) {
-                array_push($foo, $arr);
-            }
-            
-            $current->update([
-                "data" => json_encode($foo)
-            ]);
-        } else {
-            SystemSettings::create([
-                "key" => "SYSTEM_CERTIFICATES",
-                "data" => json_encode([$arr])
-            ]);
-        }
-
         try{
             $this->client->get('/certificateAdd',[
                 'query' => [
@@ -122,26 +81,6 @@ class Helper {
 
     public function removeCertificate($targetName)
     {
-        $arr = [
-            "targetName" => $targetName
-        ];
-        
-        $current = SystemSettings::where("key", "SYSTEM_CERTIFICATES")->first();
-
-        if ($current) {
-            $foo = json_decode($current->data, true);
-            for ($i = 0; $i < count($foo); $i++) {
-                if ($foo[$i]["targetName"] == $targetName) {
-                    unset($foo[$i]);
-                    $foo = array_values($foo);
-                    break;
-                }
-            }
-            $current->update([
-                "data" => $foo
-            ]);
-        }
-
         try{
             $this->client->get('/certificateRemove',[
                 'query' => [

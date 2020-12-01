@@ -3,7 +3,6 @@
 use App\User;
 use App\Models\Module;
 use App\Models\AdminNotification;
-use App\Models\Liman;
 use Illuminate\Support\Facades\Hash;
 
 Artisan::command('administrator', function () {
@@ -149,20 +148,3 @@ Artisan::command('module:remove {module_name}', function ($module_name) {
         $this->error("Modul silinemedi.$flag");
     }
 })->describe("Module remove");
-
-Artisan::command('register_liman', function () {
-    Liman::updateOrCreate([
-        "machine_id" => getLimanId()
-    ],[
-        "last_ip" => env("LIMAN_IP",trim(`hostname -I`)),
-        "rsync_password" => base64_encode(str_random())
-    ]);
-})->describe("Module remove");
-
-Artisan::command('update_settings', function () {
-    updateSystemSettings();
-})->describe("Update the system settings");
-
-Artisan::command('receive_settings', function () {
-    receiveSystemSettings();
-})->describe("Receive the system settings");
