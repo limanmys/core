@@ -74,8 +74,12 @@ class Helper {
 
     public function addCertificate($tmpPath, $targetName)
     {
+        $contents = $tmpPath;
+        if(is_file($tmpPath)){
+            $contents = file_get_contents($tmpPath);
+        }
         $arr = [
-            "certificate" => file_get_contents($tmpPath),
+            "certificate" => $contents,
             "targetName" => $targetName
         ];
         

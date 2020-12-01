@@ -3,7 +3,10 @@
 use App\User;
 use App\Models\Module;
 use App\Models\AdminNotification;
+use App\Models\Extension;
 use App\Models\Liman;
+use App\Models\SystemSettings;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 
 Artisan::command('administrator', function () {
@@ -166,3 +169,54 @@ Artisan::command('update_settings', function () {
 Artisan::command('receive_settings', function () {
     receiveSystemSettings();
 })->describe("Receive the system settings");
+
+Artisan::command('receive_settings', function () {
+    receiveSystemSettings();
+})->describe("Receive the system settings");
+
+Artisan::command('sync', function () {
+    receiveSystemSettings();
+
+    $masterIp = env('LIMAN_MASTER_IP');
+
+    if($masterIp == ""){
+        $firstLiman = Liman::first();
+        $masterIp = $firstLiman->last_ip;
+    }
+
+    $this->info("Dosyalar eşitleniyor, kaynak : " . $masterIp);
+
+    shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" . $masterIp . ":/liman/extensions/ /liman/extensions/");
+    shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" . $masterIp . ":/liman/keys/ /liman/keys/");
+    shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" . $masterIp . ":/liman/modules/ /liman/modules/");
+    
+    $root = rootSystem();
+    $extensions = Extension::all();
+    foreach($extensions as $extension){
+        $this->info($extension->name . " eklentisinin kullanıcısı oluşturuluyor, izinleri düzenleniyor.");
+        $root->userAdd($extension->id);
+        $root->fixExtensionPermissions($extension->id,$extension->name);
+    }
+    
+    $dns = SystemSettings::where([
+        "key" => "SYSTEM_DNS"
+    ])->first();
+    if($dns){
+        $json = json_decode($dns->data);
+        $root->dnsUpdate($json[0],$json[1],$json[2]);
+    }
+
+    $certificates = SystemSettings::where([
+        "key" => "SYSTEM_CERTIFICATES"
+    ])->first();
+    if($certificates){
+        $json = json_decode($certificates->data,true);
+        foreach($json as $cert){
+            if(is_file("/usr/local/share/ca-certificates/" . $cert["targetName"] . ".crt")){
+                continue;
+            }
+            $root->addCertificate($cert["certificate"],$cert["targetName"]);
+        }
+    }
+    
+})->describe("Sync everything");
