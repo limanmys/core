@@ -178,6 +178,21 @@ class Helper {
         return true;
     }
 
+    public function installPackages($packages)
+    {
+        try{
+            $this->client->get('/installPackages',[
+                'query' => [
+                    'liman_token' => $this->authKey,
+                    'packages' => $packages,
+                ]
+            ]);
+        }catch(\Exception $e){
+            return false;
+        }
+        return true;
+    }
+
     public function runCommand($command)
     {
         try{

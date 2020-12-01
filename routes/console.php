@@ -3,9 +3,7 @@
 use App\User;
 use App\Models\Module;
 use App\Models\AdminNotification;
-use App\Models\Extension;
 use App\Models\Liman;
-use App\Models\SystemSettings;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 
@@ -158,7 +156,6 @@ Artisan::command('register_liman', function () {
         "machine_id" => getLimanId()
     ],[
         "last_ip" => env("LIMAN_IP",trim(`hostname -I`)),
-        "rsync_password" => base64_encode(str_random())
     ]);
 })->describe("Module remove");
 
@@ -174,7 +171,8 @@ Artisan::command('receive_settings', function () {
     receiveSystemSettings();
 })->describe("Receive the system settings");
 
-Artisan::command('sync', function () {
+
+Artisan::command('sync_core', function () {
     if (trim(`id -u`) != "0") {
         $this->error("Bu komutu root olarak çalışmalısınız!");
         return;
@@ -186,62 +184,11 @@ Artisan::command('sync', function () {
         systemctl restart nginx;
         systemctl restart liman-render;
         systemctl restart liman-system;
+        systemctl restart liman-socket;
     `;
+})->describe("Sync core files.");
 
-    $masterIp = env('LIMAN_MASTER_IP');
 
-    if($masterIp == ""){
-        $firstLiman = Liman::first();
-        $masterIp = $firstLiman->last_ip;
-    }
-
-    $this->info("Dosyalar eşitleniyor, kaynak : " . $masterIp);
-
-    shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" . $masterIp . ":/liman/extensions/ /liman/extensions/");
-    shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" . $masterIp . ":/liman/keys/ /liman/keys/");
-    shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" . $masterIp . ":/liman/modules/ /liman/modules/");
-    
-    $root = rootSystem();
-    $extensions = Extension::all();
-    $names =[];
-
-    foreach($extensions as $extension){
-        array_push($names,strtolower($extension->name));
-        $this->info($extension->name . " eklentisinin kullanıcısı oluşturuluyor, izinleri düzenleniyor.");
-        $root->userAdd($extension->id);
-        $root->fixExtensionPermissions($extension->id,$extension->name);
-    }
-
-    $scan = scandir('/liman/extensions/');
-
-    foreach($scan as $a){
-        if(substr($a,0,1) == ".") {
-            continue;
-        }
-        if(!in_array($a,$names)){
-            `rm -rf /liman/extensions/$a`;
-        }
-    }
-
-    $dns = SystemSettings::where([
-        "key" => "SYSTEM_DNS"
-    ])->first();
-    if($dns){
-        $json = json_decode($dns->data);
-        $root->dnsUpdate($json[0],$json[1],$json[2]);
-    }
-
-    $certificates = SystemSettings::where([
-        "key" => "SYSTEM_CERTIFICATES"
-    ])->first();
-    if($certificates){
-        $json = json_decode($certificates->data,true);
-        foreach($json as $cert){
-            if(is_file("/usr/local/share/ca-certificates/" . $cert["targetName"] . ".crt")){
-                continue;
-            }
-            $root->addCertificate($cert["certificate"],$cert["targetName"]);
-        }
-    }
-    
-})->describe("Sync everything");
+Artisan::command('sync_safe', function () {
+    syncFiles();
+})->describe("Sync safe files without restarting");

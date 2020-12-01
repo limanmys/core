@@ -11,6 +11,6 @@ class Liman extends Model
     protected $table = "limans";
 
     protected $fillable = [
-        "machine_id" ,"last_ip", "rsync_password"
+        "machine_id" ,"last_ip"
     ];
 }

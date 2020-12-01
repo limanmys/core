@@ -166,6 +166,65 @@ if (!function_exists('respond')) {
     }
 }
 
+if (!function_exists('syncFiles')) {
+    function syncFiles()
+    {
+        $masterIp = env('LIMAN_MASTER_IP');
+
+        if($masterIp == ""){
+            $firstLiman = Liman::first();
+            $masterIp = $firstLiman->last_ip;
+        }
+
+        shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" . $masterIp . ":/liman/extensions/ /liman/extensions/");
+        shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" --exclude 'service.key' liman@" . $masterIp . ":/liman/keys/ /liman/keys/");
+        shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" . $masterIp . ":/liman/modules/ /liman/modules/");
+        
+        $root = rootSystem();
+        $extensions = Extension::all();
+        $names =[];
+
+        foreach($extensions as $extension){
+            array_push($names,strtolower($extension->name));
+            $root->userAdd($extension->id);
+            $root->fixExtensionPermissions($extension->id,$extension->name);
+        }
+
+        $scan = scandir('/liman/extensions/');
+
+        foreach($scan as $a){
+            if(substr($a,0,1) == ".") {
+                continue;
+            }
+            if(!in_array($a,$names)){
+                `rm -rf /liman/extensions/$a`;
+            }
+        }
+
+        $dns = SystemSettings::where([
+            "key" => "SYSTEM_DNS"
+        ])->first();
+        if($dns){
+            $json = json_decode($dns->data);
+            $root->dnsUpdate($json[0],$json[1],$json[2]);
+        }
+
+        $certificates = SystemSettings::where([
+            "key" => "SYSTEM_CERTIFICATES"
+        ])->first();
+        if($certificates){
+            $json = json_decode($certificates->data,true);
+            foreach($json as $cert){
+                if(is_file("/usr/local/share/ca-certificates/" . $cert["targetName"] . ".crt")){
+                    continue;
+                }
+                $root->addCertificate($cert["certificate"],$cert["targetName"]);
+            }
+        }
+    }
+}
+
+
 if (!function_exists('ip_in_range')) {
     function ip_in_range($ip, $range)
     {
