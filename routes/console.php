@@ -175,7 +175,18 @@ Artisan::command('receive_settings', function () {
 })->describe("Receive the system settings");
 
 Artisan::command('sync', function () {
+    if (trim(`id -u`) != "0") {
+        $this->error("Bu komutu root olarak çalışmalısınız!");
+        return;
+    }
+   
     receiveSystemSettings();
+
+    `
+        systemctl restart nginx;
+        systemctl restart liman-render;
+        systemctl restart liman-system;
+    `;
 
     $masterIp = env('LIMAN_MASTER_IP');
 
@@ -192,12 +203,26 @@ Artisan::command('sync', function () {
     
     $root = rootSystem();
     $extensions = Extension::all();
+    $names =[];
+
     foreach($extensions as $extension){
+        array_push($names,strtolower($extension->name));
         $this->info($extension->name . " eklentisinin kullanıcısı oluşturuluyor, izinleri düzenleniyor.");
         $root->userAdd($extension->id);
         $root->fixExtensionPermissions($extension->id,$extension->name);
     }
-    
+
+    $scan = scandir('/liman/extensions/');
+
+    foreach($scan as $a){
+        if(substr($a,0,1) == ".") {
+            continue;
+        }
+        if(!in_array($a,$names)){
+            `rm -rf /liman/extensions/$a`;
+        }
+    }
+
     $dns = SystemSettings::where([
         "key" => "SYSTEM_DNS"
     ])->first();

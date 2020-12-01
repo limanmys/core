@@ -9,6 +9,7 @@ use App\Models\Server;
 use App\Models\Certificate;
 use App\Models\Liman;
 use App\Models\Module;
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
@@ -898,7 +899,6 @@ if (!function_exists('setEnv')) {
             return false;
         }
         shell_exec('php /liman/server/artisan config:clear');
-        shell_exec("sed -i -e :a -e '/^\n*$/{\$d;N;ba' -e '}' /liman/server/.env");
         return true;
     }
 }
