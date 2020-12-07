@@ -136,6 +136,12 @@
                       <p>{{__("Bileşenler")}}</p>
                   </a>
               </li>
+              <li class="nav-item">
+                  <a href='/takip' class="nav-link">
+                      <i class="nav-icon fas fa-grip-horizontal"></i>
+                      <p>{{__("Sunucu Takibi")}}</p>
+                  </a>
+              </li>
             </ul>
           </nav>
           <!-- /.sidebar-menu -->

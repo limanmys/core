@@ -82,6 +82,14 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     Route::get('/kasa', 'UserController@userKeyList')->name('keys');
 
+    Route::get('/takip', 'ServerMonitorController@list')->name('monitor_list');
+
+    Route::post('/takip/sil', 'ServerMonitorController@remove')->name('monitor_remove');
+
+    Route::post('/takip/ekle', 'ServerMonitorController@add')->name('monitor_add');
+
+    Route::post('/takip/yenile', 'ServerMonitorController@refresh')->name('monitor_refresh');
+
     Route::post('/onbellek_temizle', 'UserController@cleanSessions')->name(
         'clean_sessions'
     );

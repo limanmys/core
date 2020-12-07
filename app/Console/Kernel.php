@@ -9,6 +9,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
 use App\Models\CronMail;
 use App\Jobs\CronEmailJob;
+use App\Models\MonitorServer;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Carbon\Carbon;
 
@@ -135,6 +136,21 @@ class Kernel extends ConsoleKernel
             })
             ->everyMinute()
             ->name('Mail Check');
+
+        // Server monitoring
+        $schedule
+            ->call(function () {
+                $servers = MonitorServer::all();
+                foreach($servers as $server){
+                    $online = checkPort($server->ip_address,$server->port);
+                    $server->update([
+                        "online" => $online,
+                        "last_checked" => Carbon::now()
+                    ]);
+                }
+            })
+            ->everyMinute()
+            ->name('Server Monitoring');
     }
 
     /**
