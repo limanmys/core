@@ -63,6 +63,7 @@ jobs:
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
         run: |
+          VERSION=$(cat package/liman/server/storage/VERSION)
           bash package/liman/server/storage/create_deb.sh
           ls -lah package.deb
           sha256sum package.deb
