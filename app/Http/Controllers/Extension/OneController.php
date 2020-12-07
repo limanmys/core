@@ -15,7 +15,6 @@ use Illuminate\Support\Str;
 use mervick\aesEverywhere\AES256;
 use GuzzleHttp\Client;
 use App\Models\Token;
-use App\Jobs\ExtensionDependenciesJob;
 use Illuminate\Contracts\Bus\Dispatcher;
 use App\Models\AdminNotification;
 
@@ -218,11 +217,6 @@ class OneController extends Controller
 
     public function forceDepInstall()
     {
-        $flag =extension()->update([
-            "status" => "0"
-        ]);
-        
-
         $file = file_get_contents("/liman/extensions/" .strtolower(extension()->name) . "/db.json");
         $json = json_decode($file,true);
         if(json_last_error() != JSON_ERROR_NONE){
@@ -230,30 +224,7 @@ class OneController extends Controller
         }
 
         if (array_key_exists("dependencies",$json) && $json["dependencies"] != ""){
-            $job = (new ExtensionDependenciesJob(
-                extension(),
-                $json["dependencies"]
-            ))->onQueue('system_updater');
-    
-            // Dispatch job right away.
-            $job_id = app(Dispatcher::class)->dispatch($job);$job = (new ExtensionDependenciesJob(
-                extension(),
-                $json["dependencies"]
-            ))->onQueue('system_updater');
-    
-            // Dispatch job right away.
-            $job_id = app(Dispatcher::class)->dispatch($job);
-
-            AdminNotification::create([
-                "title" =>
-                    extension()->display_name . " eklentisinin bağımlılıkları yükleniyor!",
-                "type" => "",
-                "message" =>
-                    extension()->display_name .
-                    " eklentisinin bağımlılıkları yükleniyor, bu süre içerisinde eklentiyi kullanamazsınız.",
-                "level" => 3,
-            ]);
-
+            rootSystem()->installPackages($json["dependencies"]);
             return respond("İşlem başlatıldı!");
         }else{
             return respond("Bu eklentinin hiçbir bağımlılığı yok!",201);

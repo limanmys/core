@@ -40,6 +40,14 @@ class Kernel extends ConsoleKernel
             ->dailyAt("23:59")
             ->name('Token Cleanup');
 
+        // Sync files.
+        $schedule
+            ->call(function () {
+                syncFiles();
+            })
+            ->everyFiveMinutes()
+            ->name('Sync extensions');
+
         // Run Health Check every hour.
         $schedule
             ->call(function () {

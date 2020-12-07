@@ -14,7 +14,6 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Validator;
 use App\Jobs\ExtensionUpdaterJob;
-use App\Jobs\ExtensionDependenciesJob;
 use Illuminate\Contracts\Bus\Dispatcher;
 use App\Models\AdminNotification;
 
@@ -229,27 +228,7 @@ class MainController extends Controller
         $new->save();
         
         if (array_key_exists("dependencies", $json) && $json["dependencies"] != "") {
-            $job = (new ExtensionDependenciesJob(
-                $new,
-                $json["dependencies"]
-            ))->onQueue('system_updater');
-    
-            // Dispatch job right away.
-            $job_id = app(Dispatcher::class)->dispatch($job);
-
-            AdminNotification::create([
-                "title" =>
-                    $new->display_name . " eklentisinin bağımlılıkları yükleniyor!",
-                "type" => "",
-                "message" =>
-                    $new->display_name .
-                    " eklentisinin bağımlılıkları yükleniyor, bu süre içerisinde eklentiyi kullanamazsınız.",
-                "level" => 3,
-            ]);
-            $new->update([
-                "status" == "0"
-            ]);
-            $new->save();
+            rootSystem()->installPackages($json["dependencies"]);
         }
 
         $system = rootSystem();
