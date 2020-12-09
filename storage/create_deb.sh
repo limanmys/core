@@ -28,7 +28,7 @@ chmod 775 DEBIAN/preinst
 chmod 775 DEBIAN/postinst
 
 echo """Package: liman
-Version: $VERSION-$GITHUB_RUN_NUMBER
+Version: $VERSION-$1
 Installed-Size: 77892
 Maintainer: Mert CELEN <mcelen@havelsan.com.tr>
 Section: admin

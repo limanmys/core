@@ -17,7 +17,7 @@
 <nav class="main-header navbar navbar-expand navbar-dark" style="height:58.86px;border:0px;"> <!-- exactly 58.86 :) -->
 <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#" onclick="request('{{route('set_collapse')}}',new FormData(),null)"><i class="fas fa-bars"></i></a>
+            <a class="nav-link" data-widget="pushmenu" href="#" onclick="collapseNav()"><i class="fas fa-bars"></i></a>
           </li>
           <li class="nav-item">
             <a class="nav-link" onclick="toggleDarkMode()"><i id="darkModeIcon" class="fas fa-sun"></i></a>
@@ -27,7 +27,17 @@
 	if(typeof currentlyDark != "undefined" && currentlyDark == true){
 		setDarkMode();
 	}
+
+  function collapseNav(){
+    $("#limanLogo").toggleClass("specialLogoMargin");
+    request('{{route('set_collapse')}}',new FormData(),null);
+  }
 </script>
+<style>
+  .specialLogoMargin{
+    margin-left: -0.75rem;
+  }
+</style>
         </ul>
 @if(request('server') != null)
 <ul class="mx-auto order-0 navbar-nav text-white">
