@@ -22,14 +22,12 @@ jobs:
           repository: limanmys/php-sandbox
           path: package/liman/sandbox/php
           token: ${{ secrets.CI_TOKEN }}
-          ref: "1.5-dev"
       - name: Getting Liman' Render Engine
         uses: actions/checkout@v2
         with:
           repository: limanmys/go
           path: render_engine
           token: ${{ secrets.CI_TOKEN }}
-          ref: "postgresql"
       - uses: actions/cache@v2
         with:
           path: ~/.npm
