@@ -1,0 +1,3 @@
+[submodule "storage/extension_templates"]
+	path = storage/extension_templates
+	url = https://github.com/limanmys/extension_templates

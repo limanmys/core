@@ -3,10 +3,13 @@
 use App\Models\AdminNotification;
 use App\Models\Extension;
 use App\Models\Notification;
+use App\Models\SystemSettings;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\Certificate;
+use App\Models\Liman;
 use App\Models\Module;
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +22,120 @@ use Illuminate\Support\Str;
 use Jenssegers\Blade\Blade;
 use App\System\Helper;
 use mervick\aesEverywhere\AES256;
+use phpseclib\Crypt\RSA;
+
+if (!function_exists('updateSystemSettings')) {
+    function updateSystemSettings()
+    {
+        SystemSettings::updateOrCreate(
+            ['key' => 'APP_KEY'],
+            ['data' => env('APP_KEY')]
+        );
+
+        SystemSettings::updateOrCreate(
+            ['key' => 'LIMAN_RESTRICTED'],
+            ['data' => env('LIMAN_RESTRICTED',false)]
+        );
+
+        SystemSettings::updateOrCreate(
+            ['key' => 'SSL_PUBLIC_KEY'],
+            ['data' => file_get_contents("/liman/certs/liman.crt")]
+        );
+
+        SystemSettings::updateOrCreate(
+            ['key' => 'SSL_PRIVATE_KEY'],
+            ['data' => file_get_contents("/liman/certs/liman.key")]
+        );
+        $sshPublic = SystemSettings::where([
+            "key" => "SSH_PUBLIC"
+        ])->first();
+        if(!$sshPublic){
+            $rsa = new RSA();
+            $rsa->setPublicKeyFormat(RSA::PUBLIC_FORMAT_OPENSSH);
+            extract($rsa->createKey());
+            `mkdir -p /home/liman/.ssh`;
+            file_put_contents("/home/liman/.ssh/authorized_keys",$publickey);
+            file_put_contents("/home/liman/.ssh/liman_pub",$publickey);
+            file_put_contents("/home/liman/.ssh/liman_priv",$privatekey);
+            
+            chmod("/home/liman/.ssh/liman_pub",0600);
+            chmod("/home/liman/.ssh/liman_priv",0600);
+
+            SystemSettings::create([
+                "key" => "SSH_PUBLIC",
+                "data" => $publickey
+            ]);
+
+            SystemSettings::updateOrCreate(
+                ['key' => 'SSH_PRIVATE_KEY'],
+                ['data' => $privatekey]
+            );
+        }
+    }
+}
+
+if (!function_exists('receiveSystemSettings')) {
+    function receiveSystemSettings()
+    {
+        $app_key = SystemSettings::where([
+            "key" => "APP_KEY"
+        ])->first();
+
+        if($app_key){
+            setEnv([
+                "APP_KEY" => $app_key->data
+            ]);
+        }
+        
+        $restricted = SystemSettings::where([
+            "key" => "LIMAN_RESTRICTED"
+        ])->first();
+
+        if($restricted){
+            setEnv([
+                "LIMAN_RESTRICTED" => $restricted->data
+            ]);
+        }
+
+        $public_key = SystemSettings::where([
+            "key" => "SSL_PUBLIC_KEY"
+        ])->first();
+
+        if($public_key){
+            file_put_contents("/liman/certs/liman.crt",$public_key->data);
+        }
+
+        $private_key = SystemSettings::where([
+            "key" => "SSL_PRIVATE_KEY"
+        ])->first();
+
+        if($private_key){
+            file_put_contents("/liman/certs/liman.key",$private_key->data);
+        }
+
+        $sshPublic = SystemSettings::where([
+            "key" => "SSH_PUBLIC"
+        ])->first();
+
+        if ($sshPublic) {
+            `mkdir -p /home/liman/.ssh`;
+            file_put_contents("/home/liman/.ssh/authorized_keys",$sshPublic->data);
+            file_put_contents("/home/liman/.ssh/liman_pub",$sshPublic->data);            
+            chmod("/home/liman/.ssh/liman_pub",0600);
+        }
+
+        $sshPrivate = SystemSettings::where([
+            "key" => "SSH_PRIVATE_KEY"
+        ])->first();
+
+        if ($sshPrivate) {
+            `mkdir -p /home/liman/.ssh`;
+            file_put_contents("/home/liman/.ssh/liman_priv",$sshPrivate->data);            
+            chmod("/home/liman/.ssh/liman_priv",0600);
+        }
+
+    }
+}
 
 if (!function_exists('respond')) {
     /**
@@ -48,6 +165,69 @@ if (!function_exists('respond')) {
         }
     }
 }
+
+if (!function_exists('syncFiles')) {
+    function syncFiles()
+    {
+        $masterIp = env('LIMAN_MASTER_IP');
+
+        if($masterIp == ""){
+            $firstLiman = Liman::first();
+            $masterIp = $firstLiman->last_ip;
+        }
+
+        shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" . $masterIp . ":/liman/extensions/ /liman/extensions/");
+        shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" --exclude 'service.key' liman@" . $masterIp . ":/liman/keys/ /liman/keys/");
+        shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" . $masterIp . ":/liman/modules/ /liman/modules/");
+        
+        $root = rootSystem();
+        $extensions = Extension::all();
+        $names =[];
+
+        foreach($extensions as $extension){
+            array_push($names,strtolower($extension->name));
+            $root->userAdd($extension->id);
+            $root->fixExtensionPermissions($extension->id,$extension->name);
+            $json = getExtensionJson($extension->name);
+            if(array_key_exists("dependencies",$json) && $json["dependencies"] != ""){
+                $root->installPackages($json["dependencies"]);
+            }
+        }
+
+        $scan = scandir('/liman/extensions/');
+
+        foreach($scan as $a){
+            if(substr($a,0,1) == ".") {
+                continue;
+            }
+            if(!in_array($a,$names)){
+                `rm -rf /liman/extensions/$a`;
+            }
+        }
+
+        $dns = SystemSettings::where([
+            "key" => "SYSTEM_DNS"
+        ])->first();
+        if($dns){
+            $json = json_decode($dns->data);
+            $root->dnsUpdate($json[0],$json[1],$json[2]);
+        }
+
+        $certificates = SystemSettings::where([
+            "key" => "SYSTEM_CERTIFICATES"
+        ])->first();
+        if($certificates){
+            $json = json_decode($certificates->data,true);
+            foreach($json as $cert){
+                if(is_file("/usr/local/share/ca-certificates/" . $cert["targetName"] . ".crt")){
+                    continue;
+                }
+                $root->addCertificate($cert["certificate"],$cert["targetName"]);
+            }
+        }
+    }
+}
+
 
 if (!function_exists('ip_in_range')) {
     function ip_in_range($ip, $range)
@@ -88,6 +268,13 @@ if (!function_exists('rootSystem')) {
     function rootSystem()
     {
         return new Helper();
+    }
+}
+
+if (!function_exists('users')) {
+    function users()
+    {
+        return User::all();
     }
 }
 
@@ -375,7 +562,7 @@ if (!function_exists('adminNotifications')) {
     function adminNotifications()
     {
         return AdminNotification::where([
-            "read" => "false",
+            "read" => false,
         ])
             ->orderBy('updated_at', 'desc')
             ->get();
@@ -920,6 +1107,14 @@ if (!function_exists('endsWith')) {
             return true;
         }
         return substr($string, -$len) === $endString;
+    }
+}
+
+if (!function_exists('fetchExtensionTemplates')) {
+    function fetchExtensionTemplates()
+    {
+        $path = storage_path('extension_templates/templates.json');
+        return json_decode(file_get_contents($path));
     }
 }
 

@@ -15,6 +15,8 @@ use Illuminate\Support\Str;
 use mervick\aesEverywhere\AES256;
 use GuzzleHttp\Client;
 use App\Models\Token;
+use Illuminate\Contracts\Bus\Dispatcher;
+use App\Models\AdminNotification;
 
 /**
  * Class OneController
@@ -198,6 +200,35 @@ class OneController extends Controller
             'similar' => $similar,
             'extensionDb' => extensionDb(),
         ]);
+    }
+
+    public function forceEnableExtension()
+    {
+        $flag =extension()->update([
+            "status" => "1"
+        ]);
+
+        if($flag){
+            return respond("Eklenti başarıyla aktifleştirildi!");
+        }else{
+            return respond("Eklenti aktifleştirilirken bir hata oluştu!",201);
+        }
+    }
+
+    public function forceDepInstall()
+    {
+        $file = file_get_contents("/liman/extensions/" .strtolower(extension()->name) . "/db.json");
+        $json = json_decode($file,true);
+        if(json_last_error() != JSON_ERROR_NONE){
+            return respond("Eklenti dosyası okunurken bir hata oluştu!",201);
+        }
+
+        if (array_key_exists("dependencies",$json) && $json["dependencies"] != ""){
+            rootSystem()->installPackages($json["dependencies"]);
+            return respond("İşlem başlatıldı!");
+        }else{
+            return respond("Bu eklentinin hiçbir bağımlılığı yok!",201);
+        }
     }
 
     /**

@@ -40,6 +40,9 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     require_once app_path('Http/Controllers/Roles/_routes.php');
 
+    // Cron Mail Routes
+    require_once app_path('Http/Controllers/CronMail/__routes.php');
+
     // Internal Sandbox Routes
 
     require_once app_path('Http/Controllers/Extension/Sandbox/_routes.php');
@@ -79,6 +82,14 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     Route::get('/kasa', 'UserController@userKeyList')->name('keys');
 
+    Route::get('/takip', 'ServerMonitorController@list')->name('monitor_list');
+
+    Route::post('/takip/sil', 'ServerMonitorController@remove')->name('monitor_remove');
+
+    Route::post('/takip/ekle', 'ServerMonitorController@add')->name('monitor_add');
+
+    Route::post('/takip/yenile', 'ServerMonitorController@refresh')->name('monitor_refresh');
+
     Route::post('/onbellek_temizle', 'UserController@cleanSessions')->name(
         'clean_sessions'
     );
@@ -93,10 +104,6 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
     // Send LimanRequest Route
 
     Route::post('/talep', 'HomeController@request')->name('request_send');
-
-    // Search Page
-
-    Route::post('/arama/', 'SearchController@index')->name('search');
 
     // User Add
     Route::post('/kullanici/ekle', 'UserController@add')

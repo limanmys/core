@@ -9,7 +9,7 @@
             <h5>{{env("BRAND_NAME")}}</h5>
         </div>
         <div class="card">
-            <div class="card-body login-card-body">
+            <div class="card-body">
                 @if ($errors->count() > 0 )
                     <div class="alert alert-danger">
                         {{$errors->first()}}
@@ -30,7 +30,7 @@
                     <div class="input-group mb-3">
                         <input type="text" name="liman_email_mert" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" placeholder="{{__("Email Adresi")}}" value="{{ old('liman_email_mert') }}" required>
                         <div class="input-group-append">
-                            <div class="input-group-text">
+                            <div class="input-group-text" style="max-width:40px;">
                                 <span class="fas fa-envelope"></span>
                             </div>
                         </div>
@@ -38,7 +38,7 @@
                     <div class="input-group mb-3">
                         <input type="password" name="liman_password_baran" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" placeholder="Parola">
                         <div class="input-group-append">
-                            <div class="input-group-text">
+                            <div class="input-group-text" style="max-width:40px;">
                             <span class="fas fa-lock"></span>
                             </div>
                         </div>
@@ -60,22 +60,7 @@
             </div>
         </div>
         <center>
-        <div class="row">
-        <!-- Space for new icons -->
-            <div class="col-md-2"></div>
-            <div class="col-md-2"></div>
-            <div class="col-md-2">
-                <a href="https://www.github.com/limanmys" target="_blank"><i class="fab fa-github" style="color:white;font-size:50px;"></i></a>
-            </div>
-            <div class="col-md-2">
-                <a href="https://discord.gg/RMBFABn" target="_blank"><i class="fab fa-discord" style="color:white;font-size:50px;"></i></a>
-            </div>
-        <!-- Space for new icons -->
-            <div class="col-md-2"></div>
-            <div class="col-md-2"></div>
-        </div><br>
         <a href="https://liman.havelsan.com.tr" target="_blank"><img src="/images/havelsan-aciklab.png" height="50"></a></center>
-
     </div>
     <style>
         .login-page, .card-body {

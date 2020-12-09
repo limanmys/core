@@ -31,7 +31,7 @@ class HomeController extends Controller
      * @apiSuccess {Integer} server_count Count of the servers in Liman.
      * @apiSuccess {Integer} extension_count Count of the extensions in Liman.
      * @apiSuccess {Integer} user_count Count of the users in Liman.
-     * @apiSuccess {Integer} settings_count Count of the settings in Liman.
+     * @apiSuccess {Integer} version Liman Version.
      */
 
     public function index()
@@ -52,7 +52,7 @@ class HomeController extends Controller
             "server_count" => Server::all()->count(),
             "extension_count" => Extension::all()->count(),
             "user_count" => User::all()->count(),
-            "settings_count" => UserSettings::all()->count(),
+            "version" => getVersion() . " - " . getVersionCode(),
         ]);
     }
 

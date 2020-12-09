@@ -3,12 +3,15 @@
 namespace App\Console;
 
 use App\Models\AdminNotification;
-use App\Models\Notification;
-use App\User;
 use App\Http\Controllers\MarketController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
+use App\Models\CronMail;
+use App\Jobs\CronEmailJob;
+use App\Models\MonitorServer;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Carbon\Carbon;
 
 class Kernel extends ConsoleKernel
 {
@@ -36,6 +39,14 @@ class Kernel extends ConsoleKernel
             })
             ->dailyAt("23:59")
             ->name('Token Cleanup');
+
+        // Sync files.
+        $schedule
+            ->call(function () {
+                syncFiles();
+            })
+            ->everyFiveMinutes()
+            ->name('Sync extensions');
 
         // Run Health Check every hour.
         $schedule
@@ -89,6 +100,65 @@ class Kernel extends ConsoleKernel
             })
             ->hourly()
             ->name('Update Check');
+
+        // Mail System.
+        $schedule
+            ->call(function () {
+                $objects = CronMail::all();
+                foreach ($objects as $object) {
+                    $now = Carbon::now();
+                    $flag = false;
+                    switch ($object->cron_type) {
+                        case "hourly":
+                            $before = $now->subHour();
+                            if ($before->greaterThan($object->last)) {
+                                $flag = true;
+                            }
+                            break;
+                        case "daily":
+                            $before = $now->subDay();
+                            if ($before->greaterThan($object->last)) {
+                                $flag = true;
+                            }
+                            break;
+                        case "weekly":
+                            $before = $now->subWeek();
+                            if ($before->greaterThan($object->last)) {
+                                $flag = true;
+                            }
+                            break;
+                        case "monthly":
+                            $before = $now->subMonth();
+                            if ($before->greaterThan($object->last)) {
+                                $flag = true;
+                            }
+                            break;
+                    }
+                    if ($flag) {
+                        $job = (new CronEmailJob(
+                            $object
+                        ))->onQueue('cron_mail');
+                        app(Dispatcher::class)->dispatch($job);
+                    }
+                }
+            })
+            ->everyMinute()
+            ->name('Mail Check');
+
+        // Server monitoring
+        $schedule
+            ->call(function () {
+                $servers = MonitorServer::all();
+                foreach($servers as $server){
+                    $online = checkPort($server->ip_address,$server->port);
+                    $server->update([
+                        "online" => $online,
+                        "last_checked" => Carbon::now()
+                    ]);
+                }
+            })
+            ->everyMinute()
+            ->name('Server Monitoring');
     }
 
     /**

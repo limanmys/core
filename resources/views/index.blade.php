@@ -2,6 +2,10 @@
 
 @section('content')
     @include('errors')
+    <br><div class="callout callout-info">
+        <h5>{{__("Liman MYS'ye Hoşgeldiniz")}}</h5>
+        {{__("Kullanım rehberine ulaşmak için")}} <a href="https://rehber.liman.dev/" target="_blank">https://rehber.liman.dev/</a> {{__("adresini ziyaret edebilirsiniz.")}}
+    </div>
     <div class="row" style="padding-top: 15px;">
       <div class="col-md-3 col-sm-4 col-xs-12">
           <div class="info-box">
@@ -34,8 +38,8 @@
           <div class="info-box">
             <span class="info-box-icon bg-info"><i class="fas fa-cog"></i></span>
             <div class="info-box-content">
-              <span class="info-box-text">{{__("Limandaki Ayar Sayısı")}}</span>
-              <span class="info-box-number">{{$settings_count}}</span>
+              <span class="info-box-text">{{__("Liman Versiyonu")}}</span>
+              <span class="info-box-number">{{$version}}</span>
             </div>
           </div>
       </div>
@@ -248,8 +252,9 @@
                   info_box.find('.overlay').remove();
                 } catch(e) {
                   info_box.find('.overlay i').remove();
+                  info_box.find('.overlay .spinner-border').remove();
                   info_box.find('.overlay span').remove();
-                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+e.message+'</span>');
+                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip("Bir Hata Oluştu!")+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+"Bir Hata Oluştu!"+'</span>');
                 }
                 if(next){
                   next();
@@ -264,7 +269,7 @@
                 info_box.find('.overlay .spinner-border').remove();
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
-                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+json.message+'</span>');
+                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip("Bir Hata Oluştu!")+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+"Bir Hata Oluştu!"+'</span>');
                 if(next){
                   next();
                 }
@@ -286,7 +291,7 @@
                   element.find('.overlay .spinner-border').remove();
                   element.find('.overlay i').remove();
                   element.find('.overlay span').remove();
-                  element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(e.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+e.message+'</span>');
+                  element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip("Bir Hata Oluştu!")+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+"Bir Hata Oluştu!"+'</span>');
                 }
                 if(next){
                   next();
@@ -301,7 +306,7 @@
                 element.find('.overlay .spinner-border').remove();
                 element.find('.overlay i').remove();
                 element.find('.overlay span').remove();
-                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip(json.message)+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+json.message+'</span>');
+                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip("Bir Hata Oluştu!")+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+"Bir Hata Oluştu!"+'</span>');
                 if(next){
                   next();
                 }
@@ -316,9 +321,9 @@
         }
 
         function API(target)
-    {
-        return "{{route('home')}}/extensionRun/" + target;
-    }
+        {
+            return "{{route('home')}}/extensionRun/" + target;
+        }
 
         function createChart(element, labels, data) {
           $("#" + element + ' .overlay').remove();

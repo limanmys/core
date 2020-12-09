@@ -8,7 +8,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\BadResponseException;
 use App\Models\AdminNotification;
 
 class LimanUpdaterJob implements ShouldQueue

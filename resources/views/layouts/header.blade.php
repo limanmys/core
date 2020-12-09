@@ -3,7 +3,7 @@
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="/" class="brand-link">
-            <img src="/images/limanlogo.png" height="30" style="opacity: .8;margin-left: 0.3rem;cursor:pointer;" title="Versiyon {{getVersion() . ' Build : ' . getVersionCode()}}">
+            <img class="specialLogoMargin" id="limanLogo" src="/images/limanlogo.png" height="30" style="opacity: .8;cursor:pointer;" title="Versiyon {{getVersion() . ' Build : ' . getVersionCode()}}">
         </a>
         <!-- Sidebar -->
         <div class="sidebar">  
@@ -134,6 +134,12 @@
                   <a href='/bilesenler' class="nav-link">
                       <i class="nav-icon fas fa-chart-pie"></i>
                       <p>{{__("Bileşenler")}}</p>
+                  </a>
+              </li>
+              <li class="nav-item">
+                  <a href='/takip' class="nav-link">
+                      <i class="nav-icon fas fa-grip-horizontal"></i>
+                      <p>{{__("Sunucu Takibi")}}</p>
                   </a>
               </li>
             </ul>

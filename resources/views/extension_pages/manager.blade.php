@@ -40,6 +40,14 @@
             "target" => "addLicenseToExtension",
             "icon" => " context-menu-icon-add"
         ],
+        "Bağımlılıkları Yükle" => [
+            "target" => "forceInstallDepencencies",
+            "icon" => "fa-box-open"
+        ],
+        "Zorla Aktifleştir" => [
+            "target" => "forceActivateExtension",
+            "icon" => "fa-check-double"
+        ],
         "Sil" => [
             "target" => "delete",
             "icon" => " context-menu-icon-delete"
@@ -58,6 +66,30 @@
         "extension_id:extension_id" => "extension_id:hidden"
     ],
     "submit_text" => "Ekle"
+])
+
+@include('modal',[
+    "id"=>"forceActivateExtension",
+    "title" => "Zorla Aktifleştir",
+    "text" => "Bu eklentiyi zorla aktifleştirmek istediğinize emin misiniz?",
+    "url" => route('extension_force_enable'),
+    "next" => "reload",
+    "inputs" => [
+        "extension_id:extension_id" => "extension_id:hidden"
+    ],
+    "submit_text" => "Aktifleştir"
+])
+
+@include('modal',[
+    "id"=>"forceInstallDepencencies",
+    "title" => "Bağımlılıkları Yükle",
+    "text" => "Bu eklentinin bağımlılıklarını tekrar yüklemek istediğinize emin misiniz?",
+    "url" => route('extension_force_dep_install'),
+    "next" => "reload",
+    "inputs" => [
+        "extension_id:extension_id" => "extension_id:hidden"
+    ],
+    "submit_text" => "Yükle"
 ])
 
 @include('modal',[
@@ -131,25 +163,27 @@ foreach ($extensions as $extension) {
     "submit_text" => "İndir"
 ])
 
+@php
+    $templates = fetchExtensionTemplates();
+@endphp
 
 @include('modal',[
     "id"=>"newExtension",
     "url" => route('extension_new'),
     "next" => "debug",
     "title" => "Yeni Eklenti Oluştur",
-    "selects" => [
-    "PHP 7.3:php" => [
-        "-:php" => "language:hidden"
-    ],
-    /*"Python 3.7(BETA):python" => [
-        "-:python" => "language:hidden"
-    ]*/
-    ],
     "inputs" => [
         "Eklenti Adı" => "name:text",
+        "Tipi:template" => collect($templates->templates)->mapWithKeys(function($value, $key){
+            return [$value => $key];
+        })->toArray()
     ],
     "submit_text" => "Oluştur"
 ])
+<script>
+    $('#newExtension').find('select[name=template]').val('{{ $templates->default }}');
+</script>
+
 @endif
 
 @include('modal',[

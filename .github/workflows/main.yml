@@ -10,13 +10,26 @@ jobs:
         with:
           path: package/liman/server
 
+      - name: Getting Liman' Extension Templates
+        uses: actions/checkout@v2
+        with:
+          repository: limanmys/extension_templates
+          path: package/liman/server/storage/extension_templates
+          token: ${{ secrets.CI_TOKEN }}
       - name: Getting Liman' PHP Sandbox
         uses: actions/checkout@v2
         with:
           repository: limanmys/php-sandbox
           path: package/liman/sandbox/php
           token: ${{ secrets.CI_TOKEN }}
-
+          ref: "1.5-dev"
+      - name: Getting Liman' Render Engine
+        uses: actions/checkout@v2
+        with:
+          repository: limanmys/go
+          path: render_engine
+          token: ${{ secrets.CI_TOKEN }}
+          ref: "postgresql"
       - uses: actions/cache@v2
         with:
           path: ~/.npm
@@ -50,45 +63,10 @@ jobs:
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
         run: |
-          DEBIAN_FRONTEND=noninteractive sudo apt install jq -y 1>/dev/null 2>/dev/null
-          VERSION=`cat package/liman/server/storage/VERSION`
-          echo $GITHUB_RUN_NUMBER > package/liman/server/storage/VERSION_CODE
-          COMMIT="${GITHUB_REF#refs/heads/} : "
-          COMMIT+=`git --git-dir=package/liman/server/.git log -1 --pretty=%B`
-          COMMIT=`echo $COMMIT | jq -SrR @uri`
-          DATE=$(date)
-          composer install --no-dev -d package/liman/server
-          git --git-dir=package/liman/server/.git log -30 --pretty=format:"%s%x09%ad" > package/liman/server/storage/changelog
-          rm -rf package/liman/server/.git package/liman/sandbox/php/.git
-          rm -rf package/liman/webssh/.git
-          rm -rf package/liman/server/node_modules
-          mv package/liman/server/storage/build_tools/DEBIAN package/
-          rm -rf package/liman/server/storage/build_tools
-          cd package
-          touch DEBIAN/md5sums
-          touch DEBIAN/md5sums
-          touch DEBIAN/control
-
-          find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum  1>/dev/null 2>/dev/null || true
-          find . \( -name ".git" -o -name ".gitignore" -o -name ".gitmodules" -o -name ".gitattributes" \) -exec rm -rf -- {} + 1>/dev/null 2>/dev/null || true
-          
-          chmod 775 DEBIAN/preinst
-          chmod 775 DEBIAN/postinst
-
-          echo """Package: liman
-          Version: $VERSION-$GITHUB_RUN_NUMBER
-          Installed-Size: 77892
-          Maintainer: Mert CELEN <mcelen@havelsan.com.tr>
-          Section: admin
-          Date : $DATE
-          Architecture: amd64
-          Priority: important
-          Description: Liman MYS
-          Depends: gpg, zip, unzip, nginx, redis, php-redis, php7.3-fpm, php7.3-curl, php7.3, php7.3-sqlite3, php7.3-snmp, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-posix, libnginx-mod-http-headers-more-filter, libssl1.1, supervisor
-          """ > DEBIAN/control
-          cd ../
-          dpkg-deb -Zgzip --build package
-          ls -lah
+          VERSION=$(cat package/liman/server/storage/VERSION)
+          bash package/liman/server/storage/create_deb.sh $GITHUB_RUN_NUMBER
+          ls -lah package.deb
+          sha256sum package.deb
           [ "$GITHUB_REF" == "refs/heads/master" ] && CHANNEL="liman-release" || CHANNEL="liman-dev-release"
           [ "$GITHUB_REF" == "refs/heads/master" ] && FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER.deb" || FILE_NAME="liman-${GITHUB_REF#refs/heads/}-$VERSION-$GITHUB_RUN_NUMBER.deb"
           curl -F "file=@package.deb" "https://slack.com/api/files.upload?token=$SLACK_TOKEN&channels=$CHANNEL&filename=$FILE_NAME&pretty=1&initial_comment=$COMMIT" || echo

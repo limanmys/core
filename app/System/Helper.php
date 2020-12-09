@@ -2,6 +2,7 @@
 
 namespace App\System;
 
+use App\Models\SystemSettings;
 use GuzzleHttp\Client;
 
 class Helper {
@@ -60,11 +61,58 @@ class Helper {
         }catch(\Exception $e){
             return false;
         }
+
+        SystemSettings::updateOrCreate(
+            ['key' => 'SYSTEM_DNS'],
+            ['data' => json_encode([
+                $server1, $server2, $server3
+            ])]
+        );
+
         return true;
     }
 
     public function addCertificate($tmpPath, $targetName)
     {
+        $contents = $tmpPath;
+        if(is_file($tmpPath)){
+            $contents = file_get_contents($tmpPath);
+        }else{
+            $tmpPath = "/tmp/" . str_random(16);
+            file_put_contents($tmpPath,$contents);
+        }
+        $arr = [
+            "certificate" => $contents,
+            "targetName" => $targetName
+        ];
+        
+        $current = SystemSettings::where("key", "SYSTEM_CERTIFICATES")->first();
+
+        if ($current) {
+            $foo = json_decode($current->data, true);
+            $flag = true;
+            for ($i = 0; $i < count($foo); $i++) {
+                if ($foo[$i]["targetName"] == $targetName) {
+                    $foo[$i]["certificate"] = $arr["certificate"];
+                    $flag = false;
+                    break;
+                }
+            }
+            
+            if ($flag) {
+                array_push($foo, $arr);
+            }
+            
+            $current->update([
+                "data" => json_encode($foo)
+            ]);
+        } else {
+            SystemSettings::create([
+                "key" => "SYSTEM_CERTIFICATES",
+                "data" => json_encode([$arr])
+            ]);
+        }
+
         try{
             $this->client->get('/certificateAdd',[
                 'query' => [
@@ -81,6 +129,26 @@ class Helper {
 
     public function removeCertificate($targetName)
     {
+        $arr = [
+            "targetName" => $targetName
+        ];
+        
+        $current = SystemSettings::where("key", "SYSTEM_CERTIFICATES")->first();
+
+        if ($current) {
+            $foo = json_decode($current->data, true);
+            for ($i = 0; $i < count($foo); $i++) {
+                if ($foo[$i]["targetName"] == $targetName) {
+                    unset($foo[$i]);
+                    $foo = array_values($foo);
+                    break;
+                }
+            }
+            $current->update([
+                "data" => $foo
+            ]);
+        }
+
         try{
             $this->client->get('/certificateRemove',[
                 'query' => [
@@ -102,6 +170,21 @@ class Helper {
                     'liman_token' => $this->authKey,
                     'extension_id' => cleanDash($extension_id),
                     'extension_name' => strtolower($extension_name)
+                ]
+            ]);
+        }catch(\Exception $e){
+            return false;
+        }
+        return true;
+    }
+
+    public function installPackages($packages)
+    {
+        try{
+            $this->client->get('/installPackages',[
+                'query' => [
+                    'liman_token' => $this->authKey,
+                    'packages' => $packages,
                 ]
             ]);
         }catch(\Exception $e){

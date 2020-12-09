@@ -24,13 +24,15 @@ class MainController extends Controller
         ])
             ->orderBy('read')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
+        $links = $notifications->links();
         $notifications = $notifications->groupBy(function ($date) {
             return \Carbon\Carbon::parse($date->created_at)->format("d.m.Y");
         });
 
         return magicView('notification.index', [
             "notifications" => $notifications,
+            "links" => $links,
             "system" => false,
         ]);
     }
@@ -179,15 +181,16 @@ class MainController extends Controller
     public function allSystem()
     {
         $notifications = AdminNotification::orderBy('read')
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->orderBy('created_at', 'desc')->paginate(10);
 
+        $links = $notifications->links();
         $notifications = $notifications->groupBy(function ($date) {
             return \Carbon\Carbon::parse($date->created_at)->format("d.m.Y");
         });
 
         return magicView('notification.index', [
             "notifications" => $notifications,
+            "links" => $links,
             "system" => true,
         ]);
     }

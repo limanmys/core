@@ -14,7 +14,6 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Validator;
 use App\Jobs\ExtensionUpdaterJob;
-use App\Jobs\ExtensionDependenciesJob;
 use Illuminate\Contracts\Bus\Dispatcher;
 use App\Models\AdminNotification;
 
@@ -148,7 +147,7 @@ class MainController extends Controller
                 );
             }
         }
-        list($error, $new) = self::setupNewExtension($zipFile,$verify);
+        list($error, $new) = self::setupNewExtension($zipFile, $verify);
 
         if ($error) {
             return $error;
@@ -228,28 +227,8 @@ class MainController extends Controller
         $new->status = "1";
         $new->save();
         
-        if (array_key_exists("dependencies",$json) && $json["dependencies"] != ""){
-            $job = (new ExtensionDependenciesJob(
-                $new,
-                $json["dependencies"]
-            ))->onQueue('system_updater');
-    
-            // Dispatch job right away.
-            $job_id = app(Dispatcher::class)->dispatch($job);
-
-            AdminNotification::create([
-                "title" =>
-                    $new->display_name . " eklentisinin bağımlılıkları yükleniyor!",
-                "type" => "",
-                "message" =>
-                    $new->display_name .
-                    " eklentisinin bağımlılıkları yükleniyor, bu süre içerisinde eklentiyi kullanamazsınız.",
-                "level" => 3,
-            ]);
-            $new->update([
-                "status" == "0"
-            ]);
-            $new->save();
+        if (array_key_exists("dependencies", $json) && $json["dependencies"] != "") {
+            rootSystem()->installPackages($json["dependencies"]);
         }
 
         $system = rootSystem();
@@ -285,52 +264,39 @@ class MainController extends Controller
         if (Extension::where("name", request("name"))->exists()) {
             return respond("Bu isimle zaten bir eklenti var.", 201);
         }
+
+        if (!in_array(request('template'), array_keys((array) fetchExtensionTemplates()->templates))) {
+            return respond("Lütfen geçerli bir tip seçiniz.", 201);
+        }
+
+        $template = request('template');
+        $template_folder = storage_path('extension_templates/'.$template.'/');
+
+        shell_exec("cp -r $template_folder $folder");
+        foreach (glob("$folder/*.json") as $file) {
+            $content = file_get_contents($file);
+            $content = str_replace([
+                "<NAME>",
+                "<PUBLISHER>",
+                "<SUPPORTED_LIMAN>",
+                "<SUPPORT>"
+            ], [
+                request("name"),
+                auth()->user()->name,
+                file_get_contents(storage_path('VERSION')),
+                auth()->user()->email
+            ], $content);
+            file_put_contents($file, $content);
+        }
+
+        $json = json_decode(file_get_contents("$folder/db.json"));
         $ext = Extension::create([
             "name" => request("name"),
             "version" => "0.0.1",
             "icon" => "",
             "service" => "",
-            "language" => request('language'),
+            "language" => $json->language,
         ]);
-
-        $json = [
-            "name" => $name,
-            "publisher" => auth()->user()->name,
-            "version" => "0.0.1",
-            "database" => [],
-            "widgets" => [],
-            "views" => [
-                [
-                    "name" => "index",
-                    "scripts" => "",
-                ],
-            ],
-            "language" => request('language'),
-            "status" => 0,
-            "service" => "",
-            "supportedLiman" => file_get_contents(storage_path('VERSION')),
-            "support" => auth()->user()->email,
-            "icon" => "",
-        ];
-
-        shell_exec(
-            "
-            mkdir $folder;
-            mkdir $folder" .
-                DIRECTORY_SEPARATOR .
-                "views;
-            mkdir $folder" .
-                DIRECTORY_SEPARATOR .
-                "scripts;
-        "
-        );
-
-        touch($folder . DIRECTORY_SEPARATOR . "db.json");
-
-        file_put_contents(
-            $folder . DIRECTORY_SEPARATOR . "db.json",
-            json_encode($json, JSON_PRETTY_PRINT)
-        );
 
         $system = rootSystem();
         
@@ -341,10 +307,6 @@ class MainController extends Controller
 
         request()->request->add(['server' => "none"]);
         request()->request->add(['extension_id' => $ext->id]);
-
-        foreach (sandbox(request('language'))->getInitialFiles() as $file) {
-            touch($folder . "/views/$file");
-        }
 
         $system->fixExtensionPermissions($ext->id, $ext->name);
 
