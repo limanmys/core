@@ -18,11 +18,6 @@ class CreateUserMonitorsTable extends Migration
             $table->string('name');
             $table->uuid('server_monitor_id');
             $table->string("user_id");
-            $table
-                ->foreign("user_id")
-                ->references("id")
-                ->on("users")
-                ->onDelete("cascade");
             $table->timestamps();
         });
     }
