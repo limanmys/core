@@ -14,7 +14,7 @@ class CreateMonitorServersTable extends Migration
     public function up()
     {
         Schema::create('monitor_servers', function (Blueprint $table) {
-            $table->uuid('id');
+            $table->uuid('id')->primary();
             $table->string('ip_address');
             $table->integer('port');
             $table->boolean('online');
