@@ -9,25 +9,25 @@
 # 6.Commit Message
 
 #Sandbox
-wget "https://github.com/limanmys/php-sandbox/archive/$1.zip"
+wget "https://github.com/limanmys/php-sandbox/archive/$1.zip" -q
 unzip $1.zip
 mkdir -p package/liman/sandbox/php
 mv php-sandbox-$1/* package/liman/sandbox/php/
 rm -rf $1.zip php-sandbox-$1
 
 #Extension Templates
-wget "https://github.com/limanmys/extension_templates/archive/$2.zip"
+wget "https://github.com/limanmys/extension_templates/archive/$2.zip" -q
 unzip $2.zip
 mkdir -p package/liman/server/storage/extension_templates
 mv extension_templates-$2/* package/liman/server/storage/extension_templates/
 rm -rf $2.zip extension_templates-$2
 
 #Go Engine
-wget "https://github.com/limanmys/go/raw/$3/liman_render"
+wget "https://github.com/limanmys/go/raw/$3/liman_render" -q
 mv liman_render package/liman/server/storage/liman_render
 
 #WebSSH
-wget "https://github.com/limanmys/webssh/archive/master.zip"
+wget "https://github.com/limanmys/webssh/archive/master.zip" -q
 unzip master.zip
 mkdir -p package/liman/webssh
 mv webssh-master/* package/liman/webssh
@@ -43,7 +43,6 @@ DATE=$(date)
 composer install --no-dev -d package/liman/server
 rm -rf package/liman/server/node_modules
 mv package/liman/server/storage/build_tools/DEBIAN package/
-mv render_engine/liman_render package/liman/server/storage/liman_render
 rm -rf package/liman/server/storage/build_tools
 
 #Build Package
