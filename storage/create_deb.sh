@@ -1,21 +1,51 @@
 #!/bin/bash
 
-DEBIAN_FRONTEND=noninteractive sudo apt install jq -y 1>/dev/null 2>/dev/null
+# Parameters
+# 1.Sandbox Branch
+# 2.Extension Templates Branch
+# 3.Go Engine Branch
+# 4.Liman Branch
+# 5.Build Number
+# 6.Commit Message
+
+#Sandbox
+wget "https://github.com/limanmys/php-sandbox/archive/$1.zip" -q
+unzip -qq $1.zip 
+mkdir -p package/liman/sandbox/php
+mv php-sandbox-$1/* package/liman/sandbox/php/
+rm -rf $1.zip php-sandbox-$1
+
+#Extension Templates
+wget "https://github.com/limanmys/extension_templates/archive/$2.zip" -q
+unzip -qq $2.zip
+mkdir -p package/liman/server/storage/extension_templates
+mv extension_templates-$2/* package/liman/server/storage/extension_templates/
+rm -rf $2.zip extension_templates-$2
+
+#Go Engine
+wget "https://github.com/limanmys/go/raw/$3/liman_render" -q
+mv liman_render package/liman/server/storage/liman_render
+
+#WebSSH
+wget "https://github.com/limanmys/webssh/archive/master.zip" -q
+unzip -qq master.zip
+mkdir -p package/liman/webssh
+mv webssh-master/* package/liman/webssh
+rm -rf master.zip webssh-master
+
+#Setup variables and version codes.
 VERSION=$(cat package/liman/server/storage/VERSION)
-echo $GITHUB_RUN_NUMBER >package/liman/server/storage/VERSION_CODE
-COMMIT="${GITHUB_REF#refs/heads/} : "
-COMMIT+=$(git --git-dir=package/liman/server/.git log -1 --pretty=%B)
-COMMIT=$(echo $COMMIT | jq -SrR @uri)
+echo $5 >package/liman/server/storage/VERSION_CODE
+COMMIT=$(echo $6 | jq -SrR @uri)
 DATE=$(date)
+
+#Install/Update dependencies
 composer install --no-dev -d package/liman/server
-git --git-dir=package/liman/server/.git log -30 --pretty=format:"%s%x09%ad" >package/liman/server/storage/changelog
-rm -rf package/liman/server/.git package/liman/sandbox/php/.git
-rm -rf package/liman/server/storage/extension_templates/.git
-rm -rf package/liman/webssh/.git
 rm -rf package/liman/server/node_modules
 mv package/liman/server/storage/build_tools/DEBIAN package/
-mv render_engine/liman_render package/liman/server/storage/liman_render
 rm -rf package/liman/server/storage/build_tools
+
+#Build Package
 cd package
 touch DEBIAN/md5sums
 touch DEBIAN/md5sums
@@ -28,7 +58,7 @@ chmod 775 DEBIAN/preinst
 chmod 775 DEBIAN/postinst
 
 echo """Package: liman
-Version: $VERSION-$1
+Version: $VERSION-$5
 Installed-Size: 77892
 Maintainer: Mert CELEN <mcelen@havelsan.com.tr>
 Section: admin

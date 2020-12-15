@@ -173,6 +173,9 @@ if (!function_exists('syncFiles')) {
 
         if($masterIp == ""){
             $firstLiman = Liman::first();
+            if ($firstLiman == null){
+                return;
+            }
             $masterIp = $firstLiman->last_ip;
         }
 
