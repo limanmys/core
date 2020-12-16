@@ -54,7 +54,7 @@ touch DEBIAN/control
 mkdir -p liman/hashes
 find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum > liman/hashes/core.md5 || true
 gpg --batch --yes --passphrase $7 --default-key aciklab@havelsan.com.tr --sign liman/hashes/core.md5
-mv core.md5.gpg liman/hashes/core.md5
+rm liman/hashes/core.md5
 
 find . \( -name ".git" -o -name ".gitignore" -o -name ".gitmodules" -o -name ".gitattributes" \) -exec rm -rf -- {} + 1>/dev/null 2>/dev/null || true
 
