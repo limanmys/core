@@ -55,6 +55,8 @@ find . \( -name ".git" -o -name ".gitignore" -o -name ".gitmodules" -o -name ".g
 
 mkdir -p liman/hashes
 find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum > liman/hashes/core.md5 || true
+sed -i '/nginx.conf/d' liman/hashes/core.md5
+sed -i '/liman/hashes/d' liman/hashes/core.md5
 gpg --batch --yes --passphrase $7 --default-key aciklab@havelsan.com.tr --sign liman/hashes/core.md5
 rm liman/hashes/core.md5
 
