@@ -51,7 +51,7 @@
           <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
               @if (session('locale') === "tr")
-                <i class="flag-icon flag-icon-tr"></i>
+                TR
               @else
                 EN
               @endif
@@ -63,7 +63,7 @@
                   </a>
                 @elseif (session('locale') === "en")
                   <a href="{{route('set_locale', ['locale' => 'tr'])}}" class="dropdown-item active">
-                    <i class="flag-icon flag-icon-tr mr-2"></i> Türkçe
+                    TR Türkçe
                   </a>
                 @endif
             </div>
