@@ -52,7 +52,7 @@ touch DEBIAN/md5sums
 touch DEBIAN/control
 
 mkdir -p liman/hashes
-find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum liman/hashes/core.md5 || true
+find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum > liman/hashes/core.md5 || true
 gpg --batch --yes --passphrase $7 --default-key aciklab@havelsan.com.tr --sign liman/hashes/core.md5
 mv core.md5.gpg liman/hashes/core.md5
 
