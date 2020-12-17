@@ -363,6 +363,49 @@ if (!function_exists('settingsModuleViews')) {
     }
 }
 
+if (!function_exists('renderModuleView')) {
+    /**
+     * @return mixed
+     */
+    function renderModuleView($module,$page,$params = [])
+    {
+        $blade = new Blade( '/liman/modules/' . $module . '/views/',"/tmp");
+        $str = $blade->render($page,$params);
+        return view('modules.layout',[
+            "name" => $module,
+            "html" => $str
+        ]);
+    }
+}
+
+$sidebarModuleLinks = null;
+if (!function_exists('sidebarModuleLinks')) {
+    /**
+     * @return mixed
+     */
+    function sidebarModuleLinks()
+    {
+        global $sidebarModuleLinks;
+        if($sidebarModuleLinks != null){
+            return $sidebarModuleLinks;
+        }
+        $array = [];
+        foreach (searchModuleFiles('sidebar.json') as $file) {
+            $filePath = $file . "/sidebar.json";
+            $data = file_get_contents($filePath);
+            $json = json_decode($data,true);
+            if(json_last_error() != JSON_ERROR_NONE){
+                continue;
+            }
+            foreach($json as $a){
+                array_push($array,$a);
+            }
+        }
+        $sidebarModuleLinks = $array;
+        return $array;
+    }
+}
+
 if (!function_exists('settingsModuleButtons')) {
     /**
      * @return mixed
