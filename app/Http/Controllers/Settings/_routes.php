@@ -74,6 +74,15 @@ Route::view('/ayar/sunucu', 'settings.server')
     ->middleware('admin')
     ->name('settings_server');
 
+
+Route::post('/yetki/veriEkle', 'Settings\MainController@addVariable')
+    ->name('permission_add_variable')
+    ->middleware('admin');
+
+Route::post('/yetki/veriSil', 'Settings\MainController@removeVariable')
+    ->name('permission_remove_variable')
+    ->middleware('admin');
+
 Route::post(
     '/ayar/eklenti/fonksiyonlar',
     'Settings\MainController@getExtensionFunctions'

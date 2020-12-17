@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Permission;
 use App\Models\LimanRequest;
 use App\Models\Notification;
 use App\User;
+use App\Models\Permission;
 use App\Http\Controllers\Controller;
 
 class MainController extends Controller
@@ -142,4 +143,5 @@ class MainController extends Controller
         ]);
         return respond("Talep Güncellendi", 200);
     }
+
 }
