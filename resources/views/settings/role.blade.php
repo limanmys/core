@@ -357,7 +357,6 @@
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[2]);
             });
-            console.log(data);
             if(data.length == 0){
                 showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
                 return false;
