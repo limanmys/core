@@ -246,6 +246,38 @@ class MainController extends Controller
         }
     }
 
+    
+    public function addVariable()
+    {
+        if(Permission::grant(
+            request('object_id'),
+            'variable',
+            request('key'),
+            request('value'),
+            null,
+            request('object_type')
+        )){
+            return respond("Veri başarıyla eklendi!");
+        }else{
+            return respond("Veri eklenemedi!");
+        }
+    }
+
+    
+    public function removeVariable()
+    {
+        $flag = false;
+        foreach (explode(",", request('variables')) as $id) {
+            $flag = Permission::find($id)->delete();
+        }
+        
+        if($flag){
+            return respond("Veri(ler) başarıyla silindi!");
+        }
+        
+        return respond("Veri(ler) silinemedi!",201);
+    }
+
     public function getExtensionFunctions()
     {
         $extension = json_decode(

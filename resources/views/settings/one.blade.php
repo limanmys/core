@@ -30,6 +30,9 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#liman" role="tab">{{__("Liman Yetkileri")}}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#variables" role="tab">{{__("Özel Veriler")}}</a>
+                </li>
             </ul>
         </div>
         <div class="card-body">
@@ -146,6 +149,21 @@
                         "noInitialize" => "true"
                     ])
                 </div>
+                <div class="tab-pane fade show" id="variables" role="tabpanel">
+                    <button class="btn btn-success" data-toggle="modal" data-target="#variables_modal"><i data-toggle="tooltip" title="{{__('Ekle')}}" class="fa fa-plus"></i></button>
+                    <button onclick="removeVariables()" class="btn btn-danger"><i data-toggle="tooltip" title="{{__('Kaldır')}}" class="fa fa-minus"></i></button><br><br>
+                    @include('table',[
+                        "id" => "variables_table",
+                        "value" => $user->permissions->where('type','variable'),
+                        "title" => [
+                            "Adı" , "*hidden*", "Değeri"
+                        ],
+                        "display" => [
+                            "key" , "id:id", "value"
+                        ],
+                        "noInitialize" => "true"
+                    ])
+                </div>
             </div>
         </div>
     </div>
@@ -200,6 +218,20 @@
             "submit_text" => "Seçili Özelliklere Yetki Ver",
             "onsubmit" => "addData"
         ])
+
+    @include('modal',[
+        "id" => "variables_modal",
+        "title" => "Özel Veri Ekle",
+        "submit_text" => "Ekle",
+        "url" => route('permission_add_variable'),
+        "inputs" => [
+            "Adı" => "key:text",
+            "Değeri" => "value:text",
+            "$user->id:$user->id" => "object_id:hidden",
+            "users:users" => "object_type:hidden"
+        ],
+        "next" => "reload"
+    ])
 
     @component('modal-component',[
         "id" => "permissionDataModal",
@@ -284,10 +316,35 @@
             table.rows( { selected: true } ).data().each(function(element){
                 data.push(element[3]);
             });
+            if(data.length == 0){
+                showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);
+                return false;
+            }
             var form = new FormData();
             form.append("functions",data);
             form.append("user_id",'{{$user->id}}');
             request('{{route("extension_function_remove")}}',form,function(response){
+                var json = JSON.parse(response);
+                showSwal(json["message"],'success',2000);
+                setTimeout(function () {
+                    location.reload();
+                },2000);
+            }, function(response){
+                var error = JSON.parse(response);
+                showSwal(error.message,'error',2000);
+            });
+        }
+
+        function removeVariables(){
+            showSwal('{{__("Güncelleniyor...")}}','info');
+            var data = [];
+            var table = $('#variables_table').DataTable();
+            table.rows( { selected: true } ).data().each(function(element){
+                data.push(element[2]);
+            });
+            var form = new FormData();
+            form.append("variables",data);
+            request('{{route("permission_remove_variable")}}',form,function(response){
                 var json = JSON.parse(response);
                 showSwal(json["message"],'success',2000);
                 setTimeout(function () {

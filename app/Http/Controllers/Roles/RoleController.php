@@ -25,6 +25,7 @@ class RoleController extends Controller
      * @apiSuccess {Array} servers Role' Servers.
      * @apiSuccess {Array} extensions Role' Extension.
      * @apiSuccess {Array} limanPermissions Role' Liman Permissions.
+     * @apiSuccess {Array} variables Role' Extra Variables.
      */
     public function one(Role $role)
     {
@@ -44,6 +45,7 @@ class RoleController extends Controller
                     ->toArray()
             ),
             "limanPermissions" => $limanPermissions,
+            "variablesPermissions" =>  $role->permissions->where('type', 'variable')
         ]);
     }
 
