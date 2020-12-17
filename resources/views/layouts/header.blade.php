@@ -77,6 +77,18 @@
                 </li>
                 @endif
               @endif
+              @if(count(sidebarModuleLinks()))
+                <li class="nav-header">{{__("Modül Sayfaları")}}</li>
+                    @foreach(sidebarModuleLinks() as $module)
+                        <li class="nav-item">
+                            <a href='{{$module["url"]}}' class="nav-link">
+                                <i class="nav-icon {{$module['icon']}}"></i>
+                                <p>{{$module["name"]}}</p>
+                            </a>
+                        </li>
+                    @endforeach
+                </li>
+              @endif()
               @if(auth()->user()->isAdmin())
                 <li class="nav-header">{{__("Yönetim Paneli")}}</li>
                 @if(\App\Models\Module::exists())

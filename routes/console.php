@@ -192,3 +192,10 @@ Artisan::command('sync_core', function () {
 Artisan::command('sync_safe', function () {
     syncFiles();
 })->describe("Sync safe files without restarting");
+
+Artisan::command('integrity', function () {
+    echo `
+    cd /;
+    gpg -d liman/hashes/core.md5.gpg 2>/dev/null | md5sum -c 2>/dev/null | grep -v ": OK"
+    `;
+})->describe("Sync safe files without restarting");
