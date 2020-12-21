@@ -155,8 +155,8 @@ php /liman/server/artisan config:clear
 rm -rf /liman/sandbox/{.git,vendor,views,.gitignore,composer.json,composer.lock,index.php}
 
 # Set Permissions
-chown -R liman:liman /liman/{server,database,certs,sandbox,logs,webssh,modules,packages}
-chmod 700 -R /liman/{server,database,certs,logs,webssh,modules,packages}
+chown -R liman:liman /liman/{server,database,certs,sandbox,logs,webssh,modules,packages,hashes}
+chmod 700 -R /liman/{server,database,certs,logs,webssh,modules,packages,hashes}
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
