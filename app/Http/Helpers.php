@@ -34,7 +34,7 @@ if (!function_exists('updateSystemSettings')) {
 
         SystemSettings::updateOrCreate(
             ['key' => 'LIMAN_RESTRICTED'],
-            ['data' => env('LIMAN_RESTRICTED',false)]
+            ['data' => env('LIMAN_RESTRICTED', false)]
         );
 
         SystemSettings::updateOrCreate(
@@ -47,23 +47,23 @@ if (!function_exists('updateSystemSettings')) {
             ['data' => file_get_contents("/liman/certs/liman.key")]
         );
         $sshPublic = SystemSettings::where([
-            "key" => "SSH_PUBLIC"
+            "key" => "SSH_PUBLIC",
         ])->first();
-        if(!$sshPublic){
+        if (!$sshPublic) {
             $rsa = new RSA();
             $rsa->setPublicKeyFormat(RSA::PUBLIC_FORMAT_OPENSSH);
             extract($rsa->createKey());
             `mkdir -p /home/liman/.ssh`;
-            file_put_contents("/home/liman/.ssh/authorized_keys",$publickey);
-            file_put_contents("/home/liman/.ssh/liman_pub",$publickey);
-            file_put_contents("/home/liman/.ssh/liman_priv",$privatekey);
-            
-            chmod("/home/liman/.ssh/liman_pub",0600);
-            chmod("/home/liman/.ssh/liman_priv",0600);
+            file_put_contents("/home/liman/.ssh/authorized_keys", $publickey);
+            file_put_contents("/home/liman/.ssh/liman_pub", $publickey);
+            file_put_contents("/home/liman/.ssh/liman_priv", $privatekey);
+
+            chmod("/home/liman/.ssh/liman_pub", 0600);
+            chmod("/home/liman/.ssh/liman_priv", 0600);
 
             SystemSettings::create([
                 "key" => "SSH_PUBLIC",
-                "data" => $publickey
+                "data" => $publickey,
             ]);
 
             SystemSettings::updateOrCreate(
@@ -78,62 +78,64 @@ if (!function_exists('receiveSystemSettings')) {
     function receiveSystemSettings()
     {
         $app_key = SystemSettings::where([
-            "key" => "APP_KEY"
+            "key" => "APP_KEY",
         ])->first();
 
-        if($app_key){
+        if ($app_key) {
             setEnv([
-                "APP_KEY" => $app_key->data
+                "APP_KEY" => $app_key->data,
             ]);
         }
-        
+
         $restricted = SystemSettings::where([
-            "key" => "LIMAN_RESTRICTED"
+            "key" => "LIMAN_RESTRICTED",
         ])->first();
 
-        if($restricted){
+        if ($restricted) {
             setEnv([
-                "LIMAN_RESTRICTED" => $restricted->data
+                "LIMAN_RESTRICTED" => $restricted->data,
             ]);
         }
 
         $public_key = SystemSettings::where([
-            "key" => "SSL_PUBLIC_KEY"
+            "key" => "SSL_PUBLIC_KEY",
         ])->first();
 
-        if($public_key){
-            file_put_contents("/liman/certs/liman.crt",$public_key->data);
+        if ($public_key) {
+            file_put_contents("/liman/certs/liman.crt", $public_key->data);
         }
 
         $private_key = SystemSettings::where([
-            "key" => "SSL_PRIVATE_KEY"
+            "key" => "SSL_PRIVATE_KEY",
         ])->first();
 
-        if($private_key){
-            file_put_contents("/liman/certs/liman.key",$private_key->data);
+        if ($private_key) {
+            file_put_contents("/liman/certs/liman.key", $private_key->data);
         }
 
         $sshPublic = SystemSettings::where([
-            "key" => "SSH_PUBLIC"
+            "key" => "SSH_PUBLIC",
         ])->first();
 
         if ($sshPublic) {
             `mkdir -p /home/liman/.ssh`;
-            file_put_contents("/home/liman/.ssh/authorized_keys",$sshPublic->data);
-            file_put_contents("/home/liman/.ssh/liman_pub",$sshPublic->data);            
-            chmod("/home/liman/.ssh/liman_pub",0600);
+            file_put_contents(
+                "/home/liman/.ssh/authorized_keys",
+                $sshPublic->data
+            );
+            file_put_contents("/home/liman/.ssh/liman_pub", $sshPublic->data);
+            chmod("/home/liman/.ssh/liman_pub", 0600);
         }
 
         $sshPrivate = SystemSettings::where([
-            "key" => "SSH_PRIVATE_KEY"
+            "key" => "SSH_PRIVATE_KEY",
         ])->first();
 
         if ($sshPrivate) {
             `mkdir -p /home/liman/.ssh`;
-            file_put_contents("/home/liman/.ssh/liman_priv",$sshPrivate->data);            
-            chmod("/home/liman/.ssh/liman_priv",0600);
+            file_put_contents("/home/liman/.ssh/liman_priv", $sshPrivate->data);
+            chmod("/home/liman/.ssh/liman_priv", 0600);
         }
-
     }
 }
 
@@ -171,66 +173,89 @@ if (!function_exists('syncFiles')) {
     {
         $masterIp = env('LIMAN_MASTER_IP');
 
-        if($masterIp == ""){
+        if ($masterIp == "") {
             $firstLiman = Liman::first();
-            if ($firstLiman == null){
+            if ($firstLiman == null) {
                 return;
             }
             $masterIp = $firstLiman->last_ip;
         }
 
-        shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" . $masterIp . ":/liman/extensions/ /liman/extensions/");
-        shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" --exclude 'service.key' liman@" . $masterIp . ":/liman/keys/ /liman/keys/");
-        shell_exec("rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" . $masterIp . ":/liman/modules/ /liman/modules/");
-        
+        shell_exec(
+            "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" .
+                $masterIp .
+                ":/liman/extensions/ /liman/extensions/"
+        );
+        shell_exec(
+            "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" --exclude 'service.key' liman@" .
+                $masterIp .
+                ":/liman/keys/ /liman/keys/"
+        );
+        shell_exec(
+            "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" .
+                $masterIp .
+                ":/liman/modules/ /liman/modules/"
+        );
+
         $root = rootSystem();
         $extensions = Extension::all();
-        $names =[];
+        $names = [];
 
-        foreach($extensions as $extension){
-            array_push($names,strtolower($extension->name));
+        foreach ($extensions as $extension) {
+            array_push($names, strtolower($extension->name));
             $root->userAdd($extension->id);
-            $root->fixExtensionPermissions($extension->id,$extension->name);
+            $root->fixExtensionPermissions($extension->id, $extension->name);
             $json = getExtensionJson($extension->name);
-            if(array_key_exists("dependencies",$json) && $json["dependencies"] != ""){
+            if (
+                array_key_exists("dependencies", $json) &&
+                $json["dependencies"] != ""
+            ) {
                 $root->installPackages($json["dependencies"]);
             }
         }
 
         $scan = scandir('/liman/extensions/');
 
-        foreach($scan as $a){
-            if(substr($a,0,1) == ".") {
+        foreach ($scan as $a) {
+            if (substr($a, 0, 1) == ".") {
                 continue;
             }
-            if(!in_array($a,$names)){
+            if (!in_array($a, $names)) {
                 `rm -rf /liman/extensions/$a`;
             }
         }
 
         $dns = SystemSettings::where([
-            "key" => "SYSTEM_DNS"
+            "key" => "SYSTEM_DNS",
         ])->first();
-        if($dns){
+        if ($dns) {
             $json = json_decode($dns->data);
-            $root->dnsUpdate($json[0],$json[1],$json[2]);
+            $root->dnsUpdate($json[0], $json[1], $json[2]);
         }
 
         $certificates = SystemSettings::where([
-            "key" => "SYSTEM_CERTIFICATES"
+            "key" => "SYSTEM_CERTIFICATES",
         ])->first();
-        if($certificates){
-            $json = json_decode($certificates->data,true);
-            foreach($json as $cert){
-                if(is_file("/usr/local/share/ca-certificates/" . $cert["targetName"] . ".crt")){
+        if ($certificates) {
+            $json = json_decode($certificates->data, true);
+            foreach ($json as $cert) {
+                if (
+                    is_file(
+                        "/usr/local/share/ca-certificates/" .
+                            $cert["targetName"] .
+                            ".crt"
+                    )
+                ) {
                     continue;
                 }
-                $root->addCertificate($cert["certificate"],$cert["targetName"]);
+                $root->addCertificate(
+                    $cert["certificate"],
+                    $cert["targetName"]
+                );
             }
         }
     }
 }
-
 
 if (!function_exists('ip_in_range')) {
     function ip_in_range($ip, $range)
@@ -242,9 +267,10 @@ if (!function_exists('ip_in_range')) {
         list($range, $netmask) = explode('/', $range, 2);
         $range_decimal = ip2long($range);
         $ip_decimal = ip2long($ip);
-        $wildcard_decimal = pow(2, (32 - $netmask)) - 1;
+        $wildcard_decimal = pow(2, 32 - $netmask) - 1;
         $netmask_decimal = ~$wildcard_decimal;
-        return (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal));
+        return ($ip_decimal & $netmask_decimal) ==
+            ($range_decimal & $netmask_decimal);
     }
 }
 
@@ -367,13 +393,13 @@ if (!function_exists('renderModuleView')) {
     /**
      * @return mixed
      */
-    function renderModuleView($module,$page,$params = [])
+    function renderModuleView($module, $page, $params = [])
     {
-        $blade = new Blade( '/liman/modules/' . $module . '/views/',"/tmp");
-        $str = $blade->render($page,$params);
-        return view('modules.layout',[
+        $blade = new Blade('/liman/modules/' . $module . '/views/', "/tmp");
+        $str = $blade->render($page, $params);
+        return view('modules.layout', [
             "name" => $module,
-            "html" => $str
+            "html" => $str,
         ]);
     }
 }
@@ -386,19 +412,19 @@ if (!function_exists('sidebarModuleLinks')) {
     function sidebarModuleLinks()
     {
         global $sidebarModuleLinks;
-        if($sidebarModuleLinks != null){
+        if ($sidebarModuleLinks != null) {
             return $sidebarModuleLinks;
         }
         $array = [];
         foreach (searchModuleFiles('sidebar.json') as $file) {
             $filePath = $file . "/sidebar.json";
             $data = file_get_contents($filePath);
-            $json = json_decode($data,true);
-            if(json_last_error() != JSON_ERROR_NONE){
+            $json = json_decode($data, true);
+            if (json_last_error() != JSON_ERROR_NONE) {
                 continue;
             }
-            foreach($json as $a){
-                array_push($array,$a);
+            foreach ($json as $a) {
+                array_push($array, $a);
             }
         }
         $sidebarModuleLinks = $array;
@@ -846,12 +872,12 @@ if (!function_exists('extensionDb')) {
                 "name" => $key,
             ])
             ->first();
-        if ($key == "clientPassword" || $key == "clientUsername"){
+        if ($key == "clientPassword" || $key == "clientUsername") {
             $serverKey = server()->key();
-            if ($serverKey == null){
+            if ($serverKey == null) {
                 return null;
             }
-            $data = json_decode($serverKey->data,true);
+            $data = json_decode($serverKey->data, true);
             $encKey = env('APP_KEY') . auth()->user()->id . server()->id;
             return AES256::decrypt($data[$key], $encKey);
         }
@@ -1026,6 +1052,7 @@ if (!function_exists('checkHealth')) {
             "webssh" => "0700",
             "modules" => "0700",
             "packages" => "0700",
+            "hashes" => "0700",
         ];
         $messages = [];
 
