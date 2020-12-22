@@ -592,18 +592,6 @@
     @endcomponent
 
     @include('modal',[
-        "id"=>"deleteRoleMapping",
-        "title" =>"Eşleştirmeyi Sil",
-        "url" => route('delete_role_mapping'),
-        "text" => "Eşleştirmeyi silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-        "next" => "reload",
-        "inputs" => [
-            "Role Mapping Id:'null'" => "role_mapping_id:hidden"
-        ],
-        "submit_text" => "Eşleştirmeyi Sil"
-    ])
-
-    @include('modal',[
         "id"=>"addNewNotificationSource",
         "title" => "Yeni Bildirim İstemcisi Ekle",
         "url" => route('add_notification_channel'),
