@@ -682,21 +682,6 @@
             });
         }
 
-        function addRoleMapping(){
-            showSwal('{{__("Kaydediliyor...")}}','info');
-            var data = new FormData();
-            data.append('dn', $('#addRoleMapping').find('select[name=dn]').val());
-            data.append('role_id', $('#addRoleMapping').find('select[name=role_id]').val());
-            request("{{route("add_role_mapping")}}", data, function(res) {
-                var response = JSON.parse(res);
-                showSwal(response.message,'success');
-                reload();
-            }, function(response){
-                var error = JSON.parse(response);
-                showSwal(error.message,'error',2000);
-            });
-        }
-
         function addServerGroup(){
             showSwal('{{__("Ekleniyor...")}}','info');
             var data = new FormData();
