@@ -76,3 +76,4 @@ Depends: curl, gpg, zip, unzip, nginx, redis, php-redis, php7.3-fpm, php7.3-curl
 cat DEBIAN/control
 cd ../
 dpkg-deb -Zgzip --build package
+rm -rf package
