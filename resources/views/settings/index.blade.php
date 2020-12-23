@@ -592,18 +592,6 @@
     @endcomponent
 
     @include('modal',[
-        "id"=>"deleteRoleMapping",
-        "title" =>"Eşleştirmeyi Sil",
-        "url" => route('delete_role_mapping'),
-        "text" => "Eşleştirmeyi silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-        "next" => "reload",
-        "inputs" => [
-            "Role Mapping Id:'null'" => "role_mapping_id:hidden"
-        ],
-        "submit_text" => "Eşleştirmeyi Sil"
-    ])
-
-    @include('modal',[
         "id"=>"addNewNotificationSource",
         "title" => "Yeni Bildirim İstemcisi Ekle",
         "url" => route('add_notification_channel'),
@@ -673,21 +661,6 @@
             showSwal('{{__("Kaydediliyor...")}}','info');
             var data = new FormData(document.querySelector('#logForm'));
             return request("{{route("save_log_system")}}", data, function(res) {
-                var response = JSON.parse(res);
-                showSwal(response.message,'success');
-                reload();
-            }, function(response){
-                var error = JSON.parse(response);
-                showSwal(error.message,'error',2000);
-            });
-        }
-
-        function addRoleMapping(){
-            showSwal('{{__("Kaydediliyor...")}}','info');
-            var data = new FormData();
-            data.append('dn', $('#addRoleMapping').find('select[name=dn]').val());
-            data.append('role_id', $('#addRoleMapping').find('select[name=role_id]').val());
-            request("{{route("add_role_mapping")}}", data, function(res) {
                 var response = JSON.parse(res);
                 showSwal(response.message,'success');
                 reload();
