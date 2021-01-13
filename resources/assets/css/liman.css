@@ -60,3 +60,7 @@ table.dataTable tbody tr.selected {
     margin-left: 0;
   }
 }
+
+.card-header {
+  background-color: #efefef;
+}
