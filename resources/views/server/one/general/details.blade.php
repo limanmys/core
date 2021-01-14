@@ -4,7 +4,7 @@
         <h3 class="card-title">{{ __('Sunucu Bilgileri') }}</h3>
     </div>
     <div class="card-body">
-        @if($shell)
+        @if(server()->canRunCommand())
             <strong>{{ __('Hostname') }}</strong>
             <p class="text-muted">{{$outputs["hostname"]}}</p>
             <hr>
