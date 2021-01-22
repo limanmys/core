@@ -72,9 +72,6 @@
                                         <canvas id="ramChart"></canvas>
                                     </div>
                                     <div class="col-md-3">
-                                        <canvas id="diskChart"></canvas>
-                                    </div>
-                                    <div class="col-md-3">
                                         <canvas id="networkChart"></canvas>
                                     </div>
                                     <div class="col-md-3">

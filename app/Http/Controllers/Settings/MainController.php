@@ -135,7 +135,7 @@ class MainController extends Controller
                     "icon" => " context-menu-icon-delete",
                 ],
             ],
-            "onclick" => "details",
+            "onclick" => "userDetails",
         ]);
     }
 

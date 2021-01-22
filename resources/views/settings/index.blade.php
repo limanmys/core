@@ -750,7 +750,7 @@
         function afterUserAdd(response) {
             var json = JSON.parse(response);
             $("#add_user button[type='submit']").attr("disabled","true")
-            //getUserList();
+            getUserList();
         }
 
         $(function () {
