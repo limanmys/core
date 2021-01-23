@@ -29,6 +29,9 @@ class OneController extends Controller
         $outputs = [
             "hostname" => $server->getHostname(),
             "version" => $server->getVersion(),
+            "nofservices" => $server->getNoOfServices(),
+            "nofprocesses" => $server->getNoOfProcesses(),
+            "uptime" => $server->getUptime(),
         ];
 
         $input_extensions = [];
