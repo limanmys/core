@@ -13,12 +13,15 @@ class CreateLimansTable extends Migration
      */
     public function up()
     {
-        Schema::create('limans', function (Blueprint $table) {
-            $table->uuid('id');
-            $table->string('machine_id');
-            $table->string('last_ip');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('limans')) {
+            Schema::create('limans', function (Blueprint $table) {
+                $table->uuid('id');
+                $table->string('machine_id');
+                $table->string('last_ip');
+                $table->timestamps();
+            });
+        }
+        
     }
 
     /**

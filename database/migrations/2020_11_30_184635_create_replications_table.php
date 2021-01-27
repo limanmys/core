@@ -13,14 +13,17 @@ class CreateReplicationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('replications', function (Blueprint $table) {
-            $table->uuid('id');
-            $table->uuid('liman_id');
-            $table->string('key');
-            $table->integer('status')->default(0);
-            $table->string('output',9999);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('replications')) {
+            Schema::create('replications', function (Blueprint $table) {
+                $table->uuid('id');
+                $table->uuid('liman_id');
+                $table->string('key');
+                $table->integer('status')->default(0);
+                $table->string('output',9999);
+                $table->timestamps();
+            });
+        }
+        
     }
 
     /**

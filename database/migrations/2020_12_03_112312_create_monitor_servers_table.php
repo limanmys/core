@@ -13,14 +13,17 @@ class CreateMonitorServersTable extends Migration
      */
     public function up()
     {
-        Schema::create('monitor_servers', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('ip_address');
-            $table->integer('port');
-            $table->boolean('online');
-            $table->timestamp('last_checked');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('monitor_servers')) {
+            Schema::create('monitor_servers', function (Blueprint $table) {
+                $table->uuid('id')->primary();
+                $table->string('ip_address');
+                $table->integer('port');
+                $table->boolean('online');
+                $table->timestamp('last_checked');
+                $table->timestamps();
+            });
+        }
+        
     }
 
     /**

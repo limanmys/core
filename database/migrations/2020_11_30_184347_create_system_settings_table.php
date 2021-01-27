@@ -13,12 +13,15 @@ class CreateSystemSettingsTable extends Migration
      */
     public function up()
     {
-        Schema::create('system_settings', function (Blueprint $table) {
-            $table->uuid('id');
-            $table->string('key');
-            $table->string('data',10485760);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('system_settings')) {
+            Schema::create('system_settings', function (Blueprint $table) {
+                $table->uuid('id');
+                $table->string('key');
+                $table->string('data',10485760);
+                $table->timestamps();
+            });
+        }
+        
     }
 
     /**
