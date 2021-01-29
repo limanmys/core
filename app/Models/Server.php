@@ -218,6 +218,51 @@ class Server extends Model
         )[0];
     }
 
+    public function getUptime()
+    {
+        if (!$this->canRunCommand()) {
+            return "";
+        }
+
+        if ($this->isLinux()) {
+            return $this->run("uptime -s");
+        }
+        return explode(
+            "|",
+            $this->run("wmic path Win32_OperatingSystem get LastBootUpTime")
+        )[0];
+    }
+
+    public function getNoOfServices()
+    {
+        if (!$this->canRunCommand()) {
+            return "";
+        }
+
+        if ($this->isLinux()) {
+            return $this->run("systemctl list-units --type=service --state=active | wc -l");
+        }
+        return explode(
+            "|",
+            $this->run("wmic service get name | find \"\" /v /c")
+        )[0];
+    }
+
+    public function getNoOfProcesses()
+    {
+        if (!$this->canRunCommand()) {
+            return "";
+        }
+
+        if ($this->isLinux()) {
+            return $this->run("ps -aux | wc -l");
+        }
+        return explode(
+            "|",
+            $this->run("(Get-Process).Count")
+        )[0];
+    }
+
     public function getHostname()
     {
         if (!$this->canRunCommand()) {

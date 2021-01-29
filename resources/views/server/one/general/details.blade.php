@@ -38,6 +38,17 @@
             @endif
         </p>
         <hr>
+        @if(server()->canRunCommand())
+            <strong>{{ __('Açık Kalma') }}</strong>
+            <p class="text-muted">{{$outputs["uptime"]}}</p>
+            <hr>
+            <strong>{{ __('Servis Sayısı') }}</strong>
+            <p class="text-muted">{{$outputs["nofservices"]}}</p>
+            <hr>
+            <strong>{{ __('İşlem Sayısı') }}</strong>
+            <p class="text-muted">{{$outputs["nofprocesses"]}}</p>
+            <hr>
+        @endif
     </div>
     </div>
 </div>
