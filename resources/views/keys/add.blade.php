@@ -13,7 +13,7 @@
                     <option value="ssh" selected>{{__("SSH")}}</option>
                     <option value="ssh_certificate">{{__("SSH Anahtarı")}}</option>
                     <option value="winrm">{{__("WinRM")}}</option>
-                    <option value="winrm_certificate">{{__("WinRM (Sertifikalı)")}}</option>
+                    <option value="winrm_insecure">{{__("WinRM (SSL'siz)")}}</option>
                     <option value="snmp">{{__("SNMP")}}</option>
                 </select>
             </div><hr>
@@ -51,6 +51,15 @@
             $("#snmpWrapper").fadeOut();
             $(".snmp-input").attr("disabled","true");
             $("#port").val("5986").removeAttr("disabled");
+        }else if(select.value === "winrm_insecure"){
+            $("#keyPasswordCert").fadeOut(0).attr("disabled","true");
+            $("#certificateInformLabel").fadeOut(0);
+            $("#keyPassword").fadeIn(0).removeAttr("disabled");
+            $("#certificatePrompt").fadeOut(0);
+            $("#passwordPrompt").fadeIn(0);
+            $("#snmpWrapper").fadeOut();
+            $(".snmp-input").attr("disabled","true");
+            $("#port").val("5985").removeAttr("disabled");
         }else if(select.value === "ssh"){
             $("#keyPasswordCert").fadeOut(0).attr("disabled","true");
             $("#keyPassword").fadeIn(0).removeAttr("disabled");
