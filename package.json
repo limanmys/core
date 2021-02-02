@@ -1,7 +1,6 @@
 {
     "private": true,
     "scripts": {
-        "pre-commit": "lint-staged",
         "check": "prettier --check ./{config,database,app,routes,resources/views,resources/assets/js/tus.js,resources/assets/css/liman.css}",
         "dev": "npm run development",
         "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
@@ -12,9 +11,6 @@
         "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
         "docs": "node_modules/apidoc/bin/apidoc -o storage/docs -e vendor -e node_modules -e resources/ -e public/"
     },
-    "pre-commit": [
-        "pre-commit"
-    ],
     "lint-staged": {
         "{*liman.js,*tus.js,*liman.css,*.php}": [
             "prettier --write",
