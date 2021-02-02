@@ -403,6 +403,7 @@ class MainController extends Controller
             "LDAP_HOST" => request('ldapAddress'),
             "LDAP_GUID_COLUMN" => request('ldapObjectGUID'),
             "LDAP_STATUS" => request('ldapStatus'),
+            "LDAP_MAIL_COLUMN" => request('ldapMail'),
         ]);
         return respond(__("Kaydedildi!"), 200);
     }
