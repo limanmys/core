@@ -94,15 +94,17 @@ mv /liman/server/storage/nginx.conf /etc/nginx/sites-available/liman.conf
 ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
 
 # Nginx Auto Redirection
-if grep --quiet LIMAN_OPTIMIZATIONS /etc/nginx/sites-available/default; then
+if grep --quiet LIMAN_SECURITY_OPTIMIZATIONS /etc/nginx/sites-available/default; then
     echo "Nginx https redirection already set up."; 
 else
     echo """
-#LIMAN_OPTIMIZATIONS
+#LIMAN_SECURITY_OPTIMIZATIONS
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
     server_name _;
+    server_tokens off;
+    more_set_headers 'Server: LIMAN MYS';
     return 301 https://\$host\$request_uri;
 }
     """ > /etc/nginx/sites-available/default
