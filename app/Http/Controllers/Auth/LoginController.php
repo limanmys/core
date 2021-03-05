@@ -3,18 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Server;
-use App\Models\LdapRestriction;
-use App\Models\UserSettings;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use App\User;
-use App\Models\RoleMapping;
-use App\Models\RoleUser;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -82,6 +74,7 @@ class LoginController extends Controller
         $request->validate([
             $this->username() => 'required|string',
             'password' => 'required|string',
+            'captcha' => 'required|captcha'
         ]);
     }
 

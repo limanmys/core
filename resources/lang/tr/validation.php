@@ -126,6 +126,7 @@ return [
     'uploaded' => ':attribute yüklemesi başarısız.',
     'url' => ':attribute biçimi geçersiz.',
     'uuid' => ':attribute bir UUID formatına uygun olmalı.',
+    'captcha' => 'Doğrulama kodu resimdekiyle eşleşmemektedir.',
 
     /*
     |--------------------------------------------------------------------------

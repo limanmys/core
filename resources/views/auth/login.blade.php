@@ -43,6 +43,15 @@
                             </div>
                         </div>
                     </div>
+                    <div class="input-group mb-3">
+                        {!! captcha_img() !!}
+                        <input type="text" name="captcha" class="form-control {{ $errors->has('captcha') ? 'is-invalid' : '' }}" placeholder="{{__("Doğrulama")}}" value="{{ old('captcha') }}" required>
+                        <div class="input-group-append">
+                            <div class="input-group-text" style="max-width:40px;">
+                                <span class="fas fa-arrow-right"></span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-8">
                             <div class="icheck-primary">
