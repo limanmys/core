@@ -10,12 +10,8 @@ use App\User;
 use App\Models\Permission;
 use Carbon\Carbon;
 use Exception;
-use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use View;
-use GuzzleHttp\Client;
-use App\Models\UserSettings;
 
 class OneController extends Controller
 {
@@ -128,9 +124,10 @@ class OneController extends Controller
             request('extension')
         )->first()->service;
 
-        $output = server()->run(
-            sudo() . "systemctl " . request('action') . ' ' . $service
-        );
+        $output = Command::runSudo('systemctl @{:action} @{:service}', [
+            'action' => request('action'),
+            'service' => $service
+        ]);
         return [
             "result" => 200,
             "data" => $output,
@@ -236,10 +233,11 @@ class OneController extends Controller
 
         // Build query to check if file exists in server to validate.
         $query =
-            "(ls " .
-            request('path') .
-            " >> /dev/null 2>&1 && echo 1) || echo 0";
-        $flag = server()->run($query, false);
+            "(ls @{:path} >> /dev/null 2>&1 && echo 1) || echo 0";
+
+        $flag = Command::runSudo($query, [
+            'path' => request('path')
+        ], false);
 
         // Respond according to the flag.
         if ($flag == "1") {
@@ -459,7 +457,9 @@ class OneController extends Controller
     {
         $text = $download ? 'rx_bytes' : 'tx_bytes';
         $count = 0;
-        $raw = server()->run("cat /sys/class/net/*/statistics/$text");
+        $raw = Command::runSudo('cat "/sys/class/net/*/statistics/{:text}"', [
+            'text' => $text
+        ]);
         foreach (explode("\n", trim($raw)) as $data) {
             $count += intval($data);
         }
@@ -497,12 +497,10 @@ class OneController extends Controller
         if ($user_password !== $user_password_confirmation) {
             return respond("Şifreler uyuşmuyor!", 201);
         }
-        $output = trim(
-            server()->run(
-                sudo() .
-                    "bash -c 'useradd --no-user-group -p $(openssl passwd -1 $user_password) $user_name -s \"/bin/bash\"' &> /dev/null && echo 1 || echo 0"
-            )
-        );
+        $output = Command::runSudo("bash -c 'useradd --no-user-group -p $(openssl passwd -1 {:user_password}) {:user_name} -s \"/bin/bash\"' &> /dev/null && echo 1 || echo 0", [
+            'user_password' => $user_password,
+            'user_name' => $user_name
+        ]);
         if ($output == "0") {
             return respond("Kullanıcı eklenemedi!", 201);
         }
@@ -535,9 +533,9 @@ class OneController extends Controller
     public function getLocalGroupDetails()
     {
         $group = request("group");
-        $output = trim(
-            server()->run(sudo() . "getent group $group | cut -d ':' -f4")
-        );
+        $output = Command::runSudo("getent group @{:group} | cut -d ':' -f4", [
+            'group' => $group
+        ]);
 
         $users = [];
         if (!empty($output)) {
@@ -555,11 +553,9 @@ class OneController extends Controller
     public function addLocalGroup()
     {
         $group_name = request("group_name");
-        $output = trim(
-            server()->run(
-                sudo() . "groupadd $group_name &> /dev/null && echo 1 || echo 0"
-            )
-        );
+        $output = Command::runSudo('groupadd @{:group_name} &> /dev/null && echo 1 || echo 0', [
+            'group_name' => $group_name
+        ]);
         if ($output == "0") {
             return respond("Grup eklenemedi!", 201);
         }
@@ -570,12 +566,10 @@ class OneController extends Controller
     {
         $group = request("group");
         $user = request("user");
-        $output = trim(
-            server()->run(
-                sudo() .
-                    "usermod -a -G $group $user &> /dev/null && echo 1 || echo 0"
-            )
-        );
+        $output = Command::runSudo('usermod -a -G @{:group} @{:user} &> /dev/null && echo 1 || echo 0', [
+            'group' => $group,
+            'user' => $user
+        ]);
         if ($output != "1") {
             return respond("Kullanıcı gruba eklenemedi!", 201);
         }
@@ -615,17 +609,17 @@ class OneController extends Controller
     {
         $name = request("name");
         $name = str_replace(" ", "\\x20", $name);
-        $checkFile = server()->run(
-            "[ -f '/etc/sudoers.d/$name' ] && echo 1 || echo 0"
-        );
+        $checkFile = Command::runSudo("[ -f '/etc/sudoers.d/{:name}' ] && echo 1 || echo 0", [
+            'name' => $name
+        ]);
         if ($checkFile == "1") {
             return respond("Bu isimde bir kullanıcı zaten ekli!", 201);
         }
-        $output = trim(
-            server()->run(
-                sudo() .
-                    "bash -c 'echo \"$name ALL=(ALL:ALL) ALL\" | tee /etc/sudoers.d/$name' &> /dev/null && echo 1 || echo 0"
-            )
+        $output = Command::runSudo(
+            "bash -c 'echo \"{:name} ALL=(ALL:ALL) ALL\" | tee /etc/sudoers.d/{:name}' &> /dev/null && echo 1 || echo 0",
+            [
+                'name' => $name
+            ]
         );
         if ($output == "0") {
             return respond("Tam yetkili kullanıcı eklenemedi!", 201);
@@ -637,11 +631,11 @@ class OneController extends Controller
     {
         $name = request("name");
         $name = str_replace(" ", "\\x20", $name);
-        $output = trim(
-            server()->run(
-                sudo() .
-                    "bash -c 'if [ -f \"/etc/sudoers.d/$name\" ]; then rm /etc/sudoers.d/$name && echo 1 || echo 0; else echo 0; fi'"
-            )
+        $output = Command::runSudo(
+            "bash -c 'if [ -f \"/etc/sudoers.d/{:name}\" ]; then rm /etc/sudoers.d/{:name} && echo 1 || echo 0; else echo 0; fi'",
+            [
+                'name' => $name
+            ]
         );
         if ($output == "0") {
             return respond("Tam yetkili kullanıcı silinemedi!", 201);
@@ -843,11 +837,12 @@ class OneController extends Controller
     {
         if (server()->isLinux()) {
             $package = request("package_name");
-            $raw = server()->run(
-                sudo() .
-                    "bash -c 'DEBIAN_FRONTEND=noninteractive apt install \"$package\" -qqy >\"/tmp/" .
-                    basename($package) .
-                    ".txt\" 2>&1 & disown && echo \$!'"
+            $raw = Command::runSudo(
+                "bash -c 'DEBIAN_FRONTEND=noninteractive apt install @{:package} -qqy >\"/tmp/{:packageBase}.txt\" 2>&1 & disown && echo \$!'", 
+                [
+                    'packageBase' => basename($package),
+                    'package' => $package
+                ]
             );
             system_log(7, "Paket Güncelleme", [
                 'package_name' => request("package_name"),
@@ -866,37 +861,30 @@ class OneController extends Controller
                 "ps aux | grep \"apt \|dpkg \" | grep -v grep 2>/dev/null 1>/dev/null && echo '1' || echo '0'"
             )
         );
-        $command_output = server()->run(
-            sudo() .
-                'cat "/tmp/' .
-                basename(request("package_name")) .
-                '.txt" 2> /dev/null | base64'
-        );
+        $command_output = Command::runSudo('cat "/tmp/{:packageBase}.txt" 2> /dev/null | base64', [
+            'packageBase' => basename(request("package_name")),
+        ]);
         $command_output = base64_decode($command_output);
-        server()->run(
-            sudo() .
-                'truncate -s 0 /tmp/' .
-                basename(request("package_name")) .
-                '.txt'
-        );
+        Command::runSudo('truncate -s 0 "/tmp/{:packageBase}.txt"', [
+            'packageBase' => basename(request("package_name")),
+        ]);
         if ($output === "0") {
             $list_method = $mode == "install" ? "--installed" : "--upgradable";
             $package = request("package_name");
             if (endsWith($package, ".deb")) {
-                $package = server()->run(
-                    sudo() .
-                        'dpkg -I ' .
-                        $package .
-                        ' | grep Package: | cut -d\':\' -f2 | tr -d \'[:space:]\''
-                );
+                $package = Command::runSudo('dpkg -I @{:package} | grep Package: | cut -d\':\' -f2 | tr -d \'[:space:]\'', [
+                    'package' => $package,
+                ]);
             }
-            $output = server()->run(
-                sudo() .
-                    'apt list ' .
-                    $list_method .
-                    ' 2>/dev/null | grep ' .
-                    $package .
-                    ' && echo 1 || echo 0'
+            $package = Command::runSudo(
+                'apt list ' .
+                $list_method .
+                ' 2>/dev/null | grep ' .
+                '@{:package}' .
+                ' && echo 1 || echo 0', 
+                [
+                    'package' => $package,
+                ]
             );
             if (
                 ($mode == "update" && $output == "0") ||
@@ -1056,47 +1044,55 @@ class OneController extends Controller
     public function startService()
     {
         if (server()->isLinux()) {
-            $command = sudo() . "systemctl start " . request('name');
+            $command = sudo() . "systemctl start @{:name}";
         } else {
-            $command = "Start-Service " . request("name");
+            $command = "Start-Service @{:name}";
         }
-        server()->run($command);
+        Command::run($command, [
+            'name' => request("name")
+        ]);
         return respond("Servis Baslatildi", 200);
     }
 
     public function stopService()
     {
         if (server()->isLinux()) {
-            $command = sudo() . "systemctl stop " . request('name');
+            $command = sudo() . "systemctl stop @{:name}";
         } else {
-            $command = "Stop-Service " . request("name");
+            $command = "Stop-Service @{:name}";
         }
-        server()->run($command);
+        Command::run($command, [
+            'name' => request("name")
+        ]);
         return respond("Servis Durduruldu", 200);
     }
 
     public function restartService()
     {
         if (server()->isLinux()) {
-            $command = sudo() . "systemctl restart " . request('name');
+            $command = sudo() . "systemctl restart @{:name}";
         } else {
-            $command = "Restart-Service " . request("name");
+            $command = "Restart-Service @{:name}";
         }
-        server()->run($command);
+        Command::run($command, [
+            'name' => request("name")
+        ]);
         return respond("Servis Yeniden Başlatıldı", 200);
     }
 
     public function statusService()
     {
         if (server()->isLinux()) {
-            $command = sudo() . "systemctl status " . request('name');
+            $command = sudo() . "systemctl status @{:name}";
         } else {
             return respond(
                 "Windows Sunucularda yalnızca servis durumu görüntülenmektedir.",
                 201
             );
         }
-        $output = server()->run($command);
+        $output = Command::run($command, [
+            'name' => request("name")
+        ]);
         return respond($output, 200);
     }
 
