@@ -13,10 +13,12 @@ class XssSanitization
             'password',
             'old_password',
             'password_confirmation',
-            'liman_password_baran'
+            'liman_password_baran',
         ]);
-        array_walk_recursive($input, function(&$input) {
-            $input = strip_tags($input);
+        array_walk_recursive($input, function(&$input, $key) {
+            if(!str_contains(strtolower($key), 'password')){
+                $input = strip_tags($input);
+            }
         });
         $request->merge($input);
         return $next($request);
