@@ -19,4 +19,3 @@ Geliştirme Ortamı Kurulum Rehberi https://dev.to/liman/liman-icin-eklenti-geli
 Eklenti Geliştirme Rehberi https://dev.to/liman/eklenti-gelistirme-ortami-kurulumu-3ofm
 
 API Dökümantasyonu https://api.liman.dev/
-
