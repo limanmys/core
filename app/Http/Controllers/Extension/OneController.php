@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Extension;
 
 use App\Http\Controllers\Controller;
-use App\Models\UserSettings;
 use Carbon\Carbon;
 use function request;
 use Illuminate\Http\JsonResponse;
@@ -15,8 +14,7 @@ use Illuminate\Support\Str;
 use mervick\aesEverywhere\AES256;
 use GuzzleHttp\Client;
 use App\Models\Token;
-use Illuminate\Contracts\Bus\Dispatcher;
-use App\Models\AdminNotification;
+use App\System\Command;
 
 /**
  * Class OneController
@@ -239,8 +237,11 @@ class OneController extends Controller
         $ext_name = extension()->name;
         hook('extension_delete_attempt', extension());
         try {
-            shell_exec(
-                "rm -rf " . "/liman/extensions/" . strtolower(extension()->name)
+            Command::runLiman(
+                "rm -rf '/liman/extensions/{:extension}'",
+                [
+                    'extension' => strtolower(extension()->name)
+                ]
             );
         } catch (\Exception $exception) {
         }

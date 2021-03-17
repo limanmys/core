@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\User;
 use App\Models\Permission;
+use App\System\Command;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -728,13 +729,23 @@ class OneController extends Controller
         $query = request('query') ? request('query') : "";
         $server_id = request('server_id');
         $count = intval(
-            trim(
-                `grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep '"display":"true"'| grep '$query' | grep $server_id | wc -l`
+            Command::runLiman(
+                'grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep \'"display":"true"\'| grep @{:query} | grep @{:server_id} | wc -l',
+                [
+                    'query' => $query,
+                    'server_id' => $server_id
+                ]
             )
         );
         $head = $page > $count ? $count % 10 : 10;
-        $data = trim(
-            `grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep '"display":"true"'| grep '$query' | grep $server_id | tail -$page | head -$head | tac`
+        $data = Command::runLiman(
+            'grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep \'"display":"true"\'| grep @{:query} | grep @{:server_id} | tail -{:page} | head -{:head} | tac',
+            [
+                'query' => $query,
+                'server_id' => $server_id,
+                'page' => $page,
+                'head' => $head,
+            ]
         );
         $clean = [];
 
@@ -815,7 +826,9 @@ class OneController extends Controller
     public function getLogDetails()
     {
         $query = request('log_id');
-        $data = trim(`grep '$query' /liman/logs/extension.log`);
+        $data = Command::runLiman('grep @{:query} /liman/logs/extension.log', [
+            'query' => $query
+        ]);
         if ($data == "") {
             return respond("Bu loga ait detay bulunamadı", 201);
         }

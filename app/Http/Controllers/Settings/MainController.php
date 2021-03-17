@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Settings;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
-use App\Models\CronMail;
 use App\User;
 use App\Models\Role;
 use App\Http\Controllers\Controller;
@@ -15,6 +14,7 @@ use App\Models\RoleMapping;
 use App\Models\RoleUser;
 use App\Models\PermissionData;
 use App\Models\ServerGroup;
+use App\System\Command;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Support\Str;
@@ -550,7 +550,9 @@ class MainController extends Controller
 \\\$InputRunFileMonitor
 \\\$InputFilePersistStateInterval 1000
 ";
-        shell_exec("sudo bash -c 'echo \"$text\" > /etc/rsyslog.d/liman.conf'");
+        Command::runLiman("sudo bash -c 'echo @{:text} > /etc/rsyslog.d/liman.conf'", [
+            'text' => $text
+        ]);
 
         shell_exec("sudo sed -i '/module(load=\"imudp\")/d' /etc/rsyslog.conf");
         shell_exec("sudo sed -i '/module(load=\"imtcp\")/d' /etc/rsyslog.conf");
@@ -567,7 +569,9 @@ input(type=\"imudp\" port=\"514\")
 module(load=\"imtcp\")
 input(type=\"imtcp\" port=\"514\")";
 
-        shell_exec("echo '$text' | sudo tee -a /etc/rsyslog.conf");
+        Command::runLiman("echo @{:text} | sudo tee -a /etc/rsyslog.conf", [
+            'text' => $text
+        ]);
         shell_exec("sudo systemctl restart rsyslog");
 
         return respond("Başarıyla Kaydedildi!");

@@ -12,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Http\Controllers\Extension\MainController;
+use App\System\Command;
 
 class ExtensionUpdaterJob implements ShouldQueue
 {
@@ -51,11 +52,13 @@ class ExtensionUpdaterJob implements ShouldQueue
     {
         $downloadPath =
             "/tmp/" . $this->extension->id . "-" . $this->version_code;
-        $exists = trim(
-            shell_exec("[ -e '$downloadPath' ] && echo 1 || echo 0")
-        );
+        $exists = Command::runLiman("[ -e @{:downloadPath} ] && echo 1 || echo 0", [
+            "downloadPath" => $downloadPath
+        ]);
         $flag = true;
-        $fileHash = trim(shell_exec("sha512sum $downloadPath 2>/dev/null | cut -d ' ' -f 1"));
+        $fileHash = Command::runLiman("sha512sum @{:downloadPath} 2>/dev/null | cut -d ' ' -f 1", [
+            "downloadPath" => $downloadPath
+        ]);
         if ($exists != "1" || $fileHash != $this->hash) {
             $flag = self::downloadFile($downloadPath);
         }
@@ -103,14 +106,22 @@ class ExtensionUpdaterJob implements ShouldQueue
             return false;
         }
 
-        $fileHash = trim(shell_exec("sha512sum $downloadPath | cut -d ' ' -f 1"));
+        $fileHash = Command::runLiman("sha512sum @{:downloadPath} | cut -d ' ' -f 1", [
+            "downloadPath" => $downloadPath
+        ]);
         if (is_file($downloadPath) && $fileHash == $this->hash) {
             if ($this->signed) {
                 $tmp2 = "/tmp/" . str_random();
-                shell_exec(
-                    "gpg --status-fd 1 -d -o '" . $tmp2 . "' " . $downloadPath . " >/dev/null 2>/dev/null"
+                Command::runLiman(
+                    "gpg --status-fd 1 -d -o @{:tmp2} @{:downloadPath} >/dev/null 2>/dev/null", [
+                        "tmp2" => $tmp2,
+                        "downloadPath" => $downloadPath
+                    ]
                 );
-                shell_exec("mv " . $tmp2 . " " . $downloadPath);
+                Command::runLiman("mv @{:tmp2} @{:downloadPath}", [
+                    "tmp2" => $tmp2,
+                    "downloadPath" => $downloadPath
+                ]);
             }
             return true;
         } else {

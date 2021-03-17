@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Mail\CronMail as CronMailObj;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,8 +11,8 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\CronMail;
 use App\Models\Server;
 use App\Models\Extension;
+use App\System\Command;
 use App\User;
-use Illuminate\Support\Facades\Mail;
 
 class CronEmailJob implements ShouldQueue
 {
@@ -102,7 +101,9 @@ class CronEmailJob implements ShouldQueue
         $this->obj->update([
            "last" => Carbon::now()
         ]);
-        shell_exec("rm $file");
+        Command::runLiman("rm @{:file}", [
+            'file' => $file
+        ]);
     }
 
     private $tagTexts = [];

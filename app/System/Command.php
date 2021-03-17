@@ -15,6 +15,16 @@ class Command
 		return self::run(sudo() . $command, $attributes, $log);
 	}
 
+	public static function runLiman($command, $attributes = [])
+    {
+        return trim(shell_exec(self::format($command, $attributes)));
+    }
+
+	public static function runSystem($command, $attributes = [])
+    {
+        return trim(rootSystem()->runCommand(self::format($command, $attributes)));
+    }
+
     private static function format($command, $attributes = [])
     {
         foreach ($attributes as $attribute => $value) {
@@ -44,6 +54,6 @@ class Command
 
 	private static function clean($value)
 	{
-		return escapeshellarg($value);
+		return escapeshellcmd(escapeshellarg($value));
 	}
 }

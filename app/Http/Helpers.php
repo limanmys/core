@@ -8,7 +8,7 @@ use App\Models\Permission;
 use App\Models\Server;
 use App\Models\Certificate;
 use App\Models\Liman;
-use App\Models\Module;
+use App\System\Command;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
@@ -181,20 +181,29 @@ if (!function_exists('syncFiles')) {
             $masterIp = $firstLiman->last_ip;
         }
 
-        shell_exec(
+        Command::runLiman(
             "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" .
-                $masterIp .
-                ":/liman/extensions/ /liman/extensions/"
+                "{:masterIp}" .
+                ":/liman/extensions/ /liman/extensions/",
+            [
+                "masterIp" => $masterIp
+            ]
         );
-        shell_exec(
+        Command::runLiman(
             "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" --exclude 'service.key' liman@" .
-                $masterIp .
-                ":/liman/keys/ /liman/keys/"
+                "{:masterIp}" .
+                ":/liman/keys/ /liman/keys/",
+            [
+                "masterIp" => $masterIp
+            ]
         );
-        shell_exec(
+        Command::runLiman(
             "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" .
-                $masterIp .
-                ":/liman/modules/ /liman/modules/"
+                "{:masterIp}" .
+                ":/liman/modules/ /liman/modules/",
+            [
+                "masterIp" => $masterIp
+            ]
         );
 
         $root = rootSystem();
@@ -221,7 +230,9 @@ if (!function_exists('syncFiles')) {
                 continue;
             }
             if (!in_array($a, $names)) {
-                `rm -rf /liman/extensions/$a`;
+                Command::runLiman("rm -rf '/liman/extensions/{:a}'", [
+                    'a' => $a
+                ]);
             }
         }
 
@@ -330,9 +341,11 @@ if (!function_exists('registerModuleListeners')) {
 if (!function_exists('searchModuleFiles')) {
     function searchModuleFiles($type)
     {
-        $command = "find /liman/modules/ -name '" . $type . "'";
+        $command = "find /liman/modules/ -name @{:type}";
 
-        $output = trim(shell_exec($command));
+        $output = Command::runLiman($command, [
+            'type' => $type
+        ]);
         if ($output == "") {
             return [];
         }
