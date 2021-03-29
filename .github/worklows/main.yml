@@ -32,7 +32,3 @@ jobs:
           
           sudo chmod +x package/liman/server/.teamcity
           ./package/liman/server/.teamcity $GITHUB_RUN_NUMBER $COMMIT $PASSPHRASE
-
-          
-          
-          
