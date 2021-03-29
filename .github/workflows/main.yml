@@ -31,6 +31,7 @@ jobs:
           pinentry-mode   loopback""" | sudo tee -a /home/runner/.gnupg/gpg.conf
           echo "$PRIVATE_KEY" | gpg --import --batch --yes --passphrase $PASSPHRASE
 
+          VERSION=`cat package/liman/server/storage/VERSION`
           COMMIT="${GITHUB_REF#refs/heads/} : "
           COMMIT+=`git --git-dir=package/liman/server/.git log -1 --pretty=%B`
 
@@ -40,7 +41,7 @@ jobs:
           ls -lah
 
           [ "$GITHUB_REF" == "refs/heads/master" ] && CHANNEL=$MATTERMOST_CHANNEL || CHANNEL=$MATTERMOST_DEV_CHANNEL
-          [ "$GITHUB_REF" == "refs/heads/master" ] && FILE_NAME="$APP_NAME-$VERSION-$TYPE.signed" || FILE_NAME="$APP_NAME-${GITHUB_REF#refs/heads/}-$VERSION-$TYPE.signed"
+          [ "$GITHUB_REF" == "refs/heads/master" ] && FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER.deb" || FILE_NAME="liman-${GITHUB_REF#refs/heads/}-$VERSION-$GITHUB_RUN_NUMBER.deb"
           
           cp package.deb $FILE_NAME
           
