@@ -32,4 +32,6 @@ jobs:
           
           sudo chmod +x package/liman/server/.teamcity
           sudo chmod +x package/liman/server/storage/create_deb.sh
-          ./package/liman/server/.teamcity $GITHUB_RUN_NUMBER $COMMIT $PASSPHRASE
+          ./package/liman/server/.teamcity "$GITHUB_RUN_NUMBER" "$COMMIT" "$PASSPHRASE"
+
+          ls -lah
