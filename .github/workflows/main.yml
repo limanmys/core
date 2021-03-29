@@ -19,6 +19,10 @@ jobs:
         env:
             PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
             PASSPHRASE: ${{ secrets.PASSPHRASE }}
+            MATTERMOST_TOKEN: ${{ secrets.MATTERMOST_TOKEN }}
+            MATTERMOST_CHANNEL: ${{ secrets.MATTERMOST_CHANNEL }}
+            MATTERMOST_DEV_CHANNEL: ${{ secrets.MATTERMOST_DEV_CHANNEL }}
+            MATTERMOST_URL: ${{ secrets.MATTERMOST_URL }} 
         run: |
           sudo apt install zip gpg curl jq -y
           mkdir -p /home/runner/.gnupg
@@ -29,8 +33,29 @@ jobs:
 
           COMMIT="${GITHUB_REF#refs/heads/} : "
           COMMIT+=`git --git-dir=package/liman/server/.git log -1 --pretty=%B`
-          
+
           sudo chmod +x package/liman/server/storage/create_deb.sh
-          ./package/liman/server/storage/create_deb.sh master master master master $GITHUB_RUN_NUMBER $COMMIT $PASSPHRASE
+          ./package/liman/server/storage/create_deb.sh master master master master $GITHUB_RUN_NUMBER $PASSPHRASE
 
           ls -lah
+
+          [ "$GITHUB_REF" == "refs/heads/master" ] && CHANNEL=$MATTERMOST_CHANNEL || CHANNEL=$MATTERMOST_DEV_CHANNEL
+          [ "$GITHUB_REF" == "refs/heads/master" ] && FILE_NAME="$APP_NAME-$VERSION-$TYPE.signed" || FILE_NAME="$APP_NAME-${GITHUB_REF#refs/heads/}-$VERSION-$TYPE.signed"
+          
+          cp package.deb $FILE_NAME
+          
+          output=$(curl --location --request POST "$MATTERMOST_URL/api/v4/files?channel_id=$CHANNEL" \
+            --header "Authorization: Bearer $MATTERMOST_TOKEN" \
+            --header 'Content-Type: multipart/form-data' \
+            --form "files=@$FILE_NAME")
+          post_id=$(echo $output  | grep '"id":"(.*)"' -oE  | cut -d "," -f 1 | cut -d ":" -f 2 | xargs)
+          
+          if [ -z "$post_id" ]; then
+              echo "Failed to create post :("
+              exit 4
+          else
+              curl --location --request POST "$MATTERMOST_URL/api/v4/posts" \
+                --header "Authorization: Bearer $MATTERMOST_TOKEN" \
+                --header "Content-Type: application/json" \
+                --data "{\"file_ids\":[\"$post_id\"],\"message\":\"$COMMIT\",\"channel_id\":\"$CHANNEL\"}"
+          fi

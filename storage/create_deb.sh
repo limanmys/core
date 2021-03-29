@@ -36,7 +36,6 @@ rm -rf master.zip webssh-master
 #Setup variables and version codes.
 VERSION=$(cat package/liman/server/storage/VERSION)
 echo $5 >package/liman/server/storage/VERSION_CODE
-COMMIT=$(echo $6 | jq -SrR @uri)
 DATE=$(date)
 
 #Install/Update dependencies
@@ -57,7 +56,7 @@ mkdir -p liman/hashes
 find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum > liman/hashes/core.md5 || true
 sed -i '/nginx.conf/d' liman/hashes/core.md5
 sed -i '/liman/hashes/d' liman/hashes/core.md5
-gpg --batch --yes --passphrase $7 --default-key aciklab@havelsan.com.tr --sign liman/hashes/core.md5
+gpg --batch --yes --passphrase $6 --default-key aciklab@havelsan.com.tr --sign liman/hashes/core.md5
 rm liman/hashes/core.md5
 
 chmod 775 DEBIAN/preinst
