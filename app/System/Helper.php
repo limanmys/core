@@ -168,7 +168,7 @@ class Helper {
             $this->client->get('/fixPermissions',[
                 'query' => [
                     'liman_token' => $this->authKey,
-                    'extension_id' => cleanDash($extension_id),
+                    'extension_id' => $extension_id,
                     'extension_name' => strtolower($extension_name)
                 ]
             ]);

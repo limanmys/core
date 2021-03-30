@@ -116,7 +116,7 @@ class MainController extends Controller
             $decrypt = Command::runLiman(
                 "gpg --status-fd 1 -d -o '/tmp/{:originalName}' @{:extension} | grep FAILURE > /dev/null && echo 0 || echo 1",
                 [
-                    'originalName' => request()->file('extension')->getClientOriginalName(),
+                    'originalName' => "ext-".basename(request()->file('extension')->path()),
                     'extension' => request()->file('extension')->path()
                 ]
             );
@@ -127,10 +127,10 @@ class MainController extends Controller
                 );
             }
             $zipFile =
-                "/tmp/" .
-                request()
-                    ->file('extension')
-                    ->getClientOriginalName();
+                "/tmp/ext-" .
+                basename(
+                    request()->file('extension')->path()
+                );
         } else {
             if (!request()->has('force')) {
                 return respond(
@@ -165,7 +165,6 @@ class MainController extends Controller
 
         // Determine a random tmp folder to extract files
         $path = '/tmp/' . Str::random();
-
         // Extract Zip to the Temp Folder.
         $zip->extractTo($path);
 
@@ -244,8 +243,9 @@ class MainController extends Controller
             'extension_folder' => $extension_folder
         ]);
 
-        Command::runLiman("cp -r '{:path}/*' '{:extension_folder}/.'", [
-            'extension_folder' => $extension_folder
+        Command::runLiman("cp -r {:path}/* {:extension_folder}/.", [
+            'extension_folder' => $extension_folder,
+            'path' => $path
         ]);
         $system->fixExtensionPermissions($new->id, $new->name);
 
