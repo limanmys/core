@@ -34,6 +34,10 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    public function captcha(){
+        return captcha_img();
+    }
+
     public function authenticated(Request $request, $user)
     {
         $user->update([
