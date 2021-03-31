@@ -12,7 +12,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Validator;
 use App\Jobs\ExtensionUpdaterJob;
 use Illuminate\Contracts\Bus\Dispatcher;
 use App\System\Command;
@@ -88,14 +87,10 @@ class MainController extends Controller
             "request" => request()->all(),
         ]);
 
-        $flag = Validator::make(request()->all(), [
-            'extension' => 'required | max:5000000',
+        validate([
+            'extension' => 'required|max:5000000',
         ]);
-        try {
-            $flag->validate();
-        } catch (\Exception $exception) {
-            return respond("Lütfen geçerli bir eklenti giriniz.", 201);
-        }
+
         $verify = false;
         $zipFile = request()->file('extension');
         if (
