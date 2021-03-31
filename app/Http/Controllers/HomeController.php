@@ -190,6 +190,11 @@ class HomeController extends Controller
      */
     public function request()
     {
+        validate([
+            'note' => 'required|string',
+            'type' => 'required|in:server,extension,other',
+            'speed' => 'required|in:normal,urgent',
+        ]);
         LimanRequest::create([
             "user_id" => auth()->id(),
             "email" => auth()->user()->email,
