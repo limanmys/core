@@ -23,6 +23,18 @@ use Jenssegers\Blade\Blade;
 use App\System\Helper;
 use mervick\aesEverywhere\AES256;
 use phpseclib\Crypt\RSA;
+use Illuminate\Support\Facades\Validator;
+
+if (!function_exists('validate')) {
+	function validate($rules, $messages=[])
+	{
+		$validator = Validator::make(request()->all(), $rules, $messages);
+		if ($validator->fails()) {
+			$errors = $validator->errors();
+			abort(400, $errors->first());
+		}
+	}
+}
 
 if (!function_exists('updateSystemSettings')) {
     function updateSystemSettings()
