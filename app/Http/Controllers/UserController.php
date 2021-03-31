@@ -33,7 +33,8 @@ class UserController extends Controller
             "request" => request()->all(),
         ]);
         request()->request->add(['email' => strtolower(request('email'))]);
-        $flag = Validator::make(request()->all(), [
+
+        validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
@@ -43,23 +44,6 @@ class UserController extends Controller
                 'unique:users',
             ],
         ]);
-
-        try {
-            $flag->validate();
-        } catch (\Exception $exception) {
-            return respond(
-                "Lütfen geçerli veri giriniz. " . $exception->getMessage(),
-                201
-            );
-        }
-
-        // Check If user already exists.
-        if (User::where('email', request('email'))->exists()) {
-            return respond(
-                "Bu email adresi ile ekli bir kullanıcı zaten var.",
-                201
-            );
-        }
 
         // Generate Password
         do {
@@ -201,25 +185,23 @@ class UserController extends Controller
         ) {
             return respond("Eski Parolanız geçerli değil.", 201);
         }
-        $flag = Validator::make(request()->all(), [
-            'password' => [
-                'string',
-                'min:10',
-                'max:32',
-                'confirmed',
-                'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/',
-            ],
+
+        validate([
+            'name' => 'required|string|max:255' 
         ]);
 
         if (!empty(request()->password)) {
-            try {
-                $flag->validate();
-            } catch (\Exception $exception) {
-                return respond(
-                    "Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.",
-                    201
-                );
-            }
+            validate([
+                'password' => [
+                    'string',
+                    'min:10',
+                    'max:32',
+                    'confirmed',
+                    'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/',
+                ]
+            ], [
+                'password.regex' => 'Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.'
+            ]);
 
             auth()
                 ->user()
@@ -268,13 +250,7 @@ class UserController extends Controller
             unset($validations['username']);
         }
 
-        $flag = Validator::make(request()->all(), $validations);
-
-        try {
-            $flag->validate();
-        } catch (\Exception $exception) {
-            return respond("Girilen veri geçerli değil.", 201);
-        }
+        validate($validations);
 
         $data = [
             'name' => request('username'),
@@ -392,6 +368,7 @@ class UserController extends Controller
                     "message" => "Eski Parolanız geçerli değil.",
                 ]);
         }
+        
         $flag = Validator::make(request()->all(), [
             'password' => [
                 'required',
