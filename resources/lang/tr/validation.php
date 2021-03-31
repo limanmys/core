@@ -176,5 +176,11 @@ return [
         'birth_date' => 'Doğum Tarihi',
         'subject' => 'Konu',
         'message' => 'Mesaj',
+        'note' => 'Açıklama',
+        'type' => 'Tip',
+        'speed' => 'Önem Derecesi',
+        'extension' => 'Eklenti',
+        'dn' => 'DN',
+        'role_id' => 'Rol Grubu'
     ],
 ];
