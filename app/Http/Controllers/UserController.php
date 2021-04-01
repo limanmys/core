@@ -365,7 +365,15 @@ class UserController extends Controller
             return redirect()
                 ->route('password_change')
                 ->withErrors([
-                    "message" => "Eski Parolanız geçerli değil.",
+                    "message" => "Mevcut parolanız geçerli değil.",
+                ]);
+        }
+
+        if(request("old_password") == request("password")) {
+            return redirect()
+                ->route('password_change')
+                ->withErrors([
+                    "message" => "Yeni parolanız mevcut parolanıza eşit olamaz.",
                 ]);
         }
         
