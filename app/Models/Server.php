@@ -242,10 +242,7 @@ class Server extends Model
         if ($this->isLinux()) {
             return $this->run("systemctl list-units --type=service --state=active | wc -l");
         }
-        return explode(
-            "|",
-            $this->run("wmic service get name | find \"\" /v /c")
-        )[0];
+        return $this->run('(Get-Service | Measure-Object).Count');
     }
 
     public function getNoOfProcesses()
