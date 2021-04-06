@@ -230,6 +230,11 @@ class MainController extends Controller
         $system->userAdd($new->id);
 
         $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $new->id;
+
+        Command::runSystem('chmod 760 @{:path}', [
+            'path' => $passPath
+        ]);
+
         file_put_contents($passPath, Str::random(32));
 
         $extension_folder = "/liman/extensions/" . strtolower($json["name"]);
@@ -305,6 +310,11 @@ class MainController extends Controller
         $system->userAdd($ext->id);
 
         $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $ext->id;
+
+        Command::runSystem('chmod 760 @{:path}', [
+            'path' => $passPath
+        ]);
+        
         file_put_contents($passPath, Str::random(32));
 
         request()->request->add(['server' => "none"]);
