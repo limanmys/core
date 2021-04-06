@@ -324,7 +324,7 @@ class UserController extends Controller
     {
         $setting = UserSettings::where("id", request("setting_id"))->first();
         if (!$setting) {
-            return respond("Ayar bulunamadi", 201);
+            return respond("Ayar bulunamadı!", 201);
         }
 
         if (

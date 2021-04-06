@@ -75,8 +75,8 @@
         "next" => "reload",
         "inputs" => [
             "Yeni Değer" => "new_value:password",
-            "-:-" => "id:hidden",
-            "-:-" => "type:hidden"
+            "id:-" => "setting_id:hidden",
+            "type:-" => "type:hidden"
         ],
         "submit_text" => "Veriyi Güncelle"
     ])
@@ -109,10 +109,13 @@
 
         function updateSetting(element){
             var type = element.querySelector('#type').innerHTML;
+            var id = element.querySelector('#id').innerHTML;
             if(type == "key"){
                 showSwal("{{__('Sunucu anahtarını güncellemek için yeniden anahtar eklemelisiniz.')}}","info",2000);
                 $("#add_settings").modal('show');
             }else{
+                $("#update_settings").find('input[name=setting_id]').val(id);
+                $("#update_settings").find('input[name=type]').val(type);
                 $("#update_settings").modal('show');
             }
         }
