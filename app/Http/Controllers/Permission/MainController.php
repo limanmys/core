@@ -119,12 +119,27 @@ class MainController extends Controller
         system_log(7, "REQUEST_UPDATE", [
             "action" => $request,
         ]);
-        $text =
-            request("status") == "1"
-                ? __("İşleniyor.")
-                : (request("status") == "2"
-                    ? __("Tamamlandı")
-                    : __("Reddedildi"));
+
+        switch (request("status")) {
+            case "0":
+                $text = __("Talep Alındı");
+                break;
+            case "1":
+                $text = __("İşleniyor");
+                break;
+            case "2":
+                $text = __("Tamamlandı.");
+                break;
+            case "3":
+                $text = __("Reddedildi.");
+                break;
+            case "4":
+                $text = __("Silindi.");
+                break;
+            default:
+                $text = __("Bilinmeyen.");
+                break;
+        }
         Notification::send(
             __("Talebiniz güncellendi"),
             "notify",
