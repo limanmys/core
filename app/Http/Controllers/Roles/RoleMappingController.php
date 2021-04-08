@@ -7,7 +7,6 @@ use App\Models\LdapRestriction;
 use Illuminate\Http\Request;
 use App\Models\Role;
 use App\Models\RoleMapping;
-use Illuminate\Support\Facades\Validator;
 
 class RoleMappingController extends Controller
 {
@@ -23,16 +22,10 @@ class RoleMappingController extends Controller
      */
     public function add()
     {
-        $flag = Validator::make(request()->all(), [
+        validate([
             'dn' => ['required', 'string'],
             'role_id' => ['required', 'exists:roles,id'],
         ]);
-
-        try {
-            $flag->validate();
-        } catch (\Exception $exception) {
-            return respond("Lütfen geçerli veri giriniz.", 201);
-        }
 
         RoleMapping::create([
             "dn" => request('dn'),
@@ -54,15 +47,9 @@ class RoleMappingController extends Controller
      */
     public function delete()
     {
-        $flag = Validator::make(request()->all(), [
+        validate([
             'role_mapping_id' => ['required', 'exists:role_mappings,id'],
         ]);
-
-        try {
-            $flag->validate();
-        } catch (\Exception $exception) {
-            return respond("Lütfen geçerli veri giriniz.", 201);
-        }
 
         RoleMapping::find(request('role_mapping_id'))->delete();
         return respond("Rol eşleştirmesi başarıyla silindi.");

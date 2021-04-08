@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\AdminNotification;
+use App\System\Command;
 
 class ExtensionDependenciesJob implements ShouldQueue
 {
@@ -38,10 +39,15 @@ class ExtensionDependenciesJob implements ShouldQueue
     {
         $package = $this->dependencies;
         $tmp = "/tmp/" . str_random(16);
-        $installCommand = "if [ -z '\$(find /var/cache/apt/pkgcache.bin -mmin -60)' ]; then sudo apt-get update; fi;DEBIAN_FRONTEND=noninteractive sudo apt-get install -o Dpkg::Use-Pty=0 -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' $package -qqy --force-yes >" . $tmp . " 2>&1";
-        rootSystem()->runCommand($installCommand);
-        $checkCommand = "dpkg --get-selections | grep -v deinstall | awk '{print $1}' | grep -xE '" . str_replace(" ", "|", $package) ."'";
-        $installed = rootSystem()->runCommand($checkCommand);
+        $installCommand = "if [ -z '\$(find /var/cache/apt/pkgcache.bin -mmin -60)' ]; then sudo apt-get update; fi;DEBIAN_FRONTEND=noninteractive sudo apt-get install -o Dpkg::Use-Pty=0 -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' @{:package} -qqy --force-yes > @{:tmp} 2>&1";
+        Command::runSystem($installCommand, [
+            'package' => $package,
+            'tmp' => $tmp
+        ]);
+        $checkCommand = "dpkg --get-selections | grep -v deinstall | awk '{print $1}' | grep -xE @{:package}";
+        $installed = Command::runSystem($checkCommand, [
+            'package' => str_replace(" ", "|", $package)
+        ]);
         $dep = explode(" ", $this->dependencies);
         sort($dep);
         $installed = explode("\n", trim($installed));

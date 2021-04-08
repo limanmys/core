@@ -34,7 +34,7 @@
                 <div class="card-body">
                     <form class="form-horizontal" onsubmit="return saveUser(this)">
                         <div class="form-group row">
-                            <label for="inputName" class="col-sm-2 col-form-label">{{__("Kullanıcı Adı")}}</label>
+                            <label for="inputName" class="col-sm-2 col-form-label">{{__("İsim Soyisim")}}</label>
                             <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputName" name="name" value="{{auth()->user()->name}}" required minlength="6" maxlength="255" @if(user()->auth_type == "ldap") disabled @endif>
                             </div>

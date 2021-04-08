@@ -10,7 +10,6 @@ use App\Models\Permission;
 use App\Models\Extension;
 use App\Models\RoleMapping;
 use App\Models\Server;
-use Illuminate\Support\Facades\Validator;
 
 class RoleController extends Controller
 {
@@ -89,15 +88,9 @@ class RoleController extends Controller
             "request" => request()->all(),
         ]);
 
-        $flag = Validator::make(request()->all(), [
+        validate([
             'name' => ['required', 'string', 'max:255', 'unique:roles'],
         ]);
-
-        try {
-            $flag->validate();
-        } catch (\Exception $exception) {
-            return respond("Lütfen geçerli veri giriniz.", 201);
-        }
 
         $role = Role::create([
             "name" => request('name'),

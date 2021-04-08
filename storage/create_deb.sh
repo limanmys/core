@@ -36,7 +36,6 @@ rm -rf master.zip webssh-master
 #Setup variables and version codes.
 VERSION=$(cat package/liman/server/storage/VERSION)
 echo $5 >package/liman/server/storage/VERSION_CODE
-COMMIT=$(echo $6 | jq -SrR @uri)
 DATE=$(date)
 
 #Install/Update dependencies
@@ -57,7 +56,7 @@ mkdir -p liman/hashes
 find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum > liman/hashes/core.md5 || true
 sed -i '/nginx.conf/d' liman/hashes/core.md5
 sed -i '/liman/hashes/d' liman/hashes/core.md5
-gpg --batch --yes --passphrase $7 --default-key aciklab@havelsan.com.tr --sign liman/hashes/core.md5
+gpg --batch --yes --passphrase $6 --default-key aciklab@havelsan.com.tr --sign liman/hashes/core.md5
 rm liman/hashes/core.md5
 
 chmod 775 DEBIAN/preinst
@@ -72,7 +71,7 @@ Date : $DATE
 Architecture: amd64
 Priority: important
 Description: Liman MYS
-Depends: curl, gpg, zip, unzip, nginx, redis, php-redis, php7.3-fpm, php7.3-curl, php7.3, php7.3-sqlite3, php7.3-snmp, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-posix, libnginx-mod-http-headers-more-filter, libssl1.1, supervisor, postgresql-13, php7.3-pgsql, pgloader, php7.3-bcmath, rsync, dnsutils, php7.3-ldap, php-smbclient, krb5-user, php-ssh2, smbclient, novnc, python3.7, python3-jinja2, python3-requests, python3-crypto, python3-paramiko, python3-tornado""" > DEBIAN/control
+Depends: curl, gpg, zip, unzip, nginx, redis, php-redis, php7.3-fpm, php7.3-gd, php7.3-curl, php7.3, php7.3-sqlite3, php7.3-snmp, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-posix, libnginx-mod-http-headers-more-filter, libssl1.1, supervisor, postgresql-13, php7.3-pgsql, pgloader, php7.3-bcmath, rsync, dnsutils, php7.3-ldap, php-smbclient, krb5-user, php-ssh2, smbclient, novnc, python3.7, python3-jinja2, python3-requests, python3-crypto, python3-paramiko, python3-tornado""" > DEBIAN/control
 cat DEBIAN/control
 cd ../
 dpkg-deb -Zgzip --build package

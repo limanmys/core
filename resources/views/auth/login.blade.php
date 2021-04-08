@@ -43,6 +43,22 @@
                             </div>
                         </div>
                     </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-primary" type="button" onclick="getCaptcha()">
+                                <span class="fas fa-sync"></span>
+                            </button>
+                        </div>
+                        <div class="input-group-prepend" id="captcha">
+                            {!! captcha_img() !!}
+                        </div>
+                        <input type="text" name="captcha" class="form-control {{ $errors->has('captcha') ? 'is-invalid' : '' }}" placeholder="{{__("Doğrulama")}}" value="{{ old('captcha') }}" required>
+                        <div class="input-group-append">
+                            <div class="input-group-text" style="max-width:40px;">
+                                <span class="fas fa-arrow-right"></span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-8">
                             <div class="icheck-primary">
@@ -62,6 +78,16 @@
         <center>
         <a href="https://liman.havelsan.com.tr" target="_blank"><img src="/images/havelsan-aciklab.png" height="50"></a></center>
     </div>
+    <script>
+    function getCaptcha(){
+        request('{{route('captcha')}}', new FormData(), function (response) {
+            $('#captcha').html(response);
+        }, function(response){
+            var error = JSON.parse(response);
+            showSwal(error.message,'error',2000);
+        })
+    }
+    </script>
     <style>
         .login-page, .card-body {
             background: linear-gradient(261deg, #007bff, #343a40);

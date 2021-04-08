@@ -80,14 +80,14 @@
           </li>
           <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#">
-                    <i class="fa fa-user"></i>
-                    <span class="d-none d-sm-inline-block">{{user()->name}}</span>
+                    <i class="fa fa-user mr-1"></i>
+                    <span class="d-none d-sm-inline-block" title="{{ user()->name, 20 }}">{{ str_limit(user()->name, 20)}}</span>
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                     <div class="card card-widget widget-user-2" style="margin-bottom: 0px;">
                         <div class="widget-user-header bg-secondary" style="color:white">
-                          <h3 class="widget-user-username" style="margin-left: 0px;">{{user()->name}}</h3>
+                          <h3 class="widget-user-username" style="margin-left: 0px;" title="{{ user()->name, 20 }}">{{ str_limit(user()->name, 20)}}</h3>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Son Giriş Tarihi : ") . user()->last_login_at}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Giriş Yapılan Son Ip : ") . user()->last_login_ip}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Bağlı Liman : ") . getLimanHostname()}}</h5>

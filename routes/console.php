@@ -27,6 +27,7 @@ Artisan::command('administrator', function () {
     if ($user) {
         $user->update([
             "password" => Hash::make($password),
+            "forceChange" => true,
         ]);
     } else {
         $user = new User();
@@ -35,6 +36,7 @@ Artisan::command('administrator', function () {
             "email" => "administrator@liman.dev",
             "password" => Hash::make($password),
             "status" => 1,
+            "forceChange" => true,
         ]);
     }
     $user->save();

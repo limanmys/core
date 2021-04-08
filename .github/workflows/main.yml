@@ -1,0 +1,62 @@
+name: CI
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Getting Main Liman Repository
+        uses: actions/checkout@v2
+        with:
+          path: package/liman/server
+      - name: Set up Liman Environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.3"
+          tools: composer
+          extensions : ssh2, curl, sqlite3, ldap, mbstring, xml, zip, posix, smbclient, gd
+      - name: Build Liman Package
+        env:
+            PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+            PASSPHRASE: ${{ secrets.PASSPHRASE }}
+            MATTERMOST_TOKEN: ${{ secrets.MATTERMOST_TOKEN }}
+            MATTERMOST_CHANNEL: ${{ secrets.MATTERMOST_CHANNEL }}
+            MATTERMOST_DEV_CHANNEL: ${{ secrets.MATTERMOST_DEV_CHANNEL }}
+            MATTERMOST_URL: ${{ secrets.MATTERMOST_URL }} 
+        run: |
+          sudo apt install zip gpg curl jq -y
+          mkdir -p /home/runner/.gnupg
+          echo """
+          use-agent
+          pinentry-mode   loopback""" | sudo tee -a /home/runner/.gnupg/gpg.conf
+          echo "$PRIVATE_KEY" | gpg --import --batch --yes --passphrase $PASSPHRASE
+
+          VERSION=`cat package/liman/server/storage/VERSION`
+          COMMIT="${GITHUB_REF#refs/heads/} : "
+          COMMIT+=`git --git-dir=package/liman/server/.git log -1 --pretty=%B`
+
+          sudo chmod +x package/liman/server/storage/create_deb.sh
+          ./package/liman/server/storage/create_deb.sh master master master master $GITHUB_RUN_NUMBER $PASSPHRASE
+
+          ls -lah
+
+          [ "$GITHUB_REF" == "refs/heads/master" ] && CHANNEL=$MATTERMOST_CHANNEL || CHANNEL=$MATTERMOST_DEV_CHANNEL
+          [ "$GITHUB_REF" == "refs/heads/master" ] && FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER.deb" || FILE_NAME="liman-${GITHUB_REF#refs/heads/}-$VERSION-$GITHUB_RUN_NUMBER.deb"
+          
+          cp package.deb $FILE_NAME
+          
+          output=$(curl --location --request POST "$MATTERMOST_URL/api/v4/files?channel_id=$CHANNEL" \
+            --header "Authorization: Bearer $MATTERMOST_TOKEN" \
+            --header 'Content-Type: multipart/form-data' \
+            --form "files=@$FILE_NAME")
+          post_id=$(echo $output  | grep '"id":"(.*)"' -oE  | cut -d "," -f 1 | cut -d ":" -f 2 | xargs)
+          
+          if [ -z "$post_id" ]; then
+              echo "Failed to create post :("
+              exit 4
+          else
+              curl --location --request POST "$MATTERMOST_URL/api/v4/posts" \
+                --header "Authorization: Bearer $MATTERMOST_TOKEN" \
+                --header "Content-Type: application/json" \
+                --data "{\"file_ids\":[\"$post_id\"],\"message\":\"$COMMIT\",\"channel_id\":\"$CHANNEL\"}"
+          fi

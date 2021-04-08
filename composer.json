@@ -22,6 +22,7 @@
         "laravel/framework": "^6.0",
         "laravel/helpers": "*",
         "mervick/aes-everywhere": "^1.1",
+        "mews/captcha": "^3.2",
         "phpseclib/phpseclib": "^2.0",
         "pusher/pusher-php-server": "~3.0"
     },

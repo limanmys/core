@@ -12,10 +12,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Validator;
 use App\Jobs\ExtensionUpdaterJob;
 use Illuminate\Contracts\Bus\Dispatcher;
-use App\Models\AdminNotification;
+use App\System\Command;
 
 /**
  * Class MainController
@@ -60,7 +59,10 @@ class MainController extends Controller
         $tempPath = "/tmp/" . Str::random() . ".zip";
 
         // Zip the current extension
-        shell_exec("cd $path && zip -r $tempPath .");
+        Command::runLiman("cd @{:path} && zip -r @{:tempPath} .", [
+            'path' => $path,
+            'tempPath' => $tempPath
+        ]);
 
         system_log(6, "EXTENSION_DOWNLOAD", [
             "extension_id" => extension()->id,
@@ -85,14 +87,10 @@ class MainController extends Controller
             "request" => request()->all(),
         ]);
 
-        $flag = Validator::make(request()->all(), [
-            'extension' => 'required | max:5000000',
+        validate([
+            'extension' => 'required|max:5000000',
         ]);
-        try {
-            $flag->validate();
-        } catch (\Exception $exception) {
-            return respond("Lütfen geçerli bir eklenti giriniz.", 201);
-        }
+
         $verify = false;
         $zipFile = request()->file('extension');
         if (
@@ -103,30 +101,19 @@ class MainController extends Controller
                 ".signed"
             )
         ) {
-            $verify = trim(
-                shell_exec(
-                    "gpg --verify --status-fd 1 " .
-                        request()
-                            ->file('extension')
-                            ->path() .
-                        " | grep GOODSIG || echo 0"
-                )
+            $verify = Command::runLiman(
+                "gpg --verify --status-fd 1 @{:extension} | grep GOODSIG || echo 0",
+                ['extension' => request()->file('extension')->path()]
             );
             if (!(bool) $verify) {
                 return respond("Eklenti dosyanız doğrulanamadı.", 201);
             }
-            $decrypt = trim(
-                shell_exec(
-                    "gpg --status-fd 1 -d -o '/tmp/" .
-                        request()
-                            ->file('extension')
-                            ->getClientOriginalName() .
-                        "' " .
-                        request()
-                            ->file('extension')
-                            ->path() .
-                        " | grep FAILURE > /dev/null && echo 0 || echo 1"
-                )
+            $decrypt = Command::runLiman(
+                "gpg --status-fd 1 -d -o '/tmp/{:originalName}' @{:extension} | grep FAILURE > /dev/null && echo 0 || echo 1",
+                [
+                    'originalName' => "ext-".basename(request()->file('extension')->path()),
+                    'extension' => request()->file('extension')->path()
+                ]
             );
             if (!(bool) $decrypt) {
                 return respond(
@@ -135,10 +122,10 @@ class MainController extends Controller
                 );
             }
             $zipFile =
-                "/tmp/" .
-                request()
-                    ->file('extension')
-                    ->getClientOriginalName();
+                "/tmp/ext-" .
+                basename(
+                    request()->file('extension')->path()
+                );
         } else {
             if (!request()->has('force')) {
                 return respond(
@@ -147,7 +134,7 @@ class MainController extends Controller
                 );
             }
         }
-        list($error, $new) = self::setupNewExtension($zipFile, $verify);
+        list($error, $new) = $this->setupNewExtension($zipFile, $verify);
 
         if ($error) {
             return $error;
@@ -173,7 +160,6 @@ class MainController extends Controller
 
         // Determine a random tmp folder to extract files
         $path = '/tmp/' . Str::random();
-
         // Extract Zip to the Temp Folder.
         $zip->extractTo($path);
 
@@ -185,6 +171,14 @@ class MainController extends Controller
         $file = file_get_contents($path . '/db.json');
 
         $json = json_decode($file, true);
+
+        preg_match('/[A-Za-z-]+/', $json["name"], $output);
+        if (empty($output) || $output[0] != $json["name"]) {
+            return respond(
+                "Eklenti isminde yalnızca harflere izin verilmektedir.",
+                201
+            );
+        }
 
         if (
             array_key_exists("supportedLiman", $json) &&
@@ -236,13 +230,23 @@ class MainController extends Controller
         $system->userAdd($new->id);
 
         $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $new->id;
+
+        Command::runSystem('chmod 760 @{:path}', [
+            'path' => $passPath
+        ]);
+
         file_put_contents($passPath, Str::random(32));
 
         $extension_folder = "/liman/extensions/" . strtolower($json["name"]);
 
-        `mkdir -p $extension_folder`;
-        `cp -r $path/* $extension_folder/.`;
-        
+        Command::runLiman('mkdir -p @{:extension_folder}', [
+            'extension_folder' => $extension_folder
+        ]);
+
+        Command::runLiman("cp -r {:path}/* {:extension_folder}/.", [
+            'extension_folder' => $extension_folder,
+            'path' => $path
+        ]);
         $system->fixExtensionPermissions($new->id, $new->name);
 
         return [null, $new];
@@ -271,8 +275,11 @@ class MainController extends Controller
 
         $template = request('template');
         $template_folder = storage_path('extension_templates/'.$template.'/');
-
-        shell_exec("cp -r $template_folder $folder");
+        Command::runLiman("cp -r @{:template_folder} @{:folder}", [
+            'template_folder' => $template_folder,
+            'folder' => $folder
+        ]);
+        
         foreach (glob("$folder/*.json") as $file) {
             $content = file_get_contents($file);
             $content = str_replace([
@@ -303,6 +310,11 @@ class MainController extends Controller
         $system->userAdd($ext->id);
 
         $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $ext->id;
+
+        Command::runSystem('chmod 760 @{:path}', [
+            'path' => $passPath
+        ]);
+        
         file_put_contents($passPath, Str::random(32));
 
         request()->request->add(['server' => "none"]);
