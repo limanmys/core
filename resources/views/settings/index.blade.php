@@ -71,10 +71,10 @@
                         @include('table',[
                             "value" => \App\User::all(),
                             "title" => [
-                                "Kullanıcı Adı" , "Email" , "*hidden*" ,
+                                "İsim Soyisim", "Kullanıcı Adı", "Email", "*hidden*" ,
                             ],
                             "display" => [
-                                "name" , "email", "id:user_id" ,
+                                "name", "username", "email", "id:user_id" ,
                             ],
                             "menu" => [
                                 "Parolayı Sıfırla" => [
@@ -439,7 +439,8 @@
             ]
         ],
         "inputs" => [
-            "Adı" => "name:text",
+            "İsim Soyisim" => "name:text",
+            "Kullanıcı Adı (opsiyonel)" => "username:text",
             "E-mail Adresi" => "email:email",
         ],
         "submit_text" => "Ekle"
@@ -754,6 +755,8 @@
         }
 
         $(function () {
+            $("#add_user").find("input[name='username']").attr('required', false);
+
             $("#serverGroupServers").DataTable(dataTablePresets('multiple'));
 
             $("#modifyServerGroupTable").DataTable(dataTablePresets('multiple'));

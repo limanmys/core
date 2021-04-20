@@ -36,6 +36,7 @@ class UserController extends Controller
 
         validate([
             'name' => ['required', 'string', 'max:255'],
+            'username' => ['nullable', 'string', 'max:255'],
             'email' => [
                 'required',
                 'string',
@@ -58,14 +59,20 @@ class UserController extends Controller
             )
         );
 
-        // Create And Fill User Data
-        $user = User::create([
+        $data = [
             'name' => request('name'),
             'email' => strtolower(request('email')),
             'password' => Hash::make($password),
             'status' => request('type') == "administrator" ? "1" : "0",
             'forceChange' => true,
-        ]);
+        ];
+
+        if(request('username')){
+            $data['username'] = request('username');
+        }
+
+        // Create And Fill User Data
+        $user = User::create($data);
 
         hook('user_add_successful', [
             "user" => $user,
@@ -241,25 +248,32 @@ class UserController extends Controller
     public function adminUpdate()
     {
         $validations = [
-            'username' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
+            'username' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'email'],
         ];
         $user = User::where("id", request('user_id'))->first();
 
         if ($user->auth_type == "ldap") {
+            unset($validations['name']);
             unset($validations['username']);
         }
 
         validate($validations);
 
         $data = [
-            'name' => request('username'),
+            'name' => request('name'),
             'email' => request('email'),
             'status' => request('status'),
         ];
 
+        if(request('username')){
+            $data['username'] = request('username');
+        }
+
         if ($user->auth_type == "ldap") {
             unset($data['name']);
+            unset($data['username']);
         }
 
         $user->update($data);
