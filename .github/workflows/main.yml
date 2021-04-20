@@ -32,8 +32,8 @@ jobs:
           echo "$PRIVATE_KEY" | gpg --import --batch --yes --passphrase $PASSPHRASE
 
           VERSION=`cat package/liman/server/storage/VERSION`
-          COMMIT="${GITHUB_REF#refs/heads/} : "
-          COMMIT+=`git --git-dir=package/liman/server/.git log -1 --pretty=%B`
+          MESSAGE="Branch: ${GITHUB_REF#refs/heads/} \n"
+          MESSAGE+="Version: $VERSION \n"
 
           sudo chmod +x package/liman/server/storage/create_deb.sh
           ./package/liman/server/storage/create_deb.sh master master master master $GITHUB_RUN_NUMBER $PASSPHRASE
@@ -46,12 +46,13 @@ jobs:
           
           cp package.deb $FILE_NAME
           
-          output=$(curl --location --request POST "$MATTERMOST_URL/api/v4/files?channel_id=$CHANNEL" \
+          post_id=$(curl --location --request POST "$MATTERMOST_URL/api/v4/files?channel_id=$CHANNEL" \
             --header "Authorization: Bearer $MATTERMOST_TOKEN" \
             --header 'Content-Type: multipart/form-data' \
-            --form "files=@$FILE_NAME")
-          post_id=$(echo $output  | grep '"id":"(.*)"' -oE  | cut -d "," -f 1 | cut -d ":" -f 2 | xargs)
-          
+            --form "files=@$FILE_NAME" | jq -r '.file_infos[0].id')
+
+          echo $post_id
+
           if [ -z "$post_id" ]; then
               echo "Failed to create post :("
               exit 4
@@ -59,5 +60,5 @@ jobs:
               curl --location --request POST "$MATTERMOST_URL/api/v4/posts" \
                 --header "Authorization: Bearer $MATTERMOST_TOKEN" \
                 --header "Content-Type: application/json" \
-                --data "{\"file_ids\":[\"$post_id\"],\"message\":\"$COMMIT\",\"channel_id\":\"$CHANNEL\"}"
+                --data "{\"file_ids\":[\"$post_id\"],\"message\":\"$MESSAGE\",\"channel_id\":\"$CHANNEL\"}"
           fi
