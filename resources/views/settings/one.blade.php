@@ -39,21 +39,23 @@
             @include('errors')
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="general" role="tabpanel">
-                    <form onsubmit="return updateUser(this);">
-                        <div style="width: 300px;height: 300px;display: block;float: left;padding: 10px;">
+                    <form class="row" onsubmit="return updateUser(this);">
+                        <div class="col-md-3">
                             <h4>{{__("Hesap Türü")}}</h4>
                             <select name="status" class="form-control">
                                 <option value="0" @if($user->status == "0") selected @endif>{{__("Kullanıcı")}}</option>
                                 <option value="1" @if($user->status == "1") selected @endif>{{__("Yönetici")}}</option>
                             </select><br>
                             @if ($user->auth_type !== "ldap")
-                                <h4>{{__("Adı")}}</h4>
-                                <input class="form-control" type="text" value="{{$user->name}}" name="username"><br>
+                                <h4>{{__("İsim Soyisim")}}</h4>
+                                <input class="form-control" type="text" value="{{$user->name}}" name="name"><br>
+                                <h4>{{__("Kullanıcı Adı")}}</h4>
+                                <input class="form-control" type="text" value="{{$user->username}}" name="username"><br>
                             @endif
                             <h4>{{__("Email Adresi")}}</h4>
                             <input class="form-control" type="email" value="{{$user->email}}" name="email">
                         </div>
-                        <div style="width: 300px;height: 300px;display: block;float: left;padding-top: 75px;margin-left:50px;">
+                        <div class="col-md-3 align-self-center">
                             <button class="btn btn-danger btn-block" onclick="removeUser();return false;">{{__("Kullanıcıyı Sil")}}</button><br>
                             @if ($user->auth_type !== "ldap")
                                 <button class="btn btn-warning btn-block" onclick="resetPassword();return false;">{{__("Parola Sıfırla")}}</button><br>

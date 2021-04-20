@@ -123,8 +123,8 @@ class MainController extends Controller
     {
         return view('l.table', [
             "value" => \App\User::all(),
-            "title" => ["Kullanıcı Adı", "Email", "*hidden*"],
-            "display" => ["name", "email", "id:user_id"],
+            "title" => ["İsim Soyisim", "Kullanıcı Adı", "Email", "*hidden*" ,],
+            "display" => ["name", "username", "email", "id:user_id"],
             "menu" => [
                 "Parolayı Sıfırla" => [
                     "target" => "passwordReset",
