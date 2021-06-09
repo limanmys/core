@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
     ) {
         View::composer('layouts.header', function ($view) {
             $view->with('USER_FAVORITES', user()->favorites());
+            $view->with('SERVERS', \App\Models\Server::orderBy('updated_at', 'DESC')->limit(12)->get());
         });
         Carbon::setLocale(app()->getLocale());
         Notification::observe(NotificationObserver::class);
