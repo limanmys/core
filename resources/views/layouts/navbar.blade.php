@@ -15,7 +15,7 @@
             </li>
 @else
 <nav class="main-header navbar navbar-expand navbar-dark" style="height:58.86px;border:0px;"> <!-- exactly 58.86 :) -->
-<ul class="navbar-nav">
+    <ul class="navbar-nav">
           <li class="nav-item">
             <a class="nav-link" data-toggle="tooltip" title="Menüyü gizle" data-widget="pushmenu" href="#" onclick="collapseNav()"><i class="fas fa-bars"></i></a>
           </li>
@@ -23,22 +23,22 @@
             <a class="nav-link" data-toggle="tooltip" title="Karanlık mod" onclick="toggleDarkMode()"><i id="darkModeIcon" class="fas fa-sun"></i></a>
           </li>
 @endif
-<script>
-	if(typeof currentlyDark != "undefined" && currentlyDark == true){
-		setDarkMode();
-	}
+          <script>
+            if(typeof currentlyDark != "undefined" && currentlyDark == true){
+              setDarkMode();
+            }
 
-  function collapseNav(){
-    $("#limanLogo").toggleClass("specialLogoMargin");
-    request('{{route('set_collapse')}}',new FormData(),null);
-  }
-</script>
-<style>
-  .specialLogoMargin{
-    margin-left: -0.75rem;
-  }
-</style>
-<li class="nav-item">
+            function collapseNav(){
+              $("#limanLogo").toggleClass("specialLogoMargin");
+              request('{{route('set_collapse')}}',new FormData(),null);
+            }
+          </script>
+          <style>
+            .specialLogoMargin{
+              margin-left: -0.75rem;
+            }
+          </style>
+          <li class="nav-item">
             <a href="/takip" class="nav-link" data-toggle="tooltip" title="Sunucu Takibi">
               <i class="nav-icon fas fa-grip-horizontal"></i>
             </a>
