@@ -62,7 +62,7 @@
     </div>
 
     <div class="modal fade" id="add_server">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">{{__("Sunucu Ekle")}}</h4>

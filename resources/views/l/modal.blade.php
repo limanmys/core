@@ -1,6 +1,6 @@
 @php($id = isset($id) ? $id : bin2hex(random_bytes(10)))
 <div class="modal fade" id="{{$id}}">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">

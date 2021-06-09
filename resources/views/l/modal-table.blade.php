@@ -1,5 +1,5 @@
 <div class="modal fade" id="@isset($id){{$id}}@endisset">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">
