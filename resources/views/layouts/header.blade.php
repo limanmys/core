@@ -113,11 +113,6 @@
                             <i class="nav-icon fas fa-user-secret"></i>
                         </a>
                     </div>
-                    <div class="col">
-                        <a href="/bilesenler" data-toggle="tooltip" @if(request()->getRequestUri() == '/bilesenler')class="active"@endif title='{{__("Bileşenler")}}'>
-                            <i class="nav-icon fas fa-chart-pie"></i>
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>

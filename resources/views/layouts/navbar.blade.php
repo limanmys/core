@@ -17,10 +17,10 @@
 <nav class="main-header navbar navbar-expand navbar-dark" style="height:58.86px;border:0px;"> <!-- exactly 58.86 :) -->
 <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#" onclick="collapseNav()"><i class="fas fa-bars"></i></a>
+            <a class="nav-link" data-toggle="tooltip" title="Menüyü gizle" data-widget="pushmenu" href="#" onclick="collapseNav()"><i class="fas fa-bars"></i></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" onclick="toggleDarkMode()"><i id="darkModeIcon" class="fas fa-sun"></i></a>
+            <a class="nav-link" data-toggle="tooltip" title="Karanlık mod" onclick="toggleDarkMode()"><i id="darkModeIcon" class="fas fa-sun"></i></a>
           </li>
 @endif
 <script>
@@ -38,6 +38,16 @@
     margin-left: -0.75rem;
   }
 </style>
+<li class="nav-item">
+            <a href="/takip" class="nav-link" data-toggle="tooltip" title="Sunucu Takibi">
+              <i class="nav-icon fas fa-grip-horizontal"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+                <a href="/bilesenler" class="nav-link" data-toggle="tooltip" @if(request()->getRequestUri() == '/bilesenler')class="active"@endif title='{{__("Bileşenler")}}'>
+                      <i class="nav-icon fas fa-chart-pie"></i>
+                </a>
+          </li>
         </ul>
 @if(request('server') != null)
 <ul class="mx-auto order-0 navbar-nav text-white">
@@ -69,11 +79,7 @@
                 @endif
             </div>
           </li>
-          <li class="nav-item">
-            <a href="/takip" class="nav-link" >
-              <i class="nav-icon fas fa-grip-horizontal"></i>
-            </a>
-          </li>
+          
           <!-- Notifications Dropdown Menu -->
           @if(user()->isAdmin())
             <li id="adminNotifications" class="nav-item dropdown">
