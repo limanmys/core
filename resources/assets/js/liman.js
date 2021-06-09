@@ -5,7 +5,7 @@ var limanRequestList = [];
 
 function showSwal(message, type, timer = false) {
   var config = {
-    position: "bottom-start",
+    position: "bottom-end",
     type: type,
     title: message,
     toast: true,
@@ -29,7 +29,13 @@ function request(url, data, next, error, requestType = "POST") {
   }
 
   if (id != null) {
-    showSwal("Yükleniyor...", "info");
+    Swal.fire({
+      position: "bottom-end",
+      type: "info",
+      title: "Yükleniyor...",
+      toast: true,
+      showConfirmButton: false
+    });
   }
 
   modalData = data;
@@ -242,7 +248,13 @@ function route(url) {
 }
 
 window.onbeforeunload = function () {
-  showSwal("Yükleniyor...", "info");
+  Swal.fire({
+    position: "bottom-end",
+    type: "info",
+    title: "Yükleniyor...",
+    toast: true,
+    showConfirmButton: false
+  });
 };
 
 function message(data) {
@@ -414,4 +426,8 @@ $(function () {
       .not(".alert-info")
       .fadeOut(0);
   });
+});
+
+$(document).ready(function() {
+  $("body").tooltip({ selector: '[data-toggle=tooltip]' });
 });

@@ -1,0 +1,160 @@
+/* menu changes */
+
+body {
+    font-family: 'Inter', 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.tooltip {
+    font-family: 'Inter', 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+}
+
+[class*='sidebar-dark-'],
+.navbar-dark {
+    background-color: #1a202c;
+}
+
+[class*='sidebar-dark'] .brand-link {
+    border-bottom: 1px solid #2d3748 !important;
+}
+
+.main-sidebar {
+    width: 16rem;
+}
+
+.brand-link {
+    padding-left: 21px;
+    margin-right: 0 !important;
+    width: calc(16rem - 1px) !important;
+    padding-bottom: 15px;
+}
+
+.os-content {
+    padding: 0 !important;
+}
+
+.main-header .fas {
+    font-size: 16px;
+}
+
+.sidebar {
+    height: calc(100% - 7rem);
+}
+
+#liman-sidebar li a {
+    transition: 0.3s all;
+    border-radius: 0;
+    margin-bottom: 0px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(107, 114, 128);
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+}
+
+#liman-sidebar .fas,
+#liman-sidebar .fa {
+    font-size: 18px;
+    margin-right: 0.4rem;
+}
+
+#liman-sidebar li a:hover {
+    color: #edf2f7;
+}
+
+#liman-sidebar .fa-angle-right {
+    margin-top: 2px;
+}
+
+.nav-sidebar .menu-open>.nav-link i.right {
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
+#liman-sidebar .menu-open>a {
+    color: #edf2f7;
+}
+
+#liman-sidebar .active {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #edf2f7;
+    border-left: 5px #007bff solid;
+    padding-left: 10px;
+}
+
+#liman-sidebar .has-treeview>ul>li>a {
+    padding-left: 27px;
+}
+
+#liman-sidebar .has-treeview>ul>li>.active {
+    padding-left: 22px !important;
+}
+
+#liman-sidebar .nav-header {
+    padding: 8px 19px;
+    margin-top: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+#liman-sidebar .nav-treeview {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.dropdown-item {
+    font-size: 14px;
+}
+
+.sidebar-collapse .hide-on-collapse {
+    display: none;
+}
+
+.sidebar-collapse #liman-sidebar:hover .hide-on-collapse {
+    display: block;
+}
+
+.sidebar-bottom {
+    height: 3rem;
+    position: absolute;
+    bottom: -5px;
+    width: 100%;
+    z-index: 2;
+    border-top: 1px solid #2d3748;
+    background-color: #1a202c;
+}
+
+.sidebar-bottom .col {
+    border-right: 1px #2d3748 solid;
+    padding: 0;
+}
+
+.sidebar-bottom .col:last-of-type {
+    border-right: none;
+}
+
+.sidebar-bottom a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(3rem - 6px);
+    width: 100%;
+    transition: 0.3s all;
+    color: rgb(107, 114, 128);
+    font-size: 16px;
+}
+
+.sidebar-bottom a:hover {
+    background-color: rgba(255, 255, 255, 0.07);
+    color: #edf2f7;
+}
+
+.sidebar-bottom .active {
+    background-color: rgba(255, 255, 255, 0.07);
+    color: #edf2f7;
+    border-bottom: 5px #007bff inset;
+    padding-top: 5px;
+}
