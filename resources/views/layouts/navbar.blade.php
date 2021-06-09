@@ -48,6 +48,7 @@
 @endif
         <!-- Right navbar links -->
         <ul class="navbar-nav @if(request('server') == null) ml-auto @endif">
+          
           <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
               @if (session('locale') === "tr")
@@ -68,6 +69,11 @@
                 @endif
             </div>
           </li>
+          <li class="nav-item">
+            <a href="/takip" class="nav-link" >
+              <i class="nav-icon fas fa-grip-horizontal"></i>
+            </a>
+          </li>
           <!-- Notifications Dropdown Menu -->
           @if(user()->isAdmin())
             <li id="adminNotifications" class="nav-item dropdown">
@@ -75,6 +81,7 @@
               "adminNotifications","systemNotification" => true])
             </li>
           @endif
+        
           <li id="userNotifications" class="nav-item dropdown">
             @include('notifications',["notifications" => notifications()])
           </li>
@@ -83,7 +90,6 @@
                     <i class="fa fa-user mr-1"></i>
                     <span class="d-none d-sm-inline-block" title="{{ user()->name, 20 }}">{{ str_limit(user()->name, 20)}}</span>
                 </a>
-
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                     <div class="card card-widget widget-user-2" style="margin-bottom: 0px;">
                         <div class="widget-user-header bg-secondary" style="color:white">
@@ -95,7 +101,25 @@
                         </div>
                         <div class="card-footer p-0">
                           <ul class="nav flex-column" style="cursor:pointer;">
+                          @if (auth()->user()->isAdmin())
+                            <li class="nav-item">
+                              <a href="/talepler" class="nav-link text-dark">
+                              <i class="nav-icon fas fa-plus mr-1"></i>
+                              {{__("Yetki Talepleri")}}
+                              @if(\App\Models\LimanRequest::where('status',0)->count())
+                              <span class="badge badge-info right">{{\App\Models\LimanRequest::where('status',0)->count()}}</span>
+                              @endif
+                              </a>
+                            </li>
+                          @else 
                           <li class="nav-item">
+                            <a href='/taleplerim' class="nav-link">
+                                <i class="nav-icon fas fa-key mr-1"></i>
+                                <p>{{__("Yetki Talebi")}}</p>
+                            </a>
+                          </li>
+                          @endif
+                            <li class="nav-item">
                               <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-link text-dark">
                                 {{__("Çıkış Yap")}}	&nbsp;<i class="fas fa-sign-out-alt"></i>
                               </a>

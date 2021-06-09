@@ -28,7 +28,7 @@
                 @foreach($installed_extensions as $extension)
                     <span 
                         class="badge btn-secondary status_{{$extension->id}}"
-                        style="cursor:pointer;font-size: 18px; margin-bottom: 5px;"
+                        style="cursor:pointer; font-size: 14px; margin-bottom: 5px"
                         onclick="window.location.href = '{{route('extension_server',["extension_id" => $extension->id, "city" => $server->city, "server_id" => $server->id])}}'">
                         {{$extension->display_name}}
                     </span>
