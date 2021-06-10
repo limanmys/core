@@ -1,122 +1,111 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html>
 
-@section('body_class', 'login-page')
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>{{__("Liman Merkezi Yönetim Sistemi")}}</title>
 
-@section('body')
-    <div class="login-box">
-        <div class="login-logo">
-            <a><b><img src="/images/limanlogo.png" height="50"><br></b></a>
-            <h5>{{env("BRAND_NAME")}}</h5>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{mix('/css/liman.css')}}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
+</head>
+
+<body>
+  <script>
+      var module = { };
+  </script>
+  <script src="{{mix('/js/liman.js')}}"></script>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-4 auth-bg">
+        <div class="flex items-center justify-center" style="height: 100vh; flex-direction: column;">
+          <a href="https://liman.havelsan.com.tr">
+              <img class="mx-auto h-12 w-auto" src="{{ asset('images/limanlogo.png') }}" alt="Liman MYS">
+            </a>
+            <h6 style="color: #fff">{{env("BRAND_NAME")}}</h6>
         </div>
-        <div class="card">
-            <div class="card-body">
-                @if ($errors->count() > 0 )
-                    <div class="alert alert-danger">
-                        {{$errors->first()}}
-                    </div>
-                @endif
-                @if(session('warning'))
-                    <div class="alert alert-warning">
-                        {{session('warning')}}
-                    </div>
-                @endif
-                @if (session('status'))
-                    <div class="alert alert-success">
-                        {{ session('status') }}
-                    </div>
-                @endif
-                <form action="{{ route('login')}}" method="post">
-                    @csrf
-                    <div class="input-group mb-3">
-                        <input type="text" name="liman_email_mert" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" placeholder="{{__("Email Adresi")}}" value="{{ old('liman_email_mert') }}" required>
-                        <div class="input-group-append">
-                            <div class="input-group-text" style="max-width:40px;">
-                                <span class="fas fa-envelope"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="input-group mb-3">
-                        <input type="password" name="liman_password_baran" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" placeholder="Parola">
-                        <div class="input-group-append">
-                            <div class="input-group-text" style="max-width:40px;">
-                            <span class="fas fa-lock"></span>
-                            </div>
-                        </div>
-                    </div>
-                    @if (!env('EXTENSION_DEVELOPER_MODE'))
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <button class="btn btn-primary" type="button" onclick="getCaptcha()">
-                                <span class="fas fa-sync"></span>
-                            </button>
-                        </div>
-                        <div class="input-group-prepend" id="captcha">
-                            {!! captcha_img() !!}
-                        </div>
-                        <input type="text" name="captcha" class="form-control {{ $errors->has('captcha') ? 'is-invalid' : '' }}" placeholder="{{__("Doğrulama")}}" value="{{ old('captcha') }}" required>
-                        <div class="input-group-append">
-                            <div class="input-group-text" style="max-width:40px;">
-                                <span class="fas fa-arrow-right"></span>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="icheck-primary">
-                                <input type="checkbox" id="remember" name="remember">
-                                <label for="remember">
-                                    {{__("Beni Hatırla")}}
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <button type="submit" class="btn btn-primary btn-block">{{__("Giriş Yap ")}}</button>
-                        </div>
-                    </div>
-                </form>
+      </div>
+      <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 col-8">
+        <div class="max-w-md w-full space-y-8">
+          @if ($errors->count() > 0 )
+              <div class="alert alert-danger">
+                  {{$errors->first()}}
+              </div>
+          @endif
+          @if(session('warning'))
+              <div class="alert alert-warning">
+                  {{session('warning')}}
+              </div>
+          @endif
+          @if (session('status'))
+              <div class="alert alert-success">
+                  {{ session('status') }}
+              </div>
+          @endif
+          <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+              Hesabınıza giriş yapın
+            </h2>
+          </div>
+          <form class="mt-8 space-y-6" action="{{ route('login')}}" method="post" autocomplete="off">
+            @csrf
+            <input type="hidden" name="remember" value="true">
+            <div class="rounded-md shadow-sm -space-y-px">
+              <div>
+                <label for="email-address" class="sr-only">{{__('Email Adresi')}}</label>
+                <input  id="email-address" name="liman_email_mert" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="{{__('Email Adresi')}}" value="{{ old('liman_email_mert') }}">
+              </div>
+              <div>
+                <label for="password" class="sr-only">{{__('Parola')}}</label>
+                <input id="password" name="liman_password_baran" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="{{__('Parola')}}">
+              </div>
             </div>
+            @if (!env('EXTENSION_DEVELOPER_MODE'))
+            <div class="input-group mb-3">
+                    <button class="group relative justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" type="button" onclick="getCaptcha()">
+                        <span class="fas fa-sync text-indigo-500 group-hover:text-indigo-400"></span>
+                    </button>
+                <div class="rounded" id="captcha">
+                    {!! captcha_img() !!}
+                </div>
+                <input id="captcha_field" autocomplete="off" type="text" name="captcha" class="appearance-none shadow-sm rounded relative block px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm {{ $errors->has('captcha') ? 'is-invalid' : '' }}" placeholder="{{__("Doğrulama")}}" value="{{ old('captcha') }}" required>
+            </div>
+            @endif
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <input id="remember_me" name="remember" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                <label for="remember_me" class="ml-2 block text-sm text-gray-900" style="margin-top: 7px; font-weight: 400!important">
+                  {{__("Beni Hatırla")}}
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                  <svg class="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+                {{__("Giriş Yap ")}}
+              </button>
+            </div>
+          </form>
         </div>
-        <center>
-        <a href="https://liman.havelsan.com.tr" target="_blank"><img src="/images/havelsan-aciklab.png" height="50"></a></center>
+      </div>
     </div>
-    <script>
+  </div>
+  <script>
     function getCaptcha(){
-        request('{{route('captcha')}}', new FormData(), function (response) {
+        request("{{route('captcha')}}", new FormData(), function (response) {
             $('#captcha').html(response);
         }, function(response){
             var error = JSON.parse(response);
             showSwal(error.message,'error',2000);
         })
     }
-    </script>
-    <style>
-        .login-page, .card-body {
-            background: linear-gradient(261deg, #007bff, #343a40);
-            background-size: 400% 400%;
-
-            -webkit-animation: AnimationName 0s ease infinite;
-            -moz-animation: AnimationName 0s ease infinite;
-            animation: AnimationName 0s ease infinite;
-        }
-
-        @-webkit-keyframes AnimationName {
-            0%{background-position:0% 50%}
-            50%{background-position:100% 50%}
-            100%{background-position:0% 50%}
-        }
-        @-moz-keyframes AnimationName {
-            0%{background-position:0% 50%}
-            50%{background-position:100% 50%}
-            100%{background-position:0% 50%}
-        }
-        @keyframes AnimationName {
-            0%{background-position:0% 50%}
-            50%{background-position:100% 50%}
-            100%{background-position:0% 50%}
-        }
-        .login-box, .card-body {
-            color:white;
-        }
-    </style>
-@stop
+  </script>
+</body>
+</html>
