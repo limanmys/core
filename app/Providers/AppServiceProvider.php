@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 use App\Models\Notification;
+use App\Models\Permission;
 use App\Models\AdminNotification;
 use App\Observers\NotificationObserver;
 use App\Observers\AdminNotificationObserver;
@@ -25,7 +26,15 @@ class AppServiceProvider extends ServiceProvider
     ) {
         View::composer('layouts.header', function ($view) {
             $view->with('USER_FAVORITES', user()->favorites());
-            $view->with('SERVERS', \App\Models\Server::orderBy('updated_at', 'DESC')->limit(12)->get());
+            $view->with('SERVERS', \App\Models\Server::orderBy('updated_at', 'DESC')
+                ->limit(35)->get()
+                ->filter(function ($server) {
+                    return Permission::can(user()->id, 'server', 'id', $server->id);
+                })
+                ->filter(function ($server) {
+                    return !(bool) user()->favorites()->where("id", $server->id)->first();
+                })
+            );
         });
         Carbon::setLocale(app()->getLocale());
         Notification::observe(NotificationObserver::class);

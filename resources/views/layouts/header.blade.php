@@ -13,6 +13,33 @@
                 @if(count($SERVERS))
                 <li class="nav-header">{{__("Sunucular")}}</li>
                 @endif
+                @foreach ($USER_FAVORITES as $server)
+                <li class="nav-item has-treeview @if(request('server_id') == $server->id) menu-open @endif">
+                    <a href="#" class="nav-link @if(request('server_id') == $server->id) active @endif">
+                        <i class="fa fa-server nav-icon"></i>
+                        <p>
+                            {{$server->name}}
+                            <i class="right fas fa-angle-right"></i>
+                            <i class="fas fa-thumbtack right mr-3 mt-1" style="font-size: 14px; transform: none!important"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" @if(request('server_id') == $server->id) style="display: block;" @endif>
+                        <li class="nav-item">
+                            <a href="/sunucular/{{$server->id}}" class="nav-link">
+                                <i class="fa fa-info nav-icon"></i>
+                                <p>{{__("Sunucu Detayları")}}</p>
+                            </a>
+                        </li>
+                        @foreach ($server->extensions() as $extension)
+                        <li class="nav-item">
+                            <a href='/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}' class="nav-link @if(request('extension_id') == $extension->id) active @endif">
+                                <i class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-'.$extension->icon}}"></i>
+                                <p>{{__($extension->display_name)}}</p>
+                            </a>
+                        </li>
+                        @endforeach
+                    </ul>
+                @endforeach
                 @foreach ($SERVERS as $server)
                 <li class="nav-item has-treeview @if(request('server_id') == $server->id) menu-open @endif">
                     <a href="#" class="nav-link @if(request('server_id') == $server->id) active @endif">
