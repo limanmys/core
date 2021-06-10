@@ -79,11 +79,19 @@ class LoginController extends Controller
             $this->username() => $request->liman_email_mert,
             "password" => $request->liman_password_baran,
         ]);
-        $request->validate([
-            $this->username() => 'required|string',
-            'password' => 'required|string',
-            'captcha' => 'required|captcha'
-        ]);
+        if (env('EXTENSION_DEVELOPER_MODE'))
+        {
+            $request->validate([
+                $this->username() => 'required|string',
+                'password' => 'required|string'
+            ]);
+        } else {
+            $request->validate([
+                $this->username() => 'required|string',
+                'password' => 'required|string',
+                'captcha' => 'required|captcha'
+            ]);
+        }
     }
 
     protected function sendFailedLoginResponse(Request $request)

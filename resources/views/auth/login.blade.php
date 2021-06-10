@@ -43,6 +43,7 @@
                             </div>
                         </div>
                     </div>
+                    @if (!env('EXTENSION_DEVELOPER_MODE'))
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <button class="btn btn-primary" type="button" onclick="getCaptcha()">
@@ -59,6 +60,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                     <div class="row">
                         <div class="col-8">
                             <div class="icheck-primary">
