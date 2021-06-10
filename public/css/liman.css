@@ -38429,6 +38429,7 @@ body {
     font-size: 14px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    color: rgba(31, 41, 55, 1);
 }
 
 .tooltip {
@@ -38464,7 +38465,7 @@ body {
 }
 
 .sidebar {
-    height: calc(100% - 7rem);
+    height: calc(100% - 6.4rem);
 }
 
 #liman-sidebar li a {
@@ -38591,4 +38592,44 @@ nav[aria-label="breadcrumb"] {
     background-color: #fff;
     box-shadow: 0 0 1px rgb(0 0 0 / 13%), 0 1px 3px rgb(0 0 0 / 20%);
     border-radius: 3px;
+}
+
+.card-title {
+    font-weight: 600;
+}
+
+.modal-header, .modal-footer {
+    border: none;
+    background-color: rgb(249,250,251);
+}
+
+.modal-header, .modal-header .close {
+    padding: 0.5rem 1rem;
+    
+}
+
+.modal-header .close {
+    margin: -0.5rem -1rem -1rem auto;
+}
+
+.modal-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.dataTables_length, .dataTables_info {
+    float: left;
+}
+
+.dataTables_paginate {
+    float: right;
+}
+
+.dt-buttons {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.form-control {
+    font-size: 0.9rem;
 }

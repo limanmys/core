@@ -18,7 +18,7 @@
             @endif
         </div>
         <div class="col-auto align-self-center">
-            <h5>{{$server->name}}</h5>
+            <h5 class="font-weight-bold pt-2">{{$server->name}}</h5>
         </div>
     </div>
 

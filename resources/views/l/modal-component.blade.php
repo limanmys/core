@@ -15,11 +15,11 @@
         <div class="modal-body">
             {{ $slot }}
         </div>
+        @isset($footer)
         <div class="modal-footer justify-content-right">
-            @isset($footer)
-                <button class="btn {{$footer["class"]}}" onclick="{{$footer["onclick"]}}">{{__($footer["text"])}}</button>
-            @endisset
+            <button class="btn {{$footer["class"]}}" onclick="{{$footer["onclick"]}}">{{__($footer["text"])}}</button>
         </div>
+        @endisset
         </div>
     </div>
 </div>
