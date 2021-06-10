@@ -115,6 +115,7 @@
             window[`${chart}-element`].data.datasets.forEach((dataset) => {
                 dataset.data.push(data);
             });
+            $('.charts-card').find('.overlay').hide();
             window[`${chart}-element`].update();
         }
     }
