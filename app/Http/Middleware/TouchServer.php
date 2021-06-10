@@ -19,7 +19,7 @@ class TouchServer
      */
     public function handle($request, Closure $next)
     {
-        if ($request->server_id) {
+        if ($request->server_id && auth()->check()) {
             if (
                 $request->session()->get('last_touched')
                 && $request->server_id != $request->session()->get('last_touched')
