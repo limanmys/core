@@ -92,6 +92,13 @@
                 {{__("Giriş Yap ")}}
               </button>
             </div>
+
+            <div class="flex align-items-center justify-center">
+              <a href="https://aciklab.org">
+                <img src="{{ asset('images/havelsan-aciklab_hq.png') }}" alt="HAVELSAN Açıklab"
+                   style="filter: invert(0.9); max-width: 120px;">
+              </a>
+            </div>
           </form>
         </div>
       </div>
@@ -99,7 +106,7 @@
   </div>
   <script>
     function getCaptcha(){
-        request("{{route('captcha')}}", new FormData(), function (response) {
+        request("{{ route('captcha') }}", new FormData(), function (response) {
             $('#captcha').html(response);
         }, function(response){
             var error = JSON.parse(response);
