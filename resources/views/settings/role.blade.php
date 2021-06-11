@@ -8,7 +8,6 @@
             <li class="breadcrumb-item active" aria-current="page">{{$role->name . __(" rol grubunun ayarları")}}</li>
         </ol>
     </nav>
-    <h2>{{$role->name . __(" rol grubunun ayarları")}}</h2>
     <div class="card">
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
