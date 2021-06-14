@@ -34,7 +34,7 @@
         </thead>
         <tbody>
         @foreach ($value as $k)
-            <tr class="tableRow" @if(isset($k->id)) data-id="{{$k->id}}" @endif id="{{str_random(10)}}" @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this)" @endisset>
+            <tr class="tableRow" @if(isset($k->id)) data-id="{{$k->id}}" @endif id="{{str_random(10)}}">
                 @if(isset($sortable) && $sortable)
                   <td style="width: 10px; text-align: center;"><i class="fas fa-arrows-alt"></i></td>
                 @endif
@@ -42,15 +42,15 @@
                 @foreach($display as $item)
                     @if(count(explode(':',$item)) > 1)
                         @if(is_array($k))
-                            <td id="{{explode(':',$item)[1]}}" hidden>{{$k[explode(':',$item)[0]]}}</td>
+                            <td @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this.parentElement)" @endisset id="{{explode(':',$item)[1]}}" hidden>{{$k[explode(':',$item)[0]]}}</td>
                         @else
-                            <td id="{{explode(':',$item)[1]}}" hidden>{{$k->__get(explode(':',$item)[0])}}</td>
+                            <td @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this.parentElement)" @endisset id="{{explode(':',$item)[1]}}" hidden>{{$k->__get(explode(':',$item)[0])}}</td>
                         @endif
                     @else
                         @if(is_array($k))
-                            <td id="{{$item}}">{{array_key_exists($item,$k) ? $k[$item] : ""}}</td>
+                            <td @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this.parentElement)" @endisset id="{{$item}}">{{array_key_exists($item,$k) ? $k[$item] : ""}}</td>
                         @else
-                            <td id="{{$item}}">{{$k->__get($item)}}</td>
+                            <td @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this.parentElement)" @endisset id="{{$item}}">{{$k->__get($item)}}</td>
                         @endif
                     @endif
                 @endforeach
