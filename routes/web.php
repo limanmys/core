@@ -32,6 +32,10 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     require_once app_path('Http/Controllers/Widgets/_routes.php');
 
+    // Market Routes
+
+    require_once app_path('Http/Controllers/Market/__routes.php');
+
     // Modules Routes
 
     require_once app_path('Http/Controllers/Module/_routes.php');
@@ -56,19 +60,6 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
     // Set Collapse
 
     Route::post('/collapse', 'HomeController@collapse')->name('set_collapse');
-
-    // Market Routes
-
-    Route::post('/market/kontrol', 'MarketController@verifyMarketConnection')
-        ->name('verify_market')
-        ->middleware('admin');
-
-    Route::post(
-        '/market/guncellemeKontrol',
-        'MarketController@checkMarketUpdates'
-    )
-        ->name('check_updates_market')
-        ->middleware('admin');
 
     // Home Route
 

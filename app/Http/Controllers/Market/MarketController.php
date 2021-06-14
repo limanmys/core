@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Market;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Models\Extension;
@@ -10,6 +11,10 @@ use App\Jobs\LimanUpdaterJob;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Contracts\Bus\Dispatcher;
 
+/**
+ * Class Market
+ * @package App\Http\Controllers\Market
+ */
 class MarketController extends Controller
 {
     /**
@@ -35,7 +40,7 @@ class MarketController extends Controller
         return respond("Market Bağlantısı Başarıyla Sağlandı.");
     }
 
-    private function checkAccess($hostname, $port = 443)
+    private static function checkAccess($hostname, $port = 443)
     {
         return is_resource(
             @fsockopen(
@@ -165,7 +170,7 @@ class MarketController extends Controller
         return respond($params);
     }
 
-    public function getClient()
+    public static function getClient()
     {
         if (!self::checkAccess(parse_url(env("MARKET_URL"))["host"])) {
             if (env("MARKET_URL") == null) {
