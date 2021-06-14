@@ -11,8 +11,8 @@
         <div class="col-md-3">
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
-                <h3 class="profile-username text-center">{{__("Yetki Talepleri")}}</h3>
-                <p class="text-muted text-center">Bu sayfadan mevcut yetki taleplerini görebilirsiniz. İşlem yapmak istediğiniz talebe sağ tıklayarak işlem yapabilirsiniz.</p>
+                <h3 class="profile-username text-center font-weight-bold">{{__("Yetki Talepleri")}}</h3>
+                <p class="text-muted text-center mb-0">Bu sayfadan mevcut yetki taleplerini görebilirsiniz. İşlem yapmak istediğiniz talebe sağ tıklayarak işlem yapabilirsiniz.</p>
               </div>
             </div>
         </div>

@@ -12,8 +12,8 @@
         <div class="col-md-3">
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
-                <h3 class="profile-username text-center">{{auth()->user()->name}}</h3>
-                <p class="text-muted text-center">{{auth()->user()->email}}</p>
+                <h3 class="profile-username text-center font-weight-bold">{{auth()->user()->name}}</h3>
+                <p class="text-muted text-center mb-0">{{auth()->user()->email}}</p>
               </div>
             </div>
             <div class="card card-primary">

@@ -12,8 +12,8 @@
         <div class="col-md-3">
             <div class="card card-primary card-outline">
                 <div class="card-body box-profile">
-                    <h3 class="profile-username text-center">{{__("Kasa")}}</h3>
-                    <p class="text-muted text-center">Bu sayfadan mevcut verilerini görebilirsiniz. Buradaki veriler, eklentiler tarafından kullanılmaktadır.</p>
+                    <h3 class="profile-username text-center font-weight-bold">{{__("Kasa")}}</h3>
+                    <p class="text-muted text-center mb-0">Bu sayfadan mevcut verilerini görebilirsiniz. Buradaki veriler, eklentiler tarafından kullanılmaktadır.</p>
                 </div>
             </div>
         </div>
