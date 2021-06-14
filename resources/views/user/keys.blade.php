@@ -13,8 +13,8 @@
         <div class="col-md-3">
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
-                <h3 class="profile-username text-center">{{__("Kişisel Erişim Anahtarları")}}</h3>
-                <p class="text-muted text-center">{{__("Size ait Kişisel Erişim Anahtarları'nın listesini görüntüleyebilirsiniz. Mevcut anahtar üzerinde işlem yapmak için sağ tıklayabilirsiniz.")}}</p>
+                <h3 class="profile-username text-center font-weight-bold">{{__("Kişisel Erişim Anahtarları")}}</h3>
+                <p class="text-muted text-center mb-0">{{__("Size ait Kişisel Erişim Anahtarları'nın listesini görüntüleyebilirsiniz. Mevcut anahtar üzerinde işlem yapmak için sağ tıklayabilirsiniz.")}}</p>
               </div>
             </div>
         </div>

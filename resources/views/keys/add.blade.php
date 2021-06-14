@@ -2,13 +2,13 @@
     <div class="modal-body">
         <p class="key-add-info">{{__("Liman üzerindeki sunucuların eklentileri servisler üzerinden kullanabileceğiniz gibi, bazı eklentileri sunucuya bağlantı kurmadan kullanamazsınız.")}}</p>
         <p class="key-add-info">{{__("Bu sebeple, bir anahtar eklemek istiyorsanız öncelikle konuşma protokolünü seçin.")}}</p>
-        <label id="useKeyLabel">
+        <label id="useKeyLabel" style="width: 100%; margin-bottom: 5px;">
             <input id="useKey" type="checkbox" onchange="keySettingsChanged()" checked>
             {{__("Bir Anahtar Kullanmak İstiyorum")}}
         </label>
         <div id="keyDiv" style="display: none;"><br>
             <div class="form-group">
-                <label><h4>{{__("Anahtar Türü")}}</h4></label>
+                <label class="text-md">{{__("Anahtar Türü")}}</label>
                 <select name="key_type" class="form-control" disabled onchange="setPort(this)" id="keyType">
                     <option value="ssh" selected>{{__("SSH")}}</option>
                     <option value="ssh_certificate">{{__("SSH Anahtarı")}}</option>
@@ -17,20 +17,20 @@
                     <option value="snmp">{{__("SNMP")}}</option>
                 </select>
             </div><hr>
-            <h4>{{__("Kullanıcı Adı")}}</h4>
+            <label class="text-md">{{__("Kullanıcı Adı")}}</label>
             <input id="keyUsername" name="username" type="text" class="form-control" placeholder="{{__("Kullanıcı Adı")}}" required disabled autocomplete="off"><br>
-            <h4 id="passwordPrompt">{{__("Şifre")}}</h4>
-            <h4 id="certificatePrompt">{{__("SSH Private Key")}}</h4>
-            <label id="certificateInformLabel">{{__("Anahtarınızın çalışabilmesi için şifreli olmaması ve sudo komutlarını çalıştırması için sudoers dosyasında NOPASSWD olarak eklenmiş olması gerekmektedir.")}}</label>
+            <label id="passwordPrompt" class="text-md">{{__("Şifre")}}</label>
+            <label id="certificatePrompt" class="text-md">{{__("SSH Private Key")}}</label>
+            <label id="certificateInformLabel" style="font-weight: 400">{{__("Anahtarınızın çalışabilmesi için şifreli olmaması ve sudo komutlarını çalıştırması için sudoers dosyasında NOPASSWD olarak eklenmiş olması gerekmektedir.")}}</label>
             <textarea class="form-control" name="password" id="keyPasswordCert" cols="30" rows="10" required disabled></textarea>
             <input id="keyPassword" name="password" type="password" class="form-control" placeholder="{{__("Şifre")}}" required disabled autocomplete="off"><br>        </div>
-        <h4>{{__("Port")}}</h4>
+        <label class="text-md">{{__("Port")}}</label>
         <small>{{__("Eğer bilmiyorsanız varsayılan olarak bırakabilirsiniz.")}}</small>
         <input id="port" type="number" name="port" class="form-control snmp-input" placeholder="{{__("Port")}}" required min="0" value="22"><br>
     </div>
 
     <div class="modal-footer">
-        <button id="keySubmitButton" type="submit" class="btn btn-primary">{{__("Ayarları Onayla")}}</button>
+        <button id="keySubmitButton" type="submit" class="btn btn-primary"><i class="fas fa-key"></i> {{__("Ayarları Onayla")}}</button>
     </div>
 </form>
 <script>
