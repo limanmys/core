@@ -27,7 +27,7 @@
             @endforeach
             @isset($menu)
             <th scope="col" class="menu-col">
-            -
+
             </th>
             @endisset
         </tr>
@@ -55,7 +55,7 @@
                     @endif
                 @endforeach
                 @isset($menu)
-                <td id="{{ $rand }}-click">
+                <td id="{{ $rand }}-click" style="text-align: right; padding-right: 18px;">
                     <i class="fas fa-ellipsis-v"></i>
                 </td>
                 @endisset

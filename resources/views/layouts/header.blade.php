@@ -16,7 +16,7 @@
                 @foreach ($USER_FAVORITES as $server)
                 <li class="nav-item has-treeview @if(request('server_id') == $server->id) menu-open @endif">
                     <a href="#" class="nav-link @if(request('server_id') == $server->id) active @endif">
-                        <i class="fa fa-server nav-icon"></i>
+                        <i class="fab {{ $server->isLinux() ? 'fa-linux' : 'fa-windows' }} nav-icon" style="font-weight: 400"></i>
                         <p>
                             {{$server->name}}
                             <i class="right fas fa-angle-right"></i>
@@ -43,7 +43,7 @@
                 @foreach ($SERVERS as $server)
                 <li class="nav-item has-treeview @if(request('server_id') == $server->id) menu-open @endif">
                     <a href="#" class="nav-link @if(request('server_id') == $server->id) active @endif">
-                        <i class="fa fa-server nav-icon"></i>
+                        <i class="fab {{ $server->isLinux() ? 'fa-linux' : 'fa-windows' }} nav-icon" style="font-weight: 400"></i>
                         <p>
                             {{$server->name}}
                             <i class="right fas fa-angle-right"></i>

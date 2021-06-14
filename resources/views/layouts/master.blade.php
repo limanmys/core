@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ session('locale') }}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -62,7 +62,8 @@
             return {
                 bFilter: true,
                 select: {
-                    style: 'multi'
+                    style: 'multi',
+                    selector: 'td:not(:last-child)'
                 },
                 dom: 'Blfrtip',
                 buttons: {

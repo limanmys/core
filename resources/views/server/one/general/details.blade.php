@@ -37,8 +37,8 @@
                 {{__("Yüklü eklenti yok.")}}
             @endif
         </p>
-        <hr>
         @if(server()->canRunCommand())
+        <hr>
             <strong>{{ __('Açık Kalma') }}</strong>
             <p class="text-muted">{{$outputs["uptime"]}}</p>
             <hr>
@@ -47,7 +47,6 @@
             <hr>
             <strong>{{ __('İşlem Sayısı') }}</strong>
             <p class="text-muted">{{$outputs["nofprocesses"]}}</p>
-            <hr>
         @endif
     </div>
     </div>
