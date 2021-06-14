@@ -25,6 +25,11 @@
                     <th scope="col">{{ __($i) }}</th>
                 @endif
             @endforeach
+            @isset($menu)
+            <th scope="col" class="menu-col">
+            -
+            </th>
+            @endisset
         </tr>
         </thead>
         <tbody>
@@ -49,13 +54,34 @@
                         @endif
                     @endif
                 @endforeach
+                @isset($menu)
+                <td id="{{ $rand }}-click">
+                    <i class="fas fa-ellipsis-v"></i>
+                </td>
+                @endisset
             </tr>
         @endforeach
         </tbody>
     </table>
 </div>
     @if(isset($menu))
+        <style>
+            .menu-col {
+                padding-right: 0 !important;
+                cursor: default !important;
+            }
+            .menu-col::before {
+                right: 0 !important;
+                content: "" !important;
+            }
+            
+            .menu-col::after {
+                right: 0 !important;
+                content: "" !important;
+            }
+        </style>
         <script>
+            $(".menu-col").off("click");
 
             @if(isset($sortable) && $sortable)
               $('#{{$rand}}').find('tbody').sortable({
@@ -84,6 +110,37 @@
             var {{$setCurrentVariable}};
             @endisset
             @if(count($value) > 0)
+           
+            $.contextMenu({
+                selector: '#{{$rand}}-click',
+                trigger: 'left',
+                callback: function (key, options) {
+                    @isset($setCurrentVariable)
+                    {{$setCurrentVariable}} = options.$trigger[0].getAttribute("id");
+                    @endisset
+                    var target = $("#" + key);
+                    if(target.length === 0){
+                        window[key](options.$trigger[0]);
+                        return;
+                    }
+                    inputs =[];
+                    $("#" + key + " input , #" + key + ' select').each(function (index, value) {
+                        var element_value = $("#" + options.$trigger[0].getAttribute("id") + " #" + value.getAttribute('name')).text();
+                        if(element_value){
+                            inputs.push($("#" + options.$trigger[0].getAttribute("id") + " #" + value.getAttribute('name')));
+                            $("#" + key + " select[name='" + value.getAttribute('name') + "']" + " , "
+                                + "#" + key + " input[name='" + value.getAttribute('name') + "']").val(element_value).prop('checked', true);
+                        }
+                    });
+                    target.modal('show');
+                },
+                items: {
+                    @foreach($menu as $name=>$config)
+                        "{{$config['target']}}" : {name: "{{__($name)}}" , icon: "{{$config['icon']}}"},
+                    @endforeach
+                }
+            });
+
             $.contextMenu({
                 selector: '#{{$rand}} tbody tr',
                 callback: function (key, options) {
