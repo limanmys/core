@@ -87,28 +87,6 @@
                     </p>
                 </li>
                 @endif
-
-              @if(count(sidebarModuleLinks()))
-                <li class="nav-header">{{__("Modül Sayfaları")}}</li>
-                    @foreach(sidebarModuleLinks() as $module)
-                        <li class="nav-item">
-                            <a href='{{$module["url"]}}' class="nav-link">
-                                <i class="nav-icon {{$module['icon']}}"></i>
-                                <p>{{$module["name"]}}</p>
-                            </a>
-                        </li>
-                    @endforeach
-                </li>
-              @endif()
-              @if(\App\Models\Module::exists())
-                <li class="nav-header">{{__("Modüller")}}</li>
-                <li class="nav-item">
-                    <a href='/modules' class="nav-link">
-                        <i class="nav-icon fas fa-puzzle-piece"></i>
-                        <p>{{__("Modüller")}}</p>
-                    </a>
-                </li>
-                @endif
             </ul>
           </nav>
           
