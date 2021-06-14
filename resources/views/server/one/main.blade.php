@@ -12,9 +12,13 @@
     <div class="row mb-2 serverName">
         <div class="col-auto align-self-center">
             @if($favorite)
-                <button onclick="favorite('false')" class="btn btn-warning fas fa-star btn-sm" data-toggle="tooltip" title="Favorilerden Çıkar"></button>
+                <button onclick="favorite('false')" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Sabitlemeyi kaldır">
+                    <i class="fas fa-thumbtack"></i>
+                </button>
             @else
-                <button onclick="favorite('true')" class="btn btn-success far fa-star btn-sm" data-toggle="tooltip" title="Favorilere Ekle"></button>
+                <button onclick="favorite('true')" class="btn btn-success btn-sm" data-toggle="tooltip" title="Sunucuyu sabitle">
+                    <i class="fas fa-thumbtack"></i>
+                </button>
             @endif
         </div>
         <div class="col-auto align-self-center">
