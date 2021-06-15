@@ -94,7 +94,7 @@
             </div>
 
             <div class="flex align-items-center justify-center">
-              <a href="https://aciklab.org">
+              <a href="https://aciklab.org" target="_blank">
                 <img src="{{ asset('images/havelsan-aciklab_hq.png') }}" alt="HAVELSAN Açıklab"
                    style="filter: invert(0.9); max-width: 120px;">
               </a>
