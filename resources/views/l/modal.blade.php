@@ -50,6 +50,7 @@
                         <br>
                     @endisset
                 </div>
+                @isset($submit_text)
                 <div class="modal-footer justify-content-right">
                     @isset($noEnter)
                         <button type="button" class="btn btn-success">@isset($submit_text){{__($submit_text)}}@endisset</button>
@@ -57,6 +58,7 @@
                         <button type="submit" class="btn btn-success">@isset($submit_text){{__($submit_text)}}@endisset</button>
                     @endisset
                 </div>
+                @endisset
             </form>
         </div>
     </div>

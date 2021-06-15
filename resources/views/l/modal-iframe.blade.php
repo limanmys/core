@@ -11,8 +11,8 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body" style="height: 70%">
-                <iframe src="{{$url}}" style="width:100%; height:100%;background-color:black;"></iframe>
+            <div class="modal-body" style="height: 100%">
+                <iframe src="{{$url}}" style="width:100%; height:100%;background-color:black; border: none; outline: none;"></iframe>
             </div>
         </div>
     </div>
