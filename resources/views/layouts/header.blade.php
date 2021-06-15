@@ -66,7 +66,7 @@
                         @endforeach
                     </ul>
                 @endforeach
-                @if(count($SERVERS) > 1) 
+                @if(count($SERVERS) > 0) 
                 <li class="nav-item">
                 <a href='/sunucular' class="nav-link">
                     <i class="nav-icon fas fa-ellipsis-h"></i>

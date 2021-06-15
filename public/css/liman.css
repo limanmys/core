@@ -38711,7 +38711,6 @@ table.dataTable {
     font-weight: 500;
 }
 
-
 .btn:-moz-focusring {
     outline: 1px dotted ButtonText;
 }
@@ -38763,4 +38762,10 @@ table.dataTable {
     font-size: 0.75rem!important;
     line-height: 1.5!important;
     border-radius: 0.15rem!important;
+}
+
+@media only screen and (min-width: 2500px) {
+    #captcha_field {
+        width: 232px !important;
+    }
 }
