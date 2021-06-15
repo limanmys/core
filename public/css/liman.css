@@ -38769,3 +38769,25 @@ table.dataTable {
         width: 232px !important;
     }
 }
+
+.extensions_category {
+    display: block; 
+    padding: 14px 10px; 
+    float: left;
+    color: #1a202c;
+    transition: 0.3s all;
+    border-bottom: 3px #fff solid;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.extensions_category:hover {
+    border-bottom: 3px #1a202c inset;
+    color: #1a202c;
+}
+
+.active_tab {
+    border-bottom: 3px #1a202c inset !important;
+    color: #1a202c;
+}
