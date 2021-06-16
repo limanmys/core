@@ -19,6 +19,7 @@
     <button class="btn btn-warning" onclick=showExtensionUpdates()>{{__("Güncellemeleri Yükle")}}</button>
 @endif
 <div class="float-sm-right">
+    <button class="btn btn-success" onclick="window.location.href='{{ route('market') }}'"><i class="fas fa-shopping-cart mr-1"></i>Eklenti Mağazası</button>
     <button data-toggle="tooltip" title="{{__('Ayarlar')}}" class="btn btn-primary" onclick="openSettingsModal()"><i
             class="fa fa-cogs"></i></button>
 </div><br><br>

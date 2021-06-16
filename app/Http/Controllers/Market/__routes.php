@@ -41,6 +41,12 @@ Route::middleware(["admin"])->group(function () {
     )
         ->name('market_search_real');
 
+    Route::post(
+        '/market/kur/{package_name}',
+        'Market\\PublicController@installPackage'
+    )
+        ->name('market_install_package');
+
     Route::get(
         '/market/testfield',
         'Market\\PublicController@test'

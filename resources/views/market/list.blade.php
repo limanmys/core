@@ -37,12 +37,12 @@
                 @foreach ($categories as $category)
                     <a href="{{ route('market_kategori', $category->id) }}" class="extensions_category">{{ $category->name }}</a>
                 @endforeach
-                <button class="btn btn-dark mt-2 ml-1" onclick="openExtensionUploadModal()"><i class="fas fa-download mr-1"></i>Eklenti yükle</button>
+                <button class="btn btn-dark mt-2 ml-1" style="height: 38px;" onclick="openExtensionUploadModal()"><i class="fas fa-download mr-1"></i>Eklenti yükle</button>
                 </div>
                 <div class="col-6">
                     <form action="{{ route('market_search') }}" method="GET">
                         <div class="input-group mt-2 w-50 float-right">
-                            <input name="search_query" class="form-control py-2" type="search" placeholder="Eklentilerde ara..." id="extension_search">
+                            <input name="search_query" class="form-control py-2" @isset(request()->search_query) value="{{request()->search_query}}" @endisset type="search" placeholder="Eklentilerde ara..." id="extension_search">
                             <span class="input-group-append">
                                 <button class="btn btn-dark" type="submit">
                                     <i class="fa fa-search"></i>
@@ -50,6 +50,7 @@
                             </span>
                         </div>
                     </form>
+                    <button onclick="window.location.href='/ayarlar#extensions'" class="btn btn-dark mt-2 mr-2 float-right" data-toggle="tooltip" title="Eklenti Ayarları" style="height: 38px;" ><i class="fas fa-cogs"></i></button>
                 </div>
             </div>
         </div>
@@ -61,23 +62,39 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-3">
+                    @if ($app->iconPath)
+                        <img src="{{ env('MARKET_URL') . '/' . $app->iconPath }}" alt="{{ $app->name }}" class="img-fluid">
+                    @else
                         <i class="fas fa-puzzle-piece" style="font-size: 100px;"></i>
+                    @endif
                     </div>
                     <div class="col-6">
                         <h4 style="font-weight: 600;">{{ $app->name }}</h4>
-                        <p>{{ $app->description }}</p>
+                        <p class="mb-0">{{ $app->shortDescription }}</p>
                     </div>
-                    <div class="col-3 text-right">
+                    <div class="col-3 text-center">
                     @if ($app->publicVersion)
-                        <button class="btn btn-success mb-2">
+                        @if (!$app->isInstalled)
+                        <button id="installBtn" class="btn btn-success mb-2 w-100" onclick="installExtension('{{ $app->packageName }}')">
                             <i class="fas fa-download mr-1"></i> Yükle
                         </button>
+                        @endif
+
+                        @if ($app->publicVersion->needsToBeUpdated)
+                        <button id="installBtn" class="pl-1 pr-1 btn btn-warning mb-2 w-100" onclick="installExtension('{{ $app->packageName }}')">
+                            <i class="fas fa-download mr-1"></i> Güncelle
+                        </button>
+                        @elseif ($app->isInstalled)
+                        <button id="installBtn" class="btn btn-secondary mb-2 w-100 disabled" disabled>
+                            <i class="fas fa-check mr-1"></i> Kurulu
+                        </button>
+                        @endif
                     @else
-                        <button class="btn btn-primary mb-2">
+                        <button class="btn btn-primary mb-2" onclick="window.open('https://liman.havelsan.com.tr/iletisim/')">
                             <i class="fas fa-shopping-cart mr-1"></i> Satın Al
                         </button>
                     @endif
-                        <small style="cursor:pointer;" onclick="showIframeModal('{{ env('MARKET_URL') . '/Application/' . mb_strtolower($app->packageName) }}')">Daha fazla detay</small>
+                        <a href="{{ env('MARKET_URL') . '/Application/' . mb_strtolower($app->packageName) }}" target="_blank"><small>Daha fazla detay</small></a>
                     </div>
                 </div>
             </div>
@@ -86,7 +103,7 @@
                     <div class="col-6">
                         @if ($app->publicVersion)
                         <small class="font-italic">
-                            <b>Versiyon:</b> {{ $app->publicVersion->versionCode }}
+                            <b>Versiyon:</b> {{ $app->publicVersion->versionName }}
                         @else
                         <small>
                             Ücretli eklenti
@@ -95,7 +112,7 @@
                     </div>
                     <div class="col-6 text-right">
                         <small>
-                            <b>Geliştirici:</b> <a href="mailto:{{ $app->publisher->email }}">{{ $app->publisher->userName }}</a>
+                            <b>Geliştirici:</b> {{ $app->publisher->userName }}
                         </small>
                     </div>
                 </div>
@@ -132,12 +149,6 @@
     "submit_text" => "Yükle"
 ])
 
-@include('modal-iframe', [
-    "id" => "iframeModal",
-    "title" => "Eklenti Detayları",
-    "url" => ""
-])
-
 <script>
     function openExtensionUploadModal() {
         $("#extensionUpload").modal('show');
@@ -149,6 +160,59 @@
             showSwal('{{__("Maksimum eklenti boyutunu (100MB) aştınız!")}}','error');
         }
     });
+
+    function installExtension(package_name) 
+    {
+        showSwal('Kuruluyor...', 'info');
+        let extdata = new FormData();
+        request(`/market/kur/${package_name}`, extdata, function(response) {
+            Swal.close();
+            showSwal("Eklenti başarıyla kuruldu!", "success", 1500);
+            setTimeout(_ => {
+                window.location = "/ayarlar#extensions"
+            }, 1500);
+        }, function(err) {
+            installUnsignedExtension(err, package_name);
+        });
+    }
+
+    function installUnsignedExtension(response, package_name)
+    {
+        var error = JSON.parse(response);
+        if(error.status == 203){
+            Swal.fire({
+                title: "{{ __('Onay') }}",
+                text: error.message,
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: "{{ __('İptal') }}",
+                confirmButtonText: "{{ __('Tamam') }}"
+            }).then((result) => {
+                if (result.value) {
+                    showSwal('Kuruluyor...', 'info');
+                    let extdata = new FormData();
+                    extdata.append("force", "1");
+                    request(`/market/kur/${package_name}`, extdata, function(response) {
+                        console.log(response);
+                        Swal.close();
+                        showSwal("Eklenti başarıyla kuruldu!", "success", 1500);
+                        setTimeout(_ => {
+                            window.location = "/ayarlar#extensions"
+                        }, 1500);
+                    }, function(err) {
+                        console.log(err);
+                        var error = JSON.parse(err);
+                        Swal.close();
+                        showSwal(error.message, "error", 3000);
+                    });
+                }
+            });
+        } else {
+            showSwal("Eklenti kurulumunda hata oluştu!", "error", 3000);
+        }
+    }
 
     function extensionUploadError(response){
         var error = JSON.parse(response);
@@ -182,13 +246,6 @@
                 }
             });
         }
-    }
-
-    function showIframeModal(url) {
-        $('#iframeModal').modal("show");
-        $('#iframeModal').on('shown.bs.modal', function() {
-            $(this).find('iframe').attr('src', url)
-        })  
     }
 
     $(".extensions_category").each(function() {  
