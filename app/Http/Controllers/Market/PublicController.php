@@ -75,12 +75,16 @@ class PublicController extends Controller
         return $json;
     }
 
-    public function getApplications() 
+    public function getApplications(Request $request) 
     {
         $client = self::httpClient();
 
         try {
-            $response = $client->get($this->apiUrls["getApplications"]);
+            if (!$request->pageNumber) {
+                $response = $client->get($this->apiUrls["getApplications"]);
+            } else {
+                $response = $client->get($this->apiUrls["getApplications"] . "?pageNumber=" . $request->pageNumber);
+            }
         } 
         catch (\Throwable $e) 
         {
@@ -98,7 +102,17 @@ class PublicController extends Controller
             "hasNextPage" => $json->hasNextPage
         ];
 
-        return view("market.list", ["apps" => $items, "paginate" => $paginate, "categories" => $this->getCategories()]);
+        if ($json->hasNextPage)
+        {
+            array_merge($paginate, ["nextPage" => $json->pageIndex + 1]);
+        }
+
+        if ($json->hasPreviousPage)
+        {
+            array_merge($paginate, ["previousPage" => $json->pageIndex - 1]);
+        }
+
+        return view("market.list", ["apps" => $items, "paginate" => (object) $paginate, "categories" => $this->getCategories()]);
     }
 
     public function getCategoryItems(Request $request)
@@ -106,7 +120,11 @@ class PublicController extends Controller
         $client = self::httpClient();
 
         try {
-            $response = $client->get($this->apiUrls["getApplications"] . "?categoryId=" . $request->category_id);
+            if (!$request->pageNumber) {
+                $response = $client->get($this->apiUrls["getApplications"] . "?categoryId=" . $request->category_id);
+            } else {
+                $response = $client->get($this->apiUrls["getApplications"] . "?categoryId=" . $request->category_id  . "&pageNumber=" . $request->pageNumber);
+            }
         } 
         catch (\Throwable $e) 
         {
@@ -124,7 +142,17 @@ class PublicController extends Controller
             "hasNextPage" => $json->hasNextPage
         ];
 
-        return view("market.list", ["apps" => $items, "paginate" => $paginate, "categories" => $this->getCategories()]);
+        if ($json->hasNextPage)
+        {
+            array_merge($paginate, ["nextPage" => $json->pageIndex + 1]);
+        }
+
+        if ($json->hasPreviousPage)
+        {
+            array_merge($paginate, ["previousPage" => $json->pageIndex - 1]);
+        }
+
+        return view("market.list", ["apps" => $items, "paginate" => (object) $paginate, "categories" => $this->getCategories()]);
     }
 
     public function search(Request $request)
@@ -150,7 +178,17 @@ class PublicController extends Controller
             "hasNextPage" => $json->hasNextPage
         ];
 
-        return view("market.list", ["apps" => $items, "paginate" => $paginate, "categories" => $this->getCategories()]);
+        if ($json->hasNextPage)
+        {
+            array_merge($paginate, ["nextPage" => $json->pageIndex + 1]);
+        }
+
+        if ($json->hasPreviousPage)
+        {
+            array_merge($paginate, ["previousPage" => $json->pageIndex - 1]);
+        }
+
+        return view("market.list", ["apps" => $items, "paginate" => (object) $paginate, "categories" => $this->getCategories()]);
     }
 
     public function installPackage(Request $request)
@@ -282,22 +320,5 @@ class PublicController extends Controller
         }
         
         return $json;
-    }
-
-    public function test()
-    {
-        $client = self::httpClient();
-
-        try {
-            $response = $client->get($this->apiUrls["getApplications"]);
-        } 
-        catch (\Throwable $e) 
-        {
-            return respond($e->getMessage(), 201);
-        }
-
-        $json = $this->updateFilter(json_decode((string) $response->getBody())->items);
-
-        dd($json);
     }
 }

@@ -120,6 +120,20 @@
         </div>
     </div>
     @endforeach
+    
+    @if (!$paginate->totalPages == 1)
+    <div class="col-12">
+        <div class="row">
+            <div class="col-6">
+                <a href="?pageNumber={{ isset($paginate->previousPage) ? $paginate->previousPage : '' }}" class="btn btn-primary w-100 text-white @if(!$paginate->hasPreviousPage) disabled @endif"><i class="fas fa-chevron-left mr-1"></i> Önceki</a>
+            </div>
+
+            <div class="col-6">
+                <a href="?pageNumber={{ isset($paginate->nextPage) ? $paginate->nextPage : '' }}" class="btn btn-primary w-100 text-white @if(!$paginate->hasNextPage) disabled @endif">Sonraki <i class="fas fa-chevron-right ml-1"></i></a>
+            </div>
+        </div>
+    </div>
+    @endif
 
     @if (count($apps) == 0)
     <div class="container-fluid">
@@ -128,7 +142,11 @@
             <div class="error-content">
                 <h3>Uyarı</h3>
                 <p>
+                    @if (request()->search_query)
                     {{ request()->search_query }} aramasına uygun bir eklenti bulamadık.
+                    @else
+                    Eklenti bulunamadı.
+                    @endif
                     <br><button class="btn btn-success mt-3" onclick="history.back()">{{__("Geri Dön")}}</button>
                 </p>
             </div>
