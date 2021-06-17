@@ -30,6 +30,9 @@ Route::middleware(["admin"])->group(function () {
     Route::get(
         '/market/arama',
         function(Illuminate\Http\Request $request) {
+            if (!$request["search_query"]) {
+                return redirect()->route('market');
+            }
             return redirect()->route('market_search_real', ["search_query" => $request["search_query"]]);    
         }
     )
