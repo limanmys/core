@@ -71,7 +71,7 @@ class PublicController extends Controller
             return respond($e->getMessage(), 201);
         }
 
-        $json = json_decode((string) $response->getBody())->items;
+        $json = json_decode((string) $response->getBody());
         return $json;
     }
 
