@@ -121,7 +121,8 @@
     </div>
     @endforeach
     
-    @if (!$paginate->totalPages == 1)
+    @if (!$paginate->totalPages == 1 && !$paginate->totalPages == 0)
+    {{ var_dump($paginate) }}
     <div class="col-12">
         <div class="row">
             <div class="col-6">
