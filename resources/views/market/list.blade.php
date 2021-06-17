@@ -32,14 +32,14 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body py-0 pl-2 row">
-                <div class="col-6">
+                <div class="col-8">
                 <a href="{{ route('market') }}" class="extensions_category">Tüm Eklentiler</a>
                 @foreach ($categories as $category)
                     <a href="{{ route('market_kategori', $category->id) }}" class="extensions_category">{{ $category->name }}</a>
                 @endforeach
                 <button class="btn btn-dark mt-2 ml-1" style="height: 38px;" onclick="openExtensionUploadModal()"><i class="fas fa-download mr-1"></i>Eklenti yükle</button>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
                     <form action="{{ route('market_search') }}" method="GET">
                         <div class="input-group mt-2 w-50 float-right">
                             <input name="search_query" class="form-control py-2" @isset(request()->search_query) value="{{request()->search_query}}" @endisset type="search" placeholder="Eklentilerde ara..." id="extension_search">
