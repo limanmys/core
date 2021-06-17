@@ -16,7 +16,7 @@
 
     <!-- Main content -->
     <section class="content">
-        <div class="container-fluid">
+        <div class="container-fluid pt-4">
             @yield('content')
         </div>
     </section>

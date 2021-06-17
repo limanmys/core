@@ -38,24 +38,24 @@
               margin-left: -0.75rem;
             }
           </style>
-          <li class="nav-item">
+          <li class="nav-item d-none d-md-block">
             <a href="/takip" class="nav-link" data-toggle="tooltip" title="Sunucu Takibi">
               <i class="nav-icon fas fa-grip-horizontal"></i>
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item d-none d-md-block">
                 <a href="/bilesenler" class="nav-link" data-toggle="tooltip" @if(request()->getRequestUri() == '/bilesenler')class="active"@endif title='{{__("Bileşenler")}}'>
                       <i class="nav-icon fas fa-chart-pie"></i>
                 </a>
           </li>
         </ul>
-@if(request('server') != null)
-<ul class="mx-auto order-0 navbar-nav text-white">
-        <li style="font-weight:bolder;font-size:20px;cursor:pointer;" data-toggle="tooltip" data-original-title="{{server()->ip_address}}" onclick="window.location.href = '{{route('server_one',[
-            "server_id" => server()->id,
-        ])}}'">{{server()->name}}</li>
-    </ul>
-@endif
+        @if(request('server') != null)
+        <ul class="mx-auto order-0 navbar-nav text-white d-md-block d-sm-none">
+                <li style="font-weight:bolder;font-size:20px;cursor:pointer;" data-toggle="tooltip" data-original-title="{{server()->ip_address}}" onclick="window.location.href = '{{route('server_one',[
+                    "server_id" => server()->id,
+                ])}}'">{{server()->name}}</li>
+            </ul>
+        @endif
         <!-- Right navbar links -->
         <ul class="navbar-nav @if(request('server') == null) ml-auto @endif">
           
