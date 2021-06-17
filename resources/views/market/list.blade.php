@@ -32,16 +32,28 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body py-0 pl-2 row">
-                <div class="col-8">
-                <a href="{{ route('market') }}" class="extensions_category">Tüm Eklentiler</a>
-                @foreach ($categories as $category)
-                    <a href="{{ route('market_kategori', $category->id) }}" class="extensions_category">{{ $category->name }}</a>
-                @endforeach
-                <button class="btn btn-dark mt-2 ml-1" style="height: 38px;" onclick="openExtensionUploadModal()"><i class="fas fa-download mr-1"></i>Eklenti yükle</button>
+                <div class="col-lg-7" style="max-height: 52px; overflow: hidden;">
+                    <a href="javascript:void()" id="btn-nav-previous" class="extensions_category">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    
+                    <a href="javascript:void()" id="btn-nav-next" style="right: 0;" class="extensions_category">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <div class="ext_menu">
+                        <a href="{{ route('market') }}" class="extensions_category">Tüm Eklentiler</a>
+                        @foreach ($categories as $category)
+                            <a href="{{ route('market_kategori', $category->id) }}" class="extensions_category">{{ $category->name }}</a>
+                        @endforeach
+                       
+                    </div>
                 </div>
-                <div class="col-4">
+                <div class="col-lg-5 d-flex search-btns" style="justify-content: flex-end;">
+                <button onclick="window.location.href='/ayarlar#extensions'" class="btn btn-dark mt-2 mr-2 float-right" data-toggle="tooltip" title="Eklenti Ayarları" style="height: 38px;" ><i class="fas fa-cogs"></i></button>
+                    <button class="btn btn-dark mt-2 mr-2 float-right" style="height: 38px;" onclick="openExtensionUploadModal()"><i class="fas fa-download mr-1"></i>Eklenti yükle</button>
                     <form action="{{ route('market_search') }}" method="GET">
-                        <div class="input-group mt-2 w-50 float-right">
+                        
+                        <div class="input-group mt-2 float-right">
                             <input name="search_query" class="form-control py-2" @isset(request()->search_query) value="{{request()->search_query}}" @endisset type="search" placeholder="Eklentilerde ara..." id="extension_search">
                             <span class="input-group-append">
                                 <button class="btn btn-dark" type="submit">
@@ -50,29 +62,29 @@
                             </span>
                         </div>
                     </form>
-                    <button onclick="window.location.href='/ayarlar#extensions'" class="btn btn-dark mt-2 mr-2 float-right" data-toggle="tooltip" title="Eklenti Ayarları" style="height: 38px;" ><i class="fas fa-cogs"></i></button>
+                    
                 </div>
             </div>
         </div>
     </div>
 
     @foreach ($apps as $app)
-    <div class="col-md-4">
+    <div class="col-xl-4 col-lg-6 col-md-12">
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-3">
+                    <div class="col-xl-3 col-lg-5 col-md-6 col-sm-6 col-5">
                     @if ($app->iconPath)
-                        <img src="{{ env('MARKET_URL') . '/' . $app->iconPath }}" alt="{{ $app->name }}" class="img-fluid">
+                        <img src="{{ env('MARKET_URL') . '/' . $app->iconPath }}" alt="{{ $app->name }}" class="img-fluid mb-3">
                     @else
-                        <i class="fas fa-puzzle-piece" style="font-size: 100px;"></i>
+                        <img src="{{ asset('images/no-icon.jpg') }}" alt="{{ $app->name }}" class="img-fluid mb-3">
                     @endif
                     </div>
-                    <div class="col-6">
+                    <div class="col-xl-6 col-lg-7 col-md-6 col-sm-6 col-7">
                         <h4 style="font-weight: 600;">{{ $app->name }}</h4>
                         <p class="mb-0">{{ $app->shortDescription }}</p>
                     </div>
-                    <div class="col-3 text-center">
+                    <div class="col-xl-3 col-lg-12 text-center">
                     @if ($app->publicVersion)
                         @if (!$app->isInstalled)
                         <button id="installBtn" class="btn btn-success mb-2 w-100" onclick="installExtension('{{ $app->packageName }}')">
@@ -271,6 +283,31 @@
         if (this.href == window.location.href) {
             $(this).addClass("active_tab");
         }
+    });
+
+    function loopNext(){
+        $('.ext_menu').stop().animate({scrollLeft:'+=40'}, 'fast', 'linear', loopNext);
+    }
+
+    function loopPrev(){
+        $('.ext_menu').stop().animate({scrollLeft:'-=40'}, 'fast', 'linear', loopPrev);
+    }
+
+    function stop(){
+        $('.ext_menu').stop();
+    }
+
+
+    $('#btn-nav-next').hover(function () {
+        loopNext();
+    },function () {
+        stop();
+    });
+
+    $('#btn-nav-previous').hover(function () {
+        loopPrev();
+    },function () {
+        stop();
     });
 </script>
 @endsection

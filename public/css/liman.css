@@ -38771,15 +38771,18 @@ table.dataTable {
 }
 
 .extensions_category {
-    display: block; 
-    padding: 14px 10px; 
-    float: left;
+    padding: 14px 2px; 
     color: #1a202c;
     transition: 0.3s all;
     border-bottom: 3px #fff solid;
     text-transform: uppercase;
     font-weight: 600;
-    margin-right: 10px;
+    margin-right: 16px;
+    display: inline-block;
+}
+
+.extensions_category:first-of-type {
+    margin-left: 7px;
 }
 
 .extensions_category:hover {
@@ -38790,4 +38793,31 @@ table.dataTable {
 .active_tab {
     border-bottom: 3px #1a202c inset !important;
     color: #1a202c;
+}
+
+.select-info {
+    display: block;
+    font-weight: 600;
+}
+
+.ext_menu {
+    overflow: auto;
+    white-space: nowrap;
+    padding-left: 37px;
+    width: calc(100% - 37px);
+}
+
+#btn-nav-previous, #btn-nav-next {
+    position: absolute; 
+    margin: 0;
+    padding: 14px 14px;
+    background: #fff;
+}
+
+@media only screen and (max-width: 992px) 
+{
+    .search-btns {
+        margin-bottom: 12px;
+        justify-content: space-between !important;
+    }
 }
