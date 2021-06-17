@@ -399,7 +399,7 @@
                             showSwal("Okunuyor...","info");
                             request("{{route('cron_mail_get')}}",new FormData(),function (success){
                                 $("#mailWrapper").html(success);
-                                $("#mailWrapper table").DataTable();
+                                $("#mailWrapper table").DataTable(dataTablePresets("normal"));
                                 Swal.close();
                             },function(error){
                                 let json = JSON.parse(error);
