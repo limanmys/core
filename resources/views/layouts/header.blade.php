@@ -7,6 +7,16 @@
         </a>
         <!-- Sidebar -->
         <div class="sidebar">  
+          <!-- Sidebar Search -->
+          <div id="liman_search" autocomplete="off">
+            <div class="form-group has-search">
+                <span class="fa fa-search form-control-feedback"></span>
+                <input autocomplete="off" autocomplete="" type="text" id="liman_search_input" class="form-control" placeholder="Arama" name="search_query">
+            </div> 
+            <div id="liman_search_results">
+
+            </div>
+          </div>
           <!-- Sidebar Menu -->
           <nav>
             <ul id="liman-sidebar" class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">

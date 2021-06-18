@@ -24,7 +24,7 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     require_once app_path('Http/Controllers/Certificate/_routes.php');
 
-    // Server Routes
+    // Settings Routes
 
     require_once app_path('Http/Controllers/Settings/_routes.php');
 
@@ -140,6 +140,8 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
     Route::post('/user/setting/update', 'UserController@updateSetting')->name(
         'user_setting_update'
     );
+
+    Route::get('/liman_arama', 'SearchController@search')->name('search');
 });
 
 Route::any('/upload/{any?}', function () {

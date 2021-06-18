@@ -428,6 +428,72 @@ $(function () {
   });
 });
 
+function getSearchResults (query) {
+    $.ajax({
+      dataType: "json",
+      method: "GET",
+      url: "/liman_arama",
+      data: {
+        search_query: query
+      },
+      success: function (data, status, xhr) 
+      {
+
+        console.log(data)
+        if (data.length == 0) {
+          $("#liman_search_results").append(`
+            <a href="#">Sonuç bulunamadı</a>
+          `);
+        }
+
+        data.forEach(el => {
+          console.log(el);
+          $("#liman_search_results").append(`
+            <a href="${el.url}">${el.name}</a>
+          `);
+        });
+      },
+      error: function (jqXhr, textStatus, error) 
+      {
+        console.log(error);
+      }
+    })
+}
+
+function liman_search() {
+  let input = $("#liman_search_input");
+  let result = $("#liman_search_results");
+  
+  if (input.val().length > 2)
+  {
+    result.html("");
+    getSearchResults(input.val());
+    result.fadeIn(250);
+  }
+
+  if (input.val() == "") 
+  {
+    result.fadeOut(250);
+  }
+}
+
 $(document).ready(function() {
   $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+  
+  let input = $("#liman_search_input");
+  let result = $("#liman_search_results");
+
+  input.on("keyup", function () {
+    clearTimeout($.data(this, 'timer'));
+    var wait = setTimeout(liman_search, 150);
+    $(this).data('timer', wait);
+  })
+
+  $(document).on("click", function(event){
+    var $trigger = $("#liman_search");
+    if($trigger !== event.target && !$trigger.has(event.target).length)
+    {
+      result.fadeOut(250);
+    }            
+  });
 });

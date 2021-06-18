@@ -2,7 +2,7 @@
 
 @section('content')
     @include('errors')
-    <br><div class="callout callout-info">
+    <div class="callout callout-info">
         <h5>{{__("Liman MYS'ye Hoşgeldiniz")}}</h5>
         {{__("Kullanım rehberine ulaşmak için")}} <a href="https://rehber.liman.dev/" target="_blank">https://rehber.liman.dev/</a> {{__("adresini ziyaret edebilirsiniz.")}}
     </div>

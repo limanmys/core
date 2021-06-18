@@ -92,7 +92,6 @@ body {
 
 #liman-sidebar .nav-header {
     padding: 8px 19px;
-    margin-top: 10px;
     text-transform: uppercase;
     font-weight: 600;
     font-size: 14px;
@@ -396,4 +395,53 @@ table.dataTable {
         margin-bottom: 12px;
         justify-content: space-between !important;
     }
+}
+ 
+#liman_search {
+    padding: 0px 19px;
+    margin-top: 24px;
+}
+
+.has-search .form-control {
+    padding-left: 2.375rem;
+    background-color: #232c3c;
+    color: rgb(107, 114, 128);
+    border: none;
+}
+
+.has-search .form-control::placeholder {
+    color: rgb(107, 114, 128)
+}
+ 
+.has-search .form-control-feedback {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    width: 2.375rem;
+    height: 2.375rem;
+    line-height: 2.375rem;
+    text-align: center;
+    pointer-events: none;
+    color: rgb(107, 114, 128);
+}
+
+#liman_search_results {
+    position: absolute;
+    background: #232c3c;
+    border-radius: 3px;
+    z-index: 1;
+    width: 85%;
+    display: none;
+}
+
+#liman_search_results a {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    color: rgb(107, 114, 128);
+    transition: 0.3s all;
+}
+
+#liman_search_results a:hover {
+    background: #2c384c;
 }
