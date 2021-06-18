@@ -438,8 +438,6 @@ function getSearchResults (query) {
       },
       success: function (data, status, xhr) 
       {
-
-        console.log(data)
         if (data.length == 0) {
           $("#liman_search_results").append(`
             <a href="#">Sonuç bulunamadı</a>

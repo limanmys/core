@@ -9,65 +9,15 @@ class SearchController extends Controller
 {
     public function search(Request $request)
     {
-        $searchable = [
-            [
-                'name' => 'Sistem Ayarları',
-                'url' => route('settings')
-            ],
-            [
-                'name' => 'Kullanıcı Ayarları',
-                'url' => route('settings') . '#users'
-            ],
-            [
-                'name' => 'Sistem Ayarları / Eklentiler',
-                'url' => route('settings') . '#extensions'
-            ],
-            [
-                'name' => 'Sistem Ayarları / Rol Grupları',
-                'url' => route('settings') . '#roles'
-            ],
-            [
-                'name' => 'Sistem Ayarları / Sunucu Grupları',
-                'url' => route('settings') . '#serverGroups'
-            ],
-            [
-                'name' => 'Sistem Ayarları / Sertifikalar',
-                'url' => route('settings') . '#certificates'
-            ],
-            [
-                'name' => 'Sistem Ayarları / Sağlık Durumu',
-                'url' => route('settings') . '#health'
-            ],
-            [
-                'name' => 'Sistem Ayarları / Dış Bildirimler',
-                'url' => route('settings') . '#externalNotifications'
-            ],
-            [
-                'name' => 'Sistem Ayarları / Kısıtlı Mod',
-                'url' => route('settings') . '#restrictedMode'
-            ],
-            [
-                'name' => 'Sistem Ayarları / Liman Market',
-                'url' => route('settings') . '#limanMarket'
-            ],
-            [
-                'name' => 'Sistem Ayarları / DNS',
-                'url' => route('settings') . '#dnsSettings'
-            ],
-            [
-                'name' => 'Sistem Ayarları / Mail Ayarları',
-                'url' => route('settings') . '#mailSettings'
-            ],
-            [
-                'name' => 'Sistem Ayarları / İnce Ayarlar',
-                'url' => route('settings') . '#limanTweaks'
-            ],
-            [
-                'name' => 'Eklenti Mağazası',
-                'url' => route('market')
-            ],
-        ];
+        $searchable = [];
 
+        // Get constant searchables
+        foreach (config('liman.searchable') as $constant)
+        {
+            array_push($searchable, $constant);
+        }
+
+        // Server searching
         $servers = Server::select('id', 'name', 'city')->get();
         foreach ($servers as $server)
         {
@@ -75,7 +25,8 @@ class SearchController extends Controller
                 'name' => $server->name,
                 'url' => route('server_one', $server->id)
             ]);
-
+            
+            // Extension searching
             $extensions = $server->extensions();
             
             foreach($extensions as $extension)
@@ -90,9 +41,9 @@ class SearchController extends Controller
         $results = [];
         $search_query = $request->search_query;
 
+        // Searching inside the searchable array
         foreach ($searchable as $search_item)
         {
-            //if (strpos(strtolower($search_item['name']), strtolower($search_query)))
             if (str_contains(strtolower($search_item['name']), strtolower($search_query)))
             {
                 array_push($results, $search_item);
