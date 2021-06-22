@@ -445,7 +445,6 @@ function getSearchResults (query) {
         }
 
         data.forEach(el => {
-          console.log(el);
           $("#liman_search_results").append(`
             <a href="${el.url}">${el.name}</a>
           `);

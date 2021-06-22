@@ -63,7 +63,7 @@
                 bFilter: true,
                 select: {
                     style: 'multi',
-                    selector: 'td:not(:last-child)'
+                    selector: 'td:not(.table-menu)'
                 },
                 dom: 'Blfrtip',
                 buttons: {
