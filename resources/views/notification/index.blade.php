@@ -27,7 +27,7 @@
                             <i class="fas fa-bell @if($item->type=="error") bg-red @else bg-blue @endif"></i>
                         @endif
                         <div class="timeline-item">
-                            <span class="time"><i class="fa fa-clock-o"></i> {{$item->created_at}}</span>
+                            <span class="time"><i class="fa fa-clock-o"></i> {{\Carbon\Carbon::parse($item->created_at)->format('h:i:s')}}</span>
                             <h3 class="timeline-header">
                                 @if(!$item->read)<a href="javascript:void(0)">@endif
                                     {{$item->title}}

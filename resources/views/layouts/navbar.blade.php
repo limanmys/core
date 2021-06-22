@@ -100,7 +100,7 @@
                     <div class="card card-widget widget-user-2" style="margin-bottom: 0px;">
                         <div class="widget-user-header bg-secondary" style="color:white">
                           <h3 class="widget-user-username" style="margin-left: 0px;" title="{{ user()->name, 20 }}">{{ str_limit(user()->name, 20)}}</h3>
-                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Son Giriş Tarihi : ") . user()->last_login_at}}</h5>
+                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Son Giriş Tarihi : ") . \Carbon\Carbon::parse(user()->last_login_at)->isoFormat('LL')}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Giriş Yapılan Son Ip : ") . user()->last_login_ip}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Bağlı Liman : ") . getLimanHostname()}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 11px;">{{__("Liman ID: ") . getLimanId()}}</h5>
@@ -119,9 +119,9 @@
                             </li>
                           @else 
                           <li class="nav-item">
-                            <a href='/taleplerim' class="nav-link">
-                                <i class="nav-icon fas fa-key mr-1"></i>
-                                <p>{{__("Yetki Talebi")}}</p>
+                            <a href="/taleplerim" class="nav-link text-dark">
+                              <i class="nav-icon fas fa-key mr-1"></i>
+                              {{__("Yetki Talebi")}}
                             </a>
                           </li>
                           @endif

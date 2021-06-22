@@ -40,7 +40,7 @@
         @if(server()->canRunCommand())
         <hr>
             <strong>{{ __('Açık Kalma') }}</strong>
-            <p class="text-muted">{{$outputs["uptime"]}}</p>
+            <p class="text-muted">{{ \Carbon\Carbon::parse($outputs["uptime"])->diffForHumans() }}</p>
             <hr>
             <strong>{{ __('Servis Sayısı') }}</strong>
             <p class="text-muted">{{$outputs["nofservices"]}}</p>
