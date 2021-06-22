@@ -21,12 +21,10 @@ class TouchServer
     {
         if ($request->server_id && auth()->check()) {
             if (
-                $request->session()->get('last_touched')
-                && $request->server_id != $request->session()->get('last_touched')
+                ($request->session()->get('last_touched')
+                && $request->server_id != $request->session()->get('last_touched'))
+                || !$request->session()->get('last_touched')
             ) {
-                \App\Models\Server::where('id', $request->server_id)->first()->touch();
-                $request->session()->put('last_touched', $request->server_id);
-            } elseif (!$request->session()->get('last_touched')) {
                 \App\Models\Server::where('id', $request->server_id)->first()->touch();
                 $request->session()->put('last_touched', $request->server_id);
             }
