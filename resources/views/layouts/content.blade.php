@@ -16,7 +16,7 @@
 
     <!-- Main content -->
     <section class="content">
-        <div class="container-fluid pt-4">
+        <div class="container-fluid @if(auth()->check() && user()->email != 'administrator@liman.dev') pt-4 @endif">
             @yield('content')
         </div>
     </section>

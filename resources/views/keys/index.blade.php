@@ -56,7 +56,7 @@
     "title" => "Anahtar Ekle"
 ])
 <div class="modal-body">
-    <h3>{{__("Sunucu")}}</h3>
+    <label>{{__("Sunucu")}}</label>
     <select name="targetServer" id="targetServer" class="select2 form-control" onchange="setIPAdress()">
     @foreach(servers() as $server)
         <option value="{{$server->ip_address . ':' . $server->id}}">{{$server->name}}</option>

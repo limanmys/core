@@ -193,9 +193,9 @@
                 </button>
             </div>
             <div class="modal-body">
-                <h4>{{__("Lütfen Bir Eklenti Seçin")}}</h4>
+                <label>{{__("Lütfen Bir Eklenti Seçin")}}</label>
                 <select id="extensionId" class="form-control" onchange="getFunctionList()">
-                    <option selected disabled>{{__("...")}}</option>
+                    <option selected disabled>{{__("Eklenti")}}</option>
                     @foreach(extensions() as $extension)
                         <option value="{{$extension->id}}">{{$extension->display_name}}</option>
                     @endforeach

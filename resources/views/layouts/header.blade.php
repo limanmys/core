@@ -84,18 +84,27 @@
                 </a>
                  </li>
                 @else
-                <li class="nav-item">
-                <a href='/sunucular' class="nav-link">
-                    <i class="nav-icon fas fa-plus"></i>
-                    <p>{{__("Sunucu ekle")}}</p>
-                </a>
-                </li>
+                    @if (!user()->isAdmin())
+                    <li class="nav-item">
+                        <p style="color: #e2e8f0; padding: 10px 20px; font-weight: 600;">
+                        Henüz yetkilendirildiğiniz <br>bir sunucu mevcut değil.<br><br>
+                        Sistem yöneticinize başvurun.
+                        </p>
+                    </li>
+                    @else
+                    <li class="nav-item">
+                    <a href='/sunucular' class="nav-link">
+                        <i class="nav-icon fas fa-plus"></i>
+                        <p>{{__("Sunucu ekle")}}</p>
+                    </a>
+                    </li>
 
-                <li class="nav-item">
-                    <p style="color: white; padding: 10px 20px; font-weight: 600;">
-                    Liman kullanmaya başlamak için<br> yukarıdan sunucu ekleyin.
-                    </p>
-                </li>
+                    <li class="nav-item">
+                        <p style="color: #e2e8f0; padding: 10px 20px; font-weight: 600;">
+                        Liman kullanmaya başlamak için<br> yukarıdan sunucu ekleyin.
+                        </p>
+                    </li>
+                    @endif
                 @endif
             </ul>
           </nav>
@@ -109,7 +118,6 @@
                     <div class="col">
                         <a href="/ayarlar" data-toggle="tooltip" @if(request()->getRequestUri() == '/ayarlar')class="active"@endif title='{{__("Sistem Ayarları")}}'>
                             <i class="nav-icon fas fa-cog"></i>
-                            
                         </a>
                     </div>
                     @endif
@@ -118,11 +126,13 @@
                             <i class="nav-icon fas fa-user"></i>
                         </a>
                     </div>
+                    @if(auth()->user()->isAdmin())
                     <div class="col">
                         <a href="{{ route('market') }}" data-toggle="tooltip" @if(str_contains(request()->getRequestUri(), "market"))class="active"@endif title='{{__("Eklenti Mağazası")}}'>
                             <i class="nav-icon fas fa-shopping-cart"></i>
                         </a>
                     </div>
+                    @endif
                     <div class="col">
                         <a href="/kasa" data-toggle="tooltip" @if(request()->getRequestUri() == '/kasa')class="active"@endif title='{{__("Kasa")}}'>
                             <i class="nav-icon fas fa-wallet"></i>

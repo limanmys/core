@@ -138,7 +138,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <h4>{{__("Lütfen Bir Eklenti Seçin")}}</h4>
+                <label>{{__("Lütfen Bir Eklenti Seçin")}}</label>
                 <select id="extensionId" class="form-control" onchange="getFunctionList()">
                     <option selected disabled>{{__("...")}}</option>
                     @foreach(extensions() as $extension)

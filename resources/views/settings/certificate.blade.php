@@ -14,7 +14,8 @@
         </div>
         <div class="card-body">
             @if(request('server_id'))
-                <h5>{{server()->name . " " . __("sunucusu talebi.")}}</h5>
+                <h5 style="font-weight: 600">{{server()->name . " " . __("sunucusu talebi.")}}</h5>
+                <br>
             @endif
             <div class="row">
                 <div class="col-md-4">
@@ -33,8 +34,9 @@
                 <div class="col-md-4">
                     <div class="box box-solid">
                     <div class="box-header with-border">
-                        <h3 class="box-title">{{__("İmzalayan")}}</h3>
+                        <h5 class="box-title" style="font-weight: 600">{{__("İmzalayan")}}</h5>
                     </div>
+                    <hr class="my-2">
                     <div class="box-body clearfix">
                         <div class="form-group">
                             <label>{{__("İstemci")}}</label>
@@ -50,9 +52,10 @@
                 <div class="col-md-4">
                     <div class="box box-solid">
                         <div class="box-header with-border">
-                        <h3 class="box-title">{{__("Parmak İzleri")}}</h3>
+                            <h5 class="box-title" style="font-weight: 600">{{__("Parmak İzleri")}}</h5>
                         </div>
-                        <div class="box-body clearfix">
+                        <hr class="my-2">
+                    <div class="box-body clearfix">
                         <div class="form-group">
                             <label>{{__("İstemci")}}</label>
                             <input type="text" id="subjectKeyIdentifier" readonly class="form-control">
@@ -61,14 +64,15 @@
                             <label>{{__("Otorite")}}</label>
                             <input type="text" id="authorityKeyIdentifier" readonly class="form-control">
                         </div>
-                        </div>
+                    </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="box box-solid">
                     <div class="box-header with-border">
-                        <h3 class="box-title">{{__("Geçerlilik Tarihi")}}</h3>
+                        <h5 class="box-title" style="font-weight: 600">{{__("Geçerlilik Tarihi")}}</h5>
                     </div>
+                    <hr class="my-2">
                     <div class="box-body clearfix">
                         <div class="form-group">
                             <label>{{__("Başlangıç Tarihi")}}</label>
@@ -83,10 +87,11 @@
                 </div>
             </div>
             <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-12">
                         <div class="box box-solid">
+                            <br>
                             <div class="box-header with-border">
-                                <h3 class="box-title">{{__("Sertifikayı Onayla")}}</h3>
+                                <h4 class="box-title" style="font-weight: 600">{{__("Sertifikayı Onayla")}}</h4>
                             </div>
                             <div class="box-body clearfix">
                                 <span>{{__("Not : Eklediğiniz sertifika işletim sistemi tarafından güvenilecektir.")}}</span><br><br>

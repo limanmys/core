@@ -15,30 +15,30 @@
     <div class="card-body">
         @include('errors')
         <form action="{{route('cron_mail_add')}}" onsubmit="return widget_control(this)" method="POST">
-            <h4>{{__("Kullanıcı")}}</h4>
+            <label>{{__("Kullanıcı")}}</label>
             <select class="form-control" id="user_id" required name="user_id">
                 @foreach(users() as $user)
                     <option value="{{$user->id}}">{{$user->name}}</option>
                 @endforeach
             </select><br>
-            <h4>{{__("Sunucu")}}</h4>
+            <label>{{__("Sunucu")}}</label>
             <select class="form-control" onchange="getExtensions()" id="server_id" required name="server_id">
                 @foreach(servers() as $server)
                     <option value="{{$server->id}}">{{$server->name}}</option>
                 @endforeach
             </select><br>
-            <h4>{{__("Eklenti")}}</h4>
+            <label>{{__("Eklenti")}}</label>
             <select class="form-control" id="extension_id" disabled onchange="getCronMailTags()" required name="extension_id"></select><br>
-            <h4>{{__("Mail Ayarı")}}</h4>
+            <label>{{__("Mail Ayarı")}}</label>
             <select class="form-control" id="target" disabled="" name="target"></select><br>
-            <h4>{{__("Rapor Süresi")}}</h4>
+            <label>{{__("Rapor Süresi")}}</label>
             <select class="form-control" id="cron_type" name="cron_type">
                 <option value="hourly">{{__("Saatlik")}}</option>
                 <option value="daily">{{__("Günlük")}}</option>
                 <option value="weekly">{{__("Haftalık")}}</option>
                 <option value="monthly">{{__("Aylık")}}</option>
             </select><br>
-            <h4>{{__("Hedef Mail")}}</h4>
+            <label>{{__("Hedef Mail")}}</label>
             <input type="text" class="form-control" id="to" name="to" required></select><br>
             @csrf
             <button class="btn btn-success" type="submit">{{__("Mail Ayarı Ekle")}}</button>
