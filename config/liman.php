@@ -5,7 +5,7 @@ return [
     "user_widget_count" => 10,
     "nav_extension_hide_count" => 10,
     "widget_refresh_time" => 30000, //ms
-    "searchable" => [
+    "admin_searchable" => [
         [
             'name' => 'Sistem Ayarları',
             'url' =>  '/ayarlar'     
@@ -62,5 +62,15 @@ return [
             'name' => 'Eklenti Mağazası',
             'url' =>  '/market'   
         ],
+        [
+            'name' => 'Market',
+            'url' => '/market'
+        ]
+    ],
+    "user_searchable" => [
+        [
+            'name' => 'Kullanıcı Profili',
+            'url' => '/profil'
+        ]
     ]
 ];

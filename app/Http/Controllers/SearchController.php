@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Server;
 use \Illuminate\Http\Request;
+use App\Models\Permission;
 
 class SearchController extends Controller
 {
@@ -12,13 +13,23 @@ class SearchController extends Controller
         $searchable = [];
 
         // Get constant searchables
-        foreach (config('liman.searchable') as $constant)
+        if (user()->isAdmin()) {
+            foreach (config('liman.admin_searchable') as $constant)
+            {
+                array_push($searchable, $constant);
+            }
+        }
+        
+        foreach (config('liman.user_searchable') as $constant)
         {
             array_push($searchable, $constant);
         }
 
         // Server searching
-        $servers = Server::select('id', 'name', 'city')->get();
+        $servers = Server::select('id', 'name', 'city')->get()
+                ->filter(function ($server) {
+                    return Permission::can(user()->id, 'server', 'id', $server->id);
+                });
         foreach ($servers as $server)
         {
             array_push($searchable, [
