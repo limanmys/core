@@ -20119,3 +20119,16 @@ table.dataTable tbody tr.selected {
 .sidebar-bottom {
     background-color: #000;
 }
+
+.has-search .form-control {
+    padding-left: 2.375rem;
+    background-color: #222;
+}
+
+.breadcrumb {
+    background-color: #222;
+}
+
+.table thead {
+    background-color: #222;
+}

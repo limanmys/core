@@ -235,6 +235,10 @@ table.dataTable {
     border-radius: 5px;
 }
 
+.context-menu-icon.context-menu-icon--fa5 i, .context-menu-icon.context-menu-icon--fa5 svg {
+    color: #1a202c;
+}
+
 .context-menu-icon::before {
     color: #1a202c!important;
 }
@@ -425,6 +429,10 @@ table.dataTable {
     color: rgb(107, 114, 128);
 }
 
+#liman_search_input {
+    color: #e2e8f0;
+}
+
 #liman_search_results {
     position: absolute;
     background: #232c3c;
@@ -432,13 +440,14 @@ table.dataTable {
     z-index: 1;
     width: 85%;
     display: none;
+    top: 60px;
 }
 
 #liman_search_results a {
     display: block;
     width: 100%;
-    padding: 8px;
-    color: rgb(107, 114, 128);
+    padding: 8px 12px;
+    color: #e2e8f0;
     transition: 0.3s all;
 }
 
