@@ -454,3 +454,7 @@ table.dataTable {
 #liman_search_results a:hover {
     background: #2c384c;
 }
+
+.modal.fade.show {
+    background-color: rgba(0, 0, 0, 0.5);
+}
