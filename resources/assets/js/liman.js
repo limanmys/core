@@ -444,10 +444,18 @@ function getSearchResults (query) {
           `);
         }
 
+        let firstone = 0
         data.forEach(el => {
-          $("#liman_search_results").append(`
-            <a href="${el.url}">${el.name}</a>
-          `);
+          if (firstone == 0) {
+            $("#liman_search_results").append(`
+              <a href="${el.url}" class="hovered">${el.name}</a>
+            `);
+            firstone++
+          } else {
+            $("#liman_search_results").append(`
+              <a href="${el.url}">${el.name}</a>
+            `);
+          }
         });
       },
       error: function (jqXhr, textStatus, error) 
@@ -480,10 +488,49 @@ $(document).ready(function() {
   let input = $("#liman_search_input");
   let result = $("#liman_search_results");
 
-  input.on("keyup", function () {
-    clearTimeout($.data(this, 'timer'));
-    var wait = setTimeout(liman_search, 150);
-    $(this).data('timer', wait);
+  let idx = 0
+
+  input.on("keydown", function ( e ) {
+    if (e.keyCode == 13)
+    {
+      e.preventDefault();
+      result.find(".hovered")[0].click();
+    }
+
+    if(!(e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13)) {
+      clearTimeout($.data(this, 'timer'));
+      let wait = setTimeout(liman_search, 150);
+      $(this).data('timer', wait);
+      idx = 0
+    } else {
+      e.preventDefault();
+      if(!result.html().includes("Sonuç bulunamadı")) {
+        let results = result.find("a")
+        let len = results.length - 1
+        if (e.keyCode == 38) {
+          if (idx <= 0) {
+            idx = 0
+          } else {
+            idx--
+            result.find(results[idx + 1]).removeClass("hovered");
+            result.find(results[idx]).addClass("hovered");
+          }
+          console.log(idx + " " + len)
+        }
+
+        if (e.keyCode == 40) {
+          if (idx >= len) {
+            idx = len
+          } else {
+            idx++
+            result.find(results[idx - 1]).removeClass("hovered");
+            result.find(results[idx]).addClass("hovered");
+          }
+          console.log(idx + " " + len)
+        }
+      }
+    }
+    
   })
 
   $(document).on("click", function(event){

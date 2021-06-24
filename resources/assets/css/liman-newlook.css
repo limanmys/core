@@ -455,6 +455,10 @@ table.dataTable {
     background: #2c384c;
 }
 
+#liman_search_results .hovered {
+    background: #2c384c;
+}
+
 .modal.fade.show {
     background-color: rgba(0, 0, 0, 0.5);
 }
