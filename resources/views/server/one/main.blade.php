@@ -8,7 +8,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{$server->name}}</li>
         </ol>
     </nav>
-
+    
     <div class="row mb-2 serverName">
         <div class="col-auto align-self-center">
             @if($favorite)
@@ -27,6 +27,14 @@
     </div>
 
     @include('errors')
+
+    @if (count(server()->extensions()) < 1)
+    <div class="alert alert-success alert-dismissible">
+        <h5><i class="icon fas fa-smile-beam"></i> Tavsiye</h5>
+        Bu sunucuya hiç eklenti eklememişsiniz. Limanı daha verimli kullanabilmek için <a data-toggle="pill" href="#extensionsTab" role="tab"><i class="fas fa-plug"></i> eklentiler</a>
+        sekmesinden eklenti ekleyebilirsiniz veya <a href="/market"><i class="fas fa-shopping-cart"></i> eklenti mağazamızı</a> kullanarak açık kaynaklı eklentileri tek tuş ile yükleyebilirsiniz.
+    </div>
+    @endif
 
     <div class="row">
         @include('server.one.general.details',["shell" => false])
