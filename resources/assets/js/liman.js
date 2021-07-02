@@ -515,7 +515,6 @@ $(document).ready(function() {
             result.find(results[idx + 1]).removeClass("hovered");
             result.find(results[idx]).addClass("hovered");
           }
-          console.log(idx + " " + len)
         }
 
         if (e.keyCode == 40) {
@@ -526,7 +525,6 @@ $(document).ready(function() {
             result.find(results[idx - 1]).removeClass("hovered");
             result.find(results[idx]).addClass("hovered");
           }
-          console.log(idx + " " + len)
         }
       }
     }
