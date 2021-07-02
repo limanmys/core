@@ -528,7 +528,6 @@ $(document).ready(function() {
         }
       }
     }
-    
   })
 
   $(document).on("click", function(event){
@@ -538,4 +537,18 @@ $(document).ready(function() {
       result.fadeOut(250);
     }            
   });
+});
+
+function handleCloseButton(target) {
+  let selector = $("#" + target);
+
+  selector.find(selector.find(".close")[0]).click(function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    selector.modal("hide");
+  });
+}
+
+$(document).on("shown.bs.modal", function (e) {
+  handleCloseButton($(e.target).attr("id"));
 });
