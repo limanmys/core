@@ -39,9 +39,9 @@
                     <label for="{{explode(":", $input)[0]}}" class="form-check-label">{{__($name)}}</label>
                 </div>
             @else
-                <label class="@if(isset($random,$id)){{$random}} {{$id}}@endif" style="padding-top: 15px;">{{__(explode(":",$name)[0])}}</label>
+                <label class="@if(isset($random,$id)){{$random}} {{$id}}@endif">{{__(explode(":",$name)[0])}}</label>
                 <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($placeholder)}}"
-                    class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required disabled hidden style="margin-top:15px">
+                    class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required disabled hidden>
             @endif
         @elseif(explode(":", $input)[1] == "textarea")
             <label>{{__($name)}}</label>
