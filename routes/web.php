@@ -69,6 +69,10 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
         ->name('liman_stats')
         ->middleware('admin');
 
+    Route::post('/online_servers', 'HomeController@getServerStatus')
+        ->name('online_servers')
+        ->middleware('admin');
+
     // Vault Route
 
     Route::get('/kasa', 'UserController@userKeyList')->name('keys');

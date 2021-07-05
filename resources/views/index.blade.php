@@ -2,106 +2,123 @@
 
 @section('content')
     @include('errors')
-    <div class="callout callout-info">
+    <div class="callout callout-info shadow-sm">
         <h5>{{__("Liman MYS'ye Hoşgeldiniz")}}</h5>
         {{__("Kullanım rehberine ulaşmak için")}} <a href="https://rehber.liman.dev/" target="_blank">https://rehber.liman.dev/</a> {{__("adresini ziyaret edebilirsiniz.")}}
     </div>
     <div class="row" style="padding-top: 15px;">
       <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fas fa-users"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">{{__("Limandaki Sunucu Sayısı")}}</span>
-              <span class="info-box-number">{{$server_count}}</span>
+          <div class="small-box shadow-sm bg-info">
+            <div class="inner">
+              <h3>{{$server_count}}</h3>
+              <p>{{__("Limandaki Sunucu Sayısı")}}</p>
             </div>
+            <div class="icon">
+              <i class="fas fa-server"></i>
+            </div>
+            <a href="/sunucular" class="small-box-footer">
+              Sunucuları listele <i class="fas fa-arrow-circle-right"></i>
+            </a>
+          </div>
+      </div>
+      
+      <div class="col-md-3 col-sm-4 col-xs-12">
+          <div class="small-box shadow-sm bg-info">
+            <div class="inner">
+              <h3>{{$extension_count}}</h3>
+              <p>{{__("Limandaki Eklenti Sayısı")}}</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-plug"></i>
+            </div>
+            <a href="/ayarlar#extensions" class="small-box-footer">
+              Eklentileri yönet <i class="fas fa-arrow-circle-right"></i>
+            </a>
           </div>
       </div>
       <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fas fa-plus"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">{{__("Limandaki Eklenti Sayısı")}}</span>
-              <span class="info-box-number">{{$extension_count}}</span>
+          <div class="small-box shadow-sm bg-info">
+            <div class="inner">
+              <h3>{{$user_count}}</h3>
+              <p>{{__("Limandaki Kullanıcı Sayısı")}}</p>
             </div>
+            <div class="icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <a href="/ayarlar#users" class="small-box-footer">
+              Kullanıcıları yönet <i class="fas fa-arrow-circle-right"></i>
+            </a>
           </div>
       </div>
       <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fas fa-user"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">{{__("Limandaki Kullanıcı Sayısı")}}</span>
-              <span class="info-box-number">{{$user_count}}</span>
+          <div class="small-box shadow-sm bg-info">
+            <div class="inner">
+              <h3>{{$version}}</h3>
+              <p>{{__("Liman Versiyonu")}}</p>
             </div>
-          </div>
-      </div>
-      <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fas fa-cog"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">{{__("Liman Versiyonu")}}</span>
-              <span class="info-box-number">{{$version}}</span>
+            <div class="icon">
+              <i class="fas fa-cogs"></i>
+            </div>
+            <div class="small-box-footer">
+              &nbsp;
             </div>
           </div>
       </div>
       @if(user()->isAdmin())
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box loading">
-              <span class="info-box-icon bg-info"><i class="fas fa-microchip"></i></span>
+            <div class="info-box shadow-sm loading chartbox">
+              <div class="overlay">
+                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+              </div>
               <div class="info-box-content">
-                <span class="info-box-text">{{__("Cpu Kullanımı")}}</span>
-                <span class="info-box-number" id="cpuUsage">
-                  <div class="overlay" style="background: rgba(255,255,255,.9);">
-                        <div class="spinner-border" role="status">
-                          <span class="sr-only">{{__("Yükleniyor")}}</span>
-                        </div>
-                    </div></span>
+                <canvas id="cpuChart"></canvas>
               </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box">
-              <span class="info-box-icon bg-info"><i class="fas fa-memory"></i></span>
+            <div class="info-box shadow-sm loading chartbox">
+              <div class="overlay">
+                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+              </div>
               <div class="info-box-content">
-                <span class="info-box-text">{{__("Ram Kullanımı")}}</span>
-                <span class="info-box-number" id="ramUsage">
-                  <div class="overlay" style="background: rgba(255,255,255,.9);">
-                        <div class="spinner-border" role="status">
-                          <span class="sr-only">{{__("Yükleniyor")}}</span>
-                        </div>
-                  </div>
-                </span>
+                <canvas id="ramChart"></canvas>
               </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box">
-              <span class="info-box-icon bg-info"><i class="far fa-hdd"></i></span>
+            <div class="info-box shadow-sm loading chartbox">
+              <div class="overlay">
+                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+              </div>
               <div class="info-box-content">
-                <span class="info-box-text">{{__("Disk Kullanımı")}}</span>
-                <span class="info-box-number" id="diskUsage">
-                    <div class="overlay" style="background: rgba(255,255,255,.9);">
-                        <div class="spinner-border" role="status">
-                          <span class="sr-only">{{__("Yükleniyor")}}</span>
-                        </div>
-                    </div>
-                </span>
+                <canvas id="diskChart"></canvas>
               </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box">
-              <span class="info-box-icon bg-info"><i class="fas fa-network-wired"></i></span>
+            <div class="info-box shadow-sm loading chartbox">
+              <div class="overlay">
+                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+              </div>
               <div class="info-box-content">
-                <span class="info-box-text">{{__("Ağ Kullanımı")}}</span>
-                <span class="info-box-number" id="networkUsage">
-                <div class="overlay" style="background: rgba(255,255,255,.9);">
-                        <div class="spinner-border" role="status">
-                          <span class="sr-only">{{__("Yükleniyor")}}</span>
-                        </div>
-                    </div>
-                </span>
+                <canvas id="networkChart"></canvas>
               </div>
             </div>
+        </div>
+        <div class="col-md-6 col-sm-12">
+          <div class="card shadow-sm loading online-servers" style="min-height: 100px;">
+              <div class="card-header">
+                <h3 class="card-title">Sunucu Durumları</h3>
+              </div>
+              <div class="overlay">
+                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+              </div>
+              <div class="card-body" style="padding: 4px;">
+                <ul class="list-group list-group-flush srvlist">
+                  
+                </ul>
+              </div>
+          </div>
         </div>
       @endif
     </div>
@@ -153,6 +170,31 @@
     }
     </style>
     <script>
+        function getOnlineServers() {
+          request('{{route('online_servers')}}', new FormData(), function(response){
+              var json = JSON.parse(response);
+              console.log(json)
+
+              json.forEach(function (item) {
+                $(".srvlist").append(`
+                  <li class="list-group-item">
+                    <a href="/sunucular/${item.id}" style="color:#222">
+                      <i class="fab ${item.icon} mr-1"></i> <span class="text-bold">${item.name}</span>
+                    </a>
+                    <div class="float-right">
+                      <span class="text-xs">${item.uptime ? item.uptime : ""}</span>  
+                      <span class="ml-1 badge ${item.badge_class}">${item.status ? "Online" : "Offline"}</span>
+                    </div>
+                  </li>
+                `);
+              });
+              
+              $(".online-servers").find(".overlay").hide();
+          });
+        }
+
+        getOnlineServers();
+
         var limanEnableWidgets = true;
         $(".sortable-widget").sortable({
             stop: function(event, ui) {
@@ -214,10 +256,11 @@
           }
             request('{{route('liman_stats')}}', new FormData(), function(response){
               var json = JSON.parse(response);
-                $("#ramUsage").text(json.ram);
-                $("#diskUsage").text(json.disk);
-                $("#cpuUsage").text(json.cpu);
-                $("#networkUsage").text(json.network);
+              resourceChart('{{__("Cpu Kullanımı")}}', "cpuChart", json.time, json.cpu);
+              resourceChart('{{__("Ram Kullanımı")}}', "ramChart", json.time, json.ram);
+              resourceChart('{{__("IO Kullanımı")}}', "diskChart", json.time, json.io);
+              networkChart('{{__("Network")}}', "networkChart", json.time, json.network);
+              $(".chartbox").find(".overlay").hide();
               setTimeout(() => {
                 retrieveStats();
               }, 2500);
@@ -325,29 +368,149 @@
             return "{{route('home')}}/extensionRun/" + target;
         }
 
-        function createChart(element, labels, data) {
-          $("#" + element + ' .overlay').remove();
-          window[element + "Chart"] = new Chart($("#" + element+' .card-body canvas'), {
-            type: 'bar',
-            data: {
-              datasets: [{
-                data: data,
-              }],
-              labels: labels
+        function resourceChart(title, chart, time, data, prefix=true, postfix="")
+        {
+          if(!window[`${chart}-element`]){
+              window[`${chart}-element`] = new Chart($(`#${chart}`), {
+                  type: 'line',
+                  data: {
+                      datasets: [{
+                          data: [data, data],
+                          steppedLine: false,
+                          borderColor: 'rgb(255, 159, 64)',
+                          backgroundColor: 'rgba(255, 159, 64, .5)',
+                          fill: true,
+                          pointRadius: 0
+                      }],
+                      labels: [time, time]
+                  },
+                  options: {
+                      responsive: true,
+                      legend: false,
+                      tooltips: {
+                          mode: 'index',
+                          intersect: false,
+                      },
+                      hover: {
+                          mode: 'nearest',
+                          intersect: true
+                      },
+                      title: {
+              display: true,
+              text: `${title} ` + (prefix ? `%${data} ${postfix}` : `${data} ${postfix}`),
             },
-            options: {
-              animation: false,
-              responsive: true,
-              legend: false,
-              scales: {
-                yAxes: [{
-                  ticks: {
-                    beginAtZero: true,
+                      scales: {
+                          xAxes: [{
+                              display: false 
+                          }],
+                          yAxes: [{
+                              ticks: {
+                                  beginAtZero: true,
+                                  max: 100
+                              }
+                          }]
+                      },
                   }
-                }]
+              });
+          }else{
+              window[`${chart}-element`].options.title.text = `${title} ` + (prefix ? `%${data} ${postfix}` : `${data} ${postfix}`);
+              window[`${chart}-element`].data.labels.push(time);
+              window[`${chart}-element`].data.datasets.forEach((dataset) => {
+                  dataset.data.push(data);
+              });
+              $('.charts-card').find('.overlay').hide();
+              window[`${chart}-element`].update();
+          }
+      }
+
+      function networkChart(title, chart, time, data)
+      {
+          if(!window[`${chart}-element`]){
+              window[`${chart}-element`] = new Chart($(`#${chart}`), {
+                  type: 'line',
+                  data: {
+                      datasets: [{
+                          label: '{{__('Download')}}',
+                          data: [data.down, data.down],
+                          steppedLine: false,
+                          borderColor: 'rgb(255, 159, 64)',
+                          backgroundColor: 'rgba(255, 159, 64, .5)',
+                          fill: true,
+                          pointRadius: 0
+                      },{
+                          label: '{{__('Upload')}}',
+                          data: [data.up, data.up],
+                          steppedLine: false,
+                          borderColor: 'rgb(54, 162, 235)',
+                          backgroundColor: 'rgba(54, 162, 235, .5)',
+                          fill: true,
+                          pointRadius: 0
+                      }],
+                      labels: [time, time]
+                  },
+                  options: {
+                      responsive: true,
+                      legend: false,
+                      tooltips: {
+                          mode: 'index',
+                          intersect: false,
+                      },
+                      hover: {
+                          mode: 'nearest',
+                          intersect: true
+                      },
+                      title: {
+              display: true,
+              text: `${title} Down: ${data.down} kb/s Up: ${data.up} kb/s`,
+            },
+                      scales: {
+                          xAxes: [{
+                              display: false 
+                          }],
+                          yAxes: [{
+                              ticks: {
+                                  beginAtZero: true
+                              }
+                          }]
+                      },
+                  }
+              });
+          }else{
+              window[`${chart}-element`].options.title.text = `${title} Down: ${data.down} kb/s Up: ${data.up} kb/s`;
+              window[`${chart}-element`].data.labels.push(time);
+              window[`${chart}-element`].data.datasets[0].data.push(data.down);
+              window[`${chart}-element`].data.datasets[1].data.push(data.up);
+              window[`${chart}-element`].update();
+          }
+      }
+
+      function createChart(element, time, data) {
+          $("#" + element + "Text").text("%" + data[0]);
+          window[element + "Chart"] = new Chart($("#" + element), {
+              type: 'line',
+              data: {
+                  datasets: [{
+                      data: data,
+                  }],
+                  labels: [
+                      time,
+                  ]
               },
-            }
+              options: {
+                  animation: false,
+                  responsive: true,
+                  legend: false,
+                  scales: {
+                      yAxes: [{
+                          ticks: {
+                              beginAtZero: true,
+                              min: 0,
+                              max: 100
+                          }
+                      }]
+                  },
+              }
           })
-        }
+      }
     </script>
 @stop
