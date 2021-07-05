@@ -43,7 +43,7 @@
             @if (!(server()->canRunCommand() && server()->isWindows()))
             <p class="text-muted">{{ \Carbon\Carbon::parse($outputs["uptime"])->diffForHumans() }}</p>
             @else
-            <p class="text-muted">{{ \Carbon\Carbon::parse(explode(".", "20210702075630.499383+180")[0])->diffForHumans() }}</p>
+            <p class="text-muted">{{ \Carbon\Carbon::parse(explode(".", $outputs["uptime"])[0])->diffForHumans() }}</p>
             @endif
             <hr>
             <strong>{{ __('Servis Sayısı') }}</strong>
