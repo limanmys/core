@@ -195,27 +195,18 @@ if (!function_exists('syncFiles')) {
 
         Command::runLiman(
             "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" .
-                "{:masterIp}" .
-                ":/liman/extensions/ /liman/extensions/",
-            [
-                "masterIp" => $masterIp
-            ]
+                "$masterIp" .
+                ":/liman/extensions/ /liman/extensions/"
         );
         Command::runLiman(
             "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" --exclude 'service.key' liman@" .
-                "{:masterIp}" .
-                ":/liman/keys/ /liman/keys/",
-            [
-                "masterIp" => $masterIp
-            ]
+                "$masterIp" .
+                ":/liman/keys/ /liman/keys/"
         );
         Command::runLiman(
             "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" .
-                "{:masterIp}" .
-                ":/liman/modules/ /liman/modules/",
-            [
-                "masterIp" => $masterIp
-            ]
+                "$masterIp" .
+                ":/liman/modules/ /liman/modules/"
         );
 
         $root = rootSystem();
