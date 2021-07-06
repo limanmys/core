@@ -71,7 +71,7 @@ Date : $DATE
 Architecture: amd64
 Priority: important
 Description: Liman MYS
-Depends: curl, gpg, zip, unzip, nginx, redis, php7.4-redis | php7.3-redis, php7.4-fpm | php7.3-fpm, php7.4-gd | php7.3-gd, php7.4-curl | php7.3-curl, php7.4 | php7.3, php7.4-sqlite3 | php7.3-sqlite3, php7.4-snmp | php7.3-snmp, php7.4-mbstring | php7.3-mbstring, php7.4-xml | php7.3-xml, php7.4-zip | php7.3-zip, php7.4-posix | php7.3-posix, libnginx-mod-http-headers-more-filter, libssl1.1, supervisor, postgresql-13, php7.4-pgsql | php7.3-pgsql, pgloader, php7.4-bcmath | php7.3-bcmath, rsync, dnsutils, php7.4-ldap | php7.3-ldap, php7.4-smbclient | php7.3-smbclient, krb5-user, php7.4-ssh2 | php7.3-ssh2, smbclient, novnc, python3.8 | python3.7 , python3-jinja2, python3-requests, python3-crypto, python3-paramiko, python3-tornado""" > DEBIAN/control
+Depends: curl, gpg, zip, unzip, nginx, redis, php-redis, php7.3-fpm | php7.4-fpm, php7.3-gd | php7.4-gd, php7.3-curl | php7.4-curl, php7.3 | php7.4, php7.3-sqlite3 | php7.4-sqlite3, php7.3-snmp | php7.4-snmp, php7.3-mbstring | php7.4-mbstring, php7.3-xml | php7.4-mbstring, php7.3-zip | php7.4-zip, php7.3-posix | php7.4-posix, libnginx-mod-http-headers-more-filter, libssl1.1, supervisor, postgresql-13, php7.3-pgsql | php7.4-pgsql, pgloader, php7.3-bcmath | php7.4-bcmath, rsync, dnsutils, php7.3-ldap | php7.4-ldap, php-smbclient, krb5-user, php-ssh2, smbclient, novnc, python3.7 | python3.8 , python3-jinja2, python3-requests, python3-crypto, python3-paramiko, python3-tornado""" > DEBIAN/control
 cat DEBIAN/control
 cd ../
 dpkg-deb -Zgzip --build package
