@@ -321,4 +321,30 @@ class PublicController extends Controller
         
         return $json;
     }
+
+    public function getHomepageApps() 
+    {
+        $client = self::httpClient();
+
+        try {
+            $response = $client->get($this->apiUrls["getApplications"]);
+        } 
+        catch (\Throwable $e) 
+        {
+            return respond($e->getMessage(), 201);
+        }
+
+        $json = json_decode((string) $response->getBody());
+
+        $items = $this->updateFilter($json->items);
+        
+        $final = [];
+        $keys = array_rand($items, 4);
+        shuffle($keys);
+        foreach ($keys as $key) {
+            array_push($final, $items[$key]);
+        }
+        
+        return $final;
+    }
 }

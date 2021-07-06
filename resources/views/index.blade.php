@@ -105,19 +105,49 @@
               </div>
             </div>
         </div>
-        <div class="col-md-6 col-sm-12">
-          <div class="card shadow-sm loading online-servers" style="min-height: 100px;">
-              <div class="card-header">
-                <h3 class="card-title">Sunucu Durumları</h3>
-              </div>
-              <div class="overlay">
-                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
-              </div>
-              <div class="card-body" style="padding: 4px;">
-                <ul class="list-group list-group-flush srvlist">
+        <div class="row row-eq-height" style="width: 100%; margin-left: 0;">
+          <div class="col-md-6 col-sm-12">
+            <div class="card shadow-sm loading online-servers" style="height: 100%; min-height: 220px;">
+                <div class="card-header">
+                  <h3 class="card-title">Sunucu Durumları</h3>
+                </div>
+                <div class="overlay">
+                  <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                </div>
+                <div class="card-body" style="padding: 4px;">
+                  <ul class="list-group list-group-flush srvlist">
+                    
+                  </ul>
                   
-                </ul>
-              </div>
+                </div>
+                <div class="noServer" style="height: 100%; display:flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <i class="fas fa-info fa-3x mb-4"></i>
+                    <h5 class="text-bold">Henüz sunucu eklememişsiniz.</h5>
+                </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-sm-12">
+            <div class="card shadow-sm loading market-widget" style="height: 100%; min-height: 220px;">
+                <div class="card-header p-0">
+                  <h3 class="card-title" style="padding: 12px; padding-left: 1.25rem">Önerilen Eklentiler</h3>
+                  <div class="float-right">
+                    <button style="margin: 5px" class="btn btn-sm btn-success" onclick="window.location.href='/market'"><i class="fas fa-shopping-cart mr-1"></i>Eklenti Mağazası</button>
+                  </div>
+                </div>
+                <div class="overlay">
+                  <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                </div>
+                <div class="card-body" style="padding: 4px;">
+                  <div class="row row-eq-height market-col-1">
+                  </div>
+                  <div class="row row-eq-height market-col-2">
+                  </div>
+                </div>
+                <div class="noApp" style="height: 100%; display:flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <i class="fas fa-info fa-3x mb-4"></i>
+                    <h5 class="text-bold">Market bağlantınızı kontrol edin.</h5>
+                </div>
+            </div>
           </div>
         </div>
       @endif
@@ -170,7 +200,43 @@
     }
     </style>
     <script>
+        @if(user()->isAdmin())
+        function appendApp(item) {
+          return (`<div class="col-md-6 col-sm-12">
+                      <div class="row p-2">
+                        <div class="col-lg-4 col-5">
+                            <a href="{{ route('market') }}"><img src="https://market.liman.dev/${item.iconPath}" alt="${item.name}" class="img-fluid mb-3"></a>
+                        </div>
+                        <div class="col-lg-8 col-7">
+                            <a href="{{ route('market') }}" class="text-dark"><h4 style="font-weight: 600;">${item.name}</h4></a>
+                            <p class="mb-0">${item.shortDescription}</p>
+                        </div>
+                      </div>
+                    </div>`);
+        }
+
+        function getHomepageApps() {
+          $(".market-widget").find(".noApp").css("display", "none");
+          request('{{route('market_widget')}}', new FormData(), function(response){
+              var json = JSON.parse(response);
+              let a = 0;
+              json.forEach(function (item) {
+                if (a++ < 2) {
+                  $(".market-col-1").append(appendApp(item));
+                } else {
+                  $(".market-col-2").append(appendApp(item));
+                }
+              });
+              if (json.length < 1) {
+                $(".market-widget").find(".noApp").css("display", "flex");
+              }
+              $(".market-widget").find(".overlay").hide();
+          });
+        }
+        getHomepageApps();
+
         function getOnlineServers() {
+          $(".online-servers").find(".noServer").css("display", "none");
           request('{{route('online_servers')}}', new FormData(), function(response){
               var json = JSON.parse(response);
               json.forEach(function (item) {
@@ -186,12 +252,14 @@
                   </li>
                 `);
               });
-              
+              if (json.length < 1) {
+                $(".online-servers").find(".noServer").css("display", "flex");
+              }
               $(".online-servers").find(".overlay").hide();
           });
         }
-
         getOnlineServers();
+        @endif
 
         var limanEnableWidgets = true;
         $(".sortable-widget").sortable({
@@ -262,7 +330,7 @@
               $(".chartbox").find(".overlay").hide();
               setTimeout(() => {
                 retrieveStats();
-              }, 1600);
+              }, 2500);
             });
         }
         retrieveStats();

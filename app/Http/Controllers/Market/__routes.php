@@ -21,6 +21,12 @@ Route::middleware(["admin"])->group(function () {
     )
         ->name("market");
 
+    Route::post(
+        '/market/homepage_widget',
+        'Market\\PublicController@getHomepageApps'
+    )
+        ->name("market_widget");
+
     Route::get(
         '/market/kategori/{category_id}',
         'Market\\PublicController@getCategoryItems'

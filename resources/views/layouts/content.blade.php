@@ -4,7 +4,7 @@
 @endif
     @if(auth()->check() && user()->email == "administrator@liman.dev")
     <div class="alert alert-danger customAlert">
-        {{__("Tam yetkili ana yönetici hesabı ile giriş yaptınız, sisteme zarar verebilirsiniz.")}}
+        <i class="fas fa-heart-broken mr-1"></i>{{__("Tam yetkili ana yönetici hesabı ile giriş yaptınız, sisteme zarar verebilirsiniz.")}} <a href="/ayarlar#users">Yeni bir hesap oluşturup</a>, yetkilendirmeleri ayarlamanızı tavsiye ederiz.
     </div>
     @endif
     <!-- Content Header (Page header) -->
