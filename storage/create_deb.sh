@@ -65,7 +65,7 @@ chmod 775 DEBIAN/postinst
 echo """Package: liman
 Version: $VERSION-$5
 Installed-Size: 77892
-Maintainer: Mert CELEN <mcelen@havelsan.com.tr>
+Maintainer: Baran SEKIN <baran@liman.dev>, Dogukan OKSUZ <dogukan@liman.dev>
 Section: admin
 Date : $DATE
 Architecture: amd64
