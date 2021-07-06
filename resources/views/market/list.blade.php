@@ -118,7 +118,7 @@
                             <b>Versiyon:</b> {{ $app->publicVersion->versionName }}
                         @else
                         <small>
-                            Ücretli eklenti
+                            Kurumsal eklenti
                         @endif
                         </small>
                     </div>

@@ -173,8 +173,6 @@
         function getOnlineServers() {
           request('{{route('online_servers')}}', new FormData(), function(response){
               var json = JSON.parse(response);
-              console.log(json)
-
               json.forEach(function (item) {
                 $(".srvlist").append(`
                   <li class="list-group-item">
@@ -250,20 +248,21 @@
           }
         }
         @if(user()->isAdmin())
+        var stats;
         function retrieveStats(){
           if(!limanEnableWidgets){
             return;
           }
             request('{{route('liman_stats')}}', new FormData(), function(response){
-              var json = JSON.parse(response);
-              resourceChart('{{__("Cpu Kullanımı")}}', "cpuChart", json.time, json.cpu);
-              resourceChart('{{__("Ram Kullanımı")}}', "ramChart", json.time, json.ram);
-              resourceChart('{{__("IO Kullanımı")}}', "diskChart", json.time, json.io);
-              networkChart('{{__("Network")}}', "networkChart", json.time, json.network);
+              stats = JSON.parse(response);
+              resourceChart('{{__("Cpu Kullanımı")}}', "cpuChart", stats.time, stats.cpu);
+              resourceChart('{{__("Ram Kullanımı")}}', "ramChart", stats.time, stats.ram);
+              resourceChart('{{__("IO Kullanımı")}}', "diskChart", stats.time, stats.io);
+              networkChart('{{__("Network")}}', "networkChart", stats.time, stats.network);
               $(".chartbox").find(".overlay").hide();
               setTimeout(() => {
                 retrieveStats();
-              }, 2500);
+              }, 1600);
             });
         }
         retrieveStats();
@@ -396,12 +395,12 @@
                           intersect: true
                       },
                       title: {
-              display: true,
-              text: `${title} ` + (prefix ? `%${data} ${postfix}` : `${data} ${postfix}`),
-            },
+                        display: true,
+                        text: `${title} ` + (prefix ? `%${data} ${postfix}` : `${data} ${postfix}`),
+                      },
                       scales: {
                           xAxes: [{
-                              display: false 
+                              display: false
                           }],
                           yAxes: [{
                               ticks: {
@@ -410,16 +409,28 @@
                               }
                           }]
                       },
+                      animation: {
+                        onComplete: () => {
+                          delayed = true;
+                        },
+                        delay: (context) => {
+                          let delay = 0;
+                          if (context.type === 'data' && context.mode === 'default' && !delayed) {
+                            delay = context.dataIndex * 500 + context.datasetIndex * 200;
+                          }
+                          return delay;
+                        },
+                      },
                   }
               });
-          }else{
+          }else{ 
               window[`${chart}-element`].options.title.text = `${title} ` + (prefix ? `%${data} ${postfix}` : `${data} ${postfix}`);
               window[`${chart}-element`].data.labels.push(time);
               window[`${chart}-element`].data.datasets.forEach((dataset) => {
                   dataset.data.push(data);
               });
               $('.charts-card').find('.overlay').hide();
-              window[`${chart}-element`].update();
+              window[`${chart}-element`].update(); 
           }
       }
 
@@ -460,9 +471,9 @@
                           intersect: true
                       },
                       title: {
-              display: true,
-              text: `${title} Down: ${data.down} kb/s Up: ${data.up} kb/s`,
-            },
+                        display: true,
+                        text: `${title} Down: ${data.down} kb/s Up: ${data.up} kb/s`,
+                      },
                       scales: {
                           xAxes: [{
                               display: false 
@@ -472,6 +483,18 @@
                                   beginAtZero: true
                               }
                           }]
+                      },
+                      animation: {
+                        onComplete: () => {
+                          delayed = true;
+                        },
+                        delay: (context) => {
+                          let delay = 0;
+                          if (context.type === 'data' && context.mode === 'default' && !delayed) {
+                            delay = context.dataIndex * 500 + context.datasetIndex * 200;
+                          }
+                          return delay;
+                        },
                       },
                   }
               });
