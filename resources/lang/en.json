@@ -623,6 +623,7 @@
     "Geliştirici": "Developer",
     "Sunucu ekle": "Add server",
     "Liman kullanmaya başlamak için": "Add server to start using",
-    "yukarıdan sunucu ekleyin.": "Liman from above."
+    "yukarıdan sunucu ekleyin.": "Liman from above.",
+    "Bu sayfadan mevcut verilerini görebilirsiniz. Buradaki veriler, eklentiler tarafından kullanılmaktadır.": "On this page you can view your existing data. This data is used by extensions."
 
 }
