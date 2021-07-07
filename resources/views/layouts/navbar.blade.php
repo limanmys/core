@@ -17,10 +17,10 @@
 <nav class="main-header navbar navbar-expand navbar-dark" style="height:58.86px;border:0px;"> <!-- exactly 58.86 :) -->
     <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" data-toggle="tooltip" title="Menüyü gizle" data-widget="pushmenu" href="#" onclick="collapseNav()"><i class="fas fa-bars"></i></a>
+            <a class="nav-link" data-toggle="tooltip" title="{{ __('Menüyü gizle') }}" data-widget="pushmenu" href="#" onclick="collapseNav()"><i class="fas fa-bars"></i></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" data-toggle="tooltip" title="Karanlık mod" onclick="toggleDarkMode()"><i id="darkModeIcon" class="fas fa-sun"></i></a>
+            <a class="nav-link" data-toggle="tooltip" title="{{ __('Karanlık mod') }}" onclick="toggleDarkMode()"><i id="darkModeIcon" class="fas fa-sun"></i></a>
           </li>
 @endif
           <script>
@@ -39,7 +39,7 @@
             }
           </style>
           <li class="nav-item d-none d-md-block">
-            <a href="/takip" class="nav-link" data-toggle="tooltip" title="Sunucu Takibi">
+            <a href="/takip" class="nav-link" data-toggle="tooltip" title="{{ __('Sunucu Takibi') }}">
               <i class="nav-icon fas fa-grip-horizontal"></i>
             </a>
           </li>

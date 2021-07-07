@@ -11,7 +11,7 @@
           <div id="liman_search" autocomplete="off">
             <div class="form-group has-search">
                 <span class="fa fa-search form-control-feedback"></span>
-                <input autocomplete="off" autocomplete="" type="text" id="liman_search_input" class="form-control" placeholder="Arama" name="search_query">
+                <input autocomplete="off" autocomplete="" type="text" id="liman_search_input" class="form-control" placeholder="{{ __('Arama') }}" name="search_query">
             </div> 
             <div id="liman_search_results">
 
@@ -87,8 +87,8 @@
                     @if (!user()->isAdmin())
                     <li class="nav-item">
                         <p style="color: #e2e8f0; padding: 10px 20px; font-weight: 600;">
-                        Henüz yetkilendirildiğiniz <br>bir sunucu mevcut değil.<br><br>
-                        Sistem yöneticinize başvurun.
+                        {{ __('Henüz yetkilendirildiğiniz') }} <br>{{ __('bir sunucu mevcut değil.') }}<br><br>
+                        {{ __('Sistem yöneticinize başvurun.') }}
                         </p>
                     </li>
                     @else
@@ -101,7 +101,7 @@
 
                     <li class="nav-item">
                         <p style="color: #e2e8f0; padding: 10px 20px; font-weight: 600;">
-                        Liman kullanmaya başlamak için<br> yukarıdan sunucu ekleyin.
+                        {{ __('Liman kullanmaya başlamak için') }}<br> {{ __('yukarıdan sunucu ekleyin.') }}
                         </p>
                     </li>
                     @endif

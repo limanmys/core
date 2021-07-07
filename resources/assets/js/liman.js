@@ -3,6 +3,14 @@ var customRequestData = [];
 var limanRecordRequests = false;
 var limanRequestList = [];
 
+function loadingText() {
+  if ($('html').attr('lang') == "tr") {
+    return "Yükleniyor...";
+  } else {
+    return "Loading...";
+  }
+}
+
 function showSwal(message, type, timer = false) {
   var config = {
     position: "bottom-end",
@@ -32,7 +40,7 @@ function request(url, data, next, error, requestType = "POST") {
     Swal.fire({
       position: "bottom-end",
       type: "info",
-      title: "Yükleniyor...",
+      title: loadingText(),
       toast: true,
       showConfirmButton: false
     });
@@ -251,7 +259,7 @@ window.onbeforeunload = function () {
   Swal.fire({
     position: "bottom-end",
     type: "info",
-    title: "Yükleniyor...",
+    title: loadingText(),
     toast: true,
     showConfirmButton: false
   });

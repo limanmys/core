@@ -23,7 +23,7 @@
                         $category_name = request()->search_query;
                     }
                     @endphp
-                    <li class="breadcrumb-item active" aria-current="page">{{ $category_name }} eklentileri</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ $category_name }} {{ __('eklentileri') }}</li>
                 @endif
             </ol>
         </nav>
@@ -41,7 +41,7 @@
                         <i class="fas fa-chevron-right"></i>
                     </a>
                     <div class="ext_menu">
-                        <a href="{{ route('market') }}" class="extensions_category">Tüm Eklentiler</a>
+                        <a href="{{ route('market') }}" class="extensions_category">{{ __("Tüm Eklentiler") }}</a>
                         @foreach ($categories as $category)
                             <a href="{{ route('market_kategori', $category->id) }}" class="extensions_category">{{ $category->name }}</a>
                         @endforeach
@@ -49,12 +49,12 @@
                     </div>
                 </div>
                 <div class="col-lg-5 d-flex search-btns" style="justify-content: flex-end;">
-                <button onclick="window.location.href='/ayarlar#extensions'" class="btn btn-dark mt-2 mr-2 float-right" data-toggle="tooltip" title="Eklenti Ayarları" style="height: 38px;" ><i class="fas fa-cogs"></i></button>
-                    <button class="btn btn-dark mt-2 mr-2 float-right" style="height: 38px;" onclick="openExtensionUploadModal()"><i class="fas fa-download mr-1"></i>Eklenti yükle</button>
+                <button onclick="window.location.href='/ayarlar#extensions'" class="btn btn-dark mt-2 mr-2 float-right" data-toggle="tooltip" title="{{ __('Eklenti Ayarları') }}" style="height: 38px;" ><i class="fas fa-cogs"></i></button>
+                    <button class="btn btn-dark mt-2 mr-2 float-right" style="height: 38px;" onclick="openExtensionUploadModal()"><i class="fas fa-download mr-1"></i>{{ __("Eklenti yükle") }}</button>
                     <form action="{{ route('market_search') }}" method="GET">
                         
                         <div class="input-group mt-2 float-right">
-                            <input name="search_query" class="form-control py-2" @isset(request()->search_query) value="{{request()->search_query}}" @endisset type="search" placeholder="Eklentilerde ara..." id="extension_search">
+                            <input name="search_query" class="form-control py-2" @isset(request()->search_query) value="{{request()->search_query}}" @endisset type="search" placeholder="{{ __('Eklentilerde ara...') }}" id="extension_search">
                             <span class="input-group-append">
                                 <button class="btn btn-dark" type="submit">
                                     <i class="fa fa-search"></i>
@@ -88,25 +88,25 @@
                     @if ($app->publicVersion)
                         @if (!$app->isInstalled)
                         <button id="installBtn" class="btn btn-success mb-2 w-100" onclick="installExtension('{{ $app->packageName }}')">
-                            <i class="fas fa-download mr-1"></i> Yükle
+                            <i class="fas fa-download mr-1"></i> {{ __("Yükle") }}
                         </button>
                         @endif
 
                         @if ($app->publicVersion->needsToBeUpdated)
                         <button id="installBtn" class="pl-1 pr-1 btn btn-warning mb-2 w-100" onclick="installExtension('{{ $app->packageName }}')">
-                            <i class="fas fa-download mr-1"></i> Güncelle
+                            <i class="fas fa-download mr-1"></i> {{ __("Güncelle") }}
                         </button>
                         @elseif ($app->isInstalled)
                         <button id="installBtn" class="btn btn-secondary mb-2 w-100 disabled" disabled>
-                            <i class="fas fa-check mr-1"></i> Kurulu
+                            <i class="fas fa-check mr-1"></i> {{ __("Kurulu") }}
                         </button>
                         @endif
                     @else
                         <button class="btn btn-primary mb-2" onclick="window.open('https://liman.havelsan.com.tr/iletisim/')">
-                            <i class="fas fa-shopping-cart mr-1"></i> Satın Al
+                            <i class="fas fa-shopping-cart mr-1"></i> {{ __("Satın Al") }}
                         </button>
                     @endif
-                        <a href="{{ env('MARKET_URL') . '/Application/' . mb_strtolower($app->packageName) }}" target="_blank"><small>Daha fazla detay</small></a>
+                        <a href="{{ env('MARKET_URL') . '/Application/' . mb_strtolower($app->packageName) }}" target="_blank"><small>{{ __("Daha fazla detay") }}</small></a>
                     </div>
                 </div>
             </div>
@@ -115,16 +115,16 @@
                     <div class="col-6">
                         @if ($app->publicVersion)
                         <small class="font-italic">
-                            <b>Versiyon:</b> {{ $app->publicVersion->versionName }}
+                            <b>{{ __("Versiyon") }}:</b> {{ $app->publicVersion->versionName }}
                         @else
                         <small>
-                            Kurumsal eklenti
+                            {{ __("Kurumsal eklenti") }}
                         @endif
                         </small>
                     </div>
                     <div class="col-6 text-right">
                         <small>
-                            <b>Geliştirici:</b> {{ $app->publisher->userName }}
+                            <b>{{ __("Geliştirici") }}:</b> {{ $app->publisher->userName }}
                         </small>
                     </div>
                 </div>

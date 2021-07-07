@@ -8,7 +8,7 @@
         <ol class="breadcrumb" style="float:left;">
             <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
             <li class="breadcrumb-item"><a href="{{route('server_one', server()->id)}}">{{ server()->name }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ server()->name }} {{__(extension()->display_name)}} eklentisi</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ server()->name }} {{__(extension()->display_name)}} {{ __('eklentisi') }}</li>
         </ol>
         
     </nav>

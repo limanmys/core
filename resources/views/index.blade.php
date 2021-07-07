@@ -17,7 +17,7 @@
               <i class="fas fa-server"></i>
             </div>
             <a href="/sunucular" class="small-box-footer">
-              Sunucuları listele <i class="fas fa-arrow-circle-right"></i>
+              {{ __("Sunucuları listele") }} <i class="fas fa-arrow-circle-right"></i>
             </a>
           </div>
       </div>
@@ -32,7 +32,7 @@
               <i class="fas fa-plug"></i>
             </div>
             <a href="/ayarlar#extensions" class="small-box-footer">
-              Eklentileri yönet <i class="fas fa-arrow-circle-right"></i>
+              {{ __("Eklentileri yönet") }} <i class="fas fa-arrow-circle-right"></i>
             </a>
           </div>
       </div>
@@ -46,7 +46,7 @@
               <i class="fas fa-users"></i>
             </div>
             <a href="/ayarlar#users" class="small-box-footer">
-              Kullanıcıları yönet <i class="fas fa-arrow-circle-right"></i>
+              {{ __("Kullanıcıları yönet") }} <i class="fas fa-arrow-circle-right"></i>
             </a>
           </div>
       </div>
@@ -109,7 +109,7 @@
           <div class="col-md-6 col-sm-12">
             <div class="card shadow-sm loading online-servers" style="height: 100%; min-height: 220px;">
                 <div class="card-header">
-                  <h3 class="card-title">Sunucu Durumları</h3>
+                  <h3 class="card-title">{{ __("Sunucu Durumları") }}</h3>
                 </div>
                 <div class="overlay">
                   <i class="fas fa-2x fa-sync-alt fa-spin"></i>
@@ -129,9 +129,9 @@
           <div class="col-md-6 col-sm-12">
             <div class="card shadow-sm loading market-widget" style="height: 100%; min-height: 220px;">
                 <div class="card-header p-0">
-                  <h3 class="card-title" style="padding: 12px; padding-left: 1.25rem">Önerilen Eklentiler</h3>
+                  <h3 class="card-title" style="padding: 12px; padding-left: 1.25rem">{{ __("Önerilen Eklentiler") }}</h3>
                   <div class="float-right">
-                    <button style="margin: 5px" class="btn btn-sm btn-success" onclick="window.location.href='/market'"><i class="fas fa-shopping-cart mr-1"></i>Eklenti Mağazası</button>
+                    <button style="margin: 5px" class="btn btn-sm btn-success" onclick="window.location.href='/market'"><i class="fas fa-shopping-cart mr-1"></i>{{ __("Eklenti Mağazası") }}</button>
                   </div>
                 </div>
                 <div class="overlay">
@@ -194,6 +194,7 @@
         @endforeach
       @endif
     </div>
+    <div class="row my-2"></div>
     <style>
     .sortable-widget{
       cursor: default;

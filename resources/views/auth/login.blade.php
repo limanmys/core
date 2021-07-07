@@ -46,7 +46,7 @@
           @endif
           <div>
             <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Hesabınıza giriş yapın
+              {{ __('Hesabınıza giriş yapın') }}
             </h2>
           </div>
           <form class="mt-8 space-y-6" action="{{ route('login')}}" method="post" autocomplete="off">
