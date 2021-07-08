@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdminNotification;
 use App\Models\LimanRequest;
 use App\Models\Server;
 use App\User;
 use App\Models\Token;
-use App\Models\UserSettings;
 use App\Models\Extension;
-use App\Models\Notification;
 use App\Models\Widget;
 
 class HomeController extends Controller
@@ -210,10 +209,10 @@ class HomeController extends Controller
         $users = User::where('status', 1)->get();
         foreach ($users as $user) 
         {
-            Notification::create([
+            AdminNotification::create([
                 "user_id" => $user->id,
-                "title" => "İzin isteği: " . auth()->user()->name,
-                "type" => "notify",
+                "title" => __("İzin isteği: ") . auth()->user()->name,
+                "type" => "auth_request",
                 "message" => request('note'),
                 "server_id" => null,
                 "extension_id" => null,

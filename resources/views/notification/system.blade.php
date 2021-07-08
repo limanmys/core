@@ -51,6 +51,14 @@ switch ($notification->type) {
         header("Location: $url", true);
         exit();
         break;
+    case "auth_request":
+        $url = route("request_list");
+        $notification->update([
+            "read" => "true"
+        ]);
+        header("Location: $url", true);
+        exit();
+        break;
     default:
         break;
 }
