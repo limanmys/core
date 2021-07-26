@@ -626,5 +626,7 @@
     "yukarıdan sunucu ekleyin.": "Liman from above.",
     "Bu sayfadan mevcut verilerini görebilirsiniz. Buradaki veriler, eklentiler tarafından kullanılmaktadır.": "On this page you can view your existing data. This data is used by extensions.",
     "İzin isteği: ": "Permission request:",
-    "Not": "Note"
+    "Not": "Note",
+    "Bağımlılıkları Yükle": "Install Dependencies",
+    "Zorla Aktifleştir": "Force Activate"
 }
