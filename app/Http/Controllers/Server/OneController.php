@@ -980,7 +980,7 @@ class OneController extends Controller
         return [
             "count" => count($updates),
             "list" => $updates,
-            "table" => view('l.table', [
+            "table" => view('table', [
                 "id" => "updateListTable",
                 "value" => $updates,
                 "title" => ["Paket Adı", "Versiyon", "Tip", "Durumu"],
@@ -1134,7 +1134,7 @@ class OneController extends Controller
         }
 
         return respond(
-            view('l.table', [
+            view('table', [
                 "id" => "openPortsTable",
                 "value" => $arr,
                 "title" => [

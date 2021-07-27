@@ -396,7 +396,7 @@ if (!function_exists('settingsModuleViews')) {
         $str = "";
         foreach (searchModuleFiles('settings.blade.php') as $file) {
             $blade = new Blade(
-                [realpath(base_path('resources/views/l')), $file],
+                [realpath(base_path('resources/views/components')), $file],
                 "/tmp"
             );
             $str .= $blade->render('settings');
@@ -490,7 +490,7 @@ if (!function_exists('serverModuleViews')) {
         $str = "";
         foreach (searchModuleFiles('server.blade.php') as $file) {
             $blade = new Blade(
-                [realpath(base_path('resources/views/l')), $file],
+                [realpath(base_path('resources/views/components')), $file],
                 "/tmp"
             );
             $str .= $blade->render('server');

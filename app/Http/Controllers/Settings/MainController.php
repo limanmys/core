@@ -121,7 +121,7 @@ class MainController extends Controller
 
     public function getUserList()
     {
-        return view('l.table', [
+        return view('table', [
             "value" => \App\User::all(),
             "title" => ["İsim Soyisim", "Kullanıcı Adı", "Email", "*hidden*" ,],
             "display" => ["name", "username", "email", "id:user_id"],
@@ -197,7 +197,7 @@ class MainController extends Controller
             default:
                 abort(504, "Tip Bulunamadı");
         }
-        return view('l.table', [
+        return view('table', [
             "value" => (object)$data,
             "title" => $title,
             "display" => $display,
@@ -324,7 +324,7 @@ class MainController extends Controller
             }
         }
 
-        return view('l.table', [
+        return view('table', [
             "value" => $cleanFunctions,
             "title" => ["*hidden*", "Açıklama"],
             "display" => ["name:name", "description"],

@@ -57,7 +57,7 @@ class MainController extends Controller
 
         $inputs = $template["settings"];
 
-        $view = view('l.inputs', [
+        $view = view('inputs', [
             "inputs" => $inputs,
         ])->render();
 

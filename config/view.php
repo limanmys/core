@@ -12,7 +12,7 @@ return [
     |
     */
 
-    'paths' => [resource_path('views'), resource_path('views/l')],
+    'paths' => [resource_path('views'), resource_path('views/components')],
 
     /*
     |--------------------------------------------------------------------------
