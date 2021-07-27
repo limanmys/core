@@ -64,3 +64,11 @@ table.dataTable tbody tr.selected {
 .card-header {
   background-color: #efefef;
 }
+
+#ouTreeWrapper {
+  padding: 0;
+}
+
+.jstree-default .jstree-node {
+  margin-left: 12px !important;
+}

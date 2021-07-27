@@ -12,8 +12,8 @@
         <div class="col-md-3">
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
-                <h3 class="profile-username text-center">{{auth()->user()->name}}</h3>
-                <p class="text-muted text-center">{{auth()->user()->email}}</p>
+                <h3 class="profile-username text-center font-weight-bold">{{auth()->user()->name}}</h3>
+                <p class="text-muted text-center mb-0">{{auth()->user()->email}}</p>
               </div>
             </div>
             <div class="card card-primary">
@@ -25,7 +25,7 @@
                 <p class="text-muted">{{auth()->user()->last_login_ip}}</p>
                 <hr>
                 <strong>{{ __('Son Giriş Tarihi') }}</strong>
-                <p class="text-muted">{{auth()->user()->last_login_at}}</p>
+                <p class="text-muted">{{\Carbon\Carbon::parse(auth()->user()->last_login_at)->isoFormat('LL')}}</p>
               </div>
             </div>
         </div>

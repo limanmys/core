@@ -20,6 +20,7 @@ mix.styles([
     'resources/assets/css/toastr.min.css',
     'resources/assets/css/OverlayScrollbars.css',
     'resources/assets/css/liman.css',
+    'resources/assets/css/liman-newlook.css',
 ], 'public/css/liman.css').version();
 mix.combine([
     'resources/assets/js/jquery.js',

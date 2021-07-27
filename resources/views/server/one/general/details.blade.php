@@ -28,7 +28,7 @@
                 @foreach($installed_extensions as $extension)
                     <span 
                         class="badge btn-secondary status_{{$extension->id}}"
-                        style="cursor:pointer;font-size: 18px; margin-bottom: 5px;"
+                        style="cursor:pointer; font-size: 14px; margin-bottom: 5px"
                         onclick="window.location.href = '{{route('extension_server',["extension_id" => $extension->id, "city" => $server->city, "server_id" => $server->id])}}'">
                         {{$extension->display_name}}
                     </span>
@@ -37,17 +37,20 @@
                 {{__("Yüklü eklenti yok.")}}
             @endif
         </p>
-        <hr>
         @if(server()->canRunCommand())
+        <hr>
             <strong>{{ __('Açık Kalma') }}</strong>
-            <p class="text-muted">{{$outputs["uptime"]}}</p>
+            @if (!(server()->canRunCommand() && server()->isWindows()))
+            <p class="text-muted">{{ \Carbon\Carbon::parse($outputs["uptime"])->diffForHumans() }}</p>
+            @else
+            <p class="text-muted">{{ \Carbon\Carbon::parse(explode(".", $outputs["uptime"])[0])->diffForHumans() }}</p>
+            @endif
             <hr>
             <strong>{{ __('Servis Sayısı') }}</strong>
             <p class="text-muted">{{$outputs["nofservices"]}}</p>
             <hr>
             <strong>{{ __('İşlem Sayısı') }}</strong>
             <p class="text-muted">{{$outputs["nofprocesses"]}}</p>
-            <hr>
         @endif
     </div>
     </div>

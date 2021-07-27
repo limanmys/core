@@ -3,9 +3,17 @@ var customRequestData = [];
 var limanRecordRequests = false;
 var limanRequestList = [];
 
+function loadingText() {
+  if ($('html').attr('lang') == "tr") {
+    return "Yükleniyor...";
+  } else {
+    return "Loading...";
+  }
+}
+
 function showSwal(message, type, timer = false) {
   var config = {
-    position: "bottom-start",
+    position: "bottom-end",
     type: type,
     title: message,
     toast: true,
@@ -29,7 +37,13 @@ function request(url, data, next, error, requestType = "POST") {
   }
 
   if (id != null) {
-    showSwal("Yükleniyor...", "info");
+    Swal.fire({
+      position: "bottom-end",
+      type: "info",
+      title: loadingText(),
+      toast: true,
+      showConfirmButton: false
+    });
   }
 
   modalData = data;
@@ -242,7 +256,13 @@ function route(url) {
 }
 
 window.onbeforeunload = function () {
-  showSwal("Yükleniyor...", "info");
+  Swal.fire({
+    position: "bottom-end",
+    type: "info",
+    title: loadingText(),
+    toast: true,
+    showConfirmButton: false
+  });
 };
 
 function message(data) {
@@ -414,4 +434,129 @@ $(function () {
       .not(".alert-info")
       .fadeOut(0);
   });
+});
+
+function getSearchResults (query) {
+    $.ajax({
+      dataType: "json",
+      method: "GET",
+      url: "/liman_arama",
+      data: {
+        search_query: query
+      },
+      success: function (data, status, xhr) 
+      {
+        if (data.length == 0) {
+          $("#liman_search_results").append(`
+            <a href="#">Sonuç bulunamadı</a>
+          `);
+        }
+
+        let firstone = 0
+        data.forEach(el => {
+          if (firstone == 0) {
+            $("#liman_search_results").append(`
+              <a href="${el.url}" class="hovered">${el.name}</a>
+            `);
+            firstone++
+          } else {
+            $("#liman_search_results").append(`
+              <a href="${el.url}">${el.name}</a>
+            `);
+          }
+        });
+      },
+      error: function (jqXhr, textStatus, error) 
+      {
+        console.log(error);
+      }
+    })
+}
+
+function liman_search() {
+  let input = $("#liman_search_input");
+  let result = $("#liman_search_results");
+  
+  if (input.val().length > 2)
+  {
+    result.html("");
+    getSearchResults(input.val());
+    result.fadeIn(250);
+  }
+
+  if (input.val() == "") 
+  {
+    result.fadeOut(250);
+  }
+}
+
+$(document).ready(function() {
+  $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+  
+  let input = $("#liman_search_input");
+  let result = $("#liman_search_results");
+
+  let idx = 0
+
+  input.on("keydown", function ( e ) {
+    if (e.keyCode == 13)
+    {
+      e.preventDefault();
+      result.find(".hovered")[0].click();
+    }
+
+    if(!(e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13)) {
+      clearTimeout($.data(this, 'timer'));
+      let wait = setTimeout(liman_search, 150);
+      $(this).data('timer', wait);
+      idx = 0
+    } else {
+      e.preventDefault();
+      if(!result.html().includes("Sonuç bulunamadı")) {
+        let results = result.find("a")
+        let len = results.length - 1
+        if (e.keyCode == 38) {
+          if (idx <= 0) {
+            idx = 0
+          } else {
+            idx--
+            result.find(results[idx + 1]).removeClass("hovered");
+            result.find(results[idx]).addClass("hovered");
+          }
+        }
+
+        if (e.keyCode == 40) {
+          if (idx >= len) {
+            idx = len
+          } else {
+            idx++
+            result.find(results[idx - 1]).removeClass("hovered");
+            result.find(results[idx]).addClass("hovered");
+          }
+        }
+      }
+    }
+  })
+
+  $(document).on("click", function(event){
+    var $trigger = $("#liman_search");
+    if($trigger !== event.target && !$trigger.has(event.target).length)
+    {
+      result.fadeOut(250);
+    }            
+  });
+});
+
+function handleCloseButton(target) {
+  let selector = $("#" + target);
+
+  selector.find(selector.find(".close")[0]).click(function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    selector.modal("hide");
+  });
+}
+
+$(document).on("shown.bs.modal", function (e) {
+  handleCloseButton($(e.target).attr("id"));
 });

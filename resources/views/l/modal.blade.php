@@ -1,6 +1,6 @@
 @php($id = isset($id) ? $id : bin2hex(random_bytes(10)))
 <div class="modal fade" id="{{$id}}">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-dialog-centered @if(!isset($notSized) || !$notSized) modal-xl @endif {{ isset($modalDialogClasses) ? $modalDialogClasses : ''}}">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">
@@ -50,6 +50,7 @@
                         <br>
                     @endisset
                 </div>
+                @isset($submit_text)
                 <div class="modal-footer justify-content-right">
                     @isset($noEnter)
                         <button type="button" class="btn btn-success">@isset($submit_text){{__($submit_text)}}@endisset</button>
@@ -57,6 +58,7 @@
                         <button type="submit" class="btn btn-success">@isset($submit_text){{__($submit_text)}}@endisset</button>
                     @endisset
                 </div>
+                @endisset
             </form>
         </div>
     </div>

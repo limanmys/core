@@ -11,8 +11,8 @@
     <div class="col-md-3">
         <div class="card card-primary card-outline">
             <div class="card-body box-profile">
-                <h3 class="profile-username text-center">{{__("Bileşenler")}}</h3>
-                <p class="text-muted text-center">{{__("Bu sayfadan mevcut bileşenleri görebilirsiniz. Ayrıca yeni bileşen eklemek için Bileşen Ekle butonunu kullanabilirsiniz.")}}</p>
+                <h3 class="profile-username text-center font-weight-bold">{{__("Bileşenler")}}</h3>
+                <p class="text-muted text-center mb-0">{{__("Bu sayfadan mevcut bileşenleri görebilirsiniz. Ayrıca yeni bileşen eklemek için Bileşen Ekle butonunu kullanabilirsiniz.")}}</p>
             </div>
         </div>
     </div>

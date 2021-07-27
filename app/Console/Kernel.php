@@ -3,7 +3,7 @@
 namespace App\Console;
 
 use App\Models\AdminNotification;
-use App\Http\Controllers\MarketController;
+use App\Http\Controllers\Market\MarketController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;

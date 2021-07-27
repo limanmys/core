@@ -215,9 +215,9 @@
                     <p>{{__("Liman'ın sunucu adreslerini çözebilmesi için gerekli DNS sunucularını aşağıdan düzenleyebilirsiniz.")}}</p>
                     <form onsubmit="return saveDNS(this);">
                         <label>{{__("Öncelikli DNS Sunucusu")}}</label>
-                        <input type="text" name="dns1" id="dns1" class="form-control">
+                        <input type="text" name="dns1" id="dns1" class="form-control mb-3">
                         <label>{{__("Alternatif DNS Sunucusu")}}</label>
-                        <input type="text" name="dns2" id="dns2" class="form-control">
+                        <input type="text" name="dns2" id="dns2" class="form-control mb-3">
                         <label>{{__("Alternatif DNS Sunucusu")}}</label>
                         <input type="text" name="dns3" id="dns3" class="form-control"><br>
                         <button type="submit" class="btn btn-primary">{{__("Kaydet")}}</button>
@@ -399,7 +399,7 @@
                             showSwal("Okunuyor...","info");
                             request("{{route('cron_mail_get')}}",new FormData(),function (success){
                                 $("#mailWrapper").html(success);
-                                $("#mailWrapper table").DataTable();
+                                $("#mailWrapper table").DataTable(dataTablePresets("normal"));
                                 Swal.close();
                             },function(error){
                                 let json = JSON.parse(error);

@@ -21,6 +21,7 @@ class Kernel extends HttpKernel
             Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
+            \App\Http\Middleware\TouchServer::class,
             \App\Http\Middleware\APILogin::class,
             \Illuminate\Session\Middleware\AuthenticateSession::class,
             Middleware\Language::class,

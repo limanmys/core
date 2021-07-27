@@ -2,106 +2,153 @@
 
 @section('content')
     @include('errors')
-    <br><div class="callout callout-info">
+    <div class="callout callout-info shadow-sm">
         <h5>{{__("Liman MYS'ye Hoşgeldiniz")}}</h5>
         {{__("Kullanım rehberine ulaşmak için")}} <a href="https://rehber.liman.dev/" target="_blank">https://rehber.liman.dev/</a> {{__("adresini ziyaret edebilirsiniz.")}}
     </div>
     <div class="row" style="padding-top: 15px;">
       <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fas fa-users"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">{{__("Limandaki Sunucu Sayısı")}}</span>
-              <span class="info-box-number">{{$server_count}}</span>
+          <div class="small-box shadow-sm bg-info">
+            <div class="inner">
+              <h3>{{$server_count}}</h3>
+              <p>{{__("Limandaki Sunucu Sayısı")}}</p>
             </div>
+            <div class="icon">
+              <i class="fas fa-server"></i>
+            </div>
+            <a href="/sunucular" class="small-box-footer">
+              {{ __("Sunucuları listele") }} <i class="fas fa-arrow-circle-right"></i>
+            </a>
+          </div>
+      </div>
+      
+      <div class="col-md-3 col-sm-4 col-xs-12">
+          <div class="small-box shadow-sm bg-info">
+            <div class="inner">
+              <h3>{{$extension_count}}</h3>
+              <p>{{__("Limandaki Eklenti Sayısı")}}</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-plug"></i>
+            </div>
+            <a href="/ayarlar#extensions" class="small-box-footer">
+              {{ __("Eklentileri yönet") }} <i class="fas fa-arrow-circle-right"></i>
+            </a>
           </div>
       </div>
       <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fas fa-plus"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">{{__("Limandaki Eklenti Sayısı")}}</span>
-              <span class="info-box-number">{{$extension_count}}</span>
+          <div class="small-box shadow-sm bg-info">
+            <div class="inner">
+              <h3>{{$user_count}}</h3>
+              <p>{{__("Limandaki Kullanıcı Sayısı")}}</p>
             </div>
+            <div class="icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <a href="/ayarlar#users" class="small-box-footer">
+              {{ __("Kullanıcıları yönet") }} <i class="fas fa-arrow-circle-right"></i>
+            </a>
           </div>
       </div>
       <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fas fa-user"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">{{__("Limandaki Kullanıcı Sayısı")}}</span>
-              <span class="info-box-number">{{$user_count}}</span>
+          <div class="small-box shadow-sm bg-info">
+            <div class="inner">
+              <h3>{{$version}}</h3>
+              <p>{{__("Liman Versiyonu")}}</p>
             </div>
-          </div>
-      </div>
-      <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-info"><i class="fas fa-cog"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">{{__("Liman Versiyonu")}}</span>
-              <span class="info-box-number">{{$version}}</span>
+            <div class="icon">
+              <i class="fas fa-cogs"></i>
+            </div>
+            <div class="small-box-footer">
+              &nbsp;
             </div>
           </div>
       </div>
       @if(user()->isAdmin())
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box loading">
-              <span class="info-box-icon bg-info"><i class="fas fa-microchip"></i></span>
+            <div class="info-box shadow-sm loading chartbox">
+              <div class="overlay">
+                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+              </div>
               <div class="info-box-content">
-                <span class="info-box-text">{{__("Cpu Kullanımı")}}</span>
-                <span class="info-box-number" id="cpuUsage">
-                  <div class="overlay" style="background: rgba(255,255,255,.9);">
-                        <div class="spinner-border" role="status">
-                          <span class="sr-only">{{__("Yükleniyor")}}</span>
-                        </div>
-                    </div></span>
+                <canvas id="cpuChart"></canvas>
               </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box">
-              <span class="info-box-icon bg-info"><i class="fas fa-memory"></i></span>
+            <div class="info-box shadow-sm loading chartbox">
+              <div class="overlay">
+                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+              </div>
               <div class="info-box-content">
-                <span class="info-box-text">{{__("Ram Kullanımı")}}</span>
-                <span class="info-box-number" id="ramUsage">
-                  <div class="overlay" style="background: rgba(255,255,255,.9);">
-                        <div class="spinner-border" role="status">
-                          <span class="sr-only">{{__("Yükleniyor")}}</span>
-                        </div>
+                <canvas id="ramChart"></canvas>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-4 col-xs-12">
+            <div class="info-box shadow-sm loading chartbox">
+              <div class="overlay">
+                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+              </div>
+              <div class="info-box-content">
+                <canvas id="diskChart"></canvas>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-4 col-xs-12">
+            <div class="info-box shadow-sm loading chartbox">
+              <div class="overlay">
+                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+              </div>
+              <div class="info-box-content">
+                <canvas id="networkChart"></canvas>
+              </div>
+            </div>
+        </div>
+        <div class="row row-eq-height" style="width: 100%; margin-left: 0;">
+          <div class="col-md-6 col-sm-12">
+            <div class="card shadow-sm loading online-servers" style="height: 100%; min-height: 220px;">
+                <div class="card-header">
+                  <h3 class="card-title">{{ __("Sunucu Durumları") }}</h3>
+                </div>
+                <div class="overlay">
+                  <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                </div>
+                <div class="card-body" style="padding: 4px;">
+                  <ul class="list-group list-group-flush srvlist">
+                    
+                  </ul>
+                  
+                </div>
+                <div class="noServer" style="height: 100%; display:flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <i class="fas fa-info fa-3x mb-4"></i>
+                    <h5 class="text-bold">Henüz sunucu eklememişsiniz.</h5>
+                </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-sm-12">
+            <div class="card shadow-sm loading market-widget" style="height: 100%; min-height: 220px;">
+                <div class="card-header p-0">
+                  <h3 class="card-title" style="padding: 12px; padding-left: 1.25rem">{{ __("Önerilen Eklentiler") }}</h3>
+                  <div class="float-right">
+                    <button style="margin: 5px" class="btn btn-sm btn-success" onclick="window.location.href='/market'"><i class="fas fa-shopping-cart mr-1"></i>{{ __("Eklenti Mağazası") }}</button>
                   </div>
-                </span>
-              </div>
+                </div>
+                <div class="overlay">
+                  <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                </div>
+                <div class="card-body" style="padding: 4px;">
+                  <div class="row row-eq-height market-col-1">
+                  </div>
+                  <div class="row row-eq-height market-col-2">
+                  </div>
+                </div>
+                <div class="noApp" style="height: 100%; display:flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <i class="fas fa-info fa-3x mb-4"></i>
+                    <h5 class="text-bold">Market bağlantınızı kontrol edin.</h5>
+                </div>
             </div>
-        </div>
-        <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box">
-              <span class="info-box-icon bg-info"><i class="far fa-hdd"></i></span>
-              <div class="info-box-content">
-                <span class="info-box-text">{{__("Disk Kullanımı")}}</span>
-                <span class="info-box-number" id="diskUsage">
-                    <div class="overlay" style="background: rgba(255,255,255,.9);">
-                        <div class="spinner-border" role="status">
-                          <span class="sr-only">{{__("Yükleniyor")}}</span>
-                        </div>
-                    </div>
-                </span>
-              </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box">
-              <span class="info-box-icon bg-info"><i class="fas fa-network-wired"></i></span>
-              <div class="info-box-content">
-                <span class="info-box-text">{{__("Ağ Kullanımı")}}</span>
-                <span class="info-box-number" id="networkUsage">
-                <div class="overlay" style="background: rgba(255,255,255,.9);">
-                        <div class="spinner-border" role="status">
-                          <span class="sr-only">{{__("Yükleniyor")}}</span>
-                        </div>
-                    </div>
-                </span>
-              </div>
-            </div>
+          </div>
         </div>
       @endif
     </div>
@@ -147,12 +194,74 @@
         @endforeach
       @endif
     </div>
+    <div class="row my-2"></div>
     <style>
     .sortable-widget{
       cursor: default;
     }
     </style>
     <script>
+        @if(user()->isAdmin())
+        function appendApp(item) {
+          return (`<div class="col-md-6 col-sm-12">
+                      <div class="row p-2">
+                        <div class="col-lg-4 col-5">
+                            <a href="{{ route('market') }}"><img src="https://market.liman.dev/${item.iconPath}" alt="${item.name}" class="img-fluid mb-3"></a>
+                        </div>
+                        <div class="col-lg-8 col-7">
+                            <a href="{{ route('market') }}" class="text-dark"><h4 style="font-weight: 600;">${item.name}</h4></a>
+                            <p class="mb-0">${item.shortDescription}</p>
+                        </div>
+                      </div>
+                    </div>`);
+        }
+
+        function getHomepageApps() {
+          $(".market-widget").find(".noApp").css("display", "none");
+          request('{{route('market_widget')}}', new FormData(), function(response){
+              var json = JSON.parse(response);
+              let a = 0;
+              json.forEach(function (item) {
+                if (a++ < 2) {
+                  $(".market-col-1").append(appendApp(item));
+                } else {
+                  $(".market-col-2").append(appendApp(item));
+                }
+              });
+              if (json.length < 1) {
+                $(".market-widget").find(".noApp").css("display", "flex");
+              }
+              $(".market-widget").find(".overlay").hide();
+          });
+        }
+        getHomepageApps();
+
+        function getOnlineServers() {
+          $(".online-servers").find(".noServer").css("display", "none");
+          request('{{route('online_servers')}}', new FormData(), function(response){
+              var json = JSON.parse(response);
+              json.forEach(function (item) {
+                $(".srvlist").append(`
+                  <li class="list-group-item">
+                    <a href="/sunucular/${item.id}" style="color:#222">
+                      <i class="fab ${item.icon} mr-1"></i> <span class="text-bold">${item.name}</span>
+                    </a>
+                    <div class="float-right">
+                      <span class="text-xs">${item.uptime ? item.uptime : ""}</span>  
+                      <span class="ml-1 badge ${item.badge_class}">${item.status ? "Online" : "Offline"}</span>
+                    </div>
+                  </li>
+                `);
+              });
+              if (json.length < 1) {
+                $(".online-servers").find(".noServer").css("display", "flex");
+              }
+              $(".online-servers").find(".overlay").hide();
+          });
+        }
+        getOnlineServers();
+        @endif
+
         var limanEnableWidgets = true;
         $(".sortable-widget").sortable({
             stop: function(event, ui) {
@@ -208,16 +317,18 @@
           }
         }
         @if(user()->isAdmin())
+        var stats;
         function retrieveStats(){
           if(!limanEnableWidgets){
             return;
           }
             request('{{route('liman_stats')}}', new FormData(), function(response){
-              var json = JSON.parse(response);
-                $("#ramUsage").text(json.ram);
-                $("#diskUsage").text(json.disk);
-                $("#cpuUsage").text(json.cpu);
-                $("#networkUsage").text(json.network);
+              stats = JSON.parse(response);
+              resourceChart('{{__("Cpu Kullanımı")}}', "cpuChart", stats.time, stats.cpu);
+              resourceChart('{{__("Ram Kullanımı")}}', "ramChart", stats.time, stats.ram);
+              resourceChart('{{__("IO Kullanımı")}}', "diskChart", stats.time, stats.io);
+              networkChart('{{__("Network")}}', "networkChart", stats.time, stats.network);
+              $(".chartbox").find(".overlay").hide();
               setTimeout(() => {
                 retrieveStats();
               }, 2500);
@@ -325,29 +436,173 @@
             return "{{route('home')}}/extensionRun/" + target;
         }
 
-        function createChart(element, labels, data) {
-          $("#" + element + ' .overlay').remove();
-          window[element + "Chart"] = new Chart($("#" + element+' .card-body canvas'), {
-            type: 'bar',
-            data: {
-              datasets: [{
-                data: data,
-              }],
-              labels: labels
-            },
-            options: {
-              animation: false,
-              responsive: true,
-              legend: false,
-              scales: {
-                yAxes: [{
-                  ticks: {
-                    beginAtZero: true,
+        function resourceChart(title, chart, time, data, prefix=true, postfix="")
+        {
+          if(!window[`${chart}-element`]){
+              window[`${chart}-element`] = new Chart($(`#${chart}`), {
+                  type: 'line',
+                  data: {
+                      datasets: [{
+                          data: [data, data],
+                          steppedLine: false,
+                          borderColor: 'rgb(255, 159, 64)',
+                          backgroundColor: 'rgba(255, 159, 64, .5)',
+                          fill: true,
+                          pointRadius: 0
+                      }],
+                      labels: [time, time]
+                  },
+                  options: {
+                      responsive: true,
+                      legend: false,
+                      tooltips: {
+                          mode: 'index',
+                          intersect: false,
+                      },
+                      hover: {
+                          mode: 'nearest',
+                          intersect: true
+                      },
+                      title: {
+                        display: true,
+                        text: `${title} ` + (prefix ? `%${data} ${postfix}` : `${data} ${postfix}`),
+                      },
+                      scales: {
+                          xAxes: [{
+                              display: false
+                          }],
+                          yAxes: [{
+                              ticks: {
+                                  beginAtZero: true,
+                                  max: 100
+                              }
+                          }]
+                      },
+                      animation: {
+                        onComplete: () => {
+                          delayed = true;
+                        },
+                        delay: (context) => {
+                          let delay = 0;
+                          if (context.type === 'data' && context.mode === 'default' && !delayed) {
+                            delay = context.dataIndex * 500 + context.datasetIndex * 200;
+                          }
+                          return delay;
+                        },
+                      },
                   }
-                }]
+              });
+          }else{ 
+              window[`${chart}-element`].options.title.text = `${title} ` + (prefix ? `%${data} ${postfix}` : `${data} ${postfix}`);
+              window[`${chart}-element`].data.labels.push(time);
+              window[`${chart}-element`].data.datasets.forEach((dataset) => {
+                  dataset.data.push(data);
+              });
+              $('.charts-card').find('.overlay').hide();
+              window[`${chart}-element`].update(); 
+          }
+      }
+
+      function networkChart(title, chart, time, data)
+      {
+          if(!window[`${chart}-element`]){
+              window[`${chart}-element`] = new Chart($(`#${chart}`), {
+                  type: 'line',
+                  data: {
+                      datasets: [{
+                          label: '{{__('Download')}}',
+                          data: [data.down, data.down],
+                          steppedLine: false,
+                          borderColor: 'rgb(255, 159, 64)',
+                          backgroundColor: 'rgba(255, 159, 64, .5)',
+                          fill: true,
+                          pointRadius: 0
+                      },{
+                          label: '{{__('Upload')}}',
+                          data: [data.up, data.up],
+                          steppedLine: false,
+                          borderColor: 'rgb(54, 162, 235)',
+                          backgroundColor: 'rgba(54, 162, 235, .5)',
+                          fill: true,
+                          pointRadius: 0
+                      }],
+                      labels: [time, time]
+                  },
+                  options: {
+                      responsive: true,
+                      legend: false,
+                      tooltips: {
+                          mode: 'index',
+                          intersect: false,
+                      },
+                      hover: {
+                          mode: 'nearest',
+                          intersect: true
+                      },
+                      title: {
+                        display: true,
+                        text: `${title} Down: ${data.down} kb/s Up: ${data.up} kb/s`,
+                      },
+                      scales: {
+                          xAxes: [{
+                              display: false 
+                          }],
+                          yAxes: [{
+                              ticks: {
+                                  beginAtZero: true
+                              }
+                          }]
+                      },
+                      animation: {
+                        onComplete: () => {
+                          delayed = true;
+                        },
+                        delay: (context) => {
+                          let delay = 0;
+                          if (context.type === 'data' && context.mode === 'default' && !delayed) {
+                            delay = context.dataIndex * 500 + context.datasetIndex * 200;
+                          }
+                          return delay;
+                        },
+                      },
+                  }
+              });
+          }else{
+              window[`${chart}-element`].options.title.text = `${title} Down: ${data.down} kb/s Up: ${data.up} kb/s`;
+              window[`${chart}-element`].data.labels.push(time);
+              window[`${chart}-element`].data.datasets[0].data.push(data.down);
+              window[`${chart}-element`].data.datasets[1].data.push(data.up);
+              window[`${chart}-element`].update();
+          }
+      }
+
+      function createChart(element, time, data) {
+          $("#" + element + "Text").text("%" + data[0]);
+          window[element + "Chart"] = new Chart($("#" + element), {
+              type: 'line',
+              data: {
+                  datasets: [{
+                      data: data,
+                  }],
+                  labels: [
+                      time,
+                  ]
               },
-            }
+              options: {
+                  animation: false,
+                  responsive: true,
+                  legend: false,
+                  scales: {
+                      yAxes: [{
+                          ticks: {
+                              beginAtZero: true,
+                              min: 0,
+                              max: 100
+                          }
+                      }]
+                  },
+              }
           })
-        }
+      }
     </script>
 @stop

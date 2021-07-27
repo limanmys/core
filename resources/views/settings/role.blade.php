@@ -8,7 +8,6 @@
             <li class="breadcrumb-item active" aria-current="page">{{$role->name . __(" rol grubunun ayarları")}}</li>
         </ol>
     </nav>
-    <h2>{{$role->name . __(" rol grubunun ayarları")}}</h2>
     <div class="card">
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
@@ -128,7 +127,7 @@
         </div>
     </div>
     <div class="modal fade" id="functionsModal">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">
@@ -139,7 +138,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <h4>{{__("Lütfen Bir Eklenti Seçin")}}</h4>
+                <label>{{__("Lütfen Bir Eklenti Seçin")}}</label>
                 <select id="extensionId" class="form-control" onchange="getFunctionList()">
                     <option selected disabled>{{__("...")}}</option>
                     @foreach(extensions() as $extension)

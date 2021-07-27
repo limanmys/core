@@ -1,5 +1,5 @@
 <div class="modal fade" id="@isset($id){{$id}}@endisset">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">
@@ -14,11 +14,11 @@
             <div class="modal-body" style="width:100%; height:auto;padding:10px;">
                 @include('table',$table)
             </div>
+            @isset($footer)
             <div class="modal-footer justify-content-right">
-                @isset($footer)
-                    <button class="btn {{$footer["class"]}}" onclick="{{$footer["onclick"]}}">{{$footer["text"]}}</button>
-                @endisset
+                <button class="btn {{$footer["class"]}}" onclick="{{$footer["onclick"]}}">{{$footer["text"]}}</button>
             </div>
+            @endisset
         </div>
     </div>
 </div>
