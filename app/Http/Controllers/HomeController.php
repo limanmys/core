@@ -237,17 +237,17 @@ class HomeController extends Controller
                 $errstr,
                 0.5);
             
-            if ($status && $server->getUptime()) {
-                if (!($server->canRunCommand() && $server->isWindows())) {
-                    $uptime = \Carbon\Carbon::parse($server->getUptime())->diffForHumans();
+            try {
+                if ($server->isWindows()) {
+                    preg_match('/\d+/', $server->getUptime(), $output);
+                    $uptime = $output[0];
+                } else {
+                    $uptime = $server->getUptime();
                 }
-                else
-                {
-                    $uptime = \Carbon\Carbon::parse(explode(".", $server->getUptime())[0])->diffForHumans();
-                }
-            } else {
-                $uptime = null;
-            }
+                $uptime = \Carbon\Carbon::parse($uptime)->diffForHumans();
+            } catch (\Throwable $e) {
+                $uptime = " ";
+            }        
             
             array_push($data, [
                 "id" => $server->id,
