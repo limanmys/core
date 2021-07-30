@@ -40,11 +40,7 @@
         @if(server()->canRunCommand())
         <hr>
             <strong>{{ __('Açık Kalma') }}</strong>
-            @if (!(server()->canRunCommand() && server()->isWindows()))
-            <p class="text-muted">{{ \Carbon\Carbon::parse($outputs["uptime"])->diffForHumans() }}</p>
-            @else
-            <p class="text-muted">{{ \Carbon\Carbon::parse(explode(".", $outputs["uptime"])[0])->diffForHumans() }}</p>
-            @endif
+            <p class="text-muted">{{ $outputs["uptime"] }}</p>
             <hr>
             <strong>{{ __('Servis Sayısı') }}</strong>
             <p class="text-muted">{{$outputs["nofservices"]}}</p>

@@ -23,12 +23,24 @@ class OneController extends Controller
             abort(504, "Sunucu Bulunamadı.");
         }
 
+        try {
+            if ($server->isWindows()) {
+                preg_match('/\d+/', $server->getUptime(), $output);
+                $uptime = $output[0];
+            } else {
+                $uptime = $server->getUptime();
+            }
+            $uptime = Carbon::parse($uptime)->diffForHumans();
+        } catch (\Throwable $e) {
+            $uptime = __("Uptime parse edemiyorum.");
+        }        
+
         $outputs = [
             "hostname" => $server->getHostname(),
             "version" => $server->getVersion(),
             "nofservices" => $server->getNoOfServices(),
             "nofprocesses" => $server->getNoOfProcesses(),
-            "uptime" => $server->getUptime(),
+            "uptime" => $uptime,
         ];
 
         $input_extensions = [];

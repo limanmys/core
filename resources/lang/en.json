@@ -628,5 +628,6 @@
     "İzin isteği: ": "Permission request:",
     "Not": "Note",
     "Bağımlılıkları Yükle": "Install Dependencies",
-    "Zorla Aktifleştir": "Force Activate"
+    "Zorla Aktifleştir": "Force Activate",
+    "Uptime parse edemiyorum.": "I can not parse uptime."
 }
