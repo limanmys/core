@@ -68,15 +68,7 @@ return [
         ],
         [
             'name' => 'Yetki Talepleri',
-            'url ' => '/talepler'
-        ],
-        [
-            'name' => 'Kasa',
-            'url' => '/kasa'
-        ],
-        [
-            'name' => 'Erişim Anahtarları',
-            'url' => '/profil/anahtarlarim'
+            'url' => '/talepler'
         ],
     ],
     "user_searchable" => [
