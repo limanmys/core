@@ -20132,3 +20132,7 @@ table.dataTable tbody tr.selected {
 .table thead {
     background-color: #222;
 }
+
+.online-servers a {
+    color: #fff !important;
+}
