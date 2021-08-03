@@ -267,7 +267,7 @@ class RoleController extends Controller
             default:
                 abort(504, "Tip Bulunamadı");
         }
-        return magicView('l.table', [
+        return magicView('table', [
             "value" => $data,
             "title" => $title,
             "display" => $display,
