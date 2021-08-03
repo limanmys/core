@@ -20,6 +20,8 @@
 <!-- Admin Password Recovery : https://www.youtube.com/watch?v=dQw4w9WgXcQ -->
 @if(auth()->check())
 <script>
+
+
     toastr.options.closeButton = true;
     Echo.private('App.User.{{auth()->user()->id}}')
         .notification((notification) => {
@@ -139,7 +141,7 @@
 
     function navigateButtons(){
         jQuery(function($) {
-            var path = window.location.href;
+            var path = window.location.origin + window.location.pathname;
             $('nav ul a').each(function() {
                 if (this.href === path) {
                     $(this).addClass('active');
