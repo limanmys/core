@@ -707,5 +707,9 @@
     "Talebiniz başarıyla alındı.": "Your request is created.",
     "Acil": "Urgent",
     "Reddet": "Deny",
-    "Sertifika alınamıyor!": "I can not fetch the certificate!"
+    "Sertifika alınamıyor!": "I can not fetch the certificate!",
+    "Market'e bağlanmak için bir anahtarınız yok!": "You have no access token to connect to the Market!",
+    "Anahtarınız ile Market'e bağlanılamadı!": "Your access token is invalid.",
+    "Market Bağlantısı Başarıyla Sağlandı.": "Successfully connected to Market.",
+    
 }
