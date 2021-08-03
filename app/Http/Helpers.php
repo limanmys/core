@@ -605,7 +605,7 @@ if (!function_exists('retrieveCertificate')) {
                 );
                 $flag = true;
             } catch (\Exception $exception) {
-                return [false, "Sertifika alınamıyor!"];
+                return [false, __("Sertifika alınamıyor!")];
             }
         }
 

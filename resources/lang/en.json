@@ -706,5 +706,6 @@
     "Kullanıcı Profili": "Profile",
     "Talebiniz başarıyla alındı.": "Your request is created.",
     "Acil": "Urgent",
-    "Reddet": "Deny"
+    "Reddet": "Deny",
+    "Sertifika alınamıyor!": "I can not fetch the certificate!"
 }
