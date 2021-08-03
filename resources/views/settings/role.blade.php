@@ -12,9 +12,6 @@
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" data-toggle="pill" href="#role_users" role="tab" aria-selected="true">{{__("Kullanıcılar")}}</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#extension" role="tab" >{{__("Eklenti Yetkileri")}}</a>
                 </li>
                 <li class="nav-item">
@@ -28,6 +25,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#variables" role="tab">{{__("Özel Veriler")}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="pill" href="#role_users" role="tab" aria-selected="true">{{__("Kullanıcılar")}}</a>
                 </li>
             </ul>
         </div>

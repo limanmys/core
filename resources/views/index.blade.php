@@ -152,7 +152,7 @@
         </div>
       @endif
     </div>
-    <div class="row sortable-widget">
+    <div class="row sortable-widget mt-4">
       @if($widgets->count())
         @foreach($widgets as $widget)
           @if($widget->type==="count_box" || $widget->type==="")
