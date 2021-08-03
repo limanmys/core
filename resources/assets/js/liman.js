@@ -11,6 +11,14 @@ function loadingText() {
   }
 }
 
+function noResultFoundString() {
+  if ($('html').attr('lang') == "tr") {
+    return "Sonuç bulunamadı!";
+  } else {
+    return "No results found!";
+  }
+}
+
 function showSwal(message, type, timer = false) {
   var config = {
     position: "bottom-end",
@@ -448,7 +456,7 @@ function getSearchResults (query) {
       {
         if (data.length == 0) {
           $("#liman_search_results").append(`
-            <a href="#">Sonuç bulunamadı</a>
+            <a href="#">${noResultFoundString()}</a>
           `);
         }
 

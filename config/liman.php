@@ -65,12 +65,36 @@ return [
         [
             'name' => 'Market',
             'url' => '/market'
-        ]
+        ],
+        [
+            'name' => 'Yetki Talepleri',
+            'url ' => '/talepler'
+        ],
+        [
+            'name' => 'Kasa',
+            'url' => '/kasa'
+        ],
+        [
+            'name' => 'Erişim Anahtarları',
+            'url' => '/profil/anahtarlarim'
+        ],
     ],
     "user_searchable" => [
         [
             'name' => 'Kullanıcı Profili',
             'url' => '/profil'
-        ]
+        ],
+        [
+            'name' => 'Kasa',
+            'url' => '/kasa'
+        ],
+        [
+            'name' => 'Erişim Anahtarları',
+            'url' => '/profil/anahtarlarim'
+        ],
+        [
+            'name' => 'Yetki Talebi',
+            'url' => '/taleplerim'
+        ],
     ]
 ];
