@@ -16,12 +16,14 @@ class SearchController extends Controller
         if (user()->isAdmin()) {
             foreach (config('liman.admin_searchable') as $constant)
             {
+                $constant["name"] = __($constant["name"]);
                 array_push($searchable, $constant);
             }
         }
         
         foreach (config('liman.user_searchable') as $constant)
         {
+            $constant["name"] = __($constant["name"]);
             array_push($searchable, $constant);
         }
 

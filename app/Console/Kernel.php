@@ -58,10 +58,10 @@ class Kernel extends ConsoleKernel
                         'health_problem'
                     )->delete();
                     AdminNotification::create([
-                        "title" => "Sağlık Problemi Bulundu!",
+                        "title" => __("Sağlık Problemi Bulundu!"),
                         "type" => "health_problem",
                         "message" =>
-                            "Detaylar için lütfen ayarlardan sağlık kontrolünü kontrol edin.",
+                            __("Detaylar için lütfen ayarlardan sağlık kontrolünü kontrol edin."),
                         "level" => 3,
                     ]);
                 }
@@ -90,10 +90,10 @@ class Kernel extends ConsoleKernel
                 if ($collection->where("updateAvailable", 1)->count()) {
                     AdminNotification::where('type', 'liman_update')->delete();
                     AdminNotification::create([
-                        "title" => "Liman Güncellemesi Mevcut!",
+                        "title" => __("Liman Güncellemesi Mevcut!"),
                         "type" => "liman_update",
                         "message" =>
-                            "Yeni bir sistem güncellemesi mevcut, ayrıntılı bilgi için tıklayınız.",
+                            __("Yeni bir sistem güncellemesi mevcut, ayrıntılı bilgi için tıklayınız."),
                         "level" => 3,
                     ]);
                 }

@@ -252,7 +252,7 @@
                         ])
                     </div>
                     <div class="tab-pane fade show" id="tab_4" role="tabpanel">
-                        <button class="btn btn-success" data-toggle="modal" data-target="#addFunctionModal"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i></button><br><br>
+                        <button class="btn btn-success" data-toggle="modal" data-target="#addFunctionModal"><i data-toggle="tooltip" title="{{ __('Ekle') }}" class="fa fa-plus"></i></button><br><br>
                         @include('table',[
                             "value" => array_key_exists("functions",$extension) ? $extension["functions"] : [],
                             "title" => [
@@ -311,7 +311,7 @@
                             "title" => "Fonksiyon İzin Parametreleri"
                         ])
                             <button class="btn btn-success" onclick="addFunctionParameters()">
-                                <i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i>
+                                <i data-toggle="tooltip" title="{{ __('Ekle') }}" class="fa fa-plus"></i>
                             </button>
                             <div id="functionParameters" class="mt-2"></div>
                         @endcomponent

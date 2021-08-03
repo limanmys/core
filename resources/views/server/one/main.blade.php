@@ -12,11 +12,11 @@
     <div class="row mb-2 serverName">
         <div class="col-auto align-self-center">
             @if($favorite)
-                <button onclick="favorite('false')" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Sabitlemeyi kaldır">
+                <button onclick="favorite('false')" class="btn btn-warning btn-sm" data-toggle="tooltip" title="{{ __('Sabitlemeyi kaldır') }}">
                     <i class="fas fa-thumbtack"></i>
                 </button>
             @else
-                <button onclick="favorite('true')" class="btn btn-success btn-sm" data-toggle="tooltip" title="Sunucuyu sabitle">
+                <button onclick="favorite('true')" class="btn btn-success btn-sm" data-toggle="tooltip" title="{{ __('Sunucuyu sabitle') }}">
                     <i class="fas fa-thumbtack"></i>
                 </button>
             @endif

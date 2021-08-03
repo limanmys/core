@@ -70,14 +70,11 @@ class ExtensionUpdaterJob implements ShouldQueue
             );
             AdminNotification::create([
                 "title" =>
-                    $this->extension->display_name . " eklentisi güncellendi!",
+                    $this->extension->display_name . __(" eklentisi güncellendi!"),
                 "type" => "extension_update",
                 "message" =>
                     $this->extension->display_name .
-                    " eklentisinin yeni bir sürümü indirildi ve yüklendi. İncelemek için için <a href='" .
-                    route('settings') .
-                    "#extensions" .
-                    "'>tıklayınız.</a>",
+                    __(" eklentisinin yeni bir sürümü indirildi ve yüklendi."),
                 "level" => 3,
             ]);
             self::updateUpdatesFile();

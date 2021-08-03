@@ -80,7 +80,7 @@ class UserController extends Controller
 
         // Respond
         return respond(
-            "Kullanıcı Başarıyla Eklendi. Parola : " . $password,
+            __("Kullanıcı Başarıyla Eklendi. Parola : ") . $password,
             200
         );
     }

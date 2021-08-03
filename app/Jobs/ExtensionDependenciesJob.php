@@ -61,11 +61,11 @@ class ExtensionDependenciesJob implements ShouldQueue
 
             AdminNotification::create([
                 "title" =>
-                    $this->extension->display_name . " eklentisi hazır!",
+                    $this->extension->display_name .  __(" eklentisi hazır!"),
                 "type" => "",
                 "message" =>
                     $this->extension->display_name .
-                    " eklentisinin bağımlılıkları başarıyla yüklendi, hemen kullanmaya başlayabilirsiniz.",
+                    __(" eklentisinin bağımlılıkları başarıyla yüklendi, hemen kullanmaya başlayabilirsiniz."),
                 "level" => 3,
             ]);
         } else {
@@ -75,7 +75,7 @@ class ExtensionDependenciesJob implements ShouldQueue
                 "type" => "error",
                 "message" =>
                     $this->extension->display_name .
-                    " eklentisinin bağımlılıkları yüklenemedi, detayları " . $tmp . " dosyasından inceleyebilirsiniz.",
+                    __(" eklentisinin bağımlılıkları yüklenemedi,") . "detayları " . $tmp . " dosyasından inceleyebilirsiniz.",
                 "level" => 3,
             ]);
         }

@@ -18,7 +18,7 @@
                     <div class="info-box-content">
                         <span class="info-box-text">{{ $server->ip_address . " : " . $server->port}}</span>
                         <span class="info-box-number">{{$server->name}}</span>
-                        <span class="progress-description">{{__("Son Kontrol : " . $server->last_checked)}}</span>
+                        <span class="progress-description">{{__("Son Kontrol : ")}}{{ $server->last_checked }}</span>
                     </div>
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                     <div class="info-box-content">
                         <span class="info-box-text">{{ $server->ip_address . " : " . $server->port}}</span>
                         <span class="info-box-number">{{$server->name}}</span>
-                        <span class="progress-description">{{__("Son Kontrol : " . $server->last_checked)}}</span>
+                        <span class="progress-description">{{__("Son Kontrol : ")}}{{ $server->last_checked }}</span>
                     </div>
                     </div>
                 </div>
@@ -139,11 +139,11 @@
                 },
                 items: {
                     "refresh" : {
-                        "name" : "Şimdi Güncelle",
+                        "name" : "{{ __("Şimdi Güncelle") }}",
                         "icon" : "fas fa-redo"
                     },
                     "remove" : {
-                        "name" : "Sil",
+                        "name" : "{{ __("Sil") }}",
                         "icon" : "fas fa-trash"
                     },
                 }

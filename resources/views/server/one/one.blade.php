@@ -110,9 +110,9 @@
                 <div class="tab-pane fade show @if(!$firstRendered) active @endif" id="extensionsTab" role="tabpanel">
                     @if(auth()->user()->id == server()->user_id || auth()->user()->isAdmin())
                         <button class="btn btn-success" data-toggle="modal" data-target="#install_extension"><i
-                                    data-toggle="tooltip" title="Ekle"
+                                    data-toggle="tooltip" title="{{ __('Ekle') }}"
                                     class="fa fa-plus"></i></button>
-                        <button onclick="removeExtension()" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i>
+                        <button onclick="removeExtension()" class="btn btn-danger"><i data-toggle="tooltip" title="{{ __('Kaldır') }}" class="fa fa-minus"></i>
                         </button><br><br>
                     @endif
                     @include('table',[

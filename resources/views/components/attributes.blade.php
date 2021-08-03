@@ -15,7 +15,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">{{$title}}</h3>
                     <div class="box-tools pull-right">
-                        <button data-toggle="tooltip" title="Ekle" type="button" class="btn btn-box-tool" data-widget="collapse"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i>
+                        <button data-toggle="tooltip" title="{{ __('Ekle') }}" type="button" class="btn btn-box-tool" data-widget="collapse"><i data-toggle="tooltip" title="{{ __('Ekle') }}" class="fa fa-plus"></i>
                         </button>
                     </div>
                 </div>

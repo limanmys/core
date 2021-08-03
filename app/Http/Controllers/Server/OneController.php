@@ -766,7 +766,7 @@ class OneController extends Controller
 
         if ($data == "") {
             return respond([
-                "table" => "Bu aramaya göre bir sonuç bulunamadı.",
+                "table" => __("Bu aramaya göre bir sonuç bulunamadı."),
             ]);
         }
 
@@ -842,7 +842,7 @@ class OneController extends Controller
             'query' => $query
         ]);
         if ($data == "") {
-            return respond("Bu loga ait detay bulunamadı", 201);
+            return respond(__("Bu loga ait detay bulunamadı"), 201);
         }
         $logs = [];
         foreach (explode("\n", $data) as $row) {
@@ -1029,7 +1029,7 @@ class OneController extends Controller
             } catch (Exception $exception) {
             }
         }
-        return magicView('l.table', [
+        return magicView('table', [
             "value" => $packages,
             "title" => ["Paket Adı", "Versiyon", "Tip", "Durumu"],
             "display" => ["name", "version", "type", "status"],
