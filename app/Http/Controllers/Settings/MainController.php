@@ -96,7 +96,7 @@ class MainController extends Controller
         if ($flag) {
             return respond("Ayarlar başarıyla kaydedildi!");
         } else {
-            return respond("Ayarlar kaydedılemedı!", 201);
+            return respond("Ayarlar kaydedilemedi!", 201);
         }
     }
 

@@ -39,7 +39,7 @@ class MainController extends Controller
         if ($flag) {
             return respond("Modül güncellendi.");
         } else {
-            return respond("Bir hata oluştu.$flag", 201);
+            return respond(__("Bir hata oluştu. "). $flag, 201);
         }
     }
 

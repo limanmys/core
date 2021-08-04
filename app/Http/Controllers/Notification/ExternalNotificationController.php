@@ -30,7 +30,7 @@ class ExternalNotificationController extends Controller
                     ->all()
             )
         ) {
-            return respond("Token Oluşturuldu!\n$token");
+            return respond(__("Token Oluşturuldu! ") . $token);
         } else {
             return respond("Token Oluşturulamadı!", 201);
         }
@@ -80,7 +80,7 @@ class ExternalNotificationController extends Controller
                 "token" => $token,
             ])
         ) {
-            return respond("Token başarıyla yenilendi!\n$token");
+            return respond(__("Token başarıyla yenilendi!") . "\n$token");
         }
     }
 

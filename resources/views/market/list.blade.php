@@ -88,7 +88,7 @@
                     @if ($app->publicVersion)
                         @if (!$app->isInstalled)
                         <button id="installBtn" class="btn btn-success mb-2 w-100" onclick="installExtension('{{ $app->packageName }}')">
-                            <i class="fas fa-download mr-1"></i> {{ __("Yükle") }}
+                            <i class="fas fa-download mr-1"></i> {{ __("Kur") }}
                         </button>
                         @endif
 
@@ -102,7 +102,7 @@
                         </button>
                         @endif
                     @else
-                        <button class="btn btn-primary mb-2" onclick="window.open('https://liman.havelsan.com.tr/iletisim/')">
+                        <button class="btn btn-primary mb-2 w-100" onclick="window.open('https://liman.havelsan.com.tr/iletisim/')">
                             <i class="fas fa-shopping-cart mr-1"></i> {{ __("Satın Al") }}
                         </button>
                     @endif

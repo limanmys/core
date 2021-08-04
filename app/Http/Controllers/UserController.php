@@ -161,7 +161,7 @@ class UserController extends Controller
             "password" => $password,
         ]);
 
-        return respond("Yeni Parola : " . $password, 200);
+        return respond(__("Yeni Parola: ") . $password, 200);
     }
 
     /**

@@ -556,7 +556,7 @@ class SettingsController extends Controller
         }
 
         if (empty($functions)) {
-            return respond("Bir Hata Olustu", 201);
+            return respond("Bir hata oluştu!", 201);
         }
 
         for ($i = 0; $i < count($functions); $i++) {

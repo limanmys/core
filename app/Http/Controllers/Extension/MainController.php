@@ -186,7 +186,7 @@ class MainController extends Controller
         ) {
             return [
                 respond(
-                    "Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu" .
+                    __("Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu") .
                         $json["supportedLiman"],
                     201
                 ),
