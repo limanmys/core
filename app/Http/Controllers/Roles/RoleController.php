@@ -10,6 +10,7 @@ use App\Models\Permission;
 use App\Models\Extension;
 use App\Models\RoleMapping;
 use App\Models\Server;
+use App\User;
 
 class RoleController extends Controller
 {
@@ -139,7 +140,7 @@ class RoleController extends Controller
     {
         foreach (json_decode(request('users')) as $user) {
             RoleUser::firstOrCreate([
-                "user_id" => $user,
+                "user_id" => User::where("email", $user)->first()->id,
                 "role_id" => request('role_id'),
             ]);
         }
