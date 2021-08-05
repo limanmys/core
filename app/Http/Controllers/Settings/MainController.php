@@ -259,7 +259,7 @@ class MainController extends Controller
         )){
             return respond("Veri başarıyla eklendi!");
         }else{
-            return respond("Veri eklenemedi!");
+            return respond("Veri eklenemedi!", 201);
         }
     }
 

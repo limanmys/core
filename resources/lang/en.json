@@ -764,7 +764,7 @@
     "Eklenti Dosyası Açılamıyor.": "Unable to open the extension file.",
     "Eklenti isminde yalnızca harflere izin verilmektedir.": "Only letters are allowed in the extension name.",
     "Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu": "You must update the Liman for installing this extension. Required Liman version code:",
-    "Eklentinin bu sürümü zaten yüklü": "Extension's this version is already installed",
+    "Eklentinin bu sürümü zaten yüklü": "This version of the extension is already installed",
     "Bu isimle zaten bir eklenti var.": "There is already an extension with this name.",
     "Lütfen geçerli bir tip seçiniz.": "Please select a valid type.",
     "Sıralamalar güncellendi": "Order is updated",
@@ -864,5 +864,7 @@
     "DNS Ayarları güncellenemedi!": "Unable to update DNS settings!",
     "Bu işlemi yapmak için yetkiniz yok": "You have no permission to do that.",
     "Eksik Parametre > ": "Missing Parameter > ",
-    "Bu sunucuda komut çalıştıramazsınız!": "You can not run command on this server!"
+    "Bu sunucuda komut çalıştıramazsınız!": "You can not run command on this server!",
+    "Özel Veri Ekle": "Add Variable",
+    "Değeri": "Value"
 }

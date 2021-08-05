@@ -12,7 +12,7 @@
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="pill" href="#extension" role="tab" >{{__("Eklenti Yetkileri")}}</a>
+                    <a class="nav-link active" data-toggle="pill" href="#extension" role="tab" aria-selected="true">{{__("Eklenti Yetkileri")}}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#server" role="tab">{{__("Sunucu Yetkileri")}}</a>
@@ -27,29 +27,14 @@
                     <a class="nav-link" data-toggle="pill" href="#variables" role="tab">{{__("Özel Veriler")}}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" data-toggle="pill" href="#role_users" role="tab" aria-selected="true">{{__("Kullanıcılar")}}</a>
+                    <a class="nav-link" data-toggle="pill" href="#role_users" role="tab">{{__("Kullanıcılar")}}</a>
                 </li>
             </ul>
         </div>
         <div class="card-body">
             @include('errors')
             <div class="tab-content">
-                <div class="tab-pane fade show active" id="role_users" role="tabpanel">
-                    <button onclick="getUserList()" class="btn btn-success"><i data-toggle="tooltip" title="{{__('Ekle')}}" class="fa fa-plus"></i></button>
-                    <button onclick="removeUsers()" class="btn btn-danger"><i data-toggle="tooltip" title="{{__('Kaldır')}}" class="fa fa-minus"></i></button><br><br>
-                    @include('table',[
-                        "id" => "role_users_table",
-                        "value" => $role->users,
-                        "title" => [
-                            "Kullanıcı Adı" , "Email" , "*hidden*"
-                        ],
-                        "display" => [
-                            "name", "email", "id:id"
-                        ],
-                        "noInitialize" => "true"
-                    ])
-                </div>
-                <div class="tab-pane fade show" id="extension" role="tabpanel">
+                <div class="tab-pane fade show active" id="extension" role="tabpanel">
                     <button onclick="getList('extension')" class="btn btn-success"><i data-toggle="tooltip" title="{{__('Ekle')}}" class="fa fa-plus"></i></button>
                     <button onclick="removePermission('extension')" class="btn btn-danger"><i data-toggle="tooltip" title="{{__('Kaldır')}}" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
@@ -119,6 +104,21 @@
                         ],
                         "display" => [
                             "key" , "id:id", "value"
+                        ],
+                        "noInitialize" => "true"
+                    ])
+                </div>
+                <div class="tab-pane fade show" id="role_users" role="tabpanel">
+                    <button onclick="getUserList()" class="btn btn-success"><i data-toggle="tooltip" title="{{__('Ekle')}}" class="fa fa-plus"></i></button>
+                    <button onclick="removeUsers()" class="btn btn-danger"><i data-toggle="tooltip" title="{{__('Kaldır')}}" class="fa fa-minus"></i></button><br><br>
+                    @include('table',[
+                        "id" => "role_users_table",
+                        "value" => $role->users,
+                        "title" => [
+                            "Kullanıcı Adı" , "Email" , "*hidden*"
+                        ],
+                        "display" => [
+                            "name", "email", "id:id"
                         ],
                         "noInitialize" => "true"
                     ])
