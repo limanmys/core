@@ -420,14 +420,7 @@ class UserController extends Controller
                 'forceChange' => false,
             ]);
 
-        auth()->logout();
-        session()->flush();
-        return redirect()
-            ->route('login')
-            ->with(
-                'status',
-                "Kullanıcı Başarıyla Güncellendi, lütfen tekrar giriş yapın."
-            );
+        return redirect()->route('home');
     }
 
     /**
