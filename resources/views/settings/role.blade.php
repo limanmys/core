@@ -208,7 +208,7 @@
         }
 
         function getUserList(){
-            request('{{route('get_user_list_admin')}}', new FormData(), function (response) {
+            request('{{route('get_user_list_admin_simple')}}', new FormData(), function (response) {
                 $("#user_modal .modal-body").html(response);
                 $('#user_modal table').DataTable(dataTablePresets('multiple'));
                 $("#user_modal").modal('show');

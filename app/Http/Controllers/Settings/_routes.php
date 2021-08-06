@@ -116,6 +116,10 @@ Route::post('/kullaniciGetir', 'Settings\MainController@getUserList')
     ->middleware('admin')
     ->name('get_user_list_admin');
 
+Route::post('/kullaniciGetirBasit', 'Settings\MainController@getSimpleUserList')
+    ->middleware('admin')
+    ->name('get_user_list_admin_simple');
+    
 Route::view('/sifreDegistir', 'user.password')
     ->middleware('auth')
     ->name('password_change');

@@ -139,6 +139,16 @@ class MainController extends Controller
         ]);
     }
 
+    public function getSimpleUserList()
+    {
+        return view('table', [
+            "value" => \App\User::all(),
+            "title" => ["İsim Soyisim", "Kullanıcı Adı", "Email", "*hidden*" ,],
+            "display" => ["name", "username", "email", "id:user_id"],
+            "onclick" => "userDetails",
+        ]);
+    }
+
     public function getList()
     {
         $user = User::find(request('user_id'));
