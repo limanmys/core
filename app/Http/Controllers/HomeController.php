@@ -238,13 +238,18 @@ class HomeController extends Controller
                 0.5);
             
             try {
-                if ($server->isWindows()) {
+                if ($server->isWindows() && $server->canRunCommand()) {
                     preg_match('/\d+/', $server->getUptime(), $output);
                     $uptime = $output[0];
-                } else {
+                } else if ($server->canRunCommand()) {
                     $uptime = $server->getUptime();
+                } else {
+                    $uptime = "";
                 }
-                $uptime = \Carbon\Carbon::parse($uptime)->diffForHumans();
+
+                if ($uptime != "") {
+                    $uptime = \Carbon\Carbon::parse($uptime)->diffForHumans();
+                }
             } catch (\Throwable $e) {
                 $uptime = " ";
             }        
