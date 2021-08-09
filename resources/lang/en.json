@@ -866,5 +866,6 @@
     "Eksik Parametre > ": "Missing Parameter > ",
     "Bu sunucuda komut çalıştıramazsınız!": "You can not run command on this server!",
     "Özel Veri Ekle": "Add Variable",
-    "Değeri": "Value"
+    "Değeri": "Value",
+    "Yok": "None"
 }

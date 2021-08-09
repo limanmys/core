@@ -108,9 +108,8 @@
                                 <label class="text-md mb-0" style="width: 100%;">{{__("Şehir")}}</label>
                                 <small>{{__("Sunucunuza bir şehir atayarak, eklentileri kullanırken Türkiye haritası üzerinde erişiminizi kolaylaştırabilirsiniz.")}}</small><br>
                                 <select name="server_city" id="serverCity" class="form-control select2" required>
-                                    <option value="" disabled selected>{{__('Şehir Seçiniz')}}</option>
                                     @foreach(cities() as $name=>$code)
-                                        <option value="{{$code}}">{{$name}}</option>
+                                        <option value="{{$code}}">{{__($name)}}</option>
                                     @endforeach
                                 </select><br>
                                 <label class="text-md">{{__("Sunucunuzun İşletim Sistemi")}}</label>

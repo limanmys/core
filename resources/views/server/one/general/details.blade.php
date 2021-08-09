@@ -19,7 +19,7 @@
         <hr>
         <strong>{{ __('Şehir') }}</strong>
         <p class="text-muted">
-            {{ cities($server->city) }}
+            {{ __(cities($server->city)) }}
         </p>
         <hr>
         <strong>{{ __('Eklenti Durumları') }}</strong>
