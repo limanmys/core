@@ -25,7 +25,7 @@ class TouchServer
                 && $request->server_id != $request->session()->get('last_touched'))
                 || !$request->session()->get('last_touched')
             ) {
-                \App\Models\Server::where('id', $request->server_id)->first()->touch();
+                \App\Models\Server::where('id', $request->server_id)->firstOrFail()->touch();
                 $request->session()->put('last_touched', $request->server_id);
             }
         }
