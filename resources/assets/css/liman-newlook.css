@@ -462,3 +462,21 @@ table.dataTable {
 .modal.fade.show {
     background-color: rgba(0, 0, 0, 0.5);
 }
+
+table.table {
+    border: 1px solid #dee2e6!important;
+}
+
+.input-group-btn > button {
+    height: 100%;
+}
+
+.input-group-btn:last-of-type > button {
+    border-top-right-radius: 5px!important;
+    border-bottom-right-radius: 5px!important;
+}
+
+.input-group-append:last-of-type > button:last-of-type {
+    border-top-right-radius: 5px!important;
+    border-bottom-right-radius: 5px!important;
+}
