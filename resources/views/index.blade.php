@@ -4,7 +4,7 @@
     @include('errors')
     <div class="callout callout-info shadow-sm">
         <h5>{{__("Liman MYS'ye Hoşgeldiniz")}}</h5>
-        {{__("Kullanım rehberine ulaşmak için")}} <a href="https://rehber.liman.dev/" target="_blank">https://rehber.liman.dev/</a> {{__("adresini ziyaret edebilirsiniz.")}}
+        {{__("Kullanım rehberine ulaşmak için")}} <a href="https://docs.liman.dev/" target="_blank">https://docs.liman.dev/</a> {{__("adresini ziyaret edebilirsiniz.")}}
     </div>
     <div class="row" style="padding-top: 15px;">
       <div class="col-md-3 col-sm-4 col-xs-12">
