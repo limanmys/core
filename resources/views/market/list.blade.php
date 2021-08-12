@@ -226,14 +226,12 @@
                     let extdata = new FormData();
                     extdata.append("force", "1");
                     request(`/market/kur/${package_name}`, extdata, function(response) {
-                        console.log(response);
                         Swal.close();
                         showSwal("Eklenti başarıyla kuruldu!", "success", 1500);
                         setTimeout(_ => {
                             window.location = "/ayarlar#extensions"
                         }, 1500);
                     }, function(err) {
-                        console.log(err);
                         var error = JSON.parse(err);
                         Swal.close();
                         showSwal(error.message, "error", 3000);

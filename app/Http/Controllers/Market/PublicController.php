@@ -199,7 +199,10 @@ class PublicController extends Controller
             $response = $client->get($this->apiUrls["download"] . $request->package_name,
                                 ["sink" => $file]);
             
-            $str = $response->getHeaders()["Content-Disposition"][0];
+            $headers = $response->getHeaders();
+            array_change_key_case($headers, CASE_LOWER);
+
+            $str = $headers["content-disposition"][0];
             $arr = explode(";",$str);
             $extension = substr($arr[1],-7) == 'signed"' ? ".signed" : ".zip";
         } 

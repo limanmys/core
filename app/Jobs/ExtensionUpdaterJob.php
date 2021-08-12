@@ -94,7 +94,10 @@ class ExtensionUpdaterJob implements ShouldQueue
         $resource = fopen($downloadPath, 'w');
         $response = $client->request('GET', $this->download, ['sink' => $resource]);
         try{
-            $str = $response->getHeaders()["Content-Disposition"][0];
+            $headers = $response->getHeaders();
+            array_change_key_case($headers, CASE_LOWER);
+
+            $str = $headers["content-disposition"][0];
             $arr = explode(";",$str);
             if (substr($arr[1],-7) == 'signed"') {
                 $this->signed = true;
