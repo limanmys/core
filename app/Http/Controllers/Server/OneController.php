@@ -1133,6 +1133,21 @@ class OneController extends Controller
                     "lsof -i -P -n | grep -v '\-'| awk -F' ' '{print $1,$3,$5,$8,$9}' | sed 1,1d"
             )
         );
+
+        if (empty($output)) {
+            return respond(view(
+                "alert",
+                [
+                    "type" => "info",
+                    "title" => "Bilgilendirme",
+                    "message" => "Açık portları görüntüleyebilmek için sunucunuza <b>lsof</b> paketini kurmanız gerekmektedir."
+                ]
+            )->render() . 
+            "<button class='w-100 btn btn-info' onclick='installLsof()'><i class='fas fa-download mr-1'></i> 
+            " . __("Lsof paketini yükle") . "</button>"
+            , 201);
+        }
+
         $arr = [];
         foreach (explode("\n", $output) as $line) {
             $row = explode(" ", $line);

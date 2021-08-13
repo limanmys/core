@@ -867,5 +867,12 @@
     "Bu sunucuda komut çalıştıramazsınız!": "You can not run command on this server!",
     "Özel Veri Ekle": "Add Variable",
     "Değeri": "Value",
-    "Yok": "None"
+    "Yok": "None",
+    "Açık portları görüntüleyebilmek için sunucunuza <b>lsof</b> paketini kurmanız gerekmektedir.": "In order to view open ports, you need to install the <b>lsof</b> package on your server.",
+    "Lsof paketini yükle": "Install Lsof package",
+    "Paket Yükleme Günlüğü": "Package Installation Log",
+    "paketi kuruluyor. Lütfen bekleyin...": "package is installing. Please wait...",
+    "paketi kuruluyor.": "package is installing.",
+    "Tüm işlemler bitti.": "All transactions are finished.",
+    "Bilgilendirme": "Information"
 }

@@ -434,8 +434,22 @@
             }, 1500);
         }, function(response){
             var error = JSON.parse(response);
-            showSwal(error.message,'error',2000);
+            $("#openPortsTab").html(error.message);
+            Swal.close();
         })
+    }
+
+    function installLsof() {
+        index = 0;
+        packages = [];
+        packages.push('lsof');
+        modes['lsof'] = "install";
+        installPackage();
+        $("#updateLogs").on("hidden.bs.modal", function () {
+            setTimeout(() => {
+                getOpenPorts();
+            }, 1000);
+        });
     }
 
     function statusService(element) {
@@ -619,7 +633,7 @@
         if(modes[packages[index]]){
             data.append("mode", modes[packages[index]]);
         }
-        $('#updateLogs').find('.updateLogsBody').append("\n"+packages[index]+" paketi kuruluyor. Lütfen bekleyin...<span id='"+packages[index]+"'></span>");
+        $('#updateLogs').find('.updateLogsBody').append("\n"+packages[index]+" {{ __("paketi kuruluyor. Lütfen bekleyin...") }}<span id='"+packages[index]+"'></span>");
         request('{{route('server_install_package')}}', data, function (response) {
             checkPackage();
         }, function(response){
@@ -629,7 +643,7 @@
     }
 
     function updateProgress(){
-        $('#updateLogs').find('.progress-info').text(index+"/"+packages.length+" "+packages[index]+" paketi kuruluyor...");
+        $('#updateLogs').find('.progress-info').text(index+"/"+packages.length+" "+packages[index]+" {{ __("paketi kuruluyor.") }}");
         var percent = (index/packages.length)*100;
         $('div[role=progressbar]').attr('aria-valuenow', percent);
         $('div[role=progressbar]').attr('style', 'width: '+percent+'%');
@@ -637,7 +651,7 @@
             $('div[role=progressbar]').closest('.progress').addClass('active');
         }else{
             $('div[role=progressbar]').closest('.progress').removeClass('active');
-            $('#updateLogs').find('.progress-info').text("Tüm işlemler bitti.");
+            $('#updateLogs').find('.progress-info').text("{{ __("Tüm işlemler bitti.") }}");
         }
 
     }
@@ -664,7 +678,7 @@
             }else{
                 updateProgress();
                 getUpdates();
-                $('#updateLogs').find('.updateLogsBody').append("\n"+"Tüm işlemler bitti.");
+                $('#updateLogs').find('.updateLogsBody').append("\n"+"{{ __("Tüm işlemler bitti.") }}");
             }
         }, function(response){
             response = JSON.parse(response);
