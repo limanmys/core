@@ -41,16 +41,21 @@
                 <td style="width: 10px" class="row-number">{{$loop->iteration + $startingNumber}}</td>
                 @foreach($display as $item)
                     @if(count(explode(':',$item)) > 1)
+                        <?php
+                            $fetch =  explode(':',$item);
+                            $id = $fetch[1];
+                            $display_name = $fetch[0];
+                        ?>
                         @if(is_array($k))
-                            <td @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this.parentElement)" @endisset id="{{explode(':',$item)[1]}}" hidden>{{$k[explode(':',$item)[0]]}}</td>
+                            <td @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this.parentElement)" @endisset id="{{$id}}" hidden>{{$k[$display_name]}}</td>
                         @else
-                            <td @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this.parentElement)" @endisset id="{{explode(':',$item)[1]}}" hidden>{{$k->__get(explode(':',$item)[0])}}</td>
+                            <td @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this.parentElement)" @endisset id="{{$id}}" hidden>{{ $k->$display_name }}</td>
                         @endif
                     @else
                         @if(is_array($k))
                             <td @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this.parentElement)" @endisset id="{{$item}}">{{array_key_exists($item,$k) ? $k[$item] : ""}}</td>
                         @else
-                            <td @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this.parentElement)" @endisset id="{{$item}}">{{$k->__get($item)}}</td>
+                            <td @isset($onclick)style="cursor: pointer;" onclick="{{$onclick}}(this.parentElement)" @endisset id="{{$item}}">{{ $k->$item }}</td>
                         @endif
                     @endif
                 @endforeach
