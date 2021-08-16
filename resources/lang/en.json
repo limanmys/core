@@ -874,5 +874,7 @@
     "paketi kuruluyor. Lütfen bekleyin...": "package is installing. Please wait...",
     "paketi kuruluyor.": "package is installing.",
     "Tüm işlemler bitti.": "All transactions are finished.",
-    "Bilgilendirme": "Information"
+    "Bilgilendirme": "Information",
+    "Kuruluyor...": "Installing...",
+    "Eklenti başarıyla kuruldu!": "Extension has been installed successfully!"
 }

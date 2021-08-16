@@ -194,7 +194,7 @@
 
     function installExtension(package_name) 
     {
-        showSwal('Kuruluyor...', 'info');
+        showSwal('{{ __("Kuruluyor...") }}', 'info');
         let extdata = new FormData();
         request(`/market/kur/${package_name}`, extdata, function(response) {
             Swal.close();
@@ -222,12 +222,12 @@
                 confirmButtonText: "{{ __('Tamam') }}"
             }).then((result) => {
                 if (result.value) {
-                    showSwal('Kuruluyor...', 'info');
+                    showSwal('{{ __("Kuruluyor...") }}', 'info');
                     let extdata = new FormData();
                     extdata.append("force", "1");
                     request(`/market/kur/${package_name}`, extdata, function(response) {
                         Swal.close();
-                        showSwal("Eklenti başarıyla kuruldu!", "success", 1500);
+                        showSwal("{{ __('Eklenti başarıyla kuruldu!') }}", "success", 1500);
                         setTimeout(_ => {
                             window.location = "/ayarlar#extensions"
                         }, 1500);
