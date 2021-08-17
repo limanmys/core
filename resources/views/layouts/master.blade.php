@@ -110,17 +110,6 @@
         @if(auth()->check())
             checkNotifications();
         @endif
-
-        $('.ext_nav').slice({{getExtensionViewCount()}}, $('.ext_nav').length).hide();
-        $('.ext_nav_more_less').click(function(){
-            if ($('.ext_nav').length == $('.ext_nav:visible').length) {
-                $('.ext_nav_more_less').find('p').text("{{__('...daha fazla')}}");
-                $('.ext_nav').slice({{getExtensionViewCount()}}, $('.ext_nav').length).hide();
-            }else{
-                $('.ext_nav_more_less').find('p').text("{{__('daha az...')}}");
-                $('.ext_nav:hidden').show();
-            }
-        });
     };
 
     function initialPresets(){

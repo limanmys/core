@@ -12,12 +12,17 @@
             <div class="tab-pane text-left fade active show" id="general" role="tabpanel" aria-labelledby="vert-tabs-home-tab">
                 <div class="card-body">
                     <div class="form-group">
-                        <label for="BRAND_NAME">{{__("Sistem Dili")}}</label><br>
+                        <label for="APP_LANG">{{__("Sistem Dili")}}</label><br>
                         <small>{{__("Sistemin genel dil ayarı. Dil seçimi yapmamış kullanıcıların ayarlarını da değiştirir.")}}</small>
-                        <select name="APP_LANG" id="APP_LANG" class="form-control liman_env">
+                        <select name="APP_LANG" id="APP_LANG" class="form-control liman_env select2">
                             <option value="tr">{{ __("Türkçe") }}</option>
                             <option value="en">{{ __("İngilizce") }}</option>
                         </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="NAV_SERVER_COUNT">{{__("Sol Menü Sunucu Sayısı")}}</label><br>
+                        <small>{{__("Sol menüde gösterilecek sunucu adeti.")}}</small>
+                        <input type="text" class="form-control liman_env" id="NAV_SERVER_COUNT" name="NAV_SERVER_COUNT">
                     </div>
                     <div class="form-group">
                         <label for="BRAND_NAME">{{__("Özel İsim")}}</label><br>

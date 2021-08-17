@@ -1135,18 +1135,6 @@ if (!function_exists('lDecrypt')) {
     }
 }
 
-if (!function_exists('getExtensionViewCount')) {
-    function getExtensionViewCount()
-    {
-        $count = intval(env('NAV_EXTENSION_HIDE_COUNT'));
-        if ($count == null) {
-            setEnv(['NAV_EXTENSION_HIDE_COUNT' => 10]);
-            return 10;
-        }
-        return $count;
-    }
-}
-
 if (!function_exists('setBaseDn')) {
     function setBaseDn($ldap_host = null)
     {

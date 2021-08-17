@@ -32,16 +32,6 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function saveSettings()
-    {
-        if (intval(request('ext_count')) > 0) {
-            setEnv(['NAV_EXTENSION_HIDE_COUNT' => request('ext_count')]);
-            return respond('Ayarlar başarıyla kaydedildi.');
-        } else {
-            return respond('Bu ayar minimum 1 olmalıdır.', 201);
-        }
-    }
-
     public function addLicense()
     {
         $license = License::updateOrCreate(
