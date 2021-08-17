@@ -72,6 +72,15 @@ class MainController extends Controller
 
     public function setLimanTweaks()
     {
+        try {
+            request()->validate([
+                "NAV_SERVER_COUNT" => "required|numeric|digits_between:1,2"
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return respond("Ayarlar kaydedilemedi!", 201);
+        }
+        
+
         $flag = setEnv([
             "APP_DEBUG" => request("APP_DEBUG"),
             "BRAND_NAME" => "\"" . request("BRAND_NAME") . "\"",
