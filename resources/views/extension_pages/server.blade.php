@@ -115,7 +115,7 @@ pre {
 
     function showRequestRecords(){
         if(limanRequestList.length == 0){
-            showSwal("Lütfen önce bir sorguyu kaydedin.","error",2000);
+            showSwal('{{ __("Lütfen önce bir sorguyu kaydedin.") }}',"error",2000);
             return;
         }
         var listElement = $("#limanRequestsList");

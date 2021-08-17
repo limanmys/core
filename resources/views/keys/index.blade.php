@@ -126,10 +126,10 @@
 
         function addServerKey(){
             if(isKeyOK == false){
-                showSwal("Lütfen önce anahtarınızı doğrulayın!",'error',2000);
+                showSwal('{{ __("Lütfen önce anahtarınızı doğrulayın!") }}','error',2000);
                 return;
             }
-            showSwal("Ekleniyor...","info");
+            showSwal('{{ __("Ekleniyor...") }}',"info");
             let form = new FormData();
             form.append('username',$("#keyUsername").val());
             form.append('password',$("#keyPassword").val());

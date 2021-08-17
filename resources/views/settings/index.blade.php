@@ -396,7 +396,7 @@
                     <div id="mailWrapper"></div>
                     <script>
                         function getCronMails(){
-                            showSwal("Okunuyor...","info");
+                            showSwal('{{ __("Okunuyor...") }}',"info");
                             request("{{route('cron_mail_get')}}",new FormData(),function (success){
                                 $("#mailWrapper").html(success);
                                 $("#mailWrapper table").DataTable(dataTablePresets("normal"));

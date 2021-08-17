@@ -379,7 +379,7 @@
 
         function updateExtension(type,tableId = null){
             if ($("#icon").val() == ""){
-                showSwal("Lütfen bir ikon ekleyin!","error",2000);
+                showSwal("{{ __('Lütfen bir ikon ekleyin!') }}","error",2000);
                 return;
             }
             showSwal('{{__("Kaydediliyor...")}}','info');

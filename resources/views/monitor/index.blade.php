@@ -89,7 +89,7 @@
             }
 
             function addNewServerMonitor(){
-                showSwal("Ekleniyor...","info");
+                showSwal('{{ __("Ekleniyor...") }}',"info");
                 let form = new FormData();
                 form.append("ip_address", $("input[name='ip_address']").val());
                 form.append("port", $("input[name='port']").val());

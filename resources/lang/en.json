@@ -882,5 +882,14 @@
     "Türkçe": "Turkish",
     "İngilizce": "English",
     "Sol Menü Sunucu Sayısı": "Navigation Max Server Count",
-    "Sol menüde gösterilecek sunucu adeti.": "Maximum server count to show on left navigation bar."
+    "Sol menüde gösterilecek sunucu adeti.": "Maximum server count to show on left navigation bar.",
+    "Lütfen bir ikon ekleyin!": "Please add an icon!",
+    "Lütfen önce bir sorguyu kaydedin.": "Please save the request first!",
+    "Lütfen önce anahtarınızı doğrulayın!": "Please verify your key first!",
+    "Eklenti kurulumunda hata oluştu!": "An error occured when installing the extension!",
+    "Önce bir widget seçmelisiniz!": "Please choose a widget first!",
+    "Sertifikayı Sil": "Delete Certificate",
+    "Sertifikayı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.": "Are you sure you want to delete the certificate? This action cannot be undone.",
+    "Bu eklentiyi zorla aktifleştirmek istediğinize emin misiniz?": "Are you sure you want to force-activate this plugin?",
+    "Bu eklentinin bağımlılıklarını tekrar yüklemek istediğinize emin misiniz?": "Are you sure you want to reinstall the dependencies of this plugin?"
 }

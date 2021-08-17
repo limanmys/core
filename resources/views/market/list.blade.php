@@ -198,7 +198,7 @@
         let extdata = new FormData();
         request(`/market/kur/${package_name}`, extdata, function(response) {
             Swal.close();
-            showSwal("Eklenti başarıyla kuruldu!", "success", 1500);
+            showSwal('{{ __("Eklenti başarıyla kuruldu!") }}', "success", 1500);
             setTimeout(_ => {
                 window.location = "/ayarlar#extensions"
             }, 1500);
@@ -239,7 +239,7 @@
                 }
             });
         } else {
-            showSwal("Eklenti kurulumunda hata oluştu!", "error", 3000);
+            showSwal('{{ __("Eklenti kurulumunda hata oluştu!") }}', "error", 3000);
         }
     }
 
@@ -263,7 +263,7 @@
                     data.append("force", "1");
                     request('{{route('extension_upload')}}',data,function(response){
                         Swal.close();
-                        showSwal('Eklenti başarıyla kuruldu!', 'success');
+                        showSwal('{{ __("Eklenti başarıyla kuruldu!") }}', 'success');
                         setTimeout(() => {
                             reload();
                         }, 1500);

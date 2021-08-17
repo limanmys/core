@@ -385,7 +385,7 @@
         }
         
         function getList(type) {
-            showSwal("Okunuyor...",'info');
+            showSwal("{{ __('Okunuyor...') }}",'info');
             var form = new FormData();
             form.append('type', type);
             form.append('user_id','{{$user->id}}');

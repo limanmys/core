@@ -133,7 +133,7 @@
 </div>
 <script>
     function getLimanTweaks(){
-        showSwal("Yükleniyor...","info");
+        showSwal("{{ __('Yükleniyor...') }}","info");
         request("{{route("get_liman_tweaks")}}",new FormData(),function (success){
             let json = JSON.parse(success);
             $.each( json.message, function( key, value ) {
@@ -147,7 +147,7 @@
     }
 
     function setLimanTweaks(){
-        showSwal("Kaydediliyor...","info");
+        showSwal("{{ __('Kaydediliyor...') }}","info");
         let form = new FormData();
         $(".liman_env").each(function(){
             let current = $(this);
