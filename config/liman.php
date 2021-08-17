@@ -3,6 +3,7 @@
 return [
     "server_connection_timeout" => 5000, //ms
     "user_widget_count" => 10,
+    "wizard_max_steps" => 4,
     "widget_refresh_time" => 30000, //ms
     "admin_searchable" => [
         [

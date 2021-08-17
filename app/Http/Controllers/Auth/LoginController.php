@@ -50,6 +50,11 @@ class LoginController extends Controller
         hook("login_successful", [
             "user" => $user,
         ]);
+
+        if (env("WIZARD_STEP", 1) != config("liman.wizard_max_steps") && $user->status)
+        {
+            return redirect()->route("wizard", env("WIZARD_STEP", 1));
+        }
     }
 
     public function attemptLogin(Request $request)
