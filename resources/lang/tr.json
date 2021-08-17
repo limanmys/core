@@ -48,5 +48,7 @@
     "hourly" : "saatlik",
     "daily" : "günlük",
     "weekly" : "haftalık",
-    "monthly" : "aylık"
+    "monthly" : "aylık",
+    "Server Name Update": "Server Adı Güncellemesi",
+    "New Certificate Added": "Yeni Sertifika Eklendi"
 }

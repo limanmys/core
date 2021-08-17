@@ -306,7 +306,7 @@
     "Bir sunucu silindi.": "A server was deleted.",
     ":server (:ip) isimli sunucu silindi.": ":server (:ip) named server was deleted.",
     "Server Adı Güncellemesi": "Server Name Update",
-    ":old isimli sunucunun adı :new olarak değiştirildi.": "Name of the server named: old changed to: new.",
+    ":old isimli sunucunun adı :new olarak değiştirildi.": "Name of the server named :old changed to :new.",
     ":package_name paketi başarıyla kuruldu.": ":package_name has been installed successfully.",
     ":package_name paketi kurulamadı.": ":package_name could not be installed.",
     "Yeni sunucu eklendi.": "New server added.",
@@ -880,5 +880,7 @@
     "Sistem Dili": "System Language",
     "Sistemin genel dil ayarı. Dil seçimi yapmamış kullanıcıların ayarlarını da değiştirir.": "Default system language setting. It also sets default language for users that didn't set language before.",
     "Türkçe": "Turkish",
-    "İngilizce": "English"
+    "İngilizce": "English",
+    "Sol Menü Sunucu Sayısı": "Navigation Max Server Count",
+    "Sol menüde gösterilecek sunucu adeti.": "Maximum server count to show on left navigation bar."
 }
