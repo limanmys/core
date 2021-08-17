@@ -876,5 +876,9 @@
     "Tüm işlemler bitti.": "All transactions are finished.",
     "Bilgilendirme": "Information",
     "Kuruluyor...": "Installing...",
-    "Eklenti başarıyla kuruldu!": "Extension has been installed successfully!"
+    "Eklenti başarıyla kuruldu!": "Extension has been installed successfully!",
+    "Sistem Dili": "System Language",
+    "Sistemin genel dil ayarı. Dil seçimi yapmamış kullanıcıların ayarlarını da değiştirir.": "Default system language setting. It also sets default language for users that didn't set language before.",
+    "Türkçe": "Turkish",
+    "İngilizce": "English"
 }

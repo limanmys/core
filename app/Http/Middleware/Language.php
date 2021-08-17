@@ -21,7 +21,13 @@ class Language
             // If so, set that locale in to the app to use it later.
             app()->setLocale(session('locale'));
         } else {
-            \Session::put('locale', app()->getLocale());
+            if (auth()->check()) {
+                $locale = auth()->user()->locale ? auth()->user()->locale : env('APP_LANG', 'tr');
+                app()->setLocale($locale);
+                \Session::put('locale', $locale);
+            } else {
+                app()->setLocale(env('APP_LANG', 'tr'));
+            }
         }
 
         // Forward request to next target.

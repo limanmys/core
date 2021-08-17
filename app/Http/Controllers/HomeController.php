@@ -107,6 +107,9 @@ class HomeController extends Controller
             in_array(request('locale'), $languages)
         ) {
             \Session::put('locale', request('locale'));
+            auth()->user()->update([
+                "locale" => request('locale')
+            ]);
             return redirect()->back();
         } else {
             return response('Language not found', 404);

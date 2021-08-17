@@ -65,6 +65,7 @@ class MainController extends Controller
             "MARKET_CLIENT_ID" => env("MARKET_CLIENT_ID"),
             "MARKET_CLIENT_SECRET" => env("MARKET_CLIENT_SECRET"),
             "EXTENSION_DEVELOPER_MODE" => env("EXTENSION_DEVELOPER_MODE") ? "true" : "false",
+            "APP_LANG" => env("APP_LANG", "tr")
         ]);
     }
 
@@ -85,6 +86,7 @@ class MainController extends Controller
             "MARKET_CLIENT_ID" => request("MARKET_CLIENT_ID"),
             "MARKET_CLIENT_SECRET" => request("MARKET_CLIENT_SECRET"),
             "EXTENSION_DEVELOPER_MODE" => request("EXTENSION_DEVELOPER_MODE"),
+            "APP_LANG" => request("APP_LANG")
         ]);
 
         if (request()->has("MAIL_PASSWORD")) {

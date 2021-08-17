@@ -12,6 +12,14 @@
             <div class="tab-pane text-left fade active show" id="general" role="tabpanel" aria-labelledby="vert-tabs-home-tab">
                 <div class="card-body">
                     <div class="form-group">
+                        <label for="BRAND_NAME">{{__("Sistem Dili")}}</label><br>
+                        <small>{{__("Sistemin genel dil ayarı. Dil seçimi yapmamış kullanıcıların ayarlarını da değiştirir.")}}</small>
+                        <select name="APP_LANG" id="APP_LANG" class="form-control liman_env">
+                            <option value="tr">{{ __("Türkçe") }}</option>
+                            <option value="en">{{ __("İngilizce") }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="BRAND_NAME">{{__("Özel İsim")}}</label><br>
                         <small>{{__("Giriş ekranında gözükecek özel isim.")}}</small>
                         <input type="text" class="form-control liman_env" id="BRAND_NAME">
