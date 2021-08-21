@@ -4,7 +4,7 @@ if (user()->forceChange != true) {
     die();
 } ?>
 <!DOCTYPE html>
-<html>
+<html lang="{{ app()->getLocale() }}">
 
 <head>
   <meta charset="utf-8">
@@ -55,6 +55,8 @@ if (user()->forceChange != true) {
           <div>
             <h2 class="mt-6 text-center text-2xl font-extrabold text-gray-900">
                 Lütfen devam etmeden önce parolanızı değiştirin.
+                <hr>
+                Please change your password before proceeding.
             </h2>
           </div>
           <form class="mt-8 space-y-6" action="{{ route('password_change_save')}}" method="post" autocomplete="off">
@@ -62,17 +64,17 @@ if (user()->forceChange != true) {
             <input type="hidden" name="remember" value="true">
             <div class="rounded-md shadow-sm -space-y-px">
               <div>
-                <input type="password" name="old_password" autocomplete="off" class="appearance-none shadow-sm rounded relative block px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm" placeholder="{{__("Mevcut Parola")}}" required style="width: 100%;">
+                <input type="password" name="old_password" autocomplete="off" class="appearance-none shadow-sm rounded relative block px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm" placeholder="{{__("Mevcut Parola")}} / Current Password" required style="width: 100%;">
               </div>
             </div>
             <div class="rounded-md shadow-sm -space-y-px">
               <div>
-                <input type="password" name="password" autocomplete="off" class="appearance-none shadow-sm rounded relative block px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm" placeholder="{{__("Yeni Parola")}}" required style="width: 100%;">
+                <input type="password" name="password" autocomplete="off" class="appearance-none shadow-sm rounded relative block px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm" placeholder="{{__("Yeni Parola")}} / New Password" required style="width: 100%;">
               </div>
             </div>
             <div class="rounded-md shadow-sm -space-y-px">
               <div>
-                <input type="password" name="password_confirmation" autocomplete="off" class="appearance-none shadow-sm rounded relative block px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm" placeholder="{{__("Yeni Parola Tekrar")}}" required style="width: 100%;">
+                <input type="password" name="password_confirmation" autocomplete="off" class="appearance-none shadow-sm rounded relative block px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm" placeholder="{{__("Yeni Parola Tekrar")}} / Password Confirmation" required style="width: 100%;">
               </div>
             </div>
             <div>
@@ -82,7 +84,7 @@ if (user()->forceChange != true) {
                     <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
                   </svg>
                 </span>
-                {{__("Şifreyi Güncelle")}}
+                {{__("Şifreyi Güncelle")}} / Update Password
               </button>
             </div>
 
