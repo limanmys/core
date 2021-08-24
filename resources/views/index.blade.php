@@ -107,7 +107,7 @@
         </div>
         <div class="row row-eq-height" style="width: 100%; margin-left: 0;">
           <div class="col-md-6 col-sm-12">
-            <div class="card shadow-sm loading online-servers" style="height: 100%; min-height: 220px;">
+            <div class="card shadow-sm loading online-servers" style="height: 100%; min-height: 200px;">
                 <div class="card-header">
                   <h3 class="card-title">{{ __("Sunucu Durumları") }}</h3>
                 </div>
@@ -127,7 +127,7 @@
             </div>
           </div>
           <div class="col-md-6 col-sm-12">
-            <div class="card shadow-sm loading market-widget" style="height: 100%; min-height: 220px;">
+            <div class="card shadow-sm loading market-widget" style="height: 100%; min-height: 200px;">
                 <div class="card-header p-0">
                   <h3 class="card-title" style="padding: 12px; padding-left: 1.25rem">{{ __("Önerilen Eklentiler") }}</h3>
                   <div class="float-right">
@@ -140,7 +140,7 @@
                 <div class="card-body" style="padding: 4px;">
                   <div class="row row-eq-height market-col-1">
                   </div>
-                  <div class="row row-eq-height market-col-2">
+                  <div class="row row-eq-height market-col-2" style="margin-bottom: -15px;">
                   </div>
                 </div>
                 <div class="noApp" style="height: 100%; display:flex; flex-direction: column; align-items: center; justify-content: center;">
