@@ -28,12 +28,15 @@
 </div>
 
 @include('errors')    
-
-<div class="card">
-    <div class="card-body">
-        <div class="tab-content">
-            <div class="tab-pane fade show active" role="tabpanel" id="mainExtensionWrapper">
-                <div class="spinner-grow text-primary"></div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" role="tabpanel" id="mainExtensionWrapper">
+                        <div class="spinner-grow text-primary"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

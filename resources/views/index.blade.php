@@ -152,8 +152,9 @@
         </div>
       @endif
     </div>
+    @if($widgets->count())
     <div class="row sortable-widget mt-4">
-      @if($widgets->count())
+      
         @foreach($widgets as $widget)
           @if($widget->type==="count_box" || $widget->type==="")
             <div class="col-md-3 col-sm-4 col-xs-12" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
@@ -192,9 +193,9 @@
             </div>
           @endif
         @endforeach
-      @endif
     </div>
     <div class="row my-2"></div>
+    @endif
     <style>
     .sortable-widget{
       cursor: default;
