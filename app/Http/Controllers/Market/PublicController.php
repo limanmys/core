@@ -102,14 +102,15 @@ class PublicController extends Controller
             "hasNextPage" => $json->hasNextPage
         ];
 
+        
         if ($json->hasNextPage)
         {
-            array_merge($paginate, ["nextPage" => $json->pageIndex + 1]);
+            $paginate["nextPage"] = $json->pageIndex + 1;
         }
 
         if ($json->hasPreviousPage)
         {
-            array_merge($paginate, ["previousPage" => $json->pageIndex - 1]);
+            $paginate["previousPage"] = $json->pageIndex - 1;
         }
 
         return view("market.list", ["apps" => $items, "paginate" => (object) $paginate, "categories" => $this->getCategories()]);
@@ -144,12 +145,12 @@ class PublicController extends Controller
 
         if ($json->hasNextPage)
         {
-            array_merge($paginate, ["nextPage" => $json->pageIndex + 1]);
+            $paginate["nextPage"] = $json->pageIndex + 1;
         }
 
         if ($json->hasPreviousPage)
         {
-            array_merge($paginate, ["previousPage" => $json->pageIndex - 1]);
+            $paginate["previousPage"] = $json->pageIndex - 1;
         }
 
         return view("market.list", ["apps" => $items, "paginate" => (object) $paginate, "categories" => $this->getCategories()]);
@@ -180,12 +181,12 @@ class PublicController extends Controller
 
         if ($json->hasNextPage)
         {
-            array_merge($paginate, ["nextPage" => $json->pageIndex + 1]);
+            $paginate["nextPage"] = $json->pageIndex + 1;
         }
 
         if ($json->hasPreviousPage)
         {
-            array_merge($paginate, ["previousPage" => $json->pageIndex - 1]);
+            $paginate["previousPage"] = $json->pageIndex - 1;
         }
 
         return view("market.list", ["apps" => $items, "paginate" => (object) $paginate, "categories" => $this->getCategories()]);

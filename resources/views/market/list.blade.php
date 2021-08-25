@@ -133,9 +133,8 @@
     </div>
     @endforeach
     
-    @if (!$paginate->totalPages == 1 && !$paginate->totalPages == 0)
-    {{ var_dump($paginate) }}
-    <div class="col-12">
+    @if ($paginate->totalPages > 1)
+    <div class="col-12 mb-3">
         <div class="row">
             <div class="col-6">
                 <a href="?pageNumber={{ isset($paginate->previousPage) ? $paginate->previousPage : '' }}" class="btn btn-primary w-100 text-white @if(!$paginate->hasPreviousPage) disabled @endif"><i class="fas fa-chevron-left mr-1"></i> Önceki</a>
