@@ -201,7 +201,7 @@ class PublicController extends Controller
                                 ["sink" => $file]);
             
             $headers = $response->getHeaders();
-            array_change_key_case($headers, CASE_LOWER);
+            $headers = array_change_key_case($headers, CASE_LOWER);
 
             $str = $headers["content-disposition"][0];
             $arr = explode(";",$str);

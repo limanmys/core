@@ -95,7 +95,7 @@ class ExtensionUpdaterJob implements ShouldQueue
         $response = $client->request('GET', $this->download, ['sink' => $resource]);
         try{
             $headers = $response->getHeaders();
-            array_change_key_case($headers, CASE_LOWER);
+            $headers = array_change_key_case($headers, CASE_LOWER);
 
             $str = $headers["content-disposition"][0];
             $arr = explode(";",$str);
