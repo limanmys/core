@@ -105,7 +105,7 @@
               </div>
             </div>
         </div>
-        <div class="row row-eq-height" style="width: 100%; margin-left: 0;">
+        <div class="row row-eq-height" style="width: 100%; margin-left: 0; margin-bottom: 30px;">
           <div class="col-md-6 col-sm-12">
             <div class="card shadow-sm loading online-servers" style="height: 100%; min-height: 200px;">
                 <div class="card-header">
