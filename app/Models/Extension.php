@@ -95,4 +95,9 @@ class Extension extends Model
     {
         return Str::title(str_replace("-", " ", $this->name));
     }
+
+    public function getUpdatedAtAttribute($value)
+    {
+        return \Carbon\Carbon::parse($value)->isoFormat('LLLL');
+    }
 }

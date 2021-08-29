@@ -2,57 +2,41 @@
 
 @section('content')
 
-@include('errors')    
-
-<div class="card">
-    @if(count($last) > 0)
-    <div class="card-header">
-            <ul id="quickNavBar" class="nav nav-tabs" role="tablist">
-                
-                @foreach ($last as $extension=>$servers)
-                    @php(list($extension_id,$extension_name) = explode(":",$extension))
-                    @if(count($servers) == 1)
-                        <li class="nav-item">
-                            <a class="nav-link @if(request('extension_id') == $extension_id) active @endif" href="{{route('extension_server',[
-                                    'extension_id' => $extension_id,
-                                    'city' => '06',
-                                    'server_id' => $servers[0]['id']
-                                ])}}" role="tab">{{__($extension_name)}}</a>
-                        </li>
-                    @else
-                        <li class="dropdown nav-item" style="line-height:2.6"><!--  2.6 means absolutely nothing -->
-                            <a class="dropdown-toggle @if(request('extension_id') == $extension_id) active @endif" data-toggle="dropdown" href="#">{{__($extension_name)}}
-                            <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                            @foreach($servers as $server)
-                                <li class="nav-item"><a class="nav-link" href="{{route('extension_server',[
-                                    'extension_id' => $extension_id,
-                                    'city' => '06',
-                                    'server_id' => $server['id']
-                                ])}}">{{$server['name']}}</a></li>
-                            @endforeach
-                            </ul>
-                        </li>
-                        
-                    @endif
-                @endforeach 
-            </ul>
-            <div class="right" id="ext_menu" style="float:right;margin-top:-40px">
-        <button data-toggle="tooltip" title="{{__('Eklenti Ayarları')}}" class="btn btn-primary" onclick="window.location.href = '{{route('extension_server_settings_page',[
-            "server_id" => server()->id,
-            "extension_id" => extension()->id
-        ])}}'"><i class="fa fa-cogs"></i></button>
-        @if(count($tokens) > 0)
-        <button data-toggle="tooltip" title="{{__('Sorgu Oluştur')}}" class="btn btn-primary" onclick="showRequestRecords()"><i class="fa fa-book"></i></button>
-        @endif
-        <button data-toggle="tooltip" title="{{__('Destek Al')}}" class="btn btn-primary" onclick="location.href = 'mailto:{{env('APP_NOTIFICATION_EMAIL')}}?subject={{env('BRAND_NAME')}} {{getVersion()}} - {{extension()->display_name}} {{extension()->version}}'"><i class="fas fa-headset"></i></button>
-</div>  
+<div class="row">
+    <div class="col-6">
+    <nav aria-label="breadcrumb" style="display:block; width: 100%;">
+        <ol class="breadcrumb" style="float:left;">
+            <li class="breadcrumb-item"><a href="{{route('home')}}">{{__("Ana Sayfa")}}</a></li>
+            <li class="breadcrumb-item"><a href="{{route('server_one', server()->id)}}">{{ server()->name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ server()->name }} {{__(extension()->display_name)}} {{ __('eklentisi') }}</li>
+        </ol>
+        
+    </nav>
     </div>
-    @endif
-    <div class="card-body">
-        <div class="tab-content">
-            <div class="tab-pane fade show active" role="tabpanel" id="mainExtensionWrapper">
-                <div class="spinner-grow text-primary"></div>
+    <div class="col-6">
+        <div id="ext_menu" style="float:right;">
+                <button data-toggle="tooltip" title="{{__('Eklenti Ayarları')}}" class="btn btn-primary" onclick="window.location.href = '{{route('extension_server_settings_page',[
+                    "server_id" => server()->id,
+                    "extension_id" => extension()->id
+                ])}}'"><i class="fa fa-cogs"></i></button>
+                @if(count($tokens) > 0)
+                <button data-toggle="tooltip" title="{{__('Sorgu Oluştur')}}" class="btn btn-primary" onclick="showRequestRecords()"><i class="fa fa-book"></i></button>
+                @endif
+                <button data-toggle="tooltip" title="{{__('Destek Al')}}" class="btn btn-primary" onclick="location.href = 'mailto:{{env('APP_NOTIFICATION_EMAIL')}}?subject={{env('BRAND_NAME')}} {{getVersion()}} - {{extension()->display_name}} {{extension()->version}}'"><i class="fas fa-headset"></i></button>
+        </div>  
+    </div>
+</div>
+
+@include('errors')    
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" role="tabpanel" id="mainExtensionWrapper">
+                        <div class="spinner-grow text-primary"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -134,7 +118,7 @@ pre {
 
     function showRequestRecords(){
         if(limanRequestList.length == 0){
-            showSwal("Lütfen önce bir sorguyu kaydedin.","error",2000);
+            showSwal('{{ __("Lütfen önce bir sorguyu kaydedin.") }}',"error",2000);
             return;
         }
         var listElement = $("#limanRequestsList");

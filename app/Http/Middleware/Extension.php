@@ -33,7 +33,7 @@ class Extension
                 continue;
             }
             AdminNotification::create([
-                "title" => "Yeni Sertifika Onayı",
+                "title" => __("Yeni Sertifika Onayı"),
                 "type" => "cert_request",
                 "message" =>
                     $server->ip_address . ":" . trim($port) . ":" . $server->id,
@@ -43,7 +43,7 @@ class Extension
                 ->back()
                 ->withErrors([
                     "message" =>
-                        "Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede bu sunucu ile eklentiye erişemezsiniz.",
+                        __("Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede bu sunucu ile eklentiye erişemezsiniz."),
                 ]);
         }
         return $next($request);

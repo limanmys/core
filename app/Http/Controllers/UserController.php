@@ -80,7 +80,7 @@ class UserController extends Controller
 
         // Respond
         return respond(
-            "Kullanıcı Başarıyla Eklendi. Parola : " . $password,
+            __("Kullanıcı Başarıyla Eklendi. Parola : ") . $password,
             200
         );
     }
@@ -161,7 +161,7 @@ class UserController extends Controller
             "password" => $password,
         ]);
 
-        return respond("Yeni Parola : " . $password, 200);
+        return respond(__("Yeni Parola: ") . $password, 200);
     }
 
     /**
@@ -420,14 +420,7 @@ class UserController extends Controller
                 'forceChange' => false,
             ]);
 
-        auth()->logout();
-        session()->flush();
-        return redirect()
-            ->route('login')
-            ->with(
-                'status',
-                "Kullanıcı Başarıyla Güncellendi, lütfen tekrar giriş yapın."
-            );
+        return redirect()->route('home');
     }
 
     /**

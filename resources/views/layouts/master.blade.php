@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ session('locale') }}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,6 +20,8 @@
 <!-- Admin Password Recovery : https://www.youtube.com/watch?v=dQw4w9WgXcQ -->
 @if(auth()->check())
 <script>
+
+
     toastr.options.closeButton = true;
     Echo.private('App.User.{{auth()->user()->id}}')
         .notification((notification) => {
@@ -62,7 +64,8 @@
             return {
                 bFilter: true,
                 select: {
-                    style: 'multi'
+                    style: 'multi',
+                    selector: 'td:not(.table-menu)'
                 },
                 dom: 'Blfrtip',
                 buttons: {
@@ -101,23 +104,12 @@
         navigateButtons();
         activeTab();
         var title = $(".breadcrumb-item.active").text();
-        if(title !== undefined){
+        if(title != ""){
             document.title = title + " / Liman";
         }
         @if(auth()->check())
             checkNotifications();
         @endif
-
-        $('.ext_nav').slice({{getExtensionViewCount()}}, $('.ext_nav').length).hide();
-        $('.ext_nav_more_less').off('click').click(function(){
-            if ($('.ext_nav').length == $('.ext_nav:visible').length) {
-                $('.ext_nav_more_less').find('p').text("{{__('...daha fazla')}}");
-                $('.ext_nav').slice({{getExtensionViewCount()}}, $('.ext_nav').length).hide();
-            }else{
-                $('.ext_nav_more_less').find('p').text("{{__('daha az...')}}");
-                $('.ext_nav:hidden').show();
-            }
-        });
     };
 
     function initialPresets(){
@@ -138,7 +130,7 @@
 
     function navigateButtons(){
         jQuery(function($) {
-            var path = window.location.href;
+            var path = window.location.origin + window.location.pathname;
             $('nav ul a').each(function() {
                 if (this.href === path) {
                     $(this).addClass('active');

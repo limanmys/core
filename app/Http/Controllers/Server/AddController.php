@@ -116,12 +116,10 @@ class AddController extends Controller
                         $message["path"]
                     );
                     AdminNotification::create([
-                        "title" => "Yeni Sertifika Eklendi",
+                        "title" => __("Yeni Sertifika Eklendi"),
                         "type" => "new_cert",
                         "message" =>
-                            "Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.<br><br><a href='" .
-                            route('settings') .
-                            "#certificates'>Detaylar</a>",
+                            __("Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi."),
                         "level" => 3,
                     ]);
                 }
@@ -129,7 +127,7 @@ class AddController extends Controller
                     $this->server->enabled = false;
                     $this->server->save();
                     AdminNotification::create([
-                        "title" => "Yeni Sertifika Onayı",
+                        "title" => __("Yeni Sertifika Onayı"),
                         "type" => "cert_request",
                         "message" =>
                             $this->server->ip_address .
@@ -140,7 +138,7 @@ class AddController extends Controller
                         "level" => 3,
                     ]);
                     return respond(
-                        "Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede sunucuya erişemezsiniz.",
+                        __("Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede sunucuya erişemezsiniz."),
                         202
                     );
                 }

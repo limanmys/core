@@ -36,40 +36,67 @@
         <div class="card-body">
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="tab_1" role="tabpanel">
-                        <h3>{{__("Eklenti Adı")}}</h3>
-                        <input id="extensionName" type="text" class="form-control" value="{{$extension['name']}}" disabled required><br>
-                        <h3>{{__("Yayınlayan")}}</h3>
-                        <input type="text" name="name" class="form-control" value="{{$extension['publisher']}}" disabled required><br>
-                        <h3>{{__("Yazılım Dili")}}</h3>
-                        <select name="programmingLanguage" class="form-control" value="{{$extension['language']}}" autocomplete="off" disabled><br>
-                            <option value="php" @if($extension["language"] == "php") selected='true' @endif >PHP 7.3</option>
-                            <option value="python" @if($extension["language"] == "python") selected='true' @endif>Python 3</option>
-                        </select><br>
-                        <h3>{{__("Anahtar'ı Zorunlu Kıl")}}</h3>
-                        <select id="require_key" class="form-control" autocomplete="off" enabled><br>
-                            <option value="true" @if(array_key_exists("require_key",$extension) && $extension["require_key"] == "true") selected='true' @endif >Evet</option>
-                            <option value="false" @if(!array_key_exists("require_key",$extension) || $extension["require_key"] != "true") selected='true' @endif>Hayır</option>
-                        </select><br>
-                        <h3>{{__("Destek Email'i")}}</h3>
-                        <input id="support" type="text" name="email" class="form-control" value="{{$extension["support"]}}" required><br>
-                        <h3>{{__("Logo (Font Awesome Ikon)")}}</h3>
-                        <input id="icon" type="text" name="icon" class="form-control" value="{{$extension["icon"]}}" required><br>
-                        <h3>{{__("Gerekli Minimum Liman Sürüm Kodu")}}</h3>
-                        <span style="cursor:pointer;" onclick="$('#supportedLiman').val('{{getVersionCode()}}')">{{__("Mevcut Liman Sürüm Kodunu Al")}}</span>
-                        <input id="supportedLiman" type="text" name="icon" class="form-control" value="{{array_key_exists("supportedLiman",$extension) ? $extension["supportedLiman"] : getVersionCode()}}" required><br>
-                        <h3>{{__("Versiyon")}}</h3>
-                        <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}" required><br>
-                        <h3>{{__("Ayar Doğrulama Fonksiyonu/Betiği")}}</h3>
-                        <input id="verification" type="text" name="verification" class="form-control" value="{{array_key_exists("verification",$extension) ? $extension["verification"] : ""}}" required><br>
-                        <h3>{{__("Paket bağımlılıkları")}}</h3>
-                        <input id="dependencies" type="text" name="dependencies" class="form-control" value="{{array_key_exists("dependencies",$extension) ? $extension["dependencies"] : ""}}" required><br>
-                        <small>{{__("Birden fazla paket yazmak için aralarında boşluk bırakabilirsiniz.")}}</small><br>
-                        <h3>{{__("Servis Adı yada Kontrol Etmek için Port")}}</h3>
-                        <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}" required><br>
-                        <h3>{{__("SSL Sertifikası Eklenecek Portlar")}}</h3>
-                        <small>{{__("Birden fazla port yazmak için aralarında virgül bırakabilirsiniz.")}}</small><br>
-                        <input id="sslPorts" type="text" name="service" class="form-control" value="{{array_key_exists("sslPorts",$extension) ? $extension["sslPorts"] : ""}}" required><br>
-                        <button class="btn btn-success btn-sm" onclick="updateExtension('general')">{{__("Kaydet")}}</button><br>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label>{{__("Eklenti Adı")}}</label>
+                                <input id="extensionName" type="text" class="form-control" value="{{$extension['name']}}" disabled required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>{{__("Yayınlayan")}}</label>
+                                <input type="text" name="name" class="form-control" value="{{$extension['publisher']}}" disabled required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                            <label>{{__("Yazılım Dili")}}</label>
+                                <select name="programmingLanguage" class="form-control" value="{{$extension['language']}}" autocomplete="off" disabled><br>
+                                    <option value="php" @if($extension["language"] == "php") selected='true' @endif >PHP 7.3</option>
+                                    <option value="python" @if($extension["language"] == "python") selected='true' @endif>Python 3</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>{{__("Anahtar'ı Zorunlu Kıl")}}</label>
+                                <select id="require_key" class="form-control" autocomplete="off" enabled><br>
+                                    <option value="true" @if(array_key_exists("require_key",$extension) && $extension["require_key"] == "true") selected='true' @endif >Evet</option>
+                                    <option value="false" @if(!array_key_exists("require_key",$extension) || $extension["require_key"] != "true") selected='true' @endif>Hayır</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>{{__("Destek Email'i")}}</label>
+                                <input id="support" type="text" name="email" class="form-control" value="{{$extension["support"]}}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>{{__("Logo (Font Awesome Ikon)")}}</label>
+                                <input id="icon" type="text" name="icon" class="form-control" value="{{$extension["icon"]}}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>{{__("Paket bağımlılıkları")}}</label>
+                                <input id="dependencies" type="text" name="dependencies" class="form-control" value="{{array_key_exists("dependencies",$extension) ? $extension["dependencies"] : ""}}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>{{__("Versiyon")}}</label>
+                                <input id="version" type="text" name="version" class="form-control" value="{{$extension["version"]}}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>{{__("Ayar Doğrulama Fonksiyonu/Betiği")}}</label>
+                                <input id="verification" type="text" name="verification" class="form-control" value="{{array_key_exists("verification",$extension) ? $extension["verification"] : ""}}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>{{__("Gerekli Minimum Liman Sürüm Kodu")}}</label>
+                                <input id="supportedLiman" type="text" name="icon" class="form-control" value="{{array_key_exists("supportedLiman",$extension) ? $extension["supportedLiman"] : getVersionCode()}}" required>
+                                <small style="cursor:pointer; font-style: italic;" onclick="$('#supportedLiman').val('{{getVersionCode()}}')">{{__("Mevcut Liman Sürüm Kodunu Al")}}</small>
+                            </div>    
+                            <div class="col-md-4 mb-3">
+                                <label>{{__("Servis Adı yada Kontrol Etmek için Port")}}</label>
+                                <input id="service" type="text" name="service" class="form-control" value="{{$extension["service"]}}" required>
+                                <small>{{__("Birden fazla paket yazmak için aralarında boşluk bırakabilirsiniz.")}}</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>{{__("SSL Sertifikası Eklenecek Portlar")}}</label>
+                                <input id="sslPorts" type="text" name="service" class="form-control" value="{{array_key_exists("sslPorts",$extension) ? $extension["sslPorts"] : ""}}" required>
+                                <small>{{__("Birden fazla port yazmak için aralarında virgül bırakabilirsiniz.")}}</small>
+                            </div>
+                        </div>    
+                       
+                        <button class="btn btn-success " onclick="updateExtension('general')"><i class="fas fa-save mr-1"></i>{{__("Kaydet")}}</button><br>
                     </div>
                     <div class="tab-pane fade show" id="tab_2" role="tabpanel">
                         @include('modal-button',[
@@ -225,7 +252,7 @@
                         ])
                     </div>
                     <div class="tab-pane fade show" id="tab_4" role="tabpanel">
-                        <button class="btn btn-success" data-toggle="modal" data-target="#addFunctionModal"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i></button><br><br>
+                        <button class="btn btn-success" data-toggle="modal" data-target="#addFunctionModal"><i data-toggle="tooltip" title="{{ __('Ekle') }}" class="fa fa-plus"></i></button><br><br>
                         @include('table',[
                             "value" => array_key_exists("functions",$extension) ? $extension["functions"] : [],
                             "title" => [
@@ -284,7 +311,7 @@
                             "title" => "Fonksiyon İzin Parametreleri"
                         ])
                             <button class="btn btn-success" onclick="addFunctionParameters()">
-                                <i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i>
+                                <i data-toggle="tooltip" title="{{ __('Ekle') }}" class="fa fa-plus"></i>
                             </button>
                             <div id="functionParameters" class="mt-2"></div>
                         @endcomponent
@@ -352,7 +379,7 @@
 
         function updateExtension(type,tableId = null){
             if ($("#icon").val() == ""){
-                showSwal("Lütfen bir ikon ekleyin!","error",2000);
+                showSwal("{{ __('Lütfen bir ikon ekleyin!') }}","error",2000);
                 return;
             }
             showSwal('{{__("Kaydediliyor...")}}','info');

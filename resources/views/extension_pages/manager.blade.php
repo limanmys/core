@@ -19,8 +19,7 @@
     <button class="btn btn-warning" onclick=showExtensionUpdates()>{{__("Güncellemeleri Yükle")}}</button>
 @endif
 <div class="float-sm-right">
-    <button data-toggle="tooltip" title="{{__('Ayarlar')}}" class="btn btn-primary" onclick="openSettingsModal()"><i
-            class="fa fa-cogs"></i></button>
+    <button class="btn btn-success" onclick="window.location.href='{{ route('market') }}'"><i class="fas fa-shopping-cart mr-1"></i>{{ __("Eklenti Mağazası") }}</button>
 </div><br><br>
 @include('errors')
 
@@ -90,17 +89,6 @@
         "extension_id:extension_id" => "extension_id:hidden"
     ],
     "submit_text" => "Yükle"
-])
-
-@include('modal',[
-    "id"=>"extSettings",
-    "title" => "Ayarlar",
-    "url" => route('save_settings'),
-    "next" => "reload",
-    "inputs" => [
-        "Sol menüde kaç eklenti gözüksün?" => "ext_count:number",
-    ],
-    "submit_text" => "Kaydet"
 ])
 
 @component('modal-component',[
@@ -199,7 +187,6 @@ foreach ($extensions as $extension) {
 ])
 
 <script>
-    $('input[name=ext_count]').val('{{getExtensionViewCount()}}');
        var extensionUpdates = [];
        function showExtensionUpdates(){
            showSwal('{{__("Okunuyor...")}}','info');
@@ -256,10 +243,6 @@ foreach ($extensions as $extension) {
             showSwal('{{__("Maksimum eklenti boyutunu (100MB) aştınız!")}}','error');
         }
     });
-
-    function openSettingsModal(){
-        $('#extSettings').modal('show');
-    }
 
     function extensionUploadError(response){
         var error = JSON.parse(response);

@@ -110,9 +110,9 @@
                 <div class="tab-pane fade show @if(!$firstRendered) active @endif" id="extensionsTab" role="tabpanel">
                     @if(auth()->user()->id == server()->user_id || auth()->user()->isAdmin())
                         <button class="btn btn-success" data-toggle="modal" data-target="#install_extension"><i
-                                    data-toggle="tooltip" title="Ekle"
+                                    data-toggle="tooltip" title="{{ __('Ekle') }}"
                                     class="fa fa-plus"></i></button>
-                        <button onclick="removeExtension()" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i>
+                        <button onclick="removeExtension()" class="btn btn-danger"><i data-toggle="tooltip" title="{{ __('Kaldır') }}" class="fa fa-minus"></i>
                         </button><br><br>
                     @endif
                     @include('table',[
@@ -208,37 +208,36 @@
                 </div>
                 
                 <div class="tab-pane fade show" id="settingsTab" role="tabpanel">
-                    <table class="notDataTable" style="width: 900px;">
-                        <tr>
-                            <td>
-                                <form id="edit_form" onsubmit="return request('{{route('server_update')}}',this,reload)" target="#">
-                                    <h5>{{__("Sunucu Adı")}}</h5>
-                                    <input type="text" name="name" placeholder="Sunucu Adı" class="form-control " required=""
-                                            value="{{server()->name}}"><br>
-                                    <h5>{{__("Kontrol Portu")}}</h5>
-                                    <input type="number" name="control_port" placeholder="Kontrol Portu" class="form-control "
-                                            required="" value="{{server()->control_port}}"><br>
-                                    <h5>{{__("Ip Adresi")}}</h5>
-                                    <input type="text" name="ip_address" placeholder="Ip Adresi" class="form-control "
-                                            required="" value="{{server()->ip_address}}"><br>
-                                    <h5>{{__("Şehir")}}</h5>
-                                    <select name="city" class="form-control" required="">
-                                        @foreach(cities() as $city=>$value)
-                                            <option value="{{$value}}" @if($value == server()->city) selected @endif>{{$city}}</option>
-                                        @endforeach
-                                    </select>
-                            </td>
-                            <td style="width:300px;text-align:center;padding-left:60px">
-                                <button type="submit" class="btn btn-success btn-block">{{__("Bilgileri Güncelle")}}</button><br><br>
-                                @include('modal-button',[
-                                    "class" => "btn-danger btn-block",
-                                    "target_id" => "delete",
-                                        "text" => "Sunucuyu Sil"
-                                ])
-                                </form>
-                            </td>
-                        </tr>
-                    </table>
+                    <form id="edit_form" onsubmit="return request('{{route('server_update')}}',this,reload)" target="#">
+                        <label>{{__("Sunucu Adı")}}</label>
+                        <input type="text" name="name" placeholder="Sunucu Adı" class="form-control mb-3" required=""
+                                value="{{server()->name}}">
+                        <label>{{__("Kontrol Portu")}}</label>
+                        <input type="number" name="control_port" placeholder="Kontrol Portu" class="form-control mb-3"
+                                required="" value="{{server()->control_port}}">
+                        <label>{{__("Ip Adresi")}}</label>
+                        <input type="text" name="ip_address" placeholder="Ip Adresi" class="form-control mb-3"
+                                required="" value="{{server()->ip_address}}">
+                        <label>{{__("Şehir")}}</label>
+                        <select name="city" class="form-control mb-3" required="">
+                            @foreach(cities() as $city=>$value)
+                                <option value="{{$value}}" @if($value == server()->city) selected @endif>{{$city}}</option>
+                            @endforeach
+                        </select>
+                    
+                        <div class="row">
+                            <div class="col">
+                                <button type="submit" class="btn btn-success btn-block">{{__("Bilgileri Güncelle")}}</button>
+                            </div>
+                            <div class="col">
+                            @include('modal-button',[
+                                "class" => "btn-danger btn-block",
+                                "target_id" => "delete",
+                                "text" => "Sunucuyu Sil"
+                            ])
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

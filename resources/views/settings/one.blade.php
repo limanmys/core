@@ -8,7 +8,6 @@
             <li class="breadcrumb-item active" aria-current="page">{{$user->name . __(" kullanıcısı ayarları")}}</li>
         </ol>
     </nav>
-    <h2>{{ __(":user_name kullanıcısı ayarları", ["user_name" => $user->name])}}</h2>
     <div class="card">
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
@@ -40,33 +39,46 @@
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="general" role="tabpanel">
                     <form class="row" onsubmit="return updateUser(this);">
-                        <div class="col-md-3">
-                            <h4>{{__("Hesap Türü")}}</h4>
+                        <div class="col-12 row">
+                            <div class="col-md-6"><label>{{__("Hesap Türü")}}</label>
                             <select name="status" class="form-control">
                                 <option value="0" @if($user->status == "0") selected @endif>{{__("Kullanıcı")}}</option>
                                 <option value="1" @if($user->status == "1") selected @endif>{{__("Yönetici")}}</option>
-                            </select><br>
+                            </select>
+                            </div>
                             @if ($user->auth_type !== "ldap")
-                                <h4>{{__("İsim Soyisim")}}</h4>
+                            <div class="col-md-6">
+                                <label>{{__("İsim Soyisim")}}</label>
                                 <input class="form-control" type="text" value="{{$user->name}}" name="name"><br>
-                                <h4>{{__("Kullanıcı Adı")}}</h4>
+                            </div>
+                            <div class="col-md-6">   
+                                <label>{{__("Kullanıcı Adı")}}</label>
                                 <input class="form-control" type="text" value="{{$user->username}}" name="username"><br>
+                            </div>
                             @endif
-                            <h4>{{__("Email Adresi")}}</h4>
-                            <input class="form-control" type="email" value="{{$user->email}}" name="email">
+                            <div class="col-md-6"> 
+                                <label>{{__("Email Adresi")}}</label>
+                                <input class="form-control" type="email" value="{{$user->email}}" name="email">
+                            </div>
                         </div>
-                        <div class="col-md-3 align-self-center">
-                            <button class="btn btn-danger btn-block" onclick="removeUser();return false;">{{__("Kullanıcıyı Sil")}}</button><br>
+                        <div class="col-12 row align-self-center">
+                            <div class="col-4">
+                                <button class="btn btn-danger btn-block" onclick="removeUser();return false;">{{__("Kullanıcıyı Sil")}}</button><br>
+                            </div>
                             @if ($user->auth_type !== "ldap")
+                            <div class="col-4">
                                 <button class="btn btn-warning btn-block" onclick="resetPassword();return false;">{{__("Parola Sıfırla")}}</button><br>
+                            </div>
                             @endif
-                            <button class="btn btn-success btn-block" type="submit">{{__("Değişiklikleri Kaydet")}}</button>
+                            <div class="col-4">
+                                <button class="btn btn-success btn-block" type="submit">{{__("Değişiklikleri Kaydet")}}</button>
+                            </div>
                         </div>
                     </form>
                 </div>
                 <div class="tab-pane fade show" id="user_roles" role="tabpanel">
-                    <button onclick="getList('role')" class="btn btn-success"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i></button>
-                    <button onclick="removeRole()" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i></button><br><br>
+                    <button onclick="getList('role')" class="btn btn-success"><i data-toggle="tooltip" title="{{ __('Ekle') }}" class="fa fa-plus"></i></button>
+                    <button onclick="removeRole()" class="btn btn-danger"><i data-toggle="tooltip" title="{{ __('Kaldır') }}" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "role_table",
                         "value" => $user->roles,
@@ -86,8 +98,8 @@
                     ])
                 </div>
                 <div class="tab-pane fade show" id="extension" role="tabpanel">
-                    <button onclick="getList('extension')" class="btn btn-success"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i></button>
-                    <button onclick="removePermission('extension')" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i></button><br><br>
+                    <button onclick="getList('extension')" class="btn btn-success"><i data-toggle="tooltip" title="{{ __('Ekle') }}" class="fa fa-plus"></i></button>
+                    <button onclick="removePermission('extension')" class="btn btn-danger"><i data-toggle="tooltip" title="{{ __('Kaldır') }}" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "extension_table",
                         "value" => $extensions,
@@ -101,8 +113,8 @@
                     ])
                 </div>
                 <div class="tab-pane fade show" id="server" role="tabpanel">
-                    <button onclick="getList('server')" class="btn btn-success"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i></button>
-                    <button onclick="removePermission('server')" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i></button><br><br>
+                    <button onclick="getList('server')" class="btn btn-success"><i data-toggle="tooltip" title="{{ __('Ekle') }}" class="fa fa-plus"></i></button>
+                    <button onclick="removePermission('server')" class="btn btn-danger"><i data-toggle="tooltip" title="{{ __('Kaldır') }}" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "server_table",
                         "value" => $servers,
@@ -116,8 +128,8 @@
                     ])
                 </div>
                 <div class="tab-pane fade show" id="function" role="tabpanel">
-                    <button class="btn btn-success" data-toggle="modal" data-target="#functionsModal"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i></button>
-                    <button onclick="removeFunctions()" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i></button><br><br>
+                    <button class="btn btn-success" data-toggle="modal" data-target="#functionsModal"><i data-toggle="tooltip" title="{{ __('Ekle') }}" class="fa fa-plus"></i></button>
+                    <button onclick="removeFunctions()" class="btn btn-danger"><i data-toggle="tooltip" title="{{ __('Kaldır') }}" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "extensionFunctions",
                         "value" => $user->permissions->where('type','function'),
@@ -137,8 +149,8 @@
                     ])
                 </div>
                 <div class="tab-pane fade show" id="liman" role="tabpanel">
-                    <button onclick="getList('liman')" class="btn btn-success"><i data-toggle="tooltip" title="Ekle" class="fa fa-plus"></i></button>
-                    <button onclick="removePermission('liman')" class="btn btn-danger"><i data-toggle="tooltip" title="Kaldır" class="fa fa-minus"></i></button><br><br>
+                    <button onclick="getList('liman')" class="btn btn-success"><i data-toggle="tooltip" title="{{ __('Ekle') }}" class="fa fa-plus"></i></button>
+                    <button onclick="removePermission('liman')" class="btn btn-danger"><i data-toggle="tooltip" title="{{ __('Kaldır') }}" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "liman_table",
                         "value" => getLimanPermissions($user->id),
@@ -170,7 +182,7 @@
         </div>
     </div>
     <div class="modal fade" id="functionsModal">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">
@@ -181,9 +193,9 @@
                 </button>
             </div>
             <div class="modal-body">
-                <h4>{{__("Lütfen Bir Eklenti Seçin")}}</h4>
+                <label>{{__("Lütfen Bir Eklenti Seçin")}}</label>
                 <select id="extensionId" class="form-control" onchange="getFunctionList()">
-                    <option selected disabled>{{__("...")}}</option>
+                    <option selected disabled>{{__("Eklenti")}}</option>
                     @foreach(extensions() as $extension)
                         <option value="{{$extension->id}}">{{$extension->display_name}}</option>
                     @endforeach
@@ -373,7 +385,7 @@
         }
         
         function getList(type) {
-            showSwal("Okunuyor...",'info');
+            showSwal("{{ __('Okunuyor...') }}",'info');
             var form = new FormData();
             form.append('type', type);
             form.append('user_id','{{$user->id}}');

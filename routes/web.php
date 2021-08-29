@@ -24,13 +24,21 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     require_once app_path('Http/Controllers/Certificate/_routes.php');
 
-    // Server Routes
+    // Settings Routes
 
     require_once app_path('Http/Controllers/Settings/_routes.php');
 
     // Widgets Routes
 
     require_once app_path('Http/Controllers/Widgets/_routes.php');
+
+    // Market Routes
+
+    require_once app_path('Http/Controllers/Market/__routes.php');
+
+    // Wizard Routes
+    
+    require_once app_path('Http/Controllers/Wizard/_routes.php');
 
     // Modules Routes
 
@@ -57,25 +65,16 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     Route::post('/collapse', 'HomeController@collapse')->name('set_collapse');
 
-    // Market Routes
-
-    Route::post('/market/kontrol', 'MarketController@verifyMarketConnection')
-        ->name('verify_market')
-        ->middleware('admin');
-
-    Route::post(
-        '/market/guncellemeKontrol',
-        'MarketController@checkMarketUpdates'
-    )
-        ->name('check_updates_market')
-        ->middleware('admin');
-
     // Home Route
 
     Route::get('/', 'HomeController@index')->name('home');
 
     Route::post('/', 'HomeController@getLimanStats')
         ->name('liman_stats')
+        ->middleware('admin');
+
+    Route::post('/online_servers', 'HomeController@getServerStatus')
+        ->name('online_servers')
         ->middleware('admin');
 
     // Vault Route
@@ -149,6 +148,8 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
     Route::post('/user/setting/update', 'UserController@updateSetting')->name(
         'user_setting_update'
     );
+
+    Route::get('/liman_arama', 'SearchController@search')->name('search');
 });
 
 Route::any('/upload/{any?}', function () {

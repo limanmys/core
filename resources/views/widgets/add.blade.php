@@ -10,20 +10,20 @@
 </nav>
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">{{__("Bileşen Ekle")}}</h3>
+        <div class="card-title">{{__("Bileşen Ekle")}}</div>
     </div>
     <div class="card-body">
         @include('errors')
         <form action="{{route('widget_add')}}" onsubmit="return widget_control(this)" method="POST">
-            <h4>{{__("Sunucu")}}</h4>
+            <label>{{__("Sunucu")}}</label>
             <select class="form-control" onchange="getExtensions()" id="server_id" required name="server_id">
                 @foreach(servers() as $server)
                     <option value="{{$server->id}}">{{$server->name}}</option>
                 @endforeach
             </select><br>
-            <h4>{{__("Eklenti")}}</h4>
+            <label>{{__("Eklenti")}}</label>
             <select class="form-control" id="extension_id" disabled onchange="getWidgets()" required name="extension_id"></select><br>
-            <h4>{{__("Bileşen")}}</h4>
+            <label>{{__("Bileşen")}}</label>
             <select class="form-control" id="widget_name" disabled="" name="widget_name"></select><br>
             @csrf
             <button class="btn btn-success" type="submit">{{__("Bileşen Ekle")}}</button>

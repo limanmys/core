@@ -69,12 +69,13 @@
                         @endif
                 @endforeach
             @else
-            <br>
-                <h3>{{__("Bu eklentinin hiçbir ayarı yok.")}}</h3>
+                <div>{{__("Bu eklentinin hiçbir ayarı yok.")}}</div>
             @endif
         </div>
+        @if($extension["database"])
         <div class="card-footer">
             <button type="submit" class="btn btn-success">{{__("Kaydet")}}</button>
         </div>
+        @endif
     </form>
 </div>

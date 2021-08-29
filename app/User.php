@@ -39,6 +39,7 @@ class User extends Authenticatable
         'auth_type',
         'last_login_at',
         'last_login_ip',
+        'locale'
     ];
 
     /**

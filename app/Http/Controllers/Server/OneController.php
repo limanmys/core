@@ -23,12 +23,24 @@ class OneController extends Controller
             abort(504, "Sunucu Bulunamadı.");
         }
 
+        try {
+            if ($server->isWindows()) {
+                preg_match('/\d+/', $server->getUptime(), $output);
+                $uptime = $output[0];
+            } else {
+                $uptime = $server->getUptime();
+            }
+            $uptime = Carbon::parse($uptime)->diffForHumans();
+        } catch (\Throwable $e) {
+            $uptime = __("Uptime parse edemiyorum.");
+        }        
+
         $outputs = [
             "hostname" => $server->getHostname(),
             "version" => $server->getVersion(),
             "nofservices" => $server->getNoOfServices(),
             "nofprocesses" => $server->getNoOfProcesses(),
-            "uptime" => $server->getUptime(),
+            "uptime" => $uptime,
         ];
 
         $input_extensions = [];
@@ -754,7 +766,7 @@ class OneController extends Controller
 
         if ($data == "") {
             return respond([
-                "table" => "Bu aramaya göre bir sonuç bulunamadı.",
+                "table" => __("Bu aramaya göre bir sonuç bulunamadı."),
             ]);
         }
 
@@ -830,7 +842,7 @@ class OneController extends Controller
             'query' => $query
         ]);
         if ($data == "") {
-            return respond("Bu loga ait detay bulunamadı", 201);
+            return respond(__("Bu loga ait detay bulunamadı"), 201);
         }
         $logs = [];
         foreach (explode("\n", $data) as $row) {
@@ -980,7 +992,7 @@ class OneController extends Controller
         return [
             "count" => count($updates),
             "list" => $updates,
-            "table" => view('l.table', [
+            "table" => view('table', [
                 "id" => "updateListTable",
                 "value" => $updates,
                 "title" => ["Paket Adı", "Versiyon", "Tip", "Durumu"],
@@ -1017,7 +1029,7 @@ class OneController extends Controller
             } catch (Exception $exception) {
             }
         }
-        return magicView('l.table', [
+        return magicView('table', [
             "value" => $packages,
             "title" => ["Paket Adı", "Versiyon", "Tip", "Durumu"],
             "display" => ["name", "version", "type", "status"],
@@ -1121,6 +1133,21 @@ class OneController extends Controller
                     "lsof -i -P -n | grep -v '\-'| awk -F' ' '{print $1,$3,$5,$8,$9}' | sed 1,1d"
             )
         );
+
+        if (empty($output)) {
+            return respond(view(
+                "alert",
+                [
+                    "type" => "info",
+                    "title" => "Bilgilendirme",
+                    "message" => "Açık portları görüntüleyebilmek için sunucunuza <b>lsof</b> paketini kurmanız gerekmektedir."
+                ]
+            )->render() . 
+            "<button class='w-100 btn btn-info' onclick='installLsof()'><i class='fas fa-download mr-1'></i> 
+            " . __("Lsof paketini yükle") . "</button>"
+            , 201);
+        }
+
         $arr = [];
         foreach (explode("\n", $output) as $line) {
             $row = explode(" ", $line);
@@ -1134,7 +1161,7 @@ class OneController extends Controller
         }
 
         return respond(
-            view('l.table', [
+            view('table', [
                 "id" => "openPortsTable",
                 "value" => $arr,
                 "title" => [

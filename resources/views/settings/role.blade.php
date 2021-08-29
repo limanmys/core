@@ -8,15 +8,11 @@
             <li class="breadcrumb-item active" aria-current="page">{{$role->name . __(" rol grubunun ayarları")}}</li>
         </ol>
     </nav>
-    <h2>{{$role->name . __(" rol grubunun ayarları")}}</h2>
     <div class="card">
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" data-toggle="pill" href="#role_users" role="tab" aria-selected="true">{{__("Kullanıcılar")}}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="pill" href="#extension" role="tab" >{{__("Eklenti Yetkileri")}}</a>
+                    <a class="nav-link active" data-toggle="pill" href="#extension" role="tab" aria-selected="true">{{__("Eklenti Yetkileri")}}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#server" role="tab">{{__("Sunucu Yetkileri")}}</a>
@@ -30,27 +26,15 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#variables" role="tab">{{__("Özel Veriler")}}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#role_users" role="tab">{{__("Kullanıcılar")}}</a>
+                </li>
             </ul>
         </div>
         <div class="card-body">
             @include('errors')
             <div class="tab-content">
-                <div class="tab-pane fade show active" id="role_users" role="tabpanel">
-                    <button onclick="getUserList()" class="btn btn-success"><i data-toggle="tooltip" title="{{__('Ekle')}}" class="fa fa-plus"></i></button>
-                    <button onclick="removeUsers()" class="btn btn-danger"><i data-toggle="tooltip" title="{{__('Kaldır')}}" class="fa fa-minus"></i></button><br><br>
-                    @include('table',[
-                        "id" => "role_users_table",
-                        "value" => $role->users,
-                        "title" => [
-                            "Kullanıcı Adı" , "Email" , "*hidden*"
-                        ],
-                        "display" => [
-                            "name", "email", "id:id"
-                        ],
-                        "noInitialize" => "true"
-                    ])
-                </div>
-                <div class="tab-pane fade show" id="extension" role="tabpanel">
+                <div class="tab-pane fade show active" id="extension" role="tabpanel">
                     <button onclick="getList('extension')" class="btn btn-success"><i data-toggle="tooltip" title="{{__('Ekle')}}" class="fa fa-plus"></i></button>
                     <button onclick="removePermission('extension')" class="btn btn-danger"><i data-toggle="tooltip" title="{{__('Kaldır')}}" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
@@ -124,11 +108,26 @@
                         "noInitialize" => "true"
                     ])
                 </div>
+                <div class="tab-pane fade show" id="role_users" role="tabpanel">
+                    <button onclick="getUserList()" class="btn btn-success"><i data-toggle="tooltip" title="{{__('Ekle')}}" class="fa fa-plus"></i></button>
+                    <button onclick="removeUsers()" class="btn btn-danger"><i data-toggle="tooltip" title="{{__('Kaldır')}}" class="fa fa-minus"></i></button><br><br>
+                    @include('table',[
+                        "id" => "role_users_table",
+                        "value" => $role->users,
+                        "title" => [
+                            "Kullanıcı Adı" , "Email" , "*hidden*"
+                        ],
+                        "display" => [
+                            "name", "email", "id:id"
+                        ],
+                        "noInitialize" => "true"
+                    ])
+                </div>
             </div>
         </div>
     </div>
     <div class="modal fade" id="functionsModal">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">
@@ -139,7 +138,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <h4>{{__("Lütfen Bir Eklenti Seçin")}}</h4>
+                <label>{{__("Lütfen Bir Eklenti Seçin")}}</label>
                 <select id="extensionId" class="form-control" onchange="getFunctionList()">
                     <option selected disabled>{{__("...")}}</option>
                     @foreach(extensions() as $extension)
@@ -209,7 +208,7 @@
         }
 
         function getUserList(){
-            request('{{route('get_user_list_admin')}}', new FormData(), function (response) {
+            request('{{route('get_user_list_admin_simple')}}', new FormData(), function (response) {
                 $("#user_modal .modal-body").html(response);
                 $('#user_modal table').DataTable(dataTablePresets('multiple'));
                 $("#user_modal").modal('show');

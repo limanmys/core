@@ -12,8 +12,8 @@
         <div class="col-md-3">
             <div class="card card-primary card-outline">
                 <div class="card-body box-profile">
-                    <h3 class="profile-username text-center">{{__("Kasa")}}</h3>
-                    <p class="text-muted text-center">Bu sayfadan mevcut verilerini görebilirsiniz. Buradaki veriler, eklentiler tarafından kullanılmaktadır.</p>
+                    <h3 class="profile-username text-center font-weight-bold">{{__("Kasa")}}</h3>
+                    <p class="text-muted text-center mb-0">{{ __("Bu sayfadan mevcut verilerini görebilirsiniz. Buradaki veriler, eklentiler tarafından kullanılmaktadır.") }}</p>
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@
     "title" => "Anahtar Ekle"
 ])
 <div class="modal-body">
-    <h3>{{__("Sunucu")}}</h3>
+    <label>{{__("Sunucu")}}</label>
     <select name="targetServer" id="targetServer" class="select2 form-control" onchange="setIPAdress()">
     @foreach(servers() as $server)
         <option value="{{$server->ip_address . ':' . $server->id}}">{{$server->name}}</option>
@@ -126,10 +126,10 @@
 
         function addServerKey(){
             if(isKeyOK == false){
-                showSwal("Lütfen önce anahtarınızı doğrulayın!",'error',2000);
+                showSwal('{{ __("Lütfen önce anahtarınızı doğrulayın!") }}','error',2000);
                 return;
             }
-            showSwal("Ekleniyor...","info");
+            showSwal('{{ __("Ekleniyor...") }}',"info");
             let form = new FormData();
             form.append('username',$("#keyUsername").val());
             form.append('password',$("#keyPassword").val());

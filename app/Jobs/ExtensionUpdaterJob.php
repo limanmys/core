@@ -70,14 +70,11 @@ class ExtensionUpdaterJob implements ShouldQueue
             );
             AdminNotification::create([
                 "title" =>
-                    $this->extension->display_name . " eklentisi güncellendi!",
+                    $this->extension->display_name . __(" eklentisi güncellendi!"),
                 "type" => "extension_update",
                 "message" =>
                     $this->extension->display_name .
-                    " eklentisinin yeni bir sürümü indirildi ve yüklendi. İncelemek için için <a href='" .
-                    route('settings') .
-                    "#extensions" .
-                    "'>tıklayınız.</a>",
+                    __(" eklentisinin yeni bir sürümü indirildi ve yüklendi."),
                 "level" => 3,
             ]);
             self::updateUpdatesFile();
@@ -97,7 +94,10 @@ class ExtensionUpdaterJob implements ShouldQueue
         $resource = fopen($downloadPath, 'w');
         $response = $client->request('GET', $this->download, ['sink' => $resource]);
         try{
-            $str = $response->getHeaders()["Content-Disposition"][0];
+            $headers = $response->getHeaders();
+            $headers = array_change_key_case($headers, CASE_LOWER);
+
+            $str = $headers["content-disposition"][0];
             $arr = explode(";",$str);
             if (substr($arr[1],-7) == 'signed"') {
                 $this->signed = true;

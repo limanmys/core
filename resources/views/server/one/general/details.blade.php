@@ -19,7 +19,7 @@
         <hr>
         <strong>{{ __('Şehir') }}</strong>
         <p class="text-muted">
-            {{ cities($server->city) }}
+            {{ __(cities($server->city)) }}
         </p>
         <hr>
         <strong>{{ __('Eklenti Durumları') }}</strong>
@@ -28,7 +28,7 @@
                 @foreach($installed_extensions as $extension)
                     <span 
                         class="badge btn-secondary status_{{$extension->id}}"
-                        style="cursor:pointer;font-size: 18px; margin-bottom: 5px;"
+                        style="cursor:pointer; font-size: 14px; margin-bottom: 5px"
                         onclick="window.location.href = '{{route('extension_server',["extension_id" => $extension->id, "city" => $server->city, "server_id" => $server->id])}}'">
                         {{$extension->display_name}}
                     </span>
@@ -37,17 +37,16 @@
                 {{__("Yüklü eklenti yok.")}}
             @endif
         </p>
-        <hr>
         @if(server()->canRunCommand())
+        <hr>
             <strong>{{ __('Açık Kalma') }}</strong>
-            <p class="text-muted">{{$outputs["uptime"]}}</p>
+            <p class="text-muted">{{ $outputs["uptime"] }}</p>
             <hr>
             <strong>{{ __('Servis Sayısı') }}</strong>
             <p class="text-muted">{{$outputs["nofservices"]}}</p>
             <hr>
             <strong>{{ __('İşlem Sayısı') }}</strong>
             <p class="text-muted">{{$outputs["nofprocesses"]}}</p>
-            <hr>
         @endif
     </div>
     </div>

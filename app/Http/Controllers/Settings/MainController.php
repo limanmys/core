@@ -65,11 +65,22 @@ class MainController extends Controller
             "MARKET_CLIENT_ID" => env("MARKET_CLIENT_ID"),
             "MARKET_CLIENT_SECRET" => env("MARKET_CLIENT_SECRET"),
             "EXTENSION_DEVELOPER_MODE" => env("EXTENSION_DEVELOPER_MODE") ? "true" : "false",
+            "APP_LANG" => env("APP_LANG", "tr"),
+            "NAV_SERVER_COUNT" => env("NAV_SERVER_COUNT")
         ]);
     }
 
     public function setLimanTweaks()
     {
+        try {
+            request()->validate([
+                "NAV_SERVER_COUNT" => "required|numeric|digits_between:1,2"
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return respond("Ayarlar kaydedilemedi!", 201);
+        }
+        
+
         $flag = setEnv([
             "APP_DEBUG" => request("APP_DEBUG"),
             "BRAND_NAME" => "\"" . request("BRAND_NAME") . "\"",
@@ -85,6 +96,8 @@ class MainController extends Controller
             "MARKET_CLIENT_ID" => request("MARKET_CLIENT_ID"),
             "MARKET_CLIENT_SECRET" => request("MARKET_CLIENT_SECRET"),
             "EXTENSION_DEVELOPER_MODE" => request("EXTENSION_DEVELOPER_MODE"),
+            "APP_LANG" => request("APP_LANG"),
+            "NAV_SERVER_COUNT" => request("NAV_SERVER_COUNT")
         ]);
 
         if (request()->has("MAIL_PASSWORD")) {
@@ -96,7 +109,7 @@ class MainController extends Controller
         if ($flag) {
             return respond("Ayarlar başarıyla kaydedildi!");
         } else {
-            return respond("Ayarlar kaydedılemedı!", 201);
+            return respond("Ayarlar kaydedilemedi!", 201);
         }
     }
 
@@ -121,7 +134,7 @@ class MainController extends Controller
 
     public function getUserList()
     {
-        return view('l.table', [
+        return view('table', [
             "value" => \App\User::all(),
             "title" => ["İsim Soyisim", "Kullanıcı Adı", "Email", "*hidden*" ,],
             "display" => ["name", "username", "email", "id:user_id"],
@@ -135,6 +148,16 @@ class MainController extends Controller
                     "icon" => " context-menu-icon-delete",
                 ],
             ],
+            "onclick" => "userDetails",
+        ]);
+    }
+
+    public function getSimpleUserList()
+    {
+        return view('table', [
+            "value" => \App\User::all(),
+            "title" => ["İsim Soyisim", "Kullanıcı Adı", "Email", "*hidden*" ,],
+            "display" => ["name", "username", "email", "id:user_id"],
             "onclick" => "userDetails",
         ]);
     }
@@ -197,7 +220,7 @@ class MainController extends Controller
             default:
                 abort(504, "Tip Bulunamadı");
         }
-        return view('l.table', [
+        return view('table', [
             "value" => (object)$data,
             "title" => $title,
             "display" => $display,
@@ -259,7 +282,7 @@ class MainController extends Controller
         )){
             return respond("Veri başarıyla eklendi!");
         }else{
-            return respond("Veri eklenemedi!");
+            return respond("Veri eklenemedi!", 201);
         }
     }
 
@@ -324,7 +347,7 @@ class MainController extends Controller
             }
         }
 
-        return view('l.table', [
+        return view('table', [
             "value" => $cleanFunctions,
             "title" => ["*hidden*", "Açıklama"],
             "display" => ["name:name", "description"],
@@ -372,12 +395,10 @@ class MainController extends Controller
             if ($flag) {
                 addCertificate(request('ldapAddress'), 636, $message["path"]);
                 AdminNotification::create([
-                    "title" => "Yeni Sertifika Eklendi",
+                    "title" => __("Yeni Sertifika Eklendi"),
                     "type" => "new_cert",
                     "message" =>
-                        "Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.<br><br><a href='" .
-                        route('settings') .
-                        "#certificates'>Detaylar</a>",
+                        __("Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi."),
                     "level" => 3,
                 ]);
             }

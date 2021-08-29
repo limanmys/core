@@ -195,27 +195,18 @@ if (!function_exists('syncFiles')) {
 
         Command::runLiman(
             "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" .
-                "{:masterIp}" .
-                ":/liman/extensions/ /liman/extensions/",
-            [
-                "masterIp" => $masterIp
-            ]
+                "$masterIp" .
+                ":/liman/extensions/ /liman/extensions/"
         );
         Command::runLiman(
             "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" --exclude 'service.key' liman@" .
-                "{:masterIp}" .
-                ":/liman/keys/ /liman/keys/",
-            [
-                "masterIp" => $masterIp
-            ]
+                "$masterIp" .
+                ":/liman/keys/ /liman/keys/"
         );
         Command::runLiman(
             "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@" .
-                "{:masterIp}" .
-                ":/liman/modules/ /liman/modules/",
-            [
-                "masterIp" => $masterIp
-            ]
+                "$masterIp" .
+                ":/liman/modules/ /liman/modules/"
         );
 
         $root = rootSystem();
@@ -405,7 +396,7 @@ if (!function_exists('settingsModuleViews')) {
         $str = "";
         foreach (searchModuleFiles('settings.blade.php') as $file) {
             $blade = new Blade(
-                [realpath(base_path('resources/views/l')), $file],
+                [realpath(base_path('resources/views/components')), $file],
                 "/tmp"
             );
             $str .= $blade->render('settings');
@@ -499,7 +490,7 @@ if (!function_exists('serverModuleViews')) {
         $str = "";
         foreach (searchModuleFiles('server.blade.php') as $file) {
             $blade = new Blade(
-                [realpath(base_path('resources/views/l')), $file],
+                [realpath(base_path('resources/views/components')), $file],
                 "/tmp"
             );
             $str .= $blade->render('server');
@@ -614,7 +605,7 @@ if (!function_exists('retrieveCertificate')) {
                 );
                 $flag = true;
             } catch (\Exception $exception) {
-                return [false, "Sertifika alınamıyor!"];
+                return [false, __("Sertifika alınamıyor!")];
             }
         }
 
@@ -1141,18 +1132,6 @@ if (!function_exists('lDecrypt')) {
     {
         $key = env('APP_KEY') . user()->id . server()->id;
         return AES256::decrypt($data, $key);
-    }
-}
-
-if (!function_exists('getExtensionViewCount')) {
-    function getExtensionViewCount()
-    {
-        $count = intval(env('NAV_EXTENSION_HIDE_COUNT'));
-        if ($count == null) {
-            setEnv(['NAV_EXTENSION_HIDE_COUNT' => 10]);
-            return 10;
-        }
-        return $count;
     }
 }
 

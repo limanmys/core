@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdminNotification;
 use App\Models\LimanRequest;
 use App\Models\Server;
 use App\User;
 use App\Models\Token;
-use App\Models\UserSettings;
 use App\Models\Extension;
 use App\Models\Widget;
 
@@ -64,19 +64,21 @@ class HomeController extends Controller
      *
      * @apiSuccess {String} cpu CPU Usage of Liman.
      * @apiSuccess {String} ram Ram Usage of Liman.
-     * @apiSuccess {String} disk Disk Usage of Liman.
+     * @apiSuccess {String} io IO Usage of Liman.
      * @apiSuccess {String} network Network Usage of Liman.
+     * @apiSuccess {String} time Date when data fetched.
      */
     public function getLimanStats()
     {
         $cpuUsage = shell_exec(
             "ps -eo %cpu --no-headers | grep -v 0.0 | awk '{s+=$1} END {print s/NR*10}'"
         );
-        $cpuUsage = round($cpuUsage, 0, 2);
+        $cpuUsage = round($cpuUsage, 2);
         $ramUsage = shell_exec("free -t | awk 'NR == 2 {printf($3/$2*100)}'");
-        $ramUsage = round($ramUsage, 0, 2);
-        $diskUsage = shell_exec("df --output=pcent / | tr -dc '0-9'");
-        $diskUsage = round($diskUsage, 0, 2);
+        $ramUsage = round($ramUsage, 2);
+        $ioPercent = shell_exec(
+            "iostat -d | tail -n +4 | head -n -1 | awk '{s+=$2} END {print s}'"
+        );
 
         $firstDown = $this->calculateNetworkBytes();
         $firstUp = $this->calculateNetworkBytes(false);
@@ -84,16 +86,15 @@ class HomeController extends Controller
         $secondDown = $this->calculateNetworkBytes();
         $secondUp = $this->calculateNetworkBytes(false);
 
-        $network =
-            strval(intval(($secondDown - $firstDown) / 1024 / 1024) / 2) .
-            " mb/sn ↓  " .
-            strval(intval(($secondUp - $firstUp) / 1024 / 1024) / 2) .
-            " mb/sn ↑";
         return response([
-            "cpu" => "%" . $cpuUsage,
-            "ram" => "%" . $ramUsage,
-            "disk" => "%" . $diskUsage,
-            "network" => $network,
+            "cpu" => $cpuUsage,
+            "ram" => $ramUsage,
+            "io" => round($ioPercent, 2),
+            'network' => [
+                'down' => round(($secondDown - $firstDown) / 1024 / 2, 2),
+                'up' => round(($secondUp - $firstUp) / 1024 / 2, 2),
+            ],
+            "time" => \Carbon\Carbon::now()->format('H:i:s'),
         ]);
     }
 
@@ -106,6 +107,9 @@ class HomeController extends Controller
             in_array(request('locale'), $languages)
         ) {
             \Session::put('locale', request('locale'));
+            auth()->user()->update([
+                "locale" => request('locale')
+            ]);
             return redirect()->back();
         } else {
             return response('Language not found', 404);
@@ -114,15 +118,16 @@ class HomeController extends Controller
 
     private function calculateNetworkBytes($download = true)
     {
-        $text = $download ? "rx_bytes" : "tx_bytes";
+        $text = $download ? 'rx_bytes' : 'tx_bytes';
         $count = 0;
         $raw = trim(shell_exec("cat /sys/class/net/*/statistics/$text"));
 
-        foreach (explode("\n", $raw) as $data) {
+        foreach (explode("\n", trim($raw)) as $data) {
             $count += intval($data);
         }
         return $count;
     }
+
 
     public function collapse()
     {
@@ -203,6 +208,65 @@ class HomeController extends Controller
             "speed" => request('speed'),
             "status" => 0,
         ]);
+
+        $users = User::where('status', 1)->get();
+        foreach ($users as $user) 
+        {
+            AdminNotification::create([
+                "user_id" => $user->id,
+                "title" => __("İzin isteği: ") . auth()->user()->name,
+                "type" => "auth_request",
+                "message" => request('note'),
+                "server_id" => null,
+                "extension_id" => null,
+                "level" => 0,
+                "read" => false,
+            ]);
+        }
+        
         return respond('Talebiniz başarıyla alındı.', 200);
+    }
+
+    public function getServerStatus($count = 6)
+    {   
+        $servers = Server::orderBy("updated_at", "DESC")->limit($count)->get();
+        $data = [];
+
+        foreach ($servers as $server) {
+            $status = @fsockopen(
+                $server->ip_address,
+                $server->control_port,
+                $errno,
+                $errstr,
+                0.5);
+            
+            try {
+                if ($server->isWindows() && $server->canRunCommand()) {
+                    preg_match('/\d+/', $server->getUptime(), $output);
+                    $uptime = $output[0];
+                } else if ($server->canRunCommand()) {
+                    $uptime = $server->getUptime();
+                } else {
+                    $uptime = "";
+                }
+
+                if ($uptime != "") {
+                    $uptime = \Carbon\Carbon::parse($uptime)->diffForHumans();
+                }
+            } catch (\Throwable $e) {
+                $uptime = " ";
+            }        
+            
+            array_push($data, [
+                "id" => $server->id,
+                "icon" => $server->isLinux() ? 'fa-linux' : 'fa-windows',
+                "name" => $server->name,
+                "uptime" => (bool)$uptime ? $uptime : null,
+                "badge_class" => (bool)$status ? "badge-success" : "badge-danger",
+                "status" => (bool)$status
+            ]);
+        }
+        
+        return $data;
     }
 }

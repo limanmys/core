@@ -50,15 +50,19 @@ class Permission extends Model
         $extra = null,
         $morph_type = "users"
     ) {
-        return Permission::firstOrCreate([
-            "morph_id" => $morph_id,
-            "morph_type" => $morph_type,
-            "type" => $type,
-            "key" => $key,
-            "value" => $value,
-            "extra" => $extra,
-            "blame" => user()->id,
-        ]);
+        try {
+            return Permission::firstOrCreate([
+                "morph_id" => $morph_id,
+                "morph_type" => $morph_type,
+                "type" => $type,
+                "key" => $key,
+                "value" => $value,
+                "extra" => $extra,
+                "blame" => user()->id,
+            ]);
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     public static function revoke($morph_id, $type, $key, $value, $extra = null)

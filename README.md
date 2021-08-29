@@ -1,21 +1,31 @@
-# Liman MYS
+# Liman Core
 
-## Liman Nedir?
+Liman Core allows you to centrally manage all servers in your IT processes remotely, with stable and secure. You can improve the features with expandable extensions and modules.
 
- BT süreçlerinizde bulunan bütün bileşenleri uzaktan, kararlı, güvenli ve genişletilebilir yöntemler ile merkezi olarak yönetmenizi sağlar.
+More information on the Liman [website](https://liman.dev).
 
-Açık kaynak göç projelerinde Linux çekirdeğine sahip işletim sistemlerini ve diğer platformları Liman MYS ile yönetebilirsiniz. 
+## What is Liman?
 
-## Kurulum
+As an open source version of Liman, it meets your basic needs for server management. You can develop extensions according to your wishes or you can manage certain servers with a nice interface with the extensions available in the liman market.
 
-Kurulum için https://depo.aciklab.org/ adresindeki yönergeleri izleyebilirsiniz.
+* Server Management
+* Extension Infrastracture
+* User and Role Management
+* Web based management
 
-## Faydalı Linkler
+## Install
 
-Liman Eklenti Yapısı https://dev.to/liman/liman-eklenti-yapisi-3jep
+Liman is packaged as DEB in Aciklab repository. Therefore, it supports Debian, Pardus and Ubuntu.
+You can find the [installation documentation](https://docs.liman.dev/start/installing) for your Linux distribution.
 
-Geliştirme Ortamı Kurulum Rehberi https://dev.to/liman/liman-icin-eklenti-gelistirme-1jdc
+## Authors
 
-Eklenti Geliştirme Rehberi https://dev.to/liman/eklenti-gelistirme-ortami-kurulumu-3ofm
+Liman Core started to be developed by the [Aciklab](https://aciklab.org) group in HAVELSAN and continues to be developed. Thanks to everyone who contributed. Special thanks to Mert Çelen, who is no longer developing but has made a great effort.
 
-API Dökümantasyonu https://api.liman.dev/
+Liman Core is sponsored by [HAVELSAN](https://havelsan.com.tr/en).
+
+## License
+
+MIT License
+
+See [LICENSE](https://github.com/limanmys/core/blob/master/LICENSE) the full text.

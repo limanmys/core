@@ -12,7 +12,7 @@ class Parameters
         foreach ($parameters as $parameter) {
             if (!request()->has($parameter) || !strlen(request($parameter))) {
                 // If found something that is missing, abort the process and warn user.
-                return respond("Eksik Parametre > $parameter", 403);
+                return respond("Eksik Parametre > ". $parameter, 403);
             }
         }
         // Forward request to next target.

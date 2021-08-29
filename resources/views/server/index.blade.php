@@ -12,16 +12,16 @@
         <div class="col-md-3">
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
-                <h3 class="profile-username text-center">{{__("Sunucular")}}</h3>
-                <p class="text-muted text-center">{{__("Bu sayfadan mevcut sunucularını görebilirsiniz. Ayrıca yeni sunucu eklemek için Sunucu Ekle butonunu kullanabilirsiniz.")}}</p>
+                <h3 class="profile-username text-center font-weight-bold">{{__("Sunucular")}}</h3>
+                <p class="text-muted text-center mb-0">{{__("Bu sayfadan mevcut sunucularını görebilirsiniz. Ayrıca yeni sunucu eklemek için Sunucu Ekle butonunu kullanabilirsiniz.")}}</p>
               </div>
             </div>
         </div>
         <div class="col-md-9">
             <div class="card">
                 <div class="card-body">
-                        @if(\App\Models\Permission::can(user()->id,'liman','id','add_server'))
-                        <button href="#tab_1" type="button" class="btn btn-success" data-toggle="modal" data-target="#add_server">{{__("Sunucu Ekle")}}</button><br><br>
+                    @if(\App\Models\Permission::can(user()->id,'liman','id','add_server'))
+                        <button href="#tab_1" type="button" class="btn btn-success" data-toggle="modal" data-target="#add_server"><i class="nav-icon fas fa-plus mr-1"></i> {{__("Sunucu Ekle")}}</button><br><br>
                     @endif
                     
                     @include('errors')
@@ -62,7 +62,7 @@
     </div>
 
     <div class="modal fade" id="add_server">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">{{__("Sunucu Ekle")}}</h4>
@@ -87,40 +87,39 @@
                     <div class="tab-pane fade show active" id="network" role="tabpanel" aria-labelledby="networkTab">
                         <form onsubmit="return checkAccess(this)">
                             <div class="modal-body">
-                                <h4>{{__("Sunucunuzun Adresi")}}</h4>
+                                <label class="text-md">{{__("Sunucunuzun Adresi")}}</label>
                                 <input type="text" id="serverHostName" name="hostname" class="form-control" placeholder="{{__("Sunucunuzun Hostname yada IP Adresini girin.")}}" required><br>
-                                <h4>{{__("Sunucunuzun Portu")}}</h4>
-                                <h6>{{__("Sunucunuzun açık olup olmadığını algılamak için kontrol edilebilecek bir port girin.")}}</h6>
+                                <label class="text-md">{{__("Sunucunuzun Portu")}}</label>
+                                <div>{{__("Sunucunuzun açık olup olmadığını algılamak için kontrol edilebilecek bir port girin.")}}</div>
                                 <pre>{{__("SSH : 22\nWinRM : 5986\nActive Directory, Samba : 636")}}</pre>
                                 <input id="serverControlPort" type="number" name="port" class="form-control" placeholder="{{__("Kontrol Portu Girin (Yalnızca Sayı).")}}" required min="-1">
                                 <small><i>{{__("Eğer hedefiniz UDP protokolü üzerinden dinliyorsa bu kontrolü atlamak için -1 girebilirsiniz.")}}</i></small>
                             </div>
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">{{__("Bağlantıyı Kontrol Et")}}</button>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-plug"></i> {{__("Bağlantıyı Kontrol Et")}}</button>
                             </div>
                         </form>
                     </div>
                     <div class="tab-pane fade" id="general" role="tabpanel" aria-labelledby="generalTab">
                         <form onsubmit="return checkGeneral(this)">
                             <div class="modal-body">
-                                <h4>{{__("Sunucunuzun Adı")}}</h4>
+                                <label class="text-md">{{__("Sunucunuzun Adı")}}</label>
                                 <input id="server_name" type="text" name="server_name" class="form-control" placeholder="{{__("Sunucunuzun Adı")}}" required><br>
-                                <h4>{{__("Şehir")}}</h4>
+                                <label class="text-md mb-0" style="width: 100%;">{{__("Şehir")}}</label>
                                 <small>{{__("Sunucunuza bir şehir atayarak, eklentileri kullanırken Türkiye haritası üzerinde erişiminizi kolaylaştırabilirsiniz.")}}</small><br>
                                 <select name="server_city" id="serverCity" class="form-control select2" required>
-                                    <option value="" disabled selected>{{__('Şehir Seçiniz')}}</option>
                                     @foreach(cities() as $name=>$code)
-                                        <option value="{{$code}}">{{$name}}</option>
+                                        <option value="{{$code}}">{{__($name)}}</option>
                                     @endforeach
                                 </select><br>
-                                <h4>{{__("Sunucunuzun İşletim Sistemi")}}</h4>
+                                <label class="text-md">{{__("Sunucunuzun İşletim Sistemi")}}</label>
                                 <div class="form-group">
                                     <div class="radio">
-                                        <label>
+                                        <label style="font-weight: 400; margin-right: 10px;">
                                             <input type="radio" name="operating_system" value="windows" data-content="{{__("Microsoft Windows")}}">
                                             {{__("Microsoft Windows")}}
                                         </label>
-                                        <label>
+                                        <label style="font-weight: 400">
                                             <input type="radio" name="operating_system" value="linux" checked data-content="{{__("GNU/Linux")}}">
                                             {{__("GNU/Linux")}}
                                         </label>
@@ -128,7 +127,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">{{__("Ayarları Onayla")}}</button>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-wrench"></i> {{__("Ayarları Onayla")}}</button>
                             </div>
                         </form>
                     </div>
@@ -166,7 +165,7 @@
                             </table>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" onclick="addServer()" class="btn btn-success">{{__("Sunucuyu Ekle")}}</button>
+                            <button type="button" onclick="addServer()" class="btn btn-success"><i class="fas fa-check"></i> {{__("Sunucuyu Ekle")}}</button>
                         </div>
                     </div>
                 </div>

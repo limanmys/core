@@ -50,6 +50,11 @@ class LoginController extends Controller
         hook("login_successful", [
             "user" => $user,
         ]);
+
+        if (env("WIZARD_STEP", 1) != config("liman.wizard_max_steps") && $user->status)
+        {
+            return redirect()->route("wizard", env("WIZARD_STEP", 1));
+        }
     }
 
     public function attemptLogin(Request $request)
@@ -58,11 +63,11 @@ class LoginController extends Controller
 
         $flag = $this->guard()->attempt(
             $this->credentials($request),
-            $request->filled('remember')
+            (bool) $request->remember
         );
 
         Event::listen('login_attempt_success', function ($data) use (&$flag) {
-            $this->guard()->login($data, request()->filled('remember'));
+            $this->guard()->login($data, (bool) request()->remember);
             $flag = true;
         });
 
@@ -79,11 +84,19 @@ class LoginController extends Controller
             $this->username() => $request->liman_email_mert,
             "password" => $request->liman_password_baran,
         ]);
-        $request->validate([
-            $this->username() => 'required|string',
-            'password' => 'required|string',
-            'captcha' => 'required|captcha'
-        ]);
+        if (env('EXTENSION_DEVELOPER_MODE'))
+        {
+            $request->validate([
+                $this->username() => 'required|string',
+                'password' => 'required|string'
+            ]);
+        } else {
+            $request->validate([
+                $this->username() => 'required|string',
+                'password' => 'required|string',
+                'captcha' => 'required|captcha'
+            ]);
+        }
     }
 
     protected function sendFailedLoginResponse(Request $request)

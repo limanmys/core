@@ -30,7 +30,7 @@ class ExternalNotificationController extends Controller
                     ->all()
             )
         ) {
-            return respond("Token Oluşturuldu!\n$token");
+            return respond(__("Token Oluşturuldu! ") . $token);
         } else {
             return respond("Token Oluşturulamadı!", 201);
         }
@@ -80,7 +80,7 @@ class ExternalNotificationController extends Controller
                 "token" => $token,
             ])
         ) {
-            return respond("Token başarıyla yenilendi!\n$token");
+            return respond(__("Token başarıyla yenilendi!") . "\n$token");
         }
     }
 
@@ -133,7 +133,7 @@ class ExternalNotificationController extends Controller
         }
 
         AdminNotification::create([
-            "title" => "Dış Bildirim -> " . $request->get('title'),
+            "title" => __("Dış Bildirim -> ") . $request->get('title'),
             "type" => "external_notification",
             "message" => $request->get('message'),
             "level" => 3,

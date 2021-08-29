@@ -210,7 +210,7 @@ class Server extends Model
         }
 
         if ($this->isLinux()) {
-            return $this->run("lsb_release -ds");
+            return $this->run("cat /etc/os-release | grep ^PRETTY_NAME= | cut -d\"=\" -f2 | sed 's/\"//g'");
         }
         return explode(
             "|",
