@@ -913,5 +913,7 @@
     "Kurulum başarılı!": "Installation successful!",
     "Liman'ı kullandığınız için teşekkür ederiz. Oluşturduğunuz kullanıcı hesabı ile Liman MYS'ye giriş yapabilirsiniz. Yeni eklenti mağazamızı kullanarak ücretsiz eklentilerimizi indirip sunucunuzda kullanabilirsiniz!": "Thank you for using the Liman. You can log in to Liman MYS with the user account you created. You can download our free extensions from new extension store and use them on your servers.",
     "Tamamla": "Complete",
-    "Liman başarıyla kuruldu! Hesabınız ile giriş yapın.": "Liman is installed successfully! Log in with your account."
+    "Liman başarıyla kuruldu! Hesabınız ile giriş yapın.": "Liman is installed successfully! Log in with your account.",
+    "Henüz sunucu eklememişsiniz.": "You haven't added a server yet.",
+    "Market bağlantınızı kontrol edin.": "Check the Market connection."
 }

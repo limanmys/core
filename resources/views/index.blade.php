@@ -122,7 +122,7 @@
                 </div>
                 <div class="noServer" style="height: 100%; display:flex; flex-direction: column; align-items: center; justify-content: center;">
                     <i class="fas fa-info fa-3x mb-4"></i>
-                    <h5 class="text-bold">Henüz sunucu eklememişsiniz.</h5>
+                    <h5 class="text-bold">{{ __("Henüz sunucu eklememişsiniz.") }}</h5>
                 </div>
             </div>
           </div>
@@ -145,7 +145,7 @@
                 </div>
                 <div class="noApp" style="height: 100%; display:flex; flex-direction: column; align-items: center; justify-content: center;">
                     <i class="fas fa-info fa-3x mb-4"></i>
-                    <h5 class="text-bold">Market bağlantınızı kontrol edin.</h5>
+                    <h5 class="text-bold">{{ __("Market bağlantınızı kontrol edin.") }}</h5>
                 </div>
             </div>
           </div>
