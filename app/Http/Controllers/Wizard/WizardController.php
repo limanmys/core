@@ -88,7 +88,7 @@ class WizardController extends Controller
             $validator = Validator::make($request->all(), [
                 "name" => "required|string|max:60",
                 "email" => "required|email",
-                "password" => "required|string|min:10|max:32|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/",
+                "password" => "required|string|min:10|max:32|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-.]).{10,}$/",
                 "confirm" => "requried|same:password",
                 "username" => "required|string|max:35"
             ]);

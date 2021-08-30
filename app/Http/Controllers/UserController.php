@@ -54,7 +54,7 @@ class UserController extends Controller
             $password = substr($pool, 0, 10);
         } while (
             !preg_match(
-                "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/",
+                "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-.]).{10,}$/",
                 $password
             )
         );
@@ -146,7 +146,7 @@ class UserController extends Controller
             $password = substr($pool, 0, 10);
         } while (
             !preg_match(
-                "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/",
+                "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-.]).{10,}$/",
                 $password
             )
         );
@@ -204,7 +204,7 @@ class UserController extends Controller
                     'min:10',
                     'max:32',
                     'confirmed',
-                    'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/',
+                    'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-.]).{10,}$/',
                 ]
             ], [
                 'password.regex' => 'Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.'
@@ -398,7 +398,7 @@ class UserController extends Controller
                 'min:10',
                 'max:32',
                 'confirmed',
-                'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{10,}$/',
+                'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-.]).{10,}$/',
             ],
         ]);
 
