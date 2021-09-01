@@ -915,5 +915,9 @@
     "Tamamla": "Complete",
     "Liman başarıyla kuruldu! Hesabınız ile giriş yapın.": "Liman is installed successfully! Log in with your account.",
     "Henüz sunucu eklememişsiniz.": "You haven't added a server yet.",
-    "Market bağlantınızı kontrol edin.": "Check the Market connection."
+    "Market bağlantınızı kontrol edin.": "Check the Market connection.",
+    "Giriş Ekranı Logosu": "Login Screen Logo",
+    "Dosya yükleme başarısız!": "File upload failed!",
+    "Dosya yükleme başarılı!": "File upload successful!",
+    "Giriş ekranının üzerinde görünmesi için kendi logonuzu ekleyebilirsiniz.": "You can add your own logo to appear above the login screen."
 }

@@ -44,6 +44,11 @@
                   {{ session('status') }}
               </div>
           @endif
+          @if (env("BRANDING") != "")
+          <div class="flex items-center justify-center w-full">
+            <img src="{{ env('BRANDING') }}" alt="{{ env('BRAND_NAME') }}" style="max-width: 200px;">
+          </div>
+          @endif
           <div>
             <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
               {{ __('Hesabınıza giriş yapın') }}

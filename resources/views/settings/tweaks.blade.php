@@ -39,6 +39,20 @@
                         <small>{{__("Maillerde ve bildimlerde eklenmesi gereken Liman'ın adresi")}}</small>
                         <input type="text" class="form-control liman_env" id="APP_URL">
                     </div>
+                    <div class="form-group">
+                        <label for="icon-file-input">{{__("Giriş Ekranı Logosu")}}</label><br>
+                        <small>{{__("Giriş ekranının üzerinde görünmesi için kendi logonuzu ekleyebilirsiniz.")}}</small>
+                    </div>
+                    <div class="input-group" id="icon-file-input" style="margin-top: -15px;">
+                        <input type="text" id="icon-selected-file" class="form-control" readonly="">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-labeled btn-secondary" id="icon-browse" style="border-radius: 0px;">{{ __('Gözat') }}</button>
+                        </span>
+                        <span class="input-group-btn">
+                            <button type="button" class=" btn btn-labeled btn-primary" id="icon-upload" disabled="" style="border-radius: 0px;">{{ __('Yükle') }}</button>
+                        </span>
+                        <input type="file" name="" id="icon-upload-file" style="display:none;">
+                    </div>
                 </div>
             </div>
             <div class="tab-pane fade" id="market" role="tabpanel" aria-labelledby="vert-tabs-profile-tab">
@@ -170,4 +184,39 @@
             showSwal(json.message,"error",2000);
         });
     }
+
+    jQuery(document).ready(function ($) {
+        var uploadButton = $('#icon-upload'),
+        selectedFile = $('#icon-selected-file');
+        
+        $('#icon-file-input').on('change', function (e) {
+        var name = e.target.value.split('\\').reverse()[0];
+    
+        if (name) {
+            selectedFile.val(name);
+            uploadButton.attr('disabled', false);
+        } else {
+            selectedFile.val('');
+            uploadButton.attr('disabled', true);
+        }
+        });
+
+        $('#icon-browse, #icon-selected-file').click(function(){
+            $('#icon-upload-file').click();
+        });
+
+    });
+
+    $( "#icon-upload" ).click(function() {
+        var selectedFile = $('#icon-upload-file').prop('files');
+        let data = new FormData();
+        data.append("photo", selectedFile[0])
+        request("{{ route('upload_login_logo') }}", data, function (response) {
+            response = JSON.parse(response);
+            showSwal(response.message, "success", 2000);
+        }, function (error) {
+            let response = JSON.parse(error);
+            showSwal(response.message, "error", 2000);
+        });
+    });
 </script>
