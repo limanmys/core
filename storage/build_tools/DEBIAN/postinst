@@ -326,6 +326,9 @@ systemctl restart php7.3-fpm
 # Optimize Liman
 php /liman/server/artisan optimize:clear
 
+# Liman Storage Link
+php /liman/server/artisan storage:link
+
 # Enable Liman
 php /liman/server/artisan up
 
