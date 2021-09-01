@@ -85,12 +85,18 @@ class WizardController extends Controller
     private function setStep2(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
+            request()->validate([
                 "name" => "required|string|max:60",
                 "email" => "required|email",
-                "password" => "required|string|min:10|max:32|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-.]).{10,}$/",
-                "confirm" => "requried|same:password",
-                "username" => "required|string|max:35"
+                "confirm" => "required|same:password",
+                "username" => "required|string|max:35",
+                'password' => [
+                    'required',
+                    'string',
+                    'min:10',
+                    'max:32',
+                    'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\[\]\(\)\{\}\#\?\%\&\*\+\,\-\.\/\:\;\<\=\>\@\^\_\`\~]).{10,}$/',
+                ]
             ]);
 
             User::create([
@@ -100,7 +106,7 @@ class WizardController extends Controller
                 "username" => $request->username,
                 "locale" => getEnv("APP_LANG"),
                 "auth_type" => "local",
-                "forceChange" => "f",
+                "forceChange" => "false",
                 "status" => "1"
             ]);
             return respond("Kullanıcı başarıyla eklendi.", 200);
