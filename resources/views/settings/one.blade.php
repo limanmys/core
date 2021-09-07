@@ -61,16 +61,19 @@
                                 <input class="form-control" type="email" value="{{$user->email}}" name="email">
                             </div>
                         </div>
-                        <div class="col-12 row align-self-center">
-                            <div class="col-4">
+                        <div class="col-12 row align-self-center @if($user->auth_type == 'ldap') mt-3 @endif ">
+                            @php
+                                $col = $user->auth_type !== "ldap" ? "4" : "6";
+                            @endphp
+                            <div class="col-{{ $col }}">
                                 <button class="btn btn-danger btn-block" onclick="removeUser();return false;">{{__("Kullanıcıyı Sil")}}</button><br>
                             </div>
                             @if ($user->auth_type !== "ldap")
-                            <div class="col-4">
+                            <div class="col-{{ $col }}">
                                 <button class="btn btn-warning btn-block" onclick="resetPassword();return false;">{{__("Parola Sıfırla")}}</button><br>
                             </div>
                             @endif
-                            <div class="col-4">
+                            <div class="col-{{ $col }}">
                                 <button class="btn btn-success btn-block" type="submit">{{__("Değişiklikleri Kaydet")}}</button>
                             </div>
                         </div>
