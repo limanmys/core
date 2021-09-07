@@ -2,7 +2,7 @@
 <nav class="main-header navbar navbar-expand navbar-dark" style="margin-left:0px;height:58.86px;border:0px;">
 <ul class="navbar-nav"  style="line-height:60px;">
         <a href="/" class="brand-link">
-            <img src="/images/limanlogo.svg" height="30" style="opacity: .8;cursor:pointer;" title="Versiyon {{getVersion()}}">
+            <img src="{{ asset('/images/limanlogo.svg') }}" height="30" style="opacity: .8;cursor:pointer;" title="Versiyon {{getVersion()}}">
         </a>
 <li class="nav-item d-none d-sm-inline-block">
               <a href="/" class="nav-link" style="padding-top: 0px;">{{__("Ana Sayfa")}}</a>

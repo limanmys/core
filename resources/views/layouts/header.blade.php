@@ -3,7 +3,7 @@
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="/" class="brand-link">
-            <img id="limanLogo" src="/images/limanlogo.svg" height="20" style="opacity: .9;cursor:pointer;" title="Versiyon {{getVersion() . ' Build : ' . getVersionCode()}}">
+            <img id="limanLogo" src="{{ asset('/images/limanlogo.svg') }}" height="20" style="opacity: .9;cursor:pointer;" title="Versiyon {{getVersion() . ' Build : ' . getVersionCode()}}">
         </a>
         <!-- Sidebar -->
         <div class="sidebar">  

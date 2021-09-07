@@ -5,6 +5,6 @@
         <a href="https://liman.havelsan.com.tr/iletisim/" target="_blank" class="pl-3" style="color: #869099; border-left: 1px #eee solid;">{{ __("İletişim") }}</a>
     </div>
     <a href="https://aciklab.org" target="_blank">
-        <img src="/images/aciklab-footer.svg" alt="HAVELSAN" style="max-height: 30px; margin-top: -12px; margin-bottom: -8px;">
+        <img src="{{ asset('/images/aciklab-footer.svg') }}" alt="HAVELSAN" style="max-height: 30px; margin-top: -12px; margin-bottom: -8px;">
     </a>
 </footer>
