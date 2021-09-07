@@ -919,5 +919,7 @@
     "Giriş Ekranı Logosu": "Login Screen Logo",
     "Dosya yükleme başarısız!": "File upload failed!",
     "Dosya yükleme başarılı!": "File upload successful!",
-    "Giriş ekranının üzerinde görünmesi için kendi logonuzu ekleyebilirsiniz.": "You can add your own logo to appear above the login screen."
+    "Giriş ekranının üzerinde görünmesi için kendi logonuzu ekleyebilirsiniz.": "You can add your own logo to appear above the login screen.",
+    "Dokümantasyon": "Docs",
+    "İletişim": "Contact"
 }
