@@ -17,7 +17,7 @@
 <body class="antialiased">
     <div class="wrapper min-h-screen flex flex-col items-center justify-center w-4/12 mx-auto">
         <img class="mb-5 h-20 z-50 w-auto filter invert brightness-100 select-none" draggable="false"
-            src="/images/limanlogo.png" alt="Liman MYS">
+            src="/images/limanlogo.svg" alt="Liman MYS" style="max-height: 50px;">
         <div class="w-full bg-gray-50 rounded z-50 py-10 shadow-sm text-gray-800">
             <div class="px-7">
                 <svg class="mb-4 h-20 w-20 text-green-500 mx-auto" viewBox="0 0 20 20" fill="currentColor">  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>

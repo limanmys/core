@@ -22,13 +22,21 @@
       <div class="col-4 auth-bg">
         <div class="flex items-center justify-center" style="height: 100vh; flex-direction: column;">
           <a href="https://liman.havelsan.com.tr">
-              <img class="mx-auto h-12 w-auto" src="{{ asset('images/limanlogo.png') }}" alt="Liman MYS">
+              <img class="mx-auto h-12 w-auto" style="padding: 6px;" src="{{ asset('images/limanlogo.svg') }}" alt="Liman MYS">
             </a>
-            <h6 style="color: #fff">{{env("BRAND_NAME")}}</h6>
+            <h2 class="text-center text-2xl font-extrabold" style="width: 300px;">
+              <hr style="border-color: rgba(255,255,255,0.2)">
+            </h2>
+            <h6 style="color: #fff; font-weight: 600;">{{env("BRAND_NAME")}}</h6>
         </div>
       </div>
       <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 col-8">
         <div class="max-w-md w-full space-y-8">
+          @if (env("BRANDING") != "")
+          <div class="flex items-center justify-center w-full">
+            <img src="{{ env('BRANDING') }}" alt="{{ env('BRAND_NAME') }}" style="max-width: 200px;">
+          </div>
+          @endif
           @if ($errors->count() > 0 )
               <div class="alert alert-danger">
                   {{$errors->first()}}
@@ -43,11 +51,6 @@
               <div class="alert alert-success">
                   {{ session('status') }}
               </div>
-          @endif
-          @if (env("BRANDING") != "")
-          <div class="flex items-center justify-center w-full">
-            <img src="{{ env('BRANDING') }}" alt="{{ env('BRAND_NAME') }}" style="max-width: 200px;">
-          </div>
           @endif
           <div>
             <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -98,14 +101,12 @@
                 {{__("Giriş Yap ")}}
               </button>
             </div>
-            @if (env("BRANDING") == "")
             <div class="flex align-items-center justify-center">
               <a href="https://aciklab.org" target="_blank">
-                <img src="{{ asset('images/havelsan-aciklab_hq.png') }}" alt="HAVELSAN Açıklab"
-                   style="filter: invert(0.9); max-width: 120px;">
+                <img src="{{ asset('images/aciklab-dikey.svg') }}" alt="HAVELSAN Açıklab"
+                   style="max-width: 120px;">
               </a>
             </div>
-            @endif
           </form>
         </div>
       </div>
