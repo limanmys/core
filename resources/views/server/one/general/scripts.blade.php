@@ -237,7 +237,6 @@
             @if(server()->isLinux())
                 resourceChart('{{__("Cpu Kullanımı")}}', "cpuChart", data.time, data.cpuPercent);
                 resourceChart('{{__("Ram Kullanımı")}}', "ramChart", data.time, data.ramPercent);
-                resourceChart('{{__("Disk Kullanımı")}}', "diskChart", data.time, data.diskPercent);
                 resourceChart('{{__("Disk I/O")}}', "ioChart", data.time, data.ioPercent);
                 networkChart('{{__("Network")}}', "networkChart", data.time, data.network);
             @else
