@@ -153,7 +153,7 @@
             }
         </script>
 
-        <div class="float" onclick="addNewMonitor()" id="requestRecordButton">
+        <div class="float" style="margin-bottom: 50px;" onclick="addNewMonitor()" id="requestRecordButton">
             <i class="fas fa-plus"></i>
         </div>
         <style>

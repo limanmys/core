@@ -11109,7 +11109,7 @@ body,
   body:not(.sidebar-mini-md) .main-footer,
   body:not(.sidebar-mini-md) .main-header {
     transition: margin-left 0.3s ease-in-out;
-    margin-left: 250px;
+    margin-left: 255px;
   }
 }
 
@@ -11144,7 +11144,7 @@ body,
   .sidebar-mini-md .main-footer,
   .sidebar-mini-md .main-header {
     transition: margin-left 0.3s ease-in-out;
-    margin-left: 250px;
+    margin-left: 255px;
   }
 }
 

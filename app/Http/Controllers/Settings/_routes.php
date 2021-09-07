@@ -143,3 +143,7 @@ Route::post('/inceAyarlar/yaz', 'Settings\MainController@setLimanTweaks')
 Route::post('/dnsYaz', 'Settings\MainController@setDNSServers')
     ->middleware('admin')
     ->name('set_liman_dns_servers');
+
+Route::post('/uploadLoginLogo', 'Settings\MainController@uploadLoginLogo')
+    ->middleware('admin')
+    ->name('upload_login_logo');

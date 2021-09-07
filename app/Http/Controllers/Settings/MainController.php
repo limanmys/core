@@ -17,6 +17,8 @@ use App\Models\ServerGroup;
 use App\System\Command;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MainController extends Controller
@@ -750,5 +752,32 @@ input(type=\"imtcp\" port=\"514\")";
         } else {
             return respond("DNS Ayarları güncellenemedi!", 201);
         }
+    }
+
+    function uploadLoginLogo(Request $request) {
+        try {
+            request()->validate([
+                'photo' => 'mimes:jpeg,png|max:4096|required'
+            ]);
+        } catch (\Throwable $e) {
+            return respond("Dosya yükleme başarısız!", 201);
+        }
+        
+        $uploadedFile = $request->file('photo');
+        $filename = time() . $uploadedFile->getClientOriginalName();
+
+        try {
+            Storage::disk('local')->putFileAs(
+                'public/files/',
+                $uploadedFile,
+                $filename
+            );
+        } catch (\Throwable $e) {
+            return respond("Dosya yükleme başarısız!", 201);
+        }
+
+        setEnv(["BRANDING" => "/storage/files/" . $filename ]);
+
+        return respond("Dosya yükleme başarılı!", 200);
     }
 }

@@ -11,6 +11,6 @@
 </div>
 
 <script src="{{asset('js/xterm.min.js')}}"></script>
-<script src="/js/terminal.js"></script>
+<script src="{{ asset('/js/terminal.js') }}"></script>
 </body>
 </html>
