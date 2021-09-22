@@ -922,5 +922,6 @@
     "Giriş ekranının üzerinde görünmesi için kendi logonuzu ekleyebilirsiniz.": "You can add your own logo to appear above the login screen.",
     "Dokümantasyon": "Docs",
     "İletişim": "Contact",
-    "Bu eklenti klasörü bulunmamaktadır.": "This extension folder does not exist."
+    "Bu eklenti klasörü bulunmamaktadır.": "This extension folder does not exist.",
+    "Sayfa bulunamadı.": "Page not found."
 }

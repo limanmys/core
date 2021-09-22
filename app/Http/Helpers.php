@@ -862,7 +862,7 @@ if (!function_exists('getExtensionJson')) {
                 true
             );
         } else {
-            abort(403, __("Bu eklenti klasörü bulunmamaktadır."));
+            abort(404, __("Bu eklenti klasörü bulunmamaktadır."));
         }
     }
 }
