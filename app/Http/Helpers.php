@@ -849,15 +849,21 @@ if (!function_exists('getExtensionJson')) {
      */
     function getExtensionJson($extension_name)
     {
-        return json_decode(
-            file_get_contents(
-                "/liman/extensions/" .
-                    strtolower($extension_name) .
-                    DIRECTORY_SEPARATOR .
-                    "db.json"
-            ),
-            true
-        );
+        $extension_json = "/liman/extensions/" .
+                strtolower($extension_name) .
+                DIRECTORY_SEPARATOR .
+                "db.json";
+
+        if (file_exists($extension_json)) {
+            return json_decode(
+                file_get_contents(
+                    $extension_json
+                ),
+                true
+            );
+        } else {
+            abort(403, __("Bu eklenti klasörü bulunmamaktadır."));
+        }
     }
 }
 
