@@ -45,6 +45,10 @@ class CronEmailJob implements ShouldQueue
      */
     public function handle()
     {
+        // If not a valid e-mail address, do not run handler
+        if (!filter_var( $this->obj->to, FILTER_VALIDATE_EMAIL )) {
+            return;
+        }
         if (!$this->doubleCheckTime()) {
             return;
         }
@@ -74,8 +78,11 @@ class CronEmailJob implements ShouldQueue
 
         $encoded = base64_encode($this->obj->extension_id . "-" . $this->obj->server_id . "-" . $this->obj->target);
         $time = "awk -F'[]]|[[]'   '$0 ~ /^\[/ && $2 >= \"$before\" { p=1 } $0 ~ /^\[/ && $2 >= \"$now\" { p=0 } p { print $0 }' /liman/logs/extension.log";
-        $command = "$time | grep '" . $encoded . "' | grep '" . $this->obj->user_id . "' | wc -l";
-        $count = trim(shell_exec($command));
+        $command = Command::runLiman("{:time} | grep @{:encoded} | grep @{:user_id} | wc -l", [
+            "time" => $time,
+            "encoded" => $encoded,
+            "user_id" => $this->user->id
+        ]);        
         $subject = $this->user->name . " kullanıcısının " . __($this->obj->cron_type) . " Liman MYS Raporu";
         $view = view('email.cron_mail', [
             "user" => $this->user,
@@ -87,14 +94,19 @@ class CronEmailJob implements ShouldQueue
             "extension" => $this->extension,
             "target" => $this->getTagText($this->obj->target, $this->extension->name),
             "from" => trim(env("APP_NOTIFICATION_EMAIL")),
-            "to" => $this->obj->to
+            "to" => trim($this->obj->to)
         ])->render();
         $file = "/tmp/" . str_random(16);
         file_put_contents($file, $view);
-        $command = "curl -s -v --connect-timeout 15 \"smtp://" . trim(env("MAIL_HOST")) . ":" . trim(env("MAIL_PORT")) . "\" -u \"" .
-             trim(env("MAIL_USERNAME")) . ":" . trim(env("MAIL_PASSWORD")) . "\" --mail-from \"" . trim(env("APP_NOTIFICATION_EMAIL")) . "\" --mail-rcpt \"" .
-              $this->obj->to . "\" -T " . $file . " 2>&1";
-        $output = shell_exec($command);
+        $output = Command::runLiman("curl -s -v --connect-timeout 15 \"smtp://{:mail_host}:{:mail_port}\" -u \"{:mail_username}:{:mail_password}\" --mail-from \"{:mail_from}\" --mail-rcpt \"{:mail_receipt}\" -T {:file} 2>&1", [
+                "mail_host" => trim(env("MAIL_HOST")),
+                "mail_port" => trim(env("MAIL_PORT")),
+                "mail_username" => trim(env("MAIL_USERNAME")),
+                "mail_password" => trim(env("MAIL_PASSWORD")),
+                "mail_from" => trim(env("APP_NOTIFICATION_EMAIL")),
+                "mail_receipt" => trim($this->obj->to),
+                "file" => $file
+            ]);
         if (env("MAIL_DEBUG")) {
             echo "---BEGIN---\n$command\n$output\n---END---\n";
         }

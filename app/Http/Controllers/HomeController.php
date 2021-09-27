@@ -119,13 +119,18 @@ class HomeController extends Controller
     private function calculateNetworkBytes($download = true)
     {
         $text = $download ? 'rx_bytes' : 'tx_bytes';
-        $count = 0;
-        $raw = trim(shell_exec("cat /sys/class/net/*/statistics/$text"));
-
-        foreach (explode("\n", trim($raw)) as $data) {
-            $count += intval($data);
+        if ($text == "rx_bytes" || $text == "tx_bytes")
+        {
+            $count = 0;
+            $raw = trim(shell_exec("cat /sys/class/net/*/statistics/$text"));
+    
+            foreach (explode("\n", trim($raw)) as $data) {
+                $count += intval($data);
+            }
+            return $count;
+        } else {
+            return "Invalid data";
         }
-        return $count;
     }
 
 

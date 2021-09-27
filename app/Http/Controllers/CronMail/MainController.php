@@ -37,6 +37,9 @@ class MainController extends Controller
 
     public function addCronMail()
     {
+        if (!filter_var( request()->to, FILTER_VALIDATE_EMAIL )) {
+            return respond("Geçerli bir mail adresi giriniz.", 201);
+        }
         $obj = new CronMail(request()->all());
         $obj->last = Carbon::now()->subDecade();
         if ($obj->save()) {
