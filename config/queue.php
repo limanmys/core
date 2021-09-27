@@ -79,7 +79,7 @@ return [
     */
 
     'failed' => [
-        'database' => 'sqlite',
+        'database' => env('DB_CONNECTION', 'pgsql'),
         'table' => 'failed_jobs',
     ],
 ];
