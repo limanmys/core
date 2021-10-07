@@ -1119,7 +1119,7 @@ if (!function_exists('checkHealth')) {
         if (empty($messages)) {
             array_push($messages, [
                 "type" => "success",
-                "message" => __("Herşey Yolunda, sıkıntı yok!"),
+                "message" => __("Her şey Yolunda, sıkıntı yok!"),
             ]);
         }
 
