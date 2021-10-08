@@ -12,7 +12,8 @@ class Command
 
     public static function runSudo($command, $attributes = [], $log = true)
 	{
-		return self::run(sudo() . $command, $attributes, $log);
+		$command = trim(self::format($command, $attributes));
+		return self::run(sudo() . "bash -c 'echo {:command} | base64 -d | bash'", ["command" => base64_encode($command)], $attributes, $log);
 	}
 
 	public static function runLiman($command, $attributes = [])
