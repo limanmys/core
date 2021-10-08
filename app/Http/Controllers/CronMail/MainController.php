@@ -40,6 +40,14 @@ class MainController extends Controller
         if (!filter_var( request()->to, FILTER_VALIDATE_EMAIL )) {
             return respond("Geçerli bir mail adresi giriniz.", 201);
         }
+        validate([
+            "user_id" => "required|exists:users,id",
+            "server_id" => "required|exists:servers,id",
+            "extension_id" => "required|exists:extensions,id",
+            "target" => "required",
+            "cron_type" => "required|in:hourly,daily,weekly,monthly",
+            "to" => "required|email"
+        ]);
         $obj = new CronMail(request()->all());
         $obj->last = Carbon::now()->subDecade();
         if ($obj->save()) {

@@ -78,11 +78,11 @@ class CronEmailJob implements ShouldQueue
 
         $encoded = base64_encode($this->obj->extension_id . "-" . $this->obj->server_id . "-" . $this->obj->target);
         $time = "awk -F'[]]|[[]'   '$0 ~ /^\[/ && $2 >= \"$before\" { p=1 } $0 ~ /^\[/ && $2 >= \"$now\" { p=0 } p { print $0 }' /liman/logs/extension.log";
-        $command = Command::runLiman("{:time} | grep @{:encoded} | grep @{:user_id} | wc -l", [
+        $count = Command::runLiman(":time: | grep @{:encoded} | grep @{:user_id} | wc -l", [
             "time" => $time,
             "encoded" => $encoded,
             "user_id" => $this->user->id
-        ]);        
+        ]);
         $subject = $this->user->name . " kullanıcısının " . __($this->obj->cron_type) . " Liman MYS Raporu";
         $view = view('email.cron_mail', [
             "user" => $this->user,
@@ -108,7 +108,7 @@ class CronEmailJob implements ShouldQueue
                 "file" => $file
             ]);
         if (env("MAIL_DEBUG")) {
-            echo "---BEGIN---\n$command\n$output\n---END---\n";
+            echo "---BEGIN---\n$output\n---END---\n";
         }
         $this->obj->update([
            "last" => Carbon::now()

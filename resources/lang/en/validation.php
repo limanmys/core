@@ -157,5 +157,7 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'cron_type' => 'Report Frequency'
+    ],
 ];
