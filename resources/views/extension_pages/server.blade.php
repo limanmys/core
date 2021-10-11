@@ -125,7 +125,7 @@ pre {
         var modalElement = $("#limanRequestsModal");
         listElement.html("");
         $.each(limanRequestList, function(index, entries) {
-            listElement.append("<li onclick='showCurlCommand(this," + index + ")' class='list-group-item liman-request-item'>" + entries["target"] +"</li>")
+            listElement.append($("<li />").addClass("list-group-item liman-request-item").click([element, index], showCurlCommand).text(entries["target"]));
         });
         modalElement.modal('show');
     }
