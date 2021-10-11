@@ -505,7 +505,7 @@
     "Rol Grubunu Sil" : "Delete Role Group",
     "Sunucuları Gruplama" : "Server Groupping",
     "Sunucu Grubu Ekle" : "Add Server Group",
-    "Herşey Yolunda, sıkıntı yok!" : "Everything is fine!",
+    "Her şey Yolunda, sıkıntı yok!" : "Everything is fine!",
     "Yeni Bildirim İstemcisi Ekle" : "Add External Notification Client",
     "İp Adresi / Hostname" : "IP Address / Hostname",
     "İp Adresi bölümüne izin vermek istediğiniz bir subnet adresini ya da ip adresini yazarak erişimi kısıtlayabilirsiniz. Örneğin : 192.168.1.0/24" : "You can restrict access by typing a subnet address or IP address that you want to allow in the Ip Address section. For example: 192.168.1.0/24",

@@ -178,10 +178,7 @@ class MainController extends Controller
 
         preg_match('/[A-Za-z-]+/', $json["name"], $output);
         if (empty($output) || $output[0] != $json["name"]) {
-            return respond(
-                "Eklenti isminde yalnızca harflere izin verilmektedir.",
-                201
-            );
+            return [respond("Eklenti isminde yalnızca harflere izin verilmektedir.",201), null];
         }
 
         if (
