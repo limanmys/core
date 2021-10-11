@@ -1032,9 +1032,19 @@ if (!function_exists('setEnv')) {
         $str = file_get_contents($envFile);
 
         if (count($values) > 0) {
-            foreach ($values as $envKey => $envValue) {
+            foreach ($values as $envKey => &$envValue) {
                 $str .= "\n"; // In case the searched variable is in the last line without \n
                 $keyPosition = strpos($str, "{$envKey}=");
+
+                // if apostrophe exists, trim it
+                if (strpos($envValue, '"') !== false) {
+                    $envValue = trim($envValue, '"');
+                }
+
+                // if new value has spaces in it wrap it with apostrophe
+                if (strpos($envValue, " ") !== false) {
+                    $envValue = "\"${envValue}\"";
+                }
                 $endOfLinePosition = strpos($str, "\n", $keyPosition);
                 $oldLine = substr(
                     $str,
@@ -1059,7 +1069,6 @@ if (!function_exists('setEnv')) {
         return true;
     }
 }
-
 if (!function_exists('checkHealth')) {
     function checkHealth()
     {
