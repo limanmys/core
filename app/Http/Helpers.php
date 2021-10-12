@@ -1041,10 +1041,13 @@ if (!function_exists('setEnv')) {
                     $envValue = trim($envValue, '"');
                 }
 
-                // if new value has spaces in it wrap it with apostrophe
-                if (strpos($envValue, " ") !== false) {
-                    $envValue = "\"${envValue}\"";
+                // handle escaping characters
+                if (preg_match('/[#\s"\'\\\\]|\\\\n/', $envValue)) {
+                    $envValue = str_replace('\\', '\\\\', $envValue);
+                    $envValue = str_replace('"', '\"', $envValue);
+                    $envValue = "\"{$envValue}\"";
                 }
+
                 $endOfLinePosition = strpos($str, "\n", $keyPosition);
                 $oldLine = substr(
                     $str,
