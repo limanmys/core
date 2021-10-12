@@ -24,6 +24,7 @@ use App\System\Helper;
 use mervick\aesEverywhere\AES256;
 use phpseclib\Crypt\RSA;
 use Illuminate\Support\Facades\Validator;
+use Jackiedo\DotenvEditor\Facades\DotenvEditor;
 
 if (!function_exists('validate')) {
 	function validate($rules, $messages=[])
@@ -1028,46 +1029,9 @@ if (!function_exists('getPermissions')) {
 if (!function_exists('setEnv')) {
     function setEnv(array $values)
     {
-        $envFile = app()->environmentFilePath();
-        $str = file_get_contents($envFile);
-
-        if (count($values) > 0) {
-            foreach ($values as $envKey => &$envValue) {
-                $str .= "\n"; // In case the searched variable is in the last line without \n
-                $keyPosition = strpos($str, "{$envKey}=");
-
-                // if apostrophe exists, trim it
-                if (strpos($envValue, '"') !== false) {
-                    $envValue = trim($envValue, '"');
-                }
-
-                // handle escaping characters
-                if (preg_match('/[#\s"\'\\\\]|\\\\n/', $envValue)) {
-                    $envValue = str_replace('\\', '\\\\', $envValue);
-                    $envValue = str_replace('"', '\"', $envValue);
-                    $envValue = "\"{$envValue}\"";
-                }
-
-                $endOfLinePosition = strpos($str, "\n", $keyPosition);
-                $oldLine = substr(
-                    $str,
-                    $keyPosition,
-                    $endOfLinePosition - $keyPosition
-                );
-
-                // If key does not exist, add it
-                if (!$keyPosition || !$endOfLinePosition || !$oldLine) {
-                    $str .= "{$envKey}={$envValue}\n";
-                } else {
-                    $str = str_replace($oldLine, "{$envKey}={$envValue}", $str);
-                }
-            }
-        }
-
-        $str = substr($str, 0, -1);
-        if (!file_put_contents($envFile, $str)) {
-            return false;
-        }
+        $editor = DotenvEditor::load(base_path('.env'));
+        $editor->setKeys($values);
+        $editor->save();
         shell_exec('php /liman/server/artisan config:clear');
         return true;
     }

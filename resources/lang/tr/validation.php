@@ -181,6 +181,7 @@ return [
         'speed' => 'Önem Derecesi',
         'extension' => 'Eklenti',
         'dn' => 'DN',
-        'role_id' => 'Rol Grubu'
+        'role_id' => 'Rol Grubu',
+        'NAV_SERVER_COUNT' => 'Sol Menü Sunucu Sayısı'
     ],
 ];

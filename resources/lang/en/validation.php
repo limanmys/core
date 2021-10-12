@@ -157,5 +157,7 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'NAV_SERVER_COUNT' => 'Navigation Max Server Count',
+    ],
 ];
