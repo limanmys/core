@@ -1031,7 +1031,11 @@ if (!function_exists('setEnv')) {
     {
         $editor = DotenvEditor::load(base_path('.env'));
         $editor->setKeys($values);
-        $editor->save();
+        try{
+            $editor->save();
+        }catch(\Exception $ex){
+            return false;
+        }
         shell_exec('php /liman/server/artisan config:clear');
         return true;
     }
