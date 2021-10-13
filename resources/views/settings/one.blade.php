@@ -135,12 +135,16 @@
                     <button onclick="removeFunctions()" class="btn btn-danger"><i data-toggle="tooltip" title="{{ __('Kaldır') }}" class="fa fa-minus"></i></button><br><br>
                     @include('table',[
                         "id" => "extensionFunctions",
-                        "value" => $user->permissions->where('type','function'),
+                        "value" => $user->permissions->where('type','function')->map(function ($item){
+                            $function = getExtensionFunctions($item->value)->where('name', $item->extra)->first();
+                            $item->description = isset($function['description']) ? extensionTranslate($function['description'], $item->value) : '';
+                            return $item;
+                        }),
                         "title" => [
-                            "Fonksiyon Adı" , "Eklenti" , "*hidden*"
+                            "Açıklama", "Fonksiyon Adı" , "Eklenti" , "*hidden*"
                         ],
                         "display" => [
-                            "extra" , "value", "id:id"
+                            "description", "extra" , "value", "id:id"
                         ],
                         "menu" => [
                             "Yetki Verilerini Düzenle" => [
@@ -331,7 +335,7 @@
             var data = [];
             var table = $('#extensionFunctions').DataTable();
             table.rows( { selected: true } ).data().each(function(element){
-                data.push(element[3]);
+                data.push(element[4]);
             });
             if(data.length == 0){
                 showSwal("{{__('Lütfen önce seçim yapınız.')}}",'error',2000);

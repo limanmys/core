@@ -1026,6 +1026,43 @@ if (!function_exists('getPermissions')) {
         return substr(sprintf("%o", fileperms($path)), -4);
     }
 }
+
+if (!function_exists('getExtensionFunctions')) {
+    function getExtensionFunctions(string $extension_name)
+    {
+        $extension = json_decode(
+            file_get_contents(
+                "/liman/extensions/" .
+                strtolower($extension_name) .
+                DIRECTORY_SEPARATOR .
+                "db.json"
+            ),
+            true
+        );
+        return isset($extension["functions"])
+            ? collect($extension["functions"])
+            : [];
+    }
+}
+
+if (!function_exists('extensionTranslate')) {
+    function extensionTranslate(string $text, string $extension_name)
+    {
+        $lang = session('locale');
+        $file =
+            "/liman/extensions/" .
+            strtolower($extension_name) .
+            "/lang/" .
+            $lang .
+            ".json";
+        if(is_file($file)){
+            $lang = json_decode(file_get_contents($file), true);
+            return isset($lang[$text]) ? $lang[$text] : $text;
+        }
+        return $text;
+    }
+}
+
 if (!function_exists('setEnv')) {
     function setEnv(array $values)
     {
