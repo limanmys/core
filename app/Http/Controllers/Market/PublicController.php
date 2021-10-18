@@ -205,7 +205,7 @@ class PublicController extends Controller
 
             $str = $headers["content-disposition"][0];
             $arr = explode(";",$str);
-            $extension = substr($arr[1],-7) == 'signed"' ? ".signed" : ".zip";
+            $extension = substr($arr[1],-7) == '.signed' ? ".signed" : ".zip";
         } 
         catch (\Throwable $e) 
         {
@@ -223,7 +223,7 @@ class PublicController extends Controller
         ) {
             $verify = Command::runLiman(
                 "gpg --verify --status-fd 1 @{:extension} | grep GOODSIG || echo 0",
-                ['extension' => request()->file('extension')->path()]
+                ['extension' => $zipFile]
             );
             if (!(bool) $verify) {
                 return respond("Eklenti dosyanız doğrulanamadı.", 201);
@@ -231,8 +231,8 @@ class PublicController extends Controller
             $decrypt = Command::runLiman(
                 "gpg --status-fd 1 -d -o '/tmp/{:originalName}' @{:extension} | grep FAILURE > /dev/null && echo 0 || echo 1",
                 [
-                    'originalName' => $request->package_name,
-                    'extension' => $request->package_name . ".zip"
+                    'originalName' => $request->package_name . ".zip",
+                    'extension' => $zipFile
                 ]
             );
             if (!(bool) $decrypt) {
