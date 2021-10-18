@@ -78,6 +78,27 @@ class CronEmailJob implements ShouldQueue
 
         $encoded = base64_encode($this->obj->extension_id . "-" . $this->obj->server_id . "-" . $this->obj->target);
         $time = "awk -F'[]]|[[]'   '$0 ~ /^\[/ && $2 >= \"$before\" { p=1 } $0 ~ /^\[/ && $2 >= \"$now\" { p=0 } p { print $0 }' /liman/logs/extension.log";
+
+        $output = Command::runLiman(":time: | grep @{:encoded} | grep @{:user_id}", [
+            "time" => $time,
+            "encoded" => $encoded,
+            "user_id" => $this->user->id
+        ]);
+
+        $data = [];
+        if(!empty($output)){
+            foreach(explode("\n", trim($output)) as $row){
+                $fetch = explode("liman_render:", $row);
+                if(isset($fetch[1])){
+                    $message = json_decode(trim($fetch[1]));
+                    if($message && isset($message->data)){
+                        $decoded = json_decode($message->data);
+                        $decoded && $data[] = $decoded;
+                    }
+                }
+            } 
+        }
+        
         $count = Command::runLiman(":time: | grep @{:encoded} | grep @{:user_id} | wc -l", [
             "time" => $time,
             "encoded" => $encoded,
@@ -88,6 +109,7 @@ class CronEmailJob implements ShouldQueue
             "user" => $this->user,
             "subject" => $subject,
             "result" => $count,
+            "data" => $data,
             "before" => $before,
             "now" => $now,
             "server" => $this->server,
@@ -99,14 +121,14 @@ class CronEmailJob implements ShouldQueue
         $file = "/tmp/" . str_random(16);
         file_put_contents($file, $view);
         $output = Command::runLiman("curl -s -v --connect-timeout 15 \"smtp://{:mail_host}:{:mail_port}\" -u \"{:mail_username}:{:mail_password}\" --mail-from \"{:mail_from}\" --mail-rcpt \"{:mail_receipt}\" -T {:file} 2>&1", [
-                "mail_host" => trim(env("MAIL_HOST")),
-                "mail_port" => trim(env("MAIL_PORT")),
-                "mail_username" => trim(env("MAIL_USERNAME")),
-                "mail_password" => trim(env("MAIL_PASSWORD")),
-                "mail_from" => trim(env("APP_NOTIFICATION_EMAIL")),
-                "mail_receipt" => trim($this->obj->to),
-                "file" => $file
-            ]);
+            "mail_host" => trim(env("MAIL_HOST")),
+            "mail_port" => trim(env("MAIL_PORT")),
+            "mail_username" => trim(env("MAIL_USERNAME")),
+            "mail_password" => trim(env("MAIL_PASSWORD")),
+            "mail_from" => trim(env("APP_NOTIFICATION_EMAIL")),
+            "mail_receipt" => trim($this->obj->to),
+            "file" => $file
+        ]);
         if (env("MAIL_DEBUG")) {
             echo "---BEGIN---\n$output\n---END---\n";
         }
