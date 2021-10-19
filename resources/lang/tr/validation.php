@@ -182,6 +182,7 @@ return [
         'extension' => 'Eklenti',
         'dn' => 'DN',
         'role_id' => 'Rol Grubu',
-        'cron_type' => 'Rapor Süresi'
+        'cron_type' => 'Rapor Süresi',
+        'to.*' => 'Email'
     ],
 ];

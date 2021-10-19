@@ -158,6 +158,7 @@ return [
     */
 
     'attributes' => [
-        'cron_type' => 'Report Frequency'
+        'cron_type' => 'Report Frequency',
+        'to.*' => 'Email'
     ],
 ];
