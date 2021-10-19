@@ -104,10 +104,9 @@ class CronEmailJob implements ShouldQueue
             "encoded" => $encoded,
             "user_id" => $this->user->id
         ]);
-        $subject = $this->user->name . " kullanıcısının " . __($this->obj->cron_type) . " Liman MYS Raporu";
         $view = view('email.cron_mail', [
             "user" => $this->user,
-            "subject" => $subject,
+            "subject" => "Liman MYS Bilgilendirme",
             "result" => $count,
             "data" => $data,
             "before" => $before,
