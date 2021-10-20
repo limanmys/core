@@ -105,12 +105,11 @@ class CronEmailJob implements ShouldQueue
                     "encoded" => $encoded,
                     "user_id" => $user->id
                 ]);
-    
-                if ((int) $count == 0 && ($target == "GROUP_ADD" || $target == "GROUP_REMOVE")) {
-                    continue;
-                }
-    
+        
                 foreach ($this->to as $to) {
+                    if ((int) $count == 0) {
+                        continue;
+                    }
                     $view = view('email.cron_mail', [
                         "user_name" => $user->name,
                         "subject" => "Liman MYS Bilgilendirme",
