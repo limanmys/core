@@ -30,7 +30,7 @@
             <label>{{__("Eklenti")}}</label>
             <select class="form-control" id="extension_id" disabled onchange="getCronMailTags()" required name="extension_id"></select><br>
             <label>{{__("Mail Ayarı")}}</label>
-            <select class="form-control" id="target" disabled="" name="target"></select><br>
+            <select class="form-control select2" id="target" disabled="" name="target[]" multiple="multiple" data-placeholder="{{ __("Hedef fonksiyon seçiniz.") }}"></select><br>
             <label>{{__("Rapor Süresi")}}</label>
             <select class="form-control" id="cron_type" name="cron_type">
                 <option value="hourly">{{__("Saatlik")}}</option>
@@ -89,7 +89,7 @@
     }
 
     function widget_control(element){
-        if(!$(element).find('select[name=target]').val()){
+        if(!$(element).find('select#target').val()){
             showSwal("{{_("Önce bir widget seçmelisiniz!")}}",'error',2000);
             return false;
         }

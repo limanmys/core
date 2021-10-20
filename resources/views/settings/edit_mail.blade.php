@@ -30,7 +30,7 @@
             <label>{{__("Eklenti")}}</label>
             <select class="form-control" id="extension_id" disabled onchange="getCronMailTags()" required name="extension_id"></select><br>
             <label>{{__("Mail Ayarı")}}</label>
-            <select class="form-control" id="target" disabled="" name="target"></select><br>
+            <select class="form-control select2" id="target" disabled="" name="target[]" multiple="multiple" data-placeholder="{{ __("Hedef fonksiyon seçiniz.") }}"></select><br>
             <label>{{__("Rapor Süresi")}}</label>
             <select class="form-control" id="cron_type" name="cron_type">
                 <option value="hourly" @if($cron_mail->cron_type == 'hourly') selected @endif>{{ __("Saatlik") }}</option>
@@ -74,6 +74,12 @@
         });
     }
 
+    function decodeEntities(encodedString) {
+        var textArea = document.createElement('textarea');
+        textArea.innerHTML = encodedString;
+        return textArea.value;
+    }
+
     function getCronMailTags(){
         $("#target").text('');
         var form = new FormData();
@@ -82,8 +88,14 @@
             let json = JSON.parse(response);
             let element = $("#target");
             element.text('');
+            let selected_items = JSON.parse(decodeEntities("{{ $cron_mail->target }}"));
             $.each(json.message, function( index, value ) {
-                element.append('<option value="'+ value["tag"] +'" '+((value["tag"] == '{{ $cron_mail->target }}') ? 'selected' : '')+'>' + value["description"] + '</option>');
+                element.append('<option value="'+ value["tag"] +'">' + value["description"] + '</option>');
+                $.each(selected_items, function (idx, val) {
+                    if (value["tag"] == val) {
+                        $(element).find(`option[value=${value["tag"]}]`).attr("selected", "selected");
+                    }
+                })
             });
             element.removeAttr('disabled');
         }, function(response){
@@ -93,7 +105,7 @@
     }
 
     function widget_control(element){
-        if(!$(element).find('select[name=target]').val()){
+        if(!$(element).find('select#target').val()){
             showSwal("{{_("Önce bir widget seçmelisiniz!")}}",'error',2000);
             return false;
         }

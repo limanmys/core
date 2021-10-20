@@ -51,6 +51,7 @@ class MainController extends Controller
         $request = request()->all();
         $request["user_id"] = json_encode($request["user_id"]);
         $request["to"] = json_encode($request["to"]);
+        $request["target"] = json_encode($request["target"]);
         $request["last"] = Carbon::now()->subDecade();
 
         $cron_mail = CronMail::create($request);
@@ -106,7 +107,11 @@ class MainController extends Controller
             $ext = Extension::find($obj->extension_id);
             if ($ext) {
                 $obj->extension_name = $ext->display_name;
-                $obj->tag_string = $this->getTagText($obj->target, $ext->name);
+                $target_list = json_decode($obj->target);
+                foreach ($target_list as &$target) {
+                    $target = $this->getTagText($target, $ext->name);
+                }
+                $obj->tag_string = implode(", ", $target_list);
             } else {
                 $obj->extension_name = "Bu eklenti silinmiş!";
                 $obj->tag_string = "Bu eklenti silinmiş!";
@@ -176,8 +181,9 @@ class MainController extends Controller
         $users = User::find($users);
 
         $to = json_decode($cron_mail->to);
+        $target = json_decode($cron_mail->target);
 
-        return view("settings.edit_mail", compact(['cron_mail', 'users', 'to']));
+        return view("settings.edit_mail", compact(['cron_mail', 'users', 'to', 'target']));
     }
 
     public function edit()
