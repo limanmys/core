@@ -1,3 +1,3 @@
-<h3>{{$notification->title}}</h3>
+<h3>{{ __("Liman MYS Bilgilendirme") }}</h3>
 
 <pre>{{$notification->message}}</pre>
