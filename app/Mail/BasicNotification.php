@@ -32,6 +32,7 @@ class BasicNotification extends Mailable
         return $this->from([
             "address" => env('APP_NOTIFICATION_EMAIL'),
             "name" => __("Liman Bildiri Sistemi"),
+            "subject" => __("Liman MYS Bilgilendirme")
         ])->view('email.external_notification');
     }
 }
