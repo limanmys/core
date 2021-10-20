@@ -104,8 +104,11 @@ class CronEmailJob implements ShouldQueue
                 "user_id" => $user->id
             ]);
 
-            foreach ($this->to as $to) {
+            if ((int) $count == 0) {
+                continue;
+            }
 
+            foreach ($this->to as $to) {
                 $view = view('email.cron_mail', [
                     "user_name" => $user->name,
                     "subject" => "Liman MYS Bilgilendirme",
