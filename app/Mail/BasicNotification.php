@@ -11,7 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class BasicNotification extends Mailable
 {
     use Queueable, SerializesModels;
-    public $user, $notification;
+    public $user, $notification, $subject;
     /**
      * Create a new message instance.
      *
@@ -20,6 +20,7 @@ class BasicNotification extends Mailable
     public function __construct(AdminNotification $notification)
     {
         $this->notification = $notification;
+        $this->subject = __("Liman MYS Bilgilendirme");
     }
 
     /**
@@ -31,8 +32,7 @@ class BasicNotification extends Mailable
     {
         return $this->from([
             "address" => env('APP_NOTIFICATION_EMAIL'),
-            "name" => __("Liman Bildiri Sistemi"),
-            "subject" => __("Liman MYS Bilgilendirme")
+            "name" => __("Liman Bildiri Sistemi")
         ])->view('email.external_notification');
     }
 }

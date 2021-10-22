@@ -1,9 +1,9 @@
 <div style="font-family: sans-serif; display: block; margin: auto; max-width: 900px;" class="main">
     <p>Merhaba,</p><br>
-    <pre>{{$notification->message}}</pre><br><br>
+    <pre>{{ $notification->message }}</pre><br>
     <p>Bilginize.</p>
     <br><br>
-    <p>Bu email <a href="https://liman.dev">Liman MYS</a> <b>dış bildirim servisi</b> tarafından oluşturulmuştur.</p>
+    <p>Bu email <a href="https://liman.dev">Liman MYS</a> dış bildirim sisteminde <b>{{ explode("->", $notification->title)[1] ? explode("->", $notification->title)[1] : 'Liman' }}</b> tarafından oluşturulmuştur.</p>
 </div>
 
 <style>

@@ -133,7 +133,7 @@ class ExternalNotificationController extends Controller
         }
 
         AdminNotification::create([
-            "title" => __("Dış Bildirim -> ") . $request->get('title'),,
+            "title" => __("Dış Bildirim -> ") . $request->get('title'),
             "type" => "external_notification",
             "message" => $request->get('message'),
             "level" => 3,
