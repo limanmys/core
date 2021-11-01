@@ -150,9 +150,9 @@
     "daha az...": "less...",
     "Ayarlar": "Settings",
     "Destek Al": "Get Support",
-    "Son Giriş Tarihi : ": "Last Login Date : ",
-    "Giriş Yapılan Son Ip : ": "The last IP address logged in : ",
-    "Bağlı Liman : ": "Connected Liman : ",
+    "Son Giriş Tarihi: ": "Last Login Date: ",
+    "Giriş Yapılan Son IP: ": "The last IP address logged in: ",
+    "Bağlı Liman: ": "Connected Liman: ",
     "Liman ID: ": "Liman ID: ",
     "Sağlık Kontrolü": "Health check",
     " kullanıcısı ayarları": " user settings",
@@ -924,5 +924,6 @@
     "İletişim": "Contact",
     "Bu eklenti klasörü bulunmamaktadır.": "This extension folder does not exist.",
     "Sayfa bulunamadı.": "Page not found.",
-    "Dış Bildirim -> ": "External Notification -> "
+    "Dış Bildirim -> ": "External Notification -> ",
+    "Liman ID Kopyala": "Copy Liman ID"
 }
