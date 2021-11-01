@@ -568,7 +568,7 @@ class MainController extends Controller
 \\\$InputRunFileMonitor
 \\\$InputFilePersistStateInterval 1000
 ";
-        Command::runLiman("sudo bash -c 'echo @{:text} > /etc/rsyslog.d/liman.conf'", [
+        Command::runLiman("echo @{:text} > /etc/rsyslog.d/liman.conf", [
             'text' => $text
         ]);
 

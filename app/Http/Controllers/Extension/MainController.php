@@ -161,7 +161,11 @@ class MainController extends Controller
         // Determine a random tmp folder to extract files
         $path = '/tmp/' . Str::random();
         // Extract Zip to the Temp Folder.
-        $zip->extractTo($path);
+        try {
+            $zip->extractTo($path);
+        }catch(\Exception $ex){
+            return [respond("Eklenti Dosyası Açılamıyor.", 201), null];
+        }
 
         if (count(scandir($path)) == 3) {
             $path = $path . '/' . scandir($path)[2];
@@ -174,10 +178,7 @@ class MainController extends Controller
 
         preg_match('/[A-Za-z-]+/', $json["name"], $output);
         if (empty($output) || $output[0] != $json["name"]) {
-            return respond(
-                "Eklenti isminde yalnızca harflere izin verilmektedir.",
-                201
-            );
+            return [respond("Eklenti isminde yalnızca harflere izin verilmektedir.",201), null];
         }
 
         if (

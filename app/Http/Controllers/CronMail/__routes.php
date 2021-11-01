@@ -29,3 +29,13 @@ Route::get(
     '/mail/ekle',
     'CronMail\MainController@getView'
 )->name('cron_mail_add_page')->middleware("admin");
+
+Route::get(
+    '/mail/edit/{id}',
+    'CronMail\MainController@editView'
+)->name('cron_mail_edit_page')->middleware("admin");
+
+Route::post(
+    '/mail/edit/{id}',
+    'CronMail\MainController@edit'
+)->name('cron_mail_edit')->middleware("admin");

@@ -99,7 +99,7 @@ class ExtensionUpdaterJob implements ShouldQueue
 
             $str = $headers["content-disposition"][0];
             $arr = explode(";",$str);
-            if (substr($arr[1],-7) == 'signed"') {
+            if (substr($arr[1],-7) == '.signed') {
                 $this->signed = true;
             }
         }catch(\Exception $e){

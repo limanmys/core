@@ -3,25 +3,19 @@
     "id" => "cronMailsTable",
     "value" => $cronMails,
     "title" => [
-        "Takip Edilecek Kullanıcı" , "Sunucu", "Eklenti", "Özellik", "*hidden*"
+        "Takip Edilecek Kullanıcı", "Gönderilecek Mail", "Sunucu", "Eklenti", "Özellik", "*hidden*"
     ],
     "display" => [
-        "username" , "server_name", "extension_name", "tag_string" , "id:cron_id"
-    ],
-    "menu" => [
-        "Düzenle" => [
-            "target" => "editCronMail",
-            "icon" => " context-menu-icon-edit"
-        ],
-        "Sil" => [
-            "target" => "deleteCronMail",
-            "icon" => " context-menu-icon-delete"
-        ]
+        "username", "to", "server_name", "extension_name", "tag_string" , "id:cron_id"
     ],
     "menu" => [
         "Şimdi Gönder" => [
             "target" => "sendCronMail",
             "icon" => "fa-paper-plane"
+        ],
+        "Düzenle" => [
+            "target" => "editCronMail",
+            "icon" => " context-menu-icon-edit"
         ],
         "Sil" => [
             "target" => "removeCronMail",
@@ -64,3 +58,12 @@
     ],
 ])
 @endcomponent
+
+<script>
+    function editCronMail(node)
+    {
+        let id = $(node).find("#cron_id").html();
+
+        location.href = `/mail/edit/${id}`;
+    }
+</script>
