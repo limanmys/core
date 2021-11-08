@@ -1,4 +1,4 @@
-# Liman Core
+# Liman Core Example Fork
 
 Liman Core allows you to centrally manage all servers in your IT processes remotely, with stable and secure. You can improve the features with expandable extensions and modules.
 
