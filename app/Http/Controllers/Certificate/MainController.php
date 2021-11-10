@@ -35,6 +35,18 @@ class MainController extends Controller
             );
         }
 
+        list($flag, $message) = retrieveCertificate(
+            request('hostname'),
+            request('port')
+        );
+
+        if (!$flag) {
+            return respond(
+                $message,
+                201
+            );
+        }
+
         // Create Certificate Object.
         $certificate = Certificate::create([
             "server_hostname" => strtolower(request('server_hostname')),

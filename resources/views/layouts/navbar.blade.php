@@ -2,7 +2,7 @@
 <nav class="main-header navbar navbar-expand navbar-dark" style="margin-left:0px;height:58.86px;border:0px;">
 <ul class="navbar-nav"  style="line-height:60px;">
         <a href="/" class="brand-link">
-            <img src="/images/limanlogo.png" height="30" style="opacity: .8;cursor:pointer;" title="Versiyon {{getVersion()}}">
+            <img src="{{ asset('/images/limanlogo.svg') }}" height="30" style="opacity: .8;cursor:pointer;" title="Versiyon {{getVersion()}}">
         </a>
 <li class="nav-item d-none d-sm-inline-block">
               <a href="/" class="nav-link" style="padding-top: 0px;">{{__("Ana Sayfa")}}</a>
@@ -14,7 +14,7 @@
               <a href="mailto:{{env('APP_NOTIFICATION_EMAIL')}}?subject={{env('BRAND_NAME')}} {{extension()->display_name}} {{extension()->version}}" class="nav-link" style="padding-top: 0px;">{{__("Destek Al")}}</a>
             </li>
 @else
-<nav class="main-header navbar navbar-expand navbar-dark" style="height:58.86px;border:0px;"> <!-- exactly 58.86 :) -->
+<nav class="main-header navbar navbar-expand navbar-dark" style="height:58.86px;border:0px;">
     <ul class="navbar-nav">
           <li class="nav-item">
             <a class="nav-link" data-toggle="tooltip" title="{{ __('Menüyü gizle') }}" data-widget="pushmenu" href="#" onclick="collapseNav()"><i class="fas fa-bars"></i></a>
@@ -29,15 +29,9 @@
             }
 
             function collapseNav(){
-              $("#limanLogo").toggleClass("specialLogoMargin");
               request('{{route('set_collapse')}}',new FormData(),null);
             }
           </script>
-          <style>
-            .specialLogoMargin{
-              margin-left: -0.75rem;
-            }
-          </style>
           <li class="nav-item d-none d-md-block">
             <a href="/takip" class="nav-link" data-toggle="tooltip" title="{{ __('Sunucu Takibi') }}">
               <i class="nav-icon fas fa-grip-horizontal"></i>
@@ -100,10 +94,10 @@
                     <div class="card card-widget widget-user-2" style="margin-bottom: 0px;">
                         <div class="widget-user-header bg-secondary" style="color:white">
                           <h3 class="widget-user-username" style="margin-left: 0px;" title="{{ user()->name, 20 }}">{{ str_limit(user()->name, 20)}}</h3>
-                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Son Giriş Tarihi : ") . \Carbon\Carbon::parse(user()->last_login_at)->isoFormat('LL')}}</h5>
-                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Giriş Yapılan Son Ip : ") . user()->last_login_ip}}</h5>
-                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Bağlı Liman : ") . getLimanHostname()}}</h5>
-                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 11px;">{{__("Liman ID: ") . getLimanId()}}</h5>
+                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Son Giriş Tarihi: ") . \Carbon\Carbon::parse(user()->last_login_at)->isoFormat('LL')}}</h5>
+                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Giriş Yapılan Son IP: ") . user()->last_login_ip}}</h5>
+                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Bağlı Liman: ") . getLimanHostname()}}</h5>
+                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 11px;">{{__("Liman ID: ")}} <span id="liman-id">{{ getLimanId() }}</span> <i data-toggle="tooltip" data-original-title="{{ __("Liman ID Kopyala") }}" id="copy-liman-id" class="far fa-copy fa-lg ml-1" onclick="copyToClipboard('liman-id')"></i></h5>
                         </div>
                         <div class="card-footer p-0">
                           <ul class="nav flex-column" style="cursor:pointer;">

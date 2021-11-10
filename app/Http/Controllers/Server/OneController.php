@@ -510,7 +510,7 @@ class OneController extends Controller
         if ($user_password !== $user_password_confirmation) {
             return respond("Şifreler uyuşmuyor!", 201);
         }
-        $output = Command::runSudo("bash -c 'useradd --no-user-group -p $(openssl passwd -1 {:user_password}) {:user_name} -s \"/bin/bash\"' &> /dev/null && echo 1 || echo 0", [
+        $output = Command::runSudo("useradd --no-user-group -p $(openssl passwd -1 {:user_password}) {:user_name} -s \"/bin/bash\" &> /dev/null && echo 1 || echo 0", [
             'user_password' => $user_password,
             'user_name' => $user_name
         ]);
@@ -629,7 +629,7 @@ class OneController extends Controller
             return respond("Bu isimde bir kullanıcı zaten ekli!", 201);
         }
         $output = Command::runSudo(
-            "bash -c 'echo \"{:name} ALL=(ALL:ALL) ALL\" | tee /etc/sudoers.d/{:name}' &> /dev/null && echo 1 || echo 0",
+            "echo \"{:name} ALL=(ALL:ALL) ALL\" | tee /etc/sudoers.d/{:name} &> /dev/null && echo 1 || echo 0",
             [
                 'name' => $name
             ]
@@ -645,7 +645,7 @@ class OneController extends Controller
         $name = request("name");
         $name = str_replace(" ", "\\x20", $name);
         $output = Command::runSudo(
-            "bash -c 'if [ -f \"/etc/sudoers.d/{:name}\" ]; then rm /etc/sudoers.d/{:name} && echo 1 || echo 0; else echo 0; fi'",
+            "if [ -f \"/etc/sudoers.d/{:name}\" ]; then rm /etc/sudoers.d/{:name} && echo 1 || echo 0; else echo 0; fi",
             [
                 'name' => $name
             ]
@@ -863,7 +863,7 @@ class OneController extends Controller
         if (server()->isLinux()) {
             $package = request("package_name");
             $raw = Command::runSudo(
-                "bash -c 'DEBIAN_FRONTEND=noninteractive apt install @{:package} -qqy >\"/tmp/{:packageBase}.txt\" 2>&1 & disown && echo \$!'", 
+                "DEBIAN_FRONTEND=noninteractive apt install @{:package} -qqy >\"/tmp/{:packageBase}.txt\" 2>&1 & disown && echo \$!", 
                 [
                     'packageBase' => basename($package),
                     'package' => $package

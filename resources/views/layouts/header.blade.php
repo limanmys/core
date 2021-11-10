@@ -3,7 +3,7 @@
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="/" class="brand-link">
-            <img id="limanLogo" src="/images/limanlogo_hq.png" height="20" style="opacity: .8;cursor:pointer;" title="Versiyon {{getVersion() . ' Build : ' . getVersionCode()}}">
+            <img id="limanLogo" src="{{ asset('/images/limanlogo.svg') }}" height="20" style="opacity: .9;cursor:pointer;" title="Versiyon {{getVersion() . ' Build : ' . getVersionCode()}}">
         </a>
         <!-- Sidebar -->
         <div class="sidebar">  
@@ -20,7 +20,7 @@
           <!-- Sidebar Menu -->
           <nav>
             <ul id="liman-sidebar" class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                @if(count($SERVERS))
+                @if(count($SERVERS) + count($USER_FAVORITES))
                 <li class="nav-header">{{__("Sunucular")}}</li>
                 @endif
                 @foreach ($USER_FAVORITES as $server)
@@ -76,7 +76,7 @@
                         @endforeach
                     </ul>
                 @endforeach
-                @if(count($SERVERS) > 0) 
+                @if(count($SERVERS) + count($USER_FAVORITES) > 0) 
                 <li class="nav-item">
                 <a href='/sunucular' class="nav-link">
                     <i class="nav-icon fas fa-ellipsis-h"></i>

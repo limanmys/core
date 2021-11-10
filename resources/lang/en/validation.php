@@ -157,5 +157,9 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'NAV_SERVER_COUNT' => 'Navigation Max Server Count',
+        'cron_type' => 'Report Frequency',
+        'to.*' => 'Email'
+    ],
 ];

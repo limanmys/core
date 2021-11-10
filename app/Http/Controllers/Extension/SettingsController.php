@@ -96,8 +96,15 @@ class SettingsController extends Controller
         );
 
         if (request('type') == "general") {
-            $params = request()->all();
-            extension()->update($params);
+            extension()->update(request()->only([
+                'icon',
+                'support',
+                'version',
+                'service',
+                'require_key',
+                'sslPorts',
+                'supportedLiman'
+            ]));
             $extension["icon"] = request("icon");
             $extension["service"] = request("service");
             $extension["version"] = request("version");

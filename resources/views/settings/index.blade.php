@@ -7,414 +7,420 @@
             <li class="breadcrumb-item active" aria-current="page">{{__("Sistem Ayarları")}}</li>
         </ol>
     </nav>
-    <div class="card">
-        <div class="card-header p-2">
-            <ul class="nav nav-tabs" role="tabpanel">
-                <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="#users" aria-selected="true">{{__("Kullanıcı Ayarları")}}</a>
-                </li>
-                <li class="nav-item">
-                    <a id="extensionNavLink" class="nav-link" data-toggle="tab" href="#extensions" aria-selected="true">{{__("Eklentiler")}} @if(is_file(storage_path("extension_updates"))) <span style="color:green" class="blinking">*</span> @endif</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#roles" onclick="getRoleList()" aria-selected="true">{{__("Rol Grupları")}}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#serverGroups" aria-selected="true">{{__("Sunucu Grupları")}}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#certificates" >{{__("Sertifikalar")}}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#health" onclick="checkHealth()">{{__("Sağlık Durumu")}}</a>
-                </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#update">{{__("Güncelleme")}}</a>
-                </li> -->
-                <!-- <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#changeLog">{{__("Son Değişiklikler")}}</a>
-                </li> -->
-                <!-- <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#rsyslog" onclick="readLogs()">{{__("Log Yönetimi")}}</a>
-                </li> -->
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#externalNotifications" onclick="">{{__("Dış Bildirimler")}}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#restrictedMode" onclick="">{{__("Kısıtlı Mod")}}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#limanMarket" onclick="checkMarketAccess()">{{__("Liman Market")}}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#dnsSettings" onclick="getDNS()">{{__("DNS Ayarları")}}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#mailSettings" onclick="getCronMails()">{{__("Mail Ayarları")}}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#limanTweaks" onclick="getLimanTweaks()">{{__("İnce Ayarlar")}}</a>
-                </li>
-                {!! settingsModuleButtons() !!}
-            </ul>
-        </div>
-        <div class="card-body">
-            @include('errors')
-            <div class="tab-content">
-                <div class="tab-pane fade show active" id="users" role="tabpanel">
-                    @include('modal-button',[
-                        "class" => "btn-success",
-                        "target_id" => "add_user",
-                        "text" => "Kullanıcı Ekle"
-                    ])<br><br>
-                    <div id="usersTable">
-                        @include('table',[
-                            "value" => \App\User::all(),
-                            "title" => [
-                                "İsim Soyisim", "Kullanıcı Adı", "Email", "*hidden*" ,
-                            ],
-                            "display" => [
-                                "name", "username", "email", "id:user_id" ,
-                            ],
-                            "menu" => [
-                                "Parolayı Sıfırla" => [
-                                    "target" => "passwordReset",
-                                    "icon" => "fa-lock"
-                                ],
-                                "Sil" => [
-                                    "target" => "deleteUser",
-                                    "icon" => " context-menu-icon-delete"
-                                ]
-                            ],
-                            "onclick" => "userDetails"
-                        ])
-                    </div>
-                </div>
-                <div class="tab-pane fade show" id="roles" role="tabpanel">
-                    @include('modal-button',[
-                        "class" => "btn-success",
-                        "target_id" => "add_role",
-                        "text" => "Rol Grubu Ekle"
-                    ])<br><br>
-                    <div id="rolesTable">
-
-                    </div>
-                </div>
-                <div class="tab-pane fade show" id="certificates" role="tabpanel">
-                    <button class="btn btn-success" onclick="window.location.href = '{{route('certificate_add_page')}}'"><i
-                        class="fa fa-plus"></i> {{__("Sertifika Ekle")}}</button>
-                    <br><br>
-                    @include('table',[
-                        "value" => \App\Models\Certificate::all(),
-                        "title" => [
-                            "Sunucu Adresi" , "Servis" , "*hidden*" ,
-                        ],
-                        "display" => [
-                            "server_hostname" , "origin", "id:certificate_id" ,
-                        ],
-                        "menu" => [
-                            "Güncelle" => [
-                                "target" => "updateCertificate",
-                                "icon" => "fa-sync-alt"
-                            ],
-                            "Sil" => [
-                                "target" => "deleteCertificate",
-                                "icon" => " context-menu-icon-delete"
-                            ]
-                        ],
-                    ])
-                </div>
-                <div class="tab-pane fade show" id="health" role="tabpanel">
-                    <pre id="output"></pre>
-                </div>
-                <div class="tab-pane fade show" id="extensions" role="tabpanel">
-                    @include('extension_pages.manager')
-                </div>
-                <div class="tab-pane fade show" id="limanMarket" role="tabpanel">
-                    <div id="marketStatus" class="alert alert-secondary" role="alert">
-
-                    </div>
-                    <div id="marketLoading">
-                        <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
-                    </div>
-                    <div id="marketEnabled" style="display:none;">
-                    <div id="marketTableWrapper">
-                        @include('table',[
-                            "id" => "marketTable",
-                            "value" => [],
-                            "title" => [
-                                "Sistem Adı" , "Mevcut Versiyon", "Durumu"
-                            ],
-                            "display" => [
-                                "packageName" , "currentVersion", "status"
-                            ],
-                        ])
-                    </div>
-
-                    </div>
-                    <div id="marketDisabled" style="display:none">
-                        <p>{{__("Liman kurulumunuzu Liman Market'e bağlayarak sistemdeki tüm güncellemeleri takip edebilir, güncellemeleri indirebilirsiniz.")}}</p>
-                        <button type="button" class="btn btn-primary btn-lg" onclick="location.href = '{{route('redirect_market')}}'">{{__("Liman Market'i Bağla")}}</button>
-                    </div>
-                    <script>
-                        function checkMarketAccess(){
-                            var status = $("#marketStatus");
-                            $("#marketTableWrapper").fadeOut(0);
-                            status.html("{{__('Market bağlantısı kontrol ediliyor...')}}");
-                            status.attr("class","alert alert-secondary");
-                            request("{{route('verify_market')}}",new FormData(),function(success){
-                                var json = JSON.parse(success);
-                                $("#marketLoading").fadeOut(0);
-                                $("#marketDisabled").fadeOut(0);
-                                $("#marketEnabled").fadeIn();
-                                status.html(json.message);
-                                status.attr("class","alert alert-success");
-                                setTimeout(() => {
-                                    checkMarketUpdates();
-                                }, 1000);
-                            },function(error){
-                                var json = JSON.parse(error);
-                                $("#marketLoading").fadeOut(0);
-                                $("#marketEnabled").fadeOut(0);
-                                $("#marketDisabled").fadeIn();
-                                status.html(json.message);
-                                status.attr("class","alert alert-danger");
-                            });
-                        }
-
-                        function checkMarketUpdates(){
-                            var status = $("#marketStatus");
-                            status.html("{{__('Güncellemeler kontrol ediliyor...')}}");
-                            status.attr("class","alert alert-secondary");
-                            $("#marketLoading").fadeIn(0);
-                            request("{{route('check_updates_market')}}",new FormData(),function(success){
-                                var json = JSON.parse(success);
-                                var table = $("#marketTable").DataTable();
-                                var counter = 1;
-                                table.clear();
-                                $.each(json.message,function (index,current) {
-                                    var row = table.row.add([
-                                        counter++, current["packageName"], current["currentVersion"], current["status"]
-                                    ]).draw().node();
-                                });
-                                table.draw();
-                                status.html("{{__('Güncellemeler başarıyla kontrol edildi')}}");
-                                status.attr("class","alert alert-success");
-                                $("#marketLoading").fadeOut(0);
-                                $("#marketTableWrapper").fadeIn(0);
-                            },function(error){
-                                var json = JSON.parse(error);
-                                status.html(json.message);
-                                status.attr("class","alert alert-danger");
-                            });
-                        }
-                    </script>
-
-                </div>
-                <div class="tab-pane fade show" id="dnsSettings" role="tabpanel">
-                    <p>{{__("Liman'ın sunucu adreslerini çözebilmesi için gerekli DNS sunucularını aşağıdan düzenleyebilirsiniz.")}}</p>
-                    <form onsubmit="return saveDNS(this);">
-                        <label>{{__("Öncelikli DNS Sunucusu")}}</label>
-                        <input type="text" name="dns1" id="dns1" class="form-control mb-3">
-                        <label>{{__("Alternatif DNS Sunucusu")}}</label>
-                        <input type="text" name="dns2" id="dns2" class="form-control mb-3">
-                        <label>{{__("Alternatif DNS Sunucusu")}}</label>
-                        <input type="text" name="dns3" id="dns3" class="form-control"><br>
-                        <button type="submit" class="btn btn-primary">{{__("Kaydet")}}</button>
-                    </form>
-                </div>
-                <div class="tab-pane fade show" id="servers" role="tabpanel">
-                    <?php
-                    $servers = servers();
-                    foreach ($servers as $server) {
-                        $server->enabled = $server->enabled
-                            ? __("Aktif")
-                            : __("Pasif");
-                    }
-                    ?>
-                    <button class="btn btn-success" onclick="serverStatus(true)" disabled>{{__("Aktifleştir")}}</button>
-                    <button class="btn btn-danger" onchange="serverStatus(false)" disabled>{{__("Pasifleştir")}}</button><br><br>
-                    @include('table',[
-                        "value" => $servers,
-                        "title" => [
-                            "Sunucu Adı" , "İp Adresi" , "Durumu" , "*hidden*"
-                        ],
-                        "display" => [
-                            "name" , "ip_address", "enabled", "id:server_id"
-                        ],
-                        "noInitialize" => true
-                    ])
-                    <script>
-                        $("#servers table").DataTable(dataTablePresets('multiple'));
-                    </script>
-                </div>
-                {!! settingsModuleViews() !!}
-                <div class="tab-pane fade show" id="update" role="tabpanel">
-                    @php($updateOutput = shell_exec("apt list --upgradable | grep 'liman'"))
-                    @if($updateOutput)
-                        <pre>{{$updateOutput}}</pre>
-                    @else
-                        <pre>{{__("Liman Sürümünüz : " . getVersion() . " güncel.")}}</pre>
-                    @endif
-                </div>
-
-                <div class="tab-pane fade show" id="changeLog" role="tabpanel">
-                    <ul>
-                        @foreach (explode("\n",$changelog) as $line)
-                        <li>{{$line}}</li>
-                        @endforeach
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header p-2">
+                    <ul class="nav nav-tabs" role="tabpanel">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#users" aria-selected="true">{{__("Kullanıcı Ayarları")}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="extensionNavLink" class="nav-link" data-toggle="tab" href="#extensions" aria-selected="true">{{__("Eklentiler")}} @if(is_file(storage_path("extension_updates"))) <span style="color:green" class="blinking">*</span> @endif</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#roles" onclick="getRoleList()" aria-selected="true">{{__("Rol Grupları")}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#serverGroups" aria-selected="true">{{__("Sunucu Grupları")}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#certificates" >{{__("Sertifikalar")}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#health" onclick="checkHealth()">{{__("Sağlık Durumu")}}</a>
+                        </li>
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#update">{{__("Güncelleme")}}</a>
+                        </li> -->
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#changeLog">{{__("Son Değişiklikler")}}</a>
+                        </li> -->
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#rsyslog" onclick="readLogs()">{{__("Log Yönetimi")}}</a>
+                        </li> -->
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#externalNotifications" onclick="">{{__("Dış Bildirimler")}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#restrictedMode" onclick="">{{__("Kısıtlı Mod")}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#limanMarket" onclick="checkMarketAccess()">{{__("Liman Market")}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#dnsSettings" onclick="getDNS()">{{__("DNS Ayarları")}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#mailSettings" onclick="getCronMails()">{{__("Mail Ayarları")}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#limanTweaks" onclick="getLimanTweaks()">{{__("İnce Ayarlar")}}</a>
+                        </li>
+                        {!! settingsModuleButtons() !!}
                     </ul>
                 </div>
-
-                <div class="tab-pane fade show" id="restrictedMode" role="tabpanel">
-                    <p>{{__("Liman'ı kısıtlamak ve kullanıcıların yalnızca bir eklentiyi kullanması için bu modu kullanabilirsiniz. Bu modu kullandığınız taktirde, kullanıcılar varsayılan olarak eklenti ve sunucu yetkisine sahip olacak, ancak fonksiyon yetkilerine sahip olmayacaklardır. Yöneticiler mevcut liman arayüzünü görmeye devam edecek, kullanıcılar ise yalnızca eklenti çerçevesini görüntüleyebilecektir.")}}</p>
-                    <form onsubmit="return saveRestricted(this);">
-                        <div class="form-check">
-                            <input name="LIMAN_RESTRICTED" type="checkbox" class="form-check-input" id="rectricedModeToggle" @if(env("LIMAN_RESTRICTED")) checked @endif>
-                            <label class="form-check-label" for="rectricedModeToggle">{{__("Kısıtlı Modu Aktifleştir.")}}</label>
-                        </div><br>
-
-                        <div class="form-group">
-                            <label for="restrictedServer">{{__("Gösterilecek Sunucu")}}</label>
-                            <select name="LIMAN_RESTRICTED_SERVER" id="restrictedServer" class="form-control select2" required>
-                                <option value="" disabled selected>{{__('Lütfen bir sunucu seçin.')}}</option>
-                                        @foreach(servers() as $server)
-                                            <option value="{{$server->id}}" @if(env("LIMAN_RESTRICTED_SERVER") == $server->id) selected @endif>{{$server->name}}</option>
-                                        @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                        <label for="restrictedExtension">{{__("Gösterilecek Eklenti")}}</label>
-                            <select name="LIMAN_RESTRICTED_EXTENSION" id="restrictedExtension" class="form-control select2" required>
-                                <option value="" disabled selected>{{__('Lütfen bir eklenti seçin.')}}</option>
-                                        @foreach(extensions() as $extension)
-                                            <option value="{{$extension->id}}" @if(env("LIMAN_RESTRICTED_EXTENSION") == $extension->id) selected @endif>{{$extension->display_name}}</option>
-                                        @endforeach
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">{{__("Ayarları Kaydet")}}</button>
-                    </form>
-                    <script>
-                        function saveRestricted(form){
-                            return request('{{route("restricted_mode_update")}}',form,function(success){
-                                var json = JSON.parse(success);
-                                showSwal(json.message,'success');
-                                setTimeout(() => {
-                                    reload();
-                                }, 2000);
-                            },function(error){
-                                var json = JSON.parse(error);
-                                showSwal(json.message,'danger',2000);
-                            });
-                        }
-                    </script>
-                </div>
-
-                <div class="tab-pane fade show" id="externalNotifications" role="tabpanel">
-                @include('modal-button',[
-                        "class" => "btn-primary",
-                        "target_id" => "addNewNotificationSource",
-                        "text" => "Yeni İstemci Ekle"
-                    ])<br><br>
-                    @include('table',[
-                            "value" => \App\Models\ExternalNotification::all(),
-                            "title" => [
-                                "İsim" , "İp Adresi / Hostname", "Son Erişim Tarihi" , "*hidden*" ,
-                            ],
-                            "display" => [
-                                "name" , "ip", "last_used", "id:id" ,
-                            ],
-                            "menu" => [
-                                "Düzenle" => [
-                                    "target" => "editExternalNotificationToken",
-                                    "icon" => " context-menu-icon-edit"
-                                ],
-                                "Yeni Token Al" => [
-                                    "target" => "renewExternalNotificationToken",
-                                    "icon" => "fa-lock"
-                                ],
-                                "Sil" => [
-                                    "target" => "deleteExternalNotificationToken",
-                                    "icon" => " context-menu-icon-delete"
-                                ]
-                            ],
-                        ])
-                </div>
-
-                <div class="tab-pane fade show" id="rsyslog" role="tabpanel">
-                <p>{{__("Liman Üzerindeki İşlem Loglarını hedef bir log sunucusuna rsyslog servisi ile göndermek için hedef log sunucusunun adresi ve portunu yazınız.")}}</p>
-                    <form id="logForm" onsubmit="return saveLogSystem()">
-                        <div class="form-row">
-                            <div class="form-group col-md-10">
-                                <label for="targetHostname">{{__("Sunucu Adresi")}}</label>
-                                <input type="text" class="form-control" name="targetHostname" id="logIpAddress">
-                            </div>
-                            <div class="form-group col-md-2">
-                                <label for="targetPort">{{__("Sunucu Portu")}}</label>
-                                <input type="number" class="form-control" name="targetPort" value="514" id="logPort">
+                <div class="card-body">
+                    @include('errors')
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="users" role="tabpanel">
+                            @include('modal-button',[
+                                "class" => "btn-success",
+                                "target_id" => "add_user",
+                                "text" => "Kullanıcı Ekle"
+                            ])<br><br>
+                            <div id="usersTable">
+                                @include('table',[
+                                    "value" => \App\User::all(),
+                                    "title" => [
+                                        "İsim Soyisim", "Kullanıcı Adı", "Email", "*hidden*" ,
+                                    ],
+                                    "display" => [
+                                        "name", "username", "email", "id:user_id" ,
+                                    ],
+                                    "menu" => [
+                                        "Parolayı Sıfırla" => [
+                                            "target" => "passwordReset",
+                                            "icon" => "fa-lock"
+                                        ],
+                                        "Sil" => [
+                                            "target" => "deleteUser",
+                                            "icon" => " context-menu-icon-delete"
+                                        ]
+                                    ],
+                                    "onclick" => "userDetails"
+                                ])
                             </div>
                         </div>
-                        <div class="form-row">
-                        <div class="form-group col-md-2">
-                                <label for="logInterval">{{__("Log Gönderme Aralığı (Dakika)")}}</label>
-                                <input type="number" class="form-control" name="logInterval" value="10" id="logInterval">
+                        <div class="tab-pane fade show" id="roles" role="tabpanel">
+                            @include('modal-button',[
+                                "class" => "btn-success",
+                                "target_id" => "add_role",
+                                "text" => "Rol Grubu Ekle"
+                            ])<br><br>
+                            <div id="rolesTable">
+
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success">{{__("Ayarları Kaydet")}}</button>
-                    </form>
-                </div>
-                <div class="tab-pane fade show" id="serverGroups" role="tabpanel">
-                @include('modal-button',[
-                        "class" => "btn-success",
-                        "target_id" => "addServerGroup",
-                        "text" => "Sunucu Grubu Ekle"
-                ])<br><br>
-
-                <p>{{__("Sunucuları bir gruba ekleyerek eklentiler arası geçişi daha akıcı yapabilirsiniz.")}}</p>
-                @include('table',[
-                            "value" => \App\Models\ServerGroup::all(),
-                            "title" => [
-                                "Adı", "*hidden*" , "*hidden*"
-                            ],
-                            "display" => [
-                                "name" , "id:server_group_id" , "servers:servers"
-                            ],
-                            "menu" => [
-                                "Düzenle" => [
-                                    "target" => "modifyServerGroupHandler",
-                                    "icon" => " context-menu-icon-edit"
+                        <div class="tab-pane fade show" id="certificates" role="tabpanel">
+                            <button class="btn btn-success" onclick="window.location.href = '{{route('certificate_add_page')}}'"><i
+                                class="fa fa-plus"></i> {{__("Sertifika Ekle")}}</button>
+                            <br><br>
+                            @include('table',[
+                                "value" => \App\Models\Certificate::all(),
+                                "title" => [
+                                    "Sunucu Adresi" , "Servis" , "*hidden*" ,
                                 ],
-                                "Sil" => [
-                                    "target" => "deleteServerGroup",
-                                    "icon" => " context-menu-icon-delete"
-                                ]
-                            ],
-                        ])
-                </div>
-                <div class="tab-pane fade show" id="mailSettings" role="tabpanel">
-                    <div id="mailWrapper"></div>
-                    <script>
-                        function getCronMails(){
-                            showSwal('{{ __("Okunuyor...") }}',"info");
-                            request("{{route('cron_mail_get')}}",new FormData(),function (success){
-                                $("#mailWrapper").html(success);
-                                $("#mailWrapper table").DataTable(dataTablePresets("normal"));
-                                Swal.close();
-                            },function(error){
-                                let json = JSON.parse(error);
-                                showSwal(json.message,'error',2000);
-                            });
+                                "display" => [
+                                    "server_hostname" , "origin", "id:certificate_id" ,
+                                ],
+                                "menu" => [
+                                    "Güncelle" => [
+                                        "target" => "updateCertificate",
+                                        "icon" => "fa-sync-alt"
+                                    ],
+                                    "Sil" => [
+                                        "target" => "deleteCertificate",
+                                        "icon" => " context-menu-icon-delete"
+                                    ]
+                                ],
+                            ])
+                        </div>
+                        <div class="tab-pane fade show" id="health" role="tabpanel">
+                            <pre id="output"></pre>
+                        </div>
+                        <div class="tab-pane fade show" id="extensions" role="tabpanel">
+                            @include('extension_pages.manager')
+                        </div>
+                        <div class="tab-pane fade show" id="limanMarket" role="tabpanel">
+                            <div id="marketStatus" class="alert alert-secondary" role="alert">
 
-                        }
-                    </script>
-                </div>
-                <div class="tab-pane fade show" id="limanTweaks" role="tabpanel">
-                    @include("settings.tweaks")
+                            </div>
+                            <div id="marketLoading">
+                                <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                            </div>
+                            <div id="marketEnabled" style="display:none;">
+                            <div id="marketTableWrapper">
+                                @include('table',[
+                                    "id" => "marketTable",
+                                    "value" => [],
+                                    "title" => [
+                                        "Sistem Adı" , "Mevcut Versiyon", "Durumu"
+                                    ],
+                                    "display" => [
+                                        "packageName" , "currentVersion", "status"
+                                    ],
+                                ])
+                            </div>
+
+                            </div>
+                            <div id="marketDisabled" style="display:none">
+                                <p>{{__("Liman kurulumunuzu Liman Market'e bağlayarak sistemdeki tüm güncellemeleri takip edebilir, güncellemeleri indirebilirsiniz.")}}</p>
+                                <button type="button" class="btn btn-primary btn-lg" onclick="location.href = '{{route('redirect_market')}}'">{{__("Liman Market'i Bağla")}}</button>
+                            </div>
+                            <script>
+                                function checkMarketAccess(){
+                                    var status = $("#marketStatus");
+                                    $("#marketTableWrapper").fadeOut(0);
+                                    status.html("{{__('Market bağlantısı kontrol ediliyor...')}}");
+                                    status.attr("class","alert alert-secondary");
+                                    request("{{route('verify_market')}}",new FormData(),function(success){
+                                        var json = JSON.parse(success);
+                                        $("#marketLoading").fadeOut(0);
+                                        $("#marketDisabled").fadeOut(0);
+                                        $("#marketEnabled").fadeIn();
+                                        status.html(json.message);
+                                        status.attr("class","alert alert-success");
+                                        setTimeout(() => {
+                                            checkMarketUpdates();
+                                        }, 1000);
+                                    },function(error){
+                                        var json = JSON.parse(error);
+                                        $("#marketLoading").fadeOut(0);
+                                        $("#marketEnabled").fadeOut(0);
+                                        $("#marketDisabled").fadeIn();
+                                        status.html(json.message);
+                                        status.attr("class","alert alert-danger");
+                                    });
+                                }
+
+                                function checkMarketUpdates(){
+                                    var status = $("#marketStatus");
+                                    status.html("{{__('Güncellemeler kontrol ediliyor...')}}");
+                                    status.attr("class","alert alert-secondary");
+                                    $("#marketLoading").fadeIn(0);
+                                    request("{{route('check_updates_market')}}",new FormData(),function(success){
+                                        var json = JSON.parse(success);
+                                        var table = $("#marketTable").DataTable();
+                                        var counter = 1;
+                                        table.clear();
+                                        $.each(json.message,function (index,current) {
+                                            var row = table.row.add([
+                                                counter++, current["packageName"], current["currentVersion"], current["status"]
+                                            ]).draw().node();
+                                        });
+                                        table.draw();
+                                        status.html("{{__('Güncellemeler başarıyla kontrol edildi')}}");
+                                        status.attr("class","alert alert-success");
+                                        $("#marketLoading").fadeOut(0);
+                                        $("#marketTableWrapper").fadeIn(0);
+                                    },function(error){
+                                        var json = JSON.parse(error);
+                                        status.html(json.message);
+                                        status.attr("class","alert alert-danger");
+                                    });
+                                }
+                            </script>
+
+                        </div>
+                        <div class="tab-pane fade show" id="dnsSettings" role="tabpanel">
+                            <p>{{__("Liman'ın sunucu adreslerini çözebilmesi için gerekli DNS sunucularını aşağıdan düzenleyebilirsiniz.")}}</p>
+                            <form onsubmit="return saveDNS(this);">
+                                <label>{{__("Öncelikli DNS Sunucusu")}}</label>
+                                <input type="text" name="dns1" id="dns1" class="form-control mb-3">
+                                <label>{{__("Alternatif DNS Sunucusu")}}</label>
+                                <input type="text" name="dns2" id="dns2" class="form-control mb-3">
+                                <label>{{__("Alternatif DNS Sunucusu")}}</label>
+                                <input type="text" name="dns3" id="dns3" class="form-control"><br>
+                                <button type="submit" class="btn btn-primary">{{__("Kaydet")}}</button>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade show" id="servers" role="tabpanel">
+                            <?php
+                            $servers = servers();
+                            foreach ($servers as $server) {
+                                $server->enabled = $server->enabled
+                                    ? __("Aktif")
+                                    : __("Pasif");
+                            }
+                            ?>
+                            <button class="btn btn-success" onclick="serverStatus(true)" disabled>{{__("Aktifleştir")}}</button>
+                            <button class="btn btn-danger" onchange="serverStatus(false)" disabled>{{__("Pasifleştir")}}</button><br><br>
+                            @include('table',[
+                                "value" => $servers,
+                                "title" => [
+                                    "Sunucu Adı" , "İp Adresi" , "Durumu" , "*hidden*"
+                                ],
+                                "display" => [
+                                    "name" , "ip_address", "enabled", "id:server_id"
+                                ],
+                                "noInitialize" => true
+                            ])
+                            <script>
+                                $("#servers table").DataTable(dataTablePresets('multiple'));
+                            </script>
+                        </div>
+                        {!! settingsModuleViews() !!}
+                        <div class="tab-pane fade show" id="update" role="tabpanel">
+                            @php($updateOutput = shell_exec("apt list --upgradable | grep 'liman'"))
+                            @if($updateOutput)
+                                <pre>{{$updateOutput}}</pre>
+                            @else
+                                <pre>{{__("Liman Sürümünüz : " . getVersion() . " güncel.")}}</pre>
+                            @endif
+                        </div>
+
+                        <div class="tab-pane fade show" id="changeLog" role="tabpanel">
+                            <ul>
+                                @foreach (explode("\n",$changelog) as $line)
+                                <li>{{$line}}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+
+                        <div class="tab-pane fade show" id="restrictedMode" role="tabpanel">
+                            <p>{{__("Liman'ı kısıtlamak ve kullanıcıların yalnızca bir eklentiyi kullanması için bu modu kullanabilirsiniz. Bu modu kullandığınız taktirde, kullanıcılar varsayılan olarak eklenti ve sunucu yetkisine sahip olacak, ancak fonksiyon yetkilerine sahip olmayacaklardır. Yöneticiler mevcut liman arayüzünü görmeye devam edecek, kullanıcılar ise yalnızca eklenti çerçevesini görüntüleyebilecektir.")}}</p>
+                            <form onsubmit="return saveRestricted(this);">
+                                <div class="form-check">
+                                    <input name="LIMAN_RESTRICTED" type="checkbox" class="form-check-input" id="rectricedModeToggle" @if(env("LIMAN_RESTRICTED")) checked @endif>
+                                    <label class="form-check-label" for="rectricedModeToggle">{{__("Kısıtlı Modu Aktifleştir.")}}</label>
+                                </div><br>
+
+                                <div class="form-group">
+                                    <label for="restrictedServer">{{__("Gösterilecek Sunucu")}}</label>
+                                    <select name="LIMAN_RESTRICTED_SERVER" id="restrictedServer" class="form-control select2" required>
+                                        <option value="" disabled selected>{{__('Lütfen bir sunucu seçin.')}}</option>
+                                                @foreach(servers() as $server)
+                                                    <option value="{{$server->id}}" @if(env("LIMAN_RESTRICTED_SERVER") == $server->id) selected @endif>{{$server->name}}</option>
+                                                @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                <label for="restrictedExtension">{{__("Gösterilecek Eklenti")}}</label>
+                                    <select name="LIMAN_RESTRICTED_EXTENSION" id="restrictedExtension" class="form-control select2" required>
+                                        <option value="" disabled selected>{{__('Lütfen bir eklenti seçin.')}}</option>
+                                                @foreach(extensions() as $extension)
+                                                    <option value="{{$extension->id}}" @if(env("LIMAN_RESTRICTED_EXTENSION") == $extension->id) selected @endif>{{$extension->display_name}}</option>
+                                                @endforeach
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">{{__("Ayarları Kaydet")}}</button>
+                            </form>
+                            <script>
+                                function saveRestricted(form){
+                                    return request('{{route("restricted_mode_update")}}',form,function(success){
+                                        var json = JSON.parse(success);
+                                        showSwal(json.message,'success');
+                                        setTimeout(() => {
+                                            reload();
+                                        }, 2000);
+                                    },function(error){
+                                        var json = JSON.parse(error);
+                                        showSwal(json.message,'danger',2000);
+                                    });
+                                }
+                            </script>
+                        </div>
+
+                        <div class="tab-pane fade show" id="externalNotifications" role="tabpanel">
+                        @include('modal-button',[
+                                "class" => "btn-primary",
+                                "target_id" => "addNewNotificationSource",
+                                "text" => "Yeni İstemci Ekle"
+                            ])<br><br>
+                            @include('table',[
+                                    "value" => \App\Models\ExternalNotification::all(),
+                                    "title" => [
+                                        "İsim" , "İp Adresi / Hostname", "Son Erişim Tarihi" , "*hidden*" ,
+                                    ],
+                                    "display" => [
+                                        "name" , "ip", "last_used", "id:id" ,
+                                    ],
+                                    "menu" => [
+                                        "Düzenle" => [
+                                            "target" => "editExternalNotificationToken",
+                                            "icon" => " context-menu-icon-edit"
+                                        ],
+                                        "Yeni Token Al" => [
+                                            "target" => "renewExternalNotificationToken",
+                                            "icon" => "fa-lock"
+                                        ],
+                                        "Sil" => [
+                                            "target" => "deleteExternalNotificationToken",
+                                            "icon" => " context-menu-icon-delete"
+                                        ]
+                                    ],
+                                ])
+                        </div>
+
+                        <div class="tab-pane fade show" id="rsyslog" role="tabpanel">
+                        <p>{{__("Liman Üzerindeki İşlem Loglarını hedef bir log sunucusuna rsyslog servisi ile göndermek için hedef log sunucusunun adresi ve portunu yazınız.")}}</p>
+                            <form id="logForm" onsubmit="return saveLogSystem()">
+                                <div class="form-row">
+                                    <div class="form-group col-md-10">
+                                        <label for="targetHostname">{{__("Sunucu Adresi")}}</label>
+                                        <input type="text" class="form-control" name="targetHostname" id="logIpAddress">
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label for="targetPort">{{__("Sunucu Portu")}}</label>
+                                        <input type="number" class="form-control" name="targetPort" value="514" id="logPort">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                <div class="form-group col-md-2">
+                                        <label for="logInterval">{{__("Log Gönderme Aralığı (Dakika)")}}</label>
+                                        <input type="number" class="form-control" name="logInterval" value="10" id="logInterval">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-success">{{__("Ayarları Kaydet")}}</button>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade show" id="serverGroups" role="tabpanel">
+                        @include('modal-button',[
+                                "class" => "btn-success",
+                                "target_id" => "addServerGroup",
+                                "text" => "Sunucu Grubu Ekle"
+                        ])<br><br>
+
+                        <p>{{__("Sunucuları bir gruba ekleyerek eklentiler arası geçişi daha akıcı yapabilirsiniz.")}}</p>
+                        @include('table',[
+                                    "value" => \App\Models\ServerGroup::all(),
+                                    "title" => [
+                                        "Adı", "*hidden*" , "*hidden*"
+                                    ],
+                                    "display" => [
+                                        "name" , "id:server_group_id" , "servers:servers"
+                                    ],
+                                    "menu" => [
+                                        "Düzenle" => [
+                                            "target" => "modifyServerGroupHandler",
+                                            "icon" => " context-menu-icon-edit"
+                                        ],
+                                        "Sil" => [
+                                            "target" => "deleteServerGroup",
+                                            "icon" => " context-menu-icon-delete"
+                                        ]
+                                    ],
+                                ])
+                        </div>
+                        <div class="tab-pane fade show" id="mailSettings" role="tabpanel">
+                            <div id="mailWrapper"></div>
+                            <script>
+                                function getCronMails(){
+                                    showSwal('{{ __("Okunuyor...") }}',"info");
+                                    request("{{route('cron_mail_get')}}",new FormData(),function (success){
+                                        $("#mailWrapper").html(success);
+                                        $("#mailWrapper table").DataTable(dataTablePresets("normal"));
+                                        Swal.close();
+                                    },function(error){
+                                        let json = JSON.parse(error);
+                                        showSwal(json.message,'error',2000);
+                                    });
+
+                                }
+                            </script>
+                        </div>
+                        <div class="tab-pane fade show" id="limanTweaks" role="tabpanel">
+                            @include("settings.tweaks")
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        </div>
     </div>
+    
     <style>
         .blinking {
             animation: blinker 1s linear infinite;

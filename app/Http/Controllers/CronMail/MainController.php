@@ -37,9 +37,25 @@ class MainController extends Controller
 
     public function addCronMail()
     {
-        $obj = new CronMail(request()->all());
-        $obj->last = Carbon::now()->subDecade();
-        if ($obj->save()) {
+        validate([
+            "user_id" => "required|array",
+            "user_id.*" => "exists:users,id",
+            "server_id" => "required|exists:servers,id",
+            "extension_id" => "required|exists:extensions,id",
+            "target" => "required",
+            "cron_type" => "required|in:hourly,daily,weekly,monthly",
+            "to" => "required|array",
+            "to.*" => "email"
+        ]);
+
+        $request = request()->all();
+        $request["user_id"] = json_encode($request["user_id"]);
+        $request["to"] = json_encode($request["to"]);
+        $request["target"] = json_encode($request["target"]);
+        $request["last"] = Carbon::now()->subDecade();
+
+        $cron_mail = CronMail::create($request);
+        if ($cron_mail) {
             return respond("Mail ayarı başarıyla eklendi");
         } else {
             return respond("Mail ayarı eklenemedi!", 201);
@@ -91,7 +107,11 @@ class MainController extends Controller
             $ext = Extension::find($obj->extension_id);
             if ($ext) {
                 $obj->extension_name = $ext->display_name;
-                $obj->tag_string = $this->getTagText($obj->target, $ext->name);
+                $target_list = json_decode($obj->target);
+                foreach ($target_list as &$target) {
+                    $target = $this->getTagText($target, $ext->name);
+                }
+                $obj->tag_string = implode(", ", $target_list);
             } else {
                 $obj->extension_name = "Bu eklenti silinmiş!";
                 $obj->tag_string = "Bu eklenti silinmiş!";
@@ -104,14 +124,21 @@ class MainController extends Controller
                 $obj->server_name = "Bu sunucu silinmiş!";
             }
 
-            $usr = User::find($obj->user_id);
-            if ($usr) {
-                $obj->username = $usr->name;
-            } else {
-                $obj->username = "Bu kullanıcı silinmiş!";
+            $user_ids = json_decode($obj->user_id);
+            $users = [];
+            foreach ($user_ids as $usr) {
+                try {
+                    $user = User::find($usr);
+                } catch (\Throwable $e) {
+                    continue;
+                }
+                $users[] = $user->name;
             }
-
             
+            $obj->username = implode(", ", $users);
+
+            $obj->to = implode(", ", json_decode($obj->to));
+
             return $obj;
         });
         return view("settings.mail", [
@@ -142,5 +169,46 @@ class MainController extends Controller
     public function getView()
     {
         return view("settings.add_mail");
+    }
+
+    public function editView()
+    {
+        $id = request()->id;
+
+        $cron_mail = CronMail::findOrFail($id);
+
+        $users = json_decode($cron_mail->user_id);
+        $users = User::find($users);
+
+        $to = json_decode($cron_mail->to);
+        $target = json_decode($cron_mail->target);
+
+        return view("settings.edit_mail", compact(['cron_mail', 'users', 'to', 'target']));
+    }
+
+    public function edit()
+    {
+        validate([
+            "user_id" => "required|array",
+            "user_id.*" => "exists:users,id",
+            "server_id" => "required|exists:servers,id",
+            "extension_id" => "required|exists:extensions,id",
+            "target" => "required",
+            "cron_type" => "required|in:hourly,daily,weekly,monthly",
+            "to" => "required|array",
+            "to.*" => "email"
+        ]);
+
+        $id = request()->id;
+
+        $cron_mail = CronMail::findOrFail($id);
+
+        $request = request()->all(); 
+        $request["user_id"] = json_encode($request["user_id"]);
+        $request["to"] = json_encode($request["to"]);
+
+        $cron_mail->update($request);
+
+        return respond("Mail ayarı başarıyla düzenlendi.");
     }
 }

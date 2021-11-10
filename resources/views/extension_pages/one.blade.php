@@ -39,15 +39,15 @@
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label>{{__("Eklenti Adı")}}</label>
-                                <input id="extensionName" type="text" class="form-control" value="{{$extension['name']}}" disabled required>
+                                <input type="text" class="form-control" value="{{$extension['name']}}" disabled required>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label>{{__("Yayınlayan")}}</label>
-                                <input type="text" name="name" class="form-control" value="{{$extension['publisher']}}" disabled required>
+                                <input type="text" class="form-control" value="{{$extension['publisher']}}" disabled required>
                             </div>
                             <div class="col-md-4 mb-3">
                             <label>{{__("Yazılım Dili")}}</label>
-                                <select name="programmingLanguage" class="form-control" value="{{$extension['language']}}" autocomplete="off" disabled><br>
+                                <select class="form-control" value="{{$extension['language']}}" autocomplete="off" disabled><br>
                                     <option value="php" @if($extension["language"] == "php") selected='true' @endif >PHP 7.3</option>
                                     <option value="python" @if($extension["language"] == "python") selected='true' @endif>Python 3</option>
                                 </select>
@@ -384,17 +384,16 @@
             }
             showSwal('{{__("Kaydediliyor...")}}','info');
             var data = new FormData();
-            data.append('type',type);
-            data.append('name',$("#extensionName").val());
-            data.append('icon',$("#icon").val());
-            data.append('support',$("#support").val());
-            data.append('version',$("#version").val());
-            data.append('service',$("#service").val());
-            data.append('require_key',$("#require_key").val());
-            data.append('sslPorts',$("#sslPorts").val());
-            data.append('supportedLiman',$("#supportedLiman").val());
-            data.append('verification',$("#verification").val());
-            data.append('dependencies',$("#dependencies").val());
+            data.append('type', type);
+            data.append('icon', $("#icon").val());
+            data.append('support', $("#support").val());
+            data.append('version', $("#version").val());
+            data.append('service', $("#service").val());
+            data.append('require_key', $("#require_key").val());
+            data.append('sslPorts', $("#sslPorts").val());
+            data.append('supportedLiman', $("#supportedLiman").val());
+            data.append('verification', $("#verification").val());
+            data.append('dependencies', $("#dependencies").val());
             request('{{route('extension_settings_update')}}',data,function(){
                 showSwal("{{__("Başarıyla kaydedildi")}}",'success');
                 setTimeout(function(){

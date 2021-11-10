@@ -568,3 +568,17 @@ function handleCloseButton(target) {
 $(document).on("shown.bs.modal", function (e) {
   handleCloseButton($(e.target).attr("id"));
 });
+
+function copyToClipboard(elementId) {
+  var aux = document.createElement("input");
+  aux.setAttribute("value", document.getElementById(elementId).innerHTML);
+  document.body.appendChild(aux);
+  aux.select();
+  document.execCommand("copy");
+  document.body.removeChild(aux);
+  Swal.fire(
+    'Liman ID kopyalandı!',
+    'Liman ID başarıyla kopyalandı.',
+    'success'
+  );
+}

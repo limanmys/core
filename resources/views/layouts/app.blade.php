@@ -12,6 +12,7 @@
                 @include('layouts.header')
             @endauth
             @include('layouts.content')
+            @include('layouts.footer')
         </div>
     @stop
 @endif

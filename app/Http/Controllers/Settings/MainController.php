@@ -68,20 +68,15 @@ class MainController extends Controller
             "MARKET_CLIENT_SECRET" => env("MARKET_CLIENT_SECRET"),
             "EXTENSION_DEVELOPER_MODE" => env("EXTENSION_DEVELOPER_MODE") ? "true" : "false",
             "APP_LANG" => env("APP_LANG", "tr"),
-            "NAV_SERVER_COUNT" => env("NAV_SERVER_COUNT")
+            "NAV_SERVER_COUNT" => env("NAV_SERVER_COUNT", 20)
         ]);
     }
 
     public function setLimanTweaks()
     {
-        try {
-            request()->validate([
-                "NAV_SERVER_COUNT" => "required|numeric|digits_between:1,2"
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return respond("Ayarlar kaydedilemedi!", 201);
-        }
-        
+        validate([
+            "NAV_SERVER_COUNT" => "required|numeric|digits_between:1,2"
+        ]);
 
         $flag = setEnv([
             "APP_DEBUG" => request("APP_DEBUG"),
@@ -573,7 +568,7 @@ class MainController extends Controller
 \\\$InputRunFileMonitor
 \\\$InputFilePersistStateInterval 1000
 ";
-        Command::runLiman("sudo bash -c 'echo @{:text} > /etc/rsyslog.d/liman.conf'", [
+        Command::runLiman("echo @{:text} > /etc/rsyslog.d/liman.conf", [
             'text' => $text
         ]);
 
