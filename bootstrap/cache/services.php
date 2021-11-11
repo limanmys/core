@@ -27,17 +27,18 @@
     23 => 'BeyondCode\\LaravelWebSockets\\WebSocketsServiceProvider',
     24 => 'Facade\\Ignition\\IgnitionServiceProvider',
     25 => 'Intervention\\Image\\ImageServiceProvider',
-    26 => 'Laravel\\Tinker\\TinkerServiceProvider',
-    27 => 'Mews\\Captcha\\CaptchaServiceProvider',
-    28 => 'Carbon\\Laravel\\ServiceProvider',
-    29 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    30 => 'Spatie\\WebTinker\\WebTinkerServiceProvider',
-    31 => 'App\\Providers\\AppServiceProvider',
-    32 => 'App\\Providers\\AuthServiceProvider',
-    33 => 'App\\Providers\\BroadcastServiceProvider',
-    34 => 'App\\Providers\\EventServiceProvider',
-    35 => 'App\\Providers\\RouteServiceProvider',
-    36 => 'App\\Providers\\TusServiceProvider',
+    26 => 'Jackiedo\\DotenvEditor\\DotenvEditorServiceProvider',
+    27 => 'Laravel\\Tinker\\TinkerServiceProvider',
+    28 => 'Mews\\Captcha\\CaptchaServiceProvider',
+    29 => 'Carbon\\Laravel\\ServiceProvider',
+    30 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
+    31 => 'Spatie\\WebTinker\\WebTinkerServiceProvider',
+    32 => 'App\\Providers\\AppServiceProvider',
+    33 => 'App\\Providers\\AuthServiceProvider',
+    34 => 'App\\Providers\\BroadcastServiceProvider',
+    35 => 'App\\Providers\\EventServiceProvider',
+    36 => 'App\\Providers\\RouteServiceProvider',
+    37 => 'App\\Providers\\TusServiceProvider',
   ),
   'eager' => 
   array (
@@ -174,6 +175,13 @@
     'validation.presence' => 'Illuminate\\Validation\\ValidationServiceProvider',
     'command.ide-helper.generate' => 'Barryvdh\\LaravelIdeHelper\\IdeHelperServiceProvider',
     'command.ide-helper.models' => 'Barryvdh\\LaravelIdeHelper\\IdeHelperServiceProvider',
+    'dotenv-editor' => 'Jackiedo\\DotenvEditor\\DotenvEditorServiceProvider',
+    'command.dotenv.backup' => 'Jackiedo\\DotenvEditor\\DotenvEditorServiceProvider',
+    'command.dotenv.deletekey' => 'Jackiedo\\DotenvEditor\\DotenvEditorServiceProvider',
+    'command.dotenv.getbackups' => 'Jackiedo\\DotenvEditor\\DotenvEditorServiceProvider',
+    'command.dotenv.getkeys' => 'Jackiedo\\DotenvEditor\\DotenvEditorServiceProvider',
+    'command.dotenv.restore' => 'Jackiedo\\DotenvEditor\\DotenvEditorServiceProvider',
+    'command.dotenv.setkey' => 'Jackiedo\\DotenvEditor\\DotenvEditorServiceProvider',
   ),
   'when' => 
   array (
@@ -214,6 +222,9 @@
     array (
     ),
     'Barryvdh\\LaravelIdeHelper\\IdeHelperServiceProvider' => 
+    array (
+    ),
+    'Jackiedo\\DotenvEditor\\DotenvEditorServiceProvider' => 
     array (
     ),
   ),

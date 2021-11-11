@@ -100,4 +100,13 @@ class Extension extends Model
     {
         return \Carbon\Carbon::parse($value)->isoFormat('LLLL');
     }
+
+    public function setNameAttribute($value)
+    {
+        if ($this->name) {
+            return;
+        }
+
+        $this->attributes['name'] = $value;
+    }
 }

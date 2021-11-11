@@ -122,6 +122,22 @@ input::placeholder{color:#6b7280;opacity:1;}
 	margin: 0 14px;
 }
 
+#captcha_field {
+	max-width: 52%;
+}
+
+@media only screen and (max-width: 750px) {
+	#captcha_field {
+		max-width: 48%;
+	}
+} 
+
+@media only screen and (max-width: 695px) {
+	#captcha_field {
+		max-width: 45%;
+	}
+} 
+
 #captcha_field:focus {
 	outline: 2px solid transparent;
     outline-offset: 2px;
