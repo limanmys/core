@@ -65,9 +65,7 @@ class PublicController extends Controller
 
         try {
             $response = $client->get($this->apiUrls["categories"]);
-        } 
-        catch (\Throwable $e) 
-        {
+        } catch (\Throwable $e) {
             return respond($e->getMessage(), 201);
         }
 
@@ -75,7 +73,7 @@ class PublicController extends Controller
         return $json;
     }
 
-    public function getApplications(Request $request) 
+    public function getApplications(Request $request)
     {
         $client = self::httpClient();
 
@@ -85,9 +83,7 @@ class PublicController extends Controller
             } else {
                 $response = $client->get($this->apiUrls["getApplications"] . "?pageNumber=" . $request->pageNumber);
             }
-        } 
-        catch (\Throwable $e) 
-        {
+        } catch (\Throwable $e) {
             return respond($e->getMessage(), 201);
         }
 
@@ -102,14 +98,12 @@ class PublicController extends Controller
             "hasNextPage" => $json->hasNextPage
         ];
 
-        
-        if ($json->hasNextPage)
-        {
+
+        if ($json->hasNextPage) {
             $paginate["nextPage"] = $json->pageIndex + 1;
         }
 
-        if ($json->hasPreviousPage)
-        {
+        if ($json->hasPreviousPage) {
             $paginate["previousPage"] = $json->pageIndex - 1;
         }
 
@@ -126,9 +120,7 @@ class PublicController extends Controller
             } else {
                 $response = $client->get($this->apiUrls["getApplications"] . "?categoryId=" . $request->category_id  . "&pageNumber=" . $request->pageNumber);
             }
-        } 
-        catch (\Throwable $e) 
-        {
+        } catch (\Throwable $e) {
             return respond($e->getMessage(), 201);
         }
 
@@ -143,13 +135,11 @@ class PublicController extends Controller
             "hasNextPage" => $json->hasNextPage
         ];
 
-        if ($json->hasNextPage)
-        {
+        if ($json->hasNextPage) {
             $paginate["nextPage"] = $json->pageIndex + 1;
         }
 
-        if ($json->hasPreviousPage)
-        {
+        if ($json->hasPreviousPage) {
             $paginate["previousPage"] = $json->pageIndex - 1;
         }
 
@@ -162,12 +152,10 @@ class PublicController extends Controller
 
         try {
             $response = $client->get($this->apiUrls["getApplications"] . "?search=" . $request->search_query);
-        } 
-        catch (\Throwable $e) 
-        {
+        } catch (\Throwable $e) {
             return respond($e->getMessage(), 201);
         }
-        
+
         $json = json_decode((string) $response->getBody());
 
         $items = $this->updateFilter($json->items);
@@ -179,13 +167,11 @@ class PublicController extends Controller
             "hasNextPage" => $json->hasNextPage
         ];
 
-        if ($json->hasNextPage)
-        {
+        if ($json->hasNextPage) {
             $paginate["nextPage"] = $json->pageIndex + 1;
         }
 
-        if ($json->hasPreviousPage)
-        {
+        if ($json->hasPreviousPage) {
             $paginate["previousPage"] = $json->pageIndex - 1;
         }
 
@@ -197,18 +183,18 @@ class PublicController extends Controller
         $client  = self::httpClient();
         $file = fopen("/tmp/" . $request->package_name, "w");
         try {
-            $response = $client->get($this->apiUrls["download"] . $request->package_name,
-                                ["sink" => $file]);
-            
+            $response = $client->get(
+                $this->apiUrls["download"] . $request->package_name,
+                ["sink" => $file]
+            );
+
             $headers = $response->getHeaders();
             $headers = array_change_key_case($headers, CASE_LOWER);
 
             $str = $headers["content-disposition"][0];
-            $arr = explode(";",$str);
-            $extension = substr($arr[1],-7) == '.signed' ? ".signed" : ".zip";
-        } 
-        catch (\Throwable $e) 
-        {
+            $arr = explode(";", $str);
+            $extension = substr($arr[1], -7) == '.signed' ? ".signed" : ".zip";
+        } catch (\Throwable $e) {
             return respond($e->getMessage(), 201);
         }
 
@@ -265,7 +251,8 @@ class PublicController extends Controller
         return respond("Eklenti başarıyla yüklendi.", 200);
     }
 
-    private function searchForName($id, $array) {
+    private function searchForName($id, $array)
+    {
         foreach ($array as $key => $val) {
             if ($val['name'] == $id) {
                 return [true, $key];
@@ -281,8 +268,7 @@ class PublicController extends Controller
         $getExtensions = \App\Models\Extension::select('id', 'name')->get();
 
         $extensions = [];
-        foreach ($getExtensions as $extension)
-        {
+        foreach ($getExtensions as $extension) {
             $extension_json = "/liman/extensions/" .
                 strtolower($extension->name) .
                 DIRECTORY_SEPARATOR .
@@ -296,7 +282,7 @@ class PublicController extends Controller
                     true
                 );
             } else {
-                abort(404, __("Bu eklenti klasörü bulunmamaktadır."));
+                continue;
             }
 
             array_push($extensions, [
@@ -308,12 +294,10 @@ class PublicController extends Controller
             ]);
         }
 
-        foreach ($json as $extension)
-        {
-            list ($search, $indice) = $this->searchForName($extension->packageName, $extensions);
-            
-            if ($extension->publicVersion)
-            {
+        foreach ($json as $extension) {
+            list($search, $indice) = $this->searchForName($extension->packageName, $extensions);
+
+            if ($extension->publicVersion) {
                 if ($search && $extension->publicVersion->versionCode > $extensions[$indice]["versionCode"]) {
                     $extension->publicVersion->needsToBeUpdated = true;
                 } else {
@@ -321,40 +305,37 @@ class PublicController extends Controller
                 }
             }
 
-            if ($search && $extension->packageName == $extensions[$indice]["name"])
-            {
+            if ($search && $extension->packageName == $extensions[$indice]["name"]) {
                 $extension->isInstalled = true;
             } else {
                 $extension->isInstalled = false;
             }
         }
-        
+
         return $json;
     }
 
-    public function getHomepageApps() 
+    public function getHomepageApps()
     {
         $client = self::httpClient();
 
         try {
             $response = $client->get($this->apiUrls["getApplications"]);
-        } 
-        catch (\Throwable $e) 
-        {
+        } catch (\Throwable $e) {
             return respond($e->getMessage(), 201);
         }
 
         $json = json_decode((string) $response->getBody());
 
         $items = $this->updateFilter($json->items);
-        
+
         $final = [];
         $keys = array_rand($items, 4);
         shuffle($keys);
         foreach ($keys as $key) {
             array_push($final, $items[$key]);
         }
-        
+
         return $final;
     }
 }

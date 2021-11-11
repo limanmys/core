@@ -27,14 +27,14 @@ use Illuminate\Support\Facades\Validator;
 use Jackiedo\DotenvEditor\Facades\DotenvEditor;
 
 if (!function_exists('validate')) {
-	function validate($rules, $messages=[])
-	{
-		$validator = Validator::make(request()->all(), $rules, $messages);
-		if ($validator->fails()) {
-			$errors = $validator->errors();
-			abort(400, $errors->first());
-		}
-	}
+    function validate($rules, $messages = [])
+    {
+        $validator = Validator::make(request()->all(), $rules, $messages);
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            abort(400, $errors->first());
+        }
+    }
 }
 
 if (!function_exists('updateSystemSettings')) {
@@ -851,9 +851,9 @@ if (!function_exists('getExtensionJson')) {
     function getExtensionJson($extension_name)
     {
         $extension_json = "/liman/extensions/" .
-                strtolower($extension_name) .
-                DIRECTORY_SEPARATOR .
-                "db.json";
+            strtolower($extension_name) .
+            DIRECTORY_SEPARATOR .
+            "db.json";
 
         if (file_exists($extension_json)) {
             return json_decode(
@@ -863,7 +863,7 @@ if (!function_exists('getExtensionJson')) {
                 true
             );
         } else {
-            abort(404, __("Bu eklenti klasörü bulunmamaktadır."));
+            abort(404, $extension_name . __(" eklentisi sistemde bulunamadı, yeniden yüklemeyi deneyin."));
         }
     }
 }
@@ -874,7 +874,8 @@ if (!function_exists('redirect_now')) {
         try {
             \App::abort($code, '', ['Location' => $url]);
         } catch (\Exception $exception) {
-            $previousErrorHandler = set_exception_handler(function () {});
+            $previousErrorHandler = set_exception_handler(function () {
+            });
             restore_error_handler();
             call_user_func($previousErrorHandler, $exception);
             die();
@@ -1033,9 +1034,9 @@ if (!function_exists('getExtensionFunctions')) {
         $extension = json_decode(
             file_get_contents(
                 "/liman/extensions/" .
-                strtolower($extension_name) .
-                DIRECTORY_SEPARATOR .
-                "db.json"
+                    strtolower($extension_name) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
             ),
             true
         );
@@ -1055,7 +1056,7 @@ if (!function_exists('extensionTranslate')) {
             "/lang/" .
             $lang .
             ".json";
-        if(is_file($file)){
+        if (is_file($file)) {
             $lang = json_decode(file_get_contents($file), true);
             return isset($lang[$text]) ? $lang[$text] : $text;
         }
@@ -1068,9 +1069,9 @@ if (!function_exists('setEnv')) {
     {
         $editor = DotenvEditor::load(base_path('.env'));
         $editor->setKeys($values);
-        try{
+        try {
             $editor->save();
-        }catch(\Exception $ex){
+        } catch (\Exception $ex) {
             return false;
         }
         shell_exec('php /liman/server/artisan config:clear');
@@ -1111,7 +1112,7 @@ if (!function_exists('checkHealth')) {
                 array_push($messages, [
                     "type" => "danger",
                     "message" =>
-                        "'/liman/$name' izni hatalı (" .
+                    "'/liman/$name' izni hatalı (" .
                         getPermissions('/liman/' . $name) .
                         ").",
                 ]);
