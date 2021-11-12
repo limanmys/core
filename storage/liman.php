@@ -5,5 +5,5 @@ return [
     "user_widget_count" => 10,
     "extension_developer_mode" => false,
     "widget_refresh_time" => 30000, //ms
-    "brand" => "Havelsan © 2020",
+    "brand" => "HAVELSAN © 2021",
 ];
