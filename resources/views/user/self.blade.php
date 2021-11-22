@@ -25,7 +25,7 @@
                 <p class="text-muted">{{auth()->user()->last_login_ip}}</p>
                 <hr>
                 <strong>{{ __('Son Giriş Tarihi') }}</strong>
-                <p class="text-muted">{{\Carbon\Carbon::parse(auth()->user()->last_login_at)->isoFormat('LL')}}</p>
+                <p class="text-muted">{{\Carbon\Carbon::parse(auth()->user()->last_login_at)->isoFormat('LLLL')}}</p>
               </div>
             </div>
         </div>
