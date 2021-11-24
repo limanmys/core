@@ -3,20 +3,25 @@ var customRequestData = [];
 var limanRecordRequests = false;
 var limanRequestList = [];
 
-function loadingText() {
-  if ($('html').attr('lang') == "tr") {
-    return "Yükleniyor...";
-  } else {
-    return "Loading...";
-  }
-}
+let en = {
+  "Yükleniyor...": "Loading...",
+  "Sonuç bulunamadı!": "No results found!",
+  "Liman ID kopyalandı!": "Liman ID copied!",
+  "Liman ID başarıyla kopyalandı.": "Liman ID has been copied successfully!"
+}   
 
-function noResultFoundString() {
-  if ($('html').attr('lang') == "tr") {
-    return "Sonuç bulunamadı!";
-  } else {
-    return "No results found!";
+let tr = {}
+
+let language = document.getElementsByTagName('html')[0].getAttribute('lang');
+let defaultLanguage = "tr"
+console.log(`🌟 Liman localization initialized: ${language}`)
+
+let __ = (trans) => {
+  if (language === defaultLanguage && !eval(language).hasOwnProperty(trans) || !eval(language).hasOwnProperty(trans)) {
+      return trans
   }
+
+  return eval(language)[trans]
 }
 
 function showSwal(message, type, timer = false) {
@@ -48,7 +53,7 @@ function request(url, data, next, error, requestType = "POST") {
     Swal.fire({
       position: "bottom-end",
       type: "info",
-      title: loadingText(),
+      title: __("Yükleniyor..."),
       toast: true,
       showConfirmButton: false
     });
@@ -267,7 +272,7 @@ window.onbeforeunload = function () {
   Swal.fire({
     position: "bottom-end",
     type: "info",
-    title: loadingText(),
+    title: __("Yükleniyor..."),
     toast: true,
     showConfirmButton: false
   });
@@ -456,7 +461,7 @@ function getSearchResults (query) {
       {
         if (data.length == 0) {
           $("#liman_search_results").append(`
-            <a href="#">${noResultFoundString()}</a>
+            <a href="#">${__("Sonuç bulunamadı!")}</a>
           `);
         }
 
@@ -577,8 +582,8 @@ function copyToClipboard(elementId) {
   document.execCommand("copy");
   document.body.removeChild(aux);
   Swal.fire(
-    'Liman ID kopyalandı!',
-    'Liman ID başarıyla kopyalandı.',
+    __('Liman ID kopyalandı!'),
+    __('Liman ID başarıyla kopyalandı.'),
     'success'
   );
 }
