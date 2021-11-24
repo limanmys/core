@@ -94,7 +94,7 @@
                     <div class="card card-widget widget-user-2" style="margin-bottom: 0px;">
                         <div class="widget-user-header bg-secondary" style="color:white">
                           <h3 class="widget-user-username" style="margin-left: 0px;" title="{{ user()->name, 20 }}">{{ str_limit(user()->name, 20)}}</h3>
-                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Son Giriş Tarihi: ") . \Carbon\Carbon::parse(user()->last_login_at)->isoFormat('LL')}}</h5>
+                          <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Son Giriş Tarihi: ") . \Carbon\Carbon::parse(user()->last_login_at)->isoFormat('LLL')}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Giriş Yapılan Son IP: ") . user()->last_login_ip}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">{{__("Bağlı Liman: ") . getLimanHostname()}}</h5>
                           <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 11px;">{{__("Liman ID: ")}} <span id="liman-id">{{ getLimanId() }}</span> <i data-toggle="tooltip" data-original-title="{{ __("Liman ID Kopyala") }}" id="copy-liman-id" class="far fa-copy fa-lg ml-1" onclick="copyToClipboard('liman-id')"></i></h5>

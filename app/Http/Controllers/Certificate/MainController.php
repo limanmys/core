@@ -36,8 +36,8 @@ class MainController extends Controller
         }
 
         list($flag, $message) = retrieveCertificate(
-            request('hostname'),
-            request('port')
+            strtolower(request('server_hostname')),
+            request('origin')
         );
 
         if (!$flag) {
