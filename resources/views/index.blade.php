@@ -65,6 +65,7 @@
           </div>
       </div>
       @if(user()->isAdmin())
+        <script src="{{ asset('js/chart3.min.js') }}"></script>
         <div class="col-md-3 col-sm-4 col-xs-12">
             <div class="info-box shadow-sm loading chartbox">
               <div class="overlay">
@@ -201,82 +202,85 @@
       cursor: default;
     }
     </style>
-    <script>
-        @if(user()->isAdmin())
+   <script>
+        @if (user()->isAdmin())
         function appendApp(item) {
-          return (`<div class="col-md-6 col-sm-12">
-                      <div class="row p-2">
-                        <div class="col-lg-4 col-5">
-                            <a href="{{ route('market') }}"><img src="https://market.liman.dev/${item.iconPath}" alt="${item.name}" class="img-fluid mb-3"></a>
+            return (`<div class="col-md-6 col-sm-12">
+                        <div class="row p-2">
+                            <div class="col-lg-4 col-5">
+                                <a href="{{ route('market') }}"><img src="https://market.liman.dev/${item.iconPath}"
+                                        alt="${item.name}" class="img-fluid mb-3"></a>
+                            </div>
+                            <div class="col-lg-8 col-7">
+                                <a href="{{ route('market') }}" class="text-dark">
+                                    <h4 style="font-weight: 600;">${item.name}</h4>
+                                </a>
+                                <p class="mb-0">${item.shortDescription}</p>
+                            </div>
                         </div>
-                        <div class="col-lg-8 col-7">
-                            <a href="{{ route('market') }}" class="text-dark"><h4 style="font-weight: 600;">${item.name}</h4></a>
-                            <p class="mb-0">${item.shortDescription}</p>
-                        </div>
-                      </div>
                     </div>`);
         }
 
         function getHomepageApps() {
-          $(".market-widget").find(".noApp").css("display", "none");
-          request('{{route('market_widget')}}', new FormData(), function(response){
-              var json = JSON.parse(response);
-              let a = 0;
-              json.forEach(function (item) {
-                if (a++ < 2) {
-                  $(".market-col-1").append(appendApp(item));
-                } else {
-                  $(".market-col-2").append(appendApp(item));
+            $(".market-widget").find(".noApp").css("display", "none");
+            request('{{ route("market_widget") }}', new FormData(), function(response) {
+                var json = JSON.parse(response);
+                let a = 0;
+                json.forEach(function(item) {
+                    if (a++ < 2) {
+                        $(".market-col-1").append(appendApp(item));
+                    } else {
+                        $(".market-col-2").append(appendApp(item));
+                    }
+                });
+                if (json.length < 1) {
+                    $(".market-widget").find(".noApp").css("display", "flex");
                 }
-              });
-              if (json.length < 1) {
-                $(".market-widget").find(".noApp").css("display", "flex");
-              }
-              $(".market-widget").find(".overlay").hide();
-          });
+                $(".market-widget").find(".overlay").hide();
+            });
         }
         getHomepageApps();
 
         function getOnlineServers() {
-          $(".online-servers").find(".noServer").css("display", "none");
-          request('{{route('online_servers')}}', new FormData(), function(response){
-              var json = JSON.parse(response);
-              json.forEach(function (item) {
-                $(".srvlist").append(`
-                  <li class="list-group-item">
-                    <a href="/sunucular/${item.id}" style="color:#222">
-                      <i class="fab ${item.icon} mr-1"></i> <span class="text-bold">${item.name}</span>
-                    </a>
-                    <div class="float-right">
-                      <span class="text-xs">${item.uptime ? item.uptime : ""}</span>  
-                      <span class="ml-1 badge ${item.badge_class}">${item.status ? "Online" : "Offline"}</span>
-                    </div>
-                  </li>
-                `);
-              });
-              if (json.length < 1) {
-                $(".online-servers").find(".noServer").css("display", "flex");
-              }
-              $(".online-servers").find(".overlay").hide();
-          });
+            $(".online-servers").find(".noServer").css("display", "none");
+            request('{{ route("online_servers") }}', new FormData(),
+                function(response) {
+                    var json = JSON.parse(response);
+                    json.forEach(function(item) {
+                        $(".srvlist").append(` <li class="list-group-item">
+                        <a href="/sunucular/${item.id}" style="color:#222">
+                            <i class="fab ${item.icon} mr-1"></i> <span class="text-bold">${item.name}</span>
+                        </a>
+                        <div class="float-right">
+                            <span class="text-xs">${item.uptime ? item.uptime : ""}</span>
+                            <span class="ml-1 badge ${item.badge_class}">${item.status ? "Online" : "Offline"}</span>
+                        </div>
+                        </li>
+                        `);
+                    });
+                    if (json.length < 1) {
+                        $(".online-servers").find(".noServer").css("display", "flex");
+                    }
+                    $(".online-servers").find(".overlay").hide();
+                });
         }
-        getOnlineServers();
+        getOnlineServers(); 
         @endif
 
         var limanEnableWidgets = true;
         $(".sortable-widget").sortable({
             stop: function(event, ui) {
                 var data = [];
-                $(".sortable-widget > div").each(function(i, el){
+                $(".sortable-widget > div").each(function(i, el) {
                     $(el).attr('data-order', $(el).index());
                     data.push({
-                      id: $(el).attr('id'),
-                      order:  $(el).index()
+                        id: $(el).attr('id'),
+                        order: $(el).index()
                     });
                 });
                 var form = new FormData();
                 form.append('widgets', JSON.stringify(data));
-                request('{{route('update_orders')}}', form, function(response){});
+                request('{{ route("update_orders") }}', form, function(response) {});
             }
         });
         $(".sortable-widget").disableSelection();
@@ -284,326 +288,425 @@
         var widgets = [];
         var currentWidget = 0;
 
-        $(".limanWidget").each(function(){
+        $(".limanWidget").each(function() {
             var element = $(this);
             widgets.push({
-              'element': element,
-              'type': 'countBox'
+                'element': element,
+                'type': 'countBox'
             });
         });
-        $('.limanCharts').each(function(){
+        $('.limanCharts').each(function() {
             var element = $(this);
             widgets.push({
-              'element': element,
-              'type': 'chart'
+                'element': element,
+                'type': 'chart'
             });
         });
         startQueue()
-        setInterval(function(){
+        setInterval(function() {
             startQueue()
-        },{{config('liman.widget_refresh_time')}});
+        }, {{ config("liman.widget_refresh_time") }});
 
-        function startQueue(){
-          if(!limanEnableWidgets){
-            return;
-          }
-          currentWidget = 0;
-          if(currentWidget >= widgets.length || widgets.length === 0){
-            return;
-          }
-          if(widgets[currentWidget].type === 'countBox'){
-            retrieveWidgets(widgets[currentWidget].element, nextWidget)
-          }else if(widgets[currentWidget].type === 'chart'){
-            retrieveCharts(widgets[currentWidget].element, nextWidget)
-          }
+        function startQueue() {
+            if (!limanEnableWidgets) {
+                return;
+            }
+            currentWidget = 0;
+            if (currentWidget >= widgets.length || widgets.length === 0) {
+                return;
+            }
+            if (widgets[currentWidget].type === 'countBox') {
+                retrieveWidgets(widgets[currentWidget].element, nextWidget)
+            } else if (widgets[currentWidget].type === 'chart') {
+                retrieveCharts(widgets[currentWidget].element, nextWidget)
+            }
         }
-        @if(user()->isAdmin())
+        @if (user()->isAdmin())
         var stats;
-        function retrieveStats(){
-          if(!limanEnableWidgets){
-            return;
-          }
-            request('{{route('liman_stats')}}', new FormData(), function(response){
-              stats = JSON.parse(response);
-              resourceChart('{{__("Cpu Kullanımı")}}', "cpuChart", stats.time, stats.cpu);
-              resourceChart('{{__("Ram Kullanımı")}}', "ramChart", stats.time, stats.ram);
-              resourceChart('{{__("IO Kullanımı")}}', "diskChart", stats.time, stats.io);
-              networkChart('{{__("Network")}}', "networkChart", stats.time, stats.network);
-              $(".chartbox").find(".overlay").hide();
-              setTimeout(() => {
-                retrieveStats();
-              }, 2500);
-            });
+        const CHART_INTERVAL = 2500;
+        const CHART_DELAY = 0;
+        const CHART_SPEED = 12;
+
+        function retrieveStats() {
+            if (!limanEnableWidgets) {
+                return;
+            }
+
+            request('{{ route("liman_stats") }}', new FormData(),
+                function(response) {
+                    stats = JSON.parse(response);
+
+                    if (!window[`networkChart-element`]) {
+                        resourceChart('{{ __("Cpu Kullanımı") }}', "cpuChart", 'cpu', true, '', '6, 212, 139');
+                        resourceChart('{{ __("Ram Kullanımı") }}', "ramChart", 'ram', true, '', '6, 182, 212');
+                        resourceChart('{{ __("IO Kullanımı") }}', "diskChart", 'io', true, '', '6, 79, 212');
+                        networkChart('{{ __("Network") }}', "networkChart");
+                    }
+
+                    $(".chartbox").find(".overlay").hide();
+                    setTimeout(() => {
+                        retrieveStats();
+                    }, CHART_INTERVAL);
+                }
+            );
         }
         retrieveStats();
         @endif
-        function nextWidget(){
-          currentWidget++;
-          if(currentWidget >= widgets.length || widgets.length === 0){
-            return;
-          }
-          if(widgets[currentWidget].type === 'countBox'){
-            retrieveWidgets(widgets[currentWidget].element, nextWidget)
-          }else if(widgets[currentWidget].type === 'chart'){
-            retrieveCharts(widgets[currentWidget].element, nextWidget)
-          }
+
+        function nextWidget() {
+            currentWidget++;
+            if (currentWidget >= widgets.length || widgets.length === 0) {
+                return;
+            }
+            if (widgets[currentWidget].type === 'countBox') {
+                retrieveWidgets(widgets[currentWidget].element, nextWidget)
+            } else if (widgets[currentWidget].type === 'chart') {
+                retrieveCharts(widgets[currentWidget].element, nextWidget)
+            }
         }
 
-        function retrieveWidgets(element, next){
+        function retrieveWidgets(element, next) {
             var info_box = element.closest('.info-box');
             var form = new FormData();
-            form.append('widget_id',element.attr('id'));
-            form.append('token',"{{$token}}");
-            form.append('server_id',element.attr('data-server-id'));
-            request(API('widget_one'), form, function(response){
+            form.append('widget_id', element.attr('id'));
+            form.append('token', "{{ $token }}");
+            form.append('server_id', element.attr('data-server-id'));
+            request(API('widget_one'), form, function(response) {
                 try {
-                  var json = JSON.parse(response);
-                  element.html(json["message"]);
-                  info_box.find('.info-box-icon').show();
-                  info_box.find('.info-box-content').show();
-                  info_box.find('.overlay').remove();
-                } catch(e) {
-                  info_box.find('.overlay i').remove();
-                  info_box.find('.overlay .spinner-border').remove();
-                  info_box.find('.overlay span').remove();
-                  info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip("Bir Hata Oluştu!")+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+"Bir Hata Oluştu!"+'</span>');
+                    var json = JSON.parse(response);
+                    element.html(json["message"]);
+                    info_box.find('.info-box-icon').show();
+                    info_box.find('.info-box-content').show();
+                    info_box.find('.overlay').remove();
+                } catch (e) {
+                    info_box.find('.overlay i').remove();
+                    info_box.find('.overlay .spinner-border').remove();
+                    info_box.find('.overlay span').remove();
+                    info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="' + strip(
+                            "Bir Hata Oluştu!") +
+                        '" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">' +
+                        "Bir Hata Oluştu!" + '</span>');
                 }
-                if(next){
-                  next();
+                if (next) {
+                    next();
                 }
             }, function(error) {
                 var json = {};
-                try{
-                  json = JSON.parse(error);
-                }catch(e){
-                  json = e;
+                try {
+                    json = JSON.parse(error);
+                } catch (e) {
+                    json = e;
                 }
                 info_box.find('.overlay .spinner-border').remove();
                 info_box.find('.overlay i').remove();
                 info_box.find('.overlay span').remove();
-                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip("Bir Hata Oluştu!")+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+"Bir Hata Oluştu!"+'</span>');
-                if(next){
-                  next();
+                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="' + strip(
+                        "Bir Hata Oluştu!") +
+                    '" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">' +
+                    "Bir Hata Oluştu!" + '</span>');
+                if (next) {
+                    next();
                 }
-              });
+            });
         }
 
-        function retrieveCharts(element, next){
+        function retrieveCharts(element, next) {
             var id = element.attr('id');
             var form = new FormData();
             form.append('widget_id', id);
-            form.append('server_id',element.attr('data-server-id'));
-            form.append('token',"{{$token}}");
-            request(API('widget_one'), form, function(res){
+            form.append('server_id', element.attr('data-server-id'));
+            form.append('token', "{{ $token }}");
+            request(API('widget_one'), form, function(res) {
                 try {
-                  var response =  JSON.parse(res);
-                  var data =  response.message;
-                  createChart(id+'Chart',data.labels, data.data);
-                } catch(e) {
-                  element.find('.overlay .spinner-border').remove();
-                  element.find('.overlay i').remove();
-                  element.find('.overlay span').remove();
-                  element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip("Bir Hata Oluştu!")+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+"Bir Hata Oluştu!"+'</span>');
+                    var response = JSON.parse(res);
+                    var data = response.message;
+                    createChart(id + 'Chart', data.labels, data.data);
+                } catch (e) {
+                    element.find('.overlay .spinner-border').remove();
+                    element.find('.overlay i').remove();
+                    element.find('.overlay span').remove();
+                    element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="' + strip(
+                            "Bir Hata Oluştu!") +
+                        '" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">' +
+                        "Bir Hata Oluştu!" + '</span>');
                 }
-                if(next){
-                  next();
+                if (next) {
+                    next();
                 }
             }, function(error) {
                 var json = {};
-                try{
-                  json = JSON.parse(error);
-                }catch(e){
-                  json = e;
+                try {
+                    json = JSON.parse(error);
+                } catch (e) {
+                    json = e;
                 }
                 element.find('.overlay .spinner-border').remove();
                 element.find('.overlay i').remove();
                 element.find('.overlay span').remove();
-                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="'+strip("Bir Hata Oluştu!")+'" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">'+"Bir Hata Oluştu!"+'</span>');
-                if(next){
-                  next();
+                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="' + strip(
+                        "Bir Hata Oluştu!") +
+                    '" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">' +
+                    "Bir Hata Oluştu!" + '</span>');
+                if (next) {
+                    next();
                 }
-              });
+            });
         }
 
-        function strip(html)
-        {
-           var tmp = document.createElement("DIV");
-           tmp.innerHTML = html;
-           return tmp.textContent || tmp.innerText || "";
+        function strip(html) {
+            var tmp = document.createElement("DIV");
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || "";
         }
 
-        function API(target)
-        {
-            return "{{route('home')}}/extensionRun/" + target;
+        function API(target) {
+            return "{{ route('home') }}/extensionRun/" + target;
         }
 
-        function resourceChart(title, chart, time, data, prefix=true, postfix="")
-        {
-          if(!window[`${chart}-element`]){
-              window[`${chart}-element`] = new Chart($(`#${chart}`), {
-                  type: 'line',
-                  data: {
-                      datasets: [{
-                          data: [data, data],
-                          steppedLine: false,
-                          borderColor: 'rgb(255, 159, 64)',
-                          backgroundColor: 'rgba(255, 159, 64, .5)',
-                          fill: true,
-                          pointRadius: 0
-                      }],
-                      labels: [time, time]
-                  },
-                  options: {
-                      responsive: true,
-                      legend: false,
-                      tooltips: {
-                          mode: 'index',
-                          intersect: false,
-                      },
-                      hover: {
-                          mode: 'nearest',
-                          intersect: true
-                      },
-                      title: {
-                        display: true,
-                        text: `${title} ` + (prefix ? `%${data} ${postfix}` : `${data} ${postfix}`),
-                      },
-                      scales: {
-                          xAxes: [{
-                              display: false
-                          }],
-                          yAxes: [{
-                              ticks: {
-                                  beginAtZero: true,
-                                  max: 100
-                              }
-                          }]
-                      },
-                      animation: {
-                        onComplete: () => {
-                          delayed = true;
-                        },
-                        delay: (context) => {
-                          let delay = 0;
-                          if (context.type === 'data' && context.mode === 'default' && !delayed) {
-                            delay = context.dataIndex * 500 + context.datasetIndex * 200;
-                          }
-                          return delay;
-                        },
-                      },
-                  }
-              });
-          }else{ 
-              window[`${chart}-element`].options.title.text = `${title} ` + (prefix ? `%${data} ${postfix}` : `${data} ${postfix}`);
-              window[`${chart}-element`].data.labels.push(time);
-              window[`${chart}-element`].data.datasets.forEach((dataset) => {
-                  dataset.data.push(data);
-              });
-              $('.charts-card').find('.overlay').hide();
-              window[`${chart}-element`].update(); 
-          }
-      }
+        function resourceChart(title, chart, varname, prefix = true, postfix = "", color = "6, 182, 212") {
+            let time = new Date();
+            let [h, m, s] = stats.time.split(':');
+            time.setHours(h);
+            time.setMinutes(m);
+            time.setSeconds(s);
 
-      function networkChart(title, chart, time, data)
-      {
-          if(!window[`${chart}-element`]){
-              window[`${chart}-element`] = new Chart($(`#${chart}`), {
-                  type: 'line',
-                  data: {
-                      datasets: [{
-                          label: '{{__('Download')}}',
-                          data: [data.down, data.down],
-                          steppedLine: false,
-                          borderColor: 'rgb(255, 159, 64)',
-                          backgroundColor: 'rgba(255, 159, 64, .5)',
-                          fill: true,
-                          pointRadius: 0
-                      },{
-                          label: '{{__('Upload')}}',
-                          data: [data.up, data.up],
-                          steppedLine: false,
-                          borderColor: 'rgb(54, 162, 235)',
-                          backgroundColor: 'rgba(54, 162, 235, .5)',
-                          fill: true,
-                          pointRadius: 0
-                      }],
-                      labels: [time, time]
-                  },
-                  options: {
-                      responsive: true,
-                      legend: false,
-                      tooltips: {
-                          mode: 'index',
-                          intersect: false,
-                      },
-                      hover: {
-                          mode: 'nearest',
-                          intersect: true
-                      },
-                      title: {
-                        display: true,
-                        text: `${title} Down: ${data.down} kb/s Up: ${data.up} kb/s`,
-                      },
-                      scales: {
-                          xAxes: [{
-                              display: false 
-                          }],
-                          yAxes: [{
-                              ticks: {
-                                  beginAtZero: true
-                              }
-                          }]
-                      },
-                      animation: {
-                        onComplete: () => {
-                          delayed = true;
+            if (!window[`${chart}-element`]) {
+                window[`${chart}-element`] = new Chart($(`#${chart}`), {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            cubicInterpolationMode: 'monotone',
+                            data: [{
+                                    x: time - CHART_INTERVAL * 5,
+                                    y: 0
+                                },
+                                {
+                                    x: time,
+                                    y: stats[varname]
+                                }
+                            ],
+                            steppedLine: false,
+                            borderColor: `rgb(${color})`,
+                            backgroundColor: `rgba(${color}, .2)`,
+                            fill: true,
+                            pointRadius: 0
+                        }, ],
+                    },
+                    options: {
+                        plugins: {
+                            responsive: true,
+                            legend: false,
+                            tooltips: {
+                                mode: 'index',
+                                intersect: false,
+                            },
+                            title: {
+                                display: true,
+                                text: `${title} ` + (prefix ? `%${stats[varname]} ${postfix}` :
+                                    `${stats[varname]} ${postfix}`),
+                            },
+                            hover: {
+                                mode: 'nearest',
+                                intersect: true
+                            },
                         },
-                        delay: (context) => {
-                          let delay = 0;
-                          if (context.type === 'data' && context.mode === 'default' && !delayed) {
-                            delay = context.dataIndex * 500 + context.datasetIndex * 200;
-                          }
-                          return delay;
-                        },
-                      },
-                  }
-              });
-          }else{
-              window[`${chart}-element`].options.title.text = `${title} Down: ${data.down} kb/s Up: ${data.up} kb/s`;
-              window[`${chart}-element`].data.labels.push(time);
-              window[`${chart}-element`].data.datasets[0].data.push(data.down);
-              window[`${chart}-element`].data.datasets[1].data.push(data.up);
-              window[`${chart}-element`].update();
-          }
-      }
 
-      function createChart(element, time, data) {
-          $("#" + element + "Text").text("%" + data[0]);
-          window[element + "Chart"] = new Chart($("#" + element), {
-              type: 'line',
-              data: {
-                  datasets: [{
-                      data: data,
-                  }],
-                  labels: [
-                      time,
-                  ]
-              },
-              options: {
-                  animation: false,
-                  responsive: true,
-                  legend: false,
-                  scales: {
-                      yAxes: [{
-                          ticks: {
-                              beginAtZero: true,
-                              min: 0,
-                              max: 100
-                          }
-                      }]
-                  },
-              }
-          })
-      }
+                        scales: {
+                            x: {
+                                display: false,
+                                type: "realtime",
+                                realtime: {
+                                    duration: CHART_INTERVAL * CHART_SPEED,
+                                    refresh: CHART_INTERVAL,
+                                    delay: 0,
+                                    onRefresh: chart => {
+                                        let d = new Date();
+                                        let [h, m, s] = stats.time.split(':');
+                                        d.setHours(h);
+                                        d.setMinutes(m);
+                                        d.setSeconds(s);
+                                        let time = d;
+
+                                        let data0 = chart.data.datasets[0].data;
+
+                                        if (data0[data0.length - 1].x.getTime() > time.getTime())
+                                            return;
+
+                                        data0.push({
+                                            x: time,
+                                            y: stats[varname]
+                                        });
+
+
+                                        if (data0.length > 100) {
+                                            data0 = data0.slice(1000 - 15, 15);
+                                        }
+
+                                        chart.options.plugins.title.text = `${title} ` + (prefix ?
+                                            `%${stats[varname]} ${postfix}` : `${stats[varname]} ${postfix}`
+                                        );
+                                    }
+
+                                },
+                            },
+                            y: {
+                                suggestedMax: 100,
+                                suggestedMin: 0,
+                            }
+                        },
+                    },
+                    interaction: {
+                        intersect: false
+                    }
+                });
+            }
+        }
+
+        function networkChart(title, chart) {
+            let time = new Date();
+            let [h, m, s] = stats.time.split(':');
+            time.setHours(h);
+            time.setMinutes(m);
+            time.setSeconds(s);
+
+            if (!window[`${chart}-element`]) {
+                window[`${chart}-element`] = new Chart($(`#${chart}`), {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            cubicInterpolationMode: 'monotone',
+                            label: '{{ __("Download") }}',
+                            data: [{
+                                    x: time - CHART_INTERVAL * 5,
+                                    y: 0
+                                },
+                                {
+                                    x: time,
+                                    y: stats.network.down
+                                }
+                            ],
+                            steppedLine: false,
+                            borderColor: 'rgb(6, 182, 212)',
+                            backgroundColor: 'rgba(6, 182, 212, .2)',
+                            fill: true,
+                            pointRadius: 0
+                        }, {
+                            cubicInterpolationMode: 'monotone',
+                            label: '{{ __("Upload") }}',
+                            data: [{
+                                x: time - CHART_INTERVAL * 5,
+                                y: 0
+                            }, {
+                                x: time,
+                                y: stats.network.up
+                            }],
+                            steppedLine: false,
+                            borderColor: 'rgb(6, 212, 139)',
+                            backgroundColor: 'rgba(6, 212, 139, .2)',
+                            fill: true,
+                            pointRadius: 0
+                        }],
+                    },
+                    options: {
+                        plugins: {
+                            responsive: true,
+                            legend: false,
+                            tooltips: {
+                                mode: 'index',
+                                intersect: false,
+                            },
+                            title: {
+                                display: true,
+                                text: `${title} Down: ${stats.network.down} kb/s Up: ${stats.network.up} kb/s`,
+                            },
+                        },
+
+                        scales: {
+                            x: {
+                                display: false,
+                                type: "realtime",
+                                realtime: {
+                                    duration: CHART_INTERVAL * CHART_SPEED,
+                                    refresh: CHART_INTERVAL,
+                                    delay: CHART_DELAY,
+                                    onRefresh: chart => {
+                                        let d = new Date();
+                                        let [h, m, s] = stats.time.split(':');
+                                        d.setHours(h);
+                                        d.setMinutes(m);
+                                        d.setSeconds(s);
+                                        let time = d;
+
+                                        let data0 = chart.data.datasets[0].data;
+                                        let data1 = chart.data.datasets[1].data;
+
+                                        if (data0[data0.length - 1].x.getTime() > time.getTime())
+                                            return;
+
+                                        data0.push({
+                                            x: time,
+                                            y: stats.network.down
+                                        });
+                                        data1.push({
+                                            x: time,
+                                            y: stats.network.up
+                                        });
+
+                                        if (data0.length > 100) {
+                                            data0 = data0.slice(
+                                                1000 - 15, 15);
+                                            data1 = data1.slice(
+                                                1000 - 15, 15);
+                                        }
+
+                                        chart.options.plugins.title.text =
+                                            `${title} Down: ${stats.network.down} kb/s Up: ${stats.network.up} kb/s`;
+                                    }
+                                }
+
+                            },
+                            y: {
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }
+                        },
+                    },
+                    interaction: {
+                        intersect: false
+                    }
+                });
+            }
+        }
+
+
+        function createChart(element, time, data) {
+            $("#" + element + "Text").text("%" + data[0]);
+            window[element + "Chart"] = new Chart($("#" + element), {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        data: data,
+                    }],
+                    labels: [
+                        time,
+                    ]
+                },
+                options: {
+                    animation: false,
+                    responsive: true,
+                    legend: false,
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: 100
+                            }
+                        }]
+                    },
+                }
+            })
+        }
     </script>
 @stop
