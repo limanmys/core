@@ -20,7 +20,7 @@
           <!-- Sidebar Menu -->
           <nav>
             <ul id="liman-sidebar" class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                @if(count($SERVERS))
+                @if(count($SERVERS) + count($USER_FAVORITES))
                 <li class="nav-header">{{__("Sunucular")}}</li>
                 @endif
                 @foreach ($USER_FAVORITES as $server)
@@ -76,7 +76,7 @@
                         @endforeach
                     </ul>
                 @endforeach
-                @if(count($SERVERS) > 0) 
+                @if(count($SERVERS) + count($USER_FAVORITES) > 0) 
                 <li class="nav-item">
                 <a href='/sunucular' class="nav-link">
                     <i class="nav-icon fas fa-ellipsis-h"></i>

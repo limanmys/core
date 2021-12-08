@@ -243,7 +243,7 @@ class HomeController extends Controller
                 $server->control_port,
                 $errno,
                 $errstr,
-                0.5);
+                0.1);
             
             try {
                 if ($server->isWindows() && $server->canRunCommand()) {

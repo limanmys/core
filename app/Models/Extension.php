@@ -13,6 +13,7 @@ class Extension extends Model
      * @var array
      */
     protected $fillable = [
+        "display_name",
         "name",
         "version",
         "icon",
@@ -93,11 +94,23 @@ class Extension extends Model
 
     public function getDisplayNameAttribute($value)
     {
-        return Str::title(str_replace("-", " ", $this->name));
+        if(empty($this->attributes['display_name'])){
+            return Str::title(str_replace("-", " ", $this->name));
+        }
+        return $this->attributes['display_name'];
     }
 
     public function getUpdatedAtAttribute($value)
     {
         return \Carbon\Carbon::parse($value)->isoFormat('LLLL');
+    }
+
+    public function setNameAttribute($value)
+    {
+        if ($this->name) {
+            return;
+        }
+
+        $this->attributes['name'] = $value;
     }
 }

@@ -111,7 +111,7 @@ class MainController extends Controller
             $decrypt = Command::runLiman(
                 "gpg --status-fd 1 -d -o '/tmp/{:originalName}' @{:extension} | grep FAILURE > /dev/null && echo 0 || echo 1",
                 [
-                    'originalName' => "ext-".basename(request()->file('extension')->path()),
+                    'originalName' => "ext-" . basename(request()->file('extension')->path()),
                     'extension' => request()->file('extension')->path()
                 ]
             );
@@ -163,7 +163,7 @@ class MainController extends Controller
         // Extract Zip to the Temp Folder.
         try {
             $zip->extractTo($path);
-        }catch(\Exception $ex){
+        } catch (\Exception $ex) {
             return [respond("Eklenti Dosyası Açılamıyor.", 201), null];
         }
 
@@ -178,10 +178,7 @@ class MainController extends Controller
 
         preg_match('/[A-Za-z-]+/', $json["name"], $output);
         if (empty($output) || $output[0] != $json["name"]) {
-            return respond(
-                "Eklenti isminde yalnızca harflere izin verilmektedir.",
-                201
-            );
+            return [respond("Eklenti isminde yalnızca harflere izin verilmektedir.", 201), null];
         }
 
         if (
@@ -190,8 +187,8 @@ class MainController extends Controller
         ) {
             return [
                 respond(
-                    __("Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu") .
-                        $json["supportedLiman"],
+                    __("Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu") . " " .
+                        intval($json["supportedLiman"]),
                     201
                 ),
                 null,
@@ -220,11 +217,13 @@ class MainController extends Controller
         } else {
             $new = new Extension();
         }
-        
+        unset($json['issuer']);
+        unset($json['status']);
+        unset($json['order']);
         $new->fill($json);
         $new->status = "1";
         $new->save();
-        
+
         if (array_key_exists("dependencies", $json) && $json["dependencies"] != "") {
             rootSystem()->installPackages($json["dependencies"]);
         }
@@ -278,12 +277,12 @@ class MainController extends Controller
         }
 
         $template = request('template');
-        $template_folder = storage_path('extension_templates/'.$template.'/');
+        $template_folder = storage_path('extension_templates/' . $template . '/');
         Command::runLiman("cp -r @{:template_folder} @{:folder}", [
             'template_folder' => $template_folder,
             'folder' => $folder
         ]);
-        
+
         foreach (glob("$folder/*.json") as $file) {
             $content = file_get_contents($file);
             $content = str_replace([
@@ -294,7 +293,7 @@ class MainController extends Controller
             ], [
                 request("name"),
                 auth()->user()->name,
-                file_get_contents(storage_path('VERSION')),
+                trim(file_get_contents(storage_path('VERSION'))),
                 auth()->user()->email
             ], $content);
             file_put_contents($file, $content);
@@ -310,7 +309,7 @@ class MainController extends Controller
         ]);
 
         $system = rootSystem();
-        
+
         $system->userAdd($ext->id);
 
         $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $ext->id;
@@ -318,7 +317,7 @@ class MainController extends Controller
         Command::runSystem('chmod 760 @{:path}', [
             'path' => $passPath
         ]);
-        
+
         file_put_contents($passPath, Str::random(32));
 
         request()->request->add(['server' => "none"]);

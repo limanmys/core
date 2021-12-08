@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Certificate;
 
 use App\Models\AdminNotification;
 use App\Models\Certificate;
-use App\Models\Server;
 use App\Http\Controllers\Controller;
+use App\System\Command;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class MainController extends Controller
 {
@@ -31,6 +33,18 @@ class MainController extends Controller
         ) {
             return respond(
                 "Bu sunucu ve port için sertifika zaten eklenmiş.",
+                201
+            );
+        }
+
+        list($flag, $message) = retrieveCertificate(
+            strtolower(request('server_hostname')),
+            request('origin')
+        );
+
+        if (!$flag) {
+            return respond(
+                $message,
                 201
             );
         }
@@ -75,6 +89,37 @@ class MainController extends Controller
         $certificate->delete();
 
         return respond("Sertifika Başarıyla Silindi!", 200);
+    }
+
+    public function getCertificateInfo(Request $request)
+    {
+        $certificateFile = Command::runLiman("cat /usr/local/share/ca-certificates/liman-{:ipAddress}_{:port}.crt", [
+            "ipAddress" => $request->hostname,
+            "port" => $request->port
+        ]);
+
+        $certinfo = openssl_x509_parse($certificateFile);
+        $certinfo["subjectKeyIdentifier"] = array_key_exists(
+            "subjectKeyIdentifier",
+            $certinfo["extensions"]
+        )
+            ? $certinfo["extensions"]["subjectKeyIdentifier"]
+            : "";
+        $certinfo["authorityKeyIdentifier"] = array_key_exists(
+            "authorityKeyIdentifier",
+            $certinfo["extensions"]
+        )
+            ? substr($certinfo["extensions"]["authorityKeyIdentifier"], 6)
+            : "";
+        $certinfo["validFrom_time_t"] = Carbon::createFromTimestamp(
+            $certinfo["validFrom_time_t"]
+        )->format('H:i d/m/Y');
+        $certinfo["validTo_time_t"] = Carbon::createFromTimestamp(
+            $certinfo["validTo_time_t"]
+        )->format('H:i d/m/Y');
+        unset($certinfo["extensions"]);
+        
+        return respond($certinfo);
     }
 
     /**

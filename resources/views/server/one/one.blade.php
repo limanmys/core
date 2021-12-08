@@ -64,6 +64,7 @@
                                 <h3 class="card-title">{{ __('Kaynak Kullanımı') }}</h3>
                             </div>
                             <div class="card-body">
+                                <script src="{{ asset('js/chart3.min.js') }}"></script>
                                 <div class="row justify-content-center">
                                     <div class="col-md-3">
                                         <canvas id="cpuChart"></canvas>

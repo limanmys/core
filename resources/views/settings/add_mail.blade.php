@@ -16,7 +16,7 @@
         @include('errors')
         <form action="{{route('cron_mail_add')}}" onsubmit="return widget_control(this)" method="POST">
             <label>{{__("Kullanıcı")}}</label>
-            <select class="form-control" id="user_id" required name="user_id">
+            <select class="form-control select2" id="user_id" required name="user_id[]" data-placeholder="{{ __("Kullanıcı") }}" multiple="multiple">
                 @foreach(users() as $user)
                     <option value="{{$user->id}}">{{$user->name}}</option>
                 @endforeach
@@ -30,7 +30,7 @@
             <label>{{__("Eklenti")}}</label>
             <select class="form-control" id="extension_id" disabled onchange="getCronMailTags()" required name="extension_id"></select><br>
             <label>{{__("Mail Ayarı")}}</label>
-            <select class="form-control" id="target" disabled="" name="target"></select><br>
+            <select class="form-control select2" id="target" disabled="" name="target[]" multiple="multiple" data-placeholder="{{ __("Hedef fonksiyon seçiniz.") }}"></select><br>
             <label>{{__("Rapor Süresi")}}</label>
             <select class="form-control" id="cron_type" name="cron_type">
                 <option value="hourly">{{__("Saatlik")}}</option>
@@ -39,7 +39,8 @@
                 <option value="monthly">{{__("Aylık")}}</option>
             </select><br>
             <label>{{__("Hedef Mail")}}</label>
-            <input type="text" class="form-control" id="to" name="to" required></select><br>
+            <select name="to[]" id="to" required class="form-control select2" data-tags="true" data-placeholder="Mail adreslerini enter ile ayırın." data-allow-clear="true" multiple="multiple"></select>
+            <br>
             @csrf
             <button class="btn btn-success" type="submit">{{__("Mail Ayarı Ekle")}}</button>
         </form>
@@ -88,7 +89,7 @@
     }
 
     function widget_control(element){
-        if(!$(element).find('select[name=target]').val()){
+        if(!$(element).find('select#target').val()){
             showSwal("{{_("Önce bir widget seçmelisiniz!")}}",'error',2000);
             return false;
         }

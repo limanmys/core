@@ -24,16 +24,17 @@ use App\System\Helper;
 use mervick\aesEverywhere\AES256;
 use phpseclib\Crypt\RSA;
 use Illuminate\Support\Facades\Validator;
+use Jackiedo\DotenvEditor\Facades\DotenvEditor;
 
 if (!function_exists('validate')) {
-	function validate($rules, $messages=[])
-	{
-		$validator = Validator::make(request()->all(), $rules, $messages);
-		if ($validator->fails()) {
-			$errors = $validator->errors();
-			abort(400, $errors->first());
-		}
-	}
+    function validate($rules, $messages = [])
+    {
+        $validator = Validator::make(request()->all(), $rules, $messages);
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            abort(400, $errors->first());
+        }
+    }
 }
 
 if (!function_exists('updateSystemSettings')) {
@@ -849,15 +850,25 @@ if (!function_exists('getExtensionJson')) {
      */
     function getExtensionJson($extension_name)
     {
-        return json_decode(
-            file_get_contents(
-                "/liman/extensions/" .
-                    strtolower($extension_name) .
-                    DIRECTORY_SEPARATOR .
-                    "db.json"
-            ),
-            true
-        );
+        $extension_json = "/liman/extensions/" .
+            strtolower($extension_name) .
+            DIRECTORY_SEPARATOR .
+            "db.json";
+
+        if (file_exists($extension_json)) {
+            $json = json_decode(
+                file_get_contents(
+                    $extension_json
+                ),
+                true
+            );
+            if(empty($json['display_name'])){
+                $json['display_name'] = Str::title(str_replace("-", " ", $json['name']));
+            }
+            return $json;
+        } else {
+            abort(404, $extension_name . __(" eklentisi sistemde bulunamadı, yeniden yüklemeyi deneyin."));
+        }
     }
 }
 
@@ -867,7 +878,8 @@ if (!function_exists('redirect_now')) {
         try {
             \App::abort($code, '', ['Location' => $url]);
         } catch (\Exception $exception) {
-            $previousErrorHandler = set_exception_handler(function () {});
+            $previousErrorHandler = set_exception_handler(function () {
+            });
             restore_error_handler();
             call_user_func($previousErrorHandler, $exception);
             die();
@@ -1019,41 +1031,57 @@ if (!function_exists('getPermissions')) {
         return substr(sprintf("%o", fileperms($path)), -4);
     }
 }
+
+if (!function_exists('getExtensionFunctions')) {
+    function getExtensionFunctions(string $extension_name)
+    {
+        $extension = json_decode(
+            file_get_contents(
+                "/liman/extensions/" .
+                    strtolower($extension_name) .
+                    DIRECTORY_SEPARATOR .
+                    "db.json"
+            ),
+            true
+        );
+        return isset($extension["functions"])
+            ? collect($extension["functions"])
+            : [];
+    }
+}
+
+if (!function_exists('extensionTranslate')) {
+    function extensionTranslate(string $text, string $extension_name)
+    {
+        $lang = session('locale');
+        $file =
+            "/liman/extensions/" .
+            strtolower($extension_name) .
+            "/lang/" .
+            $lang .
+            ".json";
+        if (is_file($file)) {
+            $lang = json_decode(file_get_contents($file), true);
+            return isset($lang[$text]) ? $lang[$text] : $text;
+        }
+        return $text;
+    }
+}
+
 if (!function_exists('setEnv')) {
     function setEnv(array $values)
     {
-        $envFile = app()->environmentFilePath();
-        $str = file_get_contents($envFile);
-
-        if (count($values) > 0) {
-            foreach ($values as $envKey => $envValue) {
-                $str .= "\n"; // In case the searched variable is in the last line without \n
-                $keyPosition = strpos($str, "{$envKey}=");
-                $endOfLinePosition = strpos($str, "\n", $keyPosition);
-                $oldLine = substr(
-                    $str,
-                    $keyPosition,
-                    $endOfLinePosition - $keyPosition
-                );
-
-                // If key does not exist, add it
-                if (!$keyPosition || !$endOfLinePosition || !$oldLine) {
-                    $str .= "{$envKey}={$envValue}\n";
-                } else {
-                    $str = str_replace($oldLine, "{$envKey}={$envValue}", $str);
-                }
-            }
-        }
-
-        $str = substr($str, 0, -1);
-        if (!file_put_contents($envFile, $str)) {
+        $editor = DotenvEditor::load(base_path('.env'));
+        $editor->setKeys($values);
+        try {
+            $editor->save();
+        } catch (\Exception $ex) {
             return false;
         }
         shell_exec('php /liman/server/artisan config:clear');
         return true;
     }
 }
-
 if (!function_exists('checkHealth')) {
     function checkHealth()
     {
@@ -1088,7 +1116,7 @@ if (!function_exists('checkHealth')) {
                 array_push($messages, [
                     "type" => "danger",
                     "message" =>
-                        "'/liman/$name' izni hatalı (" .
+                    "'/liman/$name' izni hatalı (" .
                         getPermissions('/liman/' . $name) .
                         ").",
                 ]);
@@ -1119,7 +1147,7 @@ if (!function_exists('checkHealth')) {
         if (empty($messages)) {
             array_push($messages, [
                 "type" => "success",
-                "message" => __("Herşey Yolunda, sıkıntı yok!"),
+                "message" => __("Her şey Yolunda, sıkıntı yok!"),
             ]);
         }
 

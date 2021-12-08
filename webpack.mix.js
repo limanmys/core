@@ -49,5 +49,5 @@ mix.combine([
     'resources/assets/js/pusher.min.js',
     'resources/assets/js/jquery.overlayScrollbars.js',
     'resources/assets/js/liman.js',
-    'resources/assets/js/tus.js',
+    'resources/assets/js/tus.js'
 ], 'public/js/liman.js').version();
