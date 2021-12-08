@@ -856,12 +856,16 @@ if (!function_exists('getExtensionJson')) {
             "db.json";
 
         if (file_exists($extension_json)) {
-            return json_decode(
+            $json = json_decode(
                 file_get_contents(
                     $extension_json
                 ),
                 true
             );
+            if(empty($json['display_name'])){
+                $json['display_name'] = Str::title(str_replace("-", " ", $json['name']));
+            }
+            return $json;
         } else {
             abort(404, $extension_name . __(" eklentisi sistemde bulunamadı, yeniden yüklemeyi deneyin."));
         }
