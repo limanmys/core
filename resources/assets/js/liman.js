@@ -341,17 +341,7 @@ function renderNotifications(data, type, target, exclude) {
   $("#" + target + "Count").html(data.length);
   data.forEach((notification) => {
     var errors = ["error", "health_problem"];
-    var color = errors.includes(notification["type"]) ? "#f56954" : "#00a65a";
-    element.append(
-      "<div class='dropdown-divider'></div><a class='dropdown-item' href='/bildirim/" +
-        notification["id"] +
-        "'>" +
-        "<span style='color: " +
-        color +
-        ";width: 100%'>" +
-        notification["title"] +
-        "</span></a>"
-    );
+    element.append([...$("<div />").addClass("dropdown-divider").append("<a />").find("a").addClass("dropdown-item").attr("href", `/bildirim/${notification["id"]}`).append("<span />").find("span").css("color", errors.includes(notification["type"]) ? "#f56954" : "#00a65a").css("width", "100%").text(notification["title"]).parents()].reverse())
     var displayedNots = [];
     if (localStorage.displayedNots) {
       displayedNots = JSON.parse(localStorage.displayedNots);
@@ -465,18 +455,8 @@ function getSearchResults (query) {
           `);
         }
 
-        let firstone = 0
-        data.forEach(el => {
-          if (firstone == 0) {
-            $("#liman_search_results").append(`
-              <a href="${el.url}" class="hovered">${el.name}</a>
-            `);
-            firstone++
-          } else {
-            $("#liman_search_results").append(`
-              <a href="${el.url}">${el.name}</a>
-            `);
-          }
+        data.forEach((el, i) => {
+          $("#liman_search_results").append($("<a />").attr("href", el.url).toggleClass("hovered", i == 0).text(el.name));
         });
       },
       error: function (jqXhr, textStatus, error) 
