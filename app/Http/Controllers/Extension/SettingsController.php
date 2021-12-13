@@ -97,6 +97,7 @@ class SettingsController extends Controller
 
         if (request('type') == "general") {
             extension()->update(request()->only([
+                'display_name',
                 'icon',
                 'support',
                 'version',
@@ -105,6 +106,7 @@ class SettingsController extends Controller
                 'sslPorts',
                 'supportedLiman'
             ]));
+            $extension["display_name"] = request("display_name");
             $extension["icon"] = request("icon");
             $extension["service"] = request("service");
             $extension["version"] = request("version");

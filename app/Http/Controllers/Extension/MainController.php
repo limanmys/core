@@ -217,7 +217,9 @@ class MainController extends Controller
         } else {
             $new = new Extension();
         }
-
+        unset($json['issuer']);
+        unset($json['status']);
+        unset($json['order']);
         $new->fill($json);
         $new->status = "1";
         $new->save();
@@ -291,7 +293,7 @@ class MainController extends Controller
             ], [
                 request("name"),
                 auth()->user()->name,
-                file_get_contents(storage_path('VERSION')),
+                trim(file_get_contents(storage_path('VERSION'))),
                 auth()->user()->email
             ], $content);
             file_put_contents($file, $content);

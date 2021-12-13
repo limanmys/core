@@ -205,20 +205,22 @@
    <script>
         @if (user()->isAdmin())
         function appendApp(item) {
-            return (`<div class="col-md-6 col-sm-12">
-                        <div class="row p-2">
-                            <div class="col-lg-4 col-5">
-                                <a href="{{ route('market') }}"><img src="https://market.liman.dev/${item.iconPath}"
-                                        alt="${item.name}" class="img-fluid mb-3"></a>
-                            </div>
-                            <div class="col-lg-8 col-7">
-                                <a href="{{ route('market') }}" class="text-dark">
-                                    <h4 style="font-weight: 600;">${item.name}</h4>
-                                </a>
-                                <p class="mb-0">${item.shortDescription}</p>
-                            </div>
-                        </div>
-                    </div>`);
+          const el = $(`
+          <div class="col-md-6 col-sm-12">
+            <div class="row p-2">
+              <div class="col-lg-4 col-5">
+                  <a href="{{ route('market') }}"><img class="img-fluid mb-3"></a>
+              </div>
+              <div class="col-lg-8 col-7">
+                  <a href="{{ route('market') }}" class="text-dark"><h4 style="font-weight: 600;"></h4></a>
+                  <p class="mb-0"></p>
+              </div>
+            </div>
+          </div>`);
+          $(el).find("img").attr("src", `https://market.liman.dev/${item.iconPath}`).attr("alt", item.name);
+          $(el).find("h4").text(item.name);
+          $(el).find("p").text(item.shortDescription);
+          return el;
         }
 
         function getHomepageApps() {
@@ -247,17 +249,23 @@
                 function(response) {
                     var json = JSON.parse(response);
                     json.forEach(function(item) {
-                        $(".srvlist").append(` <li class="list-group-item">
-                        <a href="/sunucular/${item.id}" style="color:#222">
-                            <i class="fab ${item.icon} mr-1"></i> <span class="text-bold">${item.name}</span>
-                        </a>
-                        <div class="float-right">
-                            <span class="text-xs">${item.uptime ? item.uptime : ""}</span>
-                            <span class="ml-1 badge ${item.badge_class}">${item.status ? "Online" : "Offline"}</span>
-                        </div>
-                        </li>
-                        `);
-                    });
+                        const el = $(`
+                    <li class="list-group-item">
+                    <a style="color:#222">
+                        <i class="fab mr-1"></i>
+                        <span class="text-bold"></span>
+                    </a>
+                    <div class="float-right">
+                        <span class="text-xs"></span>  
+                        <span class="ml-1 badge"></span>
+                    </div>
+                    </li>`);
+                    $(el).find("a").attr("href", `/sunucular/${item.id}`).find("i").addClass(item.icon);
+                    $(el).find("span").text(item.name);
+                    $(el).find("div>span:first-child").text(item.uptime || "");
+                    $(el).find("div>span:last-child").addClass(item.badge_class).text(item.status ? "Online" : "Offline");
+
+                    $(".srvlist").append(el);
                     if (json.length < 1) {
                         $(".online-servers").find(".noServer").css("display", "flex");
                     }

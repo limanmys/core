@@ -643,8 +643,11 @@
             logContentWrapper.html("");
             $.each(json.message,function (index,current) {
                 current.id =  "a" + Math.random().toString(36).substr(2, 9);
-                logTitleWrapper.append("<a class='list-group-item list-group-item-action' id='"+ current.id + "_title' href='#" + current.id + "_content' data-toggle='list' role='tab' aria-controls='home'>" + current.title + "</a>");
-                logContentWrapper.append("<div class='tab-pane fade' id='" + current.id + "_content' role='tabpanel' aria-labelledby='" + current.id +"_title'><pre style='white-space:pre-wrap;'>" + current.message + "</pre></div>");
+                const titleEl = $("<a class='list-group-item list-group-item-action' id='"+ current.id + "_title' href='#" + current.id + "_content' data-toggle='list' role='tab' aria-controls='home' />").text(current.title);
+                logTitleWrapper.append(titleEl);
+                const contentEl = $("<div class='tab-pane fade' id='" + current.id + "_content' role='tabpanel' aria-labelledby='" + current.id +"_title'><pre style='white-space:pre-wrap;' /></div>");
+                contentEl.find("pre").text(current.message);
+                logContentWrapper.append(contentEl);
             });
             modal.modal("show");
             setTimeout(function () {
