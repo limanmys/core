@@ -203,7 +203,7 @@
     }
     </style>
    <script>
-        @if (user()->isAdmin())
+        @if(user()->isAdmin())
         function appendApp(item) {
           const el = $(`
           <div class="col-md-6 col-sm-12">
@@ -234,6 +234,7 @@
                     } else {
                         $(".market-col-2").append(appendApp(item));
                     }
+                    $(".market-widget").find(".noApp").css("display", "none");
                 });
                 if (json.length < 1) {
                     $(".market-widget").find(".noApp").css("display", "flex");
@@ -245,32 +246,40 @@
 
         function getOnlineServers() {
             $(".online-servers").find(".noServer").css("display", "none");
-            request('{{ route("online_servers") }}', new FormData(),
-                function(response) {
-                    var json = JSON.parse(response);
-                    json.forEach(function(item) {
-                        const el = $(`
-                    <li class="list-group-item">
-                    <a style="color:#222">
-                        <i class="fab mr-1"></i>
-                        <span class="text-bold"></span>
-                    </a>
-                    <div class="float-right">
-                        <span class="text-xs"></span>  
-                        <span class="ml-1 badge"></span>
-                    </div>
-                    </li>`);
-                    $(el).find("a").attr("href", `/sunucular/${item.id}`).find("i").addClass(item.icon);
-                    $(el).find("span").text(item.name);
-                    $(el).find("div>span:first-child").text(item.uptime || "");
-                    $(el).find("div>span:last-child").addClass(item.badge_class).text(item.status ? "Online" : "Offline");
+            let responsePromise = () => {
+                return new Promise((resolve) => {
+                    request('{{ route("online_servers") }}', new FormData(), function(response) {
+                        let json = JSON.parse(response);
+                        json.forEach(function(item, iter) {
+                            var el = $(`
+                                <li class="list-group-item">
+                                <a style="color:#222">
+                                    <i class="fab mr-1"></i>
+                                    <span class="text-bold"></span>
+                                </a>
+                                <div class="float-right">
+                                    <span class="text-xs"></span>  
+                                    <span class="ml-1 badge"></span>
+                                </div>
+                                </li>`
+                            );
+                            $(el).find("a").attr("href", `/sunucular/${item.id}`).find("i").addClass(item.icon);
+                            $(el).find("span").text(item.name);
+                            $(el).find("div>span:first-child").text(item.uptime || "");
+                            $(el).find("div>span:last-child").addClass(item.badge_class).text(item.status ? "Online" : "Offline");
 
-                    $(".srvlist").append(el);
-                    if (json.length < 1) {
-                        $(".online-servers").find(".noServer").css("display", "flex");
-                    }
-                    $(".online-servers").find(".overlay").hide();
-                });
+                            $(".srvlist").append(el);
+                        });
+                        $(".online-servers").find(".overlay").hide();
+                        resolve(json.length > 0 ? true : false);
+                    });
+                })
+            };
+            responsePromise().then((res) => {
+                if (!res) {
+                    $(".online-servers").find(".noServer").css("display", "flex");
+                }
+            });
         }
         getOnlineServers(); 
         @endif
@@ -485,7 +494,7 @@
                         datasets: [{
                             cubicInterpolationMode: 'monotone',
                             data: [{
-                                    x: time - CHART_INTERVAL * 5,
+                                    x: time - CHART_INTERVAL * 9,
                                     y: 0
                                 },
                                 {
@@ -585,7 +594,7 @@
                             cubicInterpolationMode: 'monotone',
                             label: '{{ __("Download") }}',
                             data: [{
-                                    x: time - CHART_INTERVAL * 5,
+                                    x: time - CHART_INTERVAL * 9,
                                     y: 0
                                 },
                                 {
