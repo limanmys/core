@@ -56,7 +56,7 @@
         request('{{route('widget_get_extensions')}}',form,function(response){
             var json = JSON.parse(response);
             for(var k in json) {
-                element.append('<option value="'+ k+ '">' + fixer(json[k]) + '</option>');
+                element.append($("<option />").attr("value", k).text(fixer(json[k])));
             }
             if(Object.keys(json).length > 0){
                 getCronMailTags();
@@ -79,7 +79,7 @@
             let element = $("#target");
             element.text('');
             $.each(json.message, function( index, value ) {
-                element.append('<option value="'+ value["tag"] +'">' + value["description"] + '</option>');
+                element.append($("<option />").attr("value", value["tag"]).text(value["description"]));
             });
             element.removeAttr('disabled');
         }, function(response){
