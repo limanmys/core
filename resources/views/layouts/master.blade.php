@@ -112,6 +112,13 @@
         @endif
     };
 
+    function publicPath(path, extension_id=null){
+        if(extension_id == null){
+            extension_id = $("meta[name=extension_id]").attr("content");
+        }
+        return "{{ route('home') }}/eklenti/"+extension_id+"/public/"+path;
+    }
+
     function initialPresets(){
         $('table').not('.notDataTable').DataTable({
             autoFill : true,

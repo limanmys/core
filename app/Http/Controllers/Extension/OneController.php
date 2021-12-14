@@ -275,7 +275,7 @@ class OneController extends Controller
         $basePath =
             "/liman/extensions/" . strtolower(extension()->name) . "/public/";
 
-        $targetPath = $basePath . base64_decode(request('path'));
+        $targetPath = $basePath . explode("public/", url()->current(), 2)[1];
 
         if (realpath($targetPath) != $targetPath) {
             abort(404);

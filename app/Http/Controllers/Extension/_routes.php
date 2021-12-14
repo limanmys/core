@@ -149,6 +149,6 @@ Route::post(
     ->middleware('admin');
 
 Route::get(
-    '/eklenti/{extension_id}/public/{path?}',
+    '/eklenti/{extension_id}/public/{any}',
     'Extension\OneController@publicFolder'
-)->name('extension_public_folder');
+)->where('any', '.+')->name('extension_public_folder');
