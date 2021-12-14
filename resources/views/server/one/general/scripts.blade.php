@@ -80,7 +80,7 @@
                     datasets: [{
                         cubicInterpolationMode: 'monotone',
                         data: [{
-                                x: time - CHART_INTERVAL * 5,
+                                x: time - CHART_INTERVAL * 9,
                                 y: 0
                             },
                             {
@@ -180,7 +180,7 @@
                             cubicInterpolationMode: 'monotone',
                             label: '{{ __("Download") }}',
                             data: [{
-                                    x: time - CHART_INTERVAL * 5,
+                                    x: time - CHART_INTERVAL * 9,
                                     y: 0
                                 },
                                 {

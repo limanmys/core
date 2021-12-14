@@ -63,7 +63,7 @@ body {
 }
 
 #liman-sidebar .fa-angle-right {
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
 .nav-sidebar .menu-open>.nav-link i.right {
@@ -384,6 +384,11 @@ table.dataTable {
     white-space: nowrap;
     padding-left: 37px;
     width: calc(100% - 37px);
+}
+
+#ext_menu button {
+    padding-top: 0.83rem !important;
+    padding-bottom: 0.83rem !important;
 }
 
 #btn-nav-previous, #btn-nav-next {
