@@ -485,3 +485,13 @@ table.table {
     border-top-right-radius: 5px!important;
     border-bottom-right-radius: 5px!important;
 }
+
+#linuxMachinePolTabNew .table {
+    border: 0 !important;
+}
+
+#linuxMachinePolTabNew .table thead, #linuxMachinePolTabNew thead {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
