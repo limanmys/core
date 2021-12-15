@@ -942,11 +942,19 @@ if (!function_exists('getObject')) {
         switch ($type) {
             case "Extension":
             case "extension":
-                return Extension::find($id);
+                try {
+                    return Extension::find($id);
+                } catch (\Throwable $e) {
+                    abort(404, __("Eklenti bulunamadı."));
+                }
                 break;
             case "Server":
             case "server":
-                return Server::find($id);
+                try {
+                    return Server::find($id);
+                } catch (\Throwable $e) {
+                    abort(404, __("Sunucu bulunamadı."));
+                }
                 break;
             default:
                 return false;
