@@ -927,5 +927,6 @@
     "Dış Bildirim -> ": "External Notification -> ",
     "Liman ID Kopyala": "Copy Liman ID",
     " eklentisi sistemde bulunamadı, yeniden yüklemeyi deneyin.": " can not be found in the system, try reinstalling it.",
-    "Eklenti Görünen Adı": "Extension Display Name"
+    "Eklenti Görünen Adı": "Extension Display Name",
+    "Sertifika Detayları": "Certificate Details"
 }
