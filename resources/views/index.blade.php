@@ -341,7 +341,7 @@
         @if (user()->isAdmin())
         var stats;
         const CHART_INTERVAL = 2500;
-        const CHART_DELAY = 0;
+        const CHART_DELAY = 4500;
         const CHART_SPEED = 12;
 
         function retrieveStats() {
@@ -482,10 +482,6 @@
 
         function resourceChart(title, chart, varname, prefix = true, postfix = "", color = "6, 182, 212") {
             let time = new Date();
-            let [h, m, s] = stats.time.split(':');
-            time.setHours(h);
-            time.setMinutes(m);
-            time.setSeconds(s);
 
             if (!window[`${chart}-element`]) {
                 window[`${chart}-element`] = new Chart($(`#${chart}`), {
@@ -494,7 +490,7 @@
                         datasets: [{
                             cubicInterpolationMode: 'monotone',
                             data: [{
-                                    x: time - CHART_INTERVAL * 9,
+                                    x: time - CHART_INTERVAL * 2,
                                     y: 0
                                 },
                                 {
@@ -535,14 +531,9 @@
                                 realtime: {
                                     duration: CHART_INTERVAL * CHART_SPEED,
                                     refresh: CHART_INTERVAL,
-                                    delay: 0,
+                                    delay: CHART_DELAY,
                                     onRefresh: chart => {
-                                        let d = new Date();
-                                        let [h, m, s] = stats.time.split(':');
-                                        d.setHours(h);
-                                        d.setMinutes(m);
-                                        d.setSeconds(s);
-                                        let time = d;
+                                        let time = new Date();
 
                                         let data0 = chart.data.datasets[0].data;
 
@@ -581,10 +572,6 @@
 
         function networkChart(title, chart) {
             let time = new Date();
-            let [h, m, s] = stats.time.split(':');
-            time.setHours(h);
-            time.setMinutes(m);
-            time.setSeconds(s);
 
             if (!window[`${chart}-element`]) {
                 window[`${chart}-element`] = new Chart($(`#${chart}`), {
@@ -594,7 +581,7 @@
                             cubicInterpolationMode: 'monotone',
                             label: '{{ __("Download") }}',
                             data: [{
-                                    x: time - CHART_INTERVAL * 9,
+                                    x: time - CHART_INTERVAL * 2,
                                     y: 0
                                 },
                                 {
@@ -611,7 +598,7 @@
                             cubicInterpolationMode: 'monotone',
                             label: '{{ __("Upload") }}',
                             data: [{
-                                x: time - CHART_INTERVAL * 5,
+                                x: time - CHART_INTERVAL * 3,
                                 y: 0
                             }, {
                                 x: time,
@@ -645,14 +632,9 @@
                                 realtime: {
                                     duration: CHART_INTERVAL * CHART_SPEED,
                                     refresh: CHART_INTERVAL,
-                                    delay: CHART_DELAY,
+                                    delay: CHART_DELAY + 2500,
                                     onRefresh: chart => {
-                                        let d = new Date();
-                                        let [h, m, s] = stats.time.split(':');
-                                        d.setHours(h);
-                                        d.setMinutes(m);
-                                        d.setSeconds(s);
-                                        let time = d;
+                                        let time = new Date();
 
                                         let data0 = chart.data.datasets[0].data;
                                         let data1 = chart.data.datasets[1].data;
