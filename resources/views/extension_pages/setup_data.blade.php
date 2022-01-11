@@ -17,8 +17,19 @@
                     {{__("Önceki ayarlarınızdan sizin için birkaç veri eklendi.")}}
                 </div>
             @endif
+
+            @if (count($globalVars))
+                <div class="alert alert-info" role="alert">
+                    {{__("Bazı ayarlar sadece eklentiyi kuran kullanıcı tarafından değiştirilebilir.")}}
+                </div>
+            @endif
+
             @if($extension["database"])
                 @foreach($extension["database"] as $item)
+                        @if (in_array($item["variable"], $globalVars))
+                            @continue
+                        @endif
+                        
                         @if($item["variable"] == "certificate")
                             <div class="form-group">
                                 <label>{{$item["name"]}}</label>

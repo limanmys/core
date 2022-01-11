@@ -141,6 +141,7 @@
                                 "Türü" => "type:text:Verinizin türü form elemanını belirler. Örneğin text, password vs.",
                                 "Variable Adı" => "variable:text:Eklenti içinden veriye bu isim ile erişirsiniz.",
                                 "Zorunlu Alan" => "required:checkbox",
+                                "Kullanıcılar Arası Paylaşımlı" => "global:checkbox",
                                 "table:database" => "table:hidden"
                             ],
                             "submit_text" => "Veri Ekle"
@@ -159,6 +160,7 @@
                                 "Türü:a" => "type_old:hidden",
                                 "Variable Adı:a" => "variable_old:hidden",
                                 "Zorunlu Alan" => "required:checkbox",
+                                "Kullanıcılar Arası Paylaşımlı" => "required:checkbox",
                                 "table:database" => "table:hidden"
                             ],
                             "submit_text" => "Veri Düzenle"
