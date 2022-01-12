@@ -208,7 +208,7 @@ class OneController extends Controller
                     $key = env('APP_KEY') . user()->id . server()->id;
                 } else {
                     $key = env('APP_KEY') . $obj->user_id . server()->id;
-                    if ($obj->user_id == user()->id) 
+                    if ($obj->user_id != user()->id) 
                         array_push($globalVars, $item["variable"]);
                 }
 
