@@ -130,6 +130,9 @@ class SettingsController extends Controller
                             $values[$key]["global"] = request('global')
                                 ? true
                                 : false;
+                            $values[$key]["writable"] = request('writable')
+                                ? true
+                                : false;    
                             break;
                         case "widgets":
                             $values[$key]["target"] = request('target');
@@ -185,6 +188,7 @@ class SettingsController extends Controller
                     "name" => request('name'),
                     "required" => request('required') ? true : false,
                     "global" => request('global') ? true : false,
+                    "writable" => request('writable') ? true : false,
                 ]);
                 break;
             case "widgets":

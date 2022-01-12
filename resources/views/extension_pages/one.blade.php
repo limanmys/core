@@ -142,6 +142,7 @@
                                 "Variable Adı" => "variable:text:Eklenti içinden veriye bu isim ile erişirsiniz.",
                                 "Zorunlu Alan" => "required:checkbox",
                                 "Kullanıcılar Arası Paylaşımlı" => "global:checkbox",
+                                "Yazılabilir" => "writable:checkbox",
                                 "table:database" => "table:hidden"
                             ],
                             "submit_text" => "Veri Ekle"
@@ -161,6 +162,7 @@
                                 "Variable Adı:a" => "variable_old:hidden",
                                 "Zorunlu Alan" => "required:checkbox",
                                 "Kullanıcılar Arası Paylaşımlı" => "required:checkbox",
+                                "Yazılabilir" => "writable:checkbox",
                                 "table:database" => "table:hidden"
                             ],
                             "submit_text" => "Veri Düzenle"

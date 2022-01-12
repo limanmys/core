@@ -933,5 +933,6 @@
     "Önceki sayfaya geri dönerek işleminize devam edebilirsiniz.": "You can continue your process by returning to the previous page.",
     "Bazı ayarlar sadece eklentiyi kuran kullanıcı tarafından değiştirilebilir.": "Some settings can only be changed by the who installed the extension at first.",
     "Kullanıcılar Arası Paylaşımlı": "Shared between users",
-    "Bu ayar sadece eklentiyi kuran kişi tarafından değiştirilebilir.": "This setting can only be changed by the who installed the extension at first."
+    "Bu ayar sadece eklentiyi kuran kişi tarafından değiştirilebilir.": "This setting can only be changed by the who installed the extension at first.",
+    "Yazılabilir": "Writable"
 }
