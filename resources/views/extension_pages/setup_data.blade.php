@@ -1,4 +1,5 @@
 <div id="accordion">
+    @if (isset(collect($extension["database"])->keyBy("required")[1]))
     <div class="card card-primary">
         <div class="card-header">
             <h3 class="card-title w-100">
@@ -107,7 +108,9 @@
         @endif
         </form>
     </div>
+    @endif
 </div>
+@if (isset(collect($extension["database"])->keyBy("required")[0]))
 <div class="card card-danger">
     <div class="card-header">
         <h4 class="card-title w-100">
@@ -116,7 +119,7 @@
             </a>
         </h4>
     </div>
-    <div id="advSettings" class="collapse" data-parent="#accordion">
+    <div id="advSettings" class="collapse @if (!isset(collect($extension['database'])->keyBy('required')[1])) show @endif" data-parent="#accordion">
         <form name="advSettings"
             action="{{ route('extension_server_settings', [
                 'extension_id' => request()->route('extension_id'),
@@ -214,5 +217,6 @@
     @endif
     </form>
 </div>
+@endif
 </div>
 </div>
