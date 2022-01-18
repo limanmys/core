@@ -934,5 +934,7 @@
     "Bazı ayarlar sadece eklentiyi kuran kullanıcı tarafından değiştirilebilir.": "Some settings can only be changed by the who installed the extension at first.",
     "Kullanıcılar Arası Paylaşımlı": "Shared between users",
     "Bu ayar sadece eklentiyi kuran kişi tarafından değiştirilebilir.": "This setting can only be changed by the who installed the extension at first.",
-    "Yazılabilir": "Writable"
+    "Yazılabilir": "Writable",
+    "Zorunlu Ayarlar": "Required Settings",
+    "Gelişmiş Ayarlar": "Advanced Settings"
 }
