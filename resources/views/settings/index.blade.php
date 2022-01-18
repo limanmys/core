@@ -71,12 +71,16 @@
                             ])<br><br>
                             <div id="usersTable">
                                 @include('table',[
-                                    "value" => \App\User::all(),
+                                    "value" => \App\User::all()->map(function($user) {
+                                        $user->status = (bool) $user->status ? __("Yönetici") : __("Kullanıcı");
+                                        $user->username = empty($user->username) ? "-" : $user->username;
+                                        return $user;
+                                    }),
                                     "title" => [
-                                        "İsim Soyisim", "Kullanıcı Adı", "Email", "*hidden*" ,
+                                        "İsim Soyisim", "Kullanıcı Adı", "Email", "Yetki", "*hidden*" ,
                                     ],
                                     "display" => [
-                                        "name", "username", "email", "id:user_id" ,
+                                        "name", "username", "email", "id:user_id", "status"
                                     ],
                                     "menu" => [
                                         "Parolayı Sıfırla" => [
