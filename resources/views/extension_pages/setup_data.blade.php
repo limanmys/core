@@ -39,7 +39,7 @@
                                 @continue
                             @endif
 
-                            @if ($item['required'] == false)
+                            @if (isset($item['required']) && $item['required'] == false)
                                 @continue
                             @endif
 
