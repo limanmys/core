@@ -12,7 +12,7 @@ jobs:
       - name: Set up Liman Environment
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "7.3"
+          php-version: "7.3" 
           tools: composer
           extensions : ssh2, curl, sqlite3, ldap, mbstring, xml, zip, posix, smbclient, gd
       - name: Build Liman Package
