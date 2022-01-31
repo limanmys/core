@@ -936,5 +936,6 @@
     "Bu ayar sadece eklentiyi kuran kişi tarafından değiştirilebilir.": "This setting can only be changed by the who installed the extension at first.",
     "Yazılabilir": "Writable",
     "Zorunlu Ayarlar": "Required Settings",
-    "Gelişmiş Ayarlar": "Advanced Settings"
+    "Gelişmiş Ayarlar": "Advanced Settings",
+    "Bazı veriler kasadan tamamlandığı için gösterilmemektedir.": "Some of data is not shown because of it's completed by vault."
 }

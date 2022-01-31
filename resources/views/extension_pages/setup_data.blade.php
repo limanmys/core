@@ -1,3 +1,31 @@
+@if (collect($extension["database"])->isEmpty())
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title w-100">
+                <a class="d-block w-100" data-toggle="collapse" href="#reqSettings">
+                    {{ __('Eklenti Ayarları') }}
+                </a>
+            </h3>
+        </div>
+        <div id="reqSettings" class="collapse show" data-parent="#accordion">
+            <div class="p-4">{{ __('Bu eklentinin hiçbir ayarı yok.') }} 
+                <br>
+                <br>
+                @include("alert", [
+                    "title" => "Bilgilendirme",
+                    "message" => "Bazı veriler kasadan tamamlandığı için gösterilmemektedir."    
+                ])
+            </div>
+        </div>
+        @if ($extension['database'])
+            <div class="card-footer">
+                <button type="submit" class="btn btn-success">{{ __('Kaydet') }}</button>
+            </div>
+        @endif
+        </form>
+    </div>
+@endif
+
 <div id="accordion">
     @if (isset(collect($extension["database"])->keyBy("required")[1]))
     <div class="card card-primary">
