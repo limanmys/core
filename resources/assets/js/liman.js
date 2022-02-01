@@ -426,7 +426,9 @@ window.Echo = new Echo({
 });
 
 $(function () {
-  $('[data-toggle="tooltip"]').tooltip();
+  $('[data-toggle="tooltip"]').tooltip({
+    container: "body"
+  });
   bsCustomFileInput.init();
   $(".select2").select2({
     theme: "bootstrap4",
@@ -484,7 +486,7 @@ function liman_search() {
 }
 
 $(document).ready(function() {
-  $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+  $("body").tooltip({ selector: '[data-toggle=tooltip]', container: 'body' });
   
   let input = $("#liman_search_input");
   let result = $("#liman_search_results");

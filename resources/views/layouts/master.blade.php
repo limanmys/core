@@ -120,7 +120,7 @@
     }
 
     function initialPresets(){
-        $('table').not('.notDataTable').DataTable({
+        $('table').not('.notDataTable').not(".bx--data-table").DataTable({
             autoFill : true,
             bFilter: true,
             destroy: true,
