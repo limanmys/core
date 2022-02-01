@@ -22,6 +22,13 @@
             {{ __(cities($server->city)) }}
         </p>
         <hr>
+        @isset($outputs["user"])
+        <strong>{{ __('Giriş Yapmış Kullanıcı') }}</strong>
+        <p class="text-muted">
+            {{ $outputs["user"] }}
+        </p>
+        <hr>
+        @endisset
         <strong>{{ __('Eklenti Durumları') }}</strong>
         <p class="text-muted">
             @if($installed_extensions->count() > 0)

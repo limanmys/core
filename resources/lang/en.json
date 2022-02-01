@@ -937,5 +937,6 @@
     "Yazılabilir": "Writable",
     "Zorunlu Ayarlar": "Required Settings",
     "Gelişmiş Ayarlar": "Advanced Settings",
-    "Bazı veriler kasadan tamamlandığı için gösterilmemektedir.": "Some of data is not shown because of it's completed by vault."
+    "Bazı veriler kasadan tamamlandığı için gösterilmemektedir.": "Some of data is not shown because of it's completed by vault.",
+    "Giriş Yapmış Kullanıcı": "Logged In User"
 }

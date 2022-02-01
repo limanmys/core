@@ -43,6 +43,10 @@ class OneController extends Controller
             "uptime" => $uptime,
         ];
 
+        if ($server->canRunCommand()) {
+            $outputs["user"] = Command::run("whoami");
+        }  
+
         $input_extensions = [];
         $available_extensions = $this->availableExtensions();
 
