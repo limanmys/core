@@ -210,6 +210,10 @@ class MainController extends Controller
                         "id" => "server_services",
                         "name" => "Sunucu Servislerini Görüntüleme",
                     ],
+                    [
+                        "id" => "server_details",
+                        "name" => "Sunucu Detaylarını Görüntüleme",
+                    ]
                 ];
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];

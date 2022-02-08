@@ -23,6 +23,10 @@ class OneController extends Controller
             abort(504, "Sunucu Bulunamadı.");
         }
 
+        if (!Permission::can(user()->id, 'liman', 'id', 'server_details')) {
+            return respond("Bu işlemi yapmak için yetkiniz yok!", 201);
+        }
+
         try {
             if ($server->isWindows()) {
                 preg_match('/\d+/', $server->getUptime(), $output);

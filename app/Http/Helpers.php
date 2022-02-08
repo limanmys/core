@@ -373,6 +373,7 @@ if (!function_exists('getLimanPermissions')) {
             "view_logs" => "Sunucu Günlük Kayıtlarını Görüntüleme",
             "add_server" => "Sunucu Ekleme",
             "server_services" => "Sunucu Servislerini Görüntüleme",
+            "server_details" => "Sunucu Detaylarını Görüntüleme"
         ];
         $permissions = Permission::where([
             "morph_id" => $user_id ? $user_id : user()->id,

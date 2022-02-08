@@ -34,10 +34,12 @@ class SearchController extends Controller
                 });
         foreach ($servers as $server)
         {
-            array_push($searchable, [
-                'name' => $server->name,
-                'url' => route('server_one', $server->id)
-            ]);
+            if (Permission::can(user()->id, 'liman', 'id', 'server_details')) {
+                array_push($searchable, [
+                    'name' => $server->name,
+                    'url' => route('server_one', $server->id)
+                ]);
+            }
             
             // Extension searching
             $extensions = $server->extensions();
