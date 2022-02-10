@@ -63,7 +63,7 @@ body {
 }
 
 #liman-sidebar .fa-angle-right {
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
 .nav-sidebar .menu-open>.nav-link i.right {
@@ -386,6 +386,11 @@ table.dataTable {
     width: calc(100% - 37px);
 }
 
+#ext_menu button {
+    padding-top: 0.83rem !important;
+    padding-bottom: 0.83rem !important;
+}
+
 #btn-nav-previous, #btn-nav-next {
     position: absolute; 
     margin: 0;
@@ -480,3 +485,13 @@ table.table {
     border-top-right-radius: 5px!important;
     border-bottom-right-radius: 5px!important;
 }
+
+#linuxMachinePolTabNew .table {
+    border: 0 !important;
+}
+
+#linuxMachinePolTabNew .table thead, #linuxMachinePolTabNew thead {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+

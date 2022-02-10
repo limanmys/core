@@ -926,5 +926,18 @@
     "Sayfa bulunamadı.": "Page not found.",
     "Dış Bildirim -> ": "External Notification -> ",
     "Liman ID Kopyala": "Copy Liman ID",
-    " eklentisi sistemde bulunamadı, yeniden yüklemeyi deneyin.": " can not be found in the system, try reinstalling it."
+    " eklentisi sistemde bulunamadı, yeniden yüklemeyi deneyin.": " can not be found in the system, try reinstalling it.",
+    "Eklenti Görünen Adı": "Extension Display Name",
+    "Sertifika Detayları": "Certificate Details",
+    "Eklenti bulunamadı.": "Extension not found.",
+    "Önceki sayfaya geri dönerek işleminize devam edebilirsiniz.": "You can continue your process by returning to the previous page.",
+    "Bazı ayarlar sadece eklentiyi kuran kullanıcı tarafından değiştirilebilir.": "Some settings can only be changed by the who installed the extension at first.",
+    "Kullanıcılar Arası Paylaşımlı": "Shared between users",
+    "Bu ayar sadece eklentiyi kuran kişi tarafından değiştirilebilir.": "This setting can only be changed by the who installed the extension at first.",
+    "Yazılabilir": "Writable",
+    "Zorunlu Ayarlar": "Required Settings",
+    "Gelişmiş Ayarlar": "Advanced Settings",
+    "Bazı veriler kasadan tamamlandığı için gösterilmemektedir.": "Some of data is not shown because of it's completed by vault.",
+    "Giriş Yapmış Kullanıcı": "Logged In User",
+    "Sunucu Detaylarını Görüntüleme": "View Server Details"
 }

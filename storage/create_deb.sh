@@ -40,6 +40,7 @@ DATE=$(date)
 
 #Install/Update dependencies
 composer install --no-dev -d package/liman/server
+composer install --no-dev -d package/liman/sandbox/php
 rm -rf package/liman/server/node_modules
 mv package/liman/server/storage/build_tools/DEBIAN package/
 rm -rf package/liman/server/storage/build_tools

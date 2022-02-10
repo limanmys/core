@@ -52,7 +52,11 @@ jobs:
             --form "files=@$FILE_NAME" | jq -r '.file_infos[0].id')
 
           echo $post_id
-
+          
+          echo "RELEASE_VER=$(echo $VERSION)" >> $GITHUB_ENV
+          echo "RELEASE_FILENAME=$(echo $FILE_NAME)" >> $GITHUB_ENV
+          echo "RELEASE_RUNNUMBER=$(echo $GITHUB_RUN_NUMBER)" >> $GITHUB_ENV
+          
           if [ -z "$post_id" ]; then
               echo "Failed to create post :("
               exit 4
@@ -62,3 +66,13 @@ jobs:
                 --header "Content-Type: application/json" \
                 --data "{\"file_ids\":[\"$post_id\"],\"message\":\"$MESSAGE\",\"channel_id\":\"$CHANNEL\"}"
           fi
+          
+      - name: Release 🚀
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          files: ${{ env.RELEASE_FILENAME }}
+          name: "Release ${{ env.RELEASE_VER }} - ${{ env.RELEASE_RUNNUMBER }}"
+          tag_name: "release.${{ env.RELEASE_RUNNUMBER }}"

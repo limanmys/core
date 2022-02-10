@@ -23,6 +23,10 @@ class OneController extends Controller
             abort(504, "Sunucu Bulunamadı.");
         }
 
+        if (!Permission::can(user()->id, 'liman', 'id', 'server_details')) {
+            return respond("Bu işlemi yapmak için yetkiniz yok!", 201);
+        }
+
         try {
             if ($server->isWindows()) {
                 preg_match('/\d+/', $server->getUptime(), $output);
@@ -42,6 +46,10 @@ class OneController extends Controller
             "nofprocesses" => $server->getNoOfProcesses(),
             "uptime" => $uptime,
         ];
+
+        if ($server->canRunCommand()) {
+            $outputs["user"] = Command::run("whoami");
+        }  
 
         $input_extensions = [];
         $available_extensions = $this->availableExtensions();
@@ -328,7 +336,6 @@ class OneController extends Controller
             $ramPercent = server()->run(
                 "free | grep Mem | awk '{print $3/$2 * 100.0}'"
             );
-            $diskPercent = server()->run("df --output=pcent / | tr -dc '0-9'");
             $ioPercent = server()->run(
                 "iostat -d | tail -n +4 | head -n -1 | awk '{s+=$2} END {print s}'"
             );
@@ -338,10 +345,9 @@ class OneController extends Controller
             $secondDown = $this->calculateNetworkBytes();
             $secondUp = $this->calculateNetworkBytes(false);
             return [
-                'cpuPercent' => round($cpuPercent, 2),
-                'ramPercent' => round($ramPercent, 2),
-                'diskPercent' => round($diskPercent, 2),
-                'ioPercent' => round($ioPercent, 2),
+                'cpu' => round($cpuPercent, 2),
+                'ram' => round($ramPercent, 2),
+                'io' => round($ioPercent, 2),
                 'network' => [
                     'down' => round(($secondDown - $firstDown) / 1024 / 2, 2),
                     'up' => round(($secondUp - $firstUp) / 1024 / 2, 2),
@@ -349,6 +355,7 @@ class OneController extends Controller
                 'time' => \Carbon\Carbon::now()->format('H:i:s'),
             ];
         } elseif (server()->isWindows()) {
+            /*
             $cpu = substr(
                 server()->run(
                     "Get-WmiObject win32_processor | Measure-Object -property LoadPercentage -Average | Select Average"
@@ -356,6 +363,7 @@ class OneController extends Controller
                 23,
                 -3
             );
+            echo $cpu;
             $disk = round(
                 floatval(
                     server()->run(
@@ -381,12 +389,13 @@ class OneController extends Controller
             } catch (\Exception $exception) {
                 $ram = "0";
             }
+            */
         }
         return [
-            "disk" => $disk,
-            "ram" => $ram,
-            "cpu" => $cpu,
-            "time" => Carbon::now()->format("H:i:s"),
+            "disk" => 0,
+            "ram" => 0,
+            "cpu" => 0,
+            "time" => 0,
         ];
     }
 
@@ -470,7 +479,7 @@ class OneController extends Controller
     {
         $text = $download ? 'rx_bytes' : 'tx_bytes';
         $count = 0;
-        $raw = Command::runSudo('cat "/sys/class/net/*/statistics/{:text}"', [
+        $raw = Command::runSudo('cat /sys/class/net/*/statistics/:text:', [
             'text' => $text
         ]);
         foreach (explode("\n", trim($raw)) as $data) {

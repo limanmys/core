@@ -97,6 +97,7 @@ class SettingsController extends Controller
 
         if (request('type') == "general") {
             extension()->update(request()->only([
+                'display_name',
                 'icon',
                 'support',
                 'version',
@@ -105,6 +106,7 @@ class SettingsController extends Controller
                 'sslPorts',
                 'supportedLiman'
             ]));
+            $extension["display_name"] = request("display_name");
             $extension["icon"] = request("icon");
             $extension["service"] = request("service");
             $extension["version"] = request("version");
@@ -125,6 +127,12 @@ class SettingsController extends Controller
                             $values[$key]["required"] = request('required')
                                 ? true
                                 : false;
+                            $values[$key]["global"] = request('global')
+                                ? true
+                                : false;
+                            $values[$key]["writable"] = request('writable')
+                                ? true
+                                : false;    
                             break;
                         case "widgets":
                             $values[$key]["target"] = request('target');
@@ -179,6 +187,8 @@ class SettingsController extends Controller
                     "type" => request('type'),
                     "name" => request('name'),
                     "required" => request('required') ? true : false,
+                    "global" => request('global') ? true : false,
+                    "writable" => request('writable') ? true : false,
                 ]);
                 break;
             case "widgets":

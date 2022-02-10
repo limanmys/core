@@ -34,12 +34,14 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview" @if(request('server_id') == $server->id) style="display: block;" @endif>
+                        @if (\App\Models\Permission::can(user()->id, 'liman', 'id', 'server_details'))
                         <li class="nav-item">
                             <a href="/sunucular/{{$server->id}}" class="nav-link">
                                 <i class="fa fa-info nav-icon"></i>
                                 <p>{{__("Sunucu Detayları")}}</p>
                             </a>
                         </li>
+                        @endif
                         @foreach ($server->extensions() as $extension)
                         <li class="nav-item">
                             <a href='/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}' class="nav-link @if(request('extension_id') == $extension->id) active @endif">
@@ -60,12 +62,14 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview" @if(request('server_id') == $server->id) style="display: block;" @endif>
+                        @if (\App\Models\Permission::can(user()->id, 'liman', 'id', 'server_details'))
                         <li class="nav-item">
                             <a href="/sunucular/{{$server->id}}" class="nav-link">
                                 <i class="fa fa-info nav-icon"></i>
                                 <p>{{__("Sunucu Detayları")}}</p>
                             </a>
                         </li>
+                        @endif
                         @foreach ($server->extensions() as $extension)
                         <li class="nav-item">
                             <a href='/l/{{$extension->id}}/{{$server->city}}/{{$server->id}}' class="nav-link @if(request('extension_id') == $extension->id) active @endif">

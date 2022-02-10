@@ -373,6 +373,7 @@ if (!function_exists('getLimanPermissions')) {
             "view_logs" => "Sunucu Günlük Kayıtlarını Görüntüleme",
             "add_server" => "Sunucu Ekleme",
             "server_services" => "Sunucu Servislerini Görüntüleme",
+            "server_details" => "Sunucu Detaylarını Görüntüleme"
         ];
         $permissions = Permission::where([
             "morph_id" => $user_id ? $user_id : user()->id,
@@ -856,12 +857,16 @@ if (!function_exists('getExtensionJson')) {
             "db.json";
 
         if (file_exists($extension_json)) {
-            return json_decode(
+            $json = json_decode(
                 file_get_contents(
                     $extension_json
                 ),
                 true
             );
+            if(empty($json['display_name'])){
+                $json['display_name'] = Str::title(str_replace("-", " ", $json['name']));
+            }
+            return $json;
         } else {
             abort(404, $extension_name . __(" eklentisi sistemde bulunamadı, yeniden yüklemeyi deneyin."));
         }
@@ -938,11 +943,19 @@ if (!function_exists('getObject')) {
         switch ($type) {
             case "Extension":
             case "extension":
-                return Extension::find($id);
+                try {
+                    return Extension::find($id);
+                } catch (\Throwable $e) {
+                    abort(404, __("Eklenti bulunamadı."));
+                }
                 break;
             case "Server":
             case "server":
-                return Server::find($id);
+                try {
+                    return Server::find($id);
+                } catch (\Throwable $e) {
+                    abort(404, __("Sunucu bulunamadı."));
+                }
                 break;
             default:
                 return false;

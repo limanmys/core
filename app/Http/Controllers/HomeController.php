@@ -238,30 +238,34 @@ class HomeController extends Controller
         $data = [];
 
         foreach ($servers as $server) {
-            $status = @fsockopen(
-                $server->ip_address,
-                $server->control_port,
-                $errno,
-                $errstr,
-                0.5);
-            
+                $status = @fsockopen(
+                    $server->ip_address,
+                    $server->control_port,
+                    $errno,
+                    $errstr,
+                    1);
+                        
             try {
-                if ($server->isWindows() && $server->canRunCommand()) {
-                    preg_match('/\d+/', $server->getUptime(), $output);
-                    $uptime = $output[0];
-                } else if ($server->canRunCommand()) {
-                    $uptime = $server->getUptime();
+                if ($status) {
+                    if ($server->isWindows() && $server->canRunCommand()) {
+                        preg_match('/\d+/', $server->getUptime(), $output);
+                        $uptime = $output[0];
+                    } else if ($server->canRunCommand()) {
+                        $uptime = $server->getUptime();
+                    } else {
+                        $uptime = "";
+                    }
+    
+                    if ($uptime != "") {
+                        $uptime = \Carbon\Carbon::parse($uptime)->diffForHumans();
+                    }
                 } else {
-                    $uptime = "";
-                }
-
-                if ($uptime != "") {
-                    $uptime = \Carbon\Carbon::parse($uptime)->diffForHumans();
+                    $uptime = " ";
                 }
             } catch (\Throwable $e) {
                 $uptime = " ";
-            }        
-            
+            }       
+
             array_push($data, [
                 "id" => $server->id,
                 "icon" => $server->isLinux() ? 'fa-linux' : 'fa-windows',

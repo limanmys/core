@@ -1,7 +1,6 @@
 const mix = require('laravel-mix');
 mix.styles([
     'resources/assets/css/font-awesome.css',
-    'resources/assets/css/flag-icon.css',
     'resources/assets/css/font.css',
     'resources/assets/css/bootstrap-tempus.css',
     'resources/assets/css/dataTables.bootstrap4.css',
@@ -49,5 +48,5 @@ mix.combine([
     'resources/assets/js/pusher.min.js',
     'resources/assets/js/jquery.overlayScrollbars.js',
     'resources/assets/js/liman.js',
-    'resources/assets/js/tus.js',
+    'resources/assets/js/tus.js'
 ], 'public/js/liman.js').version();

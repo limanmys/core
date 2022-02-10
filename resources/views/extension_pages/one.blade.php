@@ -94,6 +94,10 @@
                                 <input id="sslPorts" type="text" name="service" class="form-control" value="{{array_key_exists("sslPorts",$extension) ? $extension["sslPorts"] : ""}}" required>
                                 <small>{{__("Birden fazla port yazmak için aralarında virgül bırakabilirsiniz.")}}</small>
                             </div>
+                            <div class="col-md-12 mb-3">
+                                <label>{{__("Eklenti Görünen Adı")}}</label>
+                                <input id="display_name" type="text" class="form-control" value="{{$extension['display_name']}}" required>
+                            </div>
                         </div>    
                        
                         <button class="btn btn-success " onclick="updateExtension('general')"><i class="fas fa-save mr-1"></i>{{__("Kaydet")}}</button><br>
@@ -137,6 +141,8 @@
                                 "Türü" => "type:text:Verinizin türü form elemanını belirler. Örneğin text, password vs.",
                                 "Variable Adı" => "variable:text:Eklenti içinden veriye bu isim ile erişirsiniz.",
                                 "Zorunlu Alan" => "required:checkbox",
+                                "Kullanıcılar Arası Paylaşımlı" => "global:checkbox",
+                                "Yazılabilir" => "writable:checkbox",
                                 "table:database" => "table:hidden"
                             ],
                             "submit_text" => "Veri Ekle"
@@ -155,6 +161,8 @@
                                 "Türü:a" => "type_old:hidden",
                                 "Variable Adı:a" => "variable_old:hidden",
                                 "Zorunlu Alan" => "required:checkbox",
+                                "Kullanıcılar Arası Paylaşımlı" => "required:checkbox",
+                                "Yazılabilir" => "writable:checkbox",
                                 "table:database" => "table:hidden"
                             ],
                             "submit_text" => "Veri Düzenle"
@@ -385,6 +393,7 @@
             showSwal('{{__("Kaydediliyor...")}}','info');
             var data = new FormData();
             data.append('type', type);
+            data.append('display_name', $("#display_name").val());
             data.append('icon', $("#icon").val());
             data.append('support', $("#support").val());
             data.append('version', $("#version").val());

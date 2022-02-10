@@ -3,20 +3,25 @@ var customRequestData = [];
 var limanRecordRequests = false;
 var limanRequestList = [];
 
-function loadingText() {
-  if ($('html').attr('lang') == "tr") {
-    return "Yükleniyor...";
-  } else {
-    return "Loading...";
-  }
-}
+let en = {
+  "Yükleniyor...": "Loading...",
+  "Sonuç bulunamadı!": "No results found!",
+  "Liman ID kopyalandı!": "Liman ID copied!",
+  "Liman ID başarıyla kopyalandı.": "Liman ID has been copied successfully!"
+}   
 
-function noResultFoundString() {
-  if ($('html').attr('lang') == "tr") {
-    return "Sonuç bulunamadı!";
-  } else {
-    return "No results found!";
+let tr = {}
+
+let language = document.getElementsByTagName('html')[0].getAttribute('lang');
+let defaultLanguage = "tr"
+console.log(`🌟 Liman localization initialized: ${language}`)
+
+let __ = (trans) => {
+  if (language === defaultLanguage && !eval(language).hasOwnProperty(trans) || !eval(language).hasOwnProperty(trans)) {
+      return trans
   }
+
+  return eval(language)[trans]
 }
 
 function showSwal(message, type, timer = false) {
@@ -48,7 +53,7 @@ function request(url, data, next, error, requestType = "POST") {
     Swal.fire({
       position: "bottom-end",
       type: "info",
-      title: loadingText(),
+      title: __("Yükleniyor..."),
       toast: true,
       showConfirmButton: false
     });
@@ -267,7 +272,7 @@ window.onbeforeunload = function () {
   Swal.fire({
     position: "bottom-end",
     type: "info",
-    title: loadingText(),
+    title: __("Yükleniyor..."),
     toast: true,
     showConfirmButton: false
   });
@@ -336,17 +341,7 @@ function renderNotifications(data, type, target, exclude) {
   $("#" + target + "Count").html(data.length);
   data.forEach((notification) => {
     var errors = ["error", "health_problem"];
-    var color = errors.includes(notification["type"]) ? "#f56954" : "#00a65a";
-    element.append(
-      "<div class='dropdown-divider'></div><a class='dropdown-item' href='/bildirim/" +
-        notification["id"] +
-        "'>" +
-        "<span style='color: " +
-        color +
-        ";width: 100%'>" +
-        notification["title"] +
-        "</span></a>"
-    );
+    element.append([...$("<div />").addClass("dropdown-divider").append("<a />").find("a").addClass("dropdown-item").attr("href", `/bildirim/${notification["id"]}`).append("<span />").find("span").css("color", errors.includes(notification["type"]) ? "#f56954" : "#00a65a").css("width", "100%").text(notification["title"]).parents()].reverse())
     var displayedNots = [];
     if (localStorage.displayedNots) {
       displayedNots = JSON.parse(localStorage.displayedNots);
@@ -431,7 +426,9 @@ window.Echo = new Echo({
 });
 
 $(function () {
-  $('[data-toggle="tooltip"]').tooltip();
+  $('[data-toggle="tooltip"]').tooltip({
+    container: "body"
+  });
   bsCustomFileInput.init();
   $(".select2").select2({
     theme: "bootstrap4",
@@ -456,22 +453,12 @@ function getSearchResults (query) {
       {
         if (data.length == 0) {
           $("#liman_search_results").append(`
-            <a href="#">${noResultFoundString()}</a>
+            <a href="#">${__("Sonuç bulunamadı!")}</a>
           `);
         }
 
-        let firstone = 0
-        data.forEach(el => {
-          if (firstone == 0) {
-            $("#liman_search_results").append(`
-              <a href="${el.url}" class="hovered">${el.name}</a>
-            `);
-            firstone++
-          } else {
-            $("#liman_search_results").append(`
-              <a href="${el.url}">${el.name}</a>
-            `);
-          }
+        data.forEach((el, i) => {
+          $("#liman_search_results").append($("<a />").attr("href", el.url).toggleClass("hovered", i == 0).text(el.name));
         });
       },
       error: function (jqXhr, textStatus, error) 
@@ -499,7 +486,7 @@ function liman_search() {
 }
 
 $(document).ready(function() {
-  $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+  $("body").tooltip({ selector: '[data-toggle=tooltip]', container: 'body' });
   
   let input = $("#liman_search_input");
   let result = $("#liman_search_results");
@@ -577,8 +564,8 @@ function copyToClipboard(elementId) {
   document.execCommand("copy");
   document.body.removeChild(aux);
   Swal.fire(
-    'Liman ID kopyalandı!',
-    'Liman ID başarıyla kopyalandı.',
+    __('Liman ID kopyalandı!'),
+    __('Liman ID başarıyla kopyalandı.'),
     'success'
   );
 }

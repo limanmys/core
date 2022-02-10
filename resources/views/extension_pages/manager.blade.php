@@ -195,7 +195,7 @@ foreach ($extensions as $extension) {
                let element = $("#extensionUpdatesList");
                element.html("");
                $.each(json.message,function (index,current){
-                    element.append("<li id='extension_" + current["name"] + "_button' onclick='setExtensionUpdateData(\"" + current["name"] + "\")' class='list-group-item'>" + current["name"] + "</li>");
+                    element.append($("<li />").attr("id", `extension_${current["name"]}_button`).addClass("list-group-item").click(current["name"], setExtensionUpdateData).text(current["name"]));
                     extensionUpdates[current["name"]] = current;
                });
                if(json.message.length == 1){

@@ -40,7 +40,7 @@
         request('{{route('widget_get_extensions')}}',form,function(response){
             var json = JSON.parse(response);
             for(var k in json) {
-                element.append('<option value="'+ k+ '">' + fixer(json[k]) + '</option>');
+                element.append($("<option />").attr("value", k).text(fixer(json[k])));
             }
             if(Object.keys(json).length > 0){
                 getWidgets();
@@ -63,7 +63,7 @@
             var element = $("#widget_name");
             element.text('');
             for(var k in json) {
-                element.append('<option value="'+ fixer(json[k]["target"]) + ':' + fixer(json[k]["name"]) + ':' + fixer(json[k]["type"]) + ':' + fixer(json[k]["icon"]) +'">' + fixer(json[k]["name"]) + '</option>');
+                element.append($("<option />").attr("value", [fixer(json[k]["target"]),fixer(json[k]["name"]),fixer(json[k]["type"]),fixer(json[k]["icon"])].join(":")).text(fixer(json[k]["name"])));
             }
             element.removeAttr('disabled');
         }, function(response){

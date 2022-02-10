@@ -71,12 +71,16 @@
                             ])<br><br>
                             <div id="usersTable">
                                 @include('table',[
-                                    "value" => \App\User::all(),
+                                    "value" => \App\User::all()->map(function($user) {
+                                        $user->status = (bool) $user->status ? __("Yönetici") : __("Kullanıcı");
+                                        $user->username = empty($user->username) ? "-" : $user->username;
+                                        return $user;
+                                    }),
                                     "title" => [
-                                        "İsim Soyisim", "Kullanıcı Adı", "Email", "*hidden*" ,
+                                        "İsim Soyisim", "Kullanıcı Adı", "Email", "Yetki", "*hidden*" ,
                                     ],
                                     "display" => [
-                                        "name", "username", "email", "id:user_id" ,
+                                        "name", "username", "email", "id:user_id", "status"
                                     ],
                                     "menu" => [
                                         "Parolayı Sıfırla" => [
@@ -115,6 +119,10 @@
                                     "server_hostname" , "origin", "id:certificate_id" ,
                                 ],
                                 "menu" => [
+                                    "Detaylar" => [
+                                        "target" => "showCertificateModal",
+                                        "icon" => "fa-info"
+                                    ],
                                     "Güncelle" => [
                                         "target" => "updateCertificate",
                                         "icon" => "fa-sync-alt"
@@ -487,6 +495,68 @@
         "submit_text" => "Rol Grubunu Sil"
     ])
 
+    @component('modal-component',[
+        "id" => "showCertificate",
+        "title" => "Sertifika Detayları",
+    ])
+        <div class="row">
+            <div class="col-md-4">
+                <div class="box box-solid">
+                <div class="box-header with-border">
+                    <h5 class="box-title" style="font-weight: 600">{{__("İmzalayan")}}</h5>
+                </div>
+                <hr class="my-2">
+                <div class="box-body clearfix">
+                    <div class="form-group">
+                        <label>{{__("İstemci")}}</label>
+                        <input type="text" id="issuerCN" readonly class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>{{__("Otorite")}}</label>
+                        <input type="text" id="issuerDN" readonly class="form-control">
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="box box-solid">
+                    <div class="box-header with-border">
+                        <h5 class="box-title" style="font-weight: 600">{{__("Parmak İzleri")}}</h5>
+                    </div>
+                    <hr class="my-2">
+                <div class="box-body clearfix">
+                    <div class="form-group">
+                        <label>{{__("İstemci")}}</label>
+                        <input type="text" id="subjectKeyIdentifier" readonly class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>{{__("Otorite")}}</label>
+                        <input type="text" id="authorityKeyIdentifier" readonly class="form-control">
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="box box-solid">
+                <div class="box-header with-border">
+                    <h5 class="box-title" style="font-weight: 600">{{__("Geçerlilik Tarihi")}}</h5>
+                </div>
+                <hr class="my-2">
+                <div class="box-body clearfix">
+                    <div class="form-group">
+                        <label>{{__("Başlangıç Tarihi")}}</label>
+                        <input type="text" id="validFrom" readonly class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>{{__("Bitiş Tarihi")}}</label>
+                        <input type="text" id="validTo" readonly class="form-control">
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    @endcomponent
+
     @include('modal',[
            "id"=>"updateCertificate",
            "title" =>"Sertifikayı Güncelle",
@@ -662,7 +732,28 @@
             }
         }
 
-
+        function showCertificateModal(node) {
+            let form = new FormData();
+            form.append("hostname", $(node).find("#server_hostname").html());
+            form.append("port", $(node).find("#origin").html());
+            request("{{ route('certificate_info') }}", form, function(data) {
+                let response = JSON.parse(data)["message"];
+                if(response["issuer"]["DC"]){
+                    $("#issuerCN").val(response["issuer"]["CN"]);
+                }
+                if(response["issuer"]["DC"]){
+                    $("#issuerDN").val(response["issuer"]["DC"].reverse().join('.'));
+                }
+                $("#validFrom").val(response["validFrom_time_t"]);
+                $("#validTo").val(response["validTo_time_t"]);
+                $("#authorityKeyIdentifier").val(response["authorityKeyIdentifier"]);
+                $("#subjectKeyIdentifier").val(response["subjectKeyIdentifier"]);
+                $("#showCertificate").modal("show");
+            }, function(err) {
+                let error = JSON.parse(err);
+                showSwal(error.message, 'error', 2000);
+            });
+        }
 
         function saveLogSystem(){
             showSwal('{{__("Kaydediliyor...")}}','info');

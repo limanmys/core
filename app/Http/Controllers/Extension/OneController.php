@@ -57,16 +57,36 @@ class OneController extends Controller
         }
 
         foreach ($extension["database"] as $key) {
-            $row = DB::table('user_settings')->where([
-                "user_id" => user()->id,
+            $opts = [
                 "server_id" => server()->id,
                 'name' => $key["variable"],
-            ]);
+            ];
+
+            if (!isset($key["global"]) || $key["global"] === false) {
+                $opts["user_id"] = user()->id;
+            }
+
+            $row = DB::table('user_settings')->where($opts);
             $variable = request($key["variable"]);
             if ($variable) {
                 if ($row->exists()) {
                     $encKey = env('APP_KEY') . user()->id . server()->id;
+                    if ($row->first()->user_id != user()->id) {
+                        return redirect(
+                            route('extension_server_settings_page', [
+                                "extension_id" => extension()->id,
+                                "server_id" => server()->id,
+                                "city" => server()->city,
+                            ])
+                        )
+                            ->withInput()
+                            ->withErrors([
+                                "message" => __("Bu ayar sadece eklentiyi kuran kişi tarafından değiştirilebilir."),
+                            ]);
+                    }
                     $row->update([
+                        "user_id" => user()->id,
+                        "server_id" => server()->id,
                         "value" => AES256::encrypt($variable, $encKey),
                         "updated_at" => Carbon::now(),
                     ]);
@@ -161,6 +181,7 @@ class OneController extends Controller
             "extension_id" => extension()->id,
         ]);
         $similar = [];
+        $globalVars = [];
         $flag = server()->key();
         foreach ($extension["database"] as $key => $item) {
             if (
@@ -169,15 +190,28 @@ class OneController extends Controller
             ) {
                 unset($extension["database"][$key]);
             }
+
+            $opts = [
+                "server_id" => server()->id,
+                'name' => $item["variable"],
+            ];
+
+            if (!isset($item["global"]) || $item["global"] === false) {
+                $opts["user_id"] = user()->id;
+            }
+            
             $obj = DB::table("user_settings")
-                ->where([
-                    "user_id" => user()->id,
-                    "name" => $item["variable"],
-                    "server_id" => server()->id,
-                ])
+                ->where($opts)
                 ->first();
             if ($obj) {
-                $key = env('APP_KEY') . user()->id . server()->id;
+                if (array_key_exists("user_id", $opts)) {
+                    $key = env('APP_KEY') . user()->id . server()->id;
+                } else {
+                    $key = env('APP_KEY') . $obj->user_id . server()->id;
+                    if ($obj->user_id != user()->id) 
+                        array_push($globalVars, $item["variable"]);
+                }
+
                 $similar[$item["variable"]] = AES256::decrypt(
                     $obj->value,
                     $key
@@ -190,6 +224,7 @@ class OneController extends Controller
                 'extension' => $extension,
                 'similar' => $similar,
                 'extensionDb' => extensionDb(),
+                'globalVars' => $globalVars
             ]);
         }
 
@@ -197,6 +232,7 @@ class OneController extends Controller
             'extension' => $extension,
             'similar' => $similar,
             'extensionDb' => extensionDb(),
+            'globalVars' => $globalVars
         ]);
     }
 
@@ -275,7 +311,7 @@ class OneController extends Controller
         $basePath =
             "/liman/extensions/" . strtolower(extension()->name) . "/public/";
 
-        $targetPath = $basePath . base64_decode(request('path'));
+        $targetPath = $basePath . explode("public/", url()->current(), 2)[1];
 
         if (realpath($targetPath) != $targetPath) {
             abort(404);

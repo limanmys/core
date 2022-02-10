@@ -83,13 +83,18 @@ class MainController extends Controller
             if (isset($setting["required"]) && $setting["required"] === false) {
                 continue;
             }
+            $opts = [
+                "server_id" => server()->id,
+                'name' => $setting["variable"],
+            ];
+
+            if (!isset($setting["global"]) || $setting["global"] === false) {
+                $opts["user_id"] = user()->id;
+            }
+
             if (
                 !in_array($setting["variable"], $extra) &&
-                !UserSettings::where([
-                    "user_id" => user()->id,
-                    "server_id" => server()->id,
-                    "name" => $setting["variable"],
-                ])->exists()
+                !UserSettings::where($opts)->exists()
             ) {
                 system_log(7, "EXTENSION_MISSING_SETTINGS", [
                     "extension_id" => extension()->id,
