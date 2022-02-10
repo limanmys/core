@@ -29,6 +29,7 @@ fi
 # Delete if sudo exists
 sed -i '/liman/d' /etc/sudoers
 
+runuser liman -c '$(which gpg) --batch --yes --delete-keys aciklab@havelsan.com.tr'
 runuser liman -c '$(which gpg) --import /liman/server/storage/aciklab.public'
 
 # Certificate Creation
