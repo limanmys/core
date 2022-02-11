@@ -81,12 +81,14 @@
                     </ul>
                 @endforeach
                 @if(count($SERVERS) + count($USER_FAVORITES) > 0) 
-                <li class="nav-item">
-                <a href='/sunucular' class="nav-link">
-                    <i class="nav-icon fas fa-ellipsis-h"></i>
-                    <p>{{__("Tüm sunucuları gör")}}</p>
-                </a>
-                 </li>
+                    @if (\App\Models\Permission::can(user()->id, 'liman', 'id', 'server_details'))
+                        <li class="nav-item">
+                            <a href='/sunucular' class="nav-link">
+                                <i class="nav-icon fas fa-ellipsis-h"></i>
+                                <p>{{__("Tüm sunucuları gör")}}</p>
+                            </a>
+                        </li>
+                    @endif
                 @else
                     @if (!user()->isAdmin())
                     <li class="nav-item">
