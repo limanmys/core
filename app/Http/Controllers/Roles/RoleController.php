@@ -248,6 +248,13 @@ class RoleController extends Controller
                 $display = ["id:id", "name"];
                 break;
             case "liman":
+                $usedPermissions = Permission::where([
+                    "type" => "liman",
+                    "morph_id" => request("role_id")
+                ])
+                  ->get()
+                  ->groupBy("value");
+
                 $data = [
                     [
                         "id" => "view_logs",
@@ -266,6 +273,15 @@ class RoleController extends Controller
                         "name" => "Sunucu Detaylarını Görüntüleme",
                     ]
                 ];
+
+                foreach($usedPermissions as $permission => $values) {
+                    foreach ($data as $k => $v) {
+                        if ($v["id"] == $permission) {
+                            unset($data[$k]);
+                        };
+                    }
+                }
+                
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
                 break;
