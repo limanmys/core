@@ -110,6 +110,10 @@
             <div class="tab-pane fade" id="advanced" role="tabpanel" aria-labelledby="vert-tabs-settings-tab">
                 <div class="card-body">
                     <div class="form-group">
+                        <label for="EXTENSION_TIMEOUT">{{__("İstek Zaman Aşımı Süresi")}}</label><br>
+                        <input type="text" class="form-control liman_env" id="EXTENSION_TIMEOUT">
+                    </div>
+                    <div class="form-group">
                         <label for="APP_DEBUG">{{__("Debug Modu")}}</label><br>
                         <small>{{__("Liman'ın debug modunu aktifleştir.")}}</small>
                         <select id="APP_DEBUG" class="select2 liman_env">

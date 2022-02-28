@@ -68,7 +68,8 @@ class MainController extends Controller
             "MARKET_CLIENT_SECRET" => env("MARKET_CLIENT_SECRET"),
             "EXTENSION_DEVELOPER_MODE" => env("EXTENSION_DEVELOPER_MODE") ? "true" : "false",
             "APP_LANG" => env("APP_LANG", "tr"),
-            "NAV_SERVER_COUNT" => env("NAV_SERVER_COUNT", 20)
+            "NAV_SERVER_COUNT" => env("NAV_SERVER_COUNT", 20),
+            "EXTENSION_TIMEOUT" => env("EXTENSION_TIMEOUT", 30)
         ]);
     }
 
@@ -94,7 +95,8 @@ class MainController extends Controller
             "MARKET_CLIENT_SECRET" => request("MARKET_CLIENT_SECRET"),
             "EXTENSION_DEVELOPER_MODE" => request("EXTENSION_DEVELOPER_MODE"),
             "APP_LANG" => request("APP_LANG"),
-            "NAV_SERVER_COUNT" => request("NAV_SERVER_COUNT")
+            "NAV_SERVER_COUNT" => request("NAV_SERVER_COUNT"),
+            "EXTENSION_TIMEOUT" => request("EXTENSION_TIMEOUT"),
         ]);
 
         if (request()->has("MAIL_PASSWORD")) {
