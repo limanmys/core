@@ -96,7 +96,10 @@ class GenericConnector
 
     public function request($url, $params, $retry = 3)
     {
-        $client = new Client(['verify' => false]);
+        $client = new Client([
+            'verify' => false,
+            'connect_timeout' => env("EXTENSION_TIMEOUT", 30)
+        ]);
 
         if ($this->server != null) {
             $params["server_id"] = $this->server->id;
