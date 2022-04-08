@@ -17,7 +17,7 @@
 <nav class="main-header navbar navbar-expand navbar-dark" style="height:58.86px;border:0px;">
     <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" data-toggle="tooltip" title="{{ __('Menüyü gizle') }}" data-widget="pushmenu" href="#" onclick="collapseNav()"><i class="fas fa-bars"></i></a>
+            <a class="nav-link" data-toggle="tooltip" title="{{ __('Menüyü gizle') }}" data-widget="pushmenu" href="#" onclick="$('[role=tooltip]').remove(); collapseNav()" id="collapseMenu"><i class="fas fa-bars"></i></a>
           </li>
           <li class="nav-item">
             <a class="nav-link" data-toggle="tooltip" title="{{ __('Karanlık mod') }}" onclick="toggleDarkMode()"><i id="darkModeIcon" class="fas fa-sun"></i></a>
@@ -26,10 +26,6 @@
           <script>
             if(typeof currentlyDark != "undefined" && currentlyDark == true){
               setDarkMode();
-            }
-
-            function collapseNav(){
-              request('{{route('set_collapse')}}',new FormData(),null);
             }
           </script>
           <li class="nav-item d-none d-md-block">

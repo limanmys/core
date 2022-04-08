@@ -569,3 +569,17 @@ function copyToClipboard(elementId) {
     'success'
   );
 }
+
+function collapseNav() {
+  if (localStorage.getItem("collapse") == "true") {
+    localStorage.setItem("collapse", "false");
+  } else {
+    localStorage.setItem("collapse", "true");
+  }
+}
+
+$(document).ready(function() {
+  if (localStorage.getItem("collapse") == "true") {
+    $("body").addClass("sidebar-collapse");
+  }
+})

@@ -133,27 +133,6 @@ class HomeController extends Controller
         }
     }
 
-
-    public function collapse()
-    {
-        if (\Session::has('collapse')) {
-            \Session::remove('collapse');
-        } else {
-            \Session::put('collapse', '');
-        }
-        return respond('Ok', 200);
-    }
-
-    public function setTheme()
-    {
-        if (\Session::has('dark_mode')) {
-            \Session::remove('dark_mode');
-        } else {
-            \Session::put('dark_mode', 'true');
-        }
-        return respond('Tema Guncellendi.');
-    }
-
     /**
      * @api {get} /taleplerim Personal Liman Requests List
      * @apiName Personal Liman Requests List
