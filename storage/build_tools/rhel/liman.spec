@@ -354,5 +354,6 @@ printf "source /etc/profile; liman administrator\n\n\nDestek için liman.havelsa
 %clean
 
 %files
+/liman/*
 
 %define _unpackaged_files_terminate_build 0
