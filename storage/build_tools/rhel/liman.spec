@@ -80,6 +80,8 @@ else
     echo "SSL Certificate Created"
 fi
 
+sed -i '1s/^/host    all             all             127.0.0.1\/32            md5\n/' /var/lib/pgsql/data/pg_hba.conf
+
 DB_EXISTS=$(sudo -u liman psql -lqt | cut -d \| -f 1 | grep "liman" >/dev/null 2>/dev/null && echo "1" || echo "0")
 
 # Database Creation
@@ -107,6 +109,7 @@ else
     systemctl restart crond
 fi
 
+sed -i "s/more_set_headers/#more_set_headers/g" /liman/server/storage/nginx.conf
 mv /liman/server/storage/nginx.conf /etc/nginx/conf.d/liman.conf
 
 # Nginx Auto Redirection
@@ -115,14 +118,7 @@ if [ -f "/etc/nginx/default.d/liman.conf" ]; then
 else
     echo """
 #LIMAN_SECURITY_OPTIMIZATIONS
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    server_name _;
-    server_tokens off;
-    more_set_headers 'Server: LIMAN MYS';
-    return 301 https://\$host\$request_uri;
-}
+return 301 https://\$host\$request_uri;
     """ > /etc/nginx/default.d/liman.conf
 fi
 
@@ -295,6 +291,10 @@ systemctl daemon-reload
 rm /etc/systemd/system/liman.service 2>/dev/null
 systemctl disable liman 2>/dev/null
 systemctl stop liman 2>/dev/null
+
+firewall-cmd --permanent --zone=public --add-service=http
+firewall-cmd --permanent --zone=public --add-service=https
+firewall-cmd --reload
 
 systemctl enable liman-vnc 2>/dev/null
 systemctl enable liman-webssh 2>/dev/null
