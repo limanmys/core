@@ -79,6 +79,6 @@ cd ../
 dpkg-deb -Zgzip --build package
 
 rm -rf DEBIAN
-sed -i s/%VERSION%/$VERSION-$5/g liman.spec
+sed -i s/%VERSION%/$VERSION.$5/g liman.spec
 rpmbuild -ba liman.spec --define "_app_dir ./package" --define "_rpmdir /tmp" --define "_rpmfilename package.rpm"
 rm -rf package
