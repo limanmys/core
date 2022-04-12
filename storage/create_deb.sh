@@ -43,6 +43,7 @@ composer install --no-dev -d package/liman/server
 composer install --no-dev -d package/liman/sandbox/php
 rm -rf package/liman/server/node_modules
 mv package/liman/server/storage/build_tools/DEBIAN package/
+mv package/liman/server/storage/build_tools/rhel/liman.spec liman.spec
 rm -rf package/liman/server/storage/build_tools
 
 #Build Package
@@ -76,4 +77,8 @@ Depends: curl, gpg, zip, unzip, nginx, redis, php7.3-redis | php-redis, php7.3-f
 cat DEBIAN/control
 cd ../
 dpkg-deb -Zgzip --build package
+
+rm -rf DEBIAN
+sed -i s/%VERSION%/$VERSION-$5/g liman.spec
+rpmbuild -ba liman.spec --define "_app_dir ./package" --define "_rpmdir /tmp" --define "_rpmfilename package.rpm"
 rm -rf package
