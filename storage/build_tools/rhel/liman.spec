@@ -2,7 +2,7 @@ Name: liman
 Version: %VERSION%
 Release: 0
 License: MIT
-Requires: curl, gpgme, zip, unzip, nginx, redis, php, php-fpm, php73-php-pecl-redis5, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, oracle-epel-release-el8, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, novnc, python39, postgresql, postgresql-server
+Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php73-php-pecl-redis5, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, oracle-epel-release-el8, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, novnc, python39, postgresql, postgresql-server
 Prefix: /liman
 Summary: Liman MYS
 Group: Applications/System
@@ -34,9 +34,15 @@ else
     echo "Installing liman."
 fi
 
-/usr/pgsql-13/bin/postgresql-13-setup initdb
-systemctl enable postgresql-13
-systemctl start postgresql-13
+postgresql-setup initdb
+systemctl enable postgresql
+systemctl start postgresql
+
+systemctl enable crond
+systemctl start crond
+
+systemctl enable supervisord
+systemctl start supervisord
 
 # User Creation
 if getent passwd liman > /dev/null 2>&1; then
@@ -89,8 +95,8 @@ else
 fi
 
 # Update Php and Fpm to run as liman user.
-sed -i "s/www-data/liman/g" /etc/php/7.3/fpm/pool.d/www.conf
-sed -i "s/www-data/liman/g" /etc/nginx/nginx.conf
+sed -i "s/user = apache/user = liman/g" /etc/php-fpm.d/www.conf
+sed -i "s/user nginx/user liman/g" /etc/nginx/nginx.conf
 
 # Crontab Setting
 if [ -f "/etc/cron.d/liman" ]; then
@@ -98,14 +104,13 @@ if [ -f "/etc/cron.d/liman" ]; then
 else
     mkdir "/etc/cron.d" 2>/dev/null
     echo "* * * * * liman cd /liman/server && php artisan schedule:run >> /dev/null 2>&1" >> "/etc/cron.d/liman"
-    systemctl restart cron
+    systemctl restart crond
 fi
 
-mv /liman/server/storage/nginx.conf /etc/nginx/sites-available/liman.conf
-ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
+mv /liman/server/storage/nginx.conf /etc/nginx/conf.d/liman.conf
 
 # Nginx Auto Redirection
-if grep --quiet LIMAN_SECURITY_OPTIMIZATIONS /etc/nginx/sites-available/default; then
+if grep --quiet LIMAN_SECURITY_OPTIMIZATIONS /etc/nginx/default.d/liman.conf; then
     echo "Nginx https redirection already set up."; 
 else
     echo """
@@ -118,12 +123,12 @@ server {
     more_set_headers 'Server: LIMAN MYS';
     return 301 https://\$host\$request_uri;
 }
-    """ > /etc/nginx/sites-available/default
+    """ > /etc/nginx/default.d/liman.conf
 fi
 
 #Supervisor Configuration
-if [ -f "/etc/supervisor/conf.d/liman-extension-worker.conf" ]; then
-    rm /etc/supervisor/conf.d/liman-extension-worker.conf;
+if [ -f "/etc/supervisord.d/liman-extension-worker.ini" ]; then
+    rm /etc/supervisord.d/liman-extension-worker.ini;
 fi
 
 echo """
@@ -137,7 +142,7 @@ user=liman
 numprocs=1
 redirect_stderr=true
 stdout_logfile=/liman/logs/system_update.log
-    """ > /etc/supervisor/conf.d/liman-system-worker.conf
+    """ > /etc/supervisord.d/liman-system-worker.ini
 
 echo """
 #LIMAN_OPTIMIZATIONS
@@ -150,7 +155,7 @@ user=liman
 numprocs=8
 redirect_stderr=true
 stdout_logfile=/liman/logs/mail.log
-    """ > /etc/supervisor/conf.d/liman-cron-mail.conf
+    """ > /etc/supervisord.d/liman-cron-mail.ini
 supervisorctl reread
 supervisorctl update
 supervisorctl start all
