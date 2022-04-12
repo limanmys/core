@@ -110,7 +110,7 @@ fi
 mv /liman/server/storage/nginx.conf /etc/nginx/conf.d/liman.conf
 
 # Nginx Auto Redirection
-if grep --quiet LIMAN_SECURITY_OPTIMIZATIONS /etc/nginx/default.d/liman.conf; then
+if [ -f "/etc/nginx/default.d/liman.conf" ]; then
     echo "Nginx https redirection already set up."; 
 else
     echo """
@@ -131,37 +131,12 @@ if [ -f "/etc/supervisord.d/liman-extension-worker.ini" ]; then
     rm /etc/supervisord.d/liman-extension-worker.ini;
 fi
 
-echo """
-#LIMAN_OPTIMIZATIONS
-[program:liman-system-worker]
-process_name=%(program_name)s_%(process_num)02d
-command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=system_updater --timeout=0
-autostart=true
-autorestart=true
-user=liman
-numprocs=1
-redirect_stderr=true
-stdout_logfile=/liman/logs/system_update.log
-    """ > /etc/supervisord.d/liman-system-worker.ini
-
-echo """
-#LIMAN_OPTIMIZATIONS
-[program:liman-cron_mail-worker]
-process_name=%(program_name)s_%(process_num)02d
-command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=cron_mail --timeout=0
-autostart=true
-autorestart=true
-user=liman
-numprocs=8
-redirect_stderr=true
-stdout_logfile=/liman/logs/mail.log
-    """ > /etc/supervisord.d/liman-cron-mail.ini
 supervisorctl reread
 supervisorctl update
 supervisorctl start all
 
 #Increase Php-Fpm Memory
-sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php/7.3/fpm/php.ini
+sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php.ini
 
 # Run Database Migration
 php /liman/server/artisan migrate --force
@@ -295,8 +270,8 @@ if (systemctl -q is-active systemd-resolved.service); then
     /usr/bin/python3 /liman/server/storage/smb-dhcp-client 2> /dev/null | grep "Domain Name Server(s)" | cut -d : -f 2 |  xargs  | sed 's/ /\n/g' |sed 's/.*\..*\..*\..*/nameserver &/g' > /etc/resolv.conf
 fi
 
-sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/7.3/fpm/php.ini
-sed -i "s/post_max_size.*/post_max_size = 100M/g" /etc/php/7.3/fpm/php.ini
+sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php.ini
+sed -i "s/post_max_size.*/post_max_size = 100M/g" /etc/php.ini
 
 #Liman Helper Bash Function
 sed -i '/liman/d' /etc/profile
@@ -328,7 +303,7 @@ systemctl enable liman-render 2>/dev/null
 systemctl disable liman-connector 2>/dev/null
 systemctl enable liman-socket 2>/dev/null
 systemctl enable nginx 2>/dev/null
-systemctl enable php7.3-fpm 2>/dev/null
+systemctl enable php-fpm 2>/dev/null
 
 systemctl stop liman-connector
 systemctl restart liman-system
@@ -337,7 +312,7 @@ systemctl restart liman-vnc
 systemctl restart liman-webssh
 systemctl restart liman-socket
 systemctl restart nginx
-systemctl restart php7.3-fpm
+systemctl restart php-fpm
 
 # Optimize Liman
 php /liman/server/artisan optimize:clear
@@ -360,5 +335,6 @@ printf "source /etc/profile; liman administrator\n\n\nDestek için liman.havelsa
 
 %files
 /liman/*
+/etc/supervisord.d/*
 
 %define _unpackaged_files_terminate_build 0
