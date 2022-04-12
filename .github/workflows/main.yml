@@ -67,7 +67,7 @@ jobs:
                 --data "{\"file_ids\":[\"$post_id\"],\"message\":\"$MESSAGE\",\"channel_id\":\"$CHANNEL\"}"
           fi
 
-          cp package.rpm $FILE_NAME.rpm
+          cp /tmp/package.rpm $FILE_NAME.rpm
           
           post_id=$(curl --location --request POST "$MATTERMOST_URL/api/v4/files?channel_id=$CHANNEL" \
             --header "Authorization: Bearer $MATTERMOST_TOKEN" \
