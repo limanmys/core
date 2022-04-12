@@ -36,13 +36,11 @@ fi
 
 postgresql-setup initdb
 systemctl enable postgresql
+sed -i '1s/^/host    all             all             127.0.0.1\/32            md5\n/' /var/lib/pgsql/data/pg_hba.conf
 systemctl start postgresql
 
 systemctl enable crond
 systemctl start crond
-
-systemctl enable supervisord
-systemctl start supervisord
 
 # User Creation
 if getent passwd liman > /dev/null 2>&1; then
@@ -57,6 +55,9 @@ else
     #echo "liman     ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
     echo "Liman User Created"
 fi
+
+systemctl enable supervisord
+systemctl start supervisord
 
 # Delete if sudo exists
 sed -i '/liman/d' /etc/sudoers
@@ -79,8 +80,6 @@ else
         -out /liman/certs/liman.crt
     echo "SSL Certificate Created"
 fi
-
-sed -i '1s/^/host    all             all             127.0.0.1\/32            md5\n/' /var/lib/pgsql/data/pg_hba.conf
 
 DB_EXISTS=$(sudo -u liman psql -lqt | cut -d \| -f 1 | grep "liman" >/dev/null 2>/dev/null && echo "1" || echo "0")
 
