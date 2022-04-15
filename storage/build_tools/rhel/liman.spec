@@ -2,7 +2,7 @@ Name: liman
 Version: %VERSION%
 Release: 0
 License: MIT
-Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php73-php-pecl-redis5, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, oracle-epel-release-el8, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, novnc, python39, postgresql, postgresql-server
+Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, oracle-epel-release-el8, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, novnc, python39, postgresql, postgresql-server
 Prefix: /liman
 Summary: Liman MYS
 Group: Applications/System
@@ -41,6 +41,9 @@ systemctl start postgresql
 
 systemctl enable crond
 systemctl start crond
+
+systemctl enable redis
+systemctl start redis
 
 # User Creation
 if getent passwd liman > /dev/null 2>&1; then
@@ -96,8 +99,15 @@ else
 fi
 
 # Update Php and Fpm to run as liman user.
-sed -i "s/user = apache/user = liman/g" /etc/php-fpm.d/www.conf
-sed -i "s/user nginx/user liman/g" /etc/nginx/nginx.conf
+sed -i "s/user.*/user = liman/g" /etc/php-fpm.d/www.conf
+sed -i "s/group.*/group = liman/g" /etc/php-fpm.d/www.conf
+sed -i "s/listen.acl_users/;listen.acl_users/g" /etc/php-fpm.d/www.conf
+sed -i "s/;listen.owner/listen.owner/g" /etc/php-fpm.d/www.conf
+sed -i "s/;listen.group/listen.group/g" /etc/php-fpm.d/www.conf
+sed -i "s/;listen.mode/listen.mode/g" /etc/php-fpm.d/www.conf
+sed -i "s/listen.owner.*/listen.owner = liman/g" /etc/php-fpm.d/www.conf
+sed -i "s/listen.group.*/listen.group = liman/g" /etc/php-fpm.d/www.conf
+sed -i "s/user.*/user liman/g" /etc/nginx/nginx.conf
 
 # Crontab Setting
 if [ -f "/etc/cron.d/liman" ]; then
@@ -109,6 +119,7 @@ else
 fi
 
 sed -i "s/more_set_headers/#more_set_headers/g" /liman/server/storage/nginx.conf
+sed -i "s/php\/php7.3-fpm.sock/php-fpm\/www.sock/g" /liman/server/storage/nginx.conf
 mv /liman/server/storage/nginx.conf /etc/nginx/conf.d/liman.conf
 
 # Nginx Auto Redirection
@@ -294,6 +305,12 @@ systemctl stop liman 2>/dev/null
 firewall-cmd --permanent --zone=public --add-service=http
 firewall-cmd --permanent --zone=public --add-service=https
 firewall-cmd --reload
+
+chcon -Rt httpd_config_t /liman/certs/liman.*
+chcon -Rt httpd_config_t /etc/nginx/conf.d/liman.conf
+chcon -Rt httpd_sys_content_t /liman
+chcon -Rt httpd_sys_rw_content_t /liman
+setsebool -P httpd_can_network_connect 1
 
 systemctl enable liman-vnc 2>/dev/null
 systemctl enable liman-webssh 2>/dev/null
