@@ -99,15 +99,16 @@ else
 fi
 
 # Update Php and Fpm to run as liman user.
-sed -i "s/user.*/user = liman/g" /etc/php-fpm.d/www.conf
-sed -i "s/group.*/group = liman/g" /etc/php-fpm.d/www.conf
 sed -i "s/listen.acl_users/;listen.acl_users/g" /etc/php-fpm.d/www.conf
+sed -i "s/user =.*/user = liman/g" /etc/php-fpm.d/www.conf
+sed -i "s/group =.*/group = liman/g" /etc/php-fpm.d/www.conf
 sed -i "s/;listen.owner/listen.owner/g" /etc/php-fpm.d/www.conf
 sed -i "s/;listen.group/listen.group/g" /etc/php-fpm.d/www.conf
 sed -i "s/;listen.mode/listen.mode/g" /etc/php-fpm.d/www.conf
-sed -i "s/listen.owner.*/listen.owner = liman/g" /etc/php-fpm.d/www.conf
-sed -i "s/listen.group.*/listen.group = liman/g" /etc/php-fpm.d/www.conf
-sed -i "s/user.*/user liman/g" /etc/nginx/nginx.conf
+sed -i "s/listen.owner =.*/listen.owner = liman/g" /etc/php-fpm.d/www.conf
+sed -i "s/listen.group =.*/listen.group = liman/g" /etc/php-fpm.d/www.conf
+sed -i "s/listen.mode =.*/listen.mode = 660/g" /etc/php-fpm.d/www.conf
+sed -i "s/user .*;/user liman;/g" /etc/nginx/nginx.conf
 
 # Crontab Setting
 if [ -f "/etc/cron.d/liman" ]; then
@@ -310,6 +311,7 @@ chcon -Rt httpd_config_t /liman/certs/liman.*
 chcon -Rt httpd_config_t /etc/nginx/conf.d/liman.conf
 chcon -Rt httpd_sys_content_t /liman
 chcon -Rt httpd_sys_rw_content_t /liman
+chcon -Rt bin_t /liman/server/storage/liman_*
 setsebool -P httpd_can_network_connect 1
 
 systemctl enable liman-vnc 2>/dev/null
