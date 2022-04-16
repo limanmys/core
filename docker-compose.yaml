@@ -1,0 +1,60 @@
+version: '3.7'
+
+services:
+  php:
+    build:
+      context: .docker/php
+      args:
+        TIMEZONE: Asia/Istanbul
+    container_name: liman_php
+    volumes:
+      - ./:/var/www/liman/
+    networks:
+      - liman-net
+  
+  nginx:
+    build:
+      context: .docker/nginx
+    container_name: liman_nginx
+    depends_on:
+      - php
+    volumes:
+      - ./:/var/www/liman/
+    ports:
+      - "8080:80"
+    networks:
+      - liman-net
+  db:
+    build:
+      context: .docker/pgsql
+    restart: always
+    environment:
+      POSTGRES_DB: liman
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pgpass123
+      PGDATA: /var/lib/postgresql/data/pgdata
+    container_name: liman_db
+    volumes:
+      - db_liman:/var/lib/postgresql/data
+      - ./postgres/log:/var/log/postgresql
+    ports:
+      - "5432:5432"
+    networks:
+      - liman-net
+  adminer:
+    image: adminer:latest
+    restart: always
+    ports:
+      - "8081:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: liman_db
+    container_name: liman_adminer
+    depends_on:
+      - db
+    networks:
+      - liman-net
+volumes:
+  db_liman:
+
+networks:
+  liman-net:

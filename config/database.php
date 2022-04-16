@@ -60,7 +60,7 @@ return [
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'liman'),
             'username' => env('DB_USERNAME', 'liman'),
-            'password' => env('DB_PASSWORD', ''),
+            'password' => env('DB_PASSWORD', 'pgpass123'),
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
