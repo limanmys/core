@@ -132,7 +132,11 @@
             showSwal('{{ __("Ekleniyor...") }}',"info");
             let form = new FormData();
             form.append('username',$("#keyUsername").val());
-            form.append('password',$("#keyPassword").val());
+            if ($("#keyPassword").val() != ""){
+                form.append('password',$("#keyPassword").val());
+            } else {
+                form.append('password',$("#keyPasswordCert").val());
+            }
             form.append('type',$("#keyType").val());
             form.append('key_port',$("#port").val());
             form.append('server_id',$("#targetServer").val().split(":")[1]);
