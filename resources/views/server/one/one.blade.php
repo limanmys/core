@@ -44,6 +44,22 @@
                         </li>
                     @endif
                 @endif
+                @if(server()->canRunCommand() && server()->isWindows())
+                    @if(\App\Models\Permission::can(user()->id,'liman','id','server_services'))
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="pill" onclick="getServices()" href="#servicesTab" role="tab">{{__("Servisler")}}</a>
+                        </li>
+                    @endif
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                            {{ __('Kullanıcı İşlemleri') }} <span class="caret"></span>
+                        </a>
+                        <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 40px, 0px);">
+                            <a class="dropdown-item" href="#usersTab" onclick="getLocalUsers()" data-toggle="tab">{{__("Yerel Kullanıcılar")}}</a>
+                            <a class="dropdown-item" href="#groupsTab" onclick="getLocalGroups()" data-toggle="tab">{{__("Yerel Gruplar")}}</a>
+                        </div>
+                    </li>
+                @endif
                 @if(\App\Models\Permission::can(user()->id,'liman','id','view_logs'))
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="pill" href="#logsTab" onclick="getLogs()" role="tab">{{__("Erişim Kayıtları")}}</a>
@@ -190,6 +206,22 @@
                                 ])
                                 <div id="sudoers"></div>
                             </div>
+                    @endif
+
+                    @if (server()->isWindows())
+                        <div class="tab-pane fade show" id="usersTab" role="tabpanel">
+                            <div id="users"></div>
+                        </div>
+                        <div class="tab-pane fade show" id="groupsTab" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="groups"></div>
+                                </div>
+                                <div class="col-md-6 d-none">
+                                    <div id="groupUsers"></div>
+                                </div>
+                            </div>
+                        </div>
                     @endif
                 @endif
                 <div class="tab-pane fade show" id="logsTab" role="tabpanel">

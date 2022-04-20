@@ -490,20 +490,43 @@ class OneController extends Controller
 
     public function getLocalUsers()
     {
-        $output = server()->run(
-            "cut -d: -f1,3 /etc/passwd | egrep ':[0-9]{4}$' | cut -d: -f1"
-        );
-        $output = trim($output);
-        if (empty($output)) {
-            $users = [];
-        } else {
-            $output = explode("\n", $output);
-            foreach ($output as $user) {
-                $users[] = [
-                    "user" => $user,
-                ];
+        if (server()->isLinux()) {
+            $output = server()->run(
+                "cut -d: -f1,3 /etc/passwd | egrep ':[0-9]{4}$' | cut -d: -f1"
+            );
+            $output = trim($output);
+            if (empty($output)) {
+                $users = [];
+            } else {
+                $output = explode("\n", $output);
+                foreach ($output as $user) {
+                    $users[] = [
+                        "user" => $user,
+                    ];
+                }
             }
         }
+
+        if (server()->isWindows() && server()->canRunCommand()) {
+            $output = server()->run(
+                'Get-LocalUser | Where { $_.Enabled -eq $True} | Select-Object Name'
+            );
+            $output = trim($output);
+            if (empty($output)) {
+                $users = [];
+            } else {
+                $output = explode("\r\n", $output);
+                foreach ($output as $key => $user) {
+                    if ($key == 0 || $key == 1) {
+                        continue;
+                    }
+                    $users[] = [
+                        "user" => $user,
+                    ];
+                }
+            }
+        }
+        
         return magicView('table', [
             "value" => $users,
             "title" => ["Kullanıcı Adı"],
@@ -531,25 +554,54 @@ class OneController extends Controller
 
     public function getLocalGroups()
     {
-        $output = server()->run("getent group | cut -d ':' -f1");
-        $output = trim($output);
-        if (empty($output)) {
-            $groups = [];
-        } else {
-            $output = explode("\n", $output);
-            foreach ($output as $group) {
-                $groups[] = [
-                    "group" => $group,
-                ];
+        if (server()->isLinux()) {
+            $output = server()->run("getent group | cut -d ':' -f1");
+            $output = trim($output);
+            if (empty($output)) {
+                $groups = [];
+            } else {
+                $output = explode("\n", $output);
+                foreach ($output as $group) {
+                    $groups[] = [
+                        "group" => $group,
+                    ];
+                }
+                $groups = array_reverse($groups);
             }
-            $groups = array_reverse($groups);
+
+            return magicView('table', [
+                "value" => $groups,
+                "title" => ["Grup Adı"],
+                "display" => ["group"],
+                "onclick" => "localGroupDetails",
+            ]);
         }
-        return magicView('table', [
-            "value" => $groups,
-            "title" => ["Grup Adı"],
-            "display" => ["group"],
-            "onclick" => "localGroupDetails",
-        ]);
+
+        if (server()->isWindows() && server()->canRunCommand()) {
+            $output = server()->run(
+                'Get-LocalGroup | Select-Object Name'
+            );
+            $output = trim($output);
+            if (empty($output)) {
+                $groups = [];
+            } else {
+                $output = explode("\r\n", $output);
+                foreach ($output as $key => $group) {
+                    if ($key == 0 || $key == 1) {
+                        continue;
+                    }
+                    $groups[] = [
+                        "group" => $group,
+                    ];
+                }
+            }
+
+            return magicView('table', [
+                "value" => $groups,
+                "title" => ["Grup Adı"],
+                "display" => ["group"],
+            ]);
+        }
     }
 
     public function getLocalGroupDetails()
