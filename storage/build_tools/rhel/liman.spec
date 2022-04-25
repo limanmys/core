@@ -2,7 +2,7 @@ Name: liman
 Version: %VERSION%
 Release: 0
 License: MIT
-Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, novnc, python39, postgresql, postgresql-server
+Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, novnc, python39, python3-paramiko, python3-tornado, postgresql, postgresql-server
 Prefix: /liman
 Summary: Liman MYS
 Group: Applications/System
@@ -313,6 +313,8 @@ chcon -Rt httpd_sys_content_t /liman
 chcon -Rt httpd_sys_rw_content_t /liman
 chcon -Rt bin_t /liman/server/storage/liman_*
 setsebool -P httpd_can_network_connect 1
+
+chown -R liman /var/lib/nginx/
 
 systemctl enable liman-vnc 2>/dev/null
 systemctl enable liman-webssh 2>/dev/null
