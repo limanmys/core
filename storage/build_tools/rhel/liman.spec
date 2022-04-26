@@ -313,6 +313,10 @@ chcon -Rt httpd_sys_content_t /liman
 chcon -Rt httpd_sys_rw_content_t /liman
 chcon -Rt bin_t /liman/server/storage/liman_*
 setsebool -P httpd_can_network_connect 1
+    
+mkdir  /usr/lib/systemd/system/php-fpm.service.d
+echo -e "[Service]\nPrivateTmp=no" > /etc/systemd/system/php-fpm.service.d/privatetmp.conf
+systemctl daemon-reload
 
 chown -R liman /var/lib/nginx/
 
