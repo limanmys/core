@@ -302,6 +302,8 @@ systemctl daemon-reload
 rm /etc/systemd/system/liman.service 2>/dev/null
 systemctl disable liman 2>/dev/null
 systemctl stop liman 2>/dev/null
+    
+grep -E "^TLS_REQCERT" /etc/openldap/ldap.conf && sed -i '/^TLS_REQCERT/d' /etc/openldap/ldap.conf && echo "TLS_REQCERT allow" >>  /etc/openldap/ldap.conf || echo "TLS_REQCERT allow" >> /etc/openldap/ldap.conf
 
 firewall-cmd --permanent --zone=public --add-service=http
 firewall-cmd --permanent --zone=public --add-service=https
