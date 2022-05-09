@@ -67,7 +67,7 @@ class UserController extends Controller
             'forceChange' => true,
         ];
 
-        if(request('username')){
+        if (request('username')) {
             $data['username'] = request('username');
         }
 
@@ -194,7 +194,7 @@ class UserController extends Controller
         }
 
         validate([
-            'name' => 'required|string|max:255' 
+            'name' => 'required|string|max:255'
         ]);
 
         if (!empty(request()->password)) {
@@ -267,7 +267,7 @@ class UserController extends Controller
             'status' => request('status'),
         ];
 
-        if(request('username')){
+        if (request('username')) {
             $data['username'] = request('username');
         }
 
@@ -383,14 +383,14 @@ class UserController extends Controller
                 ]);
         }
 
-        if(request("old_password") == request("password")) {
+        if (request("old_password") == request("password")) {
             return redirect()
                 ->route('password_change')
                 ->withErrors([
                     "message" => "Yeni parolanız mevcut parolanıza eşit olamaz.",
                 ]);
         }
-        
+
         $flag = Validator::make(request()->all(), [
             'password' => [
                 'required',
@@ -409,7 +409,7 @@ class UserController extends Controller
                 ->route('password_change')
                 ->withErrors([
                     "message" =>
-                        "Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.",
+                    "Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.",
                 ]);
         }
 
@@ -500,6 +500,10 @@ class UserController extends Controller
         ServerKey::updateOrCreate(
             ["server_id" => server()->id, "user_id" => user()->id],
             ["type" => request('type'), "data" => json_encode($data)]
+        );
+
+        Server::where(["id" => server()->id])->update(
+            ["shared_key" => request()->shared == "true" ? 1 : 0]
         );
 
         ConnectorToken::clear();
