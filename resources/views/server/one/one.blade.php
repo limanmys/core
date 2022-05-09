@@ -281,25 +281,29 @@
                                     {{ $city }}</option>
                             @endforeach
                         </select>
-                        <label id="sharedKeyLabel" style="width: 100%; margin-bottom: 15px;">
-                            <input id="sharedKey" name="shared" type="checkbox"
-                                @if (server()->shared_key == 1) checked @endif>
-                            {{ __('Anahtar tüm kullanıcılar tarafından kullanılabilsin') }}
-                        </label>
+                        @if (user()->isAdmin())
+                            <label id="sharedKeyLabel" style="width: 100%; margin-bottom: 15px;">
+                                <input id="sharedKey" name="shared" type="checkbox"
+                                    @if (server()->shared_key == 1) checked @endif>
+                                {{ __('Anahtar tüm kullanıcılar tarafından kullanılabilsin') }}
+                            </label>
+                        @endif
 
-                        <div class="row">
-                            <div class="col">
-                                <button type="submit"
-                                    class="btn btn-success btn-block">{{ __('Bilgileri Güncelle') }}</button>
+                        @if (\App\Models\Permission::can(user()->id, 'liman', 'id', 'update_server'))
+                            <div class="row">
+                                <div class="col">
+                                    <button type="submit"
+                                        class="btn btn-success btn-block">{{ __('Bilgileri Güncelle') }}</button>
+                                </div>
+                                <div class="col">
+                                    @include('modal-button', [
+                                        'class' => 'btn-danger btn-block',
+                                        'target_id' => 'delete',
+                                        'text' => 'Sunucuyu Sil',
+                                    ])
+                                </div>
                             </div>
-                            <div class="col">
-                                @include('modal-button', [
-                                    'class' => 'btn-danger btn-block',
-                                    'target_id' => 'delete',
-                                    'text' => 'Sunucuyu Sil',
-                                ])
-                            </div>
-                        </div>
+                        @endif
                     </form>
                 </div>
             </div>

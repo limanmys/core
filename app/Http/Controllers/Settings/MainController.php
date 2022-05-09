@@ -199,24 +199,44 @@ class MainController extends Controller
                 $display = ["id:id", "name"];
                 break;
             case "liman":
+                $usedPermissions = Permission::where([
+                    "type" => "liman",
+                    "morph_id" => request("user_id")
+                ])
+                    ->get()
+                    ->groupBy("value");
+
                 $data = [
                     [
                         "id" => "view_logs",
-                        "name" => "Sunucu Günlük Kayıtlarını Görüntüleme",
+                        "name" => __("Sunucu Günlük Kayıtlarını Görüntüleme"),
                     ],
                     [
                         "id" => "add_server",
-                        "name" => "Sunucu Ekleme",
+                        "name" => __("Sunucu Ekleme"),
                     ],
                     [
                         "id" => "server_services",
-                        "name" => "Sunucu Servislerini Görüntüleme",
+                        "name" => __("Sunucu Servislerini Görüntüleme"),
                     ],
                     [
                         "id" => "server_details",
-                        "name" => "Sunucu Detaylarını Görüntüleme",
+                        "name" => __("Sunucu Detaylarını Görüntüleme"),
+                    ],
+                    [
+                        "id" => "update_server", 
+                        "name" => __("Sunucu Detaylarını Güncelleme"),
                     ]
                 ];
+
+                foreach ($usedPermissions as $permission => $values) {
+                    foreach ($data as $k => $v) {
+                        if ($v["id"] == $permission) {
+                            unset($data[$k]);
+                        };
+                    }
+                }
+
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
                 break;

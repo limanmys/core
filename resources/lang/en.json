@@ -945,5 +945,9 @@
   "Anahtar tüm kullanıcılar tarafından kullanılabilsin": "Share server key between users",
   "Anahtar Paylaşımı": "Shared Key",
   "Paylaşımlı": "Shared",
-  "Paylaşımsız": "Non-shared"
+  "Paylaşımsız": "Non-shared",
+  "Sunucu Servislerini Görüntüleme": "View Server Services",
+  "Sunucu Günlük Kayıtlarını Görüntüleme": "View Logs",
+  "Sunucu Ekleme": "Add Server",
+  "Sunucu Detaylarını Güncelleme": "Update Server Settings"
 }

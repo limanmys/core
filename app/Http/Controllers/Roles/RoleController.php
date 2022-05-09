@@ -252,8 +252,8 @@ class RoleController extends Controller
                     "type" => "liman",
                     "morph_id" => request("role_id")
                 ])
-                  ->get()
-                  ->groupBy("value");
+                    ->get()
+                    ->groupBy("value");
 
                 $data = [
                     [
@@ -271,17 +271,21 @@ class RoleController extends Controller
                     [
                         "id" => "server_details",
                         "name" => "Sunucu Detaylarını Görüntüleme",
+                    ],
+                    [
+                        "id" => "update_server",
+                        "name" => "Sunucu Detaylarını Güncelleme",
                     ]
                 ];
-
-                foreach($usedPermissions as $permission => $values) {
+                
+                foreach ($usedPermissions as $permission => $values) {
                     foreach ($data as $k => $v) {
                         if ($v["id"] == $permission) {
                             unset($data[$k]);
                         };
                     }
                 }
-                
+
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
                 break;

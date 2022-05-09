@@ -194,6 +194,10 @@ class OneController extends Controller
 
     public function update()
     {
+        if (!Permission::can(user()->id, 'liman', 'id', 'update_server')) {
+            return respond("Bu işlemi yapmak için yetkiniz yok!", 201);
+        }
+
         if (strlen(request('name')) > 24) {
             return respond("Lütfen daha kısa bir sunucu adı girin.", 201);
         }
@@ -213,13 +217,18 @@ class OneController extends Controller
             "request" => request()->all(),
         ]);
 
-        $output = Server::where(['id' => server()->id])->update([
+        $params = [
             "name" => request('name'),
             "control_port" => request('control_port'),
             "ip_address" => request('ip_address'),
             "city" => request('city'),
-            "shared_key" => request('shared') == "on" ? 1 : 0,
-        ]);
+        ];
+
+        if (user()->isAdmin()) {
+            $params["shared_key"] = request('shared') == "on" ? 1 : 0;
+        }
+
+        $output = Server::where(['id' => server()->id])->update($params);
 
         ConnectorToken::clear();
 
