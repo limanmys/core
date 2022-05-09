@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\User;
 use App\Models\Permission;
+use App\Models\Server;
 use App\System\Command;
 use Carbon\Carbon;
 use Exception;
@@ -37,7 +38,7 @@ class OneController extends Controller
             $uptime = Carbon::parse($uptime)->diffForHumans();
         } catch (\Throwable $e) {
             $uptime = __("Uptime parse edemiyorum.");
-        }        
+        }
 
         $outputs = [
             "hostname" => $server->getHostname(),
@@ -49,7 +50,7 @@ class OneController extends Controller
 
         if ($server->canRunCommand()) {
             $outputs["user"] = Command::run("whoami");
-        }  
+        }
 
         $input_extensions = [];
         $available_extensions = $this->availableExtensions();
@@ -181,8 +182,8 @@ class OneController extends Controller
             ];
             if (
                 DB::table("server_extensions")
-                    ->where($data)
-                    ->doesntExist()
+                ->where($data)
+                ->doesntExist()
             ) {
                 $data["id"] = Str::uuid();
                 DB::table("server_extensions")->insert($data);
@@ -212,11 +213,12 @@ class OneController extends Controller
             "request" => request()->all(),
         ]);
 
-        $output = server()->update([
+        $output = Server::where(['id' => server()->id])->update([
             "name" => request('name'),
             "control_port" => request('control_port'),
             "ip_address" => request('ip_address'),
             "city" => request('city'),
+            "shared_key" => request('shared') == "on" ? 1 : 0,
         ]);
 
         ConnectorToken::clear();
@@ -247,8 +249,8 @@ class OneController extends Controller
         server()->putFile(
             '/tmp/' .
                 request()
-                    ->file('file')
-                    ->getClientOriginalName(),
+                ->file('file')
+                ->getClientOriginalName(),
             \request('path')
         );
 
@@ -526,7 +528,7 @@ class OneController extends Controller
                 }
             }
         }
-        
+
         return magicView('table', [
             "value" => $users,
             "title" => ["Kullanıcı Adı"],
@@ -924,7 +926,7 @@ class OneController extends Controller
         if (server()->isLinux()) {
             $package = request("package_name");
             $raw = Command::runSudo(
-                "DEBIAN_FRONTEND=noninteractive apt install @{:package} -qqy >\"/tmp/{:packageBase}.txt\" 2>&1 & disown && echo \$!", 
+                "DEBIAN_FRONTEND=noninteractive apt install @{:package} -qqy >\"/tmp/{:packageBase}.txt\" 2>&1 & disown && echo \$!",
                 [
                     'packageBase' => basename($package),
                     'package' => $package
@@ -964,10 +966,10 @@ class OneController extends Controller
             }
             $package = Command::runSudo(
                 'apt list ' .
-                $list_method .
-                ' 2>/dev/null | grep ' .
-                '@{:package}' .
-                ' && echo 1 || echo 0', 
+                    $list_method .
+                    ' 2>/dev/null | grep ' .
+                    '@{:package}' .
+                    ' && echo 1 || echo 0',
                 [
                     'package' => $package,
                 ]
@@ -1196,17 +1198,19 @@ class OneController extends Controller
         );
 
         if (empty($output)) {
-            return respond(view(
-                "alert",
-                [
-                    "type" => "info",
-                    "title" => "Bilgilendirme",
-                    "message" => "Açık portları görüntüleyebilmek için sunucunuza <b>lsof</b> paketini kurmanız gerekmektedir."
-                ]
-            )->render() . 
-            "<button class='w-100 btn btn-info' onclick='installLsof()'><i class='fas fa-download mr-1'></i> 
-            " . __("Lsof paketini yükle") . "</button>"
-            , 201);
+            return respond(
+                view(
+                    "alert",
+                    [
+                        "type" => "info",
+                        "title" => "Bilgilendirme",
+                        "message" => "Açık portları görüntüleyebilmek için sunucunuza <b>lsof</b> paketini kurmanız gerekmektedir."
+                    ]
+                )->render() .
+                    "<button class='w-100 btn btn-info' onclick='installLsof()'><i class='fas fa-download mr-1'></i> 
+            " . __("Lsof paketini yükle") . "</button>",
+                201
+            );
         }
 
         $arr = [];
