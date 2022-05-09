@@ -48,7 +48,8 @@ class AddController extends Controller
         $this->server = new Server();
         $this->server->fill(request()->all());
         $this->server->user_id = auth()->id();
-        if (request('type') == null ){
+        $this->server->shared_key = request()->shared == "true" ? 1 : 0;
+        if (request('type') == null) {
             $this->server->type = "none";
         }
         request('key_port')
@@ -119,7 +120,7 @@ class AddController extends Controller
                         "title" => __("Yeni Sertifika Eklendi"),
                         "type" => "new_cert",
                         "message" =>
-                            __("Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi."),
+                        __("Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi."),
                         "level" => 3,
                     ]);
                 }
@@ -130,7 +131,7 @@ class AddController extends Controller
                         "title" => __("Yeni Sertifika Onayı"),
                         "type" => "cert_request",
                         "message" =>
-                            $this->server->ip_address .
+                        $this->server->ip_address .
                             ":" .
                             $this->server->control_port .
                             ":" .
