@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ExtensionMail;
 
 class InternalController extends Controller
 {
@@ -22,6 +24,17 @@ class InternalController extends Controller
         if (array_key_exists("SERVER_ADDR", $_SERVER)) {
             $this->checkPermissions();
         }
+    }
+
+    public function sendMail()
+    {
+        Mail::to(request('to'))->send(
+            new ExtensionMail(
+                request('subject'),
+                base64_decode(request('content')),
+                json_decode(request('attachments'), true),
+            )
+        );
     }
 
     public function sendNotification()
