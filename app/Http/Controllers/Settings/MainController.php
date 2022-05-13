@@ -250,6 +250,54 @@ class MainController extends Controller
         ]);
     }
 
+    public function allRoles()
+    {
+        $data = [];
+
+        $permissionData = 
+            Permission::with("morph")
+                        ->get()->each(function ($row) {
+                            $row->details = $row->getRelatedObject();
+                            if ($row->morph_type == "roles") {
+                                $row->users = $row->morph->users()->get();
+                            }
+                        });
+
+        foreach ($permissionData as $row) {
+            if ($row->details["value"] == "-" || $row->details["type"] == "-") {
+                continue;
+            }
+
+            $insert = [
+                "id" => $row->morph->id,
+                "morph_type" => $row->morph_type,
+                "perm_type" => $row->details["type"],
+                "perm_value" => $row->details["value"],
+            ];
+
+            if ($row->morph_type == "users") {
+                $data[] = array_merge($insert, [
+                    "username" => $row->morph->name,
+                    "role_name" => __("Rol yok"),
+                ]);
+            } elseif ($row->morph_type == "roles") {
+                foreach ($row->users as $user) {
+                    $data[] = array_merge($insert, [
+                        "username" => $user->name,
+                        "role_name" => $row->morph->name,
+                    ]);
+                }
+            }            
+        }
+
+        return view('table', [
+            "value" => $data,
+            "title" => ["*hidden*", "*hidden*", "Kullanıcı Adı", "Rol Adı", "İzin Tipi", "İzin Değeri"],
+            "display" => ["id:id", "morph_type:morph_type", "username", "role_name", "perm_type", "perm_value"],
+            "onclick" => "goToRoleItem",
+        ]);
+    }
+
     public function addList()
     {
         $arr = [];

@@ -14,6 +14,10 @@ Route::post('/ayarlar/liste', 'Settings\MainController@getList')
     ->name('settings_get_list')
     ->middleware('admin');
 
+Route::post('/ayarlar/all_roles', 'Settings\MainController@allRoles')
+    ->name('all_roles')
+    ->middleware('admin');
+
 Route::post('/ayar/yetki/ekle', 'Settings\MainController@addList')
     ->name('settings_add_to_list')
     ->middleware('admin');

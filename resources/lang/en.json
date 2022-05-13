@@ -949,5 +949,10 @@
   "Sunucu Servislerini Görüntüleme": "View Server Services",
   "Sunucu Günlük Kayıtlarını Görüntüleme": "View Logs",
   "Sunucu Ekleme": "Add Server",
-  "Sunucu Detaylarını Güncelleme": "Update Server Settings"
+  "Sunucu Detaylarını Güncelleme": "Update Server Settings",
+  "İzin Listesi": "Permission List",
+  "Rol Adı": "Role Name",
+  "İzin Tipi": "Permission Type",
+  "İzin Değeri": "Permission Value",
+  "Rol yok": "No role"
 }
