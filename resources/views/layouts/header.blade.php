@@ -170,6 +170,9 @@
                     </div>
                 @endif
             </div>
+            <div class="mini-copy">
+                &copy;{{ date("Y") }} HAVELSAN A.Ş.
+            </div>
         </div>
     </div>
     <!-- /.sidebar -->

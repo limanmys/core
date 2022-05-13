@@ -114,7 +114,7 @@ body {
 }
 
 .sidebar-bottom {
-    height: 3rem;
+    height: 4.3rem;
     position: absolute;
     bottom: -5px;
     width: 100%;
@@ -125,7 +125,16 @@ body {
 
 .sidebar-bottom .col {
     border-right: 1px #2d3748 solid;
+    border-bottom: 1px solid #2d3748;
     padding: 0;
+}
+
+.mini-copy {
+    font-size: 12px;
+    color: rgb(107, 114, 128);
+    text-align: center;
+    margin-top: 1px;
+    font-weight: 600;
 }
 
 .sidebar-bottom .col:last-of-type {
