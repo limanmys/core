@@ -32,11 +32,9 @@ jobs:
           MESSAGE+="Version: $VERSION \n"
 
           sudo chmod +x package/liman/server/storage/create_deb.sh
-          ./package/liman/server/storage/create_deb.sh 1.9.4-dev master 1.9.4-dev master $GITHUB_RUN_NUMBER $PASSPHRASE
+          ./package/liman/server/storage/create_deb.sh master master master master $GITHUB_RUN_NUMBER $PASSPHRASE
 
-          ls -lah
-
-          [ "$GITHUB_REF" == "refs/heads/master" ] && FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER.deb" || FILE_NAME="liman-${GITHUB_REF#refs/heads/}-$VERSION-$GITHUB_RUN_NUMBER.deb"
+          FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER.deb"
           FILE_NAME=$(echo $FILE_NAME | tr / -)
           
           cp package.deb $FILE_NAME
