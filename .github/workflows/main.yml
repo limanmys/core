@@ -34,6 +34,7 @@ jobs:
           sudo chmod +x package/liman/server/storage/create_deb.sh
           ./package/liman/server/storage/create_deb.sh master master master master $GITHUB_RUN_NUMBER $PASSPHRASE
 
+          [ "$GITHUB_REF" == "refs/heads/master" ] && PRERELEASE=false || PRERELEASE=true
           FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER.deb"
           FILE_NAME=$(echo $FILE_NAME | tr / -)
           
@@ -42,6 +43,7 @@ jobs:
           echo "RELEASE_VER=$(echo $VERSION)" >> $GITHUB_ENV
           echo "RELEASE_FILENAME=$(echo $FILE_NAME)" >> $GITHUB_ENV
           echo "RELEASE_RUNNUMBER=$(echo $GITHUB_RUN_NUMBER)" >> $GITHUB_ENV
+          echo "PRERELEASE=$(echo $PRERELEASE)" >> $GITHUB_ENV
           echo "LIMAN_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
           
       - name: Release 🚀
@@ -53,3 +55,4 @@ jobs:
           files: ${{ env.RELEASE_FILENAME }}
           name: "Release ${{ env.RELEASE_VER }} - ${{ env.RELEASE_RUNNUMBER }}"
           tag_name: "release.${{ env.LIMAN_BRANCH }}.${{ env.RELEASE_RUNNUMBER }}"
+          prerelease: ${{ env.PRERELEASE }}
