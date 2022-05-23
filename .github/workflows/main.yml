@@ -54,4 +54,4 @@ jobs:
         with:
           files: ${{ env.RELEASE_FILENAME }}
           name: "Release ${{ env.RELEASE_VER }} - ${{ env.RELEASE_RUNNUMBER }}"
-          tag_name: "release.${{ env.LIMAN_BRANCH }}"
+          tag_name: "release.${{ env.LIMAN_BRANCH }}.${{ env.RELEASE_RUNNUMBER }}"
