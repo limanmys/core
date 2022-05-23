@@ -19,10 +19,6 @@ jobs:
         env:
             PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
             PASSPHRASE: ${{ secrets.PASSPHRASE }}
-            MATTERMOST_TOKEN: ${{ secrets.MATTERMOST_TOKEN }}
-            MATTERMOST_CHANNEL: ${{ secrets.MATTERMOST_CHANNEL }}
-            MATTERMOST_DEV_CHANNEL: ${{ secrets.MATTERMOST_DEV_CHANNEL }}
-            MATTERMOST_URL: ${{ secrets.MATTERMOST_URL }} 
         run: |
           sudo apt install zip gpg curl jq -y
           mkdir -p /home/runner/.gnupg
@@ -38,34 +34,15 @@ jobs:
           sudo chmod +x package/liman/server/storage/create_deb.sh
           ./package/liman/server/storage/create_deb.sh master master master master $GITHUB_RUN_NUMBER $PASSPHRASE
 
-          ls -lah
-
-          [ "$GITHUB_REF" == "refs/heads/master" ] && CHANNEL=$MATTERMOST_CHANNEL || CHANNEL=$MATTERMOST_DEV_CHANNEL
-          [ "$GITHUB_REF" == "refs/heads/master" ] && FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER.deb" || FILE_NAME="liman-${GITHUB_REF#refs/heads/}-$VERSION-$GITHUB_RUN_NUMBER.deb"
+          FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER.deb"
           FILE_NAME=$(echo $FILE_NAME | tr / -)
           
           cp package.deb $FILE_NAME
           
-          post_id=$(curl --location --request POST "$MATTERMOST_URL/api/v4/files?channel_id=$CHANNEL" \
-            --header "Authorization: Bearer $MATTERMOST_TOKEN" \
-            --header 'Content-Type: multipart/form-data' \
-            --form "files=@$FILE_NAME" | jq -r '.file_infos[0].id')
-
-          echo $post_id
-          
           echo "RELEASE_VER=$(echo $VERSION)" >> $GITHUB_ENV
           echo "RELEASE_FILENAME=$(echo $FILE_NAME)" >> $GITHUB_ENV
           echo "RELEASE_RUNNUMBER=$(echo $GITHUB_RUN_NUMBER)" >> $GITHUB_ENV
-          
-          if [ -z "$post_id" ]; then
-              echo "Failed to create post :("
-              exit 4
-          else
-              curl --location --request POST "$MATTERMOST_URL/api/v4/posts" \
-                --header "Authorization: Bearer $MATTERMOST_TOKEN" \
-                --header "Content-Type: application/json" \
-                --data "{\"file_ids\":[\"$post_id\"],\"message\":\"$MESSAGE\",\"channel_id\":\"$CHANNEL\"}"
-          fi
+          echo "LIMAN_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
           
       - name: Release 🚀
         id: create_release
@@ -75,4 +52,4 @@ jobs:
         with:
           files: ${{ env.RELEASE_FILENAME }}
           name: "Release ${{ env.RELEASE_VER }} - ${{ env.RELEASE_RUNNUMBER }}"
-          tag_name: "release.${{ env.RELEASE_RUNNUMBER }}"
+          tag_name: "release.${{ env.LIMAN_BRANCH }}.${{ env.RELEASE_RUNNUMBER }}"
