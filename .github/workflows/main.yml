@@ -35,7 +35,7 @@ jobs:
           ./package/liman/server/storage/create_deb.sh 1.9.4-dev master 1.9.4-dev master $GITHUB_RUN_NUMBER $PASSPHRASE
 
           [ "$GITHUB_REF" == "refs/heads/master" ] && PRERELEASE=false || PRERELEASE=true
-          FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER.deb"
+          FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER"
           FILE_NAME=$(echo $FILE_NAME | tr / -)
           
           cp package.deb $FILE_NAME.deb

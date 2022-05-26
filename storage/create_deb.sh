@@ -81,6 +81,7 @@ cd ../
 dpkg-deb -Zgzip --build package
 
 rm -rf DEBIAN
+VERSION=$(cat package/liman/server/storage/VERSION | tr - .)
 sed -i s/%VERSION%/$VERSION.$5/g liman.spec
 mkdir -p ./package/etc/supervisord.d
 cp liman-cron-mail.ini ./package/etc/supervisord.d/liman-cron-mail.ini
