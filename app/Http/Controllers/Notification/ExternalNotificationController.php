@@ -158,10 +158,14 @@ class ExternalNotificationController extends Controller
                 ]);
             }
         }else {
+            $message = $request->get('message');
+            if(isJson($message) && isset($data->notification)){
+                $message =  $data->notification . ". " . __("Kullanıcı") . ": " . $data->user . " " . __("Makine") . ": " . $data->machine;
+            }
             AdminNotification::create([
                 "title" => __("Dış Bildirim -> ") . $request->get('title'),
                 "type" => "external_notification",
-                "message" => $request->get('message'),
+                "message" => $message,
                 "level" => 3,
             ]);
         }
