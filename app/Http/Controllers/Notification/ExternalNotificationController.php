@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Notification;
 use Illuminate\Http\Request;
 use App\Models\ExternalNotification;
 use App\Models\AdminNotification;
+use App\Models\Notification;
+use App\Models\Role;
+use App\User;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use Validator;
@@ -131,13 +134,37 @@ class ExternalNotificationController extends Controller
                 "Not Acceptable, inputs invalid"
             ],406);
         }
+        
+        $data = json_decode($request->get('message'));
 
-        AdminNotification::create([
-            "title" => __("Dış Bildirim -> ") . $request->get('title'),
-            "type" => "external_notification",
-            "message" => $request->get('message'),
-            "level" => 3,
-        ]);
+        if(isset($data->notifyUser)){
+            $user = User::where("email", $data->notifyUser)->firstOrFail();
+            Notification::create([
+                "user_id" => $user->id,
+                "title" => __("Dış Bildirim -> ") . $request->get('title'),
+                "type" => "external_notification",
+                "message" => $data->notification . ". " . __("Kullanıcı") . ": " . $data->user . " " . __("Makine") . ": " . $data->machine,
+                "level" => 3,
+            ]);
+        }else if(isset($data->notifyGroup)){
+            $role = Role::where("name", $data->notifyGroup)->firstOrFail();
+            foreach ($role->users as $user) {
+                Notification::create([
+                    "user_id" => $user->id,
+                    "title" => __("Dış Bildirim -> ") . $request->get('title'),
+                    "type" => "external_notification",
+                    "message" => $data->notification . ". " . __("Kullanıcı") . ": " . $data->user . " " . __("Makine") . ": " . $data->machine,
+                    "level" => 3,
+                ]);
+            }
+        }else {
+            AdminNotification::create([
+                "title" => __("Dış Bildirim -> ") . $request->get('title'),
+                "type" => "external_notification",
+                "message" => $request->get('message'),
+                "level" => 3,
+            ]);
+        }
 
         $channel->update([
             "last_used" => Carbon::now()
