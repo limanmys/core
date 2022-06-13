@@ -18,6 +18,7 @@ use App\System\Command;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -110,6 +111,37 @@ class MainController extends Controller
         } else {
             return respond("Ayarlar kaydedilemedi!", 201);
         }
+    }
+
+    public function testMailSettings()
+    {
+        $flag = setEnv([
+            "MAIL_ENABLED" => request("MAIL_ENABLED"),
+            "MAIL_HOST" => request("MAIL_HOST"),
+            "MAIL_PORT" => request("MAIL_PORT"),
+            "MAIL_USERNAME" => request("MAIL_USERNAME"),
+            "MAIL_ENCRYPTION" => request("MAIL_ENCRYPTION"),
+        ]);
+
+        if (request()->has("MAIL_PASSWORD")) {
+            $flag = setEnv([
+               "MAIL_PASSWORD" => request("MAIL_PASSWORD")
+            ]);
+        }
+
+        if (!$flag) {
+            return respond("Mail ayarları kaydedilemedi!", 201);
+        }
+        
+        try {
+            Mail::to(request("MAIL_USERNAME"))->send(
+                new \App\Mail\TestMail("Test Mail", __("Liman MYS test mail gönderimi."))
+            );
+        } catch (\Throwable $e) {
+            return respond("Mail gönderimi başarısız oldu!", 201);
+        }
+        
+        return respond("Mail ayarları geçerlidir.");
     }
 
     public function one(User $user)

@@ -955,5 +955,9 @@
   "Rol Adı": "Role Name",
   "İzin Tipi": "Permission Type",
   "İzin Değeri": "Permission Value",
-  "Rol yok": "No role"
+  "Rol yok": "No role",
+  "Mail gönderimi başarısız oldu!": "Mail sending failed!",
+  "Mail ayarları geçerlidir.": "Mail settings are valid.",
+  "Liman MYS test mail gönderimi.": "Liman MYS test mail sending.",
+  "Mail ayarları kaydedilemedi!": "Mail settings could not be saved!"
 }

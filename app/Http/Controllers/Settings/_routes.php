@@ -151,3 +151,7 @@ Route::post('/dnsYaz', 'Settings\MainController@setDNSServers')
 Route::post('/uploadLoginLogo', 'Settings\MainController@uploadLoginLogo')
     ->middleware('admin')
     ->name('upload_login_logo');
+
+Route::post('/testMailSettings', 'Settings\MainController@testMailSettings')
+    ->middleware('admin')
+    ->name('test_mail_settings');
