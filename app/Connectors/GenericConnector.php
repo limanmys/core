@@ -3,7 +3,6 @@
 namespace App\Connectors;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\BadResponseException;
 use App\Models\Token;
 
 class GenericConnector
@@ -121,8 +120,13 @@ class GenericConnector
             );
             return $response->getBody()->getContents();
         } catch (\Exception $exception) {
-            abort(504,"Liman Go Servisinde bir sorun oluştu, lütfen yöneticinizle iletişime geçin." . $exception->getMessage());
-            return null;
+            if (!env("APP_DEBUG")) {
+                abort(504,"Liman Go Servisinde bir sorun oluştu, lütfen yöneticinizle iletişime geçin.");
+                return null;
+            } else {
+                abort(504,"Liman Go Servisinde bir sorun oluştu, lütfen yöneticinizle iletişime geçin." . $exception->getMessage());
+                return null;
+            }
         }
     }
 }
