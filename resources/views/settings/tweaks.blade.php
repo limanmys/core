@@ -10,7 +10,7 @@
     <div class="col-7 col-sm-9">
         <div class="tab-content" id="vert-tabs-tabContent">
             <div class="tab-pane text-left fade active show" id="general" role="tabpanel" aria-labelledby="vert-tabs-home-tab">
-                <div class="card-body">
+                <div>
                     <div class="form-group">
                         <label for="APP_LANG">{{__("Sistem Dili")}}</label><br>
                         <small>{{__("Sistemin genel dil ayarı. Dil seçimi yapmamış kullanıcıların ayarlarını da değiştirir.")}}</small>
@@ -56,7 +56,7 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="market" role="tabpanel" aria-labelledby="vert-tabs-profile-tab">
-                <div class="card-body">
+                <div>
                     <div class="form-group">
                         <label for="MARKET_URL">{{__("Market Adresi")}}</label><br>
                         <small>{{__("Liman'ın güncellemeleri kontrol edeceği market adresi.")}}</small>
@@ -73,7 +73,7 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="mail" role="tabpanel" aria-labelledby="vert-tabs-messages-tab">
-                <div class="card-body">
+                <div>
                     <div class="form-group">
                         <label for="MAIL_ENABLED">{{__("Mail Sistemi Durumu")}}</label><br>
                         <select id="MAIL_ENABLED" class="select2 liman_env">
@@ -105,10 +105,17 @@
                             <option value="null">{{__("Hiçbiri")}}</option>
                         </select>
                     </div>
+                    <div class="form-group" style="margin-bottom: 0">
+                        <button class="btn btn-primary" 
+                            onclick="testMailSettings()"
+                            style="text-transform: uppercase;
+                            font-weight: 600;
+                            width: 100%;"><i class="fa-solid fa-circle-play fa-lg mr-1"></i> Test</button>
+                    </div>
                 </div>
             </div>
             <div class="tab-pane fade" id="advanced" role="tabpanel" aria-labelledby="vert-tabs-settings-tab">
-                <div class="card-body">
+                <div>
                     <div class="form-group">
                         <label for="EXTENSION_TIMEOUT">{{__("İstek Zaman Aşımı Süresi")}}</label><br>
                         <input type="text" class="form-control liman_env" id="EXTENSION_TIMEOUT">
@@ -147,7 +154,9 @@
             </div>
         </div>
     </div>
-    <button class="btn btn-success" onclick="setLimanTweaks()">{{__("Kaydet")}}</button>
+    <div class="col-md-12 mt-4">
+        <button class="btn btn-success float-right" onclick="setLimanTweaks()">{{__("Kaydet")}}</button>
+    </div>
 </div>
 <script>
     function getLimanTweaks(){
@@ -186,6 +195,28 @@
         },function (error) {
             let json = JSON.parse(error);
             showSwal(json.message,"error",2000);
+        });
+    }
+
+    function testMailSettings(){
+        showSwal("{{ __('Yükleniyor...') }}", "info");
+        let form = new FormData();
+        $(".liman_env").each(function(){
+            let current = $(this);
+            form.append(current.attr("id"), current.val());
+        });
+        let mail_password = $("#MAIL_PASSWORD");
+
+        if (mail_password.val() !== "") {
+            form.append("MAIL_PASSWORD",mail_password.val());
+        }
+
+        request("{{route("test_mail_settings")}}", form, function (success) {
+            let json = JSON.parse(success);
+            Swal.fire("", json.message, "success");
+        },function (error) {
+            let json = JSON.parse(error);
+            Swal.fire("", json.message, "error");
         });
     }
 

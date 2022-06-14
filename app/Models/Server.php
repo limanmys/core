@@ -271,6 +271,10 @@ class Server extends Model
 
     public function key()
     {
+        if ($this->shared_key == 1) {
+            return ServerKey::where("server_id", $this->id)->first();
+        }
+
         return ServerKey::where([
             "server_id" => $this->id,
             "user_id" => user()->id

@@ -20,7 +20,7 @@ You can find the [installation documentation](https://docs.liman.dev/start/insta
 
 ## Authors
 
-Liman Core started to be developed by the [Aciklab](https://aciklab.org) group in HAVELSAN and continues to be developed. Thanks to everyone who contributed. Special thanks to Mert Çelen, who is no longer developing but has made a great effort.
+Liman Core started to be developed by the [Aciklab](https://aciklab.org) group in HAVELSAN and continues to be developed. Thanks to everyone who contributed.
 
 Liman Core is sponsored by [HAVELSAN](https://havelsan.com.tr/en).
 

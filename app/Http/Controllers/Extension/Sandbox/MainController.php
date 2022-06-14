@@ -46,7 +46,7 @@ class MainController extends Controller
         if (extension()->require_key == "true" && server()->key() == null) {
             return respond(
                 __("Bu eklentiyi kullanabilmek için bir anahtara ihtiyacınız var, lütfen kasa üzerinden bir anahtar ekleyin."),
-                201
+                403
             );
         }
 

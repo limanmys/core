@@ -14,6 +14,10 @@ Route::post('/ayarlar/liste', 'Settings\MainController@getList')
     ->name('settings_get_list')
     ->middleware('admin');
 
+Route::post('/ayarlar/all_roles', 'Settings\MainController@allRoles')
+    ->name('all_roles')
+    ->middleware('admin');
+
 Route::post('/ayar/yetki/ekle', 'Settings\MainController@addList')
     ->name('settings_add_to_list')
     ->middleware('admin');
@@ -147,3 +151,7 @@ Route::post('/dnsYaz', 'Settings\MainController@setDNSServers')
 Route::post('/uploadLoginLogo', 'Settings\MainController@uploadLoginLogo')
     ->middleware('admin')
     ->name('upload_login_logo');
+
+Route::post('/testMailSettings', 'Settings\MainController@testMailSettings')
+    ->middleware('admin')
+    ->name('test_mail_settings');

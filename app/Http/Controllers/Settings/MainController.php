@@ -18,6 +18,7 @@ use App\System\Command;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -112,6 +113,37 @@ class MainController extends Controller
         }
     }
 
+    public function testMailSettings()
+    {
+        $flag = setEnv([
+            "MAIL_ENABLED" => request("MAIL_ENABLED"),
+            "MAIL_HOST" => request("MAIL_HOST"),
+            "MAIL_PORT" => request("MAIL_PORT"),
+            "MAIL_USERNAME" => request("MAIL_USERNAME"),
+            "MAIL_ENCRYPTION" => request("MAIL_ENCRYPTION"),
+        ]);
+
+        if (request()->has("MAIL_PASSWORD")) {
+            $flag = setEnv([
+               "MAIL_PASSWORD" => request("MAIL_PASSWORD")
+            ]);
+        }
+
+        if (!$flag) {
+            return respond("Mail ayarları kaydedilemedi!", 201);
+        }
+        
+        try {
+            Mail::to(request("MAIL_USERNAME"))->send(
+                new \App\Mail\TestMail("Test Mail", __("Liman MYS test mail gönderimi."))
+            );
+        } catch (\Throwable $e) {
+            return respond("Mail gönderimi başarısız oldu!", 201);
+        }
+        
+        return respond("Mail ayarları geçerlidir.");
+    }
+
     public function one(User $user)
     {
         return view('settings.one', [
@@ -199,24 +231,44 @@ class MainController extends Controller
                 $display = ["id:id", "name"];
                 break;
             case "liman":
+                $usedPermissions = Permission::where([
+                    "type" => "liman",
+                    "morph_id" => request("user_id")
+                ])
+                    ->get()
+                    ->groupBy("value");
+
                 $data = [
                     [
                         "id" => "view_logs",
-                        "name" => "Sunucu Günlük Kayıtlarını Görüntüleme",
+                        "name" => __("Sunucu Günlük Kayıtlarını Görüntüleme"),
                     ],
                     [
                         "id" => "add_server",
-                        "name" => "Sunucu Ekleme",
+                        "name" => __("Sunucu Ekleme"),
                     ],
                     [
                         "id" => "server_services",
-                        "name" => "Sunucu Servislerini Görüntüleme",
+                        "name" => __("Sunucu Servislerini Görüntüleme"),
                     ],
                     [
                         "id" => "server_details",
-                        "name" => "Sunucu Detaylarını Görüntüleme",
+                        "name" => __("Sunucu Detaylarını Görüntüleme"),
+                    ],
+                    [
+                        "id" => "update_server", 
+                        "name" => __("Sunucu Detaylarını Güncelleme"),
                     ]
                 ];
+
+                foreach ($usedPermissions as $permission => $values) {
+                    foreach ($data as $k => $v) {
+                        if ($v["id"] == $permission) {
+                            unset($data[$k]);
+                        };
+                    }
+                }
+
                 $title = ["*hidden*", "İsim"];
                 $display = ["id:id", "name"];
                 break;
@@ -227,6 +279,54 @@ class MainController extends Controller
             "value" => (object)$data,
             "title" => $title,
             "display" => $display,
+        ]);
+    }
+
+    public function allRoles()
+    {
+        $data = [];
+
+        $permissionData = 
+            Permission::with("morph")
+                        ->get()->each(function ($row) {
+                            $row->details = $row->getRelatedObject();
+                            if ($row->morph_type == "roles") {
+                                $row->users = $row->morph->users()->get();
+                            }
+                        });
+
+        foreach ($permissionData as $row) {
+            if ($row->details["value"] == "-" || $row->details["type"] == "-") {
+                continue;
+            }
+
+            $insert = [
+                "id" => $row->morph->id,
+                "morph_type" => $row->morph_type,
+                "perm_type" => $row->details["type"],
+                "perm_value" => $row->details["value"],
+            ];
+
+            if ($row->morph_type == "users") {
+                $data[] = array_merge($insert, [
+                    "username" => $row->morph->name,
+                    "role_name" => __("Rol yok"),
+                ]);
+            } elseif ($row->morph_type == "roles") {
+                foreach ($row->users as $user) {
+                    $data[] = array_merge($insert, [
+                        "username" => $user->name,
+                        "role_name" => $row->morph->name,
+                    ]);
+                }
+            }            
+        }
+
+        return view('table', [
+            "value" => $data,
+            "title" => ["*hidden*", "*hidden*", "Kullanıcı Adı", "Rol Adı", "İzin Tipi", "İzin Değeri"],
+            "display" => ["id:id", "morph_type:morph_type", "username", "role_name", "perm_type", "perm_value"],
+            "onclick" => "goToRoleItem",
         ]);
     }
 

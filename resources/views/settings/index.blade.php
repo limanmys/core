@@ -25,20 +25,14 @@
                             <a class="nav-link" data-toggle="tab" href="#serverGroups" aria-selected="true">{{__("Sunucu Grupları")}}</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#roleList" onclick="allRoles()" aria-selected="true">{{__("İzin Listesi")}}</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#certificates" >{{__("Sertifikalar")}}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#health" onclick="checkHealth()">{{__("Sağlık Durumu")}}</a>
                         </li>
-                        <!-- <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#update">{{__("Güncelleme")}}</a>
-                        </li> -->
-                        <!-- <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#changeLog">{{__("Son Değişiklikler")}}</a>
-                        </li> -->
-                        <!-- <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#rsyslog" onclick="readLogs()">{{__("Log Yönetimi")}}</a>
-                        </li> -->
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#externalNotifications" onclick="">{{__("Dış Bildirimler")}}</a>
                         </li>
@@ -401,6 +395,9 @@
                                         ]
                                     ],
                                 ])
+                        </div>
+                        <div class="tab-pane fade show" id="roleList" role="tabpanel">
+                            <div id="roleListInner"></div>  
                         </div>
                         <div class="tab-pane fade show" id="mailSettings" role="tabpanel">
                             <div id="mailWrapper"></div>
@@ -831,20 +828,6 @@
             });
         }
 
-        function readLogs(){
-            showSwal('{{__("Okunuyor...")}}','info');
-            request("{{route("get_log_system")}}", new FormData(), function(res) {
-                Swal.close();
-                var response = JSON.parse(res);
-                $("#logIpAddress").val(response["message"]["ip_address"]);
-                $("#logPort").val(response["message"]["port"]);
-                $("#logInterval").val(response["message"]["interval"]);
-            }, function(response){
-                var error = JSON.parse(response);
-                showSwal(error.message,'error',2000);
-            });
-        }
-
         function afterUserAdd(response) {
             var json = JSON.parse(response);
             $("#add_user button[type='submit']").attr("disabled","true")
@@ -877,6 +860,49 @@
                 var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
             });
+        }
+
+        function allRoles(){
+            $('.modal').modal('hide');
+            request('{{route('all_roles')}}', new FormData(), function (response) {
+                $("#roleListInner").html(response);
+                $('#roleListInner table').DataTable(dataTablePresets('normal'));
+            }, function(response){
+                var error = JSON.parse(response);
+                showSwal(error.message,'error',2000);
+            });
+        }
+
+        function goToRoleItem(row) {
+            let id = row.querySelector("#id").innerHTML;
+            let morph_type = row.querySelector("#morph_type").innerHTML;
+            let type = row.querySelector("#perm_type").innerHTML.charAt(0);
+
+            let tag = "#";
+            switch (type) {
+                case "E":
+                    tag = tag + "extension";
+                    break;
+                case "S":
+                    tag = tag + "server";
+                    break;
+                case "F":
+                    tag = tag + "function";
+                    break;
+                case "L":
+                    tag = tag + "liman";
+                    break;
+                default:
+                    break;
+            }
+
+            if (morph_type == "roles") {
+                window.location.href = '/rol/' + id + tag;
+            } 
+
+            if (morph_type == "users") {
+                window.location.href = '/ayarlar/' + id + tag;
+            }
         }
 
         function roleDetails(row){
