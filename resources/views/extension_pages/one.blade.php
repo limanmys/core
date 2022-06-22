@@ -111,13 +111,15 @@
                         @include('table',[
                             "value" => collect($extension["database"])->map(function($item){
                                 $item['required'] = isset($item['required']) && $item['required'] ? 'on' : '';
+                                $item['global'] = isset($item['global']) && $item['global'] ? 'on' : '';
+                                $item['writable'] = isset($item['writable']) && $item['writable'] ? 'on' : '';
                                 return $item;
                             }),
                             "title" => [
-                                "Adı" , "Türü" , "Variable Adı", "*hidden*" , "*hidden*", "*hidden*", "*hidden*"
+                                "Adı" , "Türü" , "Variable Adı", "*hidden*" , "*hidden*", "*hidden*", "*hidden*", "*hidden*", "*hidden*"
                             ],
                             "display" => [
-                                "name" , "type", "variable", "variable:variable_old", "type:type_old", "name:name_old", "required:required"
+                                "name" , "type", "variable", "variable:variable_old", "type:type_old", "name:name_old", "required:required", "global:global", "writable:writable"
                             ],
                             "menu" => [
                                 "Ayarları Düzenle" => [
@@ -161,7 +163,7 @@
                                 "Türü:a" => "type_old:hidden",
                                 "Variable Adı:a" => "variable_old:hidden",
                                 "Zorunlu Alan" => "required:checkbox",
-                                "Kullanıcılar Arası Paylaşımlı" => "required:checkbox",
+                                "Kullanıcılar Arası Paylaşımlı" => "global:checkbox",
                                 "Yazılabilir" => "writable:checkbox",
                                 "table:database" => "table:hidden"
                             ],
