@@ -65,6 +65,10 @@ class RoleController extends Controller
             "title" => ["Rol Grubu Adı", "*hidden*"],
             "display" => ["name", "id:role_id"],
             "menu" => [
+                "Yeniden Adlandır" => [
+                    "target" => "editRole",
+                    "icon" => " context-menu-icon-edit",
+                ],
                 "Sil" => [
                     "target" => "deleteRole",
                     "icon" => " context-menu-icon-delete",
@@ -102,6 +106,19 @@ class RoleController extends Controller
         ]);
 
         return respond("Rol grubu başarıyla eklendi.");
+    }
+
+    public function rename()
+    {
+        $count = Role::where("id", request('role_id'))->update([
+            "name" => request("name")
+        ]);
+
+        if ($count) {
+            return respond("Rol grubu başarıyla düzenlendi.");
+        } else {
+            return respond("Rol grubu düzenlenemedi!", 201);
+        }
     }
 
     /**

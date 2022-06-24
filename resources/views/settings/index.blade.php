@@ -481,6 +481,18 @@
    ])
 
     @include('modal',[
+        "id"=>"editRole",
+        "title" => "Rol Grubu Yeniden Adlandır",
+        "url" => route('role_rename'),
+        "next" => "getRoleList",
+        "inputs" => [
+            "Rol Adı" => "name:text",
+            "Rol Id:'null'" => "role_id:hidden"
+        ],
+        "submit_text" => "Düzenle"
+    ])
+
+    @include('modal',[
         "id"=>"deleteRole",
         "title" =>"Rol Grubunu Sil",
         "url" => route('role_remove'),

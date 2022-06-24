@@ -959,5 +959,8 @@
   "Mail gönderimi başarısız oldu!": "Mail sending failed!",
   "Mail ayarları geçerlidir.": "Mail settings are valid.",
   "Liman MYS test mail gönderimi.": "Liman MYS test mail sending.",
-  "Mail ayarları kaydedilemedi!": "Mail settings could not be saved!"
+  "Mail ayarları kaydedilemedi!": "Mail settings could not be saved!",
+  "Yeniden Adlandır": "Rename",
+  "Rol grubu başarıyla düzenlendi.": "Role group successfully edited.",
+  "Rol grubu düzenlenemedi!": "Cannot edit role group!"
 }

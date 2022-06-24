@@ -4,6 +4,10 @@ Route::post('/rol/ekle', 'Roles\RoleController@add')
     ->name('role_add')
     ->middleware('admin');
 
+Route::post('/rol/rename', 'Roles\RoleController@rename')
+    ->name('role_rename')
+    ->middleware('admin');
+
 Route::post('/rol/sil', 'Roles\RoleController@remove')
     ->name('role_remove')
     ->middleware('admin');
