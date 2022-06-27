@@ -334,14 +334,33 @@ function addToTable() {
   reload();
 }
 
+function isJson(str) {
+  try {
+      JSON.parse(str);
+  } catch (e) {
+      return false;
+  }
+  return true;
+}
+
 function renderNotifications(data, type, target, exclude) {
   var element = $("#" + target + " .menu");
   element.html("");
   //Set Count
   $("#" + target + "Count").html(data.length);
   data.forEach((notification) => {
+    let notificationTitle = notification["title"];
+    let notificationMsg = notification["message"];
+    if (isJson(notification["title"])) {
+      let temp = JSON.parse(notification["title"])
+      notificationTitle = temp[language];
+    }
+    if (isJson(notification["message"])) {
+      let temp = JSON.parse(notification["message"])
+      notificationMsg = temp[language];
+    }
     var errors = ["error", "health_problem"];
-    element.append([...$("<div />").addClass("dropdown-divider").append("<a />").find("a").addClass("dropdown-item").attr("href", `/bildirim/${notification["id"]}`).append("<span />").find("span").css("color", errors.includes(notification["type"]) ? "#f56954" : "#00a65a").css("width", "100%").text(notification["title"]).parents()].reverse())
+    element.append([...$("<div />").addClass("dropdown-divider").append("<a />").find("a").addClass("dropdown-item").attr("href", `/bildirim/${notification["id"]}`).append("<span />").find("span").css("color", errors.includes(notification["type"]) ? "#f56954" : "#00a65a").css("width", "100%").text(notificationTitle).parents()].reverse())
     var displayedNots = [];
     if (localStorage.displayedNots) {
       displayedNots = JSON.parse(localStorage.displayedNots);
@@ -353,15 +372,15 @@ function renderNotifications(data, type, target, exclude) {
       return;
     }
     if (errors.includes(notification.type)) {
-      toastElement = toastr.error(notification.message, notification.title, {
+      toastElement = toastr.error(notificationMsg, notificationTitle, {
         timeOut: 5000,
       });
     } else if (notification.type == "liman_update") {
-      toastElement = toastr.warning(notification.message, notification.title, {
+      toastElement = toastr.warning(notificationMsg, notificationTitle, {
         timeOut: 5000,
       });
     } else {
-      toastElement = toastr.success(notification.message, notification.title, {
+      toastElement = toastr.success(notificationMsg, notificationTitle, {
         timeOut: 5000,
       });
     }

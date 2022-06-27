@@ -77,17 +77,33 @@ switch ($notification->type) {
                     </span>
                 </div>
                 <div>
+                    @php
+                        $notificationTitle = json_decode($notification->title);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $notificationTitle = $notificationTitle->{app()->getLocale()};
+                        } else {
+                            $notificationTitle = $notification->title;
+                        }
+
+                        $notificationContent = json_decode($notification->message);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $notificationContent = $notificationContent->{app()->getLocale()};
+                        } else {
+                            $notificationContent = $notification->message;
+                        }
+                    @endphp
+
                     <div class="timeline-item">
                         <span class="time"><i class="fas fa-clock"></i> {{\Carbon\Carbon::parse($notification->created_at)->format("h:i:s")}}</span>
 
                         <h3 class="timeline-header">
                             @if(!$notification->read)<a href="javascript:void(0)">@endif
-                                {{$notification->title}}
+                                {{$notificationTitle}}
                                 @if(!$notification->read)</a>@endif
                         </h3>
 
                         <div class="timeline-body">
-                            {!!$notification->message!!}
+                            {!! $notificationContent !!}
                         </div>
                         <div class="timeline-footer">
                             @if(!$notification->read)

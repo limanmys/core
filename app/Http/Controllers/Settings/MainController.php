@@ -498,10 +498,15 @@ class MainController extends Controller
             if ($flag) {
                 addCertificate(request('ldapAddress'), 636, $message["path"]);
                 AdminNotification::create([
-                    "title" => __("Yeni Sertifika Eklendi"),
+                    "title" => json_encode([
+                        "tr" => __("Yeni Sertifika Eklendi", [], "tr"),
+                        "en" => __("Yeni Sertifika Eklendi", [], "en")
+                    ]),
                     "type" => "new_cert",
-                    "message" =>
-                        __("Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi."),
+                    "message" => json_encode([
+                        "tr" => __("Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.", [], "tr"),
+                        "en" => __("Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.", [], "en")
+                    ]),
                     "level" => 3,
                 ]);
             }

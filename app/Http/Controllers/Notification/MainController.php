@@ -89,10 +89,6 @@ class MainController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
         
-        foreach ($notifications as &$notification) {
-            $notification->title = __($notification->title);
-        }
-
         $adminNotifications = [];
         if (
             auth()
@@ -103,11 +99,7 @@ class MainController extends Controller
                 "read" => "false",
             ])
                 ->orderBy('updated_at', 'desc')
-                ->get();
-            
-            foreach ($adminNotifications as &$notification) {
-                $notification->title = __($notification->title);
-            }    
+                ->get();            
         }
         return respond([
             "user" => $notifications,

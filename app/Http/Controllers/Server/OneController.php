@@ -100,12 +100,19 @@ class OneController extends Controller
         // Delete the Server Object.
         server()->delete();
         Notification::new(
-            __("Bir sunucu silindi."),
+            "Bir sunucu silindi.",
             "notify",
-            __(":server (:ip) isimli sunucu silindi.", [
-                "server" => $server->name,
-                "ip" => $server->ip_address,
+            json_encode([
+                "tr" => __(":server (:ip) isimli sunucu silindi.", [
+                    "server" => $server->name,
+                    "ip" => $server->ip_address,
+                ], "tr"),
+                "en" => __(":server (:ip) isimli sunucu silindi.", [
+                    "server" => $server->name,
+                    "ip" => $server->ip_address,
+                ], "en")
             ])
+            
         );
         // Redirect user to servers home page.
         return respond(route('servers'), 300);
@@ -204,11 +211,17 @@ class OneController extends Controller
 
         if (server()->name !== request('name')) {
             Notification::new(
-                __("Server Adı Güncellemesi"),
+                "Server Adı Güncellemesi",
                 "notify",
-                __(":old isimli sunucunun adı :new olarak değiştirildi.", [
-                    "old" => server()->name,
-                    "new" => request('name'),
+                json_encode([
+                    "tr" => __(":old isimli sunucunun adı :new olarak değiştirildi.", [
+                        "old" => server()->name,
+                        "new" => request('name'),
+                    ], "tr"),
+                    "en" => __(":old isimli sunucunun adı :new olarak değiştirildi.", [
+                        "old" => server()->name,
+                        "new" => request('name'),
+                    ], "en")
                 ])
             );
         }

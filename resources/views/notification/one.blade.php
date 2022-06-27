@@ -38,6 +38,22 @@ if (!$item) {
                     </span>
                 </div>
                 <div>
+                    @php
+                        $notificationTitle = json_decode($item->title);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $notificationTitle = $notificationTitle->{app()->getLocale()};
+                        } else {
+                            $notificationTitle = $item->title;
+                        }
+
+                        $notificationContent = json_decode($item->message);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $notificationContent = $notificationContent->{app()->getLocale()};
+                        } else {
+                            $notificationContent = $item->message;
+                        }
+                    @endphp
+
                     @if($item->read)
                         <i class="far fa-bell @if($item->type=="error") bg-red @else bg-blue @endif"></i>
                     @else
@@ -48,12 +64,12 @@ if (!$item) {
         
                         <h3 class="timeline-header">
                             @if(!$item->read)<a href="javascript:void(0)">@endif
-                                {{$item->title}}
+                                {{$notificationTitle}}
                                 @if(!$item->read)</a>@endif
                         </h3>
         
                         <div class="timeline-body">
-                            {!! $item->message !!}
+                            {!! $notificationContent !!}
                         </div>
                         <div class="timeline-footer">
                             @if(!$item->read)

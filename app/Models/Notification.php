@@ -31,7 +31,10 @@ class Notification extends Model
         // Before we return the notification, check if it's urgent. If so, send an email.
         return Notification::create([
             "user_id" => auth()->id(),
-            "title" => $title,
+            "title" => json_encode([
+                "tr" => __($title, [], "tr"),
+                "en" => __($title, [], "en"),
+            ]),
             "type" => $type,
             "message" => $message,
             "server_id" => $server_id,

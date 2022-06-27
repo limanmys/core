@@ -141,9 +141,15 @@ class ExternalNotificationController extends Controller
             $user = User::where("email", $data->notifyUser)->firstOrFail();
             Notification::create([
                 "user_id" => $user->id,
-                "title" => __("Dış Bildirim -> ") . $request->get('title'),
+                "title" => json_encode([
+                    "tr" => __("Dış Bildirim -> ", [], "tr") . $request->get('title'),
+                    "en" => __("Dış Bildirim -> ", [], "en") . $request->get('title')
+                ]),
                 "type" => "external_notification",
-                "message" => $data->notification . ". " . __("Kullanıcı") . ": " . $data->user . " " . __("Makine") . ": " . $data->machine,
+                "message" => json_encode([
+                    "tr" => $data->notification . ". " . __("Kullanıcı", [], "tr") . ": " . $data->user . " " . __("Makine", [], "tr") . ": " . $data->machine,
+                    "en" => $data->notification . ". " . __("Kullanıcı", [], "en") . ": " . $data->user . " " . __("Makine", [], "en") . ": " . $data->machine
+                ]),  
                 "level" => 3,
             ]);
         }else if(isset($data->notifyGroup)){
@@ -151,19 +157,31 @@ class ExternalNotificationController extends Controller
             foreach ($role->users as $user) {
                 Notification::create([
                     "user_id" => $user->id,
-                    "title" => __("Dış Bildirim -> ") . $request->get('title'),
+                    "title" => json_encode([
+                        "tr" => __("Dış Bildirim -> ", [], "tr") . $request->get('title'),
+                        "en" => __("Dış Bildirim -> ", [], "en") . $request->get('title')
+                    ]),
                     "type" => "external_notification",
-                    "message" => $data->notification . ". " . __("Kullanıcı") . ": " . $data->user . " " . __("Makine") . ": " . $data->machine,
+                    "message" => json_encode([
+                        "tr" => $data->notification . ". " . __("Kullanıcı", [], "tr") . ": " . $data->user . " " . __("Makine", [], "tr") . ": " . $data->machine,
+                        "en" => $data->notification . ". " . __("Kullanıcı", [], "en") . ": " . $data->user . " " . __("Makine", [], "en") . ": " . $data->machine
+                    ]),  
                     "level" => 3,
                 ]);
             }
         }else {
             $message = $request->get('message');
             if(isJson($message) && isset($data->notification)){
-                $message =  $data->notification . ". " . __("Kullanıcı") . ": " . $data->user . " " . __("Makine") . ": " . $data->machine;
+                $message =  json_encode([
+                    "tr" => $data->notification . ". " . __("Kullanıcı", [], "tr") . ": " . $data->user . " " . __("Makine", [], "tr") . ": " . $data->machine,
+                    "en" => $data->notification . ". " . __("Kullanıcı", [], "en") . ": " . $data->user . " " . __("Makine", [], "en") . ": " . $data->machine
+                ]);
             }
             AdminNotification::create([
-                "title" => __("Dış Bildirim -> ") . $request->get('title'),
+                "title" => json_encode([
+                    "tr" => __("Dış Bildirim -> ", [], "tr") . $request->get('title'),
+                    "en" => __("Dış Bildirim -> ", [], "en") . $request->get('title')
+                ]),
                 "type" => "external_notification",
                 "message" => $message,
                 "level" => 3,

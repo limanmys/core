@@ -69,12 +69,17 @@ class ExtensionUpdaterJob implements ShouldQueue
                 $downloadPath
             );
             AdminNotification::create([
-                "title" =>
-                    $this->extension->display_name . __(" eklentisi güncellendi!"),
+                "title" => json_encode([
+                    "tr" => $this->extension->display_name . __(" eklentisi güncellendi!", [], "tr"),
+                    "en" => $this->extension->display_name . __(" eklentisi güncellendi!", [], "en")
+                ]),
                 "type" => "extension_update",
-                "message" =>
-                    $this->extension->display_name .
-                    __(" eklentisinin yeni bir sürümü indirildi ve yüklendi."),
+                "message" => json_encode([
+                    "tr" => $this->extension->display_name .
+                    __(" eklentisinin yeni bir sürümü indirildi ve yüklendi.", [], "tr"),
+                    "en" => $this->extension->display_name .
+                    __(" eklentisinin yeni bir sürümü indirildi ve yüklendi.", [], "en"),
+                ]), 
                 "level" => 3,
             ]);
             self::updateUpdatesFile();

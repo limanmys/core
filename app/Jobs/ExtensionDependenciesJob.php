@@ -60,18 +60,25 @@ class ExtensionDependenciesJob implements ShouldQueue
             $this->extension->save();
 
             AdminNotification::create([
-                "title" =>
-                    $this->extension->display_name .  __(" eklentisi hazır!"),
+                "title" => json_encode([
+                    "tr" => $this->extension->display_name .  __(" eklentisi hazır!", [], "tr"),
+                    "en" => $this->extension->display_name .  __(" eklentisi hazır!", [], "en")
+                ]),
                 "type" => "",
-                "message" =>
-                    $this->extension->display_name .
-                    __(" eklentisinin bağımlılıkları başarıyla yüklendi, hemen kullanmaya başlayabilirsiniz."),
+                "message" => json_encode([
+                    "tr" => $this->extension->display_name .
+                    __(" eklentisinin bağımlılıkları başarıyla yüklendi, hemen kullanmaya başlayabilirsiniz.", [], "tr"),
+                    "en" => $this->extension->display_name .
+                    __(" eklentisinin bağımlılıkları başarıyla yüklendi, hemen kullanmaya başlayabilirsiniz.", [], "en")
+                ]),
                 "level" => 3,
             ]);
         } else {
             AdminNotification::create([
-                "title" =>
-                    $this->extension->display_name . " eklentisi kurulamadı!",
+                "title" => json_encode([
+                    "tr" => $this->extension->display_name .  __(" eklentisi kurulamadı!", [], "tr"),
+                    "en" => $this->extension->display_name .  __(" eklentisi kurulamadı!", [], "en")
+                ]),
                 "type" => "error",
                 "message" =>
                     $this->extension->display_name .

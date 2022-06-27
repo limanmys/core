@@ -12,22 +12,31 @@
     </span>
     <div class="menu" style="max-height: 245px; overflow: scroll; overflow-x: hidden; overflow-y: auto;">
         @foreach ($notifications as $notification)
-        <div class="dropdown-divider"></div>
-            @switch($notification->type)
-                @case('error')
-                @case('health_problem')
-                @case('liman_update')
-                <a onclick="window.location.href = '/bildirim/{{$notification->id}}'" href="/bildirim/{{$notification->id}}" class="dropdown-item" style="color: #f56954;width: 100%">
-                    {{ __($notification->title) }}
-                </a>
-                @break
-                @default
-                <a onclick="window.location.href = '/bildirim/{{$notification->id}}'" href="/bildirim/{{$notification->id}}" class="dropdown-item" style="color: #00a65a;width: 100%">
-                    {{ __($notification->title) }}
-                </a>
-                @break
-            @endswitch
-        </a>
+            @php
+                $notificationTitle = json_decode($notification->title);
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $notificationTitle = $notificationTitle->{app()->getLocale()};
+                } else {
+                    $notificationTitle = $notification->title;
+                }
+            @endphp
+            <div class="dropdown-divider"></div>
+                @switch($notification->type)
+                    @case('error')
+                    @case('health_problem')
+                    @case('liman_update')
+                    <a onclick="window.location.href = '/bildirim/{{$notification->id}}'" href="/bildirim/{{$notification->id}}" class="dropdown-item" style="color: #f56954;width: 100%">
+                        {{ $notificationTitle }}
+                    </a>
+                    @break
+                    @default
+                    <a onclick="window.location.href = '/bildirim/{{$notification->id}}'" href="/bildirim/{{$notification->id}}" class="dropdown-item" style="color: #00a65a;width: 100%">
+                        {{ $notificationTitle }}
+                    </a>
+                    @break
+                @endswitch
+            </a>
         @endforeach
     </div>
     <div class="dropdown-divider"></div>
