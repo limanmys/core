@@ -147,8 +147,8 @@ class ExternalNotificationController extends Controller
                 ]),
                 "type" => "external_notification",
                 "message" => json_encode([
-                    "tr" => $data->notification . ". " . __("Kullanıcı", [], "tr") . ": " . $data->user . " " . __("Makine", [], "tr") . ": " . $data->machine,
-                    "en" => $data->notification . ". " . __("Kullanıcı", [], "en") . ": " . $data->user . " " . __("Makine", [], "en") . ": " . $data->machine
+                    "tr" => (isset($data->notification) ? $data->notification : $data->notification_tr) . ". " . __("Kullanıcı", [], "tr") . ": " . $data->user . " " . __("Makine", [], "tr") . ": " . $data->machine,
+                    "en" => (isset($data->notification) ? $data->notification : $data->notification_en) . ". " . __("Kullanıcı", [], "en") . ": " . $data->user . " " . __("Makine", [], "en") . ": " . $data->machine
                 ]),  
                 "level" => 3,
             ]);
@@ -163,18 +163,18 @@ class ExternalNotificationController extends Controller
                     ]),
                     "type" => "external_notification",
                     "message" => json_encode([
-                        "tr" => $data->notification . ". " . __("Kullanıcı", [], "tr") . ": " . $data->user . " " . __("Makine", [], "tr") . ": " . $data->machine,
-                        "en" => $data->notification . ". " . __("Kullanıcı", [], "en") . ": " . $data->user . " " . __("Makine", [], "en") . ": " . $data->machine
-                    ]),  
+                        "tr" => (isset($data->notification) ? $data->notification : $data->notification_tr) . ". " . __("Kullanıcı", [], "tr") . ": " . $data->user . " " . __("Makine", [], "tr") . ": " . $data->machine,
+                        "en" => (isset($data->notification) ? $data->notification : $data->notification_en) . ". " . __("Kullanıcı", [], "en") . ": " . $data->user . " " . __("Makine", [], "en") . ": " . $data->machine
+                    ]), 
                     "level" => 3,
                 ]);
             }
         }else {
             $message = $request->get('message');
-            if(isJson($message) && isset($data->notification)){
-                $message =  json_encode([
-                    "tr" => $data->notification . ". " . __("Kullanıcı", [], "tr") . ": " . $data->user . " " . __("Makine", [], "tr") . ": " . $data->machine,
-                    "en" => $data->notification . ". " . __("Kullanıcı", [], "en") . ": " . $data->user . " " . __("Makine", [], "en") . ": " . $data->machine
+            if(isJson($message) && (isset($data->notification) || isset($data->notification_tr) || isset($data->notification_en))){
+                $message = json_encode([
+                    "tr" => (isset($data->notification) ? $data->notification : $data->notification_tr) . ". " . __("Kullanıcı", [], "tr") . ": " . $data->user . " " . __("Makine", [], "tr") . ": " . $data->machine,
+                    "en" => (isset($data->notification) ? $data->notification : $data->notification_en) . ". " . __("Kullanıcı", [], "en") . ": " . $data->user . " " . __("Makine", [], "en") . ": " . $data->machine
                 ]);
             }
             AdminNotification::create([
