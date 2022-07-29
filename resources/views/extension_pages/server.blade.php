@@ -4,8 +4,7 @@
 @endphp
 @section('content')
 
-@if(!isset($dbJson["skeleton"]) || !$dbJson["skeleton"])
-<div class="row">
+<div class="row" @if(isset($dbJson["skeleton"]) && $dbJson["skeleton"]) style="display: none!important" @endif>
     <div class="col-6">
     <nav aria-label="breadcrumb" style="display:block; width: 100%;">
         <ol class="breadcrumb" style="float:left;">
@@ -29,7 +28,6 @@
         </div>  
     </div>
 </div>
-@endif
 
 @include('errors')    
 @if(!isset($dbJson["skeleton"]) || !$dbJson["skeleton"])
@@ -38,19 +36,83 @@
         <div class="card">
             <div class="card-body">
                 <div class="tab-content">
+@endif
                     <div class="tab-pane fade show active" role="tabpanel" id="mainExtensionWrapper">
-                        <div class="spinner-grow text-primary"></div>
+                        @if (isset($dbJson["preload"]) && $dbJson["preload"])
+                            <script>
+                                $(function(){
+                                    var list = [];
+                                    $("#quickNavBar li>a").each(function(){
+                                        list.push($(this).text());
+                                    });
+                                    if((new Set(list)).size !== list.length){
+                                        
+                                    }
+                                })
+                                function API(target)
+                                {
+                                    return "{{route('home')}}/extensionRun/" + target;
+                                }
+                                customRequestData["token"] = "{{ $auth_token }}";
+                                customRequestData["locale"] = "{{session()->get('locale')}}";
+                                @if(!isset($dbJson["vite"]) || !$dbJson["vite"])
+                                    window.onload();
+                                    $('.modal').on('shown.bs.modal', function () {
+                                        $(this).find(".alert").fadeOut();
+                                    });
+                                @endif
+                            </script>
+                            {!! $extContent !!}
+                        @else
+                            <div class="loader-wrapper d-flex" style="min-height: 500px; align-items: center; justify-content: center;">
+                                <div class="spinner-border" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                        @endif
                     </div>
+                    @if(!isset($dbJson["skeleton"]) || !$dbJson["skeleton"])
                 </div>
             </div>
         </div>
     </div>
 </div>
-@else
-<div class="tab-pane fade show active" role="tabpanel" id="mainExtensionWrapper">
-    <div class="spinner-grow text-primary"></div>
-</div>
 @endif
+
+@if(!isset($dbJson["preload"]) || !$dbJson["preload"])
+<script>
+    $(function(){
+        var list = [];
+        $("#quickNavBar li>a").each(function(){
+            list.push($(this).text());
+        });
+        if((new Set(list)).size !== list.length){
+            
+        }
+    })
+    function API(target)
+    {
+        return "{{route('home')}}/extensionRun/" + target;
+    }
+    customRequestData["token"] = "{{ $auth_token }}";
+    customRequestData["locale"] = "{{session()->get('locale')}}";
+    request(API('{{request('target_function') ? request('target_function') : 'index'}}'),new FormData(), function (success){
+        $(".loader-wrapper").fadeOut(300, function () {
+            $("#mainExtensionWrapper").html(success);
+        })
+        @if(!isset($dbJson["vite"]) || !$dbJson["vite"])
+            window.onload();
+            $('.modal').on('shown.bs.modal', function () {
+                $(this).find(".alert").fadeOut();
+            });
+        @endif
+    },function (error){ 
+        let json = JSON.parse(error);
+        showSwal(json.message,'error',2000);
+    });
+</script>
+@endif
+
 @if(count($tokens) > 0)
 <div class="float" onclick="toggleRequestRecord()" id="requestRecordButton">
     <i class="fas fa-video my-float"></i>
@@ -152,33 +214,4 @@ pre {
     }
 </script>
 @endif
-<script>
-    $(function(){
-        var list = [];
-        $("#quickNavBar li>a").each(function(){
-            list.push($(this).text());
-        });
-        if((new Set(list)).size !== list.length){
-            
-        }
-    })
-    function API(target)
-    {
-        return "{{route('home')}}/extensionRun/" + target;
-    }
-    customRequestData["token"] = "{{ $auth_token }}";
-    customRequestData["locale"] = "{{session()->get('locale')}}";
-    request(API('{{request('target_function') ? request('target_function') : 'index'}}'),new FormData(), function (success){
-        $("#mainExtensionWrapper").html(success);
-        @if(!isset($dbJson["vite"]) || !$dbJson["vite"])
-            window.onload();
-            $('.modal').on('shown.bs.modal', function () {
-                $(this).find(".alert").fadeOut();
-            });
-        @endif
-    },function (error){ 
-        let json = JSON.parse(error);
-        showSwal(json.message,'error',2000);
-    });
-</script>
 @endsection

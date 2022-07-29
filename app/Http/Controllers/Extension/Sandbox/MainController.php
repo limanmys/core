@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Extension\Sandbox;
 
+use App\Connectors\GenericConnector;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\UserSettings;
@@ -12,6 +13,7 @@ use App\Models\ServerKey;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use GuzzleHttp\Client;
 
 class MainController extends Controller
 {
@@ -55,10 +57,31 @@ class MainController extends Controller
             : 'index';
         $view = "extension_pages.server";
 
+        $token = Token::create(user()->id);
+
+        $dbJson = getExtensionJson(extension()->name);
+        if (isset($dbJson["preload"]) && $dbJson["preload"]) {
+            $client = new Client(['verify' => false]);
+            try {
+                $res = $client->request('POST', env("RENDER_ENGINE_ADDRESS","https://127.0.0.1:5454"), [
+                    'form_params' => [
+                        "lmntargetFunction" => $page,
+                        "extension_id" => extension()->id,
+                        "server_id" => server()->id,
+                        "token" => $token,
+                    ],
+                    'timeout' => 30,
+                ]);
+                $output = (string) $res->getBody();
+            } catch (\Exception $e) {
+                abort($e->getMessage(), 201);
+            }
+        }
+        
         if (env('LIMAN_RESTRICTED') == true && !user()->isAdmin()) {
             $view = "extension_pages.server_restricted";
         }
-        $token = Token::create(user()->id);
+
         return view($view, [
             "auth_token" => $token,
             "tokens" => user()
@@ -66,6 +89,7 @@ class MainController extends Controller
                 ->get()
                 ->toArray(),
             "last" => $this->getNavigationServers(),
+            "extContent" => isset($output) ? $output : null
         ]);
     }
 
