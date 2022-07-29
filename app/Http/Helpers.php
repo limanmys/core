@@ -1045,15 +1045,22 @@ if (!function_exists('getPermissions')) {
 if (!function_exists('getExtensionFunctions')) {
     function getExtensionFunctions(string $extension_name)
     {
-        $extension = json_decode(
-            file_get_contents(
-                "/liman/extensions/" .
-                    strtolower($extension_name) .
-                    DIRECTORY_SEPARATOR .
-                    "db.json"
-            ),
-            true
-        );
+        $file = "/liman/extensions/" .
+            strtolower($extension_name) .
+            DIRECTORY_SEPARATOR .
+            "db.json";
+
+        if (is_file($file)) {
+            $extension = json_decode(
+                file_get_contents(
+                    $file
+                ),
+                true
+            );
+        } else {
+            $extension = [];
+        }
+        
         return isset($extension["functions"])
             ? collect($extension["functions"])
             : [];

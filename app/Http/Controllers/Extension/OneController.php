@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Extension;
 
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use Carbon\Carbon;
 use function request;
 use Illuminate\Http\JsonResponse;
@@ -302,6 +303,14 @@ class OneController extends Controller
             file_put_contents(storage_path("extension_updates"),json_encode($json));
         }
         
+        try {
+            $query = Permission::where("value", $ext_name)
+            ->where("type", "function")
+            ->where("key", "name")
+            ->delete();
+        } catch (\Exception $exception) {
+        }        
+
         system_log(3, "EXTENSION_REMOVE");
         return respond('Eklenti Başarıyla Silindi');
     }
