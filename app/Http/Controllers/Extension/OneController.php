@@ -16,6 +16,7 @@ use mervick\aesEverywhere\AES256;
 use GuzzleHttp\Client;
 use App\Models\Token;
 use App\System\Command;
+use GuzzleHttp\Psr7\MimeType;
 
 /**
  * Class OneController
@@ -327,7 +328,9 @@ class OneController extends Controller
         }
 
         if (is_file($targetPath)) {
-            return response()->download($targetPath);
+            return response()->download($targetPath, null, [
+                "Content-Type" => MimeType::fromExtension(pathinfo($targetPath, PATHINFO_EXTENSION))
+            ]);
         } else {
             abort(404);
         }
