@@ -459,6 +459,7 @@
                 text: "{{ __('Parametreyi silmek istediğinizden emin misiniz?') }}",
                 type: 'warning',
                 showCancelButton: true,
+                animation: false,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 cancelButtonText: "{{ __('İptal') }}",

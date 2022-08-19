@@ -33,8 +33,8 @@
                                 style="font-weight: 400"></i>
                             <p>
                                 {{ $server->name }}
-                                <i class="right fas fa-angle-right"></i>
-                                <i class="fas fa-thumbtack right mr-3 mt-1"
+                                <i class="right fas fa-chevron-right"></i>
+                                <i class="fas fa-star right mr-3 mt-1"
                                     style="font-size: 14px; transform: none!important"></i>
                             </p>
                         </a>
@@ -66,7 +66,7 @@
                                 style="font-weight: 400"></i>
                             <p>
                                 {{ $server->name }}
-                                <i class="right fas fa-angle-right"></i>
+                                <i class="right fas fa-chevron-right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview" @if (request('server_id') == $server->id) style="display: block;" @endif>

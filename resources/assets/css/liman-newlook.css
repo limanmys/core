@@ -54,8 +54,9 @@ body {
 }
 
 #liman-sidebar .fas, #liman-sidebar .fa {
-    font-size: 18px;
+    font-size: 16px;
     margin-right: 0.4rem;
+    margin-top: 0.15rem;
 }
 
 #liman-sidebar li a:hover {
@@ -197,14 +198,6 @@ nav[aria-label="breadcrumb"] {
     font-weight: 600;
 }
 
-.dataTables_length, .dataTables_info {
-    float: left;
-}
-
-.dataTables_paginate {
-    float: right;
-}
-
 .dt-buttons {
     width: 100%;
     margin-bottom: 12px;
@@ -218,26 +211,6 @@ nav[aria-label="breadcrumb"] {
     --tw-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
     border: none;
-}
-
-table.dataTable {
-    border-collapse: collapse!important;
-}
-
-.table-bordered th, .table-bordered td {
-    border-left: none !important;
-    border-right: none !important;
-    border-bottom: 1px !important;
-}
-
-.table th, .table td {
-    padding: 0.75rem 0.6rem;
-}
-
-.table thead {
-    background-color: #f6f9fc;
-    text-transform: uppercase;
-    color: #4583c1;
 }
 
 .context-menu-list {
@@ -477,10 +450,6 @@ table.dataTable {
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-table.table {
-    border: 1px solid #dee2e6!important;
-}
-
 .input-group-btn > button {
     height: 100%;
 }
@@ -504,3 +473,56 @@ table.table {
     background-color: transparent !important;
 }
 
+/* New table look */
+
+table.table {
+    border: 1px solid rgba(128, 128, 128, 0.2) !important;
+    border-radius: 5px;
+    color: #1a202c !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgb(250, 250, 252);
+}
+
+table.table * {
+    transition: 0.3s all;
+}
+
+table.table thead th, table.table td {
+    border: 0 !important;
+}
+
+table.table thead {
+    background-color: rgb(250, 250, 252);
+}
+
+table.table thead th {
+    font-weight: 600;
+}
+
+table.table td {
+    border-top: 1px rgba(128, 128, 128, 0.15) solid !important;
+}
+
+.table-hover tbody tr {
+    transition: 0.3s all;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(247, 247, 250, 1);
+}
+
+.sorting_asc , .sorting_desc {
+    background-color: rgba(243, 243, 247, 1);
+    transition: 0.3s all;
+}
+
+.sorting_1 {
+    background-color: rgba(247, 247, 250, 1);
+    transition: 0.3s all;
+}
+
+.ui-sortable-handle {
+    width: 100% !important;
+}

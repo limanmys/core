@@ -69,7 +69,9 @@
         <div class="col-md-3 col-sm-4 col-xs-12">
             <div class="info-box shadow-sm loading chartbox">
               <div class="overlay">
-                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">{{ __('Yükleniyor...') }}</span>
+                </div>
               </div>
               <div class="info-box-content">
                 <canvas id="cpuChart"></canvas>
@@ -79,7 +81,9 @@
         <div class="col-md-3 col-sm-4 col-xs-12">
             <div class="info-box shadow-sm loading chartbox">
               <div class="overlay">
-                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">{{ __('Yükleniyor...') }}</span>
+                </div>
               </div>
               <div class="info-box-content">
                 <canvas id="ramChart"></canvas>
@@ -89,7 +93,9 @@
         <div class="col-md-3 col-sm-4 col-xs-12">
             <div class="info-box shadow-sm loading chartbox">
               <div class="overlay">
-                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">{{ __('Yükleniyor...') }}</span>
+                </div>
               </div>
               <div class="info-box-content">
                 <canvas id="diskChart"></canvas>
@@ -99,7 +105,9 @@
         <div class="col-md-3 col-sm-4 col-xs-12">
             <div class="info-box shadow-sm loading chartbox">
               <div class="overlay">
-                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">{{ __('Yükleniyor...') }}</span>
+                </div>
               </div>
               <div class="info-box-content">
                 <canvas id="networkChart"></canvas>
@@ -113,7 +121,9 @@
                   <h3 class="card-title">{{ __("Sunucu Durumları") }}</h3>
                 </div>
                 <div class="overlay">
-                  <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">{{ __('Yükleniyor...') }}</span>
+                    </div>
                 </div>
                 <div class="card-body" style="padding: 4px;">
                   <ul class="list-group list-group-flush srvlist">
@@ -136,7 +146,9 @@
                   </div>
                 </div>
                 <div class="overlay">
-                  <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">{{ __('Yükleniyor...') }}</span>
+                    </div>
                 </div>
                 <div class="card-body" style="padding: 4px;">
                   <div class="row row-eq-height market-col-1">
@@ -239,7 +251,7 @@
                 if (json.length < 1) {
                     $(".market-widget").find(".noApp").css("display", "flex");
                 }
-                $(".market-widget").find(".overlay").hide();
+                $(".market-widget").find(".overlay").fadeOut(500);
             });
         }
         getHomepageApps();
@@ -270,7 +282,7 @@
 
                             $(".srvlist").append(el);
                         });
-                        $(".online-servers").find(".overlay").hide();
+                        $(".online-servers").find(".overlay").fadeOut(500);
                         resolve(json.length > 0 ? true : false);
                     });
                 })
@@ -360,7 +372,7 @@
                         networkChart('{{ __("Network") }}', "networkChart");
                     }
 
-                    $(".chartbox").find(".overlay").hide();
+                    $(".chartbox").find(".overlay").fadeOut(500);
                     setTimeout(() => {
                         retrieveStats();
                     }, CHART_INTERVAL);

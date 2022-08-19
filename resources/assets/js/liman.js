@@ -39,6 +39,7 @@ function showSwal(message, type, timer = false) {
     title: message,
     toast: true,
     showConfirmButton: false,
+    animation: false
   };
   if (timer) {
     config["timer"] = timer;
@@ -63,7 +64,8 @@ function request(url, data, next, error, requestType = "POST") {
       type: "info",
       title: __("Yükleniyor..."),
       toast: true,
-      showConfirmButton: false
+      showConfirmButton: false,
+      animation: false
     });
   }
 
@@ -282,7 +284,8 @@ window.onbeforeunload = function () {
     type: "info",
     title: __("Yükleniyor..."),
     toast: true,
-    showConfirmButton: false
+    showConfirmButton: false,
+    animation: false,
   });
 };
 

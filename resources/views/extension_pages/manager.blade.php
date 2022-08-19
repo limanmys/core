@@ -25,9 +25,6 @@
 
 @include('table',[
     "value" => $extensions,
-    "sortable" => true,
-    "sortUpdateUrl" => route('update_ext_orders'),
-    "afterSortFunction" => 'location.reload',
     "title" => [
         "Eklenti Adı" , "Versiyon", "İmzalayan", "Son Güncelleme Tarihi", "*hidden*"
     ],
@@ -256,7 +253,8 @@ foreach ($extensions as $extension) {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 cancelButtonText: "{{ __('İptal') }}",
-                confirmButtonText: "{{ __('Tamam') }}"
+                confirmButtonText: "{{ __('Tamam') }}",
+                animation: false
             }).then((result) => {
                 if (result.value) {
                     showSwal('{{__("Yükleniyor...")}}','info');
