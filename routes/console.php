@@ -1,50 +1,9 @@
 <?php
 
-use App\User;
 use App\Models\Module;
 use App\Models\AdminNotification;
 use App\Models\Liman;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Hash;
-
-Artisan::command('administrator', function () {
-    // Generate Password
-    do {
-        $pool = str_shuffle(
-            'abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$@%^&!$%^&'
-        );
-        $password = substr($pool, 0, 10);
-    } while (
-        !preg_match(
-            "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\!\[\]\(\)\{\}\#\?\%\&\*\+\,\-\.\/\:\;\<\=\>\@\^\_\`\~]).{10,}$/",
-            $password
-        )
-    );
-    $user = User::where([
-        "name" => "Administrator",
-        "email" => "administrator@liman.dev",
-    ])->first();
-    if ($user) {
-        $user->update([
-            "password" => Hash::make($password),
-            "forceChange" => true,
-        ]);
-    } else {
-        $user = new User();
-        $user->fill([
-            "name" => "Administrator",
-            "email" => "administrator@liman.dev",
-            "password" => Hash::make($password),
-            "status" => 1,
-            "forceChange" => true,
-        ]);
-    }
-    $user->save();
-
-    $this->comment("Liman MYS Administrator Kullanıcısı");
-    $this->comment("Email  : administrator@liman.dev");
-    $this->comment("Parola : " . $password . "");
-})->describe('Create administrator account to use');
 
 Artisan::command('scan:translations', function () {
     if (env('EXTENSION_DEVELOPER_MODE') != true) {
@@ -159,7 +118,7 @@ Artisan::command('register_liman', function () {
     ],[
         "last_ip" => env("LIMAN_IP",trim(`hostname -I`)),
     ]);
-})->describe("Module remove");
+})->describe("Register liman");
 
 Artisan::command('update_settings', function () {
     updateSystemSettings();
@@ -168,11 +127,6 @@ Artisan::command('update_settings', function () {
 Artisan::command('receive_settings', function () {
     receiveSystemSettings();
 })->describe("Receive the system settings");
-
-Artisan::command('receive_settings', function () {
-    receiveSystemSettings();
-})->describe("Receive the system settings");
-
 
 Artisan::command('sync_core', function () {
     if (trim(`id -u`) != "0") {
@@ -193,11 +147,4 @@ Artisan::command('sync_core', function () {
 
 Artisan::command('sync_safe', function () {
     syncFiles();
-})->describe("Sync safe files without restarting");
-
-Artisan::command('integrity', function () {
-    echo `
-    cd /;
-    gpg -d liman/hashes/core.md5.gpg 2>/dev/null | md5sum -c 2>/dev/null | grep -v ": OK"
-    `;
 })->describe("Sync safe files without restarting");
