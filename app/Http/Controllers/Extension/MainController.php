@@ -13,8 +13,10 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use App\Jobs\ExtensionUpdaterJob;
+use App\Models\Permission;
 use Illuminate\Contracts\Bus\Dispatcher;
 use App\System\Command;
+use App\User;
 
 /**
  * Class MainController
@@ -370,5 +372,129 @@ class MainController extends Controller
         return respond(
             "Talebiniz başarıyla alındı, eklenti güncellendiğinde bildirim alacaksınız."
         );
+    }
+
+    /**
+     * @api {post} /eklenti/accessLogs Access Logs
+     * @apiName Access Logs
+     * @apiGroup Extension
+     *
+     * @apiParam {String} page Page number.
+     * @apiParam {String} count How much records will be retrieved.
+     * @apiParam {String} query Search query (OPTIONAL)
+     * @apiParam {String} extension_id Server Id
+     *
+     * @apiSuccess {JSON} message Message with status.
+     */
+    public function accessLogs()
+    {
+        if (!Permission::can(user()->id, 'extension', 'id', request('extension_id'))) {
+            return respond(
+                "Eklentiye erişim yetkiniz yok!", 403
+            );
+        }
+
+        if (!Permission::can(user()->id, 'liman', 'id', 'view_logs')) {
+            return respond(
+                "Eklenti günlük kayıtlarını görüntülemek için yetkiniz yok",
+                403
+            );
+        }
+
+        $page = request('page') * request('count');
+        $query = request('query') ? request('query') : "";
+        $extension_id = request('extension_id');
+        $count = intval(
+            Command::runLiman(
+                'grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep \'"display":"true"\'| grep @{:query} | grep @{:extension_id} | wc -l',
+                [
+                    'query' => $query,
+                    'extension_id' => $extension_id
+                ]
+            )
+        );
+        $head = $page > $count ? $count % request('count') : request('count');
+        $data = Command::runLiman(
+            'grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep \'"display":"true"\'| grep @{:query} | grep @{:extension_id} | tail -{:page} | head -{:head} | tac',
+            [
+                'query' => $query,
+                'extension_id' => $extension_id,
+                'page' => $page,
+                'head' => $head,
+            ]
+        );
+        $clean = [];
+
+        $knownUsers = [];
+        $knownExtensions = [];
+
+        if ($data == "") {
+            return response()->json([
+                "current_page" => request("page"),
+                "count" => request("count"),
+                "total_records" => $count,
+                "records" => []
+            ]);
+        }
+
+        foreach (explode("\n", $data) as $row) {
+            $dateEndPos = strposX($row, " ", 2);
+            $date = substr($row, 1, $dateEndPos - 2);
+            $json = substr($row, strpos($row, "{"));
+            $parsed = json_decode($json, true);
+            $parsed["date"] = $date;
+            if (!array_key_exists($parsed["extension_id"], $knownExtensions)) {
+                $extension = Extension::find($parsed["extension_id"]);
+                if ($extension) {
+                    $knownExtensions[$parsed["extension_id"]] =
+                        $extension->display_name;
+                } else {
+                    $knownExtensions[$parsed["extension_id"]] =
+                        $parsed["extension_id"];
+                }
+            }
+
+            $parsed["extension_id"] = $knownExtensions[$parsed["extension_id"]];
+            if (!array_key_exists("log_id", $parsed)) {
+                $parsed["log_id"] = null;
+            }
+            if (!array_key_exists($parsed["user_id"], $knownUsers)) {
+                $user = User::find($parsed["user_id"]);
+                if ($user) {
+                    $knownUsers[$parsed["user_id"]] = $user->name;
+                } else {
+                    $knownUsers[$parsed["user_id"]] = $parsed["user_id"];
+                }
+            }
+            $parsed["user_id"] = $knownUsers[$parsed["user_id"]];
+
+            // Details
+            $accessDetails = Command::runLiman('grep @{:query} /liman/logs/extension.log', [
+                'query' => $parsed["log_id"]
+            ]);
+            if ($accessDetails == "") {
+                $parsed["details"] = [];
+                array_push($clean, $parsed);
+                continue;
+            }
+            foreach (explode("\n", $accessDetails) as $row) {
+                $dateEndPos = strposX($row, " ", 2);
+                $date = substr($row, 1, $dateEndPos - 2);
+                $json = substr($row, strpos($row, "{"));
+                $parsedDetails = json_decode($json, true);
+                $parsedDetails["title"] = base64_decode($parsedDetails["title"]);
+                $parsedDetails["message"] = base64_decode($parsedDetails["message"]);
+                $parsed["details"] = $parsedDetails;
+            }
+
+            array_push($clean, $parsed);
+        }
+
+        return response()->json([
+            "current_page" => request("page"),
+            "count" => request("count"),
+            "total_records" => $count,
+            "records" => $clean
+        ]);
     }
 }
