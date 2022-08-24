@@ -197,8 +197,9 @@ pre {
         var modalElement = $("#limanRequestsModal");
         listElement.html("");
         $.each(limanRequestList, function(index, entries) {
-            listElement.append($("<li />").addClass("list-group-item liman-request-item").click([element, index], showCurlCommand).text(entries["target"]));
+            listElement.append($("<li />").addClass("list-group-item liman-request-item").on("click", function(el) {showCurlCommand(el, index)}).text(entries["target"]));
         });
+        listElement.find("li").first().click();
         modalElement.modal('show');
     }
 

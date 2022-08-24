@@ -548,3 +548,11 @@ table.table td
 {
 	float:right
 }
+
+#limanRequestCurlOutput {
+    background: #1a202c;
+    color: lime;
+    border-radius: 5px;
+    line-height: 21px;
+    margin-top: 20px;
+}
