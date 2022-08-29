@@ -41,6 +41,10 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception->getMessage() == "Connection refused") {
+            return response()->view("errors.rediserror", [], 500);
+        }
+
         return parent::render($request, $exception);
     }
 }

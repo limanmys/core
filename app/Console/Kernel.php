@@ -58,10 +58,15 @@ class Kernel extends ConsoleKernel
                         'health_problem'
                     )->delete();
                     AdminNotification::create([
-                        "title" => __("Sağlık Problemi Bulundu!"),
+                        "title" => json_encode([
+                            "tr" => __("Sağlık Problemi Bulundu!", [], "tr"),
+                            "en" => __("Sağlık Problemi Bulundu!", [], "en")
+                        ]),
                         "type" => "health_problem",
-                        "message" =>
-                            __("Detaylar için lütfen ayarlardan sağlık kontrolünü kontrol edin."),
+                        "message" => json_encode([
+                            "tr" => __("Detaylar için lütfen ayarlardan sağlık kontrolünü kontrol edin.", [], "tr"),
+                            "en" => __("Detaylar için lütfen ayarlardan sağlık kontrolünü kontrol edin.", [], "en")
+                        ]),
                         "level" => 3,
                     ]);
                 }
@@ -93,7 +98,7 @@ class Kernel extends ConsoleKernel
                         "title" => __("Liman Güncellemesi Mevcut!"),
                         "type" => "liman_update",
                         "message" =>
-                            __("Yeni bir sistem güncellemesi mevcut, ayrıntılı bilgi için tıklayınız."),
+                        __("Yeni bir sistem güncellemesi mevcut, ayrıntılı bilgi için tıklayınız."),
                         "level" => 3,
                     ]);
                 }
@@ -149,8 +154,8 @@ class Kernel extends ConsoleKernel
         $schedule
             ->call(function () {
                 $servers = MonitorServer::all();
-                foreach($servers as $server){
-                    $online = checkPort($server->ip_address,$server->port);
+                foreach ($servers as $server) {
+                    $online = checkPort($server->ip_address, $server->port);
                     $server->update([
                         "online" => $online,
                         "last_checked" => Carbon::now()

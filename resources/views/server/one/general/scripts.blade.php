@@ -414,6 +414,7 @@
             title: "{{ __('Onay') }}",
             text: "{{ __('Yetkili kullanıcıyı silmek istediğinizden emin misiniz?') }}",
             type: 'warning',
+            animation: false,
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',

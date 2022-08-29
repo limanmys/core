@@ -198,7 +198,10 @@ class HomeController extends Controller
         {
             AdminNotification::create([
                 "user_id" => $user->id,
-                "title" => __("İzin isteği: ") . auth()->user()->name,
+                "title" => json_encode([
+                    "tr" => __("İzin isteği: ", [], "tr") . auth()->user()->name,
+                    "en" => __("İzin isteği: ", [], "en") . auth()->user()->name
+                ]),
                 "type" => "auth_request",
                 "message" => request('note'),
                 "server_id" => null,

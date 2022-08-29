@@ -20,9 +20,15 @@
 <!-- Admin Password Recovery : https://www.youtube.com/watch?v=dQw4w9WgXcQ -->
 @if(auth()->check())
 <script>
-
-
     toastr.options.closeButton = true;
+    function isJson(str) {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
     Echo.private('App.User.{{auth()->user()->id}}')
         .notification((notification) => {
             var data = notification['\u0000*\u0000attributes'];
@@ -30,12 +36,29 @@
                 var errors = [
                     "error" , "health_problem"
                 ];
+                let notificationTitle = decodeURIComponent(JSON.parse('"' + data["title"].replace(/\"/g, '\\"') + '"'));
+                let notificationMsg = decodeURIComponent(JSON.parse('"' + data["message"].replace(/\"/g, '\\"') + '"'));
+
+                if (isJson(notificationTitle)) {
+                    let temp = JSON.parse(notificationTitle)
+                    notificationTitle = temp[language];
+                } else {
+                    notificationTitle = data["title"];
+                }
+
+                if (isJson(notificationMsg)) {
+                    let temp = JSON.parse(notificationMsg)
+                    notificationMsg = temp[language];
+                } else {
+                    notificationMsg = data["message"];
+                }
+
                 if(errors.includes(data.type)){
-                    toastElement = toastr.error(data.message, data.title, {timeOut: 5000});
+                    toastElement = toastr.error(notificationMsg, notificationTitle, {timeOut: 5000});
                 }else if(data.type == "liman_update"){
-                    toastElement = toastr.warning(data.message, data.title, {timeOut: 5000})
+                    toastElement = toastr.warning(notificationMsg, notificationTitle, {timeOut: 5000})
                 }else{
-                    toastElement = toastr.success(data.message, data.title, {timeOut: 5000})
+                    toastElement = toastr.success(notificationMsg, notificationTitle, {timeOut: 5000})
                 }
                 var displayedNots = [];
 

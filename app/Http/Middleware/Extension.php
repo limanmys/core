@@ -33,7 +33,10 @@ class Extension
                 continue;
             }
             AdminNotification::create([
-                "title" => __("Yeni Sertifika Onayı"),
+                "title" => json_encode([
+                    "tr" => __("Yeni Sertifika Onayı", [], "tr"),
+                    "en" => __("Yeni Sertifika Onayı", [], "en")
+                ]),
                 "type" => "cert_request",
                 "message" =>
                     $server->ip_address . ":" . trim($port) . ":" . $server->id,

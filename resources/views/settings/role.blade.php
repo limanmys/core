@@ -70,7 +70,12 @@
                     @include('table',[
                         "id" => "extensionFunctions",
                         "value" => $role->permissions->where('type','function')->map(function ($item){
-                            $function = getExtensionFunctions($item->value)->where('name', $item->extra)->first();
+                            $functions = getExtensionFunctions($item->value);
+                            if ($functions != []) {
+                                $function = $functions->where('name', $item->extra)->first();
+                            } else {
+                                return $item;
+                            }
                             $item->description = isset($function['description']) ? extensionTranslate($function['description'], $item->value) : '';
                             return $item;
                         }),

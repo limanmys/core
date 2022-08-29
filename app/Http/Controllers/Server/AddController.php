@@ -62,11 +62,17 @@ class AddController extends Controller
 
         $this->server->save();
         Notification::new(
-            __("Yeni sunucu eklendi."),
+            "Yeni sunucu eklendi.",
             "notify",
-            __(":server (:ip) isimli yeni bir sunucu eklendi.", [
-                "server" => $this->server->name,
-                "ip" => $this->server->ip_address,
+            json_encode([
+                "tr" =>__(":server (:ip) isimli yeni bir sunucu eklendi.", [
+                    "server" => $this->server->name,
+                    "ip" => $this->server->ip_address,
+                ], "tr"),
+                "en" => __(":server (:ip) isimli yeni bir sunucu eklendi.", [
+                    "server" => $this->server->name,
+                    "ip" => $this->server->ip_address,
+                ], "en")
             ])
         );
         // Add Server to request object to use it later.
@@ -117,10 +123,15 @@ class AddController extends Controller
                         $message["path"]
                     );
                     AdminNotification::create([
-                        "title" => __("Yeni Sertifika Eklendi"),
+                        "title" => json_encode([
+                            "tr" => __("Yeni Sertifika Eklendi", [], "tr"),
+                            "en" => __("Yeni Sertifika Eklendi", [], "en")
+                        ]),
                         "type" => "new_cert",
-                        "message" =>
-                        __("Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi."),
+                        "message" => json_encode([
+                            "tr" => __("Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.", [], "tr"),
+                            "en" => __("Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.", [], "en")
+                        ]),
                         "level" => 3,
                     ]);
                 }
@@ -128,7 +139,10 @@ class AddController extends Controller
                     $this->server->enabled = false;
                     $this->server->save();
                     AdminNotification::create([
-                        "title" => __("Yeni Sertifika Onayı"),
+                        "title" => json_encode([
+                            "tr" => __("Yeni Sertifika Onayı", [], "tr"),
+                            "en" => __("Yeni Sertifika Onayı", [], "en")
+                        ]),
                         "type" => "cert_request",
                         "message" =>
                         $this->server->ip_address .

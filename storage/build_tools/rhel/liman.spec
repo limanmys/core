@@ -280,13 +280,6 @@ fi
 sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php.ini
 sed -i "s/post_max_size.*/post_max_size = 100M/g" /etc/php.ini
 
-#Liman Helper Bash Function
-sed -i '/liman/d' /etc/profile
-echo "function liman(){ sudo runuser liman -c \"php /liman/server/artisan \$1\"; }" | tee --append /etc/profile >/dev/null 2>/dev/null
-sed -i '/liman/d' /root/.profile
-echo "function liman(){ sudo runuser liman -c \"php /liman/server/artisan \$1\"; }" | tee --append /root/.profile >/dev/null 2>/dev/null
-source /etc/profile
-
 # Prepare Folders for vnc
 rm -rf /liman/keys/vnc
 mkdir /liman/keys/vnc
@@ -355,7 +348,7 @@ cp -f /liman/server/storage/limanctl /usr/bin/limanctl
 
 #Finalize Installation
 printf "\nKurulum Başarıyla Tamamlandı!\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
-printf "source /etc/profile; liman administrator\n\n\nDestek için liman.havelsan.com.tr adresini ziyaret edebilirsiniz.\n"
+printf "sudo limanctl administrator\n\n\nDestek için liman.havelsan.com.tr adresini ziyaret edebilirsiniz.\n"
 
 %clean
 

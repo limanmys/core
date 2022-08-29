@@ -22,8 +22,8 @@ mkdir -p package/liman/server/storage/extension_templates
 mv extension_templates-$2/* package/liman/server/storage/extension_templates/
 rm -rf $2.zip extension_templates-$2
 
-#Go Engine
-wget "https://github.com/limanmys/go/raw/$3/liman_render" -q
+#Render Engine
+wget "https://github.com/limanmys/render-engine/raw/$3/liman_render" -q
 mv liman_render package/liman/server/storage/liman_render
 
 #WebSSH
@@ -69,13 +69,13 @@ chmod 775 DEBIAN/postinst
 echo """Package: liman
 Version: $VERSION-$5
 Installed-Size: 77892
-Maintainer: Baran SEKIN <baran@liman.dev>, Dogukan OKSUZ <dogukan@liman.dev>
+Maintainer: Dogukan OKSUZ <dogukan@liman.dev>
 Section: admin
 Date : $DATE
 Architecture: amd64
 Priority: important
 Description: Liman MYS
-Depends: curl, gpg, zip, unzip, nginx, redis, php7.3-redis | php-redis, php7.3-fpm, php7.3-gd, php7.3-curl, php7.3, php7.3-sqlite3, php7.3-snmp, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-posix, libnginx-mod-http-headers-more-filter, libssl1.1, supervisor, postgresql-13, php7.3-pgsql, pgloader, php7.3-bcmath, rsync, dnsutils, php7.3-ldap, php7.3-smbclient | php-smbclient, krb5-user, php7.3-ssh2 | php-ssh2, smbclient, novnc, python3.7 | python3.8 | python3.9, python3-paramiko, python3-tornado""" > DEBIAN/control
+Depends: curl, gpg, zip, unzip, nginx, redis, php7.3-redis | php-redis, php7.3-fpm, php7.3-gd, php7.3-curl, php7.3, php7.3-sqlite3, php7.3-snmp, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-posix, libnginx-mod-http-headers-more-filter, libssl1.1 | libssl3, supervisor, postgresql-13, php7.3-pgsql, pgloader, php7.3-bcmath, rsync, dnsutils, php7.3-ldap, php7.3-smbclient | php-smbclient, krb5-user, php7.3-ssh2 | php-ssh2, smbclient, novnc, python3.7 | python3.8 | python3.9 | python3.10, python3-paramiko, python3-tornado""" > DEBIAN/control
 cat DEBIAN/control
 cd ../
 dpkg-deb -Zgzip --build package

@@ -3,22 +3,30 @@ var customRequestData = [];
 var limanRecordRequests = false;
 var limanRequestList = [];
 
-let en = {
+let english = {
   "Yükleniyor...": "Loading...",
   "Sonuç bulunamadı!": "No results found!",
   "Liman ID kopyalandı!": "Liman ID copied!",
   "Liman ID başarıyla kopyalandı.": "Liman ID has been copied successfully!"
-}   
+}
 
-let tr = {}
+let turkish = {}
 
 let language = document.getElementsByTagName('html')[0].getAttribute('lang');
 let defaultLanguage = "tr"
 console.log(`🌟 Liman localization initialized: ${language}`)
 
 let __ = (trans) => {
+  if (language == "tr") {
+    language = "turkish"
+  }
+
+  if (language == "en") {
+    language = "english"
+  }
+
   if (language === defaultLanguage && !eval(language).hasOwnProperty(trans) || !eval(language).hasOwnProperty(trans)) {
-      return trans
+    return trans
   }
 
   return eval(language)[trans]
@@ -31,6 +39,7 @@ function showSwal(message, type, timer = false) {
     title: message,
     toast: true,
     showConfirmButton: false,
+    animation: false
   };
   if (timer) {
     config["timer"] = timer;
@@ -55,7 +64,8 @@ function request(url, data, next, error, requestType = "POST") {
       type: "info",
       title: __("Yükleniyor..."),
       toast: true,
-      showConfirmButton: false
+      showConfirmButton: false,
+      animation: false
     });
   }
 
@@ -68,8 +78,8 @@ function request(url, data, next, error, requestType = "POST") {
     url = window.location.origin + "/extensionRun/";
   }
 
-  var server_id = $("meta[name=server_id]").attr("content");
-  var extension_id = $("meta[name=extension_id]").attr("content");
+  var server_id = window.$("meta[name=server_id]").attr("content");
+  var extension_id = window.$("meta[name=extension_id]").attr("content");
 
   server_id != "" && data.append("server_id", server_id);
   extension_id != "" && data.append("extension_id", extension_id);
@@ -165,7 +175,7 @@ function isJson(str) {
 
 function limanRequestBuilder(index, token) {
   var str = "curl";
-  $.each(limanRequestList[index]["form"], function (index, value) {
+  window.$.each(limanRequestList[index]["form"], function (index, value) {
     str += " -F '" + index + "=" + value + "'";
   });
 
@@ -185,7 +195,7 @@ function reload() {
 }
 
 function closeCurrentModal(id) {
-  $("#" + id).modal("hide");
+  window.$("#" + id).modal("hide");
 }
 
 function redirect(url) {
@@ -198,27 +208,27 @@ function nothing() {
 }
 
 function toogleEdit(selector) {
-  $(selector).each(function () {
-    if ($(this).get(0).tagName === "SPAN") {
-      $(this).changeElementType("input");
+  window.$(selector).each(function () {
+    if (window.$(this).get(0).tagName === "SPAN") {
+      window.$(this).changeElementType("input");
     } else {
-      $(this).changeElementType("span");
+      window.$(this).changeElementType("span");
     }
   });
 }
 
 (function ($) {
-  $.fn.changeElementType = function (newType) {
+  window.$.fn.changeElementType = function (newType) {
     var attrs = {};
-    $.each(this[0].attributes, function (idx, attr) {
+    window.$.each(this[0].attributes, function (idx, attr) {
       attrs[attr.nodeName] = attr.nodeValue;
     });
 
     this.replaceWith(function () {
-      if ($(this).get(0).tagName === "SPAN") {
-        return $("<" + newType + "/>", attrs).val($(this).html());
+      if (window.$(this).get(0).tagName === "SPAN") {
+        return window.$("<" + newType + "/>", attrs).val(window.$(this).html());
       } else {
-        return $("<" + newType + "/>", attrs).html($(this).val());
+        return window.$("<" + newType + "/>", attrs).html(window.$(this).val());
       }
     });
   };
@@ -274,7 +284,8 @@ window.onbeforeunload = function () {
     type: "info",
     title: __("Yükleniyor..."),
     toast: true,
-    showConfirmButton: false
+    showConfirmButton: false,
+    animation: false,
   });
 };
 
@@ -285,7 +296,7 @@ function message(data) {
     return;
   }
   var modal_id = modal.getAttribute("id");
-  var selector = $("#" + modal_id + "_alert");
+  var selector = window.$("#" + modal_id + "_alert");
   var color = "alert-info";
   switch (json["status"]) {
     case 200:
@@ -334,14 +345,33 @@ function addToTable() {
   reload();
 }
 
+function isJson(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
 function renderNotifications(data, type, target, exclude) {
-  var element = $("#" + target + " .menu");
+  var element = window.$("#" + target + " .menu");
   element.html("");
   //Set Count
-  $("#" + target + "Count").html(data.length);
+  window.$("#" + target + "Count").html(data.length);
   data.forEach((notification) => {
+    let notificationTitle = notification["title"];
+    let notificationMsg = notification["message"];
+    if (isJson(notification["title"])) {
+      let temp = JSON.parse(notification["title"])
+      notificationTitle = temp[language];
+    }
+    if (isJson(notification["message"])) {
+      let temp = JSON.parse(notification["message"])
+      notificationMsg = temp[language];
+    }
     var errors = ["error", "health_problem"];
-    element.append([...$("<div />").addClass("dropdown-divider").append("<a />").find("a").addClass("dropdown-item").attr("href", `/bildirim/${notification["id"]}`).append("<span />").find("span").css("color", errors.includes(notification["type"]) ? "#f56954" : "#00a65a").css("width", "100%").text(notification["title"]).parents()].reverse())
+    element.append([...window.$("<div />").addClass("dropdown-divider").append("<a />").find("a").addClass("dropdown-item").attr("href", `/bildirim/${notification["id"]}`).append("<span />").find("span").css("color", errors.includes(notification["type"]) ? "#f56954" : "#00a65a").css("width", "100%").text(notificationTitle).parents()].reverse())
     var displayedNots = [];
     if (localStorage.displayedNots) {
       displayedNots = JSON.parse(localStorage.displayedNots);
@@ -353,19 +383,19 @@ function renderNotifications(data, type, target, exclude) {
       return;
     }
     if (errors.includes(notification.type)) {
-      toastElement = toastr.error(notification.message, notification.title, {
+      toastElement = toastr.error(notificationMsg, notificationTitle, {
         timeOut: 5000,
       });
     } else if (notification.type == "liman_update") {
-      toastElement = toastr.warning(notification.message, notification.title, {
+      toastElement = toastr.warning(notificationMsg, notificationTitle, {
         timeOut: 5000,
       });
     } else {
-      toastElement = toastr.success(notification.message, notification.title, {
+      toastElement = toastr.success(notificationMsg, notificationTitle, {
         timeOut: 5000,
       });
     }
-    $(toastElement).click(function () {
+    window.$(toastElement).click(function () {
       location.href = "/bildirim/" + notification.id;
     });
     displayedNots.push(notification.id);
@@ -374,7 +404,7 @@ function renderNotifications(data, type, target, exclude) {
 }
 
 function activeTab() {
-  var element = $('a[href="' + window.location.hash + '"]');
+  var element = window.$('a[href="' + window.location.hash + '"]');
   if (element) {
     element.click();
   }
@@ -410,7 +440,7 @@ function setDarkMode() {
 
 function setLightMode() {
   document.getElementById("darkModeIcon").className = "fas fa-sun";
-  $("#darkModeCss").remove();
+  window.$("#darkModeCss").remove();
   window.localStorage.setItem("dark", "false");
 }
 
@@ -425,89 +455,84 @@ window.Echo = new Echo({
   disabledTransports: ["sockjs", "xhr_polling", "xhr_streaming"],
 });
 
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip({
+window.$(function () {
+  window.$('[data-toggle="tooltip"]').tooltip({
     container: "body"
   });
   bsCustomFileInput.init();
-  $(".select2").select2({
+  window.$(".select2").select2({
     theme: "bootstrap4",
   });
 
-  $(".modal").on("show.bs.modal", function (modal) {
-    $("#" + modal.target.id + " .alert")
+  window.$(".modal").on("show.bs.modal", function (modal) {
+    window.$("#" + modal.target.id + " .alert")
       .not(".alert-info")
       .fadeOut(0);
   });
 });
 
-function getSearchResults (query) {
-    $.ajax({
-      dataType: "json",
-      method: "GET",
-      url: "/liman_arama",
-      data: {
-        search_query: query
-      },
-      success: function (data, status, xhr) 
-      {
-        if (data.length == 0) {
-          $("#liman_search_results").append(`
+function getSearchResults(query) {
+  window.$.ajax({
+    dataType: "json",
+    method: "GET",
+    url: "/liman_arama",
+    data: {
+      search_query: query
+    },
+    success: function (data, status, xhr) {
+      if (data.length == 0) {
+        window.$("#liman_search_results").append(`
             <a href="#">${__("Sonuç bulunamadı!")}</a>
           `);
-        }
-
-        data.forEach((el, i) => {
-          $("#liman_search_results").append($("<a />").attr("href", el.url).toggleClass("hovered", i == 0).text(el.name));
-        });
-      },
-      error: function (jqXhr, textStatus, error) 
-      {
-        console.log(error);
       }
-    })
+
+      data.forEach((el, i) => {
+        window.$("#liman_search_results").append(window.$("<a />").attr("href", el.url).toggleClass("hovered", i == 0).text(el.name));
+      });
+    },
+    error: function (jqXhr, textStatus, error) {
+      console.log(error);
+    }
+  })
 }
 
 function liman_search() {
-  let input = $("#liman_search_input");
-  let result = $("#liman_search_results");
-  
-  if (input.val().length > 2)
-  {
+  let input = window.$("#liman_search_input");
+  let result = window.$("#liman_search_results");
+
+  if (input.val().length > 2) {
     result.html("");
     getSearchResults(input.val());
     result.fadeIn(250);
   }
 
-  if (input.val() == "") 
-  {
+  if (input.val() == "") {
     result.fadeOut(250);
   }
 }
 
-$(document).ready(function() {
-  $("body").tooltip({ selector: '[data-toggle=tooltip]', container: 'body' });
-  
-  let input = $("#liman_search_input");
-  let result = $("#liman_search_results");
+window.$(document).ready(function () {
+  window.$("body").tooltip({ selector: '[data-toggle=tooltip]', container: 'body' });
+
+  let input = window.$("#liman_search_input");
+  let result = window.$("#liman_search_results");
 
   let idx = 0
 
-  input.on("keydown", function ( e ) {
-    if (e.keyCode == 13)
-    {
+  input.on("keydown", function (e) {
+    if (e.keyCode == 13) {
       e.preventDefault();
       result.find(".hovered")[0].click();
     }
 
-    if(!(e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13)) {
-      clearTimeout($.data(this, 'timer'));
+    if (!(e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13)) {
+      clearTimeout(window.$.data(this, 'timer'));
       let wait = setTimeout(liman_search, 150);
-      $(this).data('timer', wait);
+      window.$(this).data('timer', wait);
       idx = 0
     } else {
       e.preventDefault();
-      if(!result.html().includes("Sonuç bulunamadı")) {
+      if (!result.html().includes("Sonuç bulunamadı")) {
         let results = result.find("a")
         let len = results.length - 1
         if (e.keyCode == 38) {
@@ -533,17 +558,16 @@ $(document).ready(function() {
     }
   })
 
-  $(document).on("click", function(event){
-    var $trigger = $("#liman_search");
-    if($trigger !== event.target && !$trigger.has(event.target).length)
-    {
+  window.$(document).on("click", function (event) {
+    var $trigger = window.$("#liman_search");
+    if ($trigger !== event.target && !$trigger.has(event.target).length) {
       result.fadeOut(250);
-    }            
+    }
   });
 });
 
 function handleCloseButton(target) {
-  let selector = $("#" + target);
+  let selector = window.$("#" + target);
 
   selector.find(selector.find(".close")[0]).click(function (e) {
     e.preventDefault();
@@ -552,8 +576,8 @@ function handleCloseButton(target) {
   });
 }
 
-$(document).on("shown.bs.modal", function (e) {
-  handleCloseButton($(e.target).attr("id"));
+window.$(document).on("shown.bs.modal", function (e) {
+  handleCloseButton(window.$(e.target).attr("id"));
 });
 
 function copyToClipboard(elementId) {
@@ -578,8 +602,8 @@ function collapseNav() {
   }
 }
 
-$(document).ready(function() {
+window.$(document).ready(function () {
   if (localStorage.getItem("collapse") == "true") {
-    $("body").addClass("sidebar-collapse");
+    window.$("body").addClass("sidebar-collapse");
   }
 })

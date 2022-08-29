@@ -233,6 +233,7 @@
                     text: error.message,
                     type: 'warning',
                     showCancelButton: true,
+                    animation: false,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
                     cancelButtonText: "{{ __('İptal') }}",
@@ -270,6 +271,7 @@
                     type: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
+                    animation: false,
                     cancelButtonColor: '#d33',
                     cancelButtonText: "{{ __('İptal') }}",
                     confirmButtonText: "{{ __('Tamam') }}"

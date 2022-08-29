@@ -1,9 +1,24 @@
 <div style="font-family: sans-serif; display: block; margin: auto; max-width: 900px;" class="main">
     <p>Merhaba,</p><br>
-    <pre>{{ $notification->message }}</pre><br>
+    @php
+      $notificationTitle = json_decode($notification->title);
+      if (json_last_error() === JSON_ERROR_NONE) {
+          $notificationTitle = $notificationTitle->{app()->getLocale()};
+      } else {
+          $notificationTitle = $notification->title;
+      }
+
+      $notificationContent = json_decode($notification->message);
+      if (json_last_error() === JSON_ERROR_NONE) {
+          $notificationContent = $notificationContent->{app()->getLocale()};
+      } else {
+          $notificationContent = $notification->message;
+      }
+    @endphp
+    <pre>{{ $notificationContent }}</pre><br>
     <p>Bilginize.</p>
     <br><br>
-    <p>Bu email <a href="https://liman.dev">Liman MYS</a> dış bildirim sisteminde <b>{{ explode("->", $notification->title)[1] ? explode("->", $notification->title)[1] : 'Liman' }}</b> tarafından oluşturulmuştur.</p>
+    <p>Bu email <a href="https://liman.dev">Liman MYS</a> dış bildirim sisteminde <b>{{ explode("->", $notificationTitle)[1] ? explode("->", $notificationTitle)[1] : 'Liman' }}</b> tarafından oluşturulmuştur.</p>
 </div>
 
 <style>

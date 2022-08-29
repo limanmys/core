@@ -84,6 +84,11 @@ Route::post('/yukle/eklenti/', 'Extension\MainController@upload')
     ->name('extension_upload')
     ->middleware('admin');
 
+Route::post(
+    '/eklenti/accessLogs',
+    'Extension\MainController@accessLogs'
+)->name('extension_access_logs');
+
 // Extension Upload Page
 Route::post('/ayarlar/eklentilisans', 'Extension\SettingsController@addLicense')
     ->name('add_extension_license')
