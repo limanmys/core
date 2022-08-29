@@ -32,7 +32,7 @@ jobs:
           MESSAGE+="Version: $VERSION \n"
 
           sudo chmod +x package/liman/server/storage/create_deb.sh
-          ./package/liman/server/storage/create_deb.sh 1.10-dev master 1.10-dev master $GITHUB_RUN_NUMBER $PASSPHRASE
+          ./package/liman/server/storage/create_deb.sh master master master master $GITHUB_RUN_NUMBER $PASSPHRASE
 
           [ "$GITHUB_REF" == "refs/heads/master" ] && PRERELEASE=false || PRERELEASE=true
           FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER"

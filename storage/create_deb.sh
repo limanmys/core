@@ -22,8 +22,8 @@ mkdir -p package/liman/server/storage/extension_templates
 mv extension_templates-$2/* package/liman/server/storage/extension_templates/
 rm -rf $2.zip extension_templates-$2
 
-#Go Engine
-wget "https://github.com/limanmys/go/raw/$3/liman_render" -q
+#Render Engine
+wget "https://github.com/limanmys/render-engine/raw/$3/liman_render" -q
 mv liman_render package/liman/server/storage/liman_render
 
 #WebSSH
@@ -69,7 +69,7 @@ chmod 775 DEBIAN/postinst
 echo """Package: liman
 Version: $VERSION-$5
 Installed-Size: 77892
-Maintainer: Baran SEKIN <baran@liman.dev>, Dogukan OKSUZ <dogukan@liman.dev>
+Maintainer: Dogukan OKSUZ <dogukan@liman.dev>
 Section: admin
 Date : $DATE
 Architecture: amd64
