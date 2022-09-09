@@ -489,7 +489,7 @@
         }
 
         function API(target) {
-            return "{{ route('home') }}/extensionRun/" + target;
+            return "{{ route('home') }}/engine/" + target;
         }
 
         function resourceChart(title, chart, varname, prefix = true, postfix = "", color = "6, 182, 212") {

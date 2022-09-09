@@ -35,11 +35,11 @@ function request(url, data, next, error, requestType = "POST") {
 
     modalData = data;
     if (
-        url.startsWith(window.location.origin + "/extensionRun/") ||
-        url.startsWith("/extensionRun/")
+        url.startsWith(window.location.origin + "/engine/") ||
+        url.startsWith("/engine/")
     ) {
-        data.append("lmntargetFunction", url.split("/extensionRun/")[1]);
-        url = window.location.origin + "/extensionRun/";
+        data.append("lmntargetFunction", url.split("/engine/")[1]);
+        url = window.location.origin + "/engine/";
     }
 
     var server_id = $("meta[name=server_id]").attr("content");

@@ -18,7 +18,7 @@ class GenericConnector
     public function execute($command)
     {
         return trim(
-            self::request('runCommand', [
+            self::request('command', [
                 "command" => $command,
             ])
         );
@@ -113,7 +113,7 @@ class GenericConnector
         try {
             $response = $client->request(
                 'POST',
-                env("RENDER_ENGINE_ADDRESS","https://127.0.0.1:5454"). "/$url",
+                env("RENDER_ENGINE_ADDRESS","https://127.0.0.1:2806"). "/$url",
                 [
                     "form_params" => $params,
                 ]

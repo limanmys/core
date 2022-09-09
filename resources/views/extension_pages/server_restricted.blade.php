@@ -14,7 +14,7 @@
 <script>
     function API(target)
     {
-        return "{{route('home')}}/extensionRun/" + target;
+        return "{{route('home')}}/engine/" + target;
     }
     customRequestData["token"] = "{{ $auth_token }}";
     customRequestData["locale"] = "{{session()->get('locale')}}";
