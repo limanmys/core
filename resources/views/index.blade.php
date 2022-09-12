@@ -59,7 +59,7 @@
             <div class="icon">
               <i class="fas fa-cogs"></i>
             </div>
-            <div class="small-box-footer">
+            <div class="small-box-footer" style="background-color: #17a2b8; border-radius: 5px">
               &nbsp;
             </div>
           </div>

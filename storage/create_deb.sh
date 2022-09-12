@@ -23,7 +23,12 @@ mv extension_templates-$2/* package/liman/server/storage/extension_templates/
 rm -rf $2.zip extension_templates-$2
 
 #Render Engine
-wget "https://github.com/limanmys/render-engine/raw/$3/liman_render" -q
+curl -s https://api.github.com/repos/limanmys/fiber-render-engine/releases/latest \
+| grep "browser_download_url.*zip" \
+| cut -d : -f 2,3 \
+| tr -d \" \
+| wget -qi -O liman_render.zip -
+unzip liman_render.zip
 mv liman_render package/liman/server/storage/liman_render
 
 #WebSSH
