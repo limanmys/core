@@ -78,7 +78,7 @@ class GenericConnector
                 "username" => $username,
                 "password" => $password,
                 "port" => $port,
-                "keyType" => $type,
+                "key_type" => $type,
             ])
         );
     }
@@ -120,13 +120,24 @@ class GenericConnector
             );
             return $response->getBody()->getContents();
         } catch (\Exception $exception) {
-            if (!env("APP_DEBUG")) {
-                abort(504,"Liman Go Servisinde bir sorun oluştu, lütfen yöneticinizle iletişime geçin.");
-                return null;
-            } else {
-                abort(504,"Liman Go Servisinde bir sorun oluştu, lütfen yöneticinizle iletişime geçin." . $exception->getMessage());
-                return null;
-            }
+            $code = 500;
+			try {
+				if ($exception->getResponse() && $exception->getResponse()->getStatusCode() >= 400) {
+					$code = $exception->getResponse()->getStatusCode();
+				
+					$message = json_decode($exception->getResponse()->getBody()->getContents())->message;
+					if ($message == "") {
+						$message = $exception->getMessage();
+					}
+				} else {
+					$message = $exception->getMessage();
+				}
+			} catch (\Throwable $e) {
+				$message = $exception->getMessage();
+			}
+
+            abort($code, $message);
+            return null;
         }
     }
 }
