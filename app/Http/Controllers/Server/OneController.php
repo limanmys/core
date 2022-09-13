@@ -945,7 +945,7 @@ class OneController extends Controller
         $server_id = request('server_id');
         $count = intval(
             Command::runLiman(
-                'grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep \'"display":"true"\'| grep @{:query} | grep @{:server_id} | wc -l',
+                'cat /liman/logs/liman_new.log | grep \"route\":\"\/\" | grep @{:query} | grep @{:server_id} | wc -l',
                 [
                     'query' => $query,
                     'server_id' => $server_id
@@ -954,7 +954,7 @@ class OneController extends Controller
         );
         $head = $page > $count ? $count % 10 : 10;
         $data = Command::runLiman(
-            'grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep \'"display":"true"\'| grep @{:query} | grep @{:server_id} | tail -{:page} | head -{:head} | tac',
+            'cat /liman/logs/liman_new.log | grep \"route\":\"\/\" | grep @{:query} | grep @{:server_id} | tail -{:page} | head -{:head} | tac',
             [
                 'query' => $query,
                 'server_id' => $server_id,
@@ -974,37 +974,35 @@ class OneController extends Controller
         }
 
         foreach (explode("\n", $data) as $row) {
-            $dateEndPos = strposX($row, " ", 2);
-            $date = substr($row, 1, $dateEndPos - 2);
-            $json = substr($row, strpos($row, "{"));
-            $parsed = json_decode($json, true);
-            $parsed["date"] = $date;
-            if (!array_key_exists($parsed["extension_id"], $knownExtensions)) {
-                $extension = Extension::find($parsed["extension_id"]);
+            $row = json_decode($row);
+            $row->ts = Carbon::parse($row->ts)->isoFormat("LLL");
+
+            if (!array_key_exists($row->request_details->extension_id, $knownExtensions)) {
+                $extension = Extension::find($row->request_details->extension_id);
                 if ($extension) {
-                    $knownExtensions[$parsed["extension_id"]] =
+                    $knownExtensions[$row->request_details->extension_id] =
                         $extension->display_name;
                 } else {
-                    $knownExtensions[$parsed["extension_id"]] =
-                        $parsed["extension_id"];
+                    $knownExtensions[$row->request_details->extension_id] =
+                        $row->request_details->extension_id;
                 }
             }
+            $row->extension_id = $knownExtensions[$row->request_details->extension_id];
 
-            $parsed["extension_id"] = $knownExtensions[$parsed["extension_id"]];
-            if (!array_key_exists("log_id", $parsed)) {
-                $parsed["log_id"] = null;
-            }
-            if (!array_key_exists($parsed["user_id"], $knownUsers)) {
-                $user = User::find($parsed["user_id"]);
+            if (!array_key_exists($row->user_id, $knownUsers)) {
+                $user = User::find($row->user_id);
                 if ($user) {
-                    $knownUsers[$parsed["user_id"]] = $user->name;
+                    $knownUsers[$row->user_id] = $user->name;
                 } else {
-                    $knownUsers[$parsed["user_id"]] = $parsed["user_id"];
+                    $knownUsers[$row->user_id] = $row->user_id;
                 }
             }
-            $parsed["user_id"] = $knownUsers[$parsed["user_id"]];
+            $row->user_id = $knownUsers[$row->user_id];
+            $row->view = $row->request_details->lmntargetFunction;
 
-            array_push($clean, $parsed);
+            $row->request_details = null;
+           
+            array_push($clean, $row);
         }
 
         $table = view('table', [
@@ -1021,7 +1019,7 @@ class OneController extends Controller
                 "extension_id",
                 "view",
                 "user_id",
-                "date",
+                "ts",
                 "log_id:id",
             ],
             "onclick" => "getLogDetails",
@@ -1040,8 +1038,9 @@ class OneController extends Controller
 
     public function getLogDetails()
     {
+        // TODO fix
         $query = request('log_id');
-        $data = Command::runLiman('grep @{:query} /liman/logs/extension.log', [
+        $data = Command::runLiman('grep @{:query} /liman/logs/liman_new.log', [
             'query' => $query
         ]);
         if ($data == "") {
