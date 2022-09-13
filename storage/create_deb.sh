@@ -27,8 +27,8 @@ curl -s https://api.github.com/repos/limanmys/fiber-render-engine/releases/lates
 | grep "browser_download_url.*zip" \
 | cut -d : -f 2,3 \
 | tr -d \" \
-| wget -qi -O liman_render.zip -
-unzip liman_render.zip
+| wget -qi -
+unzip liman_render*.zip
 mv liman_render package/liman/server/storage/liman_render
 
 #WebSSH
