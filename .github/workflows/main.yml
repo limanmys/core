@@ -20,7 +20,7 @@ jobs:
             PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
             PASSPHRASE: ${{ secrets.PASSPHRASE }}
         run: |
-          sudo apt install zip gpg curl jq -y
+          sudo apt install zip gpg curl jq wget -y
           mkdir -p /home/runner/.gnupg
           echo """
           use-agent
