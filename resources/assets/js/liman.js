@@ -110,9 +110,7 @@ function request(url, data, next, error, requestType = "POST") {
   r.open(requestType, url);
   r.setRequestHeader("X-CSRF-TOKEN", csrf);
   r.setRequestHeader("Accept", "text/json");
-  setTimeout(function () {
-    r.send(data);
-  }, 300);
+  r.send(data);
   r.onreadystatechange = function () {
     if (r.readyState === 4) {
       if (
@@ -128,9 +126,6 @@ function request(url, data, next, error, requestType = "POST") {
       if (id != null && (r.status !== 200 || r.status !== 300)) {
         message(r.responseText);
       }
-      if (id != null) {
-        // loading();
-      }
       if (r.getResponseHeader("content-type") !== "application/json") {
         return next(r.responseText);
       }
@@ -139,14 +134,12 @@ function request(url, data, next, error, requestType = "POST") {
         case 200:
           return next(r.responseText);
           break;
-        case 201:
-          if (error) return error(r.responseText);
-          break;
         case 300:
           return (window.location = response["message"]);
           break;
         case 403:
           showSwal(response["message"], "error", 2000);
+          if (error) return error(r.responseText);
           break;
         default:
           if (error) return error(r.responseText);
