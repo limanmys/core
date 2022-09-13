@@ -3,7 +3,7 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="/" class="brand-link">
-        <img id="limanLogo" src="{{ asset('/images/limanlogo.svg') }}" height="20" style="opacity: .9;cursor:pointer;"
+        <img id="limanLogo" src="{{ asset('/images/limanlogo.svg') }}" style="opacity: .9; cursor: pointer; max-height: 20px !important;"
             title="Versiyon {{ getVersion() . ' Build : ' . getVersionCode() }}">
     </a>
     <!-- Sidebar -->
@@ -130,7 +130,7 @@
         <!-- /.sidebar-menu -->
     </div>
     <div class="sidebar-bottom">
-        <div class="container">
+        <div class="container" style="min-width: 240px !important;">
             <div class="row">
                 <div class="col">
                     <a href="/profil" data-toggle="tooltip" @if (request()->getRequestUri() == '/profil') class="active" @endif

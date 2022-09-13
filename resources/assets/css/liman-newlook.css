@@ -25,7 +25,7 @@ body {
 .brand-link {
     padding-left: 21px;
     margin-right: 0 !important;
-    width: calc(16rem - 1px) !important;
+    width: auto !important;
     padding-bottom: 15px;
 }
 
