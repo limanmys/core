@@ -129,8 +129,8 @@
 
         <!-- /.sidebar-menu -->
     </div>
-    <div class="sidebar-bottom">
-        <div class="container" style="min-width: 240px !important;">
+    <div class="sidebar-bottom" style="overflow: hidden;">
+        <div class="container" style="min-width: 190px !important; overflow: hidden;">
             <div class="row">
                 <div class="col">
                     <a href="/profil" data-toggle="tooltip" @if (request()->getRequestUri() == '/profil') class="active" @endif
