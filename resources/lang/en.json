@@ -963,5 +963,18 @@
   "Yeniden Adlandır": "Rename",
   "Rol grubu başarıyla düzenlendi.": "Role group successfully edited.",
   "Rol grubu düzenlenemedi!": "Cannot edit role group!",
-  "Doğrulama başarısız, girdiğiniz bilgileri kontrol edin.": "Cannot verify the information that you have entered, please check it again."
+  "Doğrulama başarısız, girdiğiniz bilgileri kontrol edin.": "Cannot verify the information that you have entered, please check it again.",
+  "ts": "Timestamp (Epoch)",
+  "msg": "Log Title",
+  "lmn_level": "Log Level",
+  "user_id": "User ID",
+  "route": "Render Engine Route",
+  "ip_address": "IP Address",
+  "data": "Special Log Data",
+  "extension_id": "Extension ID",
+  "lmntargetFunction": "Liman Target Function",
+  "message": "Special Log Content",
+  "server_id": "Server ID",
+  "title": "Special Log Title",
+  "request_details": "Request Details"
 }

@@ -631,6 +631,10 @@
                 const contentEl = $("<div class='tab-pane fade' id='" + current.id + "_content' role='tabpanel' aria-labelledby='" + current.id +"_title'><pre style='white-space:pre-wrap;' /></div>");
                 contentEl.find("pre").text(current.message);
                 logContentWrapper.append(contentEl);
+
+                if (index == 0) {
+                    titleEl.click();
+                }
             });
             modal.modal("show");
             setTimeout(function () {

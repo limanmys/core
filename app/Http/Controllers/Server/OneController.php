@@ -945,7 +945,7 @@ class OneController extends Controller
         $server_id = request('server_id');
         $count = intval(
             Command::runLiman(
-                'cat /liman/logs/liman_new.log | grep \"route\":\"\/\" | grep @{:query} | grep @{:server_id} | wc -l',
+                'cat /liman/logs/liman_new.log | grep @{:query} | grep -v "recover middleware catch" | grep @{:server_id} | wc -l',
                 [
                     'query' => $query,
                     'server_id' => $server_id
@@ -954,7 +954,7 @@ class OneController extends Controller
         );
         $head = $page > $count ? $count % 10 : 10;
         $data = Command::runLiman(
-            'cat /liman/logs/liman_new.log | grep \"route\":\"\/\" | grep @{:query} | grep @{:server_id} | tail -{:page} | head -{:head} | tac',
+            'cat /liman/logs/liman_new.log | grep @{:query} | grep @{:server_id} | grep -v "recover middleware catch" | tail -{:page} | head -{:head} | tac',
             [
                 'query' => $query,
                 'server_id' => $server_id,
@@ -998,7 +998,14 @@ class OneController extends Controller
                 }
             }
             $row->user_id = $knownUsers[$row->user_id];
+
             $row->view = $row->request_details->lmntargetFunction;
+
+            if (isset($row->request_details->lmntargetFunction) && $row->request_details->lmntargetFunction == "") {
+                if ($row->lmn_level == "high_level" && isset($row->request_details->title)) {
+                    $row->view = base64_decode($row->request_details->title);
+                }
+            } 
 
             $row->request_details = null;
            
@@ -1038,7 +1045,6 @@ class OneController extends Controller
 
     public function getLogDetails()
     {
-        // TODO fix
         $query = request('log_id');
         $data = Command::runLiman('grep @{:query} /liman/logs/liman_new.log', [
             'query' => $query
@@ -1048,13 +1054,44 @@ class OneController extends Controller
         }
         $logs = [];
         foreach (explode("\n", $data) as $row) {
-            $dateEndPos = strposX($row, " ", 2);
-            $date = substr($row, 1, $dateEndPos - 2);
-            $json = substr($row, strpos($row, "{"));
-            $parsed = json_decode($json, true);
-            $parsed["title"] = base64_decode($parsed["title"]);
-            $parsed["message"] = base64_decode($parsed["message"]);
-            array_push($logs, $parsed);
+            $row = mb_convert_encoding($row, "UTF-8", "auto");
+            $row = json_decode($row);
+            foreach ($row as $k => $v) {
+                if ($k == "level" || $k == "log_id") {
+                    continue;
+                }
+
+                if ($row->lmn_level == "high_level" && $k == "request_details") {
+                    foreach($row->request_details as $key => $val) {
+                        if ($key == "level" || $key == "log_id") {
+                            continue;
+                        }
+
+                        if ($key == "title" || $key == "message") {
+                            $val = base64_decode($val);
+                        }
+                        
+                        array_push($logs, [
+                            "title" => __($key),
+                            "message" => $val
+                        ]);
+                    }
+                    continue;
+                }
+                
+                if ($row->lmn_level != "high_level" && $k == "request_details") {
+                    array_push($logs, [
+                        "title" => __($k),
+                        "message" => json_encode($v, JSON_PRETTY_PRINT)
+                    ]);
+                    continue;
+                }
+
+                array_push($logs, [
+                    "title" => __($k),
+                    "message" => $v
+                ]);
+            }
         }
 
         return respond($logs);

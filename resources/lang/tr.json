@@ -51,5 +51,18 @@
     "monthly" : "aylık",
     "Server Name Update": "Server Adı Güncellemesi",
     "New Certificate Added": "Yeni Sertifika Eklendi",
-    "Liman render service is not working or crashed. ": "Liman render servisi çalışmıyor ya da çöktü. "
+    "Liman render service is not working or crashed. ": "Liman render servisi çalışmıyor ya da çöktü. ",
+    "ts": "Zaman Damgası (Epoch)",
+    "msg": "Log Başlığı",
+    "lmn_level": "Log Seviyesi",
+    "user_id": "Kullanıcı ID",
+    "route": "Render Engine Rota",
+    "ip_address": "IP Adresi",
+    "data": "Özel Log İçerik",
+    "extension_id": "Eklenti ID",
+    "lmntargetFunction": "Liman Hedef Fonksiyonu",
+    "message": "Özel Log Mesajı",
+    "server_id": "Sunucu ID",
+    "title": "Özel Log Başlık",
+    "request_details": "İstek Detayları"
 }
