@@ -120,7 +120,7 @@ class GenericConnector
             );
             return $response->getBody()->getContents();
         } catch (\Exception $exception) {
-            $code = 500;
+            $code = 504;
 			try {
 				if ($exception->getResponse() && $exception->getResponse()->getStatusCode() >= 400) {
 					$code = $exception->getResponse()->getStatusCode();
@@ -136,8 +136,17 @@ class GenericConnector
 				$message = $exception->getMessage();
 			}
 
-            abort($code, $message);
-            return null;
+            if (env("APP_DEBUG", false)) {
+                return abort(
+                    504,
+                    __("Liman render service is not working or crashed. ") . $message,
+                );
+            } else {
+                return abort(
+                    504,
+                    __("Liman render service is not working or crashed. "),
+                );
+            }
         }
     }
 }

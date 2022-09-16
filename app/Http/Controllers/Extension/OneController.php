@@ -135,7 +135,7 @@ class OneController extends Controller
                     $result = $output;
                 }
             } catch (\Exception $e) {
-                $result = $e->getMessage();
+                $result = __("Doğrulama başarısız, girdiğiniz bilgileri kontrol edin.");
             }
             if (trim($result) != "ok") {
                 return redirect(

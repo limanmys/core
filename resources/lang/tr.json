@@ -50,5 +50,6 @@
     "weekly" : "haftalık",
     "monthly" : "aylık",
     "Server Name Update": "Server Adı Güncellemesi",
-    "New Certificate Added": "Yeni Sertifika Eklendi"
+    "New Certificate Added": "Yeni Sertifika Eklendi",
+    "Liman render service is not working or crashed. ": "Liman render servisi çalışmıyor ya da çöktü. "
 }

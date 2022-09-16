@@ -74,7 +74,17 @@ class MainController extends Controller
                 ]);
                 $output = (string) $res->getBody();
             } catch (\Exception $e) {
-                abort($e->getMessage(), 201);
+                if (env("APP_DEBUG", false)) {
+                    return abort(
+                        504,
+                        __("Liman render service is not working or crashed. ") . $e->getMessage(),
+                    );
+                } else {
+                    return abort(
+                        504,
+                        __("Liman render service is not working or crashed."),
+                    );
+                }
             }
         }
         

@@ -962,5 +962,6 @@
   "Mail ayarları kaydedilemedi!": "Mail settings could not be saved!",
   "Yeniden Adlandır": "Rename",
   "Rol grubu başarıyla düzenlendi.": "Role group successfully edited.",
-  "Rol grubu düzenlenemedi!": "Cannot edit role group!"
+  "Rol grubu düzenlenemedi!": "Cannot edit role group!",
+  "Doğrulama başarısız, girdiğiniz bilgileri kontrol edin.": "Cannot verify the information that you have entered, please check it again."
 }
