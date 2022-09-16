@@ -57,7 +57,7 @@ class MainController extends Controller
             "APP_DEBUG" => env("APP_DEBUG") ? "true" : "false",
             "BRAND_NAME" => env("BRAND_NAME"),
             "APP_NOTIFICATION_EMAIL" => env("APP_NOTIFICATION_EMAIL"),
-            "LOG_LEVEL" => env("LOG_LEVEL"),
+            "NEW_LOG_LEVEL" => env("NEW_LOG_LEVEL"),
             "APP_URL" => env("APP_URL"),
             "MAIL_ENABLED" => env("MAIL_ENABLED") ? "true" : "false",
             "MAIL_HOST" => env("MAIL_HOST"),
@@ -84,7 +84,7 @@ class MainController extends Controller
             "APP_DEBUG" => request("APP_DEBUG"),
             "BRAND_NAME" => "\"" . request("BRAND_NAME") . "\"",
             "APP_NOTIFICATION_EMAIL" => request("APP_NOTIFICATION_EMAIL"),
-            "LOG_LEVEL" => request("LOG_LEVEL"),
+            "NEW_LOG_LEVEL" => request("NEW_LOG_LEVEL"),
             "APP_URL" => request("APP_URL"),
             "MAIL_ENABLED" => request("MAIL_ENABLED"),
             "MAIL_HOST" => request("MAIL_HOST"),
@@ -107,6 +107,7 @@ class MainController extends Controller
         }
 
         if ($flag) {
+            Command::runSystem("systemctl restart liman-render");
             return respond("Ayarlar başarıyla kaydedildi!");
         } else {
             return respond("Ayarlar kaydedilemedi!", 201);

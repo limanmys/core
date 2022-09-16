@@ -137,17 +137,13 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="LOG_LEVEL">{{__("Log Seviyesi")}}</label><br>
+                        <label for="NEW_LOG_LEVEL">{{__("Log Seviyesi")}}</label><br>
                         <small>{{__("Log Seviyesini düzenle.")}}</small>
-                        <select id="LOG_LEVEL" class="select2 liman_env">
-                            <option value="emergency">{{__("Emergency")}}</option>
-                            <option value="alert">{{__("Alert")}}</option>
-                            <option value="critical">{{__("Critical")}}</option>
-                            <option value="error">{{__("Error")}}</option>
-                            <option value="warning">{{__("Warning")}}</option>
-                            <option value="notice">{{__("Notice")}}</option>
-                            <option value="info">{{__("Info")}}</option>
-                            <option value="debug">{{__("Debug")}}</option>
+                        <select id="NEW_LOG_LEVEL" class="select2 liman_env">
+                            <option value="1">{{__("Minimal")}}</option>
+                            <option value="2">{{__("Eklenti Log")}}</option>
+                            <option value="3">{{__("Detaylı Eklenti Logları")}}</option>
+                            <option value="0">{{__("Tüm İşlemleri Logla")}}</option>
                         </select>
                     </div>
                 </div>
