@@ -196,7 +196,7 @@ class Helper {
     public function runCommand($command)
     {
         try{
-            $response = $this->client->get('/engine',[
+            $response = $this->client->get('/extensionRun',[
                 'query' => [
                     'liman_token' => $this->authKey,
                     'command' => $command
