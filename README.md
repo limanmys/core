@@ -29,5 +29,3 @@ Liman Core is sponsored by [HAVELSAN](https://havelsan.com.tr/en).
 MIT License
 
 See [LICENSE](https://github.com/limanmys/core/blob/master/LICENSE) the full text.
-
-
