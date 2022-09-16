@@ -58,9 +58,6 @@
     @if($installed_extensions->count() > 0)
         @foreach($installed_extensions as $service)
         checkStatus('{{$service->id}}');
-        setInterval(function () {
-            checkStatus('{{$service->id}}');
-        }, 15000);
         @endforeach
     @endif
 
