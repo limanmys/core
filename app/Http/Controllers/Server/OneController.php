@@ -369,51 +369,15 @@ class OneController extends Controller
             $secondDown = $this->calculateNetworkBytes();
             $secondUp = $this->calculateNetworkBytes(false);
             return [
-                'cpu' => round($cpuPercent, 2),
-                'ram' => round($ramPercent, 2),
-                'io' => round($ioPercent, 2),
+                'cpu' => round((float) $cpuPercent, 2),
+                'ram' => round((float) $ramPercent, 2),
+                'io' => round((float) $ioPercent, 2),
                 'network' => [
                     'down' => round(($secondDown - $firstDown) / 1024 / 2, 2),
                     'up' => round(($secondUp - $firstUp) / 1024 / 2, 2),
                 ],
                 'time' => \Carbon\Carbon::now()->format('H:i:s'),
             ];
-        } elseif (server()->isWindows()) {
-            /*
-            $cpu = substr(
-                server()->run(
-                    "Get-WmiObject win32_processor | Measure-Object -property LoadPercentage -Average | Select Average"
-                ),
-                23,
-                -3
-            );
-            echo $cpu;
-            $disk = round(
-                floatval(
-                    server()->run(
-                        "(1 - (Get-WmiObject -Class Win32_logicalDisk | ? {\$_.DriveType -eq '3'}).FreeSpace / (Get-WmiObject -Class Win32_logicalDisk | ? {\$_.DriveType -eq '3'}).Size) * 100"
-                    )
-                ),
-                2
-            );
-            try {
-                $usedRam = intval(
-                    substr(
-                        server()->run("Get-Counter '\Memory\Available MBytes'"),
-                        390,
-                        -335
-                    )
-                );
-                $totalRam = intval(
-                    server()->run(
-                        "[math]::Round((Get-WmiObject Win32_ComputerSystem).totalphysicalmemory / (1024 * 1024))"
-                    )
-                );
-                $ram = round(($usedRam / $totalRam) * 100, 2);
-            } catch (\Exception $exception) {
-                $ram = "0";
-            }
-            */
         }
         return [
             "disk" => 0,

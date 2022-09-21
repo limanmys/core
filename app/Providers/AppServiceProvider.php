@@ -12,6 +12,7 @@ use App\Models\AdminNotification;
 use App\Observers\NotificationObserver;
 use App\Observers\AdminNotificationObserver;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Routing\Router $router,
         \Illuminate\Contracts\Http\Kernel $kernel
     ) {
+        Paginator::useBootstrap();
+
         View::composer('layouts.header', function ($view) {
             $view->with('USER_FAVORITES', user()->favorites());
             $view->with('SERVERS', \App\Models\Server::orderBy('updated_at', 'DESC')

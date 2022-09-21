@@ -120,7 +120,7 @@ else
 fi
 
 sed -i "s/more_set_headers/#more_set_headers/g" /liman/server/storage/nginx.conf
-sed -i "s/php\/php7.3-fpm.sock/php-fpm\/www.sock/g" /liman/server/storage/nginx.conf
+sed -i "s/php\/php8.1-fpm.sock/php-fpm\/www.sock/g" /liman/server/storage/nginx.conf
 mv /liman/server/storage/nginx.conf /etc/nginx/conf.d/liman.conf
 
 # Nginx Auto Redirection

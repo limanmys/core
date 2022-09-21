@@ -736,11 +736,14 @@ if (!function_exists('server')) {
      * @return \App\Models\Server
      */
     function server()
-    {
-        if (!request('server')) {
-            abort(504, "Sunucu Bulunamadı");
+    {   
+        if (!request()->request->get('server')) {
+            abort(501, "Sunucu Bulunamadı");
         }
-        return request('server');
+        $serverObj = json_decode(request()->request->get('server'));
+        $server = Server::find($serverObj->id);
+
+        return $server;
     }
 }
 
@@ -803,9 +806,6 @@ if (!function_exists('sandbox')) {
             $language = extension()->language;
         }
         switch ($language) {
-            case "python":
-                return new App\Sandboxes\PythonSandbox();
-                break;
             case "php":
             default:
                 return new App\Sandboxes\PHPSandbox();
