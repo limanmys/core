@@ -46,7 +46,7 @@
     </a>
 </li>
 </ul>
-@if (request('server') != null)
+@if (request()->request->get('server') != null)
     <ul class="mx-auto order-0 navbar-nav text-white d-md-block d-sm-none">
         <li style="font-weight:bolder;font-size:20px;cursor:pointer;" data-toggle="tooltip"
             data-original-title="{{ server()->ip_address }}"
@@ -57,7 +57,7 @@
     </ul>
 @endif
 <!-- Right navbar links -->
-<ul class="navbar-nav @if (request('server') == null) ml-auto @endif">
+<ul class="navbar-nav @if (request()->request->get('server') == null) ml-auto @endif">
 
     <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">

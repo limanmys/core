@@ -52,7 +52,7 @@
                                     <a href='/l/{{ $extension->id }}/{{ $server->city }}/{{ $server->id }}'
                                         class="nav-link @if (request('extension_id') == $extension->id) active @endif">
                                         <i
-                                            class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-' . $extension->icon }}"></i>
+                                            class="nav-icon {{ empty($extension->icon) ? 'fa-solid fa-puzzle-piece' : 'fas fa-' . $extension->icon }}"></i>
                                         <p>{{ __($extension->display_name) }}</p>
                                     </a>
                                 </li>
