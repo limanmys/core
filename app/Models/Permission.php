@@ -2,23 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\User;
+use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
     use UsesUuid;
 
-    protected $table = "permissions";
+    protected $table = 'permissions';
 
     protected $fillable = [
-        "morph_id",
-        "morph_type",
-        "type",
-        "key",
-        "value",
-        "extra",
-        "blame",
+        'morph_id',
+        'morph_type',
+        'type',
+        'key',
+        'value',
+        'extra',
+        'blame',
     ];
 
     public static function can($user_id, $type, $key, $value, $extra = null)
@@ -34,10 +34,10 @@ class Permission extends Model
 
         return Permission::whereIn('morph_id', $ids)
             ->where([
-                "type" => $type,
-                "key" => $key,
-                "value" => $value,
-                "extra" => $extra,
+                'type' => $type,
+                'key' => $key,
+                'value' => $value,
+                'extra' => $extra,
             ])
             ->exists();
     }
@@ -48,17 +48,17 @@ class Permission extends Model
         $key,
         $value,
         $extra = null,
-        $morph_type = "users"
+        $morph_type = 'users'
     ) {
         try {
             return Permission::firstOrCreate([
-                "morph_id" => $morph_id,
-                "morph_type" => $morph_type,
-                "type" => $type,
-                "key" => $key,
-                "value" => $value,
-                "extra" => $extra,
-                "blame" => user()->id,
+                'morph_id' => $morph_id,
+                'morph_type' => $morph_type,
+                'type' => $type,
+                'key' => $key,
+                'value' => $value,
+                'extra' => $extra,
+                'blame' => user()->id,
             ]);
         } catch (\Throwable $e) {
             return false;
@@ -68,11 +68,11 @@ class Permission extends Model
     public static function revoke($morph_id, $type, $key, $value, $extra = null)
     {
         $permission = Permission::where([
-            "morph_id" => $morph_id,
-            "type" => $type,
-            "key" => $key,
-            "value" => $value,
-            "extra" => $extra,
+            'morph_id' => $morph_id,
+            'type' => $type,
+            'key' => $key,
+            'value' => $value,
+            'extra' => $extra,
         ])->first();
         if ($permission) {
             return $permission->delete();
@@ -89,52 +89,52 @@ class Permission extends Model
     public function getRelatedObject()
     {
         switch ($this->type) {
-            case "server":
-                $permType = __("Sunucu");
+            case 'server':
+                $permType = __('Sunucu');
                 $server = Server::find($this->value);
-                $permValue = $server ? $server->name : "-";
+                $permValue = $server ? $server->name : '-';
                 break;
-            case "extension":
-                $permType = __("Eklenti");
+            case 'extension':
+                $permType = __('Eklenti');
                 $extension = Extension::find($this->value);
-                $permValue = $extension ? $extension->name : "-";
+                $permValue = $extension ? $extension->name : '-';
                 break;
-            case "liman":
-                $permType = __("Liman");
+            case 'liman':
+                $permType = __('Liman');
                 switch ($this->value) {
-                    case "view_logs":
-                        $permValue = __("Sunucu Günlük Kayıtlarını Görüntüleme");
+                    case 'view_logs':
+                        $permValue = __('Sunucu Günlük Kayıtlarını Görüntüleme');
                         break;
-                    case "add_server":
-                        $permValue = __("Sunucu Ekleme");
+                    case 'add_server':
+                        $permValue = __('Sunucu Ekleme');
                         break;
-                    case "server_services":
-                        $permValue = __("Sunucu Servislerini Görüntüleme");
+                    case 'server_services':
+                        $permValue = __('Sunucu Servislerini Görüntüleme');
                         break;
-                    case "server_details":
-                        $permValue = __("Sunucu Detaylarını Görüntüleme");
+                    case 'server_details':
+                        $permValue = __('Sunucu Detaylarını Görüntüleme');
                         break;
-                    case "update_server":
-                        $permValue =  __("Sunucu Detaylarını Güncelleme");
+                    case 'update_server':
+                        $permValue = __('Sunucu Detaylarını Güncelleme');
                         break;
                     default:
-                        $permValue = "-";
+                        $permValue = '-';
                         break;
                 }
                 break;
-            case "function":
-                $permType = __("Fonksiyon");
-                $permValue = $this->value . " - " . $this->extra;
+            case 'function':
+                $permType = __('Fonksiyon');
+                $permValue = $this->value.' - '.$this->extra;
                 break;
             default:
-                $permType = "-";
-                $permValue = "-";
+                $permType = '-';
+                $permValue = '-';
                 break;
         }
 
         return [
-            "type" => $permType,
-            "value" => $permValue
+            'type' => $permType,
+            'value' => $permValue,
         ];
     }
 }

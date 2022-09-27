@@ -8,16 +8,16 @@ use App\Models\CronMail;
 use App\Models\Extension;
 use App\Models\Server;
 use App\User;
-use Illuminate\Contracts\Bus\Dispatcher;
 use Carbon\Carbon;
+use Illuminate\Contracts\Bus\Dispatcher;
 
 class MainController extends Controller
 {
     public function getMailTags()
     {
-        $path = "/liman/extensions/" . strtolower(extension()->name) . "/db.json";
-        if (!is_file($path)) {
-            return respond("Bu eklentinin bir veritabanı yok!", 201);
+        $path = '/liman/extensions/'.strtolower(extension()->name).'/db.json';
+        if (! is_file($path)) {
+            return respond('Bu eklentinin bir veritabanı yok!', 201);
         }
 
         $file = file_get_contents($path);
@@ -25,11 +25,11 @@ class MainController extends Controller
         $json = json_decode($file, true);
 
         if (json_last_error() != JSON_ERROR_NONE) {
-            return respond("Eklenti veritabanı okunamıyor.", 201);
+            return respond('Eklenti veritabanı okunamıyor.', 201);
         }
 
-        if (array_key_exists("mail_tags", $json)) {
-            return respond($json["mail_tags"]);
+        if (array_key_exists('mail_tags', $json)) {
+            return respond($json['mail_tags']);
         } else {
             return respond([]);
         }
@@ -38,42 +38,42 @@ class MainController extends Controller
     public function addCronMail()
     {
         validate([
-            "user_id" => "required|array",
-            "user_id.*" => "exists:users,id",
-            "server_id" => "required|exists:servers,id",
-            "extension_id" => "required|exists:extensions,id",
-            "target" => "required",
-            "cron_type" => "required|in:hourly,daily,weekly,monthly",
-            "to" => "required|array",
-            "to.*" => "email"
+            'user_id' => 'required|array',
+            'user_id.*' => 'exists:users,id',
+            'server_id' => 'required|exists:servers,id',
+            'extension_id' => 'required|exists:extensions,id',
+            'target' => 'required',
+            'cron_type' => 'required|in:hourly,daily,weekly,monthly',
+            'to' => 'required|array',
+            'to.*' => 'email',
         ]);
 
         $request = request()->all();
-        $request["user_id"] = json_encode($request["user_id"]);
-        $request["to"] = json_encode($request["to"]);
-        $request["target"] = json_encode($request["target"]);
-        $request["last"] = Carbon::now()->subDecade();
+        $request['user_id'] = json_encode($request['user_id']);
+        $request['to'] = json_encode($request['to']);
+        $request['target'] = json_encode($request['target']);
+        $request['last'] = Carbon::now()->subDecade();
 
         $cron_mail = CronMail::create($request);
         if ($cron_mail) {
-            return respond("Mail ayarı başarıyla eklendi");
+            return respond('Mail ayarı başarıyla eklendi');
         } else {
-            return respond("Mail ayarı eklenemedi!", 201);
+            return respond('Mail ayarı eklenemedi!', 201);
         }
     }
 
     public function deleteCronMail()
     {
-        $obj = CronMail::find(request("cron_id"));
+        $obj = CronMail::find(request('cron_id'));
 
         if ($obj == null) {
-            return respond("Bu mail ayarı bulunamadı!");
+            return respond('Bu mail ayarı bulunamadı!');
         }
 
         if ($obj->delete()) {
-            return respond("Mail ayarı başarıyla silindi");
+            return respond('Mail ayarı başarıyla silindi');
         } else {
-            return respond("Mail ayarı silinemedi!", 201);
+            return respond('Mail ayarı silinemedi!', 201);
         }
     }
 
@@ -81,8 +81,8 @@ class MainController extends Controller
 
     private function getTagText($key, $extension_name)
     {
-        if (!array_key_exists($extension_name, $this->tagTexts)) {
-            $file = file_get_contents("/liman/extensions/" . strtolower($extension_name) . "/db.json");
+        if (! array_key_exists($extension_name, $this->tagTexts)) {
+            $file = file_get_contents('/liman/extensions/'.strtolower($extension_name).'/db.json');
             $json = json_decode($file, true);
             if (json_last_error() != JSON_ERROR_NONE) {
                 return $key;
@@ -90,14 +90,15 @@ class MainController extends Controller
             $this->tagTexts[$extension_name] = $json;
         }
 
-        if (!array_key_exists("mail_tags", $this->tagTexts[$extension_name])) {
+        if (! array_key_exists('mail_tags', $this->tagTexts[$extension_name])) {
             return $key;
         }
-        foreach ($this->tagTexts[$extension_name]["mail_tags"] as $obj) {
-            if ($obj["tag"] == $key) {
-                return $obj["description"];
+        foreach ($this->tagTexts[$extension_name]['mail_tags'] as $obj) {
+            if ($obj['tag'] == $key) {
+                return $obj['description'];
             }
         }
+
         return $key;
     }
 
@@ -111,17 +112,17 @@ class MainController extends Controller
                 foreach ($target_list as &$target) {
                     $target = $this->getTagText($target, $ext->name);
                 }
-                $obj->tag_string = implode(", ", $target_list);
+                $obj->tag_string = implode(', ', $target_list);
             } else {
-                $obj->extension_name = "Bu eklenti silinmiş!";
-                $obj->tag_string = "Bu eklenti silinmiş!";
+                $obj->extension_name = 'Bu eklenti silinmiş!';
+                $obj->tag_string = 'Bu eklenti silinmiş!';
             }
 
             $srv = Server::find($obj->server_id);
             if ($srv) {
                 $obj->server_name = $srv->name;
             } else {
-                $obj->server_name = "Bu sunucu silinmiş!";
+                $obj->server_name = 'Bu sunucu silinmiş!';
             }
 
             $user_ids = json_decode($obj->user_id);
@@ -134,28 +135,29 @@ class MainController extends Controller
                 }
                 $users[] = $user->name;
             }
-            
-            $obj->username = implode(", ", $users);
 
-            $obj->to = implode(", ", json_decode($obj->to));
+            $obj->username = implode(', ', $users);
+
+            $obj->to = implode(', ', json_decode($obj->to));
 
             return $obj;
         });
-        return view("settings.mail", [
-            "cronMails" => $mails
+
+        return view('settings.mail', [
+            'cronMails' => $mails,
         ]);
     }
 
     public function sendNow()
     {
-        $obj = CronMail::find(request("cron_id"));
+        $obj = CronMail::find(request('cron_id'));
 
         if ($obj == null) {
-            return respond("Bu mail ayarı bulunamadı!", 201);
+            return respond('Bu mail ayarı bulunamadı!', 201);
         }
 
         $obj->update([
-            "last" => Carbon::now()->subDecade()
+            'last' => Carbon::now()->subDecade(),
         ]);
 
         $job = (new CronEmailJob(
@@ -163,12 +165,12 @@ class MainController extends Controller
         ))->onQueue('cron_mail');
         app(Dispatcher::class)->dispatch($job);
 
-        return respond("İşlem başlatıldı, tamamlandığında size mail ulaşacaktır.");
+        return respond('İşlem başlatıldı, tamamlandığında size mail ulaşacaktır.');
     }
 
     public function getView()
     {
-        return view("settings.add_mail");
+        return view('settings.add_mail');
     }
 
     public function editView()
@@ -183,32 +185,32 @@ class MainController extends Controller
         $to = json_decode($cron_mail->to);
         $target = json_decode($cron_mail->target);
 
-        return view("settings.edit_mail", compact(['cron_mail', 'users', 'to', 'target']));
+        return view('settings.edit_mail', compact(['cron_mail', 'users', 'to', 'target']));
     }
 
     public function edit()
     {
         validate([
-            "user_id" => "required|array",
-            "user_id.*" => "exists:users,id",
-            "server_id" => "required|exists:servers,id",
-            "extension_id" => "required|exists:extensions,id",
-            "target" => "required",
-            "cron_type" => "required|in:hourly,daily,weekly,monthly",
-            "to" => "required|array",
-            "to.*" => "email"
+            'user_id' => 'required|array',
+            'user_id.*' => 'exists:users,id',
+            'server_id' => 'required|exists:servers,id',
+            'extension_id' => 'required|exists:extensions,id',
+            'target' => 'required',
+            'cron_type' => 'required|in:hourly,daily,weekly,monthly',
+            'to' => 'required|array',
+            'to.*' => 'email',
         ]);
 
         $id = request()->id;
 
         $cron_mail = CronMail::findOrFail($id);
 
-        $request = request()->all(); 
-        $request["user_id"] = json_encode($request["user_id"]);
-        $request["to"] = json_encode($request["to"]);
+        $request = request()->all();
+        $request['user_id'] = json_encode($request['user_id']);
+        $request['to'] = json_encode($request['to']);
 
         $cron_mail->update($request);
 
-        return respond("Mail ayarı başarıyla düzenlendi.");
+        return respond('Mail ayarı başarıyla düzenlendi.');
     }
 }

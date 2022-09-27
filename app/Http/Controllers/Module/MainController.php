@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Module;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Module;
 
 class MainController extends Controller
@@ -20,11 +19,12 @@ class MainController extends Controller
         $modules = Module::all();
         $modules->map(function ($module) {
             $module->enabled_text = $module->enabled
-                ? "Aktif"
-                : "İzin Verilmemiş";
+                ? 'Aktif'
+                : 'İzin Verilmemiş';
         });
+
         return magicView('modules.index', [
-            "modules" => $modules,
+            'modules' => $modules,
         ]);
     }
 
@@ -33,13 +33,13 @@ class MainController extends Controller
         $module = Module::findOrFail(request('module_id'))->first();
 
         $flag = $module->update([
-            "enabled" => request('moduleStatus') == "true" ? true : false,
+            'enabled' => request('moduleStatus') == 'true' ? true : false,
         ]);
 
         if ($flag) {
-            return respond("Modül güncellendi.");
+            return respond('Modül güncellendi.');
         } else {
-            return respond(__("Bir hata oluştu. "). $flag, 201);
+            return respond(__('Bir hata oluştu. ').$flag, 201);
         }
     }
 
@@ -48,33 +48,33 @@ class MainController extends Controller
         $module = Module::findOrFail(request('module_id'))->first();
 
         $template = file_get_contents(
-            "/liman/modules/" . $module->name . "/template.json"
+            '/liman/modules/'.$module->name.'/template.json'
         );
         $template = json_decode($template, true);
         if (json_last_error() != JSON_ERROR_NONE) {
-            return respond("Modul ayarlari okunamiyor.", 201);
+            return respond('Modul ayarlari okunamiyor.', 201);
         }
 
-        $inputs = $template["settings"];
+        $inputs = $template['settings'];
 
         $view = view('inputs', [
-            "inputs" => $inputs,
+            'inputs' => $inputs,
         ])->render();
 
         $data = [];
 
-        $settingsPath = "/liman/modules/" . $module->name . "/settings.json";
+        $settingsPath = '/liman/modules/'.$module->name.'/settings.json';
         if (is_file($settingsPath)) {
             $data = file_get_contents($settingsPath);
             $data = json_decode($data, true);
             if (json_last_error() == JSON_ERROR_NONE) {
-                $data = $data["variables"];
+                $data = $data['variables'];
             }
         }
 
         return respond([
-            "view" => $view,
-            "data" => $data,
+            'view' => $view,
+            'data' => $data,
         ]);
     }
 
@@ -82,9 +82,9 @@ class MainController extends Controller
     {
         $module = Module::findOrFail(request('module_id'))->first();
 
-        $filePath = "/liman/modules/" . $module->name . "/settings.json";
+        $filePath = '/liman/modules/'.$module->name.'/settings.json';
         $data = [
-            "variables" => [],
+            'variables' => [],
         ];
 
         if (is_file($filePath)) {
@@ -96,8 +96,8 @@ class MainController extends Controller
         }
 
         foreach (request()->all() as $key => $value) {
-            if (substr($key, 0, 4) == "mod-") {
-                $data["variables"][substr($key, 4)] = $value;
+            if (substr($key, 0, 4) == 'mod-') {
+                $data['variables'][substr($key, 4)] = $value;
             }
         }
 
@@ -107,9 +107,9 @@ class MainController extends Controller
         );
 
         if ($flag) {
-            return respond("Ayarlar başarıyla kaydedildi.");
+            return respond('Ayarlar başarıyla kaydedildi.');
         } else {
-            return respond("Ayarlar kaydedilemedi!", 201);
+            return respond('Ayarlar kaydedilemedi!', 201);
         }
     }
 }

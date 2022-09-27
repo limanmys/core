@@ -2,12 +2,14 @@
 
 namespace App\Connectors;
 
-use GuzzleHttp\Client;
 use App\Models\Token;
+use GuzzleHttp\Client;
 
 class GenericConnector
 {
-    public $server, $user;
+    public $server;
+
+    public $user;
 
     public function __construct(\App\Models\Server $server = null, $user = null)
     {
@@ -19,7 +21,7 @@ class GenericConnector
     {
         return trim(
             self::request('command', [
-                "command" => $command,
+                'command' => $command,
             ])
         );
     }
@@ -28,8 +30,8 @@ class GenericConnector
     {
         return trim(
             self::request('putFile', [
-                "localPath" => $localPath,
-                "remotePath" => $remotePath,
+                'localPath' => $localPath,
+                'remotePath' => $remotePath,
             ])
         );
     }
@@ -38,8 +40,8 @@ class GenericConnector
     {
         return trim(
             self::request('getFile', [
-                "localPath" => $localPath,
-                "remotePath" => $remotePath,
+                'localPath' => $localPath,
+                'remotePath' => $remotePath,
             ])
         );
     }
@@ -48,23 +50,23 @@ class GenericConnector
     {
         return trim(
             self::request('getFile', [
-                "script" => $script,
-                "parameters" => $parameters,
-                "runAsRoot" => $runAsRoot,
+                'script' => $script,
+                'parameters' => $parameters,
+                'runAsRoot' => $runAsRoot,
             ])
         );
-        $remotePath = "/tmp/" . Str::random();
+        $remotePath = '/tmp/'.Str::random();
 
         $this->sendFile($script, $remotePath);
         $output = $this->execute("[ -f '$remotePath' ] && echo 1 || echo 0");
-        if ($output != "1") {
-            abort(504, "Betik gönderilemedi");
+        if ($output != '1') {
+            abort(504, 'Betik gönderilemedi');
         }
-        $this->execute("chmod +x " . $remotePath);
+        $this->execute('chmod +x '.$remotePath);
 
         // Run Part Of The Script
         $query = $runAsRoot ? sudo() : '';
-        $query = $query . $remotePath . " " . $parameters . " 2>&1";
+        $query = $query.$remotePath.' '.$parameters.' 2>&1';
         $output = $this->execute($query);
 
         return $output;
@@ -74,11 +76,11 @@ class GenericConnector
     {
         return trim(
             self::request('verify', [
-                "ip_address" => $ip_address,
-                "username" => $username,
-                "password" => $password,
-                "port" => $port,
-                "key_type" => $type,
+                'ip_address' => $ip_address,
+                'username' => $username,
+                'password' => $password,
+                'port' => $port,
+                'key_type' => $type,
             ])
         );
     }
@@ -97,54 +99,55 @@ class GenericConnector
     {
         $client = new Client([
             'verify' => false,
-            'connect_timeout' => env("EXTENSION_TIMEOUT", 30)
+            'connect_timeout' => env('EXTENSION_TIMEOUT', 30),
         ]);
 
         if ($this->server != null) {
-            $params["server_id"] = $this->server->id;
+            $params['server_id'] = $this->server->id;
         }
 
         if ($this->user == null) {
-            $params["token"] = Token::create(user()->id);
+            $params['token'] = Token::create(user()->id);
         } else {
-            $params["token"] = Token::create($this->user->id);
+            $params['token'] = Token::create($this->user->id);
         }
 
         try {
             $response = $client->request(
                 'POST',
-                env("RENDER_ENGINE_ADDRESS","https://127.0.0.1:2806"). "/$url",
+                env('RENDER_ENGINE_ADDRESS', 'https://127.0.0.1:2806')."/$url",
                 [
-                    "form_params" => $params,
+                    'form_params' => $params,
                 ]
             );
+
             return $response->getBody()->getContents();
         } catch (\Exception $exception) {
             $code = 504;
-			try {
-				if ($exception->getResponse() && $exception->getResponse()->getStatusCode() >= 400) {
-					$code = $exception->getResponse()->getStatusCode();
-				
-					$message = json_decode($exception->getResponse()->getBody()->getContents())->message;
-					if ($message == "") {
-						$message = $exception->getMessage();
-					}
-				} else {
-					$message = $exception->getMessage();
-				}
-			} catch (\Throwable $e) {
-				$message = $exception->getMessage();
-			}
+            try {
+                if ($exception->getResponse() && $exception->getResponse()->getStatusCode() >= 400) {
+                    $code = $exception->getResponse()->getStatusCode();
 
-            if (env("APP_DEBUG", false)) {
+                    $message = json_decode($exception->getResponse()->getBody()->getContents())->message;
+                    if ($message == '') {
+                        $message = $exception->getMessage();
+                    }
+                } else {
+                    $message = $exception->getMessage();
+                }
+            } catch (\Throwable $e) {
+                $message = $exception->getMessage();
+            }
+
+            if (env('APP_DEBUG', false)) {
                 return abort(
                     504,
-                    __("Liman render service is not working or crashed. ") . $message,
+                    __('Liman render service is not working or crashed. ').$message,
                 );
             } else {
                 return abort(
                     504,
-                    __("Liman render service is not working or crashed. "),
+                    __('Liman render service is not working or crashed. '),
                 );
             }
         }

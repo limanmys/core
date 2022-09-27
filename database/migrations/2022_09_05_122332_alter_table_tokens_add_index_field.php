@@ -13,8 +13,7 @@ class AlterTableTokensAddIndexField extends Migration
      */
     public function up()
     {
-        Schema::table('tokens', function(Blueprint $table)
-        {
+        Schema::table('tokens', function (Blueprint $table) {
             $table->index('token');
         });
     }
@@ -26,8 +25,7 @@ class AlterTableTokensAddIndexField extends Migration
      */
     public function down()
     {
-        Schema::table('tokens', function(Blueprint $table)
-        {
+        Schema::table('tokens', function (Blueprint $table) {
             $table->dropIndex('token');
         });
     }

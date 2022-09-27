@@ -2,17 +2,16 @@
 
 namespace App\Providers;
 
-use Carbon\Carbon;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\ServiceProvider;
-
+use App\Models\AdminNotification;
 use App\Models\Notification;
 use App\Models\Permission;
-use App\Models\AdminNotification;
-use App\Observers\NotificationObserver;
 use App\Observers\AdminNotificationObserver;
+use App\Observers\NotificationObserver;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
                     return Permission::can(user()->id, 'server', 'id', $server->id);
                 })
                 ->filter(function ($server) {
-                    return !(bool) user()->favorites()->where("id", $server->id)->first();
+                    return ! (bool) user()->favorites()->where('id', $server->id)->first();
                 })
             );
         });
@@ -47,9 +46,9 @@ class AppServiceProvider extends ServiceProvider
             'roles' => 'App\Models\Role',
         ]);
 
-        if (request()->headers->has("liman-token") == false) {
+        if (request()->headers->has('liman-token') == false) {
             $router->pushMiddlewareToGroup(
-                "web",
+                'web',
                 \App\Http\Middleware\VerifyCsrfToken::class
             );
         }

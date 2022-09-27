@@ -19,7 +19,7 @@ class ForcePasswordChange
         if (
             auth()->check() &&
             user()->forceChange == true &&
-            !in_array(
+            ! in_array(
                 request()
                     ->route()
                     ->getName(),
@@ -28,6 +28,7 @@ class ForcePasswordChange
         ) {
             return redirect(route('password_change'));
         }
+
         return $next($request);
     }
 }

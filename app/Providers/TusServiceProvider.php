@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use TusPhp\Tus\Server as TusServer;
-use Illuminate\Support\ServiceProvider;
 use App\Http\Middleware\TusAuthenticated;
+use Illuminate\Support\ServiceProvider;
+use TusPhp\Tus\Server as TusServer;
 
 class TusServiceProvider extends ServiceProvider
 {
@@ -30,6 +30,7 @@ class TusServiceProvider extends ServiceProvider
             $server->middleware()->add(TusAuthenticated::class);
 
             $server->setApiPath('/upload');
+
             return $server;
         });
     }

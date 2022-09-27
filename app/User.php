@@ -5,15 +5,16 @@ namespace App;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
+use App\Models\UsesUuid;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\UsesUuid;
 
 /**
  * App\User
  *
  * @property-read mixed $id
+ *
  * @method static Builder|User newModelQuery()
  * @method static Builder|User newQuery()
  * @method static Builder|User query()
@@ -39,7 +40,7 @@ class User extends Authenticatable
         'auth_type',
         'last_login_at',
         'last_login_ip',
-        'locale'
+        'locale',
     ];
 
     /**
@@ -115,7 +116,7 @@ class User extends Authenticatable
 
     public function roles()
     {
-        return $this->belongsToMany('App\Models\Role', "role_users");
+        return $this->belongsToMany('App\Models\Role', 'role_users');
     }
 
     public function accessTokens()

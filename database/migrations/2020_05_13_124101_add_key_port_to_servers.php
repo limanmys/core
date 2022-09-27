@@ -1,10 +1,10 @@
 <?php
 
+use App\Models\ConnectorToken;
+use App\Models\Server;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Models\Server;
-use App\Models\ConnectorToken;
 
 class AddKeyPortToServers extends Migration
 {
@@ -27,7 +27,7 @@ class AddKeyPortToServers extends Migration
         ])->get();
         foreach ($servers as $server) {
             if ($server->key_port == null) {
-                if ($server->type == "windows_powershell") {
+                if ($server->type == 'windows_powershell') {
                     $server->key_port = 5986;
                 } else {
                     $server->key_port = 22;

@@ -2,11 +2,11 @@
 
 namespace App\Observers;
 
-use App\Models\Notification;
-use App\User;
-use App\Notifications\NotificationSent;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\BasicNotification;
+use App\Models\Notification;
+use App\Notifications\NotificationSent;
+use App\User;
+use Illuminate\Support\Facades\Mail;
 
 class NotificationObserver
 {
@@ -16,7 +16,7 @@ class NotificationObserver
             isset($notification->user_id) ? $notification->user_id : $user_id
         );
         $user->notify(new NotificationSent($notification));
-        if (env('MAIL_ENABLED') == true && $notification && $notification->type == "external_notification") {
+        if (env('MAIL_ENABLED') == true && $notification && $notification->type == 'external_notification') {
             Mail::to($user)->send(new BasicNotification($notification));
         }
     }

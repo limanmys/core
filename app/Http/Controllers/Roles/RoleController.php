@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Roles;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Role;
-use App\Models\RoleUser;
-use App\Models\Permission;
 use App\Models\Extension;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\RoleMapping;
+use App\Models\RoleUser;
 use App\Models\Server;
 use App\User;
 
@@ -30,22 +29,23 @@ class RoleController extends Controller
     public function one(Role $role)
     {
         $limanPermissions = getLimanPermissions($role->id);
+
         return magicView('settings.role', [
-            "role" => $role,
-            "servers" => Server::find(
+            'role' => $role,
+            'servers' => Server::find(
                 $role->permissions
                     ->where('type', 'server')
                     ->pluck('value')
                     ->toArray()
             ),
-            "extensions" => Extension::find(
+            'extensions' => Extension::find(
                 $role->permissions
                     ->where('type', 'extension')
                     ->pluck('value')
                     ->toArray()
             ),
-            "limanPermissions" => $limanPermissions,
-            "variablesPermissions" =>  $role->permissions->where('type', 'variable')
+            'limanPermissions' => $limanPermissions,
+            'variablesPermissions' => $role->permissions->where('type', 'variable'),
         ]);
     }
 
@@ -61,20 +61,20 @@ class RoleController extends Controller
     public function list()
     {
         return magicView('table', [
-            "value" => Role::all(),
-            "title" => ["Rol Grubu Adı", "*hidden*"],
-            "display" => ["name", "id:role_id"],
-            "menu" => [
-                "Yeniden Adlandır" => [
-                    "target" => "editRole",
-                    "icon" => " context-menu-icon-edit",
+            'value' => Role::all(),
+            'title' => ['Rol Grubu Adı', '*hidden*'],
+            'display' => ['name', 'id:role_id'],
+            'menu' => [
+                'Yeniden Adlandır' => [
+                    'target' => 'editRole',
+                    'icon' => ' context-menu-icon-edit',
                 ],
-                "Sil" => [
-                    "target" => "deleteRole",
-                    "icon" => " context-menu-icon-delete",
+                'Sil' => [
+                    'target' => 'deleteRole',
+                    'icon' => ' context-menu-icon-delete',
                 ],
             ],
-            "onclick" => "roleDetails",
+            'onclick' => 'roleDetails',
         ]);
     }
 
@@ -90,7 +90,7 @@ class RoleController extends Controller
     public function add()
     {
         hook('role_group_add_attempt', [
-            "request" => request()->all(),
+            'request' => request()->all(),
         ]);
 
         validate([
@@ -98,26 +98,26 @@ class RoleController extends Controller
         ]);
 
         $role = Role::create([
-            "name" => request('name'),
+            'name' => request('name'),
         ]);
 
         hook('role_group_add_successful', [
-            "role" => $role,
+            'role' => $role,
         ]);
 
-        return respond("Rol grubu başarıyla eklendi.");
+        return respond('Rol grubu başarıyla eklendi.');
     }
 
     public function rename()
     {
-        $count = Role::where("id", request('role_id'))->update([
-            "name" => request("name")
+        $count = Role::where('id', request('role_id'))->update([
+            'name' => request('name'),
         ]);
 
         if ($count) {
-            return respond("Rol grubu başarıyla düzenlendi.");
+            return respond('Rol grubu başarıyla düzenlendi.');
         } else {
-            return respond("Rol grubu düzenlenemedi!", 201);
+            return respond('Rol grubu düzenlenemedi!', 201);
         }
     }
 
@@ -134,13 +134,13 @@ class RoleController extends Controller
     {
         Permission::where('morph_id', request('role_id'))->delete();
 
-        RoleUser::where("role_id", request('role_id'))->delete();
+        RoleUser::where('role_id', request('role_id'))->delete();
 
-        RoleMapping::where("role_id", request('role_id'))->delete();
+        RoleMapping::where('role_id', request('role_id'))->delete();
 
-        Role::where("id", request('role_id'))->delete();
+        Role::where('id', request('role_id'))->delete();
 
-        return respond("Rol grubu başarıyla silindi.");
+        return respond('Rol grubu başarıyla silindi.');
     }
 
     /**
@@ -157,11 +157,12 @@ class RoleController extends Controller
     {
         foreach (json_decode(request('users')) as $user) {
             RoleUser::firstOrCreate([
-                "user_id" => User::where("email", $user)->first()->id,
-                "role_id" => request('role_id'),
+                'user_id' => User::where('email', $user)->first()->id,
+                'role_id' => request('role_id'),
             ]);
         }
-        return respond(__("Grup üyeleri başarıyla eklendi."), 200);
+
+        return respond(__('Grup üyeleri başarıyla eklendi.'), 200);
     }
 
     /**
@@ -178,11 +179,12 @@ class RoleController extends Controller
     {
         foreach (json_decode(request('ids')) as $role) {
             RoleUser::firstOrCreate([
-                "user_id" => request('user_id'),
-                "role_id" => $role,
+                'user_id' => request('user_id'),
+                'role_id' => $role,
             ]);
         }
-        return respond(__("Rol grupları kullanıcıya başarıyla eklendi."), 200);
+
+        return respond(__('Rol grupları kullanıcıya başarıyla eklendi.'), 200);
     }
 
     /**
@@ -197,12 +199,13 @@ class RoleController extends Controller
      */
     public function removeRolesToUser()
     {
-        RoleUser::whereIn("role_id", json_decode(request('ids')))
+        RoleUser::whereIn('role_id', json_decode(request('ids')))
             ->where([
-                "user_id" => request('user_id'),
+                'user_id' => request('user_id'),
             ])
             ->delete();
-        return respond(__("Rol grupları başarıyla silindi."), 200);
+
+        return respond(__('Rol grupları başarıyla silindi.'), 200);
     }
 
     /**
@@ -217,12 +220,13 @@ class RoleController extends Controller
      */
     public function removeRoleUsers()
     {
-        RoleUser::whereIn("user_id", json_decode(request('users')))
+        RoleUser::whereIn('user_id', json_decode(request('users')))
             ->where([
-                "role_id" => request('role_id'),
+                'role_id' => request('role_id'),
             ])
             ->delete();
-        return respond(__("Grup üyeleri başarıyla silindi."), 200);
+
+        return respond(__('Grup üyeleri başarıyla silindi.'), 200);
     }
 
     /**
@@ -242,7 +246,7 @@ class RoleController extends Controller
         $title = [];
         $display = [];
         switch (request('type')) {
-            case "server":
+            case 'server':
                 $data = Server::whereNotIn(
                     'id',
                     $role->permissions
@@ -250,10 +254,10 @@ class RoleController extends Controller
                         ->pluck('value')
                         ->toArray()
                 )->get();
-                $title = ["*hidden*", "İsim", "Türü", "İp Adresi"];
-                $display = ["id:id", "name", "type", "ip_address"];
+                $title = ['*hidden*', 'İsim', 'Türü', 'İp Adresi'];
+                $display = ['id:id', 'name', 'type', 'ip_address'];
                 break;
-            case "extension":
+            case 'extension':
                 $data = Extension::whereNotIn(
                     'id',
                     $role->permissions
@@ -261,58 +265,59 @@ class RoleController extends Controller
                         ->pluck('value')
                         ->toArray()
                 )->get();
-                $title = ["*hidden*", "İsim"];
-                $display = ["id:id", "name"];
+                $title = ['*hidden*', 'İsim'];
+                $display = ['id:id', 'name'];
                 break;
-            case "liman":
+            case 'liman':
                 $usedPermissions = Permission::where([
-                    "type" => "liman",
-                    "morph_id" => request("role_id")
+                    'type' => 'liman',
+                    'morph_id' => request('role_id'),
                 ])
                     ->get()
-                    ->groupBy("value");
+                    ->groupBy('value');
 
                 $data = [
                     [
-                        "id" => "view_logs",
-                        "name" => "Sunucu Günlük Kayıtlarını Görüntüleme",
+                        'id' => 'view_logs',
+                        'name' => 'Sunucu Günlük Kayıtlarını Görüntüleme',
                     ],
                     [
-                        "id" => "add_server",
-                        "name" => "Sunucu Ekleme",
+                        'id' => 'add_server',
+                        'name' => 'Sunucu Ekleme',
                     ],
                     [
-                        "id" => "server_services",
-                        "name" => "Sunucu Servislerini Görüntüleme",
+                        'id' => 'server_services',
+                        'name' => 'Sunucu Servislerini Görüntüleme',
                     ],
                     [
-                        "id" => "server_details",
-                        "name" => "Sunucu Detaylarını Görüntüleme",
+                        'id' => 'server_details',
+                        'name' => 'Sunucu Detaylarını Görüntüleme',
                     ],
                     [
-                        "id" => "update_server",
-                        "name" => "Sunucu Detaylarını Güncelleme",
-                    ]
+                        'id' => 'update_server',
+                        'name' => 'Sunucu Detaylarını Güncelleme',
+                    ],
                 ];
-                
+
                 foreach ($usedPermissions as $permission => $values) {
                     foreach ($data as $k => $v) {
-                        if ($v["id"] == $permission) {
+                        if ($v['id'] == $permission) {
                             unset($data[$k]);
-                        };
+                        }
                     }
                 }
 
-                $title = ["*hidden*", "İsim"];
-                $display = ["id:id", "name"];
+                $title = ['*hidden*', 'İsim'];
+                $display = ['id:id', 'name'];
                 break;
             default:
-                abort(504, "Tip Bulunamadı");
+                abort(504, 'Tip Bulunamadı');
         }
+
         return magicView('table', [
-            "value" => $data,
-            "title" => $title,
-            "display" => $display,
+            'value' => $data,
+            'title' => $title,
+            'display' => $display,
         ]);
     }
 
@@ -333,13 +338,14 @@ class RoleController extends Controller
             Permission::grant(
                 request('role_id'),
                 request('type'),
-                "id",
+                'id',
                 $id,
                 null,
-                "roles"
+                'roles'
             );
         }
-        return respond(__("Başarılı"), 200);
+
+        return respond(__('Başarılı'), 200);
     }
 
     /**
@@ -356,9 +362,10 @@ class RoleController extends Controller
     public function removeFromList()
     {
         foreach (json_decode(request('ids'), true) as $id) {
-            Permission::revoke(request('role_id'), request('type'), "id", $id);
+            Permission::revoke(request('role_id'), request('type'), 'id', $id);
         }
-        return respond(__("Başarılı"), 200);
+
+        return respond(__('Başarılı'), 200);
     }
 
     /**
@@ -373,17 +380,18 @@ class RoleController extends Controller
      */
     public function addFunctionPermissions()
     {
-        foreach (explode(",", request('functions')) as $function) {
+        foreach (explode(',', request('functions')) as $function) {
             Permission::grant(
                 request('role_id'),
-                "function",
-                "name",
+                'function',
+                'name',
                 strtolower(extension()->name),
                 $function,
-                "roles"
+                'roles'
             );
         }
-        return respond(__("Başarılı"), 200);
+
+        return respond(__('Başarılı'), 200);
     }
 
     /**
@@ -397,9 +405,10 @@ class RoleController extends Controller
      */
     public function removeFunctionPermissions()
     {
-        foreach (explode(",", request('functions')) as $function) {
+        foreach (explode(',', request('functions')) as $function) {
             Permission::find($function)->delete();
         }
-        return respond(__("Başarılı"), 200);
+
+        return respond(__('Başarılı'), 200);
     }
 }

@@ -14,7 +14,7 @@ class AlterTableAdminNotificationsChangeTitle extends Migration
     public function up()
     {
         Schema::table('admin_notifications', function (Blueprint $table) {
-            $table->text("title")->change();
+            $table->text('title')->change();
         });
     }
 

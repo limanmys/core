@@ -14,7 +14,7 @@ class AlterTableNotificationsChangeTitle extends Migration
     public function up()
     {
         Schema::table('notifications', function (Blueprint $table) {
-            $table->text("title")->change();
+            $table->text('title')->change();
         });
     }
 

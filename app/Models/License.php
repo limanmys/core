@@ -8,5 +8,5 @@ class License extends Model
 {
     use UsesUuid;
 
-    protected $fillable = ["data", "extension_id"];
+    protected $fillable = ['data', 'extension_id'];
 }

@@ -13,8 +13,7 @@ class AlterTableUserSettingsAddIndexField extends Migration
      */
     public function up()
     {
-        Schema::table('user_settings', function(Blueprint $table)
-        {
+        Schema::table('user_settings', function (Blueprint $table) {
             $table->index('user_id');
             $table->index('server_id');
         });
@@ -27,8 +26,7 @@ class AlterTableUserSettingsAddIndexField extends Migration
      */
     public function down()
     {
-        Schema::table('user_settings', function(Blueprint $table)
-        {
+        Schema::table('user_settings', function (Blueprint $table) {
             $table->dropIndex('user_id');
             $table->dropIndex('server_id');
         });

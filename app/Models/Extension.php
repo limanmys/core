@@ -9,22 +9,23 @@ use Illuminate\Support\Str;
 class Extension extends Model
 {
     use UsesUuid;
+
     /**
      * @var array
      */
     protected $fillable = [
-        "display_name",
-        "name",
-        "version",
-        "icon",
-        "service",
-        "sslPorts",
-        "issuer",
-        "language",
-        "support",
-        "displays",
-        "require_key",
-        "status"
+        'display_name',
+        'name',
+        'version',
+        'icon',
+        'service',
+        'sslPorts',
+        'issuer',
+        'language',
+        'support',
+        'displays',
+        'require_key',
+        'status',
     ];
 
     protected $casts = [
@@ -42,14 +43,14 @@ class Extension extends Model
 
         // If object is not found, abort
         if ($extension == null) {
-            abort(504, "Eklenti Bulunamadı");
+            abort(504, 'Eklenti Bulunamadı');
         }
 
         return $extension;
     }
 
     /**
-     * @param null $city
+     * @param  null  $city
      * @return mixed
      */
     public function servers($city = null)
@@ -61,17 +62,18 @@ class Extension extends Model
                 ->filter(function ($value) {
                     return DB::table('server_extensions')
                         ->where([
-                            "server_id" => $value->id,
-                            "extension_id" => request("extension_id"),
+                            'server_id' => $value->id,
+                            'extension_id' => request('extension_id'),
                         ])
                         ->exists();
                 });
         }
+
         return Server::getAll()->filter(function ($value) {
             return DB::table('server_extensions')
                 ->where([
-                    "server_id" => $value->id,
-                    "extension_id" => request("extension_id"),
+                    'server_id' => $value->id,
+                    'extension_id' => request('extension_id'),
                 ])
                 ->exists();
         });
@@ -94,9 +96,10 @@ class Extension extends Model
 
     public function getDisplayNameAttribute($value)
     {
-        if(empty($this->attributes['display_name'])){
-            return Str::title(str_replace("-", " ", $this->name));
+        if (empty($this->attributes['display_name'])) {
+            return Str::title(str_replace('-', ' ', $this->name));
         }
+
         return $this->attributes['display_name'];
     }
 

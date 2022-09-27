@@ -8,5 +8,5 @@ class PermissionData extends Model
 {
     use UsesUuid;
 
-    protected $fillable = ["permission_id", "data"];
+    protected $fillable = ['permission_id', 'data'];
 }

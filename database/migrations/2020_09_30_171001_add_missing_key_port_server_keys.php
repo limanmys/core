@@ -1,9 +1,7 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use App\Models\ServerKey;
+use Illuminate\Database\Migrations\Migration;
 
 class AddMissingKeyPortServerKeys extends Migration
 {
@@ -16,35 +14,35 @@ class AddMissingKeyPortServerKeys extends Migration
     {
         $keys = ServerKey::all();
 
-        foreach($keys as $key){
+        foreach ($keys as $key) {
             $temp = $key->data;
-            $arr = json_decode($temp,true);
-            
-            if(!array_key_exists("key_port",$arr)){
+            $arr = json_decode($temp, true);
+
+            if (! array_key_exists('key_port', $arr)) {
                 $type = $key->type;
                 $port = null;
-                switch($type){
-                    case "ssh":
-                    case "ssh_certificate":
-                        $port = "22";
+                switch($type) {
+                    case 'ssh':
+                    case 'ssh_certificate':
+                        $port = '22';
                         break;
-                    case "winrm":
-                    case "winrm_certificate":
-                        $port = "5986";
+                    case 'winrm':
+                    case 'winrm_certificate':
+                        $port = '5986';
                         break;
-                    case "snmp":
-                        $port = "161";
+                    case 'snmp':
+                        $port = '161';
                         break;
                 }
 
-                if($port == null){
+                if ($port == null) {
                     continue;
                 }
 
-                $arr["key_port"] = $port;
+                $arr['key_port'] = $port;
                 $foo = json_encode($arr);
                 $key->update([
-                    "data" => $foo
+                    'data' => $foo,
                 ]);
                 $key->save();
             }

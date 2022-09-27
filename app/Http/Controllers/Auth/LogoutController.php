@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * Class LogoutController
- * @package App\Http\Controllers\Auth
  */
 class LogoutController extends Controller
 {
@@ -16,9 +15,9 @@ class LogoutController extends Controller
      */
     public function logout()
     {
-        system_log(7, "LOGOUT_SUCCESS");
+        system_log(7, 'LOGOUT_SUCCESS');
         hook('logout_attempt', [
-            "user" => user(),
+            'user' => user(),
         ]);
         Auth::guard()->logout();
         request()
@@ -28,6 +27,7 @@ class LogoutController extends Controller
             ->session()
             ->regenerateToken();
         hook('logout_successful');
+
         return redirect(route('login'));
     }
 }

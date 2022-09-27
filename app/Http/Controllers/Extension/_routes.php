@@ -36,12 +36,12 @@ Route::post(
 Route::post(
     '/ayarlar/eklenti/zorlaBagimlilikKur',
     'Extension\OneController@forceDepInstall'
-)->name('extension_force_dep_install')->middleware("admin");
+)->name('extension_force_dep_install')->middleware('admin');
 
 Route::post(
     '/ayarlar/eklenti/zorlaAktiflestir',
     'Extension\OneController@forceEnableExtension'
-)->name('extension_force_enable')->middleware("admin");
+)->name('extension_force_enable')->middleware('admin');
 
 // Extension Details Route
 Route::get(

@@ -9,6 +9,6 @@ class UserMonitors extends Model
     use UsesUuid;
 
     protected $fillable = [
-        "user_id", "server_monitor_id", "name"
+        'user_id', 'server_monitor_id', 'name',
     ];
 }

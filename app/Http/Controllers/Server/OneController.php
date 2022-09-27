@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Server;
 
+use App\Http\Controllers\Controller;
 use App\Models\ConnectorToken;
 use App\Models\Extension;
-use App\Http\Controllers\Controller;
 use App\Models\Notification;
-use App\User;
 use App\Models\Permission;
 use App\Models\Server;
 use App\System\Command;
+use App\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -20,12 +20,12 @@ class OneController extends Controller
     public function one()
     {
         $server = server();
-        if (!$server) {
-            abort(504, "Sunucu Bulunamadı.");
+        if (! $server) {
+            abort(504, 'Sunucu Bulunamadı.');
         }
 
-        if (!Permission::can(user()->id, 'liman', 'id', 'server_details')) {
-            return respond("Bu işlemi yapmak için yetkiniz yok!", 201);
+        if (! Permission::can(user()->id, 'liman', 'id', 'server_details')) {
+            return respond('Bu işlemi yapmak için yetkiniz yok!', 201);
         }
 
         try {
@@ -37,19 +37,19 @@ class OneController extends Controller
             }
             $uptime = Carbon::parse($uptime)->diffForHumans();
         } catch (\Throwable $e) {
-            $uptime = __("Uptime parse edemiyorum.");
+            $uptime = __('Uptime parse edemiyorum.');
         }
 
         $outputs = [
-            "hostname" => $server->getHostname(),
-            "version" => $server->getVersion(),
-            "nofservices" => $server->getNoOfServices(),
-            "nofprocesses" => $server->getNoOfProcesses(),
-            "uptime" => $uptime,
+            'hostname' => $server->getHostname(),
+            'version' => $server->getVersion(),
+            'nofservices' => $server->getNoOfServices(),
+            'nofprocesses' => $server->getNoOfProcesses(),
+            'uptime' => $uptime,
         ];
 
         if ($server->canRunCommand()) {
-            $outputs["user"] = Command::run("whoami");
+            $outputs['user'] = Command::run('whoami');
         }
 
         $input_extensions = [];
@@ -59,60 +59,60 @@ class OneController extends Controller
             $arr = [];
             if (isset($extension->install)) {
                 foreach ($extension->install as $key => $parameter) {
-                    $arr[$parameter["name"]] = $key . ":" . $parameter["type"];
+                    $arr[$parameter['name']] = $key.':'.$parameter['type'];
                 }
             }
-            $arr[$extension->display_name . ":" . $extension->id] =
-                "extension_id:hidden";
+            $arr[$extension->display_name.':'.$extension->id] =
+                'extension_id:hidden';
             $input_extensions[] = [
-                "name" => $extension->display_name,
-                "id" => $extension->id,
+                'name' => $extension->display_name,
+                'id' => $extension->id,
             ];
         }
 
         return view('server.one.main', [
-            "server" => $server,
-            "favorite" => $server->isFavorite(),
-            "outputs" => $outputs,
-            "installed_extensions" => $this->installedExtensions(),
-            "available_extensions" => $available_extensions,
-            "input_extensions" => $input_extensions,
+            'server' => $server,
+            'favorite' => $server->isFavorite(),
+            'outputs' => $outputs,
+            'installed_extensions' => $this->installedExtensions(),
+            'available_extensions' => $available_extensions,
+            'input_extensions' => $input_extensions,
         ]);
     }
 
     public function remove()
     {
         hook('server_delete', [
-            "server" => server(),
+            'server' => server(),
         ]);
 
         // Check if authenticated user is owner or admin.
         if (
             server()->user_id != auth()->id() &&
-            !auth()
+            ! auth()
                 ->user()
                 ->isAdmin()
         ) {
             // Throw error
-            return respond("Yalnızca kendi sunucunuzu silebilirsiniz.", 202);
+            return respond('Yalnızca kendi sunucunuzu silebilirsiniz.', 202);
         }
         $server = server();
         // Delete the Server Object.
         server()->delete();
         Notification::new(
-            "Bir sunucu silindi.",
-            "notify",
+            'Bir sunucu silindi.',
+            'notify',
             json_encode([
-                "tr" => __(":server (:ip) isimli sunucu silindi.", [
-                    "server" => $server->name,
-                    "ip" => $server->ip_address,
-                ], "tr"),
-                "en" => __(":server (:ip) isimli sunucu silindi.", [
-                    "server" => $server->name,
-                    "ip" => $server->ip_address,
-                ], "en")
+                'tr' => __(':server (:ip) isimli sunucu silindi.', [
+                    'server' => $server->name,
+                    'ip' => $server->ip_address,
+                ], 'tr'),
+                'en' => __(':server (:ip) isimli sunucu silindi.', [
+                    'server' => $server->name,
+                    'ip' => $server->ip_address,
+                ], 'en'),
             ])
-            
+
         );
         // Redirect user to servers home page.
         return respond(route('servers'), 300);
@@ -155,90 +155,92 @@ class OneController extends Controller
 
         $output = Command::runSudo('systemctl @{:action} @{:service}', [
             'action' => request('action'),
-            'service' => $service
+            'service' => $service,
         ]);
+
         return [
-            "result" => 200,
-            "data" => $output,
+            'result' => 200,
+            'data' => $output,
         ];
     }
 
     public function enableExtension()
     {
         hook('server_extension_add', [
-            "server" => server(),
-            "request" => request()->all(),
+            'server' => server(),
+            'request' => request()->all(),
         ]);
 
         if (
-            !auth()->user()->id == server()->user_id &&
-            !auth()
+            ! auth()->user()->id == server()->user_id &&
+            ! auth()
                 ->user()
                 ->isAdmin()
         ) {
             return respond(
-                "Bu islemi yalnizca sunucu sahibi ya da bir yonetici yapabilir."
+                'Bu islemi yalnizca sunucu sahibi ya da bir yonetici yapabilir.'
             );
         }
         $extensions = json_decode(request('extensions'));
 
         foreach ($extensions as $extension) {
             $data = [
-                "server_id" => server()->id,
-                "extension_id" => $extension,
+                'server_id' => server()->id,
+                'extension_id' => $extension,
             ];
             if (
-                DB::table("server_extensions")
+                DB::table('server_extensions')
                 ->where($data)
                 ->doesntExist()
             ) {
-                $data["id"] = Str::uuid();
-                DB::table("server_extensions")->insert($data);
+                $data['id'] = Str::uuid();
+                DB::table('server_extensions')->insert($data);
             }
         }
+
         return respond('Eklenti başarıyla eklendi.');
     }
 
     public function update()
     {
-        if (!Permission::can(user()->id, 'liman', 'id', 'update_server')) {
-            return respond("Bu işlemi yapmak için yetkiniz yok!", 201);
+        if (! Permission::can(user()->id, 'liman', 'id', 'update_server')) {
+            return respond('Bu işlemi yapmak için yetkiniz yok!', 201);
         }
 
         if (strlen(request('name')) > 24) {
-            return respond("Lütfen daha kısa bir sunucu adı girin.", 201);
+            return respond('Lütfen daha kısa bir sunucu adı girin.', 201);
         }
 
         if (server()->name !== request('name')) {
             Notification::new(
-                "Server Adı Güncellemesi",
-                "notify",
+                'Server Adı Güncellemesi',
+                'notify',
                 json_encode([
-                    "tr" => __(":old isimli sunucunun adı :new olarak değiştirildi.", [
-                        "old" => server()->name,
-                        "new" => request('name'),
-                    ], "tr"),
-                    "en" => __(":old isimli sunucunun adı :new olarak değiştirildi.", [
-                        "old" => server()->name,
-                        "new" => request('name'),
-                    ], "en")
+                    'tr' => __(':old isimli sunucunun adı :new olarak değiştirildi.', [
+                        'old' => server()->name,
+                        'new' => request('name'),
+                    ], 'tr'),
+                    'en' => __(':old isimli sunucunun adı :new olarak değiştirildi.', [
+                        'old' => server()->name,
+                        'new' => request('name'),
+                    ], 'en'),
                 ])
             );
         }
 
         hook('server_update', [
-            "request" => request()->all(),
+            'request' => request()->all(),
         ]);
 
         $params = [
-            "name" => request('name'),
-            "control_port" => request('control_port'),
-            "ip_address" => request('ip_address'),
-            "city" => request('city'),
+            'name' => request('name'),
+            'control_port' => request('control_port'),
+            'ip_address' => request('ip_address'),
+            'city' => request('city'),
         ];
 
         if (user()->isAdmin()) {
-            $params["shared_key"] = request('shared') == "on" ? 1 : 0;
+            $params['shared_key'] = request('shared') == 'on' ? 1 : 0;
         }
 
         $output = Server::where(['id' => server()->id])->update($params);
@@ -246,8 +248,8 @@ class OneController extends Controller
         ConnectorToken::clear();
 
         return [
-            "result" => 200,
-            "data" => $output,
+            'result' => 200,
+            'data' => $output,
         ];
     }
 
@@ -269,7 +271,7 @@ class OneController extends Controller
 
         // Send file to the server.
         server()->putFile(
-            '/tmp/' .
+            '/tmp/'.
                 request()
                 ->file('file')
                 ->getClientOriginalName(),
@@ -278,16 +280,17 @@ class OneController extends Controller
 
         // Build query to check if file exists in server to validate.
         $query =
-            "(ls @{:path} >> /dev/null 2>&1 && echo 1) || echo 0";
+            '(ls @{:path} >> /dev/null 2>&1 && echo 1) || echo 0';
 
         $flag = Command::runSudo($query, [
-            'path' => request('path')
+            'path' => request('path'),
         ], false);
 
         // Respond according to the flag.
-        if ($flag == "1") {
-            return respond("Dosya başarıyla yüklendi.");
+        if ($flag == '1') {
+            return respond('Dosya başarıyla yüklendi.');
         }
+
         return respond('Dosya yüklenemedi.', 201);
     }
 
@@ -295,26 +298,26 @@ class OneController extends Controller
     {
         // Generate random file name
         $file = Str::random();
-        server()->getFile(request('path'), '/tmp/' . $file);
+        server()->getFile(request('path'), '/tmp/'.$file);
 
         // Extract file name from path.
-        $file_name = explode("/", request('path'));
+        $file_name = explode('/', request('path'));
 
         // Send file to the user then delete it.
         return response()
-            ->download('/tmp/' . $file, $file_name[count($file_name) - 1])
+            ->download('/tmp/'.$file, $file_name[count($file_name) - 1])
             ->deleteFileAfterSend();
     }
 
     private function availableExtensions()
     {
         return Extension::getAll()->whereNotIn(
-            "id",
-            DB::table("server_extensions")
+            'id',
+            DB::table('server_extensions')
                 ->where([
-                    "server_id" => server()->id,
+                    'server_id' => server()->id,
                 ])
-                ->pluck("extension_id")
+                ->pluck('extension_id')
                 ->toArray()
         );
     }
@@ -326,29 +329,29 @@ class OneController extends Controller
 
     public function favorite()
     {
-        $current = DB::table("user_favorites")
+        $current = DB::table('user_favorites')
             ->where([
-                "user_id" => auth()->user()->id,
-                "server_id" => server()->id,
+                'user_id' => auth()->user()->id,
+                'server_id' => server()->id,
             ])
             ->first();
 
-        if ($current && request("action") != "true") {
-            DB::table("user_favorites")
+        if ($current && request('action') != 'true') {
+            DB::table('user_favorites')
                 ->where([
-                    "user_id" => auth()->user()->id,
-                    "server_id" => server()->id,
+                    'user_id' => auth()->user()->id,
+                    'server_id' => server()->id,
                 ])
                 ->delete();
-        } elseif (!$current) {
-            DB::table("user_favorites")->insert([
-                "id" => Str::uuid(),
-                "server_id" => server()->id,
-                "user_id" => auth()->user()->id,
+        } elseif (! $current) {
+            DB::table('user_favorites')->insert([
+                'id' => Str::uuid(),
+                'server_id' => server()->id,
+                'user_id' => auth()->user()->id,
             ]);
         }
 
-        return respond("Düzenlendi.", 200);
+        return respond('Düzenlendi.', 200);
     }
 
     public function stats()
@@ -368,6 +371,7 @@ class OneController extends Controller
             sleep(1);
             $secondDown = $this->calculateNetworkBytes();
             $secondUp = $this->calculateNetworkBytes(false);
+
             return [
                 'cpu' => round((float) $cpuPercent, 2),
                 'ram' => round((float) $ramPercent, 2),
@@ -379,11 +383,12 @@ class OneController extends Controller
                 'time' => \Carbon\Carbon::now()->format('H:i:s'),
             ];
         }
+
         return [
-            "disk" => 0,
-            "ram" => 0,
-            "cpu" => 0,
-            "time" => 0,
+            'disk' => 0,
+            'ram' => 0,
+            'cpu' => 0,
+            'time' => 0,
         ];
     }
 
@@ -401,6 +406,7 @@ class OneController extends Controller
                 'cmd' => end($fetch),
             ];
         }
+
         return $data;
     }
 
@@ -418,6 +424,7 @@ class OneController extends Controller
                 'used' => $row[3],
             ];
         }
+
         return $data;
     }
 
@@ -428,6 +435,7 @@ class OneController extends Controller
                 "ps -eo pid,%mem,user,cmd --sort=-%mem --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
             )
         );
+
         return view('table', [
             'value' => $this->parsePsOutput($output),
             'title' => [__('Kullanıcı'), __('İşlem'), '%'],
@@ -442,6 +450,7 @@ class OneController extends Controller
                 "ps -eo pid,%cpu,user,cmd --sort=-%cpu --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
             )
         );
+
         return view('table', [
             'value' => $this->parsePsOutput($output),
             'title' => [__('Kullanıcı'), __('İşlem'), '%'],
@@ -456,6 +465,7 @@ class OneController extends Controller
                 "df --output=pcent,source,size,used -hl -x squashfs -x tmpfs -x devtmpfs | sed -n '1!p' | head -n 5 | sort -hr | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
             )
         );
+
         return view('table', [
             'value' => $this->parseDfOutput($output),
             'title' => [__('Disk'), __('Boyut'), __('Dolu'), '%'],
@@ -468,11 +478,12 @@ class OneController extends Controller
         $text = $download ? 'rx_bytes' : 'tx_bytes';
         $count = 0;
         $raw = Command::runSudo('cat /sys/class/net/*/statistics/:text:', [
-            'text' => $text
+            'text' => $text,
         ]);
         foreach (explode("\n", trim($raw)) as $data) {
             $count += intval($data);
         }
+
         return $count;
     }
 
@@ -489,7 +500,7 @@ class OneController extends Controller
                 $output = explode("\n", $output);
                 foreach ($output as $user) {
                     $users[] = [
-                        "user" => $user,
+                        'user' => $user,
                     ];
                 }
             }
@@ -509,35 +520,36 @@ class OneController extends Controller
                         continue;
                     }
                     $users[] = [
-                        "user" => $user,
+                        'user' => $user,
                     ];
                 }
             }
         }
 
         return magicView('table', [
-            "value" => $users,
-            "title" => ["Kullanıcı Adı"],
-            "display" => ["user"],
+            'value' => $users,
+            'title' => ['Kullanıcı Adı'],
+            'display' => ['user'],
         ]);
     }
 
     public function addLocalUser()
     {
-        $user_name = request("user_name");
-        $user_password = request("user_password");
-        $user_password_confirmation = request("user_password_confirmation");
+        $user_name = request('user_name');
+        $user_password = request('user_password');
+        $user_password_confirmation = request('user_password_confirmation');
         if ($user_password !== $user_password_confirmation) {
-            return respond("Şifreler uyuşmuyor!", 201);
+            return respond('Şifreler uyuşmuyor!', 201);
         }
-        $output = Command::runSudo("useradd --no-user-group -p $(openssl passwd -1 {:user_password}) {:user_name} -s \"/bin/bash\" &> /dev/null && echo 1 || echo 0", [
+        $output = Command::runSudo('useradd --no-user-group -p $(openssl passwd -1 {:user_password}) {:user_name} -s "/bin/bash" &> /dev/null && echo 1 || echo 0', [
             'user_password' => $user_password,
-            'user_name' => $user_name
+            'user_name' => $user_name,
         ]);
-        if ($output == "0") {
-            return respond("Kullanıcı eklenemedi!", 201);
+        if ($output == '0') {
+            return respond('Kullanıcı eklenemedi!', 201);
         }
-        return respond("Kullanıcı başarıyla eklendi!", 200);
+
+        return respond('Kullanıcı başarıyla eklendi!', 200);
     }
 
     public function getLocalGroups()
@@ -551,17 +563,17 @@ class OneController extends Controller
                 $output = explode("\n", $output);
                 foreach ($output as $group) {
                     $groups[] = [
-                        "group" => $group,
+                        'group' => $group,
                     ];
                 }
                 $groups = array_reverse($groups);
             }
 
             return magicView('table', [
-                "value" => $groups,
-                "title" => ["Grup Adı"],
-                "display" => ["group"],
-                "onclick" => "localGroupDetails",
+                'value' => $groups,
+                'title' => ['Grup Adı'],
+                'display' => ['group'],
+                'onclick' => 'localGroupDetails',
             ]);
         }
 
@@ -579,89 +591,94 @@ class OneController extends Controller
                         continue;
                     }
                     $groups[] = [
-                        "group" => $group,
+                        'group' => $group,
                     ];
                 }
             }
 
             return magicView('table', [
-                "value" => $groups,
-                "title" => ["Grup Adı"],
-                "display" => ["group"],
+                'value' => $groups,
+                'title' => ['Grup Adı'],
+                'display' => ['group'],
             ]);
         }
     }
 
     public function getLocalGroupDetails()
     {
-        $group = request("group");
+        $group = request('group');
         $output = Command::runSudo("getent group @{:group} | cut -d ':' -f4", [
-            'group' => $group
+            'group' => $group,
         ]);
 
         $users = [];
-        if (!empty($output)) {
+        if (! empty($output)) {
             $users = array_map(function ($value) {
-                return ["name" => $value];
-            }, explode(",", $output));
+                return ['name' => $value];
+            }, explode(',', $output));
         }
+
         return magicView('table', [
-            "value" => $users,
-            "title" => ["Kullanıcı Adı"],
-            "display" => ["name"],
+            'value' => $users,
+            'title' => ['Kullanıcı Adı'],
+            'display' => ['name'],
         ]);
     }
 
     public function addLocalGroup()
     {
-        $group_name = request("group_name");
+        $group_name = request('group_name');
         $output = Command::runSudo('groupadd @{:group_name} &> /dev/null && echo 1 || echo 0', [
-            'group_name' => $group_name
+            'group_name' => $group_name,
         ]);
-        if ($output == "0") {
-            return respond("Grup eklenemedi!", 201);
+        if ($output == '0') {
+            return respond('Grup eklenemedi!', 201);
         }
-        return respond("Grup başarıyla eklendi!", 200);
+
+        return respond('Grup başarıyla eklendi!', 200);
     }
 
     public function addLocalGroupUser()
     {
-        $group = request("group");
-        $user = request("user");
+        $group = request('group');
+        $user = request('user');
         $output = Command::runSudo('usermod -a -G @{:group} @{:user} &> /dev/null && echo 1 || echo 0', [
             'group' => $group,
-            'user' => $user
+            'user' => $user,
         ]);
-        if ($output != "1") {
-            return respond("Kullanıcı gruba eklenemedi!", 201);
+        if ($output != '1') {
+            return respond('Kullanıcı gruba eklenemedi!', 201);
         }
-        return respond("Kullanıcı gruba başarıyla eklendi!");
+
+        return respond('Kullanıcı gruba başarıyla eklendi!');
     }
 
     public function getSudoers()
     {
         $output = trim(
             server()->run(
-                sudo() .
+                sudo().
                     "cat /etc/sudoers /etc/sudoers.d/* | grep -v '^#\|^Defaults' | sed '/^$/d' | awk '{ print $1 \"*-*\" $2 \" \" $3 }'"
             )
         );
 
         $sudoers = [];
-        if (!empty($output)) {
+        if (! empty($output)) {
             $sudoers = array_map(function ($value) {
-                $fetch = explode("*-*", $value);
-                return ["name" => $fetch[0], "access" => $fetch[1]];
+                $fetch = explode('*-*', $value);
+
+                return ['name' => $fetch[0], 'access' => $fetch[1]];
             }, explode("\n", $output));
         }
+
         return magicView('table', [
-            "value" => $sudoers,
-            "title" => ["İsim", "Yetki"],
-            "display" => ["name", "access"],
-            "menu" => [
-                "Sil" => [
-                    "target" => "deleteSudoers",
-                    "icon" => "fa-trash",
+            'value' => $sudoers,
+            'title' => ['İsim', 'Yetki'],
+            'display' => ['name', 'access'],
+            'menu' => [
+                'Sil' => [
+                    'target' => 'deleteSudoers',
+                    'icon' => 'fa-trash',
                 ],
             ],
         ]);
@@ -669,46 +686,48 @@ class OneController extends Controller
 
     public function addSudoers()
     {
-        $name = request("name");
-        $name = str_replace(" ", "\\x20", $name);
+        $name = request('name');
+        $name = str_replace(' ', '\\x20', $name);
         $checkFile = Command::runSudo("[ -f '/etc/sudoers.d/{:name}' ] && echo 1 || echo 0", [
-            'name' => $name
+            'name' => $name,
         ]);
-        if ($checkFile == "1") {
-            return respond("Bu isimde bir kullanıcı zaten ekli!", 201);
+        if ($checkFile == '1') {
+            return respond('Bu isimde bir kullanıcı zaten ekli!', 201);
         }
         $output = Command::runSudo(
-            "echo \"{:name} ALL=(ALL:ALL) ALL\" | tee /etc/sudoers.d/{:name} &> /dev/null && echo 1 || echo 0",
+            'echo "{:name} ALL=(ALL:ALL) ALL" | tee /etc/sudoers.d/{:name} &> /dev/null && echo 1 || echo 0',
             [
-                'name' => $name
+                'name' => $name,
             ]
         );
-        if ($output == "0") {
-            return respond("Tam yetkili kullanıcı eklenemedi!", 201);
+        if ($output == '0') {
+            return respond('Tam yetkili kullanıcı eklenemedi!', 201);
         }
-        return respond("Tam yetkili kullanıcı başarıyla eklendi!", 200);
+
+        return respond('Tam yetkili kullanıcı başarıyla eklendi!', 200);
     }
 
     public function deleteSudoers()
     {
-        $name = request("name");
-        $name = str_replace(" ", "\\x20", $name);
+        $name = request('name');
+        $name = str_replace(' ', '\\x20', $name);
         $output = Command::runSudo(
-            "if [ -f \"/etc/sudoers.d/{:name}\" ]; then rm /etc/sudoers.d/{:name} && echo 1 || echo 0; else echo 0; fi",
+            'if [ -f "/etc/sudoers.d/{:name}" ]; then rm /etc/sudoers.d/{:name} && echo 1 || echo 0; else echo 0; fi',
             [
-                'name' => $name
+                'name' => $name,
             ]
         );
-        if ($output == "0") {
-            return respond("Tam yetkili kullanıcı silinemedi!", 201);
+        if ($output == '0') {
+            return respond('Tam yetkili kullanıcı silinemedi!', 201);
         }
-        return respond("Tam yetkili kullanıcı başarıyla silindi!", 200);
+
+        return respond('Tam yetkili kullanıcı başarıyla silindi!', 200);
     }
 
     public function serviceList()
     {
-        if (!Permission::can(user()->id, 'liman', 'id', 'server_services')) {
-            return respond("Bu işlemi yapmak için yetkiniz yok!", 201);
+        if (! Permission::can(user()->id, 'liman', 'id', 'server_services')) {
+            return respond('Bu işlemi yapmak için yetkiniz yok!', 201);
         }
         $services = [];
         if (server()->isLinux()) {
@@ -717,15 +736,15 @@ class OneController extends Controller
                 false
             );
             foreach (explode("\n", $raw) as $package) {
-                if ($package == "") {
+                if ($package == '') {
                     continue;
                 }
-                $row = explode(":", trim($package));
+                $row = explode(':', trim($package));
                 try {
                     array_push($services, [
-                        "name" => $row[0],
-                        "description" => $row[2],
-                        "status" => $row[1],
+                        'name' => $row[0],
+                        'description' => $row[2],
+                        'status' => $row[1],
                     ]);
                 } catch (Exception $exception) {
                 }
@@ -736,15 +755,15 @@ class OneController extends Controller
             );
             $services = [];
             foreach (explode('}', $rawServices) as $service) {
-                $row = explode(";", substr($service, 2));
-                if ($row[0] == "") {
+                $row = explode(';', substr($service, 2));
+                if ($row[0] == '') {
                     continue;
                 }
                 try {
                     array_push($services, [
-                        "name" => trim(explode('=', $row[0])[1]),
-                        "description" => trim(explode('=', $row[1])[1]),
-                        "status" => trim(explode('=', $row[2])[1]),
+                        'name' => trim(explode('=', $row[0])[1]),
+                        'description' => trim(explode('=', $row[1])[1]),
+                        'status' => trim(explode('=', $row[2])[1]),
                     ]);
                 } catch (Exception $exception) {
                 }
@@ -752,26 +771,26 @@ class OneController extends Controller
         }
 
         return magicView('table', [
-            "id" => "servicesTable",
-            "value" => $services,
-            "title" => ["Servis Adı", "Açıklama", "Durumu"],
-            "display" => ["name", "description", "status"],
-            "menu" => [
-                "Detaylar" => [
-                    "target" => "statusService",
-                    "icon" => "fa-info-circle",
+            'id' => 'servicesTable',
+            'value' => $services,
+            'title' => ['Servis Adı', 'Açıklama', 'Durumu'],
+            'display' => ['name', 'description', 'status'],
+            'menu' => [
+                'Detaylar' => [
+                    'target' => 'statusService',
+                    'icon' => 'fa-info-circle',
                 ],
-                "Başlat" => [
-                    "target" => "startService",
-                    "icon" => "fa-play",
+                'Başlat' => [
+                    'target' => 'startService',
+                    'icon' => 'fa-play',
                 ],
-                "Durdur" => [
-                    "target" => "stopService",
-                    "icon" => "fa-stop",
+                'Durdur' => [
+                    'target' => 'stopService',
+                    'icon' => 'fa-stop',
                 ],
-                "Yeniden Başlat" => [
-                    "target" => "restartService",
-                    "icon" => "fa-sync-alt",
+                'Yeniden Başlat' => [
+                    'target' => 'restartService',
+                    'icon' => 'fa-sync-alt',
                 ],
             ],
         ]);
@@ -791,22 +810,22 @@ class OneController extends Controller
      */
     public function accessLogs()
     {
-        if (!Permission::can(user()->id, 'liman', 'id', 'view_logs')) {
+        if (! Permission::can(user()->id, 'liman', 'id', 'view_logs')) {
             return respond(
-                "Sunucu Günlük Kayıtlarını görüntülemek için yetkiniz yok",
+                'Sunucu Günlük Kayıtlarını görüntülemek için yetkiniz yok',
                 201
             );
         }
 
         $page = request('page') * request('count');
-        $query = request('query') ? request('query') : "";
+        $query = request('query') ? request('query') : '';
         $server_id = request('server_id');
         $count = intval(
             Command::runLiman(
                 'grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep \'"display":"true"\'| grep @{:query} | grep @{:server_id} | wc -l',
                 [
                     'query' => $query,
-                    'server_id' => $server_id
+                    'server_id' => $server_id,
                 ]
             )
         );
@@ -825,94 +844,95 @@ class OneController extends Controller
         $knownUsers = [];
         $knownExtensions = [];
 
-        if ($data == "") {
+        if ($data == '') {
             return response()->json([
-                "current_page" => request("page"),
-                "count" => request("count"),
-                "total_records" => $count,
-                "records" => []
+                'current_page' => request('page'),
+                'count' => request('count'),
+                'total_records' => $count,
+                'records' => [],
             ]);
         }
 
         foreach (explode("\n", $data) as $row) {
-            $dateEndPos = strposX($row, " ", 2);
+            $dateEndPos = strposX($row, ' ', 2);
             $date = substr($row, 1, $dateEndPos - 2);
-            $json = substr($row, strpos($row, "{"));
+            $json = substr($row, strpos($row, '{'));
             $parsed = json_decode($json, true);
-            $parsed["date"] = $date;
-            if (!array_key_exists($parsed["extension_id"], $knownExtensions)) {
-                $extension = Extension::find($parsed["extension_id"]);
+            $parsed['date'] = $date;
+            if (! array_key_exists($parsed['extension_id'], $knownExtensions)) {
+                $extension = Extension::find($parsed['extension_id']);
                 if ($extension) {
-                    $knownExtensions[$parsed["extension_id"]] =
+                    $knownExtensions[$parsed['extension_id']] =
                         $extension->display_name;
                 } else {
-                    $knownExtensions[$parsed["extension_id"]] =
-                        $parsed["extension_id"];
+                    $knownExtensions[$parsed['extension_id']] =
+                        $parsed['extension_id'];
                 }
             }
 
-            $parsed["extension_id"] = $knownExtensions[$parsed["extension_id"]];
-            if (!array_key_exists("log_id", $parsed)) {
-                $parsed["log_id"] = null;
+            $parsed['extension_id'] = $knownExtensions[$parsed['extension_id']];
+            if (! array_key_exists('log_id', $parsed)) {
+                $parsed['log_id'] = null;
             }
-            if (!array_key_exists($parsed["user_id"], $knownUsers)) {
-                $user = User::find($parsed["user_id"]);
+            if (! array_key_exists($parsed['user_id'], $knownUsers)) {
+                $user = User::find($parsed['user_id']);
                 if ($user) {
-                    $knownUsers[$parsed["user_id"]] = $user->name;
+                    $knownUsers[$parsed['user_id']] = $user->name;
                 } else {
-                    $knownUsers[$parsed["user_id"]] = $parsed["user_id"];
+                    $knownUsers[$parsed['user_id']] = $parsed['user_id'];
                 }
             }
-            $parsed["user_id"] = $knownUsers[$parsed["user_id"]];
+            $parsed['user_id'] = $knownUsers[$parsed['user_id']];
 
             // Details
             $accessDetails = Command::runLiman('grep @{:query} /liman/logs/extension.log', [
-                'query' => $parsed["log_id"]
+                'query' => $parsed['log_id'],
             ]);
-            if ($accessDetails == "") {
-                $parsed["details"] = [];
+            if ($accessDetails == '') {
+                $parsed['details'] = [];
                 array_push($clean, $parsed);
+
                 continue;
             }
             foreach (explode("\n", $accessDetails) as $row) {
-                $dateEndPos = strposX($row, " ", 2);
+                $dateEndPos = strposX($row, ' ', 2);
                 $date = substr($row, 1, $dateEndPos - 2);
-                $json = substr($row, strpos($row, "{"));
+                $json = substr($row, strpos($row, '{'));
                 $parsedDetails = json_decode($json, true);
-                $parsedDetails["title"] = base64_decode($parsedDetails["title"]);
-                $parsedDetails["message"] = base64_decode($parsedDetails["message"]);
-                $parsed["details"] = $parsedDetails;
+                $parsedDetails['title'] = base64_decode($parsedDetails['title']);
+                $parsedDetails['message'] = base64_decode($parsedDetails['message']);
+                $parsed['details'] = $parsedDetails;
             }
 
             array_push($clean, $parsed);
         }
 
         return response()->json([
-            "current_page" => request("page"),
-            "count" => request("count"),
-            "total_records" => $count,
-            "records" => $clean
+            'current_page' => request('page'),
+            'count' => request('count'),
+            'total_records' => $count,
+            'records' => $clean,
         ]);
     }
 
     public function getLogs()
     {
-        if (!Permission::can(user()->id, 'liman', 'id', 'view_logs')) {
+        if (! Permission::can(user()->id, 'liman', 'id', 'view_logs')) {
             return respond(
-                "Sunucu Günlük Kayıtlarını görüntülemek için yetkiniz yok",
+                'Sunucu Günlük Kayıtlarını görüntülemek için yetkiniz yok',
                 403
             );
         }
 
         $page = request('page') * 10;
-        $query = request('query') ? request('query') : "";
+        $query = request('query') ? request('query') : '';
         $server_id = request('server_id');
         $count = intval(
             Command::runLiman(
                 'cat /liman/logs/liman_new.log | grep @{:query} | grep -v "recover middleware catch" | grep @{:server_id} | wc -l',
                 [
                     'query' => $query,
-                    'server_id' => $server_id
+                    'server_id' => $server_id,
                 ]
             )
         );
@@ -931,17 +951,17 @@ class OneController extends Controller
         $knownUsers = [];
         $knownExtensions = [];
 
-        if ($data == "") {
+        if ($data == '') {
             return respond([
-                "table" => __("Bu aramaya göre bir sonuç bulunamadı."),
+                'table' => __('Bu aramaya göre bir sonuç bulunamadı.'),
             ]);
         }
 
         foreach (explode("\n", $data) as $row) {
             $row = json_decode($row);
-            $row->ts = Carbon::parse($row->ts)->isoFormat("LLL");
+            $row->ts = Carbon::parse($row->ts)->isoFormat('LLL');
 
-            if (!array_key_exists($row->request_details->extension_id, $knownExtensions)) {
+            if (! array_key_exists($row->request_details->extension_id, $knownExtensions)) {
                 $extension = Extension::find($row->request_details->extension_id);
                 if ($extension) {
                     $knownExtensions[$row->request_details->extension_id] =
@@ -953,7 +973,7 @@ class OneController extends Controller
             }
             $row->extension_id = $knownExtensions[$row->request_details->extension_id];
 
-            if (!array_key_exists($row->user_id, $knownUsers)) {
+            if (! array_key_exists($row->user_id, $knownUsers)) {
                 $user = User::find($row->user_id);
                 if ($user) {
                     $knownUsers[$row->user_id] = $user->name;
@@ -965,45 +985,45 @@ class OneController extends Controller
 
             $row->view = $row->request_details->lmntargetFunction;
 
-            if (isset($row->request_details->lmntargetFunction) && $row->request_details->lmntargetFunction == "") {
-                if ($row->lmn_level == "high_level" && isset($row->request_details->title)) {
+            if (isset($row->request_details->lmntargetFunction) && $row->request_details->lmntargetFunction == '') {
+                if ($row->lmn_level == 'high_level' && isset($row->request_details->title)) {
                     $row->view = base64_decode($row->request_details->title);
                 }
-            } 
+            }
 
             $row->request_details = null;
-           
+
             array_push($clean, $row);
         }
 
         $table = view('table', [
-            "value" => (array) $clean,
-            "startingNumber" => (intval(request('page')) - 1) * 10,
-            "title" => [
-                "Eklenti",
-                "Fonksiyon",
-                "Kullanıcı",
-                "İşlem Tarihi",
-                "*hidden*",
+            'value' => (array) $clean,
+            'startingNumber' => (intval(request('page')) - 1) * 10,
+            'title' => [
+                'Eklenti',
+                'Fonksiyon',
+                'Kullanıcı',
+                'İşlem Tarihi',
+                '*hidden*',
             ],
-            "display" => [
-                "extension_id",
-                "view",
-                "user_id",
-                "ts",
-                "log_id:id",
+            'display' => [
+                'extension_id',
+                'view',
+                'user_id',
+                'ts',
+                'log_id:id',
             ],
-            "onclick" => "getLogDetails",
+            'onclick' => 'getLogDetails',
         ])->render();
 
         $pagination = view('pagination', [
-            "current" => request('page') ? intval(request('page')) : 1,
-            "count" => floor($count / 10) + 1,
-            "onclick" => "getLogs",
+            'current' => request('page') ? intval(request('page')) : 1,
+            'count' => floor($count / 10) + 1,
+            'onclick' => 'getLogs',
         ])->render();
 
         return respond([
-            "table" => $table . "<br>" . $pagination,
+            'table' => $table.'<br>'.$pagination,
         ]);
     }
 
@@ -1011,49 +1031,51 @@ class OneController extends Controller
     {
         $query = request('log_id');
         $data = Command::runLiman('grep @{:query} /liman/logs/liman_new.log', [
-            'query' => $query
+            'query' => $query,
         ]);
-        if ($data == "") {
-            return respond(__("Bu loga ait detay bulunamadı"), 201);
+        if ($data == '') {
+            return respond(__('Bu loga ait detay bulunamadı'), 201);
         }
         $logs = [];
         foreach (explode("\n", $data) as $row) {
-            $row = mb_convert_encoding($row, "UTF-8", "auto");
+            $row = mb_convert_encoding($row, 'UTF-8', 'auto');
             $row = json_decode($row);
             foreach ($row as $k => $v) {
-                if ($k == "level" || $k == "log_id") {
+                if ($k == 'level' || $k == 'log_id') {
                     continue;
                 }
 
-                if ($row->lmn_level == "high_level" && $k == "request_details") {
-                    foreach($row->request_details as $key => $val) {
-                        if ($key == "level" || $key == "log_id") {
+                if ($row->lmn_level == 'high_level' && $k == 'request_details') {
+                    foreach ($row->request_details as $key => $val) {
+                        if ($key == 'level' || $key == 'log_id') {
                             continue;
                         }
 
-                        if ($key == "title" || $key == "message") {
+                        if ($key == 'title' || $key == 'message') {
                             $val = base64_decode($val);
                         }
-                        
+
                         array_push($logs, [
-                            "title" => __($key),
-                            "message" => $val
+                            'title' => __($key),
+                            'message' => $val,
                         ]);
                     }
+
                     continue;
                 }
-                
-                if ($row->lmn_level != "high_level" && $k == "request_details") {
+
+                if ($row->lmn_level != 'high_level' && $k == 'request_details') {
                     array_push($logs, [
-                        "title" => __($k),
-                        "message" => json_encode($v, JSON_PRETTY_PRINT)
+                        'title' => __($k),
+                        'message' => json_encode($v, JSON_PRETTY_PRINT),
                     ]);
+
                     continue;
                 }
 
                 array_push($logs, [
-                    "title" => __($k),
-                    "message" => $v
+                    'title' => __($k),
+                    'message' => $v,
                 ]);
             }
         }
@@ -1064,92 +1086,96 @@ class OneController extends Controller
     public function installPackage()
     {
         if (server()->isLinux()) {
-            $package = request("package_name");
+            $package = request('package_name');
             $raw = Command::runSudo(
-                "DEBIAN_FRONTEND=noninteractive apt install @{:package} -qqy >\"/tmp/{:packageBase}.txt\" 2>&1 & disown && echo \$!",
+                'DEBIAN_FRONTEND=noninteractive apt install @{:package} -qqy >"/tmp/{:packageBase}.txt" 2>&1 & disown && echo $!',
                 [
                     'packageBase' => basename($package),
-                    'package' => $package
+                    'package' => $package,
                 ]
             );
-            system_log(7, "Paket Güncelleme", [
-                'package_name' => request("package_name"),
+            system_log(7, 'Paket Güncelleme', [
+                'package_name' => request('package_name'),
             ]);
         } else {
-            $raw = "";
+            $raw = '';
         }
+
         return $raw;
     }
 
     public function checkPackage()
     {
-        $mode = request("mode") ? request("mode") : 'update';
+        $mode = request('mode') ? request('mode') : 'update';
         $output = trim(
             server()->run(
                 "ps aux | grep \"apt \|dpkg \" | grep -v grep 2>/dev/null 1>/dev/null && echo '1' || echo '0'"
             )
         );
         $command_output = Command::runSudo('cat "/tmp/{:packageBase}.txt" 2> /dev/null | base64', [
-            'packageBase' => basename(request("package_name")),
+            'packageBase' => basename(request('package_name')),
         ]);
         $command_output = base64_decode($command_output);
         Command::runSudo('truncate -s 0 "/tmp/{:packageBase}.txt"', [
-            'packageBase' => basename(request("package_name")),
+            'packageBase' => basename(request('package_name')),
         ]);
-        if ($output === "0") {
-            $list_method = $mode == "install" ? "--installed" : "--upgradable";
-            $package = request("package_name");
-            if (endsWith($package, ".deb")) {
+        if ($output === '0') {
+            $list_method = $mode == 'install' ? '--installed' : '--upgradable';
+            $package = request('package_name');
+            if (endsWith($package, '.deb')) {
                 $package = Command::runSudo('dpkg -I @{:package} | grep Package: | cut -d\':\' -f2 | tr -d \'[:space:]\'', [
                     'package' => $package,
                 ]);
             }
             $package = Command::runSudo(
-                'apt list ' .
-                    $list_method .
-                    ' 2>/dev/null | grep ' .
-                    '@{:package}' .
+                'apt list '.
+                    $list_method.
+                    ' 2>/dev/null | grep '.
+                    '@{:package}'.
                     ' && echo 1 || echo 0',
                 [
                     'package' => $package,
                 ]
             );
             if (
-                ($mode == "update" && $output == "0") ||
-                ($mode == "install" && $output != "0")
+                ($mode == 'update' && $output == '0') ||
+                ($mode == 'install' && $output != '0')
             ) {
-                system_log(7, "Paket Güncelleme Başarılı", [
-                    'package_name' => request("package_name"),
+                system_log(7, 'Paket Güncelleme Başarılı', [
+                    'package_name' => request('package_name'),
                 ]);
+
                 return respond([
-                    "status" => __(":package_name paketi başarıyla kuruldu.", [
-                        'package_name' => request("package_name"),
+                    'status' => __(':package_name paketi başarıyla kuruldu.', [
+                        'package_name' => request('package_name'),
                     ]),
-                    "output" => trim($command_output),
+                    'output' => trim($command_output),
                 ]);
             } else {
-                system_log(7, "Paket Güncelleme Başarısız", [
-                    'package_name' => request("package_name"),
+                system_log(7, 'Paket Güncelleme Başarısız', [
+                    'package_name' => request('package_name'),
                 ]);
+
                 return respond([
-                    "status" => __(":package_name paketi kurulamadı.", [
-                        'package_name' => request("package_name"),
+                    'status' => __(':package_name paketi kurulamadı.', [
+                        'package_name' => request('package_name'),
                     ]),
-                    "output" => trim($command_output),
+                    'output' => trim($command_output),
                 ]);
             }
         } else {
             return respond(
                 [
-                    "status" => __(
-                        ":package_name paketinin kurulum işlemi henüz bitmedi.",
-                        ['package_name' => request("package_name")]
+                    'status' => __(
+                        ':package_name paketinin kurulum işlemi henüz bitmedi.',
+                        ['package_name' => request('package_name')]
                     ),
-                    "output" => trim($command_output),
+                    'output' => trim($command_output),
                 ],
                 400
             );
         }
+
         return $output;
     }
 
@@ -1157,14 +1183,15 @@ class OneController extends Controller
     {
         if (server()->isLinux()) {
             $filePath = request('filePath');
-            if (!$filePath) {
-                return respond("Dosya yolu zorunludur.", 403);
+            if (! $filePath) {
+                return respond('Dosya yolu zorunludur.', 403);
             }
-            server()->putFile($filePath, "/tmp/" . basename($filePath));
+            server()->putFile($filePath, '/tmp/'.basename($filePath));
             unlink($filePath);
-            return respond("/tmp/" . basename($filePath), 200);
+
+            return respond('/tmp/'.basename($filePath), 200);
         } else {
-            return respond("Bu sunucuya deb paketi kuramazsınız.", 403);
+            return respond('Bu sunucuya deb paketi kuramazsınız.', 403);
         }
     }
 
@@ -1172,38 +1199,39 @@ class OneController extends Controller
     {
         $updates = [];
         $raw = server()->run(
-            sudo() .
-                "apt-get -qq update 2> /dev/null > /dev/null; " .
-                sudo() .
+            sudo().
+                'apt-get -qq update 2> /dev/null > /dev/null; '.
+                sudo().
                 "apt list --upgradable 2>/dev/null | sed '1,1d'"
         );
         foreach (explode("\n", $raw) as $package) {
-            if ($package == "" || strpos($package, 'List') !== false) {
+            if ($package == '' || strpos($package, 'List') !== false) {
                 continue;
             }
-            $row = explode(" ", $package, 4);
+            $row = explode(' ', $package, 4);
             try {
                 array_push($updates, [
-                    "name" => $row[0],
-                    "version" => $row[1],
-                    "type" => $row[2],
-                    "status" => $row[3],
+                    'name' => $row[0],
+                    'version' => $row[1],
+                    'type' => $row[2],
+                    'status' => $row[3],
                 ]);
             } catch (\Exception $exception) {
             }
         }
+
         return [
-            "count" => count($updates),
-            "list" => $updates,
-            "table" => view('table', [
-                "id" => "updateListTable",
-                "value" => $updates,
-                "title" => ["Paket Adı", "Versiyon", "Tip", "Durumu"],
-                "display" => ["name", "version", "type", "status"],
-                "menu" => [
-                    "Güncelle" => [
-                        "target" => "updateSinglePackage",
-                        "icon" => "fa-sync",
+            'count' => count($updates),
+            'list' => $updates,
+            'table' => view('table', [
+                'id' => 'updateListTable',
+                'value' => $updates,
+                'title' => ['Paket Adı', 'Versiyon', 'Tip', 'Durumu'],
+                'display' => ['name', 'version', 'type', 'status'],
+                'menu' => [
+                    'Güncelle' => [
+                        'target' => 'updateSinglePackage',
+                        'icon' => 'fa-sync',
                     ],
                 ],
             ])->render(),
@@ -1213,126 +1241,132 @@ class OneController extends Controller
     public function packageList()
     {
         $raw = server()->run(
-            sudo() . "apt list --installed 2>/dev/null | sed '1,1d'",
+            sudo()."apt list --installed 2>/dev/null | sed '1,1d'",
             false
         );
         $packages = [];
         foreach (explode("\n", $raw) as $package) {
-            if ($package == "") {
+            if ($package == '') {
                 continue;
             }
-            $row = explode(" ", $package);
+            $row = explode(' ', $package);
             try {
                 array_push($packages, [
-                    "name" => $row[0],
-                    "version" => $row[1],
-                    "type" => $row[2],
-                    "status" => $row[3],
+                    'name' => $row[0],
+                    'version' => $row[1],
+                    'type' => $row[2],
+                    'status' => $row[3],
                 ]);
             } catch (Exception $exception) {
             }
         }
+
         return magicView('table', [
-            "value" => $packages,
-            "title" => ["Paket Adı", "Versiyon", "Tip", "Durumu"],
-            "display" => ["name", "version", "type", "status"],
+            'value' => $packages,
+            'title' => ['Paket Adı', 'Versiyon', 'Tip', 'Durumu'],
+            'display' => ['name', 'version', 'type', 'status'],
         ]);
     }
 
     public function removeExtension()
     {
         hook('server_extension_remove', [
-            "server" => server(),
-            "request" => request()->all(),
+            'server' => server(),
+            'request' => request()->all(),
         ]);
 
         if (
             server()->user_id != auth()->user()->id &&
-            !auth()
+            ! auth()
                 ->user()
                 ->isAdmin()
         ) {
             return respond(
-                "Yalnızca sunucu sahibi ya da yönetici bir eklentiyi silebilir.",
+                'Yalnızca sunucu sahibi ya da yönetici bir eklentiyi silebilir.',
                 201
             );
         }
 
         foreach (json_decode(request('extensions')) as $key => $value) {
-            DB::table("server_extensions")
+            DB::table('server_extensions')
                 ->where([
-                    "server_id" => server()->id,
-                    "extension_id" => $value,
+                    'server_id' => server()->id,
+                    'extension_id' => $value,
                 ])
                 ->delete();
         }
-        return respond("Eklentiler Başarıyla Silindi");
+
+        return respond('Eklentiler Başarıyla Silindi');
     }
 
     public function startService()
     {
         if (server()->isLinux()) {
-            $command = sudo() . "systemctl start @{:name}";
+            $command = sudo().'systemctl start @{:name}';
         } else {
-            $command = "Start-Service @{:name}";
+            $command = 'Start-Service @{:name}';
         }
         Command::run($command, [
-            'name' => request("name")
+            'name' => request('name'),
         ]);
-        return respond("Servis Baslatildi", 200);
+
+        return respond('Servis Baslatildi', 200);
     }
 
     public function stopService()
     {
         if (server()->isLinux()) {
-            $command = sudo() . "systemctl stop @{:name}";
+            $command = sudo().'systemctl stop @{:name}';
         } else {
-            $command = "Stop-Service @{:name}";
+            $command = 'Stop-Service @{:name}';
         }
         Command::run($command, [
-            'name' => request("name")
+            'name' => request('name'),
         ]);
-        return respond("Servis Durduruldu", 200);
+
+        return respond('Servis Durduruldu', 200);
     }
 
     public function restartService()
     {
         if (server()->isLinux()) {
-            $command = sudo() . "systemctl restart @{:name}";
+            $command = sudo().'systemctl restart @{:name}';
         } else {
-            $command = "Restart-Service @{:name}";
+            $command = 'Restart-Service @{:name}';
         }
         Command::run($command, [
-            'name' => request("name")
+            'name' => request('name'),
         ]);
-        return respond("Servis Yeniden Başlatıldı", 200);
+
+        return respond('Servis Yeniden Başlatıldı', 200);
     }
 
     public function statusService()
     {
         if (server()->isLinux()) {
-            $command = sudo() . "systemctl status @{:name}";
+            $command = sudo().'systemctl status @{:name}';
         } else {
             return respond(
-                "Windows Sunucularda yalnızca servis durumu görüntülenmektedir.",
+                'Windows Sunucularda yalnızca servis durumu görüntülenmektedir.',
                 201
             );
         }
         $output = Command::run($command, [
-            'name' => request("name")
+            'name' => request('name'),
         ]);
+
         return respond($output, 200);
     }
 
     public function getOpenPorts()
     {
-        if (server()->os != "linux") {
-            return respond("Bu sunucuda portları kontrol edemezsiniz!", 201);
+        if (server()->os != 'linux') {
+            return respond('Bu sunucuda portları kontrol edemezsiniz!', 201);
         }
 
         $output = trim(
             server()->run(
-                sudo() .
+                sudo().
                     "lsof -i -P -n | grep -v '\-'| awk -F' ' '{print $1,$3,$5,$8,$9}' | sed 1,1d"
             )
         );
@@ -1340,48 +1374,48 @@ class OneController extends Controller
         if (empty($output)) {
             return respond(
                 view(
-                    "alert",
+                    'alert',
                     [
-                        "type" => "info",
-                        "title" => "Bilgilendirme",
-                        "message" => "Açık portları görüntüleyebilmek için sunucunuza <b>lsof</b> paketini kurmanız gerekmektedir."
+                        'type' => 'info',
+                        'title' => 'Bilgilendirme',
+                        'message' => 'Açık portları görüntüleyebilmek için sunucunuza <b>lsof</b> paketini kurmanız gerekmektedir.',
                     ]
-                )->render() .
+                )->render().
                     "<button class='w-100 btn btn-info' onclick='installLsof()'><i class='fas fa-download mr-1'></i> 
-            " . __("Lsof paketini yükle") . "</button>",
+            ".__('Lsof paketini yükle').'</button>',
                 201
             );
         }
 
         $arr = [];
         foreach (explode("\n", $output) as $line) {
-            $row = explode(" ", $line);
+            $row = explode(' ', $line);
             array_push($arr, [
-                "name" => $row[0],
-                "username" => $row[1],
-                "ip_type" => $row[2],
-                "packet_type" => $row[3],
-                "port" => $row[4],
+                'name' => $row[0],
+                'username' => $row[1],
+                'ip_type' => $row[2],
+                'packet_type' => $row[3],
+                'port' => $row[4],
             ]);
         }
 
         return respond(
             view('table', [
-                "id" => "openPortsTable",
-                "value" => $arr,
-                "title" => [
-                    "Program Adı",
-                    "Kullanıcı",
-                    "İp Türü",
-                    "Paket Türü",
-                    "Port",
+                'id' => 'openPortsTable',
+                'value' => $arr,
+                'title' => [
+                    'Program Adı',
+                    'Kullanıcı',
+                    'İp Türü',
+                    'Paket Türü',
+                    'Port',
                 ],
-                "display" => [
-                    "name",
-                    "username",
-                    "ip_type",
-                    "packet_type",
-                    "port",
+                'display' => [
+                    'name',
+                    'username',
+                    'ip_type',
+                    'packet_type',
+                    'port',
                 ],
             ])->render()
         );

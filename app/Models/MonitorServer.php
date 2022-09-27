@@ -9,6 +9,6 @@ class MonitorServer extends Model
     use UsesUuid;
 
     protected $fillable = [
-        "last_checked", "online", "port", "ip_address"
+        'last_checked', 'online', 'port', 'ip_address',
     ];
 }

@@ -15,12 +15,12 @@ class CreatePermissionDataTable extends Migration
     {
         Schema::create('permission_data', function (Blueprint $table) {
             $table->uuid('id');
-            $table->uuid("permission_id");
+            $table->uuid('permission_id');
             $table
-                ->foreign("permission_id")
-                ->references("id")
-                ->on("permissions")
-                ->onDelete("cascade");
+                ->foreign('permission_id')
+                ->references('id')
+                ->on('permissions')
+                ->onDelete('cascade');
             $table->text('data');
             $table->timestamps();
         });

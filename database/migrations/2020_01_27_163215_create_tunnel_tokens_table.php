@@ -21,16 +21,16 @@ class CreateTunnelTokensTable extends Migration
             $table->string('local_port', 5);
             $table->uuid('user_id');
             $table
-                ->foreign("user_id")
-                ->references("id")
-                ->on("users")
-                ->onDelete("cascade");
+                ->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
             $table->uuid('extension_id');
             $table
-                ->foreign("extension_id")
-                ->references("id")
-                ->on("extensions")
-                ->onDelete("cascade");
+                ->foreign('extension_id')
+                ->references('id')
+                ->on('extensions')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }

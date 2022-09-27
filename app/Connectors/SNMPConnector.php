@@ -2,11 +2,8 @@
 
 namespace App\Connectors;
 
-use App\Models\UserSettings;
-
 /**
  * Class SNMPConnector
- * @package App\Classes
  */
 class SNMPConnector implements Connector
 {
@@ -14,27 +11,38 @@ class SNMPConnector implements Connector
      * @var mixed
      */
     protected $connection;
+
     protected $server;
+
     protected $ssh;
+
     protected $key;
+
     protected $user_id;
+
     protected $username;
+
     protected $securityLevel;
+
     protected $authProtocol;
+
     protected $authPassword;
+
     protected $privacyProtocol;
+
     protected $privacyPassword;
 
-    public static $verifyCommands = ["iso.3.6.1.2.1.1.1.0"];
+    public static $verifyCommands = ['iso.3.6.1.2.1.1.1.0'];
 
     /**
      * SNMPConnector constructor.
-     * @param \App\Models\Server $server
-     * @param null $user_id
+     *
+     * @param  \App\Models\Server  $server
+     * @param  null  $user_id
      */
     public function __construct(\App\Models\Server $server, $user_id)
     {
-        list($username, $password, $port) = self::retrieveCredentials();
+        [$username, $password, $port] = self::retrieveCredentials();
         $this->server = $server;
         $this->username = $username;
         $this->securityLevel = 'authPriv';
@@ -61,7 +69,7 @@ class SNMPConnector implements Connector
     /**
      * @param $script
      * @param $parameters
-     * @param null $extra
+     * @param  null  $extra
      * @return string
      */
     public function runScript($script, $parameters, $runAsRoot = false)
@@ -77,7 +85,7 @@ class SNMPConnector implements Connector
     }
 
     /**
-     * @param \App\Models\Server $server
+     * @param  \App\Models\Server  $server
      * @param $username
      * @param $password
      * @param $user_id
@@ -123,9 +131,10 @@ class SNMPConnector implements Connector
         }
 
         if (isset($flag)) {
-            return "ok";
+            return 'ok';
         }
-        return "nok";
+
+        return 'nok';
     }
 
     public static function retrieveCredentials()
@@ -133,16 +142,16 @@ class SNMPConnector implements Connector
         if (server()->key() == null) {
             abort(
                 504,
-                "Bu sunucu için SNMP anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz."
+                'Bu sunucu için SNMP anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.'
             );
         }
         $data = json_decode(server()->key()->data, true);
 
         return [
-            lDecrypt($data["clientUsername"]),
-            lDecrypt($data["clientPassword"]),
-            array_key_exists("key_port", $data)
-                ? intval($data["key_port"])
+            lDecrypt($data['clientUsername']),
+            lDecrypt($data['clientPassword']),
+            array_key_exists('key_port', $data)
+                ? intval($data['key_port'])
                 : 161,
         ];
     }

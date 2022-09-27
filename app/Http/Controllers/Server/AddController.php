@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers\Server;
 
+use App\Http\Controllers\Controller;
 use App\Models\AdminNotification;
 use App\Models\Certificate;
-use App\Models\ServerKey;
-use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Models\Permission;
 use App\Models\Server;
-use Illuminate\Support\Str;
-use App\Models\Notification;
-use App\Models\UserSettings;
+use App\Models\ServerKey;
 use mervick\aesEverywhere\AES256;
 
 class AddController extends Controller
@@ -22,79 +20,79 @@ class AddController extends Controller
 
     public function main()
     {
-        if (!Permission::can(user()->id, 'liman', 'id', 'add_server')) {
-            return respond("Bu işlemi yapmak için yetkiniz yok!", 201);
+        if (! Permission::can(user()->id, 'liman', 'id', 'add_server')) {
+            return respond('Bu işlemi yapmak için yetkiniz yok!', 201);
         }
 
         hook('server_add_attempt', [
-            "request" => request()->all(),
+            'request' => request()->all(),
         ]);
 
         // Check if name is already in use.
         if (
             Server::where([
                 'user_id' => auth()->id(),
-                "name" => request('name'),
+                'name' => request('name'),
             ])->exists()
         ) {
-            return respond("Bu sunucu ismiyle bir sunucu zaten var.", 201);
+            return respond('Bu sunucu ismiyle bir sunucu zaten var.', 201);
         }
 
         if (strlen(request('name')) > 24) {
-            return respond("Lütfen daha kısa bir sunucu adı girin.", 201);
+            return respond('Lütfen daha kısa bir sunucu adı girin.', 201);
         }
 
         // Create object with parameters.
         $this->server = new Server();
         $this->server->fill(request()->all());
         $this->server->user_id = auth()->id();
-        $this->server->shared_key = request()->shared == "true" ? 1 : 0;
+        $this->server->shared_key = request()->shared == 'true' ? 1 : 0;
         if (request('type') == null) {
-            $this->server->type = "none";
+            $this->server->type = 'none';
         }
         request('key_port')
             ? ($this->server->key_port = request('key_port'))
             : null;
         // Check if Server is online or not.
-        if (!$this->server->isAlive()) {
-            return respond("Sunucuyla bağlantı kurulamadı.", 406);
+        if (! $this->server->isAlive()) {
+            return respond('Sunucuyla bağlantı kurulamadı.', 406);
         }
 
         $this->server->save();
         Notification::new(
-            "Yeni sunucu eklendi.",
-            "notify",
+            'Yeni sunucu eklendi.',
+            'notify',
             json_encode([
-                "tr" =>__(":server (:ip) isimli yeni bir sunucu eklendi.", [
-                    "server" => $this->server->name,
-                    "ip" => $this->server->ip_address,
-                ], "tr"),
-                "en" => __(":server (:ip) isimli yeni bir sunucu eklendi.", [
-                    "server" => $this->server->name,
-                    "ip" => $this->server->ip_address,
-                ], "en")
+                'tr' => __(':server (:ip) isimli yeni bir sunucu eklendi.', [
+                    'server' => $this->server->name,
+                    'ip' => $this->server->ip_address,
+                ], 'tr'),
+                'en' => __(':server (:ip) isimli yeni bir sunucu eklendi.', [
+                    'server' => $this->server->name,
+                    'ip' => $this->server->ip_address,
+                ], 'en'),
             ])
         );
         // Add Server to request object to use it later.
-        request()->request->add(["server" => $this->server]);
+        request()->request->add(['server' => $this->server]);
 
         if (request('type')) {
-            $encKey = env('APP_KEY') . user()->id . server()->id;
+            $encKey = env('APP_KEY').user()->id.server()->id;
             $data = [
-                "clientUsername" => AES256::encrypt(
+                'clientUsername' => AES256::encrypt(
                     request('username'),
                     $encKey
                 ),
-                "clientPassword" => AES256::encrypt(
+                'clientPassword' => AES256::encrypt(
                     request('password'),
                     $encKey
                 ),
             ];
-            $data["key_port"] = request('key_port');
+            $data['key_port'] = request('key_port');
 
             ServerKey::updateOrCreate(
-                ["server_id" => server()->id, "user_id" => user()->id],
-                ["type" => request('type'), "data" => json_encode($data)]
+                ['server_id' => server()->id, 'user_id' => user()->id],
+                ['type' => request('type'), 'data' => json_encode($data)]
             );
         }
 
@@ -111,8 +109,8 @@ class AddController extends Controller
                 'server_hostname' => $this->server->ip_address,
                 'origin' => $this->server->control_port,
             ])->first();
-            if (!$cert) {
-                list($flag, $message) = retrieveCertificate(
+            if (! $cert) {
+                [$flag, $message] = retrieveCertificate(
                     request('ip_address'),
                     request('control_port')
                 );
@@ -120,46 +118,46 @@ class AddController extends Controller
                     $flag2 = addCertificate(
                         request('ip_address'),
                         request('control_port'),
-                        $message["path"]
+                        $message['path']
                     );
                     AdminNotification::create([
-                        "title" => json_encode([
-                            "tr" => __("Yeni Sertifika Eklendi", [], "tr"),
-                            "en" => __("Yeni Sertifika Eklendi", [], "en")
+                        'title' => json_encode([
+                            'tr' => __('Yeni Sertifika Eklendi', [], 'tr'),
+                            'en' => __('Yeni Sertifika Eklendi', [], 'en'),
                         ]),
-                        "type" => "new_cert",
-                        "message" => json_encode([
-                            "tr" => __("Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.", [], "tr"),
-                            "en" => __("Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.", [], "en")
+                        'type' => 'new_cert',
+                        'message' => json_encode([
+                            'tr' => __('Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.', [], 'tr'),
+                            'en' => __('Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.', [], 'en'),
                         ]),
-                        "level" => 3,
+                        'level' => 3,
                     ]);
                 }
-                if (!$flag || !$flag2) {
+                if (! $flag || ! $flag2) {
                     $this->server->enabled = false;
                     $this->server->save();
                     AdminNotification::create([
-                        "title" => json_encode([
-                            "tr" => __("Yeni Sertifika Onayı", [], "tr"),
-                            "en" => __("Yeni Sertifika Onayı", [], "en")
+                        'title' => json_encode([
+                            'tr' => __('Yeni Sertifika Onayı', [], 'tr'),
+                            'en' => __('Yeni Sertifika Onayı', [], 'en'),
                         ]),
-                        "type" => "cert_request",
-                        "message" =>
-                        $this->server->ip_address .
-                            ":" .
-                            $this->server->control_port .
-                            ":" .
+                        'type' => 'cert_request',
+                        'message' => $this->server->ip_address.
+                            ':'.
+                            $this->server->control_port.
+                            ':'.
                             $this->server->id,
-                        "level" => 3,
+                        'level' => 3,
                     ]);
+
                     return respond(
-                        __("Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede sunucuya erişemezsiniz."),
+                        __('Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede sunucuya erişemezsiniz.'),
                         202
                     );
                 }
             }
         }
-        hook("server_add_successful", ["server" => $this->server]);
+        hook('server_add_successful', ['server' => $this->server]);
 
         return respond(route('server_one', $this->server->id), 300);
     }

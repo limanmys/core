@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateJobsHistoryTable extends Migration
 {
@@ -17,22 +17,22 @@ class CreateJobsHistoryTable extends Migration
             $table->uuid('id')->primary();
             $table->uuid('user_id');
             $table
-                ->foreign("user_id")
-                ->references("id")
-                ->on("users")
-                ->onDelete("cascade");
-            $table->uuid("server_id")->nullable();
+                ->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+            $table->uuid('server_id')->nullable();
             $table
-                ->foreign("server_id")
-                ->references("id")
-                ->on("servers")
-                ->onDelete("cascade");
-            $table->uuid("extension_id")->nullable();
+                ->foreign('server_id')
+                ->references('id')
+                ->on('servers')
+                ->onDelete('cascade');
+            $table->uuid('extension_id')->nullable();
             $table
-                ->foreign("extension_id")
-                ->references("id")
-                ->on("extensions")
-                ->onDelete("cascade");
+                ->foreign('extension_id')
+                ->references('id')
+                ->on('extensions')
+                ->onDelete('cascade');
             $table->string('job', 40);
             $table->integer('job_id')->nullable();
             $table->integer('status')->default(0);

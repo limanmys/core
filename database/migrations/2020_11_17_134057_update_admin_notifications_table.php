@@ -14,7 +14,7 @@ class UpdateAdminNotificationsTable extends Migration
     public function up()
     {
         Schema::table('admin_notifications', function (Blueprint $table) {
-            $table->boolean("read")->default(false)->change();
+            $table->boolean('read')->default(false)->change();
         });
     }
 

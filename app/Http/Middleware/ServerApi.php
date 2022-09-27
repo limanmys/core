@@ -19,9 +19,8 @@ class ServerApi
             return $next($request);
         } else {
             return respond(
-                __(":server_name isimli sunucuya erişim sağlanamadı!", [
-                    "server_name" =>
-                        server()->name . "(" . server()->ip_address . ")",
+                __(':server_name isimli sunucuya erişim sağlanamadı!', [
+                    'server_name' => server()->name.'('.server()->ip_address.')',
                 ]),
                 201
             );

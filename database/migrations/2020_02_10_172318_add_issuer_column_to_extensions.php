@@ -14,7 +14,7 @@ class AddIssuerColumnToExtensions extends Migration
     public function up()
     {
         Schema::table('extensions', function (Blueprint $table) {
-            $table->string('issuer')->default("");
+            $table->string('issuer')->default('');
         });
     }
 

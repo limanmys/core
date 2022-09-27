@@ -13,7 +13,7 @@ class CreateLimansTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('limans')) {
+        if (! Schema::hasTable('limans')) {
             Schema::create('limans', function (Blueprint $table) {
                 $table->uuid('id');
                 $table->string('machine_id');
@@ -21,7 +21,6 @@ class CreateLimansTable extends Migration
                 $table->timestamps();
             });
         }
-        
     }
 
     /**

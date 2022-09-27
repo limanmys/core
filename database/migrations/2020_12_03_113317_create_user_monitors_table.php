@@ -13,16 +13,15 @@ class CreateUserMonitorsTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('user_monitors')) {
+        if (! Schema::hasTable('user_monitors')) {
             Schema::create('user_monitors', function (Blueprint $table) {
                 $table->uuid('id')->primary();
                 $table->string('name');
                 $table->uuid('server_monitor_id');
-                $table->string("user_id");
+                $table->string('user_id');
                 $table->timestamps();
             });
         }
-        
     }
 
     /**

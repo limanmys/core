@@ -13,8 +13,7 @@ class AlterTablePermissionsAddIndexField extends Migration
      */
     public function up()
     {
-        Schema::table('permissions', function(Blueprint $table)
-        {
+        Schema::table('permissions', function (Blueprint $table) {
             $table->index('morph_id');
         });
     }
@@ -26,8 +25,7 @@ class AlterTablePermissionsAddIndexField extends Migration
      */
     public function down()
     {
-        Schema::table('permissions', function(Blueprint $table)
-        {
+        Schema::table('permissions', function (Blueprint $table) {
             $table->dropIndex('morph_id');
         });
     }

@@ -2,17 +2,8 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use App\Models\Extension;
-use App\Models\Permission;
-use App\Models\Server;
-use App\Models\Token;
-use App\Models\Widget;
-use Illuminate\Http\Request;
-use App\Models\UserSettings;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use App\Http\Controllers\Extension\Sandbox\MainController;
+use App\Models\Widget;
 
 class OneController extends Controller
 {
@@ -20,19 +11,21 @@ class OneController extends Controller
     {
         $widget = Widget::find(\request('widget_id'));
         $widget->delete();
-        return respond(__("Başarıyla silindi"));
+
+        return respond(__('Başarıyla silindi'));
     }
 
     public function update()
     {
         $widget = Widget::find(\request('widget_id'));
         $widget->update([
-            "server_id" => \request('server_id'),
-            "extension_id" => \request('extension_id'),
-            "title" => \request('title'),
-            "function_name" => \request('function_name'),
+            'server_id' => \request('server_id'),
+            'extension_id' => \request('extension_id'),
+            'title' => \request('title'),
+            'function_name' => \request('function_name'),
         ]);
-        return respond(__("Başarıyla güncellendi."));
+
+        return respond(__('Başarıyla güncellendi.'));
     }
 
     public function extensions()
@@ -41,6 +34,7 @@ class OneController extends Controller
         foreach (server()->extensions() as $extension) {
             $extensions[$extension->id] = $extension->display_name;
         }
+
         return $extensions;
     }
 
@@ -48,13 +42,14 @@ class OneController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                "/liman/extensions/" .
-                    strtolower(extension()->name) .
-                    DIRECTORY_SEPARATOR .
-                    "db.json"
+                '/liman/extensions/'.
+                    strtolower(extension()->name).
+                    DIRECTORY_SEPARATOR.
+                    'db.json'
             ),
             true
         );
-        return $extension["widgets"];
+
+        return $extension['widgets'];
     }
 }

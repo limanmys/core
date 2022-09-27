@@ -1,49 +1,50 @@
 <?php
 
-Route::middleware(["admin"])->group(function () {
+Route::middleware(['admin'])->group(function () {
     Route::post(
         '/market/kontrol',
         'Market\\MarketController@verifyMarketConnection'
     )
         ->name('verify_market');
-    
+
     Route::post(
         '/market/guncellemeKontrol',
         'Market\\MarketController@checkMarketUpdates'
     )
         ->name('check_updates_market');
-    
+
     // Public
-    
+
     Route::get(
         '/market',
         'Market\\PublicController@getApplications'
     )
-        ->name("market");
+        ->name('market');
 
     Route::post(
         '/market/homepage_widget',
         'Market\\PublicController@getHomepageApps'
     )
-        ->name("market_widget");
+        ->name('market_widget');
 
     Route::get(
         '/market/kategori/{category_id}',
         'Market\\PublicController@getCategoryItems'
     )
-        ->name("market_kategori");
+        ->name('market_kategori');
 
     Route::get(
         '/market/arama',
-        function(Illuminate\Http\Request $request) {
-            if (!$request["search_query"]) {
+        function (Illuminate\Http\Request $request) {
+            if (! $request['search_query']) {
                 return redirect()->route('market');
             }
-            return redirect()->route('market_search_real', ["search_query" => $request["search_query"]]);    
+
+            return redirect()->route('market_search_real', ['search_query' => $request['search_query']]);
         }
     )
         ->name('market_search');
-    
+
     Route::get(
         '/market/arama/{search_query}',
         'Market\\PublicController@search'
@@ -60,5 +61,5 @@ Route::middleware(["admin"])->group(function () {
         '/market/testfield',
         'Market\\PublicController@test'
     )
-        ->name("test");
+        ->name('test');
 });
