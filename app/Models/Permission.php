@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Support\Database\CacheQueryBuilder;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
-    use UsesUuid;
+    use UsesUuid, CacheQueryBuilder;
 
     protected $table = 'permissions';
 

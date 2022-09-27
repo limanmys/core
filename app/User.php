@@ -6,6 +6,7 @@ use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\UsesUuid;
+use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,7 +23,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class User extends Authenticatable
 {
-    use UsesUuid, Notifiable;
+    use UsesUuid, Notifiable, CacheQueryBuilder;
 
     /**
      * The attributes that are mass assignable.

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Extension extends Model
 {
-    use UsesUuid;
+    use UsesUuid, CacheQueryBuilder;
 
     /**
      * @var array

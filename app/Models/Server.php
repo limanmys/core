@@ -4,13 +4,14 @@ namespace App\Models;
 
 use App\Connectors\GenericConnector;
 use App\Connectors\SNMPConnector;
+use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 
 class Server extends Model
 {
-    use UsesUuid;
+    use UsesUuid, CacheQueryBuilder;
 
     /**
      * @var array

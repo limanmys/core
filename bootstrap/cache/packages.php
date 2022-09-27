@@ -1,4 +1,15 @@
 <?php return array (
+  'barryvdh/laravel-debugbar' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Barryvdh\\Debugbar\\ServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Debugbar' => 'Barryvdh\\Debugbar\\Facades\\Debugbar',
+    ),
+  ),
   'beyondcode/laravel-websockets' => 
   array (
     'providers' => 
@@ -101,6 +112,13 @@
     'aliases' => 
     array (
       'Flare' => 'Spatie\\LaravelIgnition\\Facades\\Flare',
+    ),
+  ),
+  'spatie/laravel-web-tinker' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Spatie\\WebTinker\\WebTinkerServiceProvider',
     ),
   ),
 );
