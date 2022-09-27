@@ -17,7 +17,6 @@
     var module = { };
 </script>
 <script src="{{mix('/js/liman.js')}}"></script>
-<!-- Admin Password Recovery : https://www.youtube.com/watch?v=dQw4w9WgXcQ -->
 @if(auth()->check())
 <script>
     toastr.options.closeButton = true;
@@ -123,7 +122,6 @@
         $(".nav.nav-tabs a").on('click',function () {
             window.location.hash = $(this).attr("href");
         });
-        initialPresets();
         navigateButtons();
         activeTab();
         var title = $(".breadcrumb-item.active").text();
@@ -133,6 +131,7 @@
         @if(auth()->check())
             checkNotifications();
         @endif
+        initialPresets();
     };
 
     function publicPath(path, extension_id=null){
