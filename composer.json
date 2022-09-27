@@ -13,6 +13,7 @@
         "ext-xml": "*",
         "ext-zip": "*",
         "ankitpokhrel/tus-php": "^2.3",
+        "beebmx/blade": "^1.5",
         "beyondcode/laravel-websockets": "^1.13",
         "composer/semver": "^3.3",
         "doctrine/dbal": "^3.4",
@@ -29,13 +30,15 @@
         "pusher/pusher-php-server": "^7.0"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.7",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.1",
         "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0"
+        "spatie/laravel-ignition": "^1.0",
+        "spatie/laravel-web-tinker": "^1.8"
     },
     "autoload": {
         "files": [
