@@ -156,7 +156,11 @@ Route::any('/upload/{any?}', function () {
     }
     if (! file_exists($path.'/uploads')) {
         mkdir($path.'/uploads');
-        rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
+        if ($extension) {
+            rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
+        } else {
+            rootSystem()->fixExtensionPermissions("liman", "liman");
+        }
     }
     $server->setUploadDir($path.'/uploads');
     $response = $server->serve();
