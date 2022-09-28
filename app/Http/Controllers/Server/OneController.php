@@ -961,19 +961,23 @@ class OneController extends Controller
             $row = json_decode($row);
             $row->ts = Carbon::parse($row->ts)->isoFormat('LLL');
 
-            if (! array_key_exists($row->request_details->extension_id, $knownExtensions)) {
-                $extension = Extension::find($row->request_details->extension_id);
-                if ($extension) {
-                    $knownExtensions[$row->request_details->extension_id] =
-                        $extension->display_name;
-                } else {
-                    $knownExtensions[$row->request_details->extension_id] =
-                        $row->request_details->extension_id;
+            if (isset($row->request_details->extension_id)) {
+                if (! isset($knownExtensions[$row->request_details->extension_id])) {
+                    $extension = Extension::find($row->request_details->extension_id);
+                    if ($extension) {
+                        $knownExtensions[$row->request_details->extension_id] =
+                            $extension->display_name;
+                    } else {
+                        $knownExtensions[$row->request_details->extension_id] =
+                            $row->request_details->extension_id;
+                    }
                 }
+                $row->extension_id = $knownExtensions[$row->request_details->extension_id];
+            } else {
+                $row->extension_id = __('Komut');
             }
-            $row->extension_id = $knownExtensions[$row->request_details->extension_id];
 
-            if (! array_key_exists($row->user_id, $knownUsers)) {
+            if (! isset($knownUsers[$row->user_id])) {
                 $user = User::find($row->user_id);
                 if ($user) {
                     $knownUsers[$row->user_id] = $user->name;
@@ -983,14 +987,17 @@ class OneController extends Controller
             }
             $row->user_id = $knownUsers[$row->user_id];
 
-            $row->view = $row->request_details->lmntargetFunction;
+            if (isset($row->request_details->lmntargetFunction)) {
+                $row->view = $row->request_details->lmntargetFunction;
 
-            if (isset($row->request_details->lmntargetFunction) && $row->request_details->lmntargetFunction == '') {
-                if ($row->lmn_level == 'high_level' && isset($row->request_details->title)) {
-                    $row->view = base64_decode((string) $row->request_details->title);
+                if (isset($row->request_details->lmntargetFunction) && $row->request_details->lmntargetFunction == '') {
+                    if ($row->lmn_level == 'high_level' && isset($row->request_details->title)) {
+                        $row->view = base64_decode($row->request_details->title);
+                    }
                 }
+            } else {
+                $row->view = __('Komut');
             }
-
             $row->request_details = null;
 
             array_push($clean, $row);
