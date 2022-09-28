@@ -86,20 +86,6 @@ class Server extends Model
     }
 
     /**
-     * @param $script
-     * @param $parameters
-     * @param  false  $runAsRoot
-     * @return string
-     */
-    public function runScript($script, $parameters, $runAsRoot = false)
-    {
-        // Create Connector Object
-        $connector = $this->connector();
-
-        return $connector->runScript($script, $parameters, $runAsRoot);
-    }
-
-    /**
      * @param $service_name
      * @return bool
      */

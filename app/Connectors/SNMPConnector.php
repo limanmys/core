@@ -66,16 +66,6 @@ class SNMPConnector implements Connector
         );
     }
 
-    /**
-     * @param $script
-     * @param $parameters
-     * @param  null  $extra
-     * @return string
-     */
-    public function runScript($script, $parameters, $runAsRoot = false)
-    {
-    }
-
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
     }

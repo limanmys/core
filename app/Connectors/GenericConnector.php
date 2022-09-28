@@ -30,8 +30,8 @@ class GenericConnector
     {
         return trim(
             self::request('putFile', [
-                'localPath' => $localPath,
-                'remotePath' => $remotePath,
+                'local_path' => $localPath,
+                'remote_path' => $remotePath,
             ])
         );
     }
@@ -40,36 +40,10 @@ class GenericConnector
     {
         return trim(
             self::request('getFile', [
-                'localPath' => $localPath,
-                'remotePath' => $remotePath,
+                'local_path' => $localPath,
+                'remote_path' => $remotePath,
             ])
         );
-    }
-
-    public function runScript($script, $parameters, $runAsRoot = false)
-    {
-        return trim(
-            self::request('getFile', [
-                'script' => $script,
-                'parameters' => $parameters,
-                'runAsRoot' => $runAsRoot,
-            ])
-        );
-        $remotePath = '/tmp/'.Str::random();
-
-        $this->sendFile($script, $remotePath);
-        $output = $this->execute("[ -f '$remotePath' ] && echo 1 || echo 0");
-        if ($output != '1') {
-            abort(504, 'Betik gönderilemedi');
-        }
-        $this->execute('chmod +x '.$remotePath);
-
-        // Run Part Of The Script
-        $query = $runAsRoot ? sudo() : '';
-        $query = $query.$remotePath.' '.$parameters.' 2>&1';
-        $output = $this->execute($query);
-
-        return $output;
     }
 
     public function verify($ip_address, $username, $password, $port, $type)
