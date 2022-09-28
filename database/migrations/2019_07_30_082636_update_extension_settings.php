@@ -38,7 +38,7 @@ class UpdateExtensionSettings extends Migration
             }
             // If not, encrypt and update table value.
             $encrypted = openssl_encrypt(
-                Str::random(16).base64_encode($setting->value),
+                Str::random(16).base64_encode((string) $setting->value),
                 'aes-256-cfb8',
                 $key,
                 0,

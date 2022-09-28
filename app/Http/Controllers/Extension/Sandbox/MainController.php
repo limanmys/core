@@ -140,14 +140,14 @@ class MainController extends Controller
         }
     }
 
-    private function checkPermissions()
+    private function checkPermissions(): bool
     {
         if (
             ! Permission::can(
                 auth()->id(),
                 'function',
                 'name',
-                strtolower(extension()->name),
+                strtolower((string) extension()->name),
                 request('function_name')
             )
         ) {
@@ -159,7 +159,7 @@ class MainController extends Controller
             $extensionJson = json_decode(
                 file_get_contents(
                     '/liman/extensions/'.
-                        strtolower(extension()->name).
+                        strtolower((string) extension()->name).
                         DIRECTORY_SEPARATOR.
                         'db.json'
                 ),
@@ -185,7 +185,7 @@ class MainController extends Controller
                     user()->id,
                     'function',
                     'name',
-                    strtolower(extension()->name),
+                    strtolower((string) extension()->name),
                     $function
                 )
             ) {
@@ -203,7 +203,7 @@ class MainController extends Controller
             ->get();
         $cleanServers = [];
         foreach ($navServers as $rawServers) {
-            $servers = explode(',', $rawServers->servers);
+            $servers = explode(',', (string) $rawServers->servers);
             foreach ($servers as $server) {
                 if (Permission::can(user()->id, 'server', 'id', $server)) {
                     array_push($cleanServers, $server);

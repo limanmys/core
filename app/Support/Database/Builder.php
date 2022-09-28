@@ -24,7 +24,7 @@ class Builder extends QueryBuilder
      *
      * @return string
      */
-    protected function getCacheKey()
+    protected function getCacheKey(): string|bool
     {
         return json_encode([
             $this->toSql() => $this->getBindings(),

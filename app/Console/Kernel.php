@@ -27,7 +27,6 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
@@ -87,7 +86,7 @@ class Kernel extends ConsoleKernel
                     $response = $client->post(
                         env('MARKET_URL').'/api/users/me'
                     );
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     return;
                 }
                 $array = $controller->checkMarketUpdates(true);

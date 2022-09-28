@@ -18,14 +18,6 @@ class CronEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param $to
-     * @param $mail
-     */
-    protected $obj;
-
     protected $users;
 
     protected $server;
@@ -36,14 +28,13 @@ class CronEmailJob implements ShouldQueue
 
     protected $target;
 
-    public function __construct(CronMail $mailObj)
+    public function __construct(protected CronMail $obj)
     {
-        $this->obj = $mailObj;
-        $this->users = User::find(json_decode($mailObj->user_id));
-        $this->server = Server::find($mailObj->server_id);
-        $this->extension = Extension::find($mailObj->extension_id);
-        $this->to = json_decode($this->obj->to);
-        $this->target = json_decode($this->obj->target);
+        $this->users = User::find(json_decode((string) $obj->user_id));
+        $this->server = Server::find($obj->server_id);
+        $this->extension = Extension::find($obj->extension_id);
+        $this->to = json_decode((string) $this->obj->to);
+        $this->target = json_decode((string) $this->obj->target);
     }
 
     /**
@@ -92,12 +83,12 @@ class CronEmailJob implements ShouldQueue
 
                 $data = [];
                 if (! empty($output)) {
-                    foreach (explode("\n", trim($output)) as $row) {
+                    foreach (explode("\n", trim((string) $output)) as $row) {
                         $fetch = explode('liman_render:', $row);
                         if (isset($fetch[1])) {
                             $message = json_decode(trim($fetch[1]));
                             if ($message && isset($message->data)) {
-                                $decoded = json_decode($message->data);
+                                $decoded = json_decode((string) $message->data);
                                 $decoded && $data[] = $decoded;
                             }
                         }
@@ -124,18 +115,18 @@ class CronEmailJob implements ShouldQueue
                         'server' => $this->server,
                         'extension' => $this->extension,
                         'target' => $this->getTagText($target, $this->extension->name),
-                        'from' => trim(env('APP_NOTIFICATION_EMAIL')),
+                        'from' => trim((string) env('APP_NOTIFICATION_EMAIL')),
                         'to' => $to,
                     ])->render();
                     $file = '/tmp/'.str_random(16);
                     file_put_contents($file, $view);
                     $output = Command::runLiman('curl -s -v --connect-timeout 15 "smtp://{:mail_host}:{:mail_port}" -u "{:mail_username}:{:mail_password}" --mail-from "{:mail_from}" --mail-rcpt "{:mail_receipt}" -T {:file} 2>&1', [
-                        'mail_host' => trim(env('MAIL_HOST')),
-                        'mail_port' => trim(env('MAIL_PORT')),
-                        'mail_username' => trim(env('MAIL_USERNAME')),
-                        'mail_password' => trim(env('MAIL_PASSWORD')),
-                        'mail_from' => trim(env('APP_NOTIFICATION_EMAIL')),
-                        'mail_receipt' => trim($to),
+                        'mail_host' => trim((string) env('MAIL_HOST')),
+                        'mail_port' => trim((string) env('MAIL_PORT')),
+                        'mail_username' => trim((string) env('MAIL_USERNAME')),
+                        'mail_password' => trim((string) env('MAIL_PASSWORD')),
+                        'mail_from' => trim((string) env('APP_NOTIFICATION_EMAIL')),
+                        'mail_receipt' => trim((string) $to),
                         'file' => $file,
                     ]);
                     if (env('MAIL_DEBUG')) {
@@ -157,7 +148,7 @@ class CronEmailJob implements ShouldQueue
     private function getTagText($key, $extension_name)
     {
         if (! array_key_exists($extension_name, $this->tagTexts)) {
-            $file = file_get_contents('/liman/extensions/'.strtolower($extension_name).'/db.json');
+            $file = file_get_contents('/liman/extensions/'.strtolower((string) $extension_name).'/db.json');
             $json = json_decode($file, true);
             if (json_last_error() != JSON_ERROR_NONE) {
                 return $key;

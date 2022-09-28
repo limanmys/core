@@ -150,7 +150,7 @@ Route::any('/upload/{any?}', function () {
     $extension_id = request('extension_id');
     $extension = \App\Models\Extension::find($extension_id);
     if ($extension) {
-        $path = '/liman/extensions/'.strtolower($extension->name);
+        $path = '/liman/extensions/'.strtolower((string) $extension->name);
     } else {
         $path = storage_path();
     }
@@ -159,7 +159,7 @@ Route::any('/upload/{any?}', function () {
         if ($extension) {
             rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
         } else {
-            rootSystem()->fixExtensionPermissions("liman", "liman");
+            rootSystem()->fixExtensionPermissions('liman', 'liman');
         }
     }
     $server->setUploadDir($path.'/uploads');
@@ -180,11 +180,11 @@ Route::post('/upload_info', function () {
     $extension_id = request('extension_id');
     $extension = \App\Models\Extension::find($extension_id);
     if ($extension_id) {
-        $extension_path = explode('/uploads/', $info['file_path'], 2)[0];
+        $extension_path = explode('/uploads/', (string) $info['file_path'], 2)[0];
         $info['file_path'] = str_replace(
             $extension_path,
             '',
-            $info['file_path']
+            (string) $info['file_path']
         );
         rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
     }

@@ -16,7 +16,7 @@ class AddMissingKeyPortServerKeys extends Migration
 
         foreach ($keys as $key) {
             $temp = $key->data;
-            $arr = json_decode($temp, true);
+            $arr = json_decode((string) $temp, true);
 
             if (! array_key_exists('key_port', $arr)) {
                 $type = $key->type;

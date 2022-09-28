@@ -96,8 +96,8 @@ class MainController extends Controller
         }
 
         foreach (request()->all() as $key => $value) {
-            if (substr($key, 0, 4) == 'mod-') {
-                $data['variables'][substr($key, 4)] = $value;
+            if (substr((string) $key, 0, 4) == 'mod-') {
+                $data['variables'][substr((string) $key, 4)] = $value;
             }
         }
 

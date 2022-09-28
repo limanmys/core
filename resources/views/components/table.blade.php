@@ -42,7 +42,7 @@
                 @foreach($display as $item)
                     @if(count(explode(':',$item)) > 1)
                         <?php
-                            $fetch =  explode(':',$item);
+                            $fetch =  explode(':',(string) $item);
                             $id = $fetch[1];
                             $display_name = $fetch[0];
                         ?>

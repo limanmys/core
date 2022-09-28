@@ -15,7 +15,7 @@ class MainController extends Controller
 {
     public function getMailTags()
     {
-        $path = '/liman/extensions/'.strtolower(extension()->name).'/db.json';
+        $path = '/liman/extensions/'.strtolower((string) extension()->name).'/db.json';
         if (! is_file($path)) {
             return respond('Bu eklentinin bir veritabanı yok!', 201);
         }
@@ -82,7 +82,7 @@ class MainController extends Controller
     private function getTagText($key, $extension_name)
     {
         if (! array_key_exists($extension_name, $this->tagTexts)) {
-            $file = file_get_contents('/liman/extensions/'.strtolower($extension_name).'/db.json');
+            $file = file_get_contents('/liman/extensions/'.strtolower((string) $extension_name).'/db.json');
             $json = json_decode($file, true);
             if (json_last_error() != JSON_ERROR_NONE) {
                 return $key;
@@ -108,7 +108,7 @@ class MainController extends Controller
             $ext = Extension::find($obj->extension_id);
             if ($ext) {
                 $obj->extension_name = $ext->display_name;
-                $target_list = json_decode($obj->target);
+                $target_list = json_decode((string) $obj->target);
                 foreach ($target_list as &$target) {
                     $target = $this->getTagText($target, $ext->name);
                 }
@@ -125,12 +125,12 @@ class MainController extends Controller
                 $obj->server_name = 'Bu sunucu silinmiş!';
             }
 
-            $user_ids = json_decode($obj->user_id);
+            $user_ids = json_decode((string) $obj->user_id);
             $users = [];
             foreach ($user_ids as $usr) {
                 try {
                     $user = User::find($usr);
-                } catch (\Throwable $e) {
+                } catch (\Throwable) {
                     continue;
                 }
                 $users[] = $user->name;
@@ -138,7 +138,7 @@ class MainController extends Controller
 
             $obj->username = implode(', ', $users);
 
-            $obj->to = implode(', ', json_decode($obj->to));
+            $obj->to = implode(', ', json_decode((string) $obj->to));
 
             return $obj;
         });
@@ -179,11 +179,11 @@ class MainController extends Controller
 
         $cron_mail = CronMail::findOrFail($id);
 
-        $users = json_decode($cron_mail->user_id);
+        $users = json_decode((string) $cron_mail->user_id);
         $users = User::find($users);
 
-        $to = json_decode($cron_mail->to);
-        $target = json_decode($cron_mail->target);
+        $to = json_decode((string) $cron_mail->to);
+        $target = json_decode((string) $cron_mail->target);
 
         return view('settings.edit_mail', compact(['cron_mail', 'users', 'to', 'target']));
     }

@@ -100,7 +100,7 @@ class PHPSandbox implements Sandbox
             $extensionJson = json_decode(
                 file_get_contents(
                     '/liman/extensions/'.
-                        strtolower($this->extension->name).
+                        strtolower((string) $this->extension->name).
                         DIRECTORY_SEPARATOR.
                         'db.json'
                 ),
@@ -114,7 +114,7 @@ class PHPSandbox implements Sandbox
                             $this->user->id,
                             'function',
                             'name',
-                            strtolower($this->extension->name),
+                            strtolower((string) $this->extension->name),
                             $item['name']
                         ) ||
                         $item['isActive'] != 'true'
@@ -136,7 +136,7 @@ class PHPSandbox implements Sandbox
 
         $functionsPath =
             '/liman/extensions/'.
-            strtolower($this->extension->name).
+            strtolower((string) $this->extension->name).
             '/views/functions.php';
 
         $publicPath = route('extension_public_folder', [
@@ -180,7 +180,7 @@ class PHPSandbox implements Sandbox
 
         $soPath =
             '/liman/extensions/'.
-            strtolower($this->extension->name).
+            strtolower((string) $this->extension->name).
             '/liman.so';
 
         $extra = is_file($soPath) ? "-dextension=$soPath " : '';

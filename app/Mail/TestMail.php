@@ -10,19 +10,13 @@ class TestMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $subject;
-
-    public $content;
-
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($subject, $content)
+    public function __construct(public $subject, public $content)
     {
-        $this->subject = $subject;
-        $this->content = $content;
     }
 
     /**

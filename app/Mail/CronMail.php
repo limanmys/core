@@ -22,25 +22,16 @@ class CronMail extends Mailable
 
     protected $user;
 
-    protected $result;
-
     protected $server;
 
     protected $extension;
 
-    protected $before;
-
-    protected $now;
-
-    public function __construct($obj, $result, $before, $now)
+    public function __construct($obj, protected $result, protected $before, protected $now)
     {
         $this->user = User::find($obj->user_id);
         $this->server = Server::find($obj->server_id);
         $this->extension = Extension::find($obj->extension_id);
         $this->obj = $obj;
-        $this->result = $result;
-        $this->before = $before;
-        $this->now = $now;
     }
 
     /**

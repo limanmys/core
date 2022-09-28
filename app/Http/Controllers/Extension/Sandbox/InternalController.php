@@ -26,8 +26,8 @@ class InternalController extends Controller
         Mail::to(request('to'))->send(
             new ExtensionMail(
                 request('subject'),
-                base64_decode(request('content')),
-                json_decode(request('attachments'), true),
+                base64_decode((string) request('content')),
+                json_decode((string) request('attachments'), true),
             )
         );
     }
@@ -61,7 +61,7 @@ class InternalController extends Controller
         $hostname = request('hostname');
         $port = request('port');
         $token = Str::uuid();
-        $token = str_replace('-', '', $token);
+        $token = str_replace('-', '', (string) $token);
         fwrite($writer, $token.": $hostname:$port"."\n");
 
         return $token;

@@ -12,8 +12,6 @@ class SNMPConnector implements Connector
      */
     protected $connection;
 
-    protected $server;
-
     protected $ssh;
 
     protected $key;
@@ -22,13 +20,13 @@ class SNMPConnector implements Connector
 
     protected $username;
 
-    protected $securityLevel;
+    protected $securityLevel = 'authPriv';
 
-    protected $authProtocol;
+    protected $authProtocol = 'SHA';
 
     protected $authPassword;
 
-    protected $privacyProtocol;
+    protected $privacyProtocol = 'AES';
 
     protected $privacyPassword;
 
@@ -40,19 +38,15 @@ class SNMPConnector implements Connector
      * @param  \App\Models\Server  $server
      * @param  null  $user_id
      */
-    public function __construct(\App\Models\Server $server, $user_id)
+    public function __construct(protected \App\Models\Server $server, $user_id)
     {
         [$username, $password, $port] = self::retrieveCredentials();
-        $this->server = $server;
         $this->username = $username;
-        $this->securityLevel = 'authPriv';
-        $this->authProtocol = 'SHA';
         $this->authPassword = $password;
-        $this->privacyProtocol = 'AES';
         $this->privacyPassword = $password;
     }
 
-    public function execute($command, $flag = true)
+    public function execute($command, $flag = true): string|bool
     {
         return snmp3_get(
             $this->server->ip_address,
@@ -75,7 +69,6 @@ class SNMPConnector implements Connector
     }
 
     /**
-     * @param  \App\Models\Server  $server
      * @param $username
      * @param $password
      * @param $user_id
@@ -96,7 +89,7 @@ class SNMPConnector implements Connector
     {
     }
 
-    public static function createSnmp()
+    public static function createSnmp(): bool
     {
         return true;
     }
@@ -135,7 +128,7 @@ class SNMPConnector implements Connector
                 'Bu sunucu için SNMP anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.'
             );
         }
-        $data = json_decode(server()->key()->data, true);
+        $data = json_decode((string) server()->key()->data, true);
 
         return [
             lDecrypt($data['clientUsername']),

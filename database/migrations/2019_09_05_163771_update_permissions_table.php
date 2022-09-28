@@ -62,15 +62,15 @@ class UpdatePermissionsTable extends Migration
                 $permission->type = 'function';
                 $permission->key = 'name';
                 // For old type, split the function name.
-                strpos($permission->function, '_');
+                strpos((string) $permission->function, '_');
                 $permission->extra = substr(
-                    $permission->function,
-                    strpos($permission->function, '_') + 1
+                    (string) $permission->function,
+                    strpos((string) $permission->function, '_') + 1
                 );
                 $permission->value = substr(
-                    $permission->function,
+                    (string) $permission->function,
                     0,
-                    strpos($permission->function, '_')
+                    strpos((string) $permission->function, '_')
                 );
             }
 

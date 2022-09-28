@@ -38,7 +38,7 @@ class AddController extends Controller
             return respond('Bu sunucu ismiyle bir sunucu zaten var.', 201);
         }
 
-        if (strlen(request('name')) > 24) {
+        if (strlen((string) request('name')) > 24) {
             return respond('Lütfen daha kısa bir sunucu adı girin.', 201);
         }
 

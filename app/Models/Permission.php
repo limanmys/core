@@ -61,7 +61,7 @@ class Permission extends Model
                 'extra' => $extra,
                 'blame' => user()->id,
             ]);
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return false;
         }
     }
@@ -102,26 +102,14 @@ class Permission extends Model
                 break;
             case 'liman':
                 $permType = __('Liman');
-                switch ($this->value) {
-                    case 'view_logs':
-                        $permValue = __('Sunucu Günlük Kayıtlarını Görüntüleme');
-                        break;
-                    case 'add_server':
-                        $permValue = __('Sunucu Ekleme');
-                        break;
-                    case 'server_services':
-                        $permValue = __('Sunucu Servislerini Görüntüleme');
-                        break;
-                    case 'server_details':
-                        $permValue = __('Sunucu Detaylarını Görüntüleme');
-                        break;
-                    case 'update_server':
-                        $permValue = __('Sunucu Detaylarını Güncelleme');
-                        break;
-                    default:
-                        $permValue = '-';
-                        break;
-                }
+                $permValue = match ($this->value) {
+                    'view_logs' => __('Sunucu Günlük Kayıtlarını Görüntüleme'),
+                    'add_server' => __('Sunucu Ekleme'),
+                    'server_services' => __('Sunucu Servislerini Görüntüleme'),
+                    'server_details' => __('Sunucu Detaylarını Görüntüleme'),
+                    'update_server' => __('Sunucu Detaylarını Güncelleme'),
+                    default => '-',
+                };
                 break;
             case 'function':
                 $permType = __('Fonksiyon');

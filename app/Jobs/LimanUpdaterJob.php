@@ -14,8 +14,6 @@ class LimanUpdaterJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $downloadUrl;
-
     protected $downloadTo;
 
     /**
@@ -23,9 +21,8 @@ class LimanUpdaterJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($version, $downloadUrl)
+    public function __construct($version, protected $downloadUrl)
     {
-        $this->downloadUrl = $downloadUrl;
         $this->downloadTo = "/liman/packages/liman-$version.deb";
     }
 

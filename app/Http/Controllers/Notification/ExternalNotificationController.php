@@ -137,7 +137,7 @@ class ExternalNotificationController extends Controller
                 ], 406);
             }
 
-            $data = json_decode($request->get('message'));
+            $data = json_decode((string) $request->get('message'));
 
             if (isset($data->notifyUser)) {
                 $user = User::where('email', $data->notifyUser)->firstOrFail();

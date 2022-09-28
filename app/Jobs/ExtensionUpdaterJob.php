@@ -19,14 +19,6 @@ class ExtensionUpdaterJob implements ShouldQueue
 
     private $extension;
 
-    private $download;
-
-    private $version_code;
-
-    private $forceUpdate;
-
-    private $hash;
-
     private $retry = 3;
 
     private $signed = false;
@@ -38,16 +30,12 @@ class ExtensionUpdaterJob implements ShouldQueue
      */
     public function __construct(
         $extension_id,
-        $version_code,
-        $download,
-        $hash,
-        $forceUpdate = false
+        private $version_code,
+        private $download,
+        private $hash,
+        private $forceUpdate = false
     ) {
         $this->extension = Extension::find($extension_id);
-        $this->version_code = $version_code;
-        $this->download = $download;
-        $this->forceUpdate = $forceUpdate;
-        $this->hash = $hash;
     }
 
     /**
@@ -110,11 +98,11 @@ class ExtensionUpdaterJob implements ShouldQueue
             $headers = array_change_key_case($headers, CASE_LOWER);
 
             $str = $headers['content-disposition'][0];
-            $arr = explode(';', $str);
+            $arr = explode(';', (string) $str);
             if (substr($arr[1], -7) == '.signed') {
                 $this->signed = true;
             }
-        } catch(\Exception $e) {
+        } catch(\Exception) {
             return false;
         }
 

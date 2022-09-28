@@ -27,7 +27,7 @@ class MainController extends Controller
         // Check If Certificate Already Added or not.
         if (
             Certificate::where([
-                'server_hostname' => strtolower(request('server_hostname')),
+                'server_hostname' => strtolower((string) request('server_hostname')),
                 'origin' => request('origin'),
             ])->exists()
         ) {
@@ -38,7 +38,7 @@ class MainController extends Controller
         }
 
         [$flag, $message] = retrieveCertificate(
-            strtolower(request('server_hostname')),
+            strtolower((string) request('server_hostname')),
             request('origin')
         );
 
@@ -51,7 +51,7 @@ class MainController extends Controller
 
         // Create Certificate Object.
         $certificate = Certificate::create([
-            'server_hostname' => strtolower(request('server_hostname')),
+            'server_hostname' => strtolower((string) request('server_hostname')),
             'origin' => request('origin'),
         ]);
 
@@ -109,7 +109,7 @@ class MainController extends Controller
             'authorityKeyIdentifier',
             $certinfo['extensions']
         )
-            ? substr($certinfo['extensions']['authorityKeyIdentifier'], 6)
+            ? substr((string) $certinfo['extensions']['authorityKeyIdentifier'], 6)
             : '';
         $certinfo['validFrom_time_t'] = Carbon::createFromTimestamp(
             $certinfo['validFrom_time_t']

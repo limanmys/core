@@ -19,7 +19,7 @@ class WizardController extends Controller
                 setEnv(['WIZARD_STEP' => $request->step]);
 
                 return $this->$method($request);
-            } catch (BadMethodCallException $e) {
+            } catch (BadMethodCallException) {
                 return respond('Fonksiyon bulunamadı!', 404);
             }
         } else {
@@ -33,7 +33,7 @@ class WizardController extends Controller
             $method = 'setStep'.$request->step;
             try {
                 return $this->$method($request);
-            } catch (BadMethodCallException $e) {
+            } catch (BadMethodCallException) {
                 return respond('Fonksiyon bulunamadı!', 404);
             }
         } else {
@@ -113,7 +113,7 @@ class WizardController extends Controller
             ]);
 
             return respond('Kullanıcı başarıyla eklendi.', 200);
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return respond('Kullanıcı eklenemedi!', 201);
         }
     }

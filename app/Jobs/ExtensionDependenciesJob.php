@@ -14,19 +14,13 @@ class ExtensionDependenciesJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $extension;
-
-    private $dependencies;
-
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($extension, $dependencies = '')
+    public function __construct(private $extension, private $dependencies = '')
     {
-        $this->extension = $extension;
-        $this->dependencies = $dependencies;
         $this->extension->update([
             'status' => '0',
         ]);
@@ -48,11 +42,11 @@ class ExtensionDependenciesJob implements ShouldQueue
         ]);
         $checkCommand = "dpkg --get-selections | grep -v deinstall | awk '{print $1}' | grep -xE @{:package}";
         $installed = Command::runSystem($checkCommand, [
-            'package' => str_replace(' ', '|', $package),
+            'package' => str_replace(' ', '|', (string) $package),
         ]);
-        $dep = explode(' ', $this->dependencies);
+        $dep = explode(' ', (string) $this->dependencies);
         sort($dep);
-        $installed = explode("\n", trim($installed));
+        $installed = explode("\n", trim((string) $installed));
         sort($installed);
 
         if ($dep == $installed) {

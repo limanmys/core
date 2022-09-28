@@ -19,7 +19,7 @@ class Helper
         ]);
     }
 
-    public function userAdd($extension_id)
+    public function userAdd($extension_id): bool
     {
         try {
             $this->client->get('/userAdd', [
@@ -28,14 +28,14 @@ class Helper
                     'liman_token' => $this->authKey,
                 ],
             ]);
-        } catch(\Exception $e) {
+        } catch(\Exception) {
             return false;
         }
 
         return true;
     }
 
-    public function userRemove($extension_id)
+    public function userRemove($extension_id): bool
     {
         try {
             $this->client->get('/userRemove', [
@@ -44,14 +44,14 @@ class Helper
                     'liman_token' => $this->authKey,
                 ],
             ]);
-        } catch(\Exception $e) {
+        } catch(\Exception) {
             return false;
         }
 
         return true;
     }
 
-    public function dnsUpdate($server1, $server2, $server3)
+    public function dnsUpdate($server1, $server2, $server3): bool
     {
         try {
             $this->client->get('/dns', [
@@ -62,7 +62,7 @@ class Helper
                     'server3' => $server3 ?: '',
                 ],
             ]);
-        } catch(\Exception $e) {
+        } catch(\Exception) {
             return false;
         }
 
@@ -76,7 +76,7 @@ class Helper
         return true;
     }
 
-    public function addCertificate($tmpPath, $targetName)
+    public function addCertificate($tmpPath, $targetName): bool
     {
         $contents = $tmpPath;
         if (is_file($tmpPath)) {
@@ -93,7 +93,7 @@ class Helper
         $current = SystemSettings::where('key', 'SYSTEM_CERTIFICATES')->first();
 
         if ($current) {
-            $foo = json_decode($current->data, true);
+            $foo = json_decode((string) $current->data, true);
             $flag = true;
             for ($i = 0; $i < count($foo); $i++) {
                 if ($foo[$i]['targetName'] == $targetName) {
@@ -125,14 +125,14 @@ class Helper
                     'targetName' => $targetName,
                 ],
             ]);
-        } catch(\Exception $e) {
+        } catch(\Exception) {
             return false;
         }
 
         return true;
     }
 
-    public function removeCertificate($targetName)
+    public function removeCertificate($targetName): bool
     {
         $arr = [
             'targetName' => $targetName,
@@ -141,7 +141,7 @@ class Helper
         $current = SystemSettings::where('key', 'SYSTEM_CERTIFICATES')->first();
 
         if ($current) {
-            $foo = json_decode($current->data, true);
+            $foo = json_decode((string) $current->data, true);
             for ($i = 0; $i < count($foo); $i++) {
                 if ($foo[$i]['targetName'] == $targetName) {
                     unset($foo[$i]);
@@ -161,31 +161,31 @@ class Helper
                     'targetName' => $targetName,
                 ],
             ]);
-        } catch(\Exception $e) {
+        } catch(\Exception) {
             return false;
         }
 
         return true;
     }
 
-    public function fixExtensionPermissions($extension_id, $extension_name)
+    public function fixExtensionPermissions($extension_id, $extension_name): bool
     {
         try {
             $this->client->get('/fixPermissions', [
                 'query' => [
                     'liman_token' => $this->authKey,
                     'extension_id' => $extension_id,
-                    'extension_name' => strtolower($extension_name),
+                    'extension_name' => strtolower((string) $extension_name),
                 ],
             ]);
-        } catch(\Exception $e) {
+        } catch(\Exception) {
             return false;
         }
 
         return true;
     }
 
-    public function installPackages($packages)
+    public function installPackages($packages): bool
     {
         try {
             $this->client->get('/installPackages', [
@@ -194,7 +194,7 @@ class Helper
                     'packages' => $packages,
                 ],
             ]);
-        } catch(\Exception $e) {
+        } catch(\Exception) {
             return false;
         }
 
@@ -210,7 +210,7 @@ class Helper
                     'command' => $command,
                 ],
             ]);
-        } catch(\Exception $e) {
+        } catch(\Exception) {
             return __('Liman Sistem Servisine Erişilemiyor!');
         }
 

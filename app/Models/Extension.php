@@ -98,7 +98,7 @@ class Extension extends Model
     public function getDisplayNameAttribute($value)
     {
         if (empty($this->attributes['display_name'])) {
-            return Str::title(str_replace('-', ' ', $this->name));
+            return Str::title(str_replace('-', ' ', (string) $this->name));
         }
 
         return $this->attributes['display_name'];

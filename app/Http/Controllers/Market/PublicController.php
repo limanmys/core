@@ -24,7 +24,7 @@ class PublicController extends Controller
         ];
     }
 
-    private static function checkAccess($hostname, $port = 443)
+    private static function checkAccess($hostname, $port = 443): bool
     {
         return is_resource(
             @fsockopen(
@@ -39,7 +39,7 @@ class PublicController extends Controller
 
     private static function httpClient()
     {
-        if (! self::checkAccess(parse_url(env('MARKET_URL'))['host'])) {
+        if (! self::checkAccess(parse_url((string) env('MARKET_URL'))['host'])) {
             if (env('MARKET_URL') == null) {
                 abort(504, 'Market bağlantısı ayarlanmamış.');
             }
@@ -190,7 +190,7 @@ class PublicController extends Controller
             $headers = array_change_key_case($headers, CASE_LOWER);
 
             $str = $headers['content-disposition'][0];
-            $arr = explode(';', $str);
+            $arr = explode(';', (string) $str);
             $extension = substr($arr[1], -7) == '.signed' ? '.signed' : '.zip';
         } catch (\Throwable $e) {
             return respond($e->getMessage(), 201);
@@ -269,7 +269,7 @@ class PublicController extends Controller
         $extensions = [];
         foreach ($getExtensions as $extension) {
             $extension_json = '/liman/extensions/'.
-                strtolower($extension->name).
+                strtolower((string) $extension->name).
                 DIRECTORY_SEPARATOR.
                 'db.json';
 

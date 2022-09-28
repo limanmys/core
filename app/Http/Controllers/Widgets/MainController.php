@@ -23,14 +23,14 @@ class MainController extends Controller
         }
         if (
             Widget::where([
-                'name' => explode(':', request('widget_name'))[0],
-                'text' => explode(':', request('widget_name'))[3],
-                'title' => explode(':', request('widget_name'))[1],
+                'name' => explode(':', (string) request('widget_name'))[0],
+                'text' => explode(':', (string) request('widget_name'))[3],
+                'title' => explode(':', (string) request('widget_name'))[1],
                 'user_id' => auth()->user()->id,
                 'extension_id' => extension()->id,
                 'server_id' => server()->id,
-                'function' => explode(':', request('widget_name'))[0],
-                'type' => explode(':', request('widget_name'))[2],
+                'function' => explode(':', (string) request('widget_name'))[0],
+                'type' => explode(':', (string) request('widget_name'))[2],
             ])->exists()
         ) {
             return respond(
@@ -39,14 +39,14 @@ class MainController extends Controller
             );
         }
         $widget = Widget::create([
-            'name' => explode(':', request('widget_name'))[0],
-            'text' => explode(':', request('widget_name'))[3],
-            'title' => explode(':', request('widget_name'))[1],
+            'name' => explode(':', (string) request('widget_name'))[0],
+            'text' => explode(':', (string) request('widget_name'))[3],
+            'title' => explode(':', (string) request('widget_name'))[1],
             'user_id' => auth()->user()->id,
             'extension_id' => extension()->id,
             'server_id' => server()->id,
-            'function' => explode(':', request('widget_name'))[0],
-            'type' => explode(':', request('widget_name'))[2],
+            'function' => explode(':', (string) request('widget_name'))[0],
+            'type' => explode(':', (string) request('widget_name'))[2],
         ]);
 
         return respond('Bileşen Eklendi', 200);
@@ -69,7 +69,7 @@ class MainController extends Controller
 
     public function update_orders()
     {
-        foreach (json_decode(request('widgets')) as $widget) {
+        foreach (json_decode((string) request('widgets')) as $widget) {
             $data = Widget::find($widget->id);
             $data->update([
                 'order' => $widget->order,

@@ -12,7 +12,7 @@ class Server
         if (
             in_array(server()->control_port, knownPorts()) &&
             ! Certificate::where([
-                'server_hostname' => strtolower(server()->ip_address),
+                'server_hostname' => strtolower((string) server()->ip_address),
                 'origin' => server()->control_port,
             ])->exists()
         ) {

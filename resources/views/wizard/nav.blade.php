@@ -1,4 +1,4 @@
-                @php
+@php
                     $item = 1;
                 @endphp
                 <div class="col-span-2">

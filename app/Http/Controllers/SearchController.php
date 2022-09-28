@@ -54,7 +54,7 @@ class SearchController extends Controller
 
         // Searching inside the searchable array
         foreach ($searchable as $search_item) {
-            if (str_contains(strtolower($search_item['name']), strtolower($search_query))) {
+            if (str_contains(strtolower((string) $search_item['name']), strtolower((string) $search_query))) {
                 array_push($results, $search_item);
             }
         }

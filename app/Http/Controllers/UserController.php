@@ -32,7 +32,7 @@ class UserController extends Controller
         hook('user_add_attempt', [
             'request' => request()->all(),
         ]);
-        request()->request->add(['email' => strtolower(request('email'))]);
+        request()->request->add(['email' => strtolower((string) request('email'))]);
 
         validate([
             'name' => ['required', 'string', 'max:255'],
@@ -61,7 +61,7 @@ class UserController extends Controller
 
         $data = [
             'name' => request('name'),
-            'email' => strtolower(request('email')),
+            'email' => strtolower((string) request('email')),
             'password' => Hash::make($password),
             'status' => request('type') == 'administrator' ? '1' : '0',
             'forceChange' => true,
@@ -309,7 +309,7 @@ class UserController extends Controller
             $server = Server::find($first->server_id);
 
             if ($server) {
-                $ip_address = 'cn_'.str_replace('.', '_', $server->server_id);
+                $ip_address = 'cn_'.str_replace('.', '_', (string) $server->server_id);
                 if (session($ip_address)) {
                     session()->remove($ip_address);
                 }
@@ -349,7 +349,7 @@ class UserController extends Controller
             $server = Server::find($setting->server_id);
 
             if ($server) {
-                $ip_address = 'cn_'.str_replace('.', '_', $server->server_id);
+                $ip_address = 'cn_'.str_replace('.', '_', (string) $server->server_id);
                 if (session($ip_address)) {
                     session()->remove($ip_address);
                 }
@@ -405,7 +405,7 @@ class UserController extends Controller
 
         try {
             $flag->validate();
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             return redirect()
                 ->route('password_change')
                 ->withErrors([

@@ -145,23 +145,13 @@ class HomeController extends Controller
     {
         $requests = LimanRequest::where('user_id', auth()->id())->get();
         foreach ($requests as $request) {
-            switch ($request->status) {
-                case '0':
-                    $request->status = __('Talep Alındı');
-                    break;
-                case '1':
-                    $request->status = __('İşleniyor');
-                    break;
-                case '2':
-                    $request->status = __('Tamamlandı.');
-                    break;
-                case '3':
-                    $request->status = __('Reddedildi.');
-                    break;
-                default:
-                    $request->status = __('Bilinmeyen.');
-                    break;
-            }
+            $request->status = match ($request->status) {
+                '0' => __('Talep Alındı'),
+                '1' => __('İşleniyor'),
+                '2' => __('Tamamlandı.'),
+                '3' => __('Reddedildi.'),
+                default => __('Bilinmeyen.'),
+            };
         }
 
         return magicView('permission.all', [
@@ -230,7 +220,7 @@ class HomeController extends Controller
             try {
                 if ($status) {
                     if ($server->isWindows() && $server->canRunCommand()) {
-                        preg_match('/\d+/', $server->getUptime(), $output);
+                        preg_match('/\d+/', (string) $server->getUptime(), $output);
                         $uptime = $output[0];
                     } elseif ($server->canRunCommand()) {
                         $uptime = $server->getUptime();
@@ -244,7 +234,7 @@ class HomeController extends Controller
                 } else {
                     $uptime = ' ';
                 }
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 $uptime = ' ';
             }
 

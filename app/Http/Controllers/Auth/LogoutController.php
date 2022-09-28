@@ -10,10 +10,7 @@ use Illuminate\Support\Facades\Auth;
  */
 class LogoutController extends Controller
 {
-    /**
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
-     */
-    public function logout()
+    public function logout(): \Illuminate\Http\RedirectResponse
     {
         system_log(7, 'LOGOUT_SUCCESS');
         hook('logout_attempt', [

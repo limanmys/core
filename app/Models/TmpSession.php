@@ -10,6 +10,6 @@ class TmpSession extends Model
 
     public function getValueAttribute($value)
     {
-        return json_decode($value);
+        return json_decode((string) $value);
     }
 }

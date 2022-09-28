@@ -29,14 +29,14 @@ class MarketController extends Controller
         $client = self::getClient();
         try {
             $response = $client->post(env('MARKET_URL').'/api/users/me');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return respond("Anahtarınız ile Market'e bağlanılamadı!", 201);
         }
 
         return respond('Market Bağlantısı Başarıyla Sağlandı.');
     }
 
-    private static function checkAccess($hostname, $port = 443)
+    private static function checkAccess($hostname, $port = 443): bool
     {
         return is_resource(
             @fsockopen(
@@ -75,7 +75,7 @@ class MarketController extends Controller
             $obj = json_decode(
                 file_get_contents(
                     '/liman/extensions/'.
-                        strtolower($extension->name).
+                        strtolower((string) $extension->name).
                         DIRECTORY_SEPARATOR.
                         'db.json'
                 ),
@@ -168,7 +168,7 @@ class MarketController extends Controller
 
     public static function getClient()
     {
-        if (! self::checkAccess(parse_url(env('MARKET_URL'))['host'])) {
+        if (! self::checkAccess(parse_url((string) env('MARKET_URL'))['host'])) {
             if (env('MARKET_URL') == null) {
                 abort(504, 'Market bağlantısı ayarlanmamış.');
             }

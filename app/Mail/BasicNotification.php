@@ -12,8 +12,6 @@ class BasicNotification extends Mailable
 
     public $user;
 
-    public $notification;
-
     public $subject;
 
     /**
@@ -21,9 +19,8 @@ class BasicNotification extends Mailable
      *
      * @return void
      */
-    public function __construct($notification)
+    public function __construct(public $notification)
     {
-        $this->notification = $notification;
         $this->subject = __('Liman MYS Bilgilendirme');
     }
 

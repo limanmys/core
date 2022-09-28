@@ -115,10 +115,7 @@ class Server extends Model
             : false;
     }
 
-    /**
-     * @return bool
-     */
-    public function isAlive()
+    public function isAlive(): bool
     {
         if ($this->control_port == -1) {
             return true;
@@ -147,7 +144,7 @@ class Server extends Model
     /**
      * @return Server|Server[]|Collection|Builder
      */
-    public static function getAll()
+    public static function getAll(): Server|array|\Collection|\Builder
     {
         return Server::get()->filter(function ($server) {
             return Permission::can(user()->id, 'server', 'id', $server->id);

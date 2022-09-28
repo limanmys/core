@@ -12,11 +12,7 @@ use App\System\Command;
 use App\System\Helper;
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -156,7 +152,6 @@ if (! function_exists('respond')) {
     /**
      * @param $message
      * @param  int  $status
-     * @return JsonResponse|Response
      */
     function respond($message, $status = 200)
     {
@@ -215,7 +210,7 @@ if (! function_exists('syncFiles')) {
         $names = [];
 
         foreach ($extensions as $extension) {
-            array_push($names, strtolower($extension->name));
+            array_push($names, strtolower((string) $extension->name));
             $root->userAdd($extension->id);
             $root->fixExtensionPermissions($extension->id, $extension->name);
             $json = getExtensionJson($extension->name);
@@ -230,7 +225,7 @@ if (! function_exists('syncFiles')) {
         $scan = scandir('/liman/extensions/');
 
         foreach ($scan as $a) {
-            if (substr($a, 0, 1) == '.') {
+            if (substr((string) $a, 0, 1) == '.') {
                 continue;
             }
             if (! in_array($a, $names)) {
@@ -244,7 +239,7 @@ if (! function_exists('syncFiles')) {
             'key' => 'SYSTEM_DNS',
         ])->first();
         if ($dns) {
-            $json = json_decode($dns->data);
+            $json = json_decode((string) $dns->data);
             $root->dnsUpdate($json[0], $json[1], $json[2]);
         }
 
@@ -252,7 +247,7 @@ if (! function_exists('syncFiles')) {
             'key' => 'SYSTEM_CERTIFICATES',
         ])->first();
         if ($certificates) {
-            $json = json_decode($certificates->data, true);
+            $json = json_decode((string) $certificates->data, true);
             foreach ($json as $cert) {
                 if (
                     is_file(
@@ -275,11 +270,11 @@ if (! function_exists('syncFiles')) {
 if (! function_exists('ip_in_range')) {
     function ip_in_range($ip, $range)
     {
-        if (strpos($range, '/') == false) {
+        if (strpos((string) $range, '/') == false) {
             $range .= '/32';
         }
         // $range is in IP/CIDR format eg 127.0.0.1/24
-        [$range, $netmask] = explode('/', $range, 2);
+        [$range, $netmask] = explode('/', (string) $range, 2);
         $range_decimal = ip2long($range);
         $ip_decimal = ip2long($ip);
         $wildcard_decimal = pow(2, 32 - $netmask) - 1;
@@ -294,12 +289,12 @@ if (! function_exists('strposX')) {
     function strposX($haystack, $needle, $number)
     {
         if ($number == '1') {
-            return strpos($haystack, $needle);
+            return strpos((string) $haystack, (string) $needle);
         } elseif ($number > '1') {
             return strpos(
-                $haystack,
-                $needle,
-                strposX($haystack, $needle, $number - 1) + strlen($needle)
+                (string) $haystack,
+                (string) $needle,
+                strposX($haystack, $needle, $number - 1) + strlen((string) $needle)
             );
         } else {
             return error_log(
@@ -355,7 +350,7 @@ if (! function_exists('searchModuleFiles')) {
             return [];
         }
 
-        $data = explode("\n", $output);
+        $data = explode("\n", (string) $output);
         $arr = [];
         foreach ($data as $file) {
             array_push($arr, dirname($file));
@@ -466,7 +461,7 @@ if (! function_exists('settingsModuleButtons')) {
     {
         $str = '';
         foreach (searchModuleFiles('settings.blade.php') as $file) {
-            $foo = substr($file, 15);
+            $foo = substr((string) $file, 15);
             $name = substr($foo, 0, strpos($foo, '/'));
             $hrefName = $name;
             if (is_numeric($name[0])) {
@@ -486,9 +481,9 @@ if (! function_exists('settingsModuleButtons')) {
 }
 
 if (! function_exists('getLimanHostname')) {
-    function getLimanHostname()
+    function getLimanHostname(): string
     {
-        return trim(`hostname`);
+        return trim((string) `hostname`);
     }
 }
 
@@ -519,7 +514,7 @@ if (! function_exists('serverModuleButtons')) {
     {
         $str = '';
         foreach (searchModuleFiles('server.blade.php') as $file) {
-            $foo = substr($file, 15);
+            $foo = substr((string) $file, 15);
             $name = substr($foo, 0, strpos($foo, '/'));
             $str .=
                 '<li class="nav-item">
@@ -537,7 +532,7 @@ if (! function_exists('getVersion')) {
     /**
      * @return mixed
      */
-    function getVersion()
+    function getVersion(): string|bool
     {
         return file_get_contents(storage_path('VERSION'));
     }
@@ -547,7 +542,7 @@ if (! function_exists('getVersionCode')) {
     /**
      * @return mixed
      */
-    function getVersionCode()
+    function getVersionCode(): int
     {
         return intval(file_get_contents(storage_path('VERSION_CODE')));
     }
@@ -603,7 +598,7 @@ if (! function_exists('retrieveCertificate')) {
                 $get
             );
             $flag = true;
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
         }
 
         if (! $flag) {
@@ -617,7 +612,7 @@ if (! function_exists('retrieveCertificate')) {
                     $get
                 );
                 $flag = true;
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 return [false, __('Sertifika alınamıyor!')];
             }
         }
@@ -640,7 +635,7 @@ if (! function_exists('retrieveCertificate')) {
             'authorityKeyIdentifier',
             $certinfo['extensions']
         )
-            ? substr($certinfo['extensions']['authorityKeyIdentifier'], 6)
+            ? substr((string) $certinfo['extensions']['authorityKeyIdentifier'], 6)
             : '';
         $certinfo['validFrom_time_t'] = Carbon::createFromTimestamp(
             $certinfo['validFrom_time_t']
@@ -684,7 +679,7 @@ if (! function_exists('addCertificate')) {
 
         // Create Certificate Object.
         return Certificate::create([
-            'server_hostname' => strtolower($hostname),
+            'server_hostname' => strtolower((string) $hostname),
             'origin' => $port,
         ]);
     }
@@ -713,32 +708,16 @@ if (! function_exists('system_log')) {
         $array['user_id'] = user() ? user()->id : '';
         $array['ip_address'] = request()->ip();
 
-        switch ($level) {
-            case 1:
-                Log::emergency($message, $array);
-                break;
-            case 2:
-                Log::alert($message, $array);
-                break;
-            case 3:
-                Log::critical($message, $array);
-                break;
-            case 4:
-                Log::error($message, $array);
-                break;
-            case 5:
-                Log::warning($message, $array);
-                break;
-            case 6:
-                Log::notice($message, $array);
-                break;
-            case 7:
-                Log::info($message, $array);
-                break;
-            default:
-                Log::debug($message, $array);
-                break;
-        }
+        match ($level) {
+            1 => Log::emergency($message, $array),
+            2 => Log::alert($message, $array),
+            3 => Log::critical($message, $array),
+            4 => Log::error($message, $array),
+            5 => Log::warning($message, $array),
+            6 => Log::notice($message, $array),
+            7 => Log::info($message, $array),
+            default => Log::debug($message, $array),
+        };
     }
 }
 
@@ -751,7 +730,7 @@ if (! function_exists('server')) {
         if (! request()->request->get('server')) {
             abort(501, 'Sunucu Bulunamadı');
         }
-        $serverObj = json_decode(request()->request->get('server'));
+        $serverObj = json_decode((string) request()->request->get('server'));
         $server = Server::find($serverObj->id);
 
         return $server;
@@ -759,9 +738,6 @@ if (! function_exists('server')) {
 }
 
 if (! function_exists('servers')) {
-    /**
-     * @return Server|Builder
-     */
     function servers()
     {
         return auth()
@@ -814,15 +790,7 @@ if (! function_exists('sandbox')) {
      */
     function sandbox($language = null)
     {
-        if ($language == null) {
-            $language = extension()->language;
-        }
-        switch ($language) {
-            case 'php':
-            default:
-                return new App\Sandboxes\PHPSandbox();
-                break;
-        }
+        return new App\Sandboxes\PHPSandbox();
     }
 }
 
@@ -865,7 +833,7 @@ if (! function_exists('getExtensionJson')) {
     function getExtensionJson($extension_name)
     {
         $extension_json = '/liman/extensions/'.
-            strtolower($extension_name).
+            strtolower((string) $extension_name).
             DIRECTORY_SEPARATOR.
             'db.json';
 
@@ -877,7 +845,7 @@ if (! function_exists('getExtensionJson')) {
                 true
             );
             if (empty($json['display_name'])) {
-                $json['display_name'] = Str::title(str_replace('-', ' ', $json['name']));
+                $json['display_name'] = Str::title(str_replace('-', ' ', (string) $json['name']));
             }
 
             return $json;
@@ -920,7 +888,7 @@ if (! function_exists('extensionDb')) {
             if ($serverKey == null) {
                 return null;
             }
-            $data = json_decode($serverKey->data, true);
+            $data = json_decode((string) $serverKey->data, true);
             $encKey = env('APP_KEY').auth()->user()->id.server()->id;
 
             return AES256::decrypt($data[$key], $encKey);
@@ -953,7 +921,6 @@ if (! function_exists('getObject')) {
     /**
      * @param $type
      * @param  null  $id
-     * @return Extension|bool|Model|Builder|object
      */
     function getObject($type, $id = null)
     {
@@ -963,7 +930,7 @@ if (! function_exists('getObject')) {
             case 'extension':
                 try {
                     return Extension::find($id);
-                } catch (\Throwable $e) {
+                } catch (\Throwable) {
                     abort(404, __('Eklenti bulunamadı.'));
                 }
                 break;
@@ -971,7 +938,7 @@ if (! function_exists('getObject')) {
             case 'server':
                 try {
                     return Server::find($id);
-                } catch (\Throwable $e) {
+                } catch (\Throwable) {
                     abort(404, __('Sunucu bulunamadı.'));
                 }
                 break;
@@ -1018,9 +985,8 @@ if (! function_exists('cleanArray')) {
 if (! function_exists('cities')) {
     /**
      * @param  null  $city
-     * @return array|false|int|string
      */
-    function cities($city = null)
+    function cities($city = null): array|false|int|string
     {
         $cities = json_decode(
             file_get_contents(storage_path('cities.json')),
@@ -1038,15 +1004,15 @@ if (! function_exists('cleanDash')) {
     /**
      * @return array|Request|string
      */
-    function cleanDash($text)
+    function cleanDash($text): string
     {
-        return str_replace('-', '', $text);
+        return str_replace('-', '', (string) $text);
     }
 }
 if (! function_exists('isJson')) {
     function isJson($string, $return_data = false)
     {
-        $data = json_decode($string);
+        $data = json_decode((string) $string);
 
         return json_last_error() == JSON_ERROR_NONE
             ? ($return_data
@@ -1057,7 +1023,7 @@ if (! function_exists('isJson')) {
 }
 
 if (! function_exists('getPermissions')) {
-    function getPermissions($path)
+    function getPermissions($path): string
     {
         return substr(sprintf('%o', fileperms($path)), -4);
     }
@@ -1109,13 +1075,13 @@ if (! function_exists('extensionTranslate')) {
 }
 
 if (! function_exists('setEnv')) {
-    function setEnv(array $values)
+    function setEnv(array $values): bool
     {
         $editor = DotenvEditor::load(base_path('.env'));
         $editor->setKeys($values);
         try {
             $editor->save();
-        } catch (\Exception $ex) {
+        } catch (\Exception) {
             return false;
         }
         shell_exec('php /liman/server/artisan config:clear');
@@ -1220,7 +1186,7 @@ if (! function_exists('setBaseDn')) {
         $domain = str_replace(
             'dc=',
             '',
-            strtolower($entries['rootdomainnamingcontext'][0])
+            strtolower((string) $entries['rootdomainnamingcontext'][0])
         );
         $domain = str_replace(',', '.', $domain);
         setEnv([
@@ -1251,12 +1217,12 @@ if (! function_exists('checkPort')) {
 if (! function_exists('endsWith')) {
     function endsWith($string, $endString)
     {
-        $len = strlen($endString);
+        $len = strlen((string) $endString);
         if ($len == 0) {
             return true;
         }
 
-        return substr($string, -$len) === $endString;
+        return substr((string) $string, -$len) === $endString;
     }
 }
 

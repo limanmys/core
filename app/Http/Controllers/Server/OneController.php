@@ -30,13 +30,13 @@ class OneController extends Controller
 
         try {
             if ($server->isWindows()) {
-                preg_match('/\d+/', $server->getUptime(), $output);
+                preg_match('/\d+/', (string) $server->getUptime(), $output);
                 $uptime = $output[0];
             } else {
                 $uptime = $server->getUptime();
             }
             $uptime = Carbon::parse($uptime)->diffForHumans();
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             $uptime = __('Uptime parse edemiyorum.');
         }
 
@@ -181,7 +181,7 @@ class OneController extends Controller
                 'Bu islemi yalnizca sunucu sahibi ya da bir yonetici yapabilir.'
             );
         }
-        $extensions = json_decode(request('extensions'));
+        $extensions = json_decode((string) request('extensions'));
 
         foreach ($extensions as $extension) {
             $data = [
@@ -207,7 +207,7 @@ class OneController extends Controller
             return respond('Bu işlemi yapmak için yetkiniz yok!', 201);
         }
 
-        if (strlen(request('name')) > 24) {
+        if (strlen((string) request('name')) > 24) {
             return respond('Lütfen daha kısa bir sunucu adı girin.', 201);
         }
 
@@ -301,7 +301,7 @@ class OneController extends Controller
         server()->getFile(request('path'), '/tmp/'.$file);
 
         // Extract file name from path.
-        $file_name = explode('/', request('path'));
+        $file_name = explode('/', (string) request('path'));
 
         // Send file to the user then delete it.
         return response()
@@ -395,7 +395,7 @@ class OneController extends Controller
     private function parsePsOutput($output)
     {
         $data = [];
-        foreach (explode("\n", $output) as $row) {
+        foreach (explode("\n", (string) $output) as $row) {
             $row = explode('*-*', $row);
             $row[3] = str_replace('\\', '/', $row[3]);
             $fetch = explode('/', $row[3]);
@@ -413,7 +413,7 @@ class OneController extends Controller
     private function parseDfOutput($output)
     {
         $data = [];
-        foreach (explode("\n", $output) as $row) {
+        foreach (explode("\n", (string) $output) as $row) {
             $row = explode('*-*', $row);
             $row[1] = str_replace('\\', '/', $row[1]);
             $fetch = explode('/', $row[1]);
@@ -480,7 +480,7 @@ class OneController extends Controller
         $raw = Command::runSudo('cat /sys/class/net/*/statistics/:text:', [
             'text' => $text,
         ]);
-        foreach (explode("\n", trim($raw)) as $data) {
+        foreach (explode("\n", trim((string) $raw)) as $data) {
             $count += intval($data);
         }
 
@@ -615,7 +615,7 @@ class OneController extends Controller
         if (! empty($output)) {
             $users = array_map(function ($value) {
                 return ['name' => $value];
-            }, explode(',', $output));
+            }, explode(',', (string) $output));
         }
 
         return magicView('table', [
@@ -687,7 +687,7 @@ class OneController extends Controller
     public function addSudoers()
     {
         $name = request('name');
-        $name = str_replace(' ', '\\x20', $name);
+        $name = str_replace(' ', '\\x20', (string) $name);
         $checkFile = Command::runSudo("[ -f '/etc/sudoers.d/{:name}' ] && echo 1 || echo 0", [
             'name' => $name,
         ]);
@@ -710,7 +710,7 @@ class OneController extends Controller
     public function deleteSudoers()
     {
         $name = request('name');
-        $name = str_replace(' ', '\\x20', $name);
+        $name = str_replace(' ', '\\x20', (string) $name);
         $output = Command::runSudo(
             'if [ -f "/etc/sudoers.d/{:name}" ]; then rm /etc/sudoers.d/{:name} && echo 1 || echo 0; else echo 0; fi',
             [
@@ -746,7 +746,7 @@ class OneController extends Controller
                         'description' => $row[2],
                         'status' => $row[1],
                     ]);
-                } catch (Exception $exception) {
+                } catch (Exception) {
                 }
             }
         } else {
@@ -765,7 +765,7 @@ class OneController extends Controller
                         'description' => trim(explode('=', $row[1])[1]),
                         'status' => trim(explode('=', $row[2])[1]),
                     ]);
-                } catch (Exception $exception) {
+                } catch (Exception) {
                 }
             }
         }
@@ -853,7 +853,7 @@ class OneController extends Controller
             ]);
         }
 
-        foreach (explode("\n", $data) as $row) {
+        foreach (explode("\n", (string) $data) as $row) {
             $dateEndPos = strposX($row, ' ', 2);
             $date = substr($row, 1, $dateEndPos - 2);
             $json = substr($row, strpos($row, '{'));
@@ -894,13 +894,13 @@ class OneController extends Controller
 
                 continue;
             }
-            foreach (explode("\n", $accessDetails) as $row) {
+            foreach (explode("\n", (string) $accessDetails) as $row) {
                 $dateEndPos = strposX($row, ' ', 2);
                 $date = substr($row, 1, $dateEndPos - 2);
                 $json = substr($row, strpos($row, '{'));
                 $parsedDetails = json_decode($json, true);
-                $parsedDetails['title'] = base64_decode($parsedDetails['title']);
-                $parsedDetails['message'] = base64_decode($parsedDetails['message']);
+                $parsedDetails['title'] = base64_decode((string) $parsedDetails['title']);
+                $parsedDetails['message'] = base64_decode((string) $parsedDetails['message']);
                 $parsed['details'] = $parsedDetails;
             }
 
@@ -957,7 +957,7 @@ class OneController extends Controller
             ]);
         }
 
-        foreach (explode("\n", $data) as $row) {
+        foreach (explode("\n", (string) $data) as $row) {
             $row = json_decode($row);
             $row->ts = Carbon::parse($row->ts)->isoFormat('LLL');
 
@@ -987,7 +987,7 @@ class OneController extends Controller
 
             if (isset($row->request_details->lmntargetFunction) && $row->request_details->lmntargetFunction == '') {
                 if ($row->lmn_level == 'high_level' && isset($row->request_details->title)) {
-                    $row->view = base64_decode($row->request_details->title);
+                    $row->view = base64_decode((string) $row->request_details->title);
                 }
             }
 
@@ -1037,7 +1037,7 @@ class OneController extends Controller
             return respond(__('Bu loga ait detay bulunamadı'), 201);
         }
         $logs = [];
-        foreach (explode("\n", $data) as $row) {
+        foreach (explode("\n", (string) $data) as $row) {
             $row = mb_convert_encoding($row, 'UTF-8', 'auto');
             $row = json_decode($row);
             foreach ($row as $k => $v) {
@@ -1052,7 +1052,7 @@ class OneController extends Controller
                         }
 
                         if ($key == 'title' || $key == 'message') {
-                            $val = base64_decode($val);
+                            $val = base64_decode((string) $val);
                         }
 
                         array_push($logs, [
@@ -1090,7 +1090,7 @@ class OneController extends Controller
             $raw = Command::runSudo(
                 'DEBIAN_FRONTEND=noninteractive apt install @{:package} -qqy >"/tmp/{:packageBase}.txt" 2>&1 & disown && echo $!',
                 [
-                    'packageBase' => basename($package),
+                    'packageBase' => basename((string) $package),
                     'package' => $package,
                 ]
             );
@@ -1113,11 +1113,11 @@ class OneController extends Controller
             )
         );
         $command_output = Command::runSudo('cat "/tmp/{:packageBase}.txt" 2> /dev/null | base64', [
-            'packageBase' => basename(request('package_name')),
+            'packageBase' => basename((string) request('package_name')),
         ]);
-        $command_output = base64_decode($command_output);
+        $command_output = base64_decode((string) $command_output);
         Command::runSudo('truncate -s 0 "/tmp/{:packageBase}.txt"', [
-            'packageBase' => basename(request('package_name')),
+            'packageBase' => basename((string) request('package_name')),
         ]);
         if ($output === '0') {
             $list_method = $mode == 'install' ? '--installed' : '--upgradable';
@@ -1186,10 +1186,10 @@ class OneController extends Controller
             if (! $filePath) {
                 return respond('Dosya yolu zorunludur.', 403);
             }
-            server()->putFile($filePath, '/tmp/'.basename($filePath));
+            server()->putFile($filePath, '/tmp/'.basename((string) $filePath));
             unlink($filePath);
 
-            return respond('/tmp/'.basename($filePath), 200);
+            return respond('/tmp/'.basename((string) $filePath), 200);
         } else {
             return respond('Bu sunucuya deb paketi kuramazsınız.', 403);
         }
@@ -1205,7 +1205,7 @@ class OneController extends Controller
                 "apt list --upgradable 2>/dev/null | sed '1,1d'"
         );
         foreach (explode("\n", $raw) as $package) {
-            if ($package == '' || strpos($package, 'List') !== false) {
+            if ($package == '' || str_contains($package, 'List')) {
                 continue;
             }
             $row = explode(' ', $package, 4);
@@ -1216,7 +1216,7 @@ class OneController extends Controller
                     'type' => $row[2],
                     'status' => $row[3],
                 ]);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
             }
         }
 
@@ -1257,7 +1257,7 @@ class OneController extends Controller
                     'type' => $row[2],
                     'status' => $row[3],
                 ]);
-            } catch (Exception $exception) {
+            } catch (Exception) {
             }
         }
 
@@ -1287,7 +1287,7 @@ class OneController extends Controller
             );
         }
 
-        foreach (json_decode(request('extensions')) as $key => $value) {
+        foreach (json_decode((string) request('extensions')) as $key => $value) {
             DB::table('server_extensions')
                 ->where([
                     'server_id' => server()->id,

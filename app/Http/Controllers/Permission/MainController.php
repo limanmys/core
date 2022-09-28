@@ -29,37 +29,19 @@ class MainController extends Controller
                 $request->user_name = $user->name;
                 $request->user_id = $user->id;
             }
-            switch ($request->type) {
-                case 'server':
-                    $request->type = __('Sunucu');
-                    break;
-                case 'extension':
-                    $request->type = __('Eklenti');
-                    break;
-                case 'other':
-                    $request->type = __('Diğer');
-                    break;
-                default:
-                    $request->type = __('Bilinmeyen.');
-                    break;
-            }
-            switch ($request->status) {
-                case '0':
-                    $request->status = __('Talep Alındı');
-                    break;
-                case '1':
-                    $request->status = __('İşleniyor');
-                    break;
-                case '2':
-                    $request->status = __('Tamamlandı.');
-                    break;
-                case '3':
-                    $request->status = __('Reddedildi.');
-                    break;
-                default:
-                    $request->status = __('Bilinmeyen.');
-                    break;
-            }
+            $request->type = match ($request->type) {
+                'server' => __('Sunucu'),
+                'extension' => __('Eklenti'),
+                'other' => __('Diğer'),
+                default => __('Bilinmeyen.'),
+            };
+            $request->status = match ($request->status) {
+                '0' => __('Talep Alındı'),
+                '1' => __('İşleniyor'),
+                '2' => __('Tamamlandı.'),
+                '3' => __('Reddedildi.'),
+                default => __('Bilinmeyen.'),
+            };
             switch ($request->speed) {
                 case 'normal':
                     $request->speed = __('Normal');
@@ -120,26 +102,14 @@ class MainController extends Controller
             'action' => $request,
         ]);
 
-        switch (request('status')) {
-            case '0':
-                $text = __('Talep Alındı');
-                break;
-            case '1':
-                $text = __('İşleniyor');
-                break;
-            case '2':
-                $text = __('Tamamlandı.');
-                break;
-            case '3':
-                $text = __('Reddedildi.');
-                break;
-            case '4':
-                $text = __('Silindi.');
-                break;
-            default:
-                $text = __('Bilinmeyen.');
-                break;
-        }
+        $text = match (request('status')) {
+            '0' => __('Talep Alındı'),
+            '1' => __('İşleniyor'),
+            '2' => __('Tamamlandı.'),
+            '3' => __('Reddedildi.'),
+            '4' => __('Silindi.'),
+            default => __('Bilinmeyen.'),
+        };
         Notification::send(
             __('Talebiniz güncellendi'),
             'notify',

@@ -97,7 +97,7 @@ class LoginController extends Controller
         }
     }
 
-    protected function sendFailedLoginResponse(Request $request)
+    protected function sendFailedLoginResponse(Request $request): never
     {
         $credientials = (object) $this->credentials($request);
         hook('login_failed', [

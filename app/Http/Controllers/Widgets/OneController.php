@@ -43,7 +43,7 @@ class OneController extends Controller
         $extension = json_decode(
             file_get_contents(
                 '/liman/extensions/'.
-                    strtolower(extension()->name).
+                    strtolower((string) extension()->name).
                     DIRECTORY_SEPARATOR.
                     'db.json'
             ),

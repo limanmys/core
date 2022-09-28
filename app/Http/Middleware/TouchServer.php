@@ -28,7 +28,7 @@ class TouchServer
                 try {
                     \App\Models\Server::where('id', $request->server_id)->firstOrFail()->touch();
                     $request->session()->put('last_touched', $request->server_id);
-                } catch (\Throwable $e) {
+                } catch (\Throwable) {
                     return $next($request);
                 }
             }

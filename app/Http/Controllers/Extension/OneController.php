@@ -9,10 +9,7 @@ use App\System\Command;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\MimeType;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
-use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use mervick\aesEverywhere\AES256;
@@ -23,15 +20,12 @@ use function request;
  */
 class OneController extends Controller
 {
-    /**
-     * @return RedirectResponse|Redirector
-     */
-    public function serverSettings()
+    public function serverSettings(): \Illuminate\Http\RedirectResponse
     {
         $extension = json_decode(
             file_get_contents(
                 '/liman/extensions/'.
-                    strtolower(extension()->name).
+                    strtolower((string) extension()->name).
                     DIRECTORY_SEPARATOR.
                     'db.json'
             ),
@@ -133,10 +127,10 @@ class OneController extends Controller
                 } else {
                     $result = $output;
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 $result = __('Doğrulama başarısız, girdiğiniz bilgileri kontrol edin.');
             }
-            if (trim($result) != 'ok') {
+            if (trim((string) $result) != 'ok') {
                 return redirect(
                     route('extension_server_settings_page', [
                         'extension_id' => extension()->id,
@@ -172,7 +166,7 @@ class OneController extends Controller
         $extension = json_decode(
             file_get_contents(
                 '/liman/extensions/'.
-                    strtolower(extension()->name).
+                    strtolower((string) extension()->name).
                     DIRECTORY_SEPARATOR.
                     'db.json'
             ),
@@ -253,7 +247,7 @@ class OneController extends Controller
 
     public function forceDepInstall()
     {
-        $file = file_get_contents('/liman/extensions/'.strtolower(extension()->name).'/db.json');
+        $file = file_get_contents('/liman/extensions/'.strtolower((string) extension()->name).'/db.json');
         $json = json_decode($file, true);
         if (json_last_error() != JSON_ERROR_NONE) {
             return respond('Eklenti dosyası okunurken bir hata oluştu!', 201);
@@ -268,9 +262,6 @@ class OneController extends Controller
         }
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
     public function remove()
     {
         $ext_name = extension()->name;
@@ -279,16 +270,16 @@ class OneController extends Controller
             Command::runLiman(
                 "rm -rf '/liman/extensions/{:extension}'",
                 [
-                    'extension' => strtolower(extension()->name),
+                    'extension' => strtolower((string) extension()->name),
                 ]
             );
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
         }
 
         try {
             rootSystem()->userRemove(extension()->id);
             extension()->delete();
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
         }
 
         hook('extension_delete_successful', [
@@ -310,7 +301,7 @@ class OneController extends Controller
             ->where('type', 'function')
             ->where('key', 'name')
             ->delete();
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
         }
 
         system_log(3, 'EXTENSION_REMOVE');
@@ -321,9 +312,9 @@ class OneController extends Controller
     public function publicFolder()
     {
         $basePath =
-            '/liman/extensions/'.strtolower(extension()->name).'/public/';
+            '/liman/extensions/'.strtolower((string) extension()->name).'/public/';
 
-        $targetPath = $basePath.explode('public/', url()->current(), 2)[1];
+        $targetPath = $basePath.explode('public/', (string) url()->current(), 2)[1];
 
         if (realpath($targetPath) != $targetPath) {
             abort(404);

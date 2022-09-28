@@ -12,7 +12,6 @@ class Extension
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -22,11 +21,11 @@ class Extension
         if (empty(extension()->sslPorts)) {
             return $next($request);
         }
-        $ports = explode(',', extension()->sslPorts);
+        $ports = explode(',', (string) extension()->sslPorts);
         foreach ($ports as $port) {
             if (
                 Certificate::where([
-                    'server_hostname' => strtolower($server->ip_address),
+                    'server_hostname' => strtolower((string) $server->ip_address),
                     'origin' => trim($port),
                 ])->exists()
             ) {

@@ -10,22 +10,13 @@ class ExtensionMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $subject;
-
-    public $content;
-
-    public $attachs;
-
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($subject, $content, array $attachs = [])
+    public function __construct(public $subject, public $content, public array $attachs = [])
     {
-        $this->subject = $subject;
-        $this->content = $content;
-        $this->attachs = $attachs;
     }
 
     /**

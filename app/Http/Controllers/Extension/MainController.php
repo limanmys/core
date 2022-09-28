@@ -10,9 +10,6 @@ use App\System\Command;
 use App\User;
 use Exception;
 use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -23,10 +20,7 @@ use ZipArchive;
  */
 class MainController extends Controller
 {
-    /**
-     * @return Factory|View
-     */
-    public function allServers()
+    public function allServers(): \Factory|\View
     {
         // Get Servers of Extension
         $servers = extension()->servers();
@@ -56,7 +50,7 @@ class MainController extends Controller
     public function download()
     {
         // Generate Extension Folder Path
-        $path = '/liman/extensions/'.strtolower(extension()->name);
+        $path = '/liman/extensions/'.strtolower((string) extension()->name);
         $tempPath = '/tmp/'.Str::random().'.zip';
 
         // Zip the current extension
@@ -79,8 +73,6 @@ class MainController extends Controller
     }
 
     /**
-     * @return JsonResponse|Response
-     *
      * @throws Exception
      */
     public function upload()
@@ -113,7 +105,7 @@ class MainController extends Controller
             $decrypt = Command::runLiman(
                 "gpg --status-fd 1 -d -o '/tmp/{:originalName}' @{:extension} | grep FAILURE > /dev/null && echo 0 || echo 1",
                 [
-                    'originalName' => 'ext-'.basename(request()->file('extension')->path()),
+                    'originalName' => 'ext-'.basename((string) request()->file('extension')->path()),
                     'extension' => request()->file('extension')->path(),
                 ]
             );
@@ -126,7 +118,7 @@ class MainController extends Controller
             $zipFile =
                 '/tmp/ext-'.
                 basename(
-                    request()->file('extension')->path()
+                    (string) request()->file('extension')->path()
                 );
         } else {
             if (! request()->has('force')) {
@@ -166,7 +158,7 @@ class MainController extends Controller
         // Extract Zip to the Temp Folder.
         try {
             $zip->extractTo($path);
-        } catch (\Exception $ex) {
+        } catch (\Exception) {
             return [respond('Eklenti Dosyası Açılamıyor.', 201), null];
         }
 
@@ -179,7 +171,7 @@ class MainController extends Controller
 
         $json = json_decode($file, true);
 
-        preg_match('/[A-Za-z-]+/', $json['name'], $output);
+        preg_match('/[A-Za-z-]+/', (string) $json['name'], $output);
         if (empty($output) || $output[0] != $json['name']) {
             return [respond('Eklenti isminde yalnızca harflere izin verilmektedir.', 201), null];
         }
@@ -199,7 +191,7 @@ class MainController extends Controller
         }
 
         if ($verify) {
-            $json['issuer'] = explode(' ', $verify, 4)[3];
+            $json['issuer'] = explode(' ', (string) $verify, 4)[3];
         } else {
             $json['issuer'] = '';
         }
@@ -244,7 +236,7 @@ class MainController extends Controller
 
         file_put_contents($passPath, Str::random(32));
 
-        $extension_folder = '/liman/extensions/'.strtolower($json['name']);
+        $extension_folder = '/liman/extensions/'.strtolower((string) $json['name']);
 
         Command::runLiman('mkdir -p @{:extension_folder}', [
             'extension_folder' => $extension_folder,
@@ -261,10 +253,10 @@ class MainController extends Controller
 
     public function newExtension()
     {
-        $name = trim(request('name'));
+        $name = trim((string) request('name'));
         $folder = '/liman/extensions/'.strtolower($name);
 
-        preg_match('/[A-Za-z-]+/', request('name'), $output);
+        preg_match('/[A-Za-z-]+/', (string) request('name'), $output);
         if (empty($output) || $output[0] != $name) {
             return respond(
                 'Eklenti isminde yalnızca harflere izin verilmektedir.',
@@ -338,7 +330,7 @@ class MainController extends Controller
 
     public function updateExtOrders()
     {
-        foreach (json_decode(request('data')) as $extension) {
+        foreach (json_decode((string) request('data')) as $extension) {
             Extension::where('id', $extension->id)->update([
                 'order' => $extension->order,
             ]);
@@ -441,7 +433,7 @@ class MainController extends Controller
             ]);
         }
 
-        foreach (explode("\n", $data) as $row) {
+        foreach (explode("\n", (string) $data) as $row) {
             $dateEndPos = strposX($row, ' ', 2);
             $date = substr($row, 1, $dateEndPos - 2);
             $json = substr($row, strpos($row, '{'));
@@ -482,13 +474,13 @@ class MainController extends Controller
 
                 continue;
             }
-            foreach (explode("\n", $accessDetails) as $row) {
+            foreach (explode("\n", (string) $accessDetails) as $row) {
                 $dateEndPos = strposX($row, ' ', 2);
                 $date = substr($row, 1, $dateEndPos - 2);
                 $json = substr($row, strpos($row, '{'));
                 $parsedDetails = json_decode($json, true);
-                $parsedDetails['title'] = base64_decode($parsedDetails['title']);
-                $parsedDetails['message'] = base64_decode($parsedDetails['message']);
+                $parsedDetails['title'] = base64_decode((string) $parsedDetails['title']);
+                $parsedDetails['message'] = base64_decode((string) $parsedDetails['message']);
                 $parsed['details'] = $parsedDetails;
             }
 

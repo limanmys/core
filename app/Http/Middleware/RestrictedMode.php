@@ -10,7 +10,6 @@ class RestrictedMode
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -40,7 +39,7 @@ class RestrictedMode
             ]);
             if (
                 ! in_array(\Request::route()->getName(), $safeRoutes) &&
-                substr(\Request::route()->uri(), 0, 11) != 'lmn/private'
+                substr((string) \Request::route()->uri(), 0, 11) != 'lmn/private'
             ) {
                 return redirect()->route('extension_server', [
                     'extension_id' => env('LIMAN_RESTRICTED_EXTENSION'),

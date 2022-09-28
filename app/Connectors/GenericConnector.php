@@ -7,49 +7,43 @@ use GuzzleHttp\Client;
 
 class GenericConnector
 {
-    public $server;
-
-    public $user;
-
-    public function __construct(\App\Models\Server $server = null, $user = null)
+    public function __construct(public $server = null, public $user = null)
     {
-        $this->server = $server;
-        $this->user = $user;
     }
 
-    public function execute($command)
+    public function execute($command): string
     {
         return trim(
-            self::request('command', [
+            (string) self::request('command', [
                 'command' => $command,
             ])
         );
     }
 
-    public function sendFile($localPath, $remotePath, $permissions = 0644)
+    public function sendFile($localPath, $remotePath, $permissions = 0644): string
     {
         return trim(
-            self::request('putFile', [
+            (string) self::request('putFile', [
                 'local_path' => $localPath,
                 'remote_path' => $remotePath,
             ])
         );
     }
 
-    public function receiveFile($localPath, $remotePath)
+    public function receiveFile($localPath, $remotePath): string
     {
         return trim(
-            self::request('getFile', [
+            (string) self::request('getFile', [
                 'local_path' => $localPath,
                 'remote_path' => $remotePath,
             ])
         );
     }
 
-    public function verify($ip_address, $username, $password, $port, $type)
+    public function verify($ip_address, $username, $password, $port, $type): string
     {
         return trim(
-            self::request('verify', [
+            (string) self::request('verify', [
                 'ip_address' => $ip_address,
                 'username' => $username,
                 'password' => $password,
@@ -102,14 +96,14 @@ class GenericConnector
                 if ($exception->getResponse() && $exception->getResponse()->getStatusCode() >= 400) {
                     $code = $exception->getResponse()->getStatusCode();
 
-                    $message = json_decode($exception->getResponse()->getBody()->getContents())->message;
+                    $message = json_decode((string) $exception->getResponse()->getBody()->getContents())->message;
                     if ($message == '') {
                         $message = $exception->getMessage();
                     }
                 } else {
                     $message = $exception->getMessage();
                 }
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 $message = $exception->getMessage();
             }
 

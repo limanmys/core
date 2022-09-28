@@ -66,7 +66,7 @@ Artisan::command('module:add {module_name}', function ($module_name) {
 
     //Check if module supported or not.
     $json = json_decode(file_get_contents($basePath.'/db.json'), true);
-    if (getVersionCode() < intval(trim($json['minLimanSupported']))) {
+    if (getVersionCode() < intval(trim((string) $json['minLimanSupported']))) {
         return $this->error(
             "Bu modülü yüklemek için önce liman'ı güncellemelisiniz!"
         );
@@ -116,7 +116,7 @@ Artisan::command('register_liman', function () {
     Liman::updateOrCreate([
         'machine_id' => getLimanId(),
     ], [
-        'last_ip' => env('LIMAN_IP', trim(`hostname -I`)),
+        'last_ip' => env('LIMAN_IP', trim((string) `hostname -I`)),
     ]);
 })->describe('Register liman');
 
@@ -129,7 +129,7 @@ Artisan::command('receive_settings', function () {
 })->describe('Receive the system settings');
 
 Artisan::command('sync_core', function () {
-    if (trim(`id -u`) != '0') {
+    if (trim((string) `id -u`) != '0') {
         $this->error('Bu komutu root olarak çalışmalısınız!');
 
         return;

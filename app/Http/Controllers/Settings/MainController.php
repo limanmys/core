@@ -141,7 +141,7 @@ class MainController extends Controller
             Mail::to(request('MAIL_USERNAME'))->send(
                 new \App\Mail\TestMail('Test Mail', __('Liman MYS test mail gönderimi.'))
             );
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return respond('Mail gönderimi başarısız oldu!', 201);
         }
 
@@ -338,7 +338,7 @@ class MainController extends Controller
     public function addList()
     {
         $arr = [];
-        foreach (json_decode(request('ids'), true) as $id) {
+        foreach (json_decode((string) request('ids'), true) as $id) {
             array_push($arr, $id);
             Permission::grant(request('user_id'), request('type'), 'id', $id);
         }
@@ -353,7 +353,7 @@ class MainController extends Controller
     {
         $arr = [];
         $flag = false;
-        $ids = json_decode(request('ids'), true);
+        $ids = json_decode((string) request('ids'), true);
 
         if ($ids == []) {
             return respond('Lütfen bir seçim yapın', 201);
@@ -397,7 +397,7 @@ class MainController extends Controller
     public function removeVariable()
     {
         $flag = false;
-        foreach (explode(',', request('variables')) as $id) {
+        foreach (explode(',', (string) request('variables')) as $id) {
             $flag = Permission::find($id)->delete();
         }
 
@@ -413,7 +413,7 @@ class MainController extends Controller
         $extension = json_decode(
             file_get_contents(
                 '/liman/extensions/'.
-                strtolower(extension()->name).
+                strtolower((string) extension()->name).
                 DIRECTORY_SEPARATOR.
                 'db.json'
             ),
@@ -425,7 +425,7 @@ class MainController extends Controller
         $lang = session('locale');
         $file =
             '/liman/extensions/'.
-            strtolower(extension()->name).
+            strtolower((string) extension()->name).
             '/lang/'.
             $lang.
             '.json';
@@ -463,12 +463,12 @@ class MainController extends Controller
 
     public function addFunctionPermissions()
     {
-        foreach (explode(',', request('functions')) as $function) {
+        foreach (explode(',', (string) request('functions')) as $function) {
             Permission::grant(
                 request('user_id'),
                 'function',
                 'name',
-                strtolower(extension()->name),
+                strtolower((string) extension()->name),
                 $function
             );
         }
@@ -478,7 +478,7 @@ class MainController extends Controller
 
     public function removeFunctionPermissions()
     {
-        foreach (explode(',', request('functions')) as $function) {
+        foreach (explode(',', (string) request('functions')) as $function) {
             Permission::find($function)->delete();
         }
 
@@ -549,7 +549,7 @@ class MainController extends Controller
         $extension = json_decode(
             file_get_contents(
                 '/liman/extensions/'.
-                strtolower(request('extension_name')).
+                strtolower((string) request('extension_name')).
                 DIRECTORY_SEPARATOR.
                 'db.json'
             ),
@@ -571,7 +571,7 @@ class MainController extends Controller
         }
 
         $data = PermissionData::where('permission_id', request('id'))->first();
-        $data = $data ? json_decode($data->data) : (object) [];
+        $data = $data ? json_decode((string) $data->data) : (object) [];
         foreach ($parameters as $key => $parameter) {
             $parameters[$key]['value'] = isset($data->{$parameter['variable']})
                 ? $data->{$parameter['variable']}
@@ -614,7 +614,7 @@ class MainController extends Controller
 
     public function addServerGroup()
     {
-        if (! request('name') || strlen(request('name')) < 1) {
+        if (! request('name') || strlen((string) request('name')) < 1) {
             return respond('Lütfen bir grup ismi girin.', 201);
         }
         if (ServerGroup::where('name', request('name'))->exists()) {
@@ -764,13 +764,13 @@ input(type="imtcp" port="514")';
                 env('MARKET_URL').'/connect/token',
                 ['form_params' => $params]
             );
-        } catch (BadResponseException $e) {
+        } catch (BadResponseException) {
             abort(504, 'Market hesabınız bağlanırken bir hata oluştu!');
         }
 
         $json = json_decode((string) $res->getBody());
         $requiredScopes = ['user_api', 'offline_access'];
-        $currentScopes = explode(' ', $json->scope);
+        $currentScopes = explode(' ', (string) $json->scope);
 
         if ($requiredScopes != $currentScopes) {
             abort(
@@ -841,7 +841,7 @@ input(type="imtcp" port="514")';
     public function getDNSServers()
     {
         $data = `grep nameserver /etc/resolv.conf | grep -v "#" | grep nameserver`;
-        $arr = explode("\n", $data);
+        $arr = explode("\n", (string) $data);
         $arr = array_filter($arr);
         $clean = [];
         foreach ($arr as $ip) {
@@ -879,7 +879,7 @@ input(type="imtcp" port="514")';
             request()->validate([
                 'photo' => 'mimes:jpeg,png|max:4096|required',
             ]);
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return respond('Dosya yükleme başarısız!', 201);
         }
 
@@ -892,7 +892,7 @@ input(type="imtcp" port="514")';
                 $uploadedFile,
                 $filename
             );
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return respond('Dosya yükleme başarısız!', 201);
         }
 

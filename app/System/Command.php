@@ -4,7 +4,7 @@ namespace App\System;
 
 class Command
 {
-    public static function run($command, $attributes = [], $log = true)
+    public static function run($command, $attributes = [], $log = true): string
     {
         return trim((string) server()->run(self::format($command, $attributes), $log));
     }
@@ -16,12 +16,12 @@ class Command
         return self::run(sudo().'echo {:command} | base64 -d | sudo bash', ['command' => base64_encode($command)], $attributes, $log);
     }
 
-    public static function runLiman($command, $attributes = [])
+    public static function runLiman($command, $attributes = []): string
     {
         return trim((string) shell_exec(self::format($command, $attributes)));
     }
 
-    public static function runSystem($command, $attributes = [])
+    public static function runSystem($command, $attributes = []): string
     {
         return trim((string) rootSystem()->runCommand(self::format($command, $attributes)));
     }
@@ -32,7 +32,7 @@ class Command
             $command = str_replace(
                 "@{:$attribute}",
                 self::clean($value),
-                $command
+                (string) $command
             );
             $command = str_replace(
                 "{:$attribute}",
@@ -54,8 +54,8 @@ class Command
         );
     }
 
-    private static function clean($value)
+    private static function clean($value): string
     {
-        return escapeshellcmd(escapeshellarg($value));
+        return escapeshellcmd(escapeshellarg((string) $value));
     }
 }

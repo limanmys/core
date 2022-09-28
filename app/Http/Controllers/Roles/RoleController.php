@@ -155,7 +155,7 @@ class RoleController extends Controller
      */
     public function addRoleUsers()
     {
-        foreach (json_decode(request('users')) as $user) {
+        foreach (json_decode((string) request('users')) as $user) {
             RoleUser::firstOrCreate([
                 'user_id' => User::where('email', $user)->first()->id,
                 'role_id' => request('role_id'),
@@ -177,7 +177,7 @@ class RoleController extends Controller
      */
     public function addRolesToUser()
     {
-        foreach (json_decode(request('ids')) as $role) {
+        foreach (json_decode((string) request('ids')) as $role) {
             RoleUser::firstOrCreate([
                 'user_id' => request('user_id'),
                 'role_id' => $role,
@@ -199,7 +199,7 @@ class RoleController extends Controller
      */
     public function removeRolesToUser()
     {
-        RoleUser::whereIn('role_id', json_decode(request('ids')))
+        RoleUser::whereIn('role_id', json_decode((string) request('ids')))
             ->where([
                 'user_id' => request('user_id'),
             ])
@@ -220,7 +220,7 @@ class RoleController extends Controller
      */
     public function removeRoleUsers()
     {
-        RoleUser::whereIn('user_id', json_decode(request('users')))
+        RoleUser::whereIn('user_id', json_decode((string) request('users')))
             ->where([
                 'role_id' => request('role_id'),
             ])
@@ -334,7 +334,7 @@ class RoleController extends Controller
      */
     public function addList()
     {
-        foreach (json_decode(request('ids'), true) as $id) {
+        foreach (json_decode((string) request('ids'), true) as $id) {
             Permission::grant(
                 request('role_id'),
                 request('type'),
@@ -361,7 +361,7 @@ class RoleController extends Controller
      */
     public function removeFromList()
     {
-        foreach (json_decode(request('ids'), true) as $id) {
+        foreach (json_decode((string) request('ids'), true) as $id) {
             Permission::revoke(request('role_id'), request('type'), 'id', $id);
         }
 
@@ -380,12 +380,12 @@ class RoleController extends Controller
      */
     public function addFunctionPermissions()
     {
-        foreach (explode(',', request('functions')) as $function) {
+        foreach (explode(',', (string) request('functions')) as $function) {
             Permission::grant(
                 request('role_id'),
                 'function',
                 'name',
-                strtolower(extension()->name),
+                strtolower((string) extension()->name),
                 $function,
                 'roles'
             );
@@ -405,7 +405,7 @@ class RoleController extends Controller
      */
     public function removeFunctionPermissions()
     {
-        foreach (explode(',', request('functions')) as $function) {
+        foreach (explode(',', (string) request('functions')) as $function) {
             Permission::find($function)->delete();
         }
 

@@ -29,7 +29,7 @@ class EventServiceProvider extends ServiceProvider
         registerModuleListeners();
     }
 
-    public function shouldDiscoverEvents()
+    public function shouldDiscoverEvents(): bool
     {
         return true;
     }

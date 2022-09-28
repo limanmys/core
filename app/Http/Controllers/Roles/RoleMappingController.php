@@ -28,7 +28,7 @@ class RoleMappingController extends Controller
         RoleMapping::create([
             'dn' => request('dn'),
             'role_id' => request('role_id'),
-            'group_id' => md5(request('dn')),
+            'group_id' => md5((string) request('dn')),
         ]);
 
         return respond('Rol eşleştirmesi başarıyla eklendi.');
