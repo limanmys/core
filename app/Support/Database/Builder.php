@@ -2,8 +2,8 @@
 
 namespace App\Support\Database;
 
-use Cache;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Facades\Cache;
 
 class Builder extends QueryBuilder
 {
@@ -14,9 +14,13 @@ class Builder extends QueryBuilder
      */
     protected function runSelect()
     {
-        return Cache::store('request')->remember($this->getCacheKey(), 1, function () {
+        try {
+            return Cache::store('array')->remember($this->getCacheKey(), 1, function () {
+                return parent::runSelect();
+            });
+        } catch (\Throwable) {
             return parent::runSelect();
-        });
+        }
     }
 
     /**
