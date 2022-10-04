@@ -41,7 +41,7 @@ class SettingsController extends Controller
         }
     }
 
-    public function settings_one(): \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+    public function settings_one()
     {
         system_log(7, 'EXTENSION_SETTINGS_PAGE', [
             'extension_id' => extension()->_id,

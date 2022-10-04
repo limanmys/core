@@ -15,7 +15,7 @@ class Builder extends QueryBuilder
     protected function runSelect()
     {
         try {
-            return Cache::store('redis')->remember($this->getCacheKey(), 300, function () {
+            return Cache::store('redis')->remember($this->getCacheKey(), 1, function () {
                 return parent::runSelect();
             });
         } catch (\Throwable) {
