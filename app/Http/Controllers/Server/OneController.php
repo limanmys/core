@@ -1073,7 +1073,7 @@ class OneController extends Controller
 
                 if ($row->lmn_level == "high_level" && $k == "request_details") {
                     foreach($row->request_details as $key => $val) {
-                        if ($key == "level" || $key == "log_id") {
+                        if ($key == "level" || $key == "log_id" || $key == "token") {
                             continue;
                         }
 
@@ -1089,7 +1089,7 @@ class OneController extends Controller
                     continue;
                 }
                 
-                if ($row->lmn_level != "high_level" && $k == "request_details") {
+                if ($row->lmn_level != "high_level" && $k == "request_details" && $k != "token") {
                     array_push($logs, [
                         "title" => __($k),
                         "message" => json_encode($v, JSON_PRETTY_PRINT)
