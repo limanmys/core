@@ -13,7 +13,7 @@ class Command
     {
         $command = trim((string) self::format($command, $attributes));
 
-        return self::run(sudo().'echo {:command} | base64 -d | sudo bash', ['command' => base64_encode($command)], $attributes, $log);
+        return self::run(sudo() . $command, $log);
     }
 
     public static function runLiman($command, $attributes = []): string
@@ -28,6 +28,10 @@ class Command
 
     private static function format($command, $attributes = [])
     {
+        if (! is_array($attributes)) {
+            return $command;
+        }
+
         foreach ($attributes as $attribute => $value) {
             $command = str_replace(
                 "@{:$attribute}",

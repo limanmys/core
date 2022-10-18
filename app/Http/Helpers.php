@@ -909,11 +909,8 @@ if (! function_exists('sudo')) {
         if (server()->key()->type == 'ssh_certificate') {
             return 'sudo ';
         }
-        $pass64 = base64_encode(extensionDb('clientPassword')."\n");
 
-        return 'echo '.
-            $pass64.
-            ' | base64 -d | sudo -S -p " " id 2>/dev/null 1>/dev/null; sudo ';
+        return 'sudo -p "liman-pass-sudo" ';
     }
 }
 
