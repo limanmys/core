@@ -42,6 +42,13 @@ class SearchController extends Controller
             $extensions = $server->extensions();
 
             foreach ($extensions as $extension) {
+                if (! empty($extension->display_name)) {
+                    array_push($searchable, [
+                        'name' => $server->name.' / '.$extension->display_name,
+                        'url' => route('extension_server', [$extension->id, $server->city, $server->id]),
+                    ]);
+                    continue;
+                }
                 array_push($searchable, [
                     'name' => $server->name.' / '.$extension->name,
                     'url' => route('extension_server', [$extension->id, $server->city, $server->id]),
