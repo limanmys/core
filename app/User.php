@@ -104,6 +104,7 @@ class User extends Authenticatable
     public function favorites()
     {
         return $this->belongsToMany('\App\Models\Server', 'user_favorites')
+            ->orderBy("created_at", "ASC")
             ->get()
             ->filter(function ($server) {
                 return Permission::can(user()->id, 'server', 'id', $server->id);
