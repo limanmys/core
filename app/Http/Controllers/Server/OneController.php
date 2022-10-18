@@ -1054,7 +1054,7 @@ class OneController extends Controller
 
                 if ($row->lmn_level == 'high_level' && $k == 'request_details') {
                     foreach ($row->request_details as $key => $val) {
-                        if ($key == 'level' || $key == 'log_id') {
+                        if ($key == 'level' || $key == 'log_id' || $key == 'token') {
                             continue;
                         }
 
@@ -1094,13 +1094,27 @@ class OneController extends Controller
     {
         if (server()->isLinux()) {
             $package = request('package_name');
-            $raw = Command::runSudo(
-                'DEBIAN_FRONTEND=noninteractive apt install @{:package} -qqy >"/tmp/{:packageBase}.txt" 2>&1 & disown && echo $!',
-                [
-                    'packageBase' => basename((string) $package),
-                    'package' => $package,
-                ]
+            $pkgman = server()->run(
+                "which apt >/dev/null 2>&1 && echo apt || echo rpm"
             );
+            if ($pkgman == "apt") {
+                $raw = Command::runSudo(
+                    'DEBIAN_FRONTEND=noninteractive apt install @{:package} -qqy >"/tmp/{:packageBase}.txt" 2>&1 & disown && echo $!',
+                    [
+                        'packageBase' => basename((string) $package),
+                        'package' => $package,
+                    ]
+                );
+            } else {
+                $raw = Command::runSudo(
+                    'nohup bash -c "yum install @{:package} -y >"/tmp/{:packageBase}.txt" 2>&1 & disown && echo $!"',
+                    [
+                        'packageBase' => basename((string) $package),
+                        'package' => $package,
+                    ]
+                );
+            }
+            
             system_log(7, 'Paket Güncelleme', [
                 'package_name' => request('package_name'),
             ]);
@@ -1114,12 +1128,15 @@ class OneController extends Controller
     public function checkPackage()
     {
         $mode = request('mode') ? request('mode') : 'update';
+        $pkgman = server()->run(
+            "which apt >/dev/null 2>&1 && echo apt || echo rpm"
+        );
         $output = trim(
             server()->run(
-                "ps aux | grep \"apt \|dpkg \" | grep -v grep 2>/dev/null 1>/dev/null && echo '1' || echo '0'"
+                "ps aux | grep \"apt \|dpkg \|rpm \|yum \" | grep -v grep 2>/dev/null 1>/dev/null && echo '1' || echo '0'"
             )
         );
-        $command_output = Command::runSudo('cat "/tmp/{:packageBase}.txt" 2> /dev/null | base64', [
+        $command_output = Command::runSudo('cat "/tmp/{:packageBase}.txt" | base64 ', [
             'packageBase' => basename((string) request('package_name')),
         ]);
         $command_output = base64_decode((string) $command_output);
@@ -1127,23 +1144,46 @@ class OneController extends Controller
             'packageBase' => basename((string) request('package_name')),
         ]);
         if ($output === '0') {
-            $list_method = $mode == 'install' ? '--installed' : '--upgradable';
+            if ($pkgman == "apt") {
+                $list_method = $mode == 'install' ? '--installed' : '--upgradable';
+            } else {
+                $list_method = $mode == 'install' ? 'installed' : 'upgrades';
+            }
             $package = request('package_name');
             if (endsWith($package, '.deb')) {
                 $package = Command::runSudo('dpkg -I @{:package} | grep Package: | cut -d\':\' -f2 | tr -d \'[:space:]\'', [
                     'package' => $package,
                 ]);
-            }
-            $package = Command::runSudo(
-                'apt list '.
-                    $list_method.
-                    ' 2>/dev/null | grep '.
-                    '@{:package}'.
-                    ' && echo 1 || echo 0',
-                [
+            } 
+            if (endsWith($package, '.rpm')) {
+                $package = Command::runSudo('rpm -qip @{:package} 2>/dev/null | grep "Name" | cut -d\':\' -f2 | tr -d \'[:space:]\'', [
                     'package' => $package,
-                ]
-            );
+                ]);
+            }
+            if ($pkgman == "apt") {
+                $package = Command::runSudo(
+                    'apt list '.
+                        $list_method.
+                        ' 2>/dev/null | grep '.
+                        '@{:package}'.
+                        ' && echo 1 || echo 0',
+                    [
+                        'package' => $package,
+                    ]
+                );
+            } else {
+                $package = Command::runSudo(
+                    'yum list '.
+                        $list_method.
+                        ' 2>/dev/null | grep '.
+                        '@{:package}'.
+                        ' && echo 1 || echo 0',
+                    [
+                        'package' => $package,
+                    ]
+                );
+            }
+            
             if (
                 ($mode == 'update' && $output == '0') ||
                 ($mode == 'install' && $output != '0')
@@ -1204,75 +1244,152 @@ class OneController extends Controller
 
     public function updateList()
     {
-        $updates = [];
-        $raw = server()->run(
-            sudo().
-                'apt-get -qq update 2> /dev/null > /dev/null; '.
-                sudo().
-                "apt list --upgradable 2>/dev/null | sed '1,1d'"
+        $pkgman = server()->run(
+            "which apt >/dev/null 2>&1 && echo apt || echo rpm"
         );
-        foreach (explode("\n", $raw) as $package) {
-            if ($package == '' || str_contains($package, 'List')) {
-                continue;
+
+        if ($pkgman == "apt") {
+            $updates = [];
+            $raw = server()->run(
+                sudo().
+                    'apt-get -qq update 2> /dev/null > /dev/null; '.
+                    sudo().
+                    "apt list --upgradable 2>/dev/null | sed '1,1d'"
+            );
+            foreach (explode("\n", $raw) as $package) {
+                if ($package == '' || str_contains($package, 'List')) {
+                    continue;
+                }
+                $row = explode(' ', $package, 4);
+                try {
+                    array_push($updates, [
+                        'name' => $row[0],
+                        'version' => $row[1],
+                        'type' => $row[2],
+                        'status' => $row[3],
+                    ]);
+                } catch (\Exception) {
+                }
             }
-            $row = explode(' ', $package, 4);
-            try {
-                array_push($updates, [
-                    'name' => $row[0],
-                    'version' => $row[1],
-                    'type' => $row[2],
-                    'status' => $row[3],
-                ]);
-            } catch (\Exception) {
-            }
+    
+            return [
+                'count' => count($updates),
+                'list' => $updates,
+                'table' => view('table', [
+                    'id' => 'updateListTable',
+                    'value' => $updates,
+                    'title' => ['Paket Adı', 'Versiyon', 'Tip', 'Durumu'],
+                    'display' => ['name', 'version', 'type', 'status'],
+                    'menu' => [
+                        'Güncelle' => [
+                            'target' => 'updateSinglePackage',
+                            'icon' => 'fa-sync',
+                        ],
+                    ],
+                ])->render(),
+            ];
         }
 
-        return [
-            'count' => count($updates),
-            'list' => $updates,
-            'table' => view('table', [
-                'id' => 'updateListTable',
-                'value' => $updates,
-                'title' => ['Paket Adı', 'Versiyon', 'Tip', 'Durumu'],
-                'display' => ['name', 'version', 'type', 'status'],
-                'menu' => [
-                    'Güncelle' => [
-                        'target' => 'updateSinglePackage',
-                        'icon' => 'fa-sync',
+        if ($pkgman == "rpm") {
+            $updates = [];
+            $raw = server()->run(
+                sudo().
+                    "yum list upgrades --exclude=*.src 2>/dev/null | awk {'print $1 \" \" $2 \" \" $3'} | sed '1,3d'"
+            );
+            foreach (explode("\n", $raw) as $package) {
+                if ($package == '' || str_contains($package, 'List')) {
+                    continue;
+                }
+                $row = explode(' ', $package, 4);
+                try {
+                    array_push($updates, [
+                        'name' => $row[0],
+                        'version' => $row[1],
+                        'type' => $row[2],
+                    ]);
+                } catch (\Exception) {
+                }
+            }
+    
+            return [
+                'count' => count($updates),
+                'list' => $updates,
+                'table' => view('table', [
+                    'id' => 'updateListTable',
+                    'value' => $updates,
+                    'title' => ['Paket Adı', 'Versiyon', 'Repo'],
+                    'display' => ['name', 'version', 'type'],
+                    'menu' => [
+                        'Güncelle' => [
+                            'target' => 'updateSinglePackage',
+                            'icon' => 'fa-sync',
+                        ],
                     ],
-                ],
-            ])->render(),
-        ];
+                ])->render(),
+            ];
+        }
     }
 
     public function packageList()
     {
-        $raw = server()->run(
-            sudo()."apt list --installed 2>/dev/null | sed '1,1d'",
-            false
+        $pkgman = server()->run(
+            "which apt >/dev/null 2>&1 && echo apt || echo rpm"
         );
-        $packages = [];
-        foreach (explode("\n", $raw) as $package) {
-            if ($package == '') {
-                continue;
-            }
-            $row = explode(' ', $package);
-            try {
-                array_push($packages, [
-                    'name' => $row[0],
-                    'version' => $row[1],
-                    'type' => $row[2],
-                    'status' => $row[3],
-                ]);
-            } catch (Exception) {
-            }
-        }
 
-        return magicView('table', [
-            'value' => $packages,
-            'title' => ['Paket Adı', 'Versiyon', 'Tip', 'Durumu'],
-            'display' => ['name', 'version', 'type', 'status'],
-        ]);
+        if ($pkgman == "apt") {
+            $raw = server()->run(
+                sudo()."apt list --installed 2>/dev/null | sed '1,1d'",
+                false
+            );
+            $packages = [];
+            foreach (explode("\n", $raw) as $package) {
+                if ($package == '') {
+                    continue;
+                }
+                $row = explode(' ', $package);
+                try {
+                    array_push($packages, [
+                        'name' => $row[0],
+                        'version' => $row[1],
+                        'type' => $row[2],
+                        'status' => $row[3],
+                    ]);
+                } catch (Exception) {
+                }
+            }
+    
+            return magicView('table', [
+                'value' => $packages,
+                'title' => ['Paket Adı', 'Versiyon', 'Tip', 'Durumu'],
+                'display' => ['name', 'version', 'type', 'status'],
+            ]);
+        } else {
+            $raw = server()->run(
+                sudo()."yum list --installed 2>/dev/null | awk {'print $1 \" \" $2 \" \"  $3'} | sed '1,1d'",
+                false
+            );
+            $packages = [];
+            foreach (explode("\n", $raw) as $package) {
+                if ($package == '') {
+                    continue;
+                }
+                $row = explode(' ', $package);
+                try {
+                    array_push($packages, [
+                        'name' => $row[0],
+                        'version' => $row[1],
+                        'type' => $row[2],
+                    ]);
+                } catch (Exception) {
+                }
+            }
+    
+            return magicView('table', [
+                'value' => $packages,
+                'title' => ['Paket Adı', 'Versiyon', 'Paket Lokasyonu'],
+                'display' => ['name', 'version', 'type'],
+            ]);
+        }
     }
 
     public function removeExtension()
