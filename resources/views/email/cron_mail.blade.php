@@ -1,25 +1,3 @@
-From: {{$from}}
-To: {{$to}}
-Subject: {{$subject}}
-Content-Type: multipart/alternative; boundary="boundary-string"
-
---boundary-string
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Congrats for sending test email with Mailtrap!
-
-Inspect it using the tabs above and learn how this email can be improved.
-Now send your email using our fake SMTP server and integration of your choice!
-
-Good luck! Hope it works.
-
---boundary-string
-Content-Type: text/html; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
 <!doctype html>
 <html>
   <head>
@@ -36,7 +14,7 @@ Content-Disposition: inline
             @foreach ($row as $key => $value)
               <b>{{ $key }}: </b>{{ $value }}<br>
             @endforeach
-            <br><br>------------<br><br>
+            <br><hr /><br>
           @endforeach
         @endif
         <br><br>
@@ -49,5 +27,3 @@ Content-Disposition: inline
     </style>
   </body>
 </html>
-
---boundary-string--

@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class CronEmailJob implements ShouldQueue
 {
@@ -44,60 +45,72 @@ class CronEmailJob implements ShouldQueue
      */
     public function handle()
     {
-        if (! $this->doubleCheckTime()) {
+        if (!$this->doubleCheckTime()) {
             return;
         }
-        if ($this->obj->type == 'extension') {
-            $filePath = env('LOG_EXTENSION_PATH');
-        } else {
-            $filePath = env('LOG_PATH');
-        }
-        if (! is_file($filePath)) {
+
+        if (!is_file("/liman/logs/liman_new.log")) {
             return;
         }
-        $now = Carbon::now();
+
+        $now = Carbon::now()->unix();
         switch ($this->obj->cron_type) {
             case 'hourly':
-                $before = Carbon::now()->subHour();
+                $before = Carbon::now()->subHour()->unix();
                 break;
             case 'daily':
-                $before = Carbon::now()->subDay();
+                $before = Carbon::now()->subDay()->unix();
                 break;
             case 'weekly':
-                $before = Carbon::now()->subWeek();
+                $before = Carbon::now()->subWeek()->unix();
                 break;
             case 'monthly':
-                $before = Carbon::now()->subMonth();
+                $before = Carbon::now()->subMonth()->unix();
                 break;
         }
+
         foreach ($this->target as $target) {
-            $encoded = base64_encode($this->obj->extension_id.'-'.$this->obj->server_id.'-'.$target);
-            $time = "awk -F'[]]|[[]'   '$0 ~ /^\[/ && $2 >= \"$before\" { p=1 } $0 ~ /^\[/ && $2 >= \"$now\" { p=0 } p { print $0 }' /liman/logs/extension.log";
+            $encoded = base64_encode($this->obj->extension_id . '-' . $this->obj->server_id . '-' . $target);
+            $logs = Command::runLiman('cat /liman/logs/liman_new.log | grep @{:encoded}', [
+                'encoded' => $encoded
+            ]);
+
+            $logs = explode("\n", $logs);
+            foreach ($logs as $key => &$item) {
+                $tmp = json_decode($item);
+
+                if (!isset($tmp->ts)) {
+                    continue;
+                }
+
+                if ($tmp->ts < $before) {
+                    unset($logs[$key]);
+                }
+            }
+            $logs = implode("\n", $logs);
 
             foreach ($this->users as $user) {
-                $output = Command::runLiman(':time: | grep @{:encoded} | grep @{:user_id}', [
-                    'time' => $time,
-                    'encoded' => $encoded,
+                $output = Command::runLiman("echo ':logs:' | grep @{:user_id}", [
+                    'logs' => $logs,
                     'user_id' => $user->id,
                 ]);
 
                 $data = [];
-                if (! empty($output)) {
-                    foreach (explode("\n", trim((string) $output)) as $row) {
-                        $fetch = explode('liman_render:', $row);
-                        if (isset($fetch[1])) {
-                            $message = json_decode(trim($fetch[1]));
-                            if ($message && isset($message->data)) {
-                                $decoded = json_decode((string) $message->data);
-                                $decoded && $data[] = $decoded;
-                            }
+                if (!empty($output)) {
+                    foreach (explode("\n", $output) as $row) {
+                        $message = json_decode($row);
+
+                        if (isset($message->request_details->data)) {
+                            $decoded = json_decode((string) $message->request_details->data);
+                            $data[] = $decoded;
                         }
                     }
+                } else {
+                    continue;
                 }
 
-                $count = Command::runLiman(':time: | grep @{:encoded} | grep @{:user_id} | wc -l', [
-                    'time' => $time,
-                    'encoded' => $encoded,
+                $count = Command::runLiman('echo @{:logs} | grep @{:user_id} | wc -l', [
+                    'logs' => $logs,
                     'user_id' => $user->id,
                 ]);
 
@@ -105,36 +118,33 @@ class CronEmailJob implements ShouldQueue
                     if ((int) $count == 0) {
                         continue;
                     }
+
                     $view = view('email.cron_mail', [
                         'user_name' => $user->name,
                         'subject' => 'Liman MYS Bilgilendirme',
                         'result' => $count,
                         'data' => $data,
-                        'before' => $before,
-                        'now' => $now,
+                        'before' => Carbon::parse($before)->isoFormat("LLL"),
+                        'now' => Carbon::parse($now)->isoFormat("LLL"),
                         'server' => $this->server,
                         'extension' => $this->extension,
                         'target' => $this->getTagText($target, $this->extension->name),
                         'from' => trim((string) env('APP_NOTIFICATION_EMAIL')),
                         'to' => $to,
                     ])->render();
-                    $file = '/tmp/'.str_random(16);
-                    file_put_contents($file, $view);
-                    $output = Command::runLiman('curl -s -v --connect-timeout 15 "smtp://{:mail_host}:{:mail_port}" -u "{:mail_username}:{:mail_password}" --mail-from "{:mail_from}" --mail-rcpt "{:mail_receipt}" -T {:file} 2>&1', [
-                        'mail_host' => trim((string) env('MAIL_HOST')),
-                        'mail_port' => trim((string) env('MAIL_PORT')),
-                        'mail_username' => trim((string) env('MAIL_USERNAME')),
-                        'mail_password' => trim((string) env('MAIL_PASSWORD')),
-                        'mail_from' => trim((string) env('APP_NOTIFICATION_EMAIL')),
-                        'mail_receipt' => trim((string) $to),
-                        'file' => $file,
-                    ]);
+
+                    Mail::send([], [], function ($message) use ($view, $to) {
+                        $message
+                            ->to($to)
+                            ->subject("Liman MYS Bilgilendirme")
+                            ->from(trim((string) env('APP_NOTIFICATION_EMAIL')))
+                            ->html($view)
+                            ->text($view);
+                    });
+
                     if (env('MAIL_DEBUG')) {
                         echo "---BEGIN---\n$output\n---END---\n";
                     }
-                    Command::runLiman('rm @{:file}', [
-                        'file' => $file,
-                    ]);
                 }
             }
         }
@@ -147,8 +157,8 @@ class CronEmailJob implements ShouldQueue
 
     private function getTagText($key, $extension_name)
     {
-        if (! array_key_exists($extension_name, $this->tagTexts)) {
-            $file = file_get_contents('/liman/extensions/'.strtolower((string) $extension_name).'/db.json');
+        if (!array_key_exists($extension_name, $this->tagTexts)) {
+            $file = file_get_contents('/liman/extensions/' . strtolower((string) $extension_name) . '/db.json');
             $json = json_decode($file, true);
             if (json_last_error() != JSON_ERROR_NONE) {
                 return $key;
@@ -156,7 +166,7 @@ class CronEmailJob implements ShouldQueue
             $this->tagTexts[$extension_name] = $json;
         }
 
-        if (! array_key_exists('mail_tags', $this->tagTexts[$extension_name])) {
+        if (!array_key_exists('mail_tags', $this->tagTexts[$extension_name])) {
             return $key;
         }
         foreach ($this->tagTexts[$extension_name]['mail_tags'] as $obj) {
