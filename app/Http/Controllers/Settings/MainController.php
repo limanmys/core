@@ -79,8 +79,13 @@ class MainController extends Controller
     public function setLimanTweaks()
     {
         validate([
-            'NAV_SERVER_COUNT' => 'required|numeric|digits_between:1,2',
+            'NAV_SERVER_COUNT' => 'required|numeric|digits_between:1,2|min:1',
         ]);
+
+        auth()->user()->update([
+            "locale" => request('APP_LANG')
+        ]);
+        \Session::put('locale', request('APP_LANG'));
 
         $flag = setEnv([
             'APP_DEBUG' => request('APP_DEBUG'),
