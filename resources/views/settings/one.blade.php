@@ -382,8 +382,10 @@
             var form = new FormData(data);
             form.append('user_id','{{$user->id}}');
             request('{{route('update_user')}}',form,function () {
-                Swal.close();
-                location.reload();
+                Swal.fire("", "Kullanıcı başarıyla güncellendi.", "success");
+                setTimeout(function () {
+                    location.reload();
+                },3000);
             }, function(response){
                 var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);

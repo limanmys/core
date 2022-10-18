@@ -186,7 +186,7 @@
             let json = JSON.parse(success);
             showSwal(json.message,"success",2000);
             setTimeout(function () {
-                getLimanTweaks();
+                location.reload();
             },2000);
         },function (error) {
             let json = JSON.parse(error);

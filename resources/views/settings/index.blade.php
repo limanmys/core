@@ -461,7 +461,7 @@
         "id"=>"add_role",
         "title" => "Rol Grubu Ekle",
         "url" => route('role_add'),
-        "next" => "getRoleList",
+        "next" => "reload",
         "inputs" => [
             "Adı" => "name:text"
         ],
@@ -942,8 +942,13 @@
                 }
 
             }, function (error) {
+                console.log(error);
+                var box = $("#output");
+                box.html("");
+                box.append("<div class='alert alert-" + "success" + "' role='alert'>" +
+                        "Hata bulunamadı" +
+                        "</div>");
                 Swal.close();
-                alert("hata");
             });
         }
 
