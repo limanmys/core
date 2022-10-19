@@ -407,35 +407,6 @@ function fixer(val) {
   if (!val) return val;
   return val.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-var currentlyDark =
-  window.localStorage.getItem("dark") == "true" ? true : false;
-
-function toggleDarkMode() {
-  currentlyDark = !currentlyDark;
-  if (currentlyDark == true) {
-    setDarkMode();
-  } else {
-    setLightMode();
-  }
-}
-
-function setDarkMode() {
-  document.getElementById("darkModeIcon").className = "fas fa-moon";
-  var link = document.createElement("link");
-  link.href = "/css/dark.css";
-  link.type = "text/css";
-  link.id = "darkModeCss";
-  link.rel = "stylesheet";
-  link.media = "screen,print";
-  document.getElementsByTagName("head")[0].appendChild(link);
-  window.localStorage.setItem("dark", "true");
-}
-
-function setLightMode() {
-  document.getElementById("darkModeIcon").className = "fas fa-sun";
-  window.$("#darkModeCss").remove();
-  window.localStorage.setItem("dark", "false");
-}
 
 window.Echo = new Echo({
   broadcaster: "pusher",

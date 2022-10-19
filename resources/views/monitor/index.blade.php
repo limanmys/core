@@ -9,6 +9,14 @@
     </nav>
     
     <div class="row">
+            @if (count($monitor_servers) < 1) 
+                <div class="col-md-12">
+                    <div style="min-height: 60vh; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                        <h2 style="font-weight: 600">{{ __('Sunucu bulunamadı.') }}</h2>
+                        <h5>{{ __('Sağ alttaki artı düğmesinden yeni sunucu ekleyebilirsiniz.') }}</h5>
+                    </div>
+                </div>
+            @endif
             @foreach($monitor_servers as $server)
                 @if($server->online)
                 <div class="col-md-3 monitorServer" id="{{$server->id}}">

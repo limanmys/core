@@ -976,5 +976,10 @@
   "message": "Special Log Content",
   "server_id": "Server ID",
   "title": "Special Log Title",
-  "request_details": "Request Details"
+  "request_details": "Request Details",
+  "Sağ alttaki artı düğmesinden yeni sunucu ekleyebilirsiniz.": "You can add a new server to track from bottom right plus button.",
+  "Paket Yükle": "Upload Package",
+  "Paket (.rpm / .deb)": "Package (.rpm / .deb)",
+  "Paketin depodaki adını giriniz. Örneğin": "Enter the package name in the repository.",
+  "Paket Lokasyonu": "Package Location"
 }

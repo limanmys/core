@@ -24,16 +24,7 @@
                             data-widget="pushmenu" href="#" onclick="$('[role=tooltip]').remove(); collapseNav()"
                             id="collapseMenu"><i class="fas fa-bars"></i></a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tooltip" title="{{ __('Karanlık mod') }}"
-                            onclick="toggleDarkMode()"><i id="darkModeIcon" class="fas fa-sun"></i></a>
-                    </li>
 @endif
-<script>
-    if (typeof currentlyDark != "undefined" && currentlyDark == true) {
-        setDarkMode();
-    }
-</script>
 <li class="nav-item d-none d-md-block">
     <a href="/takip" class="nav-link" data-toggle="tooltip" title="{{ __('Sunucu Takibi') }}">
         <i class="fa-solid fa-eye"></i>
