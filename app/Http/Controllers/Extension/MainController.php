@@ -20,30 +20,6 @@ use ZipArchive;
  */
 class MainController extends Controller
 {
-    public function allServers(): \Factory|\View
-    {
-        // Get Servers of Extension
-        $servers = extension()->servers();
-
-        // Extract Cities of the Servers.
-        $cities = array_values(objectToArray($servers, 'city', 'city'));
-        system_log(7, 'EXTENSION_SERVERS_INDEX', [
-            'extension_id' => extension()->id,
-        ]);
-        if (count($cities) == 1) {
-            return redirect(
-                route('extension_city', [
-                    'extension_id' => extension()->id,
-                    'city' => $cities[0],
-                ])
-            );
-        }
-        // Render View with Cities
-        return magicView('extension_pages.index', [
-            'cities' => implode(',', $cities),
-        ]);
-    }
-
     /**
      * @return BinaryFileResponse
      */

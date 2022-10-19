@@ -979,24 +979,6 @@ if (! function_exists('cleanArray')) {
     }
 }
 
-if (! function_exists('cities')) {
-    /**
-     * @param  null  $city
-     */
-    function cities($city = null): array|false|int|string
-    {
-        $cities = json_decode(
-            file_get_contents(storage_path('cities.json')),
-            true
-        );
-        if ($city) {
-            return array_search($city, $cities);
-        }
-
-        return $cities;
-    }
-}
-
 if (! function_exists('cleanDash')) {
     /**
      * @return array|Request|string

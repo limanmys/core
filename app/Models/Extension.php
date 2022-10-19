@@ -51,25 +51,10 @@ class Extension extends Model
     }
 
     /**
-     * @param  null  $city
      * @return mixed
      */
-    public function servers($city = null)
+    public function servers()
     {
-        // Get all Servers which have this extension.
-        if ($city) {
-            return Server::getAll()
-                ->where('city', $city)
-                ->filter(function ($value) {
-                    return DB::table('server_extensions')
-                        ->where([
-                            'server_id' => $value->id,
-                            'extension_id' => request('extension_id'),
-                        ])
-                        ->exists();
-                });
-        }
-
         return Server::getAll()->filter(function ($value) {
             return DB::table('server_extensions')
                 ->where([

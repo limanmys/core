@@ -2,7 +2,7 @@
 
 Route::match(
     ['GET', 'POST'],
-    '/l/{extension_id}/{city}/{server_id}/{target_function?}',
+    '/l/{extension_id}/{server_id}/{target_function?}',
     'Extension\Sandbox\MainController@API'
 )
     ->name('extension_server')
@@ -12,16 +12,6 @@ Route::match(
 Route::post('/extension/run/{unique_code}', 'Extension\OneController@route')
     ->name('extension_api')
     ->middleware(['server_api', 'extension']);
-
-// Extension Page (City Select) Route
-Route::get('/l/{extension_id}', 'Extension\MainController@allServers')->name(
-    'extension_map'
-);
-
-// Extension City Servers Route
-Route::view('/l/{extension_id}/{city}', 'extension_pages.city')->name(
-    'extension_city'
-);
 
 // Extensions List Route
 Route::get('/eklentiler', 'Extension\SettingsController@settings_all')

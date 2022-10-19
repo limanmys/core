@@ -44,7 +44,7 @@ class RestrictedMode
                 return redirect()->route('extension_server', [
                     'extension_id' => env('LIMAN_RESTRICTED_EXTENSION'),
                     'server_id' => env('LIMAN_RESTRICTED_SERVER'),
-                    'city' => server()->city,
+                    
                 ]);
             }
         }

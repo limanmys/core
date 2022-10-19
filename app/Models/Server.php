@@ -19,7 +19,6 @@ class Server extends Model
     protected $fillable = [
         'name',
         'ip_address',
-        'city',
         'type',
         'control_port',
         'os',

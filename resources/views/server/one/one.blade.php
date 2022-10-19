@@ -274,13 +274,6 @@
                         <label>{{ __('Ip Adresi') }}</label>
                         <input type="text" name="ip_address" placeholder="Ip Adresi" class="form-control mb-3"
                             required="" value="{{ server()->ip_address }}">
-                        <label>{{ __('Şehir') }}</label>
-                        <select name="city" class="form-control mb-3" required="">
-                            @foreach (cities() as $city => $value)
-                                <option value="{{ $value }}" @if ($value == server()->city) selected @endif>
-                                    {{ $city }}</option>
-                            @endforeach
-                        </select>
                         @if (user()->isAdmin())
                             <label id="sharedKeyLabel" style="width: 100%; margin-bottom: 15px;">
                                 <input id="sharedKey" name="shared" type="checkbox"

@@ -236,7 +236,6 @@ class OneController extends Controller
             'name' => request('name'),
             'control_port' => request('control_port'),
             'ip_address' => request('ip_address'),
-            'city' => request('city'),
         ];
 
         if (user()->isAdmin()) {

@@ -17,11 +17,6 @@
             {{ $server->ip_address }}
         </p>
         <hr>
-        <strong>{{ __('Şehir') }}</strong>
-        <p class="text-muted">
-            {{ __(cities($server->city)) }}
-        </p>
-        <hr>
         @isset($outputs["user"])
         <strong>{{ __('Giriş Yapmış Kullanıcı') }}</strong>
         <p class="text-muted">
@@ -36,7 +31,7 @@
                     <span 
                         class="badge btn-secondary status_{{$extension->id}}"
                         style="cursor:pointer; font-size: 14px; margin-bottom: 5px"
-                        onclick="window.location.href = '{{route('extension_server',["extension_id" => $extension->id, "city" => $server->city, "server_id" => $server->id])}}'">
+                        onclick="window.location.href = '{{route('extension_server',["extension_id" => $extension->id, "server_id" => $server->id])}}'">
                         {{$extension->display_name}}
                     </span>
                 @endforeach

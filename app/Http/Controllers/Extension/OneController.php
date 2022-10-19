@@ -24,9 +24,9 @@ class OneController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                    strtolower((string) extension()->name).
-                    DIRECTORY_SEPARATOR.
+                '/liman/extensions/' .
+                    strtolower((string) extension()->name) .
+                    DIRECTORY_SEPARATOR .
                     'db.json'
             ),
             true
@@ -35,13 +35,12 @@ class OneController extends Controller
             if (
                 $key['type'] == 'password' &&
                 request($key['variable']) !=
-                    request($key['variable'].'_confirmation')
+                request($key['variable'] . '_confirmation')
             ) {
                 return redirect(
                     route('extension_server_settings_page', [
                         'extension_id' => extension()->id,
                         'server_id' => server()->id,
-                        'city' => server()->city,
                     ])
                 )
                     ->withInput()
@@ -57,7 +56,7 @@ class OneController extends Controller
                 'name' => $key['variable'],
             ];
 
-            if (! isset($key['global']) || $key['global'] === false) {
+            if (!isset($key['global']) || $key['global'] === false) {
                 $opts['user_id'] = user()->id;
             }
 
@@ -65,13 +64,12 @@ class OneController extends Controller
             $variable = request($key['variable']);
             if ($variable) {
                 if ($row->exists()) {
-                    $encKey = env('APP_KEY').user()->id.server()->id;
+                    $encKey = env('APP_KEY') . user()->id . server()->id;
                     if ($row->first()->user_id != user()->id) {
                         return redirect(
                             route('extension_server_settings_page', [
                                 'extension_id' => extension()->id,
                                 'server_id' => server()->id,
-                                'city' => server()->city,
                             ])
                         )
                             ->withInput()
@@ -86,7 +84,7 @@ class OneController extends Controller
                         'updated_at' => Carbon::now(),
                     ]);
                 } else {
-                    $encKey = env('APP_KEY').user()->id.server()->id;
+                    $encKey = env('APP_KEY') . user()->id . server()->id;
                     DB::table('user_settings')->insert([
                         'id' => Str::uuid(),
                         'server_id' => server()->id,
@@ -135,7 +133,6 @@ class OneController extends Controller
                     route('extension_server_settings_page', [
                         'extension_id' => extension()->id,
                         'server_id' => server()->id,
-                        'city' => server()->city,
                     ])
                 )
                     ->withInput()
@@ -153,7 +150,7 @@ class OneController extends Controller
             route('extension_server', [
                 'extension_id' => extension()->id,
                 'server_id' => server()->id,
-                'city' => server()->city,
+
             ])
         );
     }
@@ -165,9 +162,9 @@ class OneController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                    strtolower((string) extension()->name).
-                    DIRECTORY_SEPARATOR.
+                '/liman/extensions/' .
+                    strtolower((string) extension()->name) .
+                    DIRECTORY_SEPARATOR .
                     'db.json'
             ),
             true
@@ -191,7 +188,7 @@ class OneController extends Controller
                 'name' => $item['variable'],
             ];
 
-            if (! isset($item['global']) || $item['global'] === false) {
+            if (!isset($item['global']) || $item['global'] === false) {
                 $opts['user_id'] = user()->id;
             }
 
@@ -200,9 +197,9 @@ class OneController extends Controller
                 ->first();
             if ($obj) {
                 if (array_key_exists('user_id', $opts)) {
-                    $key = env('APP_KEY').user()->id.server()->id;
+                    $key = env('APP_KEY') . user()->id . server()->id;
                 } else {
-                    $key = env('APP_KEY').$obj->user_id.server()->id;
+                    $key = env('APP_KEY') . $obj->user_id . server()->id;
                     if ($obj->user_id != user()->id) {
                         array_push($globalVars, $item['variable']);
                     }
@@ -215,7 +212,7 @@ class OneController extends Controller
             }
         }
 
-        if (env('LIMAN_RESTRICTED') == true && ! user()->isAdmin()) {
+        if (env('LIMAN_RESTRICTED') == true && !user()->isAdmin()) {
             return magicView('extension_pages.setup_restricted', [
                 'extension' => $extension,
                 'similar' => $similar,
@@ -247,7 +244,7 @@ class OneController extends Controller
 
     public function forceDepInstall()
     {
-        $file = file_get_contents('/liman/extensions/'.strtolower((string) extension()->name).'/db.json');
+        $file = file_get_contents('/liman/extensions/' . strtolower((string) extension()->name) . '/db.json');
         $json = json_decode($file, true);
         if (json_last_error() != JSON_ERROR_NONE) {
             return respond('Eklenti dosyası okunurken bir hata oluştu!', 201);
@@ -298,9 +295,9 @@ class OneController extends Controller
 
         try {
             $query = Permission::where('value', $ext_name)
-            ->where('type', 'function')
-            ->where('key', 'name')
-            ->delete();
+                ->where('type', 'function')
+                ->where('key', 'name')
+                ->delete();
         } catch (\Exception) {
         }
 
@@ -312,9 +309,9 @@ class OneController extends Controller
     public function publicFolder()
     {
         $basePath =
-            '/liman/extensions/'.strtolower((string) extension()->name).'/public/';
+            '/liman/extensions/' . strtolower((string) extension()->name) . '/public/';
 
-        $targetPath = $basePath.explode('public/', (string) url()->current(), 2)[1];
+        $targetPath = $basePath . explode('public/', (string) url()->current(), 2)[1];
 
         if (realpath($targetPath) != $targetPath) {
             abort(404);

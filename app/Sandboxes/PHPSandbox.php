@@ -84,14 +84,12 @@ class PHPSandbox implements Sandbox
 
         $apiRoute = route('extension_server', [
             'extension_id' => $this->extension->id,
-            'city' => $this->server->city,
             'server_id' => $this->server->id,
         ]);
 
         $navigationRoute = route('extension_server', [
             'server_id' => $this->server->id,
             'extension_id' => $this->extension->id,
-            'city' => $this->server->city,
         ]);
 
         $token = Token::create($this->user->id);

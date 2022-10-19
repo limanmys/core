@@ -26,7 +26,7 @@ class SearchController extends Controller
         }
 
         // Server searching
-        $servers = Server::select('id', 'name', 'city')->get()
+        $servers = Server::select('id', 'name')->get()
                 ->filter(function ($server) {
                     return Permission::can(user()->id, 'server', 'id', $server->id);
                 });
@@ -45,13 +45,13 @@ class SearchController extends Controller
                 if (! empty($extension->display_name)) {
                     array_push($searchable, [
                         'name' => $server->name.' / '.$extension->display_name,
-                        'url' => route('extension_server', [$extension->id, $server->city, $server->id]),
+                        'url' => route('extension_server', [$extension->id, $server->id]),
                     ]);
                     continue;
                 }
                 array_push($searchable, [
                     'name' => $server->name.' / '.$extension->name,
-                    'url' => route('extension_server', [$extension->id, $server->city, $server->id]),
+                    'url' => route('extension_server', [$extension->id, $server->id]),
                 ]);
             }
         }
