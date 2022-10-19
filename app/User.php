@@ -76,11 +76,6 @@ class User extends Authenticatable
         });
     }
 
-    public function widgets()
-    {
-        return $this->hasMany("\App\Models\Widget");
-    }
-
     public function tokens()
     {
         return $this->hasMany('\App\Models\Token');

@@ -125,12 +125,6 @@ class SettingsController extends Controller
                                 ? true
                                 : false;
                             break;
-                        case 'widgets':
-                            $values[$key]['target'] = request('target');
-                            $values[$key]['type'] = request('type');
-                            $values[$key]['name'] = request('name');
-                            $values[$key]['icon'] = request('icon');
-                            break;
                     }
                     break;
                 }
@@ -180,14 +174,6 @@ class SettingsController extends Controller
                     'required' => request('required') ? true : false,
                     'global' => request('global') ? true : false,
                     'writable' => request('writable') ? true : false,
-                ]);
-                break;
-            case 'widgets':
-                array_push($values, [
-                    'target' => request('target'),
-                    'type' => request('type'),
-                    'name' => request('name'),
-                    'icon' => request('icon'),
                 ]);
                 break;
         }

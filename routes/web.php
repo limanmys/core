@@ -28,10 +28,6 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     require_once app_path('Http/Controllers/Settings/_routes.php');
 
-    // Widgets Routes
-
-    require_once app_path('Http/Controllers/Widgets/_routes.php');
-
     // Market Routes
 
     require_once app_path('Http/Controllers/Market/__routes.php');

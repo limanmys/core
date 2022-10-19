@@ -165,55 +165,6 @@
         </div>
       @endif
     </div>
-    @if($widgets->count())
-    <div class="row sortable-widget mt-4">
-      
-        @foreach($widgets as $widget)
-          @if($widget->type==="count_box" || $widget->type==="")
-            <div class="col-md-3 col-sm-4 col-xs-12" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
-                <div class="info-box" title="{{$widget->server_name . " " . __("Sunucusu")}} -> {{$widget->title}}">
-                  <span class="info-box-icon bg-info"><i class="fas fa-{{$widget->text}}"></i></span>
-                  <div class="info-box-content">
-                    <span class="info-box-text">{{__($widget->title)}}</span>
-                    <span class="info-box-number limanWidget" id="{{$widget->id}}" title="{{__($widget->title)}}" data-server-id="{{$widget->server_id}}">{{__('Yükleniyor..')}}</span>
-                    <span class="progress-description" title="{{$widget->server_name . " " . __("Sunucusu")}}">{{$widget->server_name . " " . __("Sunucusu")}}</span>
-                  </div>
-                  <div class="overlay" style="background: rgba(255,255,255,.9);">
-                      <div class="spinner-border" role="status">
-                        <span class="sr-only">{{__("Yükleniyor")}}</span>
-                      </div>
-                  </div>
-                </div>
-            </div>
-          @elseif ($widget->type==="chart")
-            <div class="col-md-6 limanCharts mb-3" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
-                <div class="card h-100" id="{{$widget->id}}Chart">
-                  <div class="card-header ui-sortable-handle" style="cursor: move;">
-                    <h3 class="card-title">
-                      <i class="fas fa-chart-pie mr-1"></i>
-                      {{$widget->server_name . " " . __("Sunucusu")}} {{__($widget->title)}}
-                    </h3>
-                  </div>
-                  <div class="card-body">
-                    <canvas class="chartjs-render-monitor"></canvas>
-                  </div>
-                  <div class="overlay" style="background: rgba(255,255,255,.9);">
-                      <div class="spinner-border" role="status">
-                        <span class="sr-only">{{__("Yükleniyor")}}</span>
-                      </div>
-                  </div>
-                </div>
-            </div>
-          @endif
-        @endforeach
-    </div>
-    <div class="row my-2"></div>
-    @endif
-    <style>
-    .sortable-widget{
-      cursor: default;
-    }
-    </style>
    <script>
         @if(user()->isAdmin())
         function appendApp(item) {
@@ -296,34 +247,10 @@
         getOnlineServers(); 
         @endif
 
-        var limanEnableWidgets = true;
-        $(".sortable-widget").sortable({
-            stop: function(event, ui) {
-                var data = [];
-                $(".sortable-widget > div").each(function(i, el) {
-                    $(el).attr('data-order', $(el).index());
-                    data.push({
-                        id: $(el).attr('id'),
-                        order: $(el).index()
-                    });
-                });
-                var form = new FormData();
-                form.append('widgets', JSON.stringify(data));
-                request('{{ route("update_orders") }}', form, function(response) {});
-            }
-        });
-        $(".sortable-widget").disableSelection();
         var intervals = [];
         var widgets = [];
         var currentWidget = 0;
 
-        $(".limanWidget").each(function() {
-            var element = $(this);
-            widgets.push({
-                'element': element,
-                'type': 'countBox'
-            });
-        });
         $('.limanCharts').each(function() {
             var element = $(this);
             widgets.push({
@@ -331,25 +258,6 @@
                 'type': 'chart'
             });
         });
-        startQueue()
-        setInterval(function() {
-            startQueue()
-        }, {{ config("liman.widget_refresh_time") }});
-
-        function startQueue() {
-            if (!limanEnableWidgets) {
-                return;
-            }
-            currentWidget = 0;
-            if (currentWidget >= widgets.length || widgets.length === 0) {
-                return;
-            }
-            if (widgets[currentWidget].type === 'countBox') {
-                retrieveWidgets(widgets[currentWidget].element, nextWidget)
-            } else if (widgets[currentWidget].type === 'chart') {
-                retrieveCharts(widgets[currentWidget].element, nextWidget)
-            }
-        }
         @if (user()->isAdmin())
         var stats;
         const CHART_INTERVAL = 2500;
@@ -357,10 +265,6 @@
         const CHART_SPEED = 12;
 
         function retrieveStats() {
-            if (!limanEnableWidgets) {
-                return;
-            }
-
             request('{{ route("liman_stats") }}', new FormData(),
                 function(response) {
                     stats = JSON.parse(response);
@@ -381,63 +285,6 @@
         }
         retrieveStats();
         @endif
-
-        function nextWidget() {
-            currentWidget++;
-            if (currentWidget >= widgets.length || widgets.length === 0) {
-                return;
-            }
-            if (widgets[currentWidget].type === 'countBox') {
-                retrieveWidgets(widgets[currentWidget].element, nextWidget)
-            } else if (widgets[currentWidget].type === 'chart') {
-                retrieveCharts(widgets[currentWidget].element, nextWidget)
-            }
-        }
-
-        function retrieveWidgets(element, next) {
-            var info_box = element.closest('.info-box');
-            var form = new FormData();
-            form.append('widget_id', element.attr('id'));
-            form.append('token', "{{ $token }}");
-            form.append('server_id', element.attr('data-server-id'));
-            request(API('widget_one'), form, function(response) {
-                try {
-                    var json = JSON.parse(response);
-                    element.html(json["message"]);
-                    info_box.find('.info-box-icon').show();
-                    info_box.find('.info-box-content').show();
-                    info_box.find('.overlay').remove();
-                } catch (e) {
-                    info_box.find('.overlay i').remove();
-                    info_box.find('.overlay .spinner-border').remove();
-                    info_box.find('.overlay span').remove();
-                    info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="' + strip(
-                            "Bir Hata Oluştu!") +
-                        '" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">' +
-                        "Bir Hata Oluştu!" + '</span>');
-                }
-                if (next) {
-                    next();
-                }
-            }, function(error) {
-                var json = {};
-                try {
-                    json = JSON.parse(error);
-                } catch (e) {
-                    json = e;
-                }
-                info_box.find('.overlay .spinner-border').remove();
-                info_box.find('.overlay i').remove();
-                info_box.find('.overlay span').remove();
-                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="' + strip(
-                        "Bir Hata Oluştu!") +
-                    '" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">' +
-                    "Bir Hata Oluştu!" + '</span>');
-                if (next) {
-                    next();
-                }
-            });
-        }
 
         function retrieveCharts(element, next) {
             var id = element.attr('id');

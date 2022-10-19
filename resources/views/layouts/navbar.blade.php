@@ -39,12 +39,6 @@
         <i class="fa-solid fa-eye"></i>
     </a>
 </li>
-<li class="nav-item d-none d-md-block">
-    <a href="/bilesenler" class="nav-link" data-toggle="tooltip"
-        @if (request()->getRequestUri() == '/bilesenler') class="active" @endif title='{{ __('Bileşenler') }}'>
-        <i class="nav-icon fas fa-chart-pie"></i>
-    </a>
-</li>
 </ul>
 @if (request()->request->get('server') != null)
     <ul class="mx-auto order-0 navbar-nav text-white d-md-block d-sm-none">

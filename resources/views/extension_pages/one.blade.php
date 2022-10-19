@@ -23,9 +23,6 @@
                     <a class="nav-link" data-toggle="pill" href="#tab_2" role="tab" >{{__("Eklenti Veritabanı")}}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="pill" href="#tab_3" role="tab">{{__("Bileşenler")}}</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" data-toggle="pill" href="#tab_4" role="tab">{{__("Fonksiyonlar")}}</a>
                 </li>
                 <li class="nav-item">
@@ -182,83 +179,6 @@
                                 "table:database" => "table:hidden"
                             ],
                             "submit_text" => "Veri'yi Sil"
-                        ])
-                    </div>
-                    <div class="tab-pane fade show" id="tab_3" role="tabpanel">
-                        @include('modal-button',[
-                            "class" => "btn-success btn-sm",
-                            "target_id" => "add_widget",
-                            "text" => "Widget Ekle"
-                        ])<br><br>
-                        @include('table',[
-                            "value" => $extension["widgets"],
-                            "title" => [
-                                "Widget Adı" , "Türü" , "Çalışacak Fonksiyon" , "*hidden*", "*hidden*", "*hidden*"
-                            ],
-                            "display" => [
-                                "name" , "type", "target", "name:name_old", "type:type_old", "target:target_old"
-                            ],
-                            "menu" => [
-                                "Düzenle" => [
-                                    "target" => "edit_widget",
-                                    "icon" => " context-menu-icon-edit"
-                                ],
-                                "Sil" => [
-                                    "target" => "remove_widget",
-                                    "icon" => " context-menu-icon-delete"
-                                ]
-                            ]
-                        ])
-                        @include('modal',[
-                            "id"=>"add_widget",
-                            "title" => "Widget Ekle",
-                            "url" => route('extension_settings_add'),
-                            "next" => "reload",
-                            "inputs" => [
-                                "Widget Adı" => "name:text:Widgetınızın adı.",
-                                "İkon (FontAwesome)" => "icon:text:Widgetınızın sol menüde görüntülenecek ikonu.",
-                                "Türü:type:Widget türü widgetın görünümünü belirler." => [
-                                    "Sayı" => "count_box",
-                                    "Grafik" => "chart"
-                                ],
-                                "table:widgets" => "table:hidden",
-                                "Çalışacak Fonksiyon" => "target:text:Widget verilerinin hangi fonksiyon yada betikten getirileceğini belirler."
-                            ],
-                            "submit_text" => "Widget Ekle"
-                        ])
-                        @include('modal',[
-                            "id"=>"edit_widget",
-                            "title" => "Widget Düzenle",
-                            "url" => route('extension_settings_update'),
-                            "next" => "updateTable",
-                            "inputs" => [
-                                "Widget Adı" => "name:text",
-                                "İkon (FontAwesome)" => "icon:text",
-                                "Türü:type" => [
-                                    "Sayı" => "count_box",
-                                    "Grafik" => "chart"
-                                ],
-                                "Çalışacak Fonksiyon" => "target:text",
-                                "Widget Adı:a" => "name_old:hidden",
-                                "table:widgets" => "table:hidden",
-                                "Türü:a" => "type_old:hidden",
-                                "Çalışacak Fonksiyon:a" => "target_old:hidden"
-                            ],
-                            "submit_text" => "Widget Düzenle"
-                        ])
-                        @include('modal',[
-                            "id"=>"remove_widget",
-                            "title" => "Widget'ı Sil",
-                            "url" => route('extension_settings_remove'),
-                            "next" => "reload",
-                            "text" => "Widget'ı silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-                            "inputs" => [
-                                "Widget Adı:a" => "name:hidden",
-                                "Türü:a" => "type:hidden",
-                                "table:widgets" => "table:hidden",
-                                "Çalışacak Fonksiyon:a" => "target:hidden"
-                            ],
-                            "submit_text" => "Widget'ı Sil"
                         ])
                     </div>
                     <div class="tab-pane fade show" id="tab_4" role="tabpanel">

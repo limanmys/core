@@ -18,13 +18,13 @@
         "composer/semver": "^3.3",
         "doctrine/dbal": "^3.4",
         "guzzlehttp/guzzle": "^7.5",
-        "icewind/smb": "^3.5",
         "jackiedo/dotenv-editor": "^2.0",
         "laravel/framework": "^9.19",
         "laravel/helpers": "^1.5",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.0",
+        "limanmys/php-smb": "^3.5",
         "mervick/aes-everywhere": "^1.1",
         "mews/captcha": "^3.2",
         "pusher/pusher-php-server": "^7.0"
@@ -84,6 +84,5 @@
         "sort-packages": true,
         "optimize-autoloader": true
     },
-    "minimum-stability": "dev",
     "prefer-stable": true
 }

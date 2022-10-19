@@ -35,20 +35,10 @@ class HomeController extends Controller
      */
     public function index()
     {
-        system_log(7, 'HOMEPAGE');
-        $widgets = Widget::where('user_id', auth()->id())
-            ->orderBy('order')
-            ->get();
-        foreach ($widgets as $widget) {
-            $widget->server_name = Server::where(
-                'id',
-                $widget->server_id
-            )->first()->name;
-        }
+        system_log(7, 'HOMEPAGE');    
 
         return magicView('index', [
             'token' => Token::create(user()->id),
-            'widgets' => $widgets,
             'server_count' => Server::all()->count(),
             'extension_count' => Extension::all()->count(),
             'user_count' => User::all()->count(),
