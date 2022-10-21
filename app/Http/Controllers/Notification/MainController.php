@@ -89,7 +89,11 @@ class MainController extends Controller
             'read' => false,
         ])
             ->orderBy('updated_at', 'desc')
-            ->get();
+            ->get()
+            ->each(function ($item, $key) {
+                $humanDate = $item->created_at->diffForHumans();
+                $item->humanDate = $humanDate;
+            });
 
         $adminNotifications = [];
         if (
@@ -101,7 +105,11 @@ class MainController extends Controller
                 'read' => 'false',
             ])
                 ->orderBy('updated_at', 'desc')
-                ->get();
+                ->get()
+                ->each(function ($item, $key) {
+                    $humanDate = $item->created_at->diffForHumans();
+                    $item->humanDate = $humanDate;
+                });
         }
 
         return respond([

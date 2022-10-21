@@ -67,7 +67,7 @@
 
     <!-- Notifications Dropdown Menu -->
     @if (user()->isAdmin())
-        <li id="adminNotifications" class="nav-item dropdown">
+        <li id="adminNotifications" class="nav-item dropdown btn-group">
             @include('notifications', [
                 'notifications' => adminNotifications(),
                 'id' => 'adminNotifications',
@@ -76,7 +76,7 @@
         </li>
     @endif
 
-    <li id="userNotifications" class="nav-item dropdown">
+    <li id="userNotifications" class="nav-item dropdown btn-group"> 
         @include('notifications', ['notifications' => notifications()])
     </li>
     <li class="nav-item dropdown">
@@ -85,7 +85,7 @@
             <span class="d-none d-sm-inline-block"
                 title="{{ user()->name, 20 }}">{{ str_limit(user()->name, 20) }}</span>
         </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right animate slideIn">
             <div class="card card-widget widget-user-2" style="margin-bottom: 0px;">
                 <div class="widget-user-header bg-secondary" style="color:white">
                     <h3 class="widget-user-username" style="margin-left: 0px;" title="{{ user()->name, 20 }}">

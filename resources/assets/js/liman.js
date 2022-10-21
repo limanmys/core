@@ -7,7 +7,9 @@ let english = {
   "Yükleniyor...": "Loading...",
   "Sonuç bulunamadı!": "No results found!",
   "Liman ID kopyalandı!": "Liman ID copied!",
-  "Liman ID başarıyla kopyalandı.": "Liman ID has been copied successfully!"
+  "Liman ID başarıyla kopyalandı.": "Liman ID has been copied successfully!",
+  "Okunmamış bildiriminiz bulunmamaktadır.": "You have been read all notifications.",
+  "/turkce.json": "/english.json"
 }
 
 let turkish = {}
@@ -315,16 +317,30 @@ function message(data) {
 
 function readNotifications(id) {
   var data = new FormData();
-  request("/bildirimler/oku", data, function () {
-    checkNotifications();
-  });
+  request("/bildirimler/oku", data, function () {});
+  setTimeout(function() {
+    var element = window.$("#userNotifications .menu");
+    element.parent().find(".notif-action").addClass("d-none").removeClass("d-block");
+    element.html(`<a class="dropdown-item d-flex align-items-start no-notif">
+        <div class="text" style="width: 100% !important; padding: 15px 0">
+            <h4 style="text-align: center; color: grey; font-size: 12px; text-transform: uppercase">${ __('Okunmamış bildiriminiz bulunmamaktadır.') }</h4>
+        </div>
+    </a>`);
+  }, 200);
 }
 
 function readSystemNotifications(id) {
   var data = new FormData();
-  request("/bildirim/adminOku", data, function () {
-    checkNotifications();
-  });
+  request("/bildirim/adminOku", data, function() {});
+  setTimeout(function() {
+    var element = window.$("#adminNotifications .menu");
+    element.parent().find(".notif-action").addClass("d-none").removeClass("d-block");
+    element.html(`<a class="dropdown-item d-flex align-items-start no-notif">
+        <div class="text" style="width: 100% !important; padding: 15px 0">
+            <h4 style="text-align: center; color: grey; font-size: 12px; text-transform: uppercase">${ __('Okunmamış bildiriminiz bulunmamaktadır.') }</h4>
+        </div>
+    </a>`);
+  }, 200);
 }
 
 var inputs = [];
@@ -347,12 +363,18 @@ function isJson(str) {
   return true;
 }
 
+const escapeHtml = (unsafe) => {
+  return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+}
+
 function renderNotifications(data, type, target, exclude) {
   var element = window.$("#" + target + " .menu");
   element.html("");
   //Set Count
   window.$("#" + target + "Count").html(data.length);
   data.forEach((notification) => {
+    element.parent().find(".notif-action").removeClass("d-none").addClass("d-block");
+    element.parent().find(".no-notif").removeClass("d-flex").addClass("d-none");
     let notificationTitle = notification["title"];
     let notificationMsg = notification["message"];
     if (isJson(notification["title"])) {
@@ -364,7 +386,14 @@ function renderNotifications(data, type, target, exclude) {
       notificationMsg = temp[language];
     }
     var errors = ["error", "health_problem"];
-    element.append([...window.$("<div />").addClass("dropdown-divider").append("<a />").find("a").addClass("dropdown-item").attr("href", `/bildirim/${notification["id"]}`).append("<span />").find("span").css("color", errors.includes(notification["type"]) ? "#f56954" : "#00a65a").css("width", "100%").text(notificationTitle).parents()].reverse())
+    let color = errors.includes(notification['type']) ? 'color: #ff4444' : ''
+    let html = `<a class="dropdown-item d-flex align-items-start" onclick="window.location.href = '/bildirim/${notification["id"]}'" href="/bildirim/${notification["id"]}">
+        <div class="text">
+            <h4 style="${color}">${escapeHtml(notificationTitle)}</h4>
+            <span class="time">${notification["humanDate"]}</span>
+        </div>
+    </a>`
+    element.append(html)
     var displayedNots = [];
     if (localStorage.displayedNots) {
       displayedNots = JSON.parse(localStorage.displayedNots);
@@ -375,22 +404,35 @@ function renderNotifications(data, type, target, exclude) {
     if (displayedNots.includes(notification.id)) {
       return;
     }
-    if (errors.includes(notification.type)) {
-      toastElement = toastr.error(notificationMsg, notificationTitle, {
-        timeOut: 5000,
+
+    let toastOptions = {
+      title: notificationTitle,
+      subtitle: "Liman",
+      body: notificationMsg,
+      delay: 3000,
+      autohide: true,
+    };
+
+    if(errors.includes(notification.type)){
+      $(document).Toasts('create', {
+          ...toastOptions,
+          icon: "fas fa-exclamation-mark",
+          class: 'bg-danger'
       });
-    } else if (notification.type == "liman_update") {
-      toastElement = toastr.warning(notificationMsg, notificationTitle, {
-        timeOut: 5000,
+    }else if(notification.type == "liman_update"){
+      $(document).Toasts('create', {
+          ...toastOptions,
+          icon: "fas fa-exclamation-mark",
+          class: 'bg-warning'
       });
-    } else {
-      toastElement = toastr.success(notificationMsg, notificationTitle, {
-        timeOut: 5000,
+    }else{
+      $(document).Toasts('create', {
+          ...toastOptions,
+          icon: "fas fa-check",
+          class: 'bg-success'
       });
     }
-    window.$(toastElement).click(function () {
-      location.href = "/bildirim/" + notification.id;
-    });
+
     displayedNots.push(notification.id);
     localStorage.displayedNots = JSON.stringify(displayedNots);
   });
@@ -571,3 +613,48 @@ window.$(document).ready(function () {
     window.$("body").addClass("sidebar-collapse");
   }
 })
+
+function isJson(str) {
+  try {
+      JSON.parse(str);
+  } catch (e) {
+      return false;
+  }
+  return true;
+}
+
+function dataTablePresets(type){
+if(type == "normal"){
+    return {
+        bFilter: true,
+        "language" : {
+            url : __("/turkce.json"),
+        }
+    };
+}else if(type == "multiple"){
+    return {
+        bFilter: true,
+        select: {
+            style: 'multi',
+            selector: 'td:not(.table-menu)'
+        },
+        dom: 'Blfrtip',
+        buttons: {
+            buttons: [
+                { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
+                { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
+            ],
+            dom: {
+                button: { className: 'btn' }
+            }
+        },
+        language: {
+            url : __("/turkce.json"),
+            buttons: {
+                selectAll: "{{ __('Tümünü Seç') }}",
+                selectNone: "{{ __('Tümünü Kaldır') }}"
+            }
+        }
+    };
+}
+}
