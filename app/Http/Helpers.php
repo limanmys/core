@@ -1083,6 +1083,7 @@ if (! function_exists('checkHealth')) {
             'modules' => '0700',
             'packages' => '0700',
             'hashes' => '0700',
+            'sql-backups' => '0750',
         ];
         $messages = [];
 
