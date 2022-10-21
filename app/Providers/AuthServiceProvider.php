@@ -2,10 +2,8 @@
 
 namespace App\Providers;
 
-use App\Models\Permission;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
-use function foo\func;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -15,7 +13,6 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'App\Models\Model' => 'App\Policies\ModelPolicy',
         'App\Models\Server' => 'App\Policies\ServerPolicy',
     ];
 
@@ -28,7 +25,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Gate::define('viewWebSocketsDashboard', function ($user = null) {
+        Gate::define('viewWebSocketsDashboard', function ($user = null): bool {
             return true;
         });
     }

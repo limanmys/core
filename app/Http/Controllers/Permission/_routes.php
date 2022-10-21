@@ -1,6 +1,6 @@
 <?php
 
-Route::middleware(["admin"])->group(function () {
+Route::middleware(['admin'])->group(function () {
     // List All Requests Route
     Route::get('/talepler', 'Permission\MainController@all')->name('request_list');
 

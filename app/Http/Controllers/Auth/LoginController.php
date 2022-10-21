@@ -11,7 +11,6 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Class LoginController
- * @package App\Http\Controllers\Auth
  */
 class LoginController extends Controller
 {
@@ -34,26 +33,26 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function captcha(){
+    public function captcha()
+    {
         return captcha_img();
     }
 
     public function authenticated(Request $request, $user)
     {
         $user->update([
-            "last_login_at" => Carbon::now()->toDateTimeString(),
-            "last_login_ip" => $request->ip(),
+            'last_login_at' => Carbon::now()->toDateTimeString(),
+            'last_login_ip' => $request->ip(),
         ]);
 
-        system_log(7, "LOGIN_SUCCESS");
+        system_log(7, 'LOGIN_SUCCESS');
 
-        hook("login_successful", [
-            "user" => $user,
+        hook('login_successful', [
+            'user' => $user,
         ]);
 
-        if (env("WIZARD_STEP", 1) != config("liman.wizard_max_steps") && $user->status)
-        {
-            return redirect()->route("wizard", env("WIZARD_STEP", 1));
+        if (env('WIZARD_STEP', 1) != config('liman.wizard_max_steps') && $user->status) {
+            return redirect()->route('wizard', env('WIZARD_STEP', 1));
         }
     }
 
@@ -71,7 +70,7 @@ class LoginController extends Controller
             $flag = true;
         });
 
-        if (!$flag) {
+        if (! $flag) {
             event('login_attempt', $credientials);
         }
 
@@ -82,29 +81,28 @@ class LoginController extends Controller
     {
         $request->request->add([
             $this->username() => $request->liman_email_mert,
-            "password" => $request->liman_password_baran,
+            'password' => $request->liman_password_baran,
         ]);
-        if (env('EXTENSION_DEVELOPER_MODE'))
-        {
+        if (env('EXTENSION_DEVELOPER_MODE')) {
             $request->validate([
                 $this->username() => 'required|string',
-                'password' => 'required|string'
+                'password' => 'required|string',
             ]);
         } else {
             $request->validate([
                 $this->username() => 'required|string',
                 'password' => 'required|string',
-                'captcha' => 'required|captcha'
+                'captcha' => 'required|captcha',
             ]);
         }
     }
 
-    protected function sendFailedLoginResponse(Request $request)
+    protected function sendFailedLoginResponse(Request $request): never
     {
         $credientials = (object) $this->credentials($request);
         hook('login_failed', [
-            "email" => $credientials->email,
-            "password" => $credientials->password,
+            'email' => $credientials->email,
+            'password' => $credientials->password,
         ]);
 
         throw ValidationException::withMessages([

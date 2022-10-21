@@ -4,12 +4,11 @@ namespace App\Http\Middleware;
 
 use App\Models\Permission;
 use Closure;
-use Illuminate\Support\Facades\Gate;
 
 class PermissionManager
 {
     // Verify those values if request have either in request url or body.
-    protected $verify = ["extension", "script", "server"];
+    protected $verify = ['extension', 'script', 'server'];
 
     // Main Function of Middleware
     public function handle($request, Closure $next)
@@ -25,12 +24,13 @@ class PermissionManager
             env('LIMAN_RESTRICTED') == true
         ) {
             $this->initializeObjects();
+
             return $next($request);
         }
 
         // Loop through every validations
         foreach ($this->verify as $target) {
-            if (!$this->check($target)) {
+            if (! $this->check($target)) {
                 return respond('Bu işlem için yetkiniz bulunmamaktadır.', 403);
             }
         }
@@ -44,12 +44,13 @@ class PermissionManager
     private function check($target)
     {
         //Let's get value from request parameters.
-        $value = request($target . "_id");
+        $value = request($target.'_id');
 
         // If request don't have parameter in request, simply ignore permissions.
         if ($value == null) {
             return true;
         }
+
         return Permission::can(auth()->user()->id, $target, 'id', $value);
     }
 
@@ -57,7 +58,7 @@ class PermissionManager
     {
         foreach ($this->verify as $target) {
             request()->request->add([
-                $target => getObject($target, request($target . '_id')),
+                $target => getObject($target, request($target.'_id')),
             ]);
         }
     }

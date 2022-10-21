@@ -14,7 +14,7 @@ class AlterTableUsersChangeLastLoginAt extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dateTime("last_login_at")->change();
+            $table->dateTime('last_login_at')->change();
         });
     }
 

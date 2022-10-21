@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Permission;
-use App\Models\ServerKey;
-use App\Models\RoleUser;
-use App\User;
-use App\Models\UserSettings;
 use App\Models\AccessToken;
+use App\Models\ConnectorToken;
+use App\Models\Permission;
+use App\Models\RoleUser;
 use App\Models\Server;
+use App\Models\ServerKey;
+use App\Models\UserSettings;
+use App\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
-use App\Models\ConnectorToken;
 use mervick\aesEverywhere\AES256;
 
 class UserController extends Controller
@@ -30,9 +30,9 @@ class UserController extends Controller
     public function add()
     {
         hook('user_add_attempt', [
-            "request" => request()->all(),
+            'request' => request()->all(),
         ]);
-        request()->request->add(['email' => strtolower(request('email'))]);
+        request()->request->add(['email' => strtolower((string) request('email'))]);
 
         validate([
             'name' => ['required', 'string', 'max:255'],
@@ -53,7 +53,7 @@ class UserController extends Controller
             );
             $password = substr($pool, 0, 10);
         } while (
-            !preg_match(
+            ! preg_match(
                 "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\!\[\]\(\)\{\}\#\?\%\&\*\+\,\-\.\/\:\;\<\=\>\@\^\_\`\~]).{10,}$/",
                 $password
             )
@@ -61,9 +61,9 @@ class UserController extends Controller
 
         $data = [
             'name' => request('name'),
-            'email' => strtolower(request('email')),
+            'email' => strtolower((string) request('email')),
             'password' => Hash::make($password),
-            'status' => request('type') == "administrator" ? "1" : "0",
+            'status' => request('type') == 'administrator' ? '1' : '0',
             'forceChange' => true,
         ];
 
@@ -75,12 +75,12 @@ class UserController extends Controller
         $user = User::create($data);
 
         hook('user_add_successful', [
-            "user" => $user,
+            'user' => $user,
         ]);
 
         // Respond
         return respond(
-            __("Kullanıcı Başarıyla Eklendi. Parola : ") . $password,
+            __('Kullanıcı Başarıyla Eklendi. Parola : ').$password,
             200
         );
     }
@@ -97,24 +97,24 @@ class UserController extends Controller
     public function remove()
     {
         hook('user_delete_attempt', [
-            "user" => request('user_id'),
+            'user' => request('user_id'),
         ]);
 
         // Delete Permissions
         Permission::where('morph_id', request('user_id'))->delete();
 
         //Delete user roles
-        RoleUser::where("user_id", request('user_id'))->delete();
+        RoleUser::where('user_id', request('user_id'))->delete();
 
         // Delete User
-        User::where("id", request('user_id'))->delete();
+        User::where('id', request('user_id'))->delete();
 
         hook('user_delete_successful', [
-            "user" => request('user_id'),
+            'user' => request('user_id'),
         ]);
 
         // Respond
-        return respond("Kullanıcı Başarıyla Silindi!", 200);
+        return respond('Kullanıcı Başarıyla Silindi!', 200);
     }
 
     /**
@@ -129,13 +129,13 @@ class UserController extends Controller
     public function passwordReset()
     {
         hook('user_password_reset_attempt', [
-            "user" => request('user_id'),
+            'user' => request('user_id'),
         ]);
 
         $user = User::find(request('user_id'));
 
-        if ($user->auth_type == "ldap") {
-            return respond("Bu kullanıcı tipinin şifresi sıfırlanamaz", 201);
+        if ($user->auth_type == 'ldap') {
+            return respond('Bu kullanıcı tipinin şifresi sıfırlanamaz', 201);
         }
 
         // Generate Password
@@ -145,23 +145,23 @@ class UserController extends Controller
             );
             $password = substr($pool, 0, 10);
         } while (
-            !preg_match(
+            ! preg_match(
                 "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\!\[\]\(\)\{\}\#\?\%\&\*\+\,\-\.\/\:\;\<\=\>\@\^\_\`\~]).{10,}$/",
                 $password
             )
         );
 
         $user->update([
-            "password" => Hash::make($password),
-            "forceChange" => true,
+            'password' => Hash::make($password),
+            'forceChange' => true,
         ]);
 
         hook('user_password_reset_successful', [
-            "user" => $user,
-            "password" => $password,
+            'user' => $user,
+            'password' => $password,
         ]);
 
-        return respond(__("Yeni Parola: ") . $password, 200);
+        return respond(__('Yeni Parola: ').$password, 200);
     }
 
     /**
@@ -177,27 +177,27 @@ class UserController extends Controller
      */
     public function selfUpdate()
     {
-        if (user()->auth_type == "ldap") {
+        if (user()->auth_type == 'ldap') {
             return respond(
-                "Bu kullanıcı tipinin bilgileri değiştirilemez!",
+                'Bu kullanıcı tipinin bilgileri değiştirilemez!',
                 201
             );
         }
 
         if (
-            !auth()->attempt([
-                "email" => user()->email,
-                "password" => request("old_password"),
+            ! auth()->attempt([
+                'email' => user()->email,
+                'password' => request('old_password'),
             ])
         ) {
-            return respond("Eski Parolanız geçerli değil.", 201);
+            return respond('Eski Parolanız geçerli değil.', 201);
         }
 
         validate([
-            'name' => 'required|string|max:255'
+            'name' => 'required|string|max:255',
         ]);
 
-        if (!empty(request()->password)) {
+        if (! empty(request()->password)) {
             validate([
                 'password' => [
                     'string',
@@ -205,9 +205,9 @@ class UserController extends Controller
                     'max:32',
                     'confirmed',
                     'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\!\[\]\(\)\{\}\#\?\%\&\*\+\,\-\.\/\:\;\<\=\>\@\^\_\`\~]).{10,}$/',
-                ]
+                ],
             ], [
-                'password.regex' => 'Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.'
+                'password.regex' => 'Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.',
             ]);
 
             auth()
@@ -231,6 +231,7 @@ class UserController extends Controller
             ->update([
                 'name' => request('name'),
             ]);
+
         return respond('Kullanıcı Başarıyla Güncellendi', 200);
     }
 
@@ -252,9 +253,9 @@ class UserController extends Controller
             'username' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'email'],
         ];
-        $user = User::where("id", request('user_id'))->first();
+        $user = User::where('id', request('user_id'))->first();
 
-        if ($user->auth_type == "ldap") {
+        if ($user->auth_type == 'ldap') {
             unset($validations['name']);
             unset($validations['username']);
         }
@@ -271,7 +272,7 @@ class UserController extends Controller
             $data['username'] = request('username');
         }
 
-        if ($user->auth_type == "ldap") {
+        if ($user->auth_type == 'ldap') {
             unset($data['name']);
             unset($data['username']);
         }
@@ -292,23 +293,23 @@ class UserController extends Controller
      */
     public function removeSetting()
     {
-        if (request('type') == "key") {
+        if (request('type') == 'key') {
             $first = ServerKey::find(request('id'));
         } else {
             $first = UserSettings::find(request('id'));
         }
 
-        if (!$first) {
-            return respond("Ayar bulunamadi", 201);
+        if (! $first) {
+            return respond('Ayar bulunamadi', 201);
         }
         if (
-            $first->name == "clientUsername" ||
-            $first->name == "clientPassword"
+            $first->name == 'clientUsername' ||
+            $first->name == 'clientPassword'
         ) {
             $server = Server::find($first->server_id);
 
             if ($server) {
-                $ip_address = "cn_" . str_replace(".", "_", $server->server_id);
+                $ip_address = 'cn_'.str_replace('.', '_', (string) $server->server_id);
                 if (session($ip_address)) {
                     session()->remove($ip_address);
                 }
@@ -318,9 +319,9 @@ class UserController extends Controller
         $flag = $first->delete();
 
         if ($flag) {
-            return respond("Başarıyla silindi", 200);
+            return respond('Başarıyla silindi', 200);
         } else {
-            return respond("Silinemedi", 201);
+            return respond('Silinemedi', 201);
         }
     }
 
@@ -336,58 +337,58 @@ class UserController extends Controller
      */
     public function updateSetting()
     {
-        $setting = UserSettings::where("id", request("setting_id"))->first();
-        if (!$setting) {
-            return respond("Ayar bulunamadı!", 201);
+        $setting = UserSettings::where('id', request('setting_id'))->first();
+        if (! $setting) {
+            return respond('Ayar bulunamadı!', 201);
         }
 
         if (
-            $setting->name == "clientUsername" ||
-            $setting->name == "clientPassword"
+            $setting->name == 'clientUsername' ||
+            $setting->name == 'clientPassword'
         ) {
             $server = Server::find($setting->server_id);
 
             if ($server) {
-                $ip_address = "cn_" . str_replace(".", "_", $server->server_id);
+                $ip_address = 'cn_'.str_replace('.', '_', (string) $server->server_id);
                 if (session($ip_address)) {
                     session()->remove($ip_address);
                 }
             }
         }
 
-        $key = env('APP_KEY') . $setting->user_id . $setting->server_id;
+        $key = env('APP_KEY').$setting->user_id.$setting->server_id;
         $encrypted = AES256::encrypt(request('new_value'), $key);
 
         $flag = $setting->update([
-            "value" => $encrypted,
+            'value' => $encrypted,
         ]);
         if ($flag) {
-            return respond("Başarıyla Güncellendi", 200);
+            return respond('Başarıyla Güncellendi', 200);
         } else {
-            return respond("Güncellenemedi", 201);
+            return respond('Güncellenemedi', 201);
         }
     }
 
     public function forcePasswordChange()
     {
         if (
-            !auth()->attempt([
-                "email" => user()->email,
-                "password" => request("old_password"),
+            ! auth()->attempt([
+                'email' => user()->email,
+                'password' => request('old_password'),
             ])
         ) {
             return redirect()
                 ->route('password_change')
                 ->withErrors([
-                    "message" => "Mevcut parolanız geçerli değil.",
+                    'message' => 'Mevcut parolanız geçerli değil.',
                 ]);
         }
 
-        if (request("old_password") == request("password")) {
+        if (request('old_password') == request('password')) {
             return redirect()
                 ->route('password_change')
                 ->withErrors([
-                    "message" => "Yeni parolanız mevcut parolanıza eşit olamaz.",
+                    'message' => 'Yeni parolanız mevcut parolanıza eşit olamaz.',
                 ]);
         }
 
@@ -404,12 +405,11 @@ class UserController extends Controller
 
         try {
             $flag->validate();
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             return redirect()
                 ->route('password_change')
                 ->withErrors([
-                    "message" =>
-                    "Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.",
+                    'message' => 'Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı,özel karakter ve büyük harf içermelidir.',
                 ]);
         }
 
@@ -433,7 +433,7 @@ class UserController extends Controller
      */
     public function userKeyList()
     {
-        $settings = UserSettings::where("user_id", user()->id)->get();
+        $settings = UserSettings::where('user_id', user()->id)->get();
 
         // Retrieve User servers that has permission.
         $servers = servers();
@@ -442,8 +442,8 @@ class UserController extends Controller
             $server = $servers->find($setting->server_id);
             $setting->server_name = $server
                 ? $server->name
-                : __("Sunucu Silinmiş.");
-            $setting->type = "setting";
+                : __('Sunucu Silinmiş.');
+            $setting->type = 'setting';
         }
 
         $keys = user()->keys;
@@ -452,13 +452,13 @@ class UserController extends Controller
             $server = $servers->find($key->server_id);
             $key->server_name = $server
                 ? $server->name
-                : __("Sunucu Silinmiş.");
-            $key->name = "Sunucu Anahtarı";
-            $key->type = "key";
+                : __('Sunucu Silinmiş.');
+            $key->name = 'Sunucu Anahtarı';
+            $key->type = 'key';
         }
 
         return magicView('keys.index', [
-            "settings" => json_decode(
+            'settings' => json_decode(
                 json_encode(
                     array_merge($settings->toArray(), $keys->toArray())
                 ),
@@ -479,41 +479,43 @@ class UserController extends Controller
      */
     public function addKey()
     {
-        $encKey = env('APP_KEY') . user()->id . server()->id;
+        $encKey = env('APP_KEY').user()->id.server()->id;
         UserSettings::where([
-            "server_id" => server()->id,
-            "user_id" => user()->id,
-            "name" => "clientUsername",
+            'server_id' => server()->id,
+            'user_id' => user()->id,
+            'name' => 'clientUsername',
         ])->delete();
         UserSettings::where([
-            "server_id" => server()->id,
-            "user_id" => user()->id,
-            "name" => "clientPassword",
+            'server_id' => server()->id,
+            'user_id' => user()->id,
+            'name' => 'clientPassword',
         ])->delete();
 
         $data = [
-            "clientUsername" => AES256::encrypt(request('username'), $encKey),
-            "clientPassword" => AES256::encrypt(request('password'), $encKey),
-            "key_port" => request('key_port'),
+            'clientUsername' => AES256::encrypt(request('username'), $encKey),
+            'clientPassword' => AES256::encrypt(request('password'), $encKey),
+            'key_port' => request('key_port'),
         ];
 
         ServerKey::updateOrCreate(
-            ["server_id" => server()->id, "user_id" => user()->id],
-            ["type" => request('type'), "data" => json_encode($data)]
+            ['server_id' => server()->id, 'user_id' => user()->id],
+            ['type' => request('type'), 'data' => json_encode($data)]
         );
 
-        Server::where(["id" => server()->id])->update(
-            ["shared_key" => request()->shared == "true" ? 1 : 0]
+        Server::where(['id' => server()->id])->update(
+            ['shared_key' => request()->shared == 'true' ? 1 : 0]
         );
 
         ConnectorToken::clear();
-        return respond("Başarıyla eklendi.");
+
+        return respond('Başarıyla eklendi.');
     }
 
     public function cleanSessions()
     {
         ConnectorToken::clear();
-        return respond("Önbellek temizlendi.");
+
+        return respond('Önbellek temizlendi.');
     }
 
     /**
@@ -526,7 +528,7 @@ class UserController extends Controller
     public function myAccessTokens()
     {
         return magicView('user.keys', [
-            "access_tokens" => user()
+            'access_tokens' => user()
                 ->accessTokens()
                 ->get(),
         ]);
@@ -545,12 +547,13 @@ class UserController extends Controller
     {
         $token = Str::random(64);
         AccessToken::create([
-            "user_id" => user()->id,
-            "name" => request("name"),
-            "token" => $token,
-            "ip_range" => request("ip_range")
+            'user_id' => user()->id,
+            'name' => request('name'),
+            'token' => $token,
+            'ip_range' => request('ip_range'),
         ]);
-        return respond("Anahtar Başarıyla Oluşturuldu.");
+
+        return respond('Anahtar Başarıyla Oluşturuldu.');
     }
 
     /**
@@ -564,11 +567,12 @@ class UserController extends Controller
      */
     public function revokeAccessToken()
     {
-        $token = AccessToken::find(request("token_id"));
-        if (!$token || $token->user_id != user()->id) {
-            return respond("Anahtar Bulunamadı!", 201);
+        $token = AccessToken::find(request('token_id'));
+        if (! $token || $token->user_id != user()->id) {
+            return respond('Anahtar Bulunamadı!', 201);
         }
         $token->delete();
-        return respond("Anahtar Başarıyla Silindi");
+
+        return respond('Anahtar Başarıyla Silindi');
     }
 }

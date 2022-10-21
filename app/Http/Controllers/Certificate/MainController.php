@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Certificate;
 
+use App\Http\Controllers\Controller;
 use App\Models\AdminNotification;
 use App\Models\Certificate;
-use App\Http\Controllers\Controller;
 use App\System\Command;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -27,22 +27,22 @@ class MainController extends Controller
         // Check If Certificate Already Added or not.
         if (
             Certificate::where([
-                "server_hostname" => strtolower(request('server_hostname')),
-                "origin" => request('origin'),
+                'server_hostname' => strtolower((string) request('server_hostname')),
+                'origin' => request('origin'),
             ])->exists()
         ) {
             return respond(
-                "Bu sunucu ve port için sertifika zaten eklenmiş.",
+                'Bu sunucu ve port için sertifika zaten eklenmiş.',
                 201
             );
         }
 
-        list($flag, $message) = retrieveCertificate(
-            strtolower(request('server_hostname')),
+        [$flag, $message] = retrieveCertificate(
+            strtolower((string) request('server_hostname')),
             request('origin')
         );
 
-        if (!$flag) {
+        if (! $flag) {
             return respond(
                 $message,
                 201
@@ -51,18 +51,18 @@ class MainController extends Controller
 
         // Create Certificate Object.
         $certificate = Certificate::create([
-            "server_hostname" => strtolower(request('server_hostname')),
-            "origin" => request('origin'),
+            'server_hostname' => strtolower((string) request('server_hostname')),
+            'origin' => request('origin'),
         ]);
 
-        $certificate->addToSystem('/tmp/' . request('path'));
+        $certificate->addToSystem('/tmp/'.request('path'));
 
         // Update Admin Notification
         AdminNotification::where('id', request('notification_id'))->update([
-            "read" => "true",
+            'read' => 'true',
         ]);
 
-        return respond("Sertifika Başarıyla Eklendi!", 200);
+        return respond('Sertifika Başarıyla Eklendi!', 200);
     }
 
     /**
@@ -80,45 +80,45 @@ class MainController extends Controller
             'id',
             request('certificate_id')
         )->first();
-        if (!$certificate) {
-            abort(504, "Sertifika bulunamadı");
+        if (! $certificate) {
+            abort(504, 'Sertifika bulunamadı');
         }
 
         $certificate->removeFromSystem();
 
         $certificate->delete();
 
-        return respond("Sertifika Başarıyla Silindi!", 200);
+        return respond('Sertifika Başarıyla Silindi!', 200);
     }
 
     public function getCertificateInfo(Request $request)
     {
-        $certificateFile = Command::runLiman("cat /usr/local/share/ca-certificates/liman-{:ipAddress}_{:port}.crt", [
-            "ipAddress" => $request->hostname,
-            "port" => $request->port
+        $certificateFile = Command::runLiman('cat /usr/local/share/ca-certificates/liman-{:ipAddress}_{:port}.crt', [
+            'ipAddress' => $request->hostname,
+            'port' => $request->port,
         ]);
 
         $certinfo = openssl_x509_parse($certificateFile);
-        $certinfo["subjectKeyIdentifier"] = array_key_exists(
-            "subjectKeyIdentifier",
-            $certinfo["extensions"]
+        $certinfo['subjectKeyIdentifier'] = array_key_exists(
+            'subjectKeyIdentifier',
+            $certinfo['extensions']
         )
-            ? $certinfo["extensions"]["subjectKeyIdentifier"]
-            : "";
-        $certinfo["authorityKeyIdentifier"] = array_key_exists(
-            "authorityKeyIdentifier",
-            $certinfo["extensions"]
+            ? $certinfo['extensions']['subjectKeyIdentifier']
+            : '';
+        $certinfo['authorityKeyIdentifier'] = array_key_exists(
+            'authorityKeyIdentifier',
+            $certinfo['extensions']
         )
-            ? substr($certinfo["extensions"]["authorityKeyIdentifier"], 6)
-            : "";
-        $certinfo["validFrom_time_t"] = Carbon::createFromTimestamp(
-            $certinfo["validFrom_time_t"]
+            ? substr((string) $certinfo['extensions']['authorityKeyIdentifier'], 6)
+            : '';
+        $certinfo['validFrom_time_t'] = Carbon::createFromTimestamp(
+            $certinfo['validFrom_time_t']
         )->format('H:i d/m/Y');
-        $certinfo["validTo_time_t"] = Carbon::createFromTimestamp(
-            $certinfo["validTo_time_t"]
+        $certinfo['validTo_time_t'] = Carbon::createFromTimestamp(
+            $certinfo['validTo_time_t']
         )->format('H:i d/m/Y');
-        unset($certinfo["extensions"]);
-        
+        unset($certinfo['extensions']);
+
         return respond($certinfo);
     }
 
@@ -134,7 +134,7 @@ class MainController extends Controller
      */
     public function requestCert()
     {
-        list($flag, $message) = retrieveCertificate(
+        [$flag, $message] = retrieveCertificate(
             request('hostname'),
             request('port')
         );
@@ -160,21 +160,21 @@ class MainController extends Controller
             'id',
             request('certificate_id')
         )->first();
-        if (!$certificate) {
-            return respond("Sertifika bulunamadı", 201);
+        if (! $certificate) {
+            return respond('Sertifika bulunamadı', 201);
         }
-        list($flag, $message) = retrieveCertificate(
+        [$flag, $message] = retrieveCertificate(
             $certificate->server_hostname,
             $certificate->origin
         );
-        if (!$flag) {
+        if (! $flag) {
             return respond($message, 201);
         }
 
         $certificate->removeFromSystem();
 
-        $certificate->addToSystem('/tmp/' . $message["path"]);
+        $certificate->addToSystem('/tmp/'.$message['path']);
 
-        return respond("Sertifika Başarıyla Güncellendi!");
+        return respond('Sertifika Başarıyla Güncellendi!');
     }
 }

@@ -1,59 +1,72 @@
+@php
+if (!function_exists('safeExplode')) {
+    function safeExplode($explodable, $split, $accessor) {
+        $temp = explode($split, $explodable);
+        if (isset($temp[$accessor])) {
+            return $temp[$accessor];
+        }
+
+        return "";
+    }
+}
+@endphp
+
 @foreach ($inputs as $name => $input)
 <div class="form-group">
     @if(is_array($input))
         @if(isset($disabled))
-            <select name="{{explode(":",$name)[1]}}" class="form-control" required disabled hidden>
+            <select name="{{safeExplode($name, ":", 1)}}" class="form-control" required disabled hidden>
                 @foreach ($input as $key => $value)
                     <option value="{{$value}}">{{__($key)}}</option>
                 @endforeach
             </select>
         @else
-            <label>{{__(explode(":",$name)[0])}}</label>
-            <select name="{{explode(":",$name)[1]}}" class="form-control" required>
+            <label>{{__(safeExplode($name, ":", 0))}}</label>
+            <select name="{{safeExplode($name, ":", 1)}}" class="form-control" required>
                 @foreach ($input as $key => $value)
                     <option value="{{$value}}">{{__($key)}}</option>
                 @endforeach
             </select>
         @endif
-        @isset(explode(":", $name,3)[2])
-        <small class="form-text text-muted">{{__(explode(":", $name,3)[2])}}</small>
-        @endisset
+        @if(safeExplode($name, ":", 2))
+        <small class="form-text text-muted">{{__(safeExplode($name, ":", 2))}}</small>
+        @endif
     @else
         @php
-            $placeholder = isset(explode(":", $input,3)[2]) ? explode(":", $input,3)[2] : "";
+            $placeholder = safeExplode($input, ":", 2);
         @endphp
-        @if(explode(":", $input)[1] == "hidden")
-            @if(explode(":", $input)[1] == "checkbox")
+        @if(safeExplode($input, ":", 1) == "hidden")
+            @if(safeExplode($input, ":", 1) == "checkbox")
                 <div class="form-check">
-                    <input id="{{explode(":", $input)[0]}}" class="form-check-input @if(isset($random,$id)){{$random}} {{$id}}@endif" type="checkbox" name="{{explode(":", $input)[0]}}">
-                    <label for="{{explode(":", $input)[0]}}" class="form-check-label @if(isset($random,$id)){{$random}} {{$id}}@endif">{{__($name)}}</label>
+                    <input id="{{safeExplode($input, ":", 0)}}" class="form-check-input @if(isset($random,$id)){{$random}} {{$id}}@endif" type="checkbox" name="{{safeExplode($input, ":", 0)}}">
+                    <label for="{{safeExplode($input, ":", 0)}}" class="form-check-label @if(isset($random,$id)){{$random}} {{$id}}@endif">{{__($name)}}</label>
                 </div>
             @else
-                <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($placeholder)}}"
-                    class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required value="{{explode(":",$name)[1]}}">@if(explode(":", $input)[1] != "hidden")@endif
+                <input type="{{safeExplode($input, ":", 1)}}" name="{{safeExplode($input, ":", 0)}}" placeholder="{{__($placeholder)}}"
+                    class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required value="{{safeExplode($name, ":", 1)}}">@if(safeExplode($input, ":", 1) != "hidden")@endif
             @endif
         @elseif(isset($disabled))
-            @if(explode(":", $input)[1] == "checkbox")
+            @if(safeExplode($input, ":", 1) == "checkbox")
                 <div class="form-check">
-                    <input id="{{explode(":", $input)[0]}}" class="form-check-input @if(isset($random,$id)){{$random}} {{$id}}@endif" type="checkbox" name="{{explode(":", $input)[0]}}">
-                    <label for="{{explode(":", $input)[0]}}" class="form-check-label @if(isset($random,$id)){{$random}} {{$id}}@endif">{{__($name)}}</label>
+                    <input id="{{safeExplode($input, ":", 0)}}" class="form-check-input @if(isset($random,$id)){{$random}} {{$id}}@endif" type="checkbox" name="{{safeExplode($input, ":", 0)}}">
+                    <label for="{{safeExplode($input, ":", 0)}}" class="form-check-label @if(isset($random,$id)){{$random}} {{$id}}@endif">{{__($name)}}</label>
                 </div>
             @else
                 <label class="@if(isset($random,$id)){{$random}} {{$id}}@endif">{{__(explode(":",$name)[0])}}</label>
-                <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($placeholder)}}"
+                <input type="{{safeExplode($input, ":", 1)}}" name="{{safeExplode($input, ":", 0)}}" placeholder="{{__($placeholder)}}"
                     class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required disabled hidden>
             @endif
-        @elseif(explode(":", $input)[1] == "textarea")
+        @elseif(safeExplode($input, ":", 1) == "textarea")
             @if(count($inputs))
-                <textarea name="{{explode(":", $input)[0]}}"
+                <textarea name="{{safeExplode($input, ":", 0)}}"
                         class="form-control" required style="height: 60%"></textarea>
             @else
-                <textarea name="{{explode(":", $input)[0]}}"
+                <textarea name="{{safeExplode($input, ":", 0)}}"
                         class="form-control" required></textarea>
             @endif
-        @elseif(explode(":", $input)[1] == "file")
+        @elseif(safeExplode($input, ":", 1) == "file")
             <div class="custom-file">
-                <input name="{{explode(":", $input)[0]}}" type="file" class="custom-file-input @if(isset($random,$id)){{$random}} {{$id}}@endif">
+                <input name="{{safeExplode($input, ":", 0)}}" type="file" class="custom-file-input @if(isset($random,$id)){{$random}} {{$id}}@endif">
                 <label class="custom-file-label">{{__($name)}}</label>
             </div>
             <style>
@@ -62,20 +75,20 @@
                 }
             </style>
         @else
-            @if(explode(":", $input)[1] == "checkbox")
+            @if(safeExplode($input, ":", 1) == "checkbox")
                 <div class="form-check">
-                    <input id="{{explode(":", $input)[0]}}" class="form-check-input @if(isset($random,$id)){{$random}} {{$id}}@endif" type="checkbox" name="{{explode(":", $input)[0]}}">
-                    <label for="{{explode(":", $input)[0]}}" class="form-check-label @if(isset($random,$id)){{$random}} {{$id}}@endif">{{__($name)}}</label>
+                    <input id="{{safeExplode($input, ":", 0)}}" class="form-check-input @if(isset($random,$id)){{$random}} {{$id}}@endif" type="checkbox" name="{{safeExplode($input, ":", 0)}}">
+                    <label for="{{safeExplode($input, ":", 0)}}" class="form-check-label @if(isset($random,$id)){{$random}} {{$id}}@endif">{{__($name)}}</label>
                 </div>
             @else
-                @if(substr(explode(":", $input)[0],0,2) != "d-")
+                @if(substr(safeExplode($input, ":", 0),0,2) != "d-")
                     <label>{{__($name)}}</label>
-                    <input type="{{explode(":", $input)[1]}}" name="{{explode(":", $input)[0]}}" placeholder="{{__($placeholder)}}"
-                        class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required>@if(explode(":", $input)[1] != "hidden")@endif
+                    <input type="{{safeExplode($input, ":", 1)}}" name="{{safeExplode($input, ":", 0)}}" placeholder="{{__($placeholder)}}"
+                        class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif" required>@if(safeExplode($input, ":", 1) != "hidden")@endif
                 @else
                     <label>{{__($name)}}</label>
-                    <input type="{{explode(":", $input)[1]}}" name="{{substr(explode(":", $input)[0],2)}}" placeholder="{{__($placeholder)}}"
-                        class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif">@if(explode(":", $input)[1] != "hidden")@endif
+                    <input type="{{safeExplode($input, ":", 1)}}" name="{{substr(safeExplode($input, ":", 0),2)}}" placeholder="{{__($placeholder)}}"
+                        class="form-control @if(isset($random,$id)){{$random}} {{$id}}@endif">@if(safeExplode($input, ":", 1) != "hidden")@endif
                 @endif
             @endif
         @endif

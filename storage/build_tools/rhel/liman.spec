@@ -2,7 +2,7 @@ Name: liman
 Version: %VERSION%
 Release: 0
 License: MIT
-Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, php-smbclient, novnc, python39, python3-paramiko, python3-tornado, postgresql, postgresql-server
+Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, php-smbclient, novnc, python39, python3-paramiko, python3-tornado, python3-websockify, postgresql15, postgresql15-server
 Prefix: /liman
 Summary: Liman MYS
 Group: Applications/System
@@ -34,10 +34,10 @@ else
     echo "Installing liman."
 fi
 
-postgresql-setup initdb
-systemctl enable postgresql
-sed -i '1s/^/host    all             all             127.0.0.1\/32            md5\n/' /var/lib/pgsql/data/pg_hba.conf
-systemctl start postgresql
+/usr/pgsql-15/bin/postgresql-15-setup initdb
+systemctl enable postgresql-15
+sed -i '1s/^/host    all             all             127.0.0.1\/32            md5\n/' /var/lib/pgsql/15/data/pg_hba.conf
+systemctl start postgresql-15
 
 systemctl enable crond
 systemctl start crond
@@ -120,7 +120,7 @@ else
 fi
 
 sed -i "s/more_set_headers/#more_set_headers/g" /liman/server/storage/nginx.conf
-sed -i "s/php\/php7.3-fpm.sock/php-fpm\/www.sock/g" /liman/server/storage/nginx.conf
+sed -i "s/php\/php8.1-fpm.sock/php-fpm\/www.sock/g" /liman/server/storage/nginx.conf
 mv /liman/server/storage/nginx.conf /etc/nginx/conf.d/liman.conf
 
 # Nginx Auto Redirection

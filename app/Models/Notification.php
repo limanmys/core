@@ -9,14 +9,14 @@ class Notification extends Model
     use UsesUuid;
 
     protected $fillable = [
-        "user_id",
-        "title",
-        "type",
-        "message",
-        "server_id",
-        "extension_id",
-        "level",
-        "read",
+        'user_id',
+        'title',
+        'type',
+        'message',
+        'server_id',
+        'extension_id',
+        'level',
+        'read',
     ];
 
     public static function new(
@@ -30,17 +30,17 @@ class Notification extends Model
         // Create a notification object and fill values.
         // Before we return the notification, check if it's urgent. If so, send an email.
         return Notification::create([
-            "user_id" => auth()->id(),
-            "title" => json_encode([
-                "tr" => __($title, [], "tr"),
-                "en" => __($title, [], "en"),
+            'user_id' => auth()->id(),
+            'title' => json_encode([
+                'tr' => __($title, [], 'tr'),
+                'en' => __($title, [], 'en'),
             ]),
-            "type" => $type,
-            "message" => $message,
-            "server_id" => $server_id,
-            "extension_id" => $extension_id,
-            "level" => $level,
-            "read" => false,
+            'type' => $type,
+            'message' => $message,
+            'server_id' => $server_id,
+            'extension_id' => $extension_id,
+            'level' => $level,
+            'read' => false,
         ]);
     }
 
@@ -55,14 +55,14 @@ class Notification extends Model
     ) {
         // Create a notification object and fill values.
         return Notification::create([
-            "user_id" => $user_id,
-            "title" => $title,
-            "type" => $type,
-            "message" => $message,
-            "server_id" => $server_id,
-            "extension_id" => $extension_id,
-            "level" => $level,
-            "read" => false,
+            'user_id' => $user_id,
+            'title' => $title,
+            'type' => $type,
+            'message' => $message,
+            'server_id' => $server_id,
+            'extension_id' => $extension_id,
+            'level' => $level,
+            'read' => false,
         ]);
     }
 }

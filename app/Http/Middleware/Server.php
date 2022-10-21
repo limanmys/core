@@ -11,23 +11,23 @@ class Server
     {
         if (
             in_array(server()->control_port, knownPorts()) &&
-            !Certificate::where([
-                'server_hostname' => strtolower(server()->ip_address),
+            ! Certificate::where([
+                'server_hostname' => strtolower((string) server()->ip_address),
                 'origin' => server()->control_port,
             ])->exists()
         ) {
             $message = __(
-                ":server_name isimli sunucu için gerekli SSL sertifikası henüz eklenmemiş!",
+                ':server_name isimli sunucu için gerekli SSL sertifikası henüz eklenmemiş!',
                 [
-                    "server_name" =>
-                        server()->name . "(" . server()->ip_address . ")",
+                    'server_name' => server()->name.'('.server()->ip_address.')',
                 ]
             );
             abort(504, $message);
+
             return redirect()
                 ->back()
                 ->withErrors([
-                    "message" => $message,
+                    'message' => $message,
                 ]);
         }
         $status = @fsockopen(
@@ -40,15 +40,15 @@ class Server
         if (is_resource($status) || server()->control_port == -1) {
             return $next($request);
         } else {
-            $message = __(":server_name isimli sunucuya erişim sağlanamadı!", [
-                "server_name" =>
-                    server()->name . "(" . server()->ip_address . ")",
+            $message = __(':server_name isimli sunucuya erişim sağlanamadı!', [
+                'server_name' => server()->name.'('.server()->ip_address.')',
             ]);
             abort(504, $message);
+
             return redirect()
                 ->back()
                 ->withErrors([
-                    "message" => $message,
+                    'message' => $message,
                 ]);
         }
     }

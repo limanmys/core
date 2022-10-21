@@ -74,9 +74,7 @@ function request(url, data, next, error, requestType = "POST") {
     r.open(requestType, url);
     r.setRequestHeader("X-CSRF-TOKEN", csrf);
     r.setRequestHeader("Accept", "text/json");
-    setTimeout(function () {
-        r.send(data);
-    }, 300);
+    r.send(data);
     r.onreadystatechange = function () {
         if (r.readyState === 4) {
             if (

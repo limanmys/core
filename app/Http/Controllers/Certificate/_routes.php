@@ -1,6 +1,6 @@
 <?php
 
-Route::middleware(["admin"])->group(function () {
+Route::middleware(['admin'])->group(function () {
     // Certificate Add View
     Route::view('/ayarlar/sertifika', 'settings.certificate')
         ->name('certificate_add_page');

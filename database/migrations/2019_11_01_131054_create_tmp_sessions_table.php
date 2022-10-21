@@ -15,9 +15,9 @@ class CreateTmpSessionsTable extends Migration
     {
         Schema::create('tmp_sessions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string("session_id");
-            $table->string("key");
-            $table->text("value");
+            $table->string('session_id');
+            $table->string('key');
+            $table->text('value');
             $table->timestamps();
         });
     }

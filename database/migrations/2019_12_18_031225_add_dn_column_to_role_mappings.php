@@ -14,7 +14,7 @@ class AddDnColumnToRoleMappings extends Migration
     public function up()
     {
         Schema::table('role_mappings', function (Blueprint $table) {
-            $table->string("dn")->nullable();
+            $table->string('dn')->nullable();
         });
     }
 

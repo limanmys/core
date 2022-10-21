@@ -78,7 +78,6 @@ Route::view('/ayar/sunucu', 'settings.server')
     ->middleware('admin')
     ->name('settings_server');
 
-
 Route::post('/yetki/veriEkle', 'Settings\MainController@addVariable')
     ->name('permission_add_variable')
     ->middleware('admin');
@@ -123,7 +122,7 @@ Route::post('/kullaniciGetir', 'Settings\MainController@getUserList')
 Route::post('/kullaniciGetirBasit', 'Settings\MainController@getSimpleUserList')
     ->middleware('admin')
     ->name('get_user_list_admin_simple');
-    
+
 Route::view('/sifreDegistir', 'user.password')
     ->middleware('auth')
     ->name('password_change');

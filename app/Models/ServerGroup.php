@@ -8,5 +8,5 @@ class ServerGroup extends Model
 {
     use UsesUuid;
 
-    protected $fillable = ["name", "servers"];
+    protected $fillable = ['name', 'servers'];
 }

@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('CACHE_DRIVER', 'database'),
+    'default' => env('CACHE_DRIVER', 'redis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -37,7 +37,7 @@ return [
         'array' => [
             'driver' => 'array',
         ],
-
+        
         'database' => [
             'driver' => 'database',
             'table' => 'cache',
@@ -84,6 +84,6 @@ return [
 
     'prefix' => env(
         'CACHE_PREFIX',
-        Str::slug(env('APP_NAME', 'laravel'), '_') . '_cache'
+        Str::slug(env('APP_NAME', 'laravel'), '_').'_cache'
     ),
 ];

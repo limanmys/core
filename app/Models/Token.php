@@ -15,20 +15,21 @@ class Token extends Model
     public static function create($user_id = null)
     {
         $user = $user_id ? $user_id : auth()->id();
-        $exists = Token::where(["user_id" => $user])->first();
+        $exists = Token::where(['user_id' => $user])->first();
         if ($exists) {
             if (Carbon::now()->diffInHours($exists->created_at) > 23) {
                 $exists->delete();
 
                 return self::generate($user);
             }
-            return $exists["token"];
+
+            return $exists['token'];
         }
-        
+
         return self::generate($user);
     }
 
-    public static function generate($user_id = null) 
+    public static function generate($user_id = null)
     {
         $token = Str::random(32);
         while (Token::where('token', $token)->exists()) {
@@ -36,8 +37,8 @@ class Token extends Model
         }
 
         Token::firstOrCreate([
-            "token" => $token,
-            "user_id" => $user_id,
+            'token' => $token,
+            'user_id' => $user_id,
         ]);
 
         return $token;

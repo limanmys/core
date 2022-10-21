@@ -2,18 +2,18 @@
 
 namespace App\Jobs;
 
+use App\Models\AdminNotification;
+use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use GuzzleHttp\Client;
-use App\Models\AdminNotification;
 
 class LimanUpdaterJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    protected $downloadUrl;
+
     protected $downloadTo;
 
     /**
@@ -21,9 +21,8 @@ class LimanUpdaterJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($version, $downloadUrl)
+    public function __construct($version, protected $downloadUrl)
     {
-        $this->downloadUrl = $downloadUrl;
         $this->downloadTo = "/liman/packages/liman-$version.deb";
     }
 
@@ -44,44 +43,44 @@ class LimanUpdaterJob implements ShouldQueue
         }
 
         $client = new Client([
-            "headers" => [
-                "Authorization" => "Bearer " . env("MARKET_ACCESS_TOKEN"),
+            'headers' => [
+                'Authorization' => 'Bearer '.env('MARKET_ACCESS_TOKEN'),
             ],
-            "verify" => false,
+            'verify' => false,
         ]);
         $resource = fopen($this->downloadTo, 'w');
-        try{
+        try {
             $client->request('GET', $this->downloadUrl, ['sink' => $resource]);
-        }catch(\Exception $e){
+        } catch(\Exception $e) {
             AdminNotification::create([
-                "title" => json_encode([
-                    "tr" => $this->extension->display_name . __(" eklentisinin güncellemesi indirilemedi!", [], "tr"),
-                    "en" => $this->extension->display_name . __(" eklentisinin güncellemesi indirilemedi!", [], "en")
+                'title' => json_encode([
+                    'tr' => $this->extension->display_name.__(' eklentisinin güncellemesi indirilemedi!', [], 'tr'),
+                    'en' => $this->extension->display_name.__(' eklentisinin güncellemesi indirilemedi!', [], 'en'),
                 ]),
-                "type" => "error",
-                "message" => json_encode([
-                    "tr" => __("Oluşan hata: ", [], "tr") . $e->getMessage(),
-                    "en" => __("Oluşan hata: ", [], "en") . $e->getMessage()
-                ])
-                    ,
-                "level" => 3,
+                'type' => 'error',
+                'message' => json_encode([
+                    'tr' => __('Oluşan hata: ', [], 'tr').$e->getMessage(),
+                    'en' => __('Oluşan hata: ', [], 'en').$e->getMessage(),
+                ]),
+                'level' => 3,
             ]);
+
             return false;
         }
 
         AdminNotification::create([
-            "title" => json_encode([
-                "tr" => $this->extension->display_name . __(" eklentisinin güncellemesi indirildi!", [], "tr"),
-                "en" => $this->extension->display_name . __(" eklentisinin güncellemesi indirildi!", [], "en")
+            'title' => json_encode([
+                'tr' => $this->extension->display_name.__(' eklentisinin güncellemesi indirildi!', [], 'tr'),
+                'en' => $this->extension->display_name.__(' eklentisinin güncellemesi indirildi!', [], 'en'),
             ]),
-            "type" => "",
-            "message" => json_encode([
-                "tr" => $this->extension->display_name . __(" eklentisinin güncellemesi başarıyla indirildi, eklentiler sekmesi üzerinden değişim kaydını görebilir, eklentiyi güncelleyebilirsiniz.", [], "tr"),
-                "en" => $this->extension->display_name . __(" eklentisinin güncellemesi başarıyla indirildi, eklentiler sekmesi üzerinden değişim kaydını görebilir, eklentiyi güncelleyebilirsiniz.", [], "en")
+            'type' => '',
+            'message' => json_encode([
+                'tr' => $this->extension->display_name.__(' eklentisinin güncellemesi başarıyla indirildi, eklentiler sekmesi üzerinden değişim kaydını görebilir, eklentiyi güncelleyebilirsiniz.', [], 'tr'),
+                'en' => $this->extension->display_name.__(' eklentisinin güncellemesi başarıyla indirildi, eklentiler sekmesi üzerinden değişim kaydını görebilir, eklentiyi güncelleyebilirsiniz.', [], 'en'),
             ]),
-            "level" => 3,
+            'level' => 3,
         ]);
-        
+
         if (is_file($this->downloadTo)) {
             return true;
         } else {

@@ -10,17 +10,13 @@ class TestMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $subject, $content;
-
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($subject, $content)
+    public function __construct(public $subject, public $content)
     {
-        $this->subject = $subject;
-        $this->content = $content;
     }
 
     /**
@@ -31,11 +27,12 @@ class TestMail extends Mailable
     public function build()
     {
         $mail = $this->from([
-            "address" => env('APP_NOTIFICATION_EMAIL'),
-            "name" => __("Liman MYS")
+            'address' => env('APP_NOTIFICATION_EMAIL'),
+            'name' => __('Liman MYS'),
         ])
             ->subject($this->subject)
-            ->view("email.extension_mail");
+            ->view('email.extension_mail');
+
         return $mail;
     }
 }

@@ -17,18 +17,18 @@ class CreateServerKeysTable extends Migration
             $table->uuid('id')->primary();
             $table->string('type');
             $table->string('data')->nullable();
-            $table->uuid("server_id");
+            $table->uuid('server_id');
             $table
-                ->foreign("server_id")
-                ->references("id")
-                ->on("servers")
-                ->onDelete("cascade");
-            $table->uuid("user_id");
+                ->foreign('server_id')
+                ->references('id')
+                ->on('servers')
+                ->onDelete('cascade');
+            $table->uuid('user_id');
             $table
-                ->foreign("user_id")
-                ->references("id")
-                ->on("users")
-                ->onDelete("cascade");
+                ->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }

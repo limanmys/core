@@ -5,206 +5,215 @@ namespace App\System;
 use App\Models\SystemSettings;
 use GuzzleHttp\Client;
 
-class Helper {
-
+class Helper
+{
     private $authKey;
+
     private $client;
+
     public function __construct()
     {
-        $this->authKey = file_get_contents("/liman/keys/service.key");
+        $this->authKey = file_get_contents('/liman/keys/service.key');
         $this->client = new Client([
-            "base_uri" => "http://127.0.0.1:3008",
+            'base_uri' => 'http://127.0.0.1:3008',
         ]);
     }
 
-    public function userAdd($extension_id)
+    public function userAdd($extension_id): bool
     {
-        try{
-            $this->client->get('/userAdd',[
+        try {
+            $this->client->get('/userAdd', [
                 'query' => [
                     'extension_id' => cleanDash($extension_id),
-                    'liman_token' => $this->authKey
-                ]
+                    'liman_token' => $this->authKey,
+                ],
             ]);
-        }catch(\Exception $e){
+        } catch(\Exception) {
             return false;
         }
+
         return true;
     }
 
-    public function userRemove($extension_id)
+    public function userRemove($extension_id): bool
     {
-        try{
-            $this->client->get('/userRemove',[
+        try {
+            $this->client->get('/userRemove', [
                 'query' => [
                     'extension_id' => cleanDash($extension_id),
-                    'liman_token' => $this->authKey
-                ]
+                    'liman_token' => $this->authKey,
+                ],
             ]);
-        }catch(\Exception $e){
+        } catch(\Exception) {
             return false;
         }
+
         return true;
     }
 
-    public function dnsUpdate($server1, $server2, $server3)
+    public function dnsUpdate($server1, $server2, $server3): bool
     {
-        try{
-            $this->client->get('/dns',[
+        try {
+            $this->client->get('/dns', [
                 'query' => [
                     'liman_token' => $this->authKey,
-                    'server1' => $server1 ?: "",
-                    'server2' => $server2 ?: "",
-                    'server3' => $server3 ?: ""
-                ]
+                    'server1' => $server1 ?: '',
+                    'server2' => $server2 ?: '',
+                    'server3' => $server3 ?: '',
+                ],
             ]);
-        }catch(\Exception $e){
+        } catch(\Exception) {
             return false;
         }
 
         SystemSettings::updateOrCreate(
             ['key' => 'SYSTEM_DNS'],
             ['data' => json_encode([
-                $server1, $server2, $server3
+                $server1, $server2, $server3,
             ])]
         );
 
         return true;
     }
 
-    public function addCertificate($tmpPath, $targetName)
+    public function addCertificate($tmpPath, $targetName): bool
     {
         $contents = $tmpPath;
-        if(is_file($tmpPath)){
+        if (is_file($tmpPath)) {
             $contents = file_get_contents($tmpPath);
-        }else{
-            $tmpPath = "/tmp/" . str_random(16);
-            file_put_contents($tmpPath,$contents);
+        } else {
+            $tmpPath = '/tmp/'.str_random(16);
+            file_put_contents($tmpPath, $contents);
         }
         $arr = [
-            "certificate" => $contents,
-            "targetName" => $targetName
+            'certificate' => $contents,
+            'targetName' => $targetName,
         ];
-        
-        $current = SystemSettings::where("key", "SYSTEM_CERTIFICATES")->first();
+
+        $current = SystemSettings::where('key', 'SYSTEM_CERTIFICATES')->first();
 
         if ($current) {
-            $foo = json_decode($current->data, true);
+            $foo = json_decode((string) $current->data, true);
             $flag = true;
             for ($i = 0; $i < count($foo); $i++) {
-                if ($foo[$i]["targetName"] == $targetName) {
-                    $foo[$i]["certificate"] = $arr["certificate"];
+                if ($foo[$i]['targetName'] == $targetName) {
+                    $foo[$i]['certificate'] = $arr['certificate'];
                     $flag = false;
                     break;
                 }
             }
-            
+
             if ($flag) {
                 array_push($foo, $arr);
             }
-            
+
             $current->update([
-                "data" => json_encode($foo)
+                'data' => json_encode($foo),
             ]);
         } else {
             SystemSettings::create([
-                "key" => "SYSTEM_CERTIFICATES",
-                "data" => json_encode([$arr])
+                'key' => 'SYSTEM_CERTIFICATES',
+                'data' => json_encode([$arr]),
             ]);
         }
 
-        try{
-            $this->client->get('/certificateAdd',[
+        try {
+            $this->client->get('/certificateAdd', [
                 'query' => [
                     'liman_token' => $this->authKey,
                     'tmpPath' => $tmpPath,
                     'targetName' => $targetName,
-                ]
+                ],
             ]);
-        }catch(\Exception $e){
+        } catch(\Exception) {
             return false;
         }
+
         return true;
     }
 
-    public function removeCertificate($targetName)
+    public function removeCertificate($targetName): bool
     {
         $arr = [
-            "targetName" => $targetName
+            'targetName' => $targetName,
         ];
-        
-        $current = SystemSettings::where("key", "SYSTEM_CERTIFICATES")->first();
+
+        $current = SystemSettings::where('key', 'SYSTEM_CERTIFICATES')->first();
 
         if ($current) {
-            $foo = json_decode($current->data, true);
+            $foo = json_decode((string) $current->data, true);
             for ($i = 0; $i < count($foo); $i++) {
-                if ($foo[$i]["targetName"] == $targetName) {
+                if ($foo[$i]['targetName'] == $targetName) {
                     unset($foo[$i]);
                     $foo = array_values($foo);
                     break;
                 }
             }
             $current->update([
-                "data" => $foo
+                'data' => $foo,
             ]);
         }
 
-        try{
-            $this->client->get('/certificateRemove',[
+        try {
+            $this->client->get('/certificateRemove', [
                 'query' => [
                     'liman_token' => $this->authKey,
                     'targetName' => $targetName,
-                ]
+                ],
             ]);
-        }catch(\Exception $e){
+        } catch(\Exception) {
             return false;
         }
+
         return true;
     }
 
-    public function fixExtensionPermissions($extension_id, $extension_name)
+    public function fixExtensionPermissions($extension_id, $extension_name): bool
     {
-        try{
-            $this->client->get('/fixPermissions',[
+        try {
+            $this->client->get('/fixPermissions', [
                 'query' => [
                     'liman_token' => $this->authKey,
                     'extension_id' => $extension_id,
-                    'extension_name' => strtolower($extension_name)
-                ]
+                    'extension_name' => strtolower((string) $extension_name),
+                ],
             ]);
-        }catch(\Exception $e){
+        } catch(\Exception) {
             return false;
         }
+
         return true;
     }
 
-    public function installPackages($packages)
+    public function installPackages($packages): bool
     {
-        try{
-            $this->client->get('/installPackages',[
+        try {
+            $this->client->get('/installPackages', [
                 'query' => [
                     'liman_token' => $this->authKey,
                     'packages' => $packages,
-                ]
+                ],
             ]);
-        }catch(\Exception $e){
+        } catch(\Exception) {
             return false;
         }
+
         return true;
     }
 
     public function runCommand($command)
     {
-        try{
-            $response = $this->client->get('/extensionRun',[
+        try {
+            $response = $this->client->get('/extensionRun', [
                 'query' => [
                     'liman_token' => $this->authKey,
-                    'command' => $command
-                ]
+                    'command' => $command,
+                ],
             ]);
-        }catch(\Exception $e){
-            return __("Liman Sistem Servisine Erişilemiyor!");
+        } catch(\Exception) {
+            return __('Liman Sistem Servisine Erişilemiyor!');
         }
+
         return $response->getBody()->getContents();
     }
 }

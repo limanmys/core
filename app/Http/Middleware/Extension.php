@@ -12,7 +12,6 @@ class Extension
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -22,33 +21,33 @@ class Extension
         if (empty(extension()->sslPorts)) {
             return $next($request);
         }
-        $ports = explode(',', extension()->sslPorts);
+        $ports = explode(',', (string) extension()->sslPorts);
         foreach ($ports as $port) {
             if (
                 Certificate::where([
-                    "server_hostname" => strtolower($server->ip_address),
-                    "origin" => trim($port),
+                    'server_hostname' => strtolower((string) $server->ip_address),
+                    'origin' => trim($port),
                 ])->exists()
             ) {
                 continue;
             }
             AdminNotification::create([
-                "title" => json_encode([
-                    "tr" => __("Yeni Sertifika Onayı", [], "tr"),
-                    "en" => __("Yeni Sertifika Onayı", [], "en")
+                'title' => json_encode([
+                    'tr' => __('Yeni Sertifika Onayı', [], 'tr'),
+                    'en' => __('Yeni Sertifika Onayı', [], 'en'),
                 ]),
-                "type" => "cert_request",
-                "message" =>
-                    $server->ip_address . ":" . trim($port) . ":" . $server->id,
-                "level" => 3,
+                'type' => 'cert_request',
+                'message' => $server->ip_address.':'.trim($port).':'.$server->id,
+                'level' => 3,
             ]);
+
             return redirect()
                 ->back()
                 ->withErrors([
-                    "message" =>
-                        __("Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede bu sunucu ile eklentiye erişemezsiniz."),
+                    'message' => __('Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede bu sunucu ile eklentiye erişemezsiniz.'),
                 ]);
         }
+
         return $next($request);
     }
 }

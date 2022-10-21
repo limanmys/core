@@ -24,29 +24,14 @@
                             data-widget="pushmenu" href="#" onclick="$('[role=tooltip]').remove(); collapseNav()"
                             id="collapseMenu"><i class="fas fa-bars"></i></a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tooltip" title="{{ __('Karanlık mod') }}"
-                            onclick="toggleDarkMode()"><i id="darkModeIcon" class="fas fa-sun"></i></a>
-                    </li>
 @endif
-<script>
-    if (typeof currentlyDark != "undefined" && currentlyDark == true) {
-        setDarkMode();
-    }
-</script>
 <li class="nav-item d-none d-md-block">
     <a href="/takip" class="nav-link" data-toggle="tooltip" title="{{ __('Sunucu Takibi') }}">
         <i class="fa-solid fa-eye"></i>
     </a>
 </li>
-<li class="nav-item d-none d-md-block">
-    <a href="/bilesenler" class="nav-link" data-toggle="tooltip"
-        @if (request()->getRequestUri() == '/bilesenler') class="active" @endif title='{{ __('Bileşenler') }}'>
-        <i class="nav-icon fas fa-chart-pie"></i>
-    </a>
-</li>
 </ul>
-@if (request('server') != null)
+@if (request()->request->get('server') != null)
     <ul class="mx-auto order-0 navbar-nav text-white d-md-block d-sm-none">
         <li style="font-weight:bolder;font-size:20px;cursor:pointer;" data-toggle="tooltip"
             data-original-title="{{ server()->ip_address }}"
@@ -57,7 +42,7 @@
     </ul>
 @endif
 <!-- Right navbar links -->
-<ul class="navbar-nav @if (request('server') == null) ml-auto @endif">
+<ul class="navbar-nav @if (request()->request->get('server') == null) ml-auto @endif">
 
     <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">

@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Roles;
 
 use App\Http\Controllers\Controller;
-use App\Models\LdapRestriction;
-use Illuminate\Http\Request;
 use App\Models\Role;
 use App\Models\RoleMapping;
 
@@ -28,12 +26,12 @@ class RoleMappingController extends Controller
         ]);
 
         RoleMapping::create([
-            "dn" => request('dn'),
-            "role_id" => request('role_id'),
-            "group_id" => md5(request('dn')),
+            'dn' => request('dn'),
+            'role_id' => request('role_id'),
+            'group_id' => md5((string) request('dn')),
         ]);
 
-        return respond("Rol eşleştirmesi başarıyla eklendi.");
+        return respond('Rol eşleştirmesi başarıyla eklendi.');
     }
 
     /**
@@ -52,6 +50,7 @@ class RoleMappingController extends Controller
         ]);
 
         RoleMapping::find(request('role_mapping_id'))->delete();
-        return respond("Rol eşleştirmesi başarıyla silindi.");
+
+        return respond('Rol eşleştirmesi başarıyla silindi.');
     }
 }

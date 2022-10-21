@@ -8,7 +8,7 @@ class Role extends Model
 {
     use UsesUuid;
 
-    protected $fillable = ["name"];
+    protected $fillable = ['name'];
 
     public function permissions()
     {
@@ -17,6 +17,6 @@ class Role extends Model
 
     public function users()
     {
-        return $this->belongsToMany('App\User', "role_users");
+        return $this->belongsToMany('App\User', 'role_users');
     }
 }

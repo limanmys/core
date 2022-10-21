@@ -13,7 +13,7 @@ class CreateMonitorServersTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('monitor_servers')) {
+        if (! Schema::hasTable('monitor_servers')) {
             Schema::create('monitor_servers', function (Blueprint $table) {
                 $table->uuid('id')->primary();
                 $table->string('ip_address');
@@ -23,7 +23,6 @@ class CreateMonitorServersTable extends Migration
                 $table->timestamps();
             });
         }
-        
     }
 
     /**

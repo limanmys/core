@@ -5,15 +5,17 @@ namespace App;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
+use App\Models\UsesUuid;
+use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\UsesUuid;
 
 /**
  * App\User
  *
  * @property-read mixed $id
+ *
  * @method static Builder|User newModelQuery()
  * @method static Builder|User newQuery()
  * @method static Builder|User query()
@@ -21,7 +23,7 @@ use App\Models\UsesUuid;
  */
 class User extends Authenticatable
 {
-    use UsesUuid, Notifiable;
+    use UsesUuid, Notifiable, CacheQueryBuilder;
 
     /**
      * The attributes that are mass assignable.
@@ -39,7 +41,7 @@ class User extends Authenticatable
         'auth_type',
         'last_login_at',
         'last_login_ip',
-        'locale'
+        'locale',
     ];
 
     /**
@@ -74,11 +76,6 @@ class User extends Authenticatable
         });
     }
 
-    public function widgets()
-    {
-        return $this->hasMany("\App\Models\Widget");
-    }
-
     public function tokens()
     {
         return $this->hasMany('\App\Models\Token');
@@ -102,6 +99,7 @@ class User extends Authenticatable
     public function favorites()
     {
         return $this->belongsToMany('\App\Models\Server', 'user_favorites')
+            ->orderBy("created_at", "ASC")
             ->get()
             ->filter(function ($server) {
                 return Permission::can(user()->id, 'server', 'id', $server->id);
@@ -115,7 +113,7 @@ class User extends Authenticatable
 
     public function roles()
     {
-        return $this->belongsToMany('App\Models\Role', "role_users");
+        return $this->belongsToMany('App\Models\Role', 'role_users');
     }
 
     public function accessTokens()

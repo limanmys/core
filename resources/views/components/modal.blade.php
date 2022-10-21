@@ -24,7 +24,7 @@
                             <label>{{__("Tipi")}}</label>
                             <select class="form-control" required onchange="cs_{{$id}}(this.value)">
                                 @foreach ($selects as $key => $select)
-                                    <option value="{{explode(":",$key)[1]}}">{{__(explode(":",$key)[0])}}</option>
+                                    <option value="{{explode(":",$key)[1] ?? ""}}">{{__(explode(":",$key)[0] ?? "")}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -32,7 +32,7 @@
                         @include('inputs',[
                                     "inputs" => $select,
                                     "disabled" => "true",
-                                    "id" => explode(":",$key)[1],
+                                    "id" => explode(":",$key)[1] ?? "",
                                     "random" => $id
                             ])
                         @endforeach
@@ -75,6 +75,6 @@
                 element.removeAttribute('disabled');
             });
         }
-        cs_{{$id}}('{{explode(':',key($selects))[1]}}')
+        cs_{{$id}}('{{explode(':',key($selects))[1] ?? ""}}')
     </script>
 @endisset

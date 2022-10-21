@@ -9,7 +9,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar Search -->
-        <div id="liman_search" autocomplete="off">
+        <div id="liman_search" autocomplete="off" data-widget="sidebar-search">
             <div class="form-group has-search">
                 <span class="fa fa-search form-control-feedback"></span>
                 <input autocomplete="off" autocomplete="" type="text" id="liman_search_input" class="form-control"
@@ -49,10 +49,10 @@
                             @endif
                             @foreach ($server->extensions() as $extension)
                                 <li class="nav-item">
-                                    <a href='/l/{{ $extension->id }}/{{ $server->city }}/{{ $server->id }}'
+                                    <a href='/l/{{ $extension->id }}/{{ $server->id }}'
                                         class="nav-link @if (request('extension_id') == $extension->id) active @endif">
                                         <i
-                                            class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-' . $extension->icon }}"></i>
+                                            class="nav-icon {{ empty($extension->icon) ? 'fa-solid fa-puzzle-piece' : 'fas fa-' . $extension->icon }}"></i>
                                         <p>{{ __($extension->display_name) }}</p>
                                     </a>
                                 </li>
@@ -80,7 +80,7 @@
                             @endif
                             @foreach ($server->extensions() as $extension)
                                 <li class="nav-item">
-                                    <a href='/l/{{ $extension->id }}/{{ $server->city }}/{{ $server->id }}'
+                                    <a href='/l/{{ $extension->id }}/{{ $server->id }}'
                                         class="nav-link @if (request('extension_id') == $extension->id) active @endif">
                                         <i
                                             class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-' . $extension->icon }}"></i>

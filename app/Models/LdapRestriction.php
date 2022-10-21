@@ -8,5 +8,5 @@ class LdapRestriction extends Model
 {
     use UsesUuid;
 
-    protected $fillable = ["name", "type"];
+    protected $fillable = ['name', 'type'];
 }

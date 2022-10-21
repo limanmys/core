@@ -17,16 +17,16 @@ class CreateConnectorTokensTable extends Migration
             $table->uuid('id');
             $table->uuid('server_id');
             $table
-                ->foreign("server_id")
-                ->references("id")
-                ->on("servers")
-                ->onDelete("cascade");
+                ->foreign('server_id')
+                ->references('id')
+                ->on('servers')
+                ->onDelete('cascade');
             $table->uuid('user_id');
             $table
-                ->foreign("user_id")
-                ->references("id")
-                ->on("users")
-                ->onDelete("cascade");
+                ->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
             $table->string('token');
             $table->timestamps();
         });

@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\AdminNotification;
+use App\Models\Extension;
 use App\Models\LimanRequest;
 use App\Models\Server;
-use App\User;
 use App\Models\Token;
-use App\Models\Extension;
 use App\Models\Widget;
+use App\User;
 
 class HomeController extends Controller
 {
@@ -33,26 +33,16 @@ class HomeController extends Controller
      * @apiSuccess {Integer} user_count Count of the users in Liman.
      * @apiSuccess {Integer} version Liman Version.
      */
-
     public function index()
     {
-        system_log(7, "HOMEPAGE");
-        $widgets = Widget::where('user_id', auth()->id())
-            ->orderBy('order')
-            ->get();
-        foreach ($widgets as $widget) {
-            $widget->server_name = Server::where(
-                'id',
-                $widget->server_id
-            )->first()->name;
-        }
+        system_log(7, 'HOMEPAGE');    
+
         return magicView('index', [
-            "token" => Token::create(user()->id),
-            "widgets" => $widgets,
-            "server_count" => Server::all()->count(),
-            "extension_count" => Extension::all()->count(),
-            "user_count" => User::all()->count(),
-            "version" => getVersion() . " - " . getVersionCode(),
+            'token' => Token::create(user()->id),
+            'server_count' => Server::all()->count(),
+            'extension_count' => Extension::all()->count(),
+            'user_count' => User::all()->count(),
+            'version' => getVersion().' - '.getVersionCode(),
         ]);
     }
 
@@ -87,29 +77,30 @@ class HomeController extends Controller
         $secondUp = $this->calculateNetworkBytes(false);
 
         return response([
-            "cpu" => $cpuUsage,
-            "ram" => $ramUsage,
-            "io" => round($ioPercent, 2),
+            'cpu' => $cpuUsage,
+            'ram' => $ramUsage,
+            'io' => round($ioPercent, 2),
             'network' => [
                 'down' => round(($secondDown - $firstDown) / 1024 / 2, 2),
                 'up' => round(($secondUp - $firstUp) / 1024 / 2, 2),
             ],
-            "time" => \Carbon\Carbon::now()->format('H:i:s'),
+            'time' => \Carbon\Carbon::now()->format('H:i:s'),
         ]);
     }
 
     public function setLocale()
     {
-        system_log(7, "SET_LOCALE");
-        $languages = ["tr", "en"];
+        system_log(7, 'SET_LOCALE');
+        $languages = ['tr', 'en'];
         if (
             request()->has('locale') &&
             in_array(request('locale'), $languages)
         ) {
             \Session::put('locale', request('locale'));
             auth()->user()->update([
-                "locale" => request('locale')
+                'locale' => request('locale'),
             ]);
+
             return redirect()->back();
         } else {
             return response('Language not found', 404);
@@ -119,17 +110,17 @@ class HomeController extends Controller
     private function calculateNetworkBytes($download = true)
     {
         $text = $download ? 'rx_bytes' : 'tx_bytes';
-        if ($text == "rx_bytes" || $text == "tx_bytes")
-        {
+        if ($text == 'rx_bytes' || $text == 'tx_bytes') {
             $count = 0;
             $raw = trim(shell_exec("cat /sys/class/net/*/statistics/$text"));
-    
+
             foreach (explode("\n", trim($raw)) as $data) {
                 $count += intval($data);
             }
+
             return $count;
         } else {
-            return "Invalid data";
+            return 'Invalid data';
         }
     }
 
@@ -144,26 +135,17 @@ class HomeController extends Controller
     {
         $requests = LimanRequest::where('user_id', auth()->id())->get();
         foreach ($requests as $request) {
-            switch ($request->status) {
-                case "0":
-                    $request->status = __("Talep Alındı");
-                    break;
-                case "1":
-                    $request->status = __("İşleniyor");
-                    break;
-                case "2":
-                    $request->status = __("Tamamlandı.");
-                    break;
-                case "3":
-                    $request->status = __("Reddedildi.");
-                    break;
-                default:
-                    $request->status = __("Bilinmeyen.");
-                    break;
-            }
+            $request->status = match ($request->status) {
+                '0' => __('Talep Alındı'),
+                '1' => __('İşleniyor'),
+                '2' => __('Tamamlandı.'),
+                '3' => __('Reddedildi.'),
+                default => __('Bilinmeyen.'),
+            };
         }
+
         return magicView('permission.all', [
-            "requests" => $requests,
+            'requests' => $requests,
         ]);
     }
 
@@ -175,7 +157,6 @@ class HomeController extends Controller
      * @apiParam {String} note Note of the request
      * @apiParam {String} type server,extension,other
      * @apiParam {String} speed normal,urgent
-     *
      */
     public function request()
     {
@@ -185,79 +166,78 @@ class HomeController extends Controller
             'speed' => 'required|in:normal,urgent',
         ]);
         LimanRequest::create([
-            "user_id" => auth()->id(),
-            "email" => auth()->user()->email,
-            "note" => request('note'),
-            "type" => request('type'),
-            "speed" => request('speed'),
-            "status" => 0,
+            'user_id' => auth()->id(),
+            'email' => auth()->user()->email,
+            'note' => request('note'),
+            'type' => request('type'),
+            'speed' => request('speed'),
+            'status' => 0,
         ]);
 
         $users = User::where('status', 1)->get();
-        foreach ($users as $user) 
-        {
+        foreach ($users as $user) {
             AdminNotification::create([
-                "user_id" => $user->id,
-                "title" => json_encode([
-                    "tr" => __("İzin isteği: ", [], "tr") . auth()->user()->name,
-                    "en" => __("İzin isteği: ", [], "en") . auth()->user()->name
+                'user_id' => $user->id,
+                'title' => json_encode([
+                    'tr' => __('İzin isteği: ', [], 'tr').auth()->user()->name,
+                    'en' => __('İzin isteği: ', [], 'en').auth()->user()->name,
                 ]),
-                "type" => "auth_request",
-                "message" => request('note'),
-                "server_id" => null,
-                "extension_id" => null,
-                "level" => 0,
-                "read" => false,
+                'type' => 'auth_request',
+                'message' => request('note'),
+                'server_id' => null,
+                'extension_id' => null,
+                'level' => 0,
+                'read' => false,
             ]);
         }
-        
+
         return respond('Talebiniz başarıyla alındı.', 200);
     }
 
     public function getServerStatus($count = 6)
-    {   
-        $servers = Server::orderBy("updated_at", "DESC")->limit($count)->get();
+    {
+        $servers = Server::orderBy('updated_at', 'DESC')->limit($count)->get();
         $data = [];
 
         foreach ($servers as $server) {
-                $status = @fsockopen(
-                    $server->ip_address,
-                    $server->control_port,
-                    $errno,
-                    $errstr,
-                    1);
-                        
+            $status = @fsockopen(
+                $server->ip_address,
+                $server->control_port,
+                $errno,
+                $errstr,
+                1);
+
             try {
                 if ($status) {
                     if ($server->isWindows() && $server->canRunCommand()) {
-                        preg_match('/\d+/', $server->getUptime(), $output);
+                        preg_match('/\d+/', (string) $server->getUptime(), $output);
                         $uptime = $output[0];
-                    } else if ($server->canRunCommand()) {
+                    } elseif ($server->canRunCommand()) {
                         $uptime = $server->getUptime();
                     } else {
-                        $uptime = "";
+                        $uptime = '';
                     }
-    
-                    if ($uptime != "") {
+
+                    if ($uptime != '') {
                         $uptime = \Carbon\Carbon::parse($uptime)->diffForHumans();
                     }
                 } else {
-                    $uptime = " ";
+                    $uptime = ' ';
                 }
-            } catch (\Throwable $e) {
-                $uptime = " ";
-            }       
+            } catch (\Throwable) {
+                $uptime = ' ';
+            }
 
             array_push($data, [
-                "id" => $server->id,
-                "icon" => $server->isLinux() ? 'fa-linux' : 'fa-windows',
-                "name" => $server->name,
-                "uptime" => (bool)$uptime ? $uptime : null,
-                "badge_class" => (bool)$status ? "badge-success" : "badge-danger",
-                "status" => (bool)$status
+                'id' => $server->id,
+                'icon' => $server->isLinux() ? 'fa-linux' : 'fa-windows',
+                'name' => $server->name,
+                'uptime' => (bool) $uptime ? $uptime : null,
+                'badge_class' => (bool) $status ? 'badge-success' : 'badge-danger',
+                'status' => (bool) $status,
             ]);
         }
-        
+
         return $data;
     }
 }

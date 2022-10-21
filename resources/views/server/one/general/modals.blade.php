@@ -12,7 +12,7 @@
             <a class="nav-link active" href="#fromRepo" data-toggle="tab">{{__("Depodan Yükle")}}</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#fromDeb" data-toggle="tab">{{__("Paket Yükle (.deb)")}}</a>
+            <a class="nav-link" href="#fromDeb" data-toggle="tab">{{__("Paket Yükle")}}</a>
         </li>
     </ul>
     <div class="tab-content">
@@ -25,7 +25,7 @@
         </div>
         <div class="tab-pane fade show" id="fromDeb" role="tabpanel">
             @include('file-input', [
-                'title' => 'Deb Paketi',
+                'title' => 'Paket (.rpm / .deb)',
                 'name' => 'debUpload',
                 'callback' => 'onDebUploadSuccess'
             ])
