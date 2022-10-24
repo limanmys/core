@@ -9,7 +9,9 @@ let english = {
   "Liman ID kopyalandı!": "Liman ID copied!",
   "Liman ID başarıyla kopyalandı.": "Liman ID has been copied successfully!",
   "Okunmamış bildiriminiz bulunmamaktadır.": "You have been read all notifications.",
-  "/turkce.json": "/english.json"
+  "/turkce.json": "/english.json",
+  "Tümünü Seç": "Select All",
+  "Tümünü Kaldır": "Remove All"
 }
 
 let turkish = {}
@@ -363,7 +365,7 @@ function isJson(str) {
   return true;
 }
 
-const escapeHtml = (unsafe) => {
+const limanEscapeHtml = (unsafe) => {
   return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 }
 
@@ -389,7 +391,7 @@ function renderNotifications(data, type, target, exclude) {
     let color = errors.includes(notification['type']) ? 'color: #ff4444' : ''
     let html = `<a class="dropdown-item d-flex align-items-start" onclick="window.location.href = '/bildirim/${notification["id"]}'" href="/bildirim/${notification["id"]}">
         <div class="text">
-            <h4 style="${color}">${escapeHtml(notificationTitle)}</h4>
+            <h4 style="${color}">${limanEscapeHtml(notificationTitle)}</h4>
             <span class="time">${notification["humanDate"]}</span>
         </div>
     </a>`
@@ -409,7 +411,7 @@ function renderNotifications(data, type, target, exclude) {
       title: notificationTitle,
       subtitle: "Liman",
       body: notificationMsg,
-      delay: 3000,
+      delay: 5000,
       autohide: true,
     };
 
@@ -651,8 +653,8 @@ if(type == "normal"){
         language: {
             url : __("/turkce.json"),
             buttons: {
-                selectAll: "{{ __('Tümünü Seç') }}",
-                selectNone: "{{ __('Tümünü Kaldır') }}"
+                selectAll: __('Tümünü Seç'),
+                selectNone: __('Tümünü Kaldır')
             }
         }
     };

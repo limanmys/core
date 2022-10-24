@@ -6,7 +6,7 @@
     @endif
     <span class="badge badge-warning navbar-badge" id="{{isset($systemNotification) ? 'adminNotificationsCount' : 'userNotificationsCount'}}">{{$notifications->count()}}</span>
 </a>
-<div class="dropdown-menu animate slideIn dropdown-menu-right">
+<div class="dropdown-menu dropdown-menu-right">
     <a href="#" class="notif-action dropdown-item dropdown-header text-center btn-link @if(count($notifications) == 0) d-none @endif" onclick="@if(!isset($systemNotification)) readNotifications() @else readSystemNotifications() @endif">
         <i class="fas fa-eye" style="font-size: 14px;"></i> {{__('Tümünü Okundu Olarak İşaretle')}}
     </a>

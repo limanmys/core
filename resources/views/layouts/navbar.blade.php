@@ -43,25 +43,17 @@
 @endif
 <!-- Right navbar links -->
 <ul class="navbar-nav @if (request()->request->get('server') == null) ml-auto @endif">
-
-    <li class="nav-item dropdown">
+    <li class="nav-item dropdown btn-group">
         <a class="nav-link" data-toggle="dropdown" href="#">
-            @if (session('locale') === 'tr')
-                TR
-            @else
-                EN
-            @endif
+            <i class="fa-solid fa-globe"></i>
         </a>
-        <div class="dropdown-menu dropdown-menu-right p-0">
-            @if (session('locale') === 'tr')
-                <a href="{{ route('set_locale', ['locale' => 'en']) }}" class="dropdown-item active">
-                    EN English
-                </a>
-            @elseif (session('locale') === 'en')
-                <a href="{{ route('set_locale', ['locale' => 'tr']) }}" class="dropdown-item active">
+        <div class="dropdown-menu dropdown-menu-right p-0" style="min-width: 150px !important;">
+                <a href="{{ route('set_locale', ['locale' => 'tr']) }}" class="dropdown-item">
                     TR Türkçe
                 </a>
-            @endif
+                <a href="{{ route('set_locale', ['locale' => 'en']) }}" class="dropdown-item">
+                    EN English
+                </a>
         </div>
     </li>
 
@@ -79,16 +71,16 @@
     <li id="userNotifications" class="nav-item dropdown btn-group"> 
         @include('notifications', ['notifications' => notifications()])
     </li>
-    <li class="nav-item dropdown">
+    <li class="btn-group nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
             <i class="fa fa-user mr-1"></i>
             <span class="d-none d-sm-inline-block"
                 title="{{ user()->name, 20 }}">{{ str_limit(user()->name, 20) }}</span>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right animate slideIn">
-            <div class="card card-widget widget-user-2" style="margin-bottom: 0px;">
-                <div class="widget-user-header bg-secondary" style="color:white">
-                    <h3 class="widget-user-username" style="margin-left: 0px;" title="{{ user()->name, 20 }}">
+            <div class="card widget-user-2" style="margin-bottom: 0px;">
+                <div class="widget-user-header">
+                    <h3 class="widget-user-username" style="margin-left: 0px; font-weight: 600;" title="{{ user()->name, 20 }}">
                         {{ str_limit(user()->name, 20) }}</h3>
                     <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 13px;">
                         {{ __('Son Giriş Tarihi: ') . \Carbon\Carbon::parse(user()->last_login_at)->isoFormat('LLL') }}
@@ -100,42 +92,38 @@
                     <h5 class="widget-user-desc" style="margin-left: 0px;font-size: 11px;">{{ __('Liman ID: ') }} <span
                             id="liman-id">{{ getLimanId() }}</span> <i data-toggle="tooltip"
                             data-original-title="{{ __('Liman ID Kopyala') }}" id="copy-liman-id"
-                            class="far fa-copy fa-lg ml-1" onclick="copyToClipboard('liman-id')"></i></h5>
+                            class="far fa-copy fa-lg ml-1" style="cursor: pointer;" onclick="copyToClipboard('liman-id')"></i></h5>
                 </div>
-                <div class="card-footer p-0">
-                    <ul class="nav flex-column" style="cursor:pointer;">
+                <div class="row" style="border-top: 1px solid rgba(0, 0, 0, 0.05);">
+                    <div class="col-md-6" style="border-right: 1px solid rgba(0, 0, 0, 0.05);">
                         @if (auth()->user()->isAdmin())
-                            <li class="nav-item">
-                                <a href="/talepler" class="nav-link text-dark">
-                                    <i class="nav-icon fas fa-plus mr-1"></i>
-                                    {{ __('Yetki Talepleri') }}
-                                    @if (\App\Models\LimanRequest::where('status', 0)->count())
-                                        <span
-                                            class="badge badge-info right">{{ \App\Models\LimanRequest::where('status', 0)->count() }}</span>
-                                    @endif
-                                </a>
-                            </li>
+                        <a class="notif-action dropdown-item text-center btn-link d-block" style="background: #fff !important" href="/talepler">
+                            {{ __('Yetki Talepleri') }} 
+                            @if (\App\Models\LimanRequest::where('status', 0)->count())
+                                <span class="badge badge-info right">{{ \App\Models\LimanRequest::where('status', 0)->count() }}</span>
+                            @endif
+                            <span class="fas fa-plus" style="font-size: 14px;"></span>
+                        </a>
                         @else
-                            <li class="nav-item">
-                                <a href="/taleplerim" class="nav-link text-dark">
-                                    <i class="nav-icon fas fa-key mr-1"></i>
-                                    {{ __('Yetki Talebi') }}
-                                </a>
-                            </li>
+                        <a class="notif-action dropdown-item text-center btn-link d-block" style="background: #fff !important" href="/taleplerim">
+                            {{ __('Yetki Talebi') }} <span class="fas fa-key" style="font-size: 14px;"></span>
+                        </a>
                         @endif
-                        <li class="nav-item">
-                            <a href="{{ route('logout') }}"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                                class="nav-link text-dark">
-                                {{ __('Çıkış Yap') }} &nbsp;<i class="fas fa-sign-out-alt"></i>
-                            </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST"
-                                style="display: none;">
-                                @csrf
-                            </form>
-                        </li>
-                    </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <a class="notif-action dropdown-item text-center btn-link d-block" style="color: #ff4444 !important; background: #fff !important" 
+                            href="{{ route('logout') }}"
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        {{ __('Çıkış Yap') }} <span class="fas fa-sign-out-alt" style="font-size: 14px;"></span>
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                            style="display: none;">
+                            @csrf
+                        </form>
+                    </div>
                 </div>
+                
+                
             </div>
         </div>
     </li>

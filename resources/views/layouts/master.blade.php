@@ -46,7 +46,7 @@ Echo.private('App.User.{{auth()->user()->id}}')
                     title: notificationTitle,
                     subtitle: "Liman",
                     body: notificationMsg,
-                    delay: 3000,
+                    delay: 5000,
                     autohide: true,
             };
 

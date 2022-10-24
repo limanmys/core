@@ -24,23 +24,7 @@
         </p>
         <hr>
         @endisset
-        <strong>{{ __('Eklenti Durumları') }}</strong>
-        <p class="text-muted">
-            @if($installed_extensions->count() > 0)
-                @foreach($installed_extensions as $extension)
-                    <span 
-                        class="badge btn-secondary status_{{$extension->id}}"
-                        style="cursor:pointer; font-size: 14px; margin-bottom: 5px"
-                        onclick="window.location.href = '{{route('extension_server',["extension_id" => $extension->id, "server_id" => $server->id])}}'">
-                        {{$extension->display_name}}
-                    </span>
-                @endforeach
-            @else
-                {{__("Yüklü eklenti yok.")}}
-            @endif
-        </p>
         @if(server()->canRunCommand())
-        <hr>
             <strong>{{ __('Açık Kalma') }}</strong>
             <p class="text-muted">{{ $outputs["uptime"] }}</p>
             <hr>

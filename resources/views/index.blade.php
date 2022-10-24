@@ -222,14 +222,14 @@
                                 </a>
                                 <div class="float-right">
                                     <span class="text-xs"></span>  
-                                    <span class="ml-1 badge"></span>
+                                    <i class="fa-solid fa-circle ml-1" style="font-size: 12px"></i>
                                 </div>
                                 </li>`
                             );
                             $(el).find("a").attr("href", `/sunucular/${item.id}`).find("i").addClass(item.icon);
                             $(el).find("span").text(item.name);
                             $(el).find("div>span:first-child").text(item.uptime || "");
-                            $(el).find("div>span:last-child").addClass(item.badge_class).text(item.status ? "Online" : "Offline");
+                            $(el).find(".fa-circle").css(item.status ? {"color": "green"} : {"color": "#ff4444"});
 
                             $(".srvlist").append(el);
                         });

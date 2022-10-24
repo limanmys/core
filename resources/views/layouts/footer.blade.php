@@ -1,6 +1,6 @@
 <footer class="main-footer shadow d-flex align-items-center justify-content-between" style="border-top: none;">
     <div class="d-none d-sm-flex">
-        <b class="mr-1">{{__("Liman Versiyonu")}}: </b> {{ getVersion() . " - " . getVersionCode() }}
+        <span data-toggle="tooltip" data-original-title="En iyi Chrome >100 ve Firefox >100 ile çalışmaktadır."><b class="mr-1">{{__("Liman Versiyonu")}}: </b> {{ getVersion() . " - " . getVersionCode() }}</span>
         <a href="https://docs.liman.dev" target="_blank"  class="ml-3 px-3" style="color: #869099; border-left: 1px #eee solid;">{{ __("Dokümantasyon") }}</a>
         <a href="https://liman.havelsan.com.tr/iletisim/" target="_blank" class="pl-3" style="color: #869099; border-left: 1px #eee solid;">{{ __("İletişim") }}</a>
     </div>
