@@ -525,20 +525,6 @@ class MainController extends Controller
         if (! setBaseDn(request('ldapAddress'))) {
             return respond('Sunucuya bağlanırken bir hata oluştu!', 201);
         }
-        if (request('ldapAddress') !== config('ldap.ldap_host')) {
-            RoleMapping::truncate();
-            User::where('auth_type', 'ldap')
-                ->get()
-                ->map(function ($item) {
-                    $item->permissions()->delete();
-                });
-            User::where('auth_type', 'ldap')
-                ->get()
-                ->map(function ($item) {
-                    RoleUser::where('user_id', $item->id)->delete();
-                });
-            User::where('auth_type', 'ldap')->delete();
-        }
         setEnv([
             'LDAP_HOST' => request('ldapAddress'),
             'LDAP_GUID_COLUMN' => request('ldapObjectGUID'),
