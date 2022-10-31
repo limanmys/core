@@ -1109,7 +1109,7 @@ class OneController extends Controller
             );
             if ($pkgman == "apt") {
                 $raw = Command::runSudo(
-                    'DEBIAN_FRONTEND=noninteractive apt install @{:package} -qqy >"/tmp/{:packageBase}.txt" 2>&1 & disown && echo $!',
+                    'nohup bash -c "DEBIAN_FRONTEND=noninteractive apt install @{:package} -qqy >"/tmp/{:packageBase}.txt" 2>&1 & disown && echo $!"',
                     [
                         'packageBase' => basename((string) $package),
                         'package' => $package,
@@ -1196,7 +1196,7 @@ class OneController extends Controller
             
             if (
                 ($mode == 'update' && $output == '0') ||
-                ($mode == 'install' && $output != '0')
+                ($mode == 'install' && $output == '0')
             ) {
                 system_log(7, 'Paket Güncelleme Başarılı', [
                     'package_name' => request('package_name'),
