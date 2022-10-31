@@ -8,6 +8,7 @@ use App\Models\Extension;
 use App\Models\Permission;
 use App\System\Command;
 use App\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Str;
@@ -360,39 +361,34 @@ class MainController extends Controller
      */
     public function accessLogs()
     {
-        if (! Permission::can(user()->id, 'extension', 'id', request('extension_id'))) {
-            return respond(
-                'Eklentiye erişim yetkiniz yok!', 403
-            );
-        }
-
         if (! Permission::can(user()->id, 'liman', 'id', 'view_logs')) {
             return respond(
-                'Eklenti günlük kayıtlarını görüntülemek için yetkiniz yok',
-                403
+                'Eklenti Günlük Kayıtlarını görüntülemek için yetkiniz yok',
+                201
             );
         }
 
-        $page = request('page') * request('count');
+        $page = request('page') * 10;
         $query = request('query') ? request('query') : '';
-        $extension_id = request('extension_id');
         $count = intval(
             Command::runLiman(
-                'grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep \'"display":"true"\'| grep @{:query} | grep @{:extension_id} | wc -l',
+                'cat /liman/logs/liman_new.log | grep @{:user_id} | grep @{:extension_id} | grep @{:query} | grep -v "recover middleware catch" | wc -l',
                 [
                     'query' => $query,
-                    'extension_id' => $extension_id,
+                    'user_id' => strlen(request('log_user_id')) > 5 ? request('log_user_id') : '',
+                    'extension_id' => request('extension_id'),
                 ]
             )
         );
-        $head = $page > $count ? $count % request('count') : request('count');
+        $head = $page > $count ? $count % 10 : 10;
         $data = Command::runLiman(
-            'grep --text EXTENSION_RENDER_PAGE /liman/logs/liman.log | grep \'"display":"true"\'| grep @{:query} | grep @{:extension_id} | tail -{:page} | head -{:head} | tac',
+            'cat /liman/logs/liman_new.log | grep @{:user_id} | grep @{:extension_id} | grep @{:query} | grep -v "recover middleware catch" | tail -{:page} | head -{:head} | tac',
             [
                 'query' => $query,
-                'extension_id' => $extension_id,
                 'page' => $page,
                 'head' => $head,
+                'user_id' => strlen(request('log_user_id')) > 5 ? request('log_user_id') : '',
+                'extension_id' => request('extension_id'),
             ]
         );
         $clean = [];
@@ -410,57 +406,49 @@ class MainController extends Controller
         }
 
         foreach (explode("\n", (string) $data) as $row) {
-            $dateEndPos = strposX($row, ' ', 2);
-            $date = substr($row, 1, $dateEndPos - 2);
-            $json = substr($row, strpos($row, '{'));
-            $parsed = json_decode($json, true);
-            $parsed['date'] = $date;
-            if (! array_key_exists($parsed['extension_id'], $knownExtensions)) {
-                $extension = Extension::find($parsed['extension_id']);
-                if ($extension) {
-                    $knownExtensions[$parsed['extension_id']] =
-                        $extension->display_name;
-                } else {
-                    $knownExtensions[$parsed['extension_id']] =
-                        $parsed['extension_id'];
+            $row = json_decode($row);
+
+            if (isset($row->request_details->extension_id)) {
+                if (! isset($knownExtensions[$row->request_details->extension_id])) {
+
+                    $extension = Extension::find($row->request_details->extension_id);
+                    if ($extension) {
+                        $knownExtensions[$row->request_details->extension_id] =
+                            $extension->display_name;
+                    } else {
+                        $knownExtensions[$row->request_details->extension_id] =
+                            $row->request_details->extension_id;
+                    }
                 }
+                $row->extension_id = $knownExtensions[$row->request_details->extension_id];
+            } else {
+                $row->extension_id = __('Komut');
             }
 
-            $parsed['extension_id'] = $knownExtensions[$parsed['extension_id']];
-            if (! array_key_exists('log_id', $parsed)) {
-                $parsed['log_id'] = null;
-            }
-            if (! array_key_exists($parsed['user_id'], $knownUsers)) {
-                $user = User::find($parsed['user_id']);
+            if (! isset($knownUsers[$row->user_id])) {
+                $user = User::find($row->user_id);
                 if ($user) {
-                    $knownUsers[$parsed['user_id']] = $user->name;
+                    $knownUsers[$row->user_id] = $user->name;
                 } else {
-                    $knownUsers[$parsed['user_id']] = $parsed['user_id'];
+                    $knownUsers[$row->user_id] = $row->user_id;
                 }
             }
-            $parsed['user_id'] = $knownUsers[$parsed['user_id']];
+                            
+            $row->user_id = $knownUsers[$row->user_id];
 
-            // Details
-            $accessDetails = Command::runLiman('grep @{:query} /liman/logs/extension.log', [
-                'query' => $parsed['log_id'],
-            ]);
-            if ($accessDetails == '') {
-                $parsed['details'] = [];
-                array_push($clean, $parsed);
+            if (isset($row->request_details->lmntargetFunction)) {
+                $row->view = $row->request_details->lmntargetFunction;
 
-                continue;
-            }
-            foreach (explode("\n", (string) $accessDetails) as $row) {
-                $dateEndPos = strposX($row, ' ', 2);
-                $date = substr($row, 1, $dateEndPos - 2);
-                $json = substr($row, strpos($row, '{'));
-                $parsedDetails = json_decode($json, true);
-                $parsedDetails['title'] = base64_decode((string) $parsedDetails['title']);
-                $parsedDetails['message'] = base64_decode((string) $parsedDetails['message']);
-                $parsed['details'] = $parsedDetails;
+                if (isset($row->request_details->lmntargetFunction) && $row->request_details->lmntargetFunction == '') {
+                    if ($row->lmn_level == 'high_level' && isset($row->request_details->title)) {
+                        $row->view = base64_decode($row->request_details->title);
+                    }
+                }
+            } else {
+                $row->view = __('Komut');
             }
 
-            array_push($clean, $parsed);
+            array_push($clean, $row);
         }
 
         return response()->json([
