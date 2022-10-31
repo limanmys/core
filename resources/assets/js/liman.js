@@ -366,7 +366,10 @@ function isJson(str) {
 }
 
 const limanEscapeHtml = (unsafe) => {
-  return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+  if (typeof unsafe === 'string' || unsafe instanceof String)
+    return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+  else
+    return unsafe
 }
 
 function renderNotifications(data, type, target, exclude) {
@@ -374,6 +377,7 @@ function renderNotifications(data, type, target, exclude) {
   element.html("");
   //Set Count
   window.$("#" + target + "Count").html(data.length);
+  let language = document.getElementsByTagName('html')[0].getAttribute('lang');
   data.forEach((notification) => {
     element.parent().find(".notif-action").removeClass("d-none").addClass("d-block");
     element.parent().find(".no-notif").removeClass("d-flex").addClass("d-none");
@@ -418,13 +422,13 @@ function renderNotifications(data, type, target, exclude) {
     if(errors.includes(notification.type)){
       $(document).Toasts('create', {
           ...toastOptions,
-          icon: "fas fa-exclamation-mark",
+          icon: "fa-solid fa-triangle-exclamation",
           class: 'bg-danger'
       });
     }else if(notification.type == "liman_update"){
       $(document).Toasts('create', {
           ...toastOptions,
-          icon: "fas fa-exclamation-mark",
+          icon: "fa-solid fa-triangle-exclamation",
           class: 'bg-warning'
       });
     }else{

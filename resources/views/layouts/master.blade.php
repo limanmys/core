@@ -25,6 +25,9 @@ Echo.private('App.User.{{auth()->user()->id}}')
             var errors = [
                 "error" , "health_problem"
             ];
+            
+            let language = document.getElementsByTagName('html')[0].getAttribute('lang');
+
             let notificationTitle = decodeURIComponent(JSON.parse('"' + data["title"].replace(/\"/g, '\\"') + '"'));
             let notificationMsg = decodeURIComponent(JSON.parse('"' + data["message"].replace(/\"/g, '\\"') + '"'));
 
@@ -53,13 +56,13 @@ Echo.private('App.User.{{auth()->user()->id}}')
             if(errors.includes(data.type)){
                 $(document).Toasts('create', {
                     ...toastOptions,
-                    icon: "fas fa-exclamation-mark",
+                    icon: "fa-solid fa-triangle-exclamation",
                     class: 'bg-danger'
                 });
             }else if(data.type == "liman_update"){
                 $(document).Toasts('create', {
                     ...toastOptions,
-                    icon: "fas fa-exclamation-mark",
+                    icon: "fa-solid fa-triangle-exclamation",
                     class: 'bg-warning'
                 });
             }else{
