@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\AccessToken;
-use App\Models\ConnectorToken;
 use App\Models\Permission;
 use App\Models\RoleUser;
 use App\Models\Server;
@@ -506,16 +505,7 @@ class UserController extends Controller
             ['shared_key' => request()->shared == 'true' ? 1 : 0]
         );
 
-        ConnectorToken::clear();
-
         return respond('Başarıyla eklendi.');
-    }
-
-    public function cleanSessions()
-    {
-        ConnectorToken::clear();
-
-        return respond('Önbellek temizlendi.');
     }
 
     /**

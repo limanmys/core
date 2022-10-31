@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\ConnectorToken;
 use App\Models\Server;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -35,9 +34,6 @@ class AddKeyPortToServers extends Migration
                 $server->save();
             }
         }
-
-        // Delete current tokens.
-        ConnectorToken::truncate();
     }
 
     /**

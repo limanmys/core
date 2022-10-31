@@ -24,8 +24,6 @@
                 <div class="card-body">
                     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add_settings"><i
                             class="fa fa-key "></i> {{ __('Anahtar Ekle') }}</button>
-                    <button type="button" class="btn btn-secondary"
-                        onclick="cleanSessions()">{{ __('Önbelleği Temizle') }}</button>
                     <div class="tab-pane active" id="settings" style="margin-top: 15px;">
                         <div class="alert alert-info alert-dismissible">
                             <h5><i class="icon fas fa-info"></i> {{ __('Bilgilendirme!') }}</h5>
@@ -96,16 +94,6 @@
     <script>
         $("#useKeyLabel").fadeOut();
         keySettingsChanged();
-
-        function cleanSessions() {
-            request('{{ route('clean_sessions') }}', new FormData(), function(response) {
-                showSwal("{{ __('Önbellek temizlendi!') }}", 'success', 2000);
-                reload();
-            }, function(response) {
-                var error = JSON.parse(response);
-                showSwal(error.message, 'error', 2000);
-            });
-        }
 
         function updateSetting(element) {
             var type = element.querySelector('#type').innerHTML;

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Server;
 
 use App\Http\Controllers\Controller;
-use App\Models\ConnectorToken;
 use App\Models\Extension;
 use App\Models\Notification;
 use App\Models\Permission;
@@ -243,8 +242,6 @@ class OneController extends Controller
         }
 
         $output = Server::where(['id' => server()->id])->update($params);
-
-        ConnectorToken::clear();
 
         return [
             'result' => 200,
@@ -928,21 +925,25 @@ class OneController extends Controller
         $server_id = request('server_id');
         $count = intval(
             Command::runLiman(
-                'cat /liman/logs/liman_new.log | grep @{:query} | grep -v "recover middleware catch" | grep @{:server_id} | wc -l',
+                'cat /liman/logs/liman_new.log | grep @{:user_id} | grep @{:extension_id} | grep @{:query} | grep -v "recover middleware catch" | grep @{:server_id} | wc -l',
                 [
                     'query' => $query,
                     'server_id' => $server_id,
+                    'user_id' => strlen(request('log_user_id')) > 5 ? request('log_user_id') : '',
+                    'extension_id' => strlen(request('log_extension_id')) > 5 ? request('log_extension_id') : '',
                 ]
             )
         );
         $head = $page > $count ? $count % 10 : 10;
         $data = Command::runLiman(
-            'cat /liman/logs/liman_new.log | grep @{:query} | grep @{:server_id} | grep -v "recover middleware catch" | tail -{:page} | head -{:head} | tac',
+            'cat /liman/logs/liman_new.log | grep @{:user_id} | grep @{:extension_id} | grep @{:query} | grep @{:server_id} | grep -v "recover middleware catch" | tail -{:page} | head -{:head} | tac',
             [
                 'query' => $query,
                 'server_id' => $server_id,
                 'page' => $page,
                 'head' => $head,
+                'user_id' => strlen(request('log_user_id')) > 5 ? request('log_user_id') : '',
+                'extension_id' => strlen(request('log_extension_id')) > 5 ? request('log_extension_id') : '',
             ]
         );
         $clean = [];
@@ -1027,11 +1028,12 @@ class OneController extends Controller
         $pagination = view('pagination', [
             'current' => request('page') ? intval(request('page')) : 1,
             'count' => floor($count / 10) + 1,
+            'total_count' => $count,
             'onclick' => 'getLogs',
         ])->render();
 
         return respond([
-            'table' => $table.'<br>'.$pagination,
+            'table' => $table . $pagination,
         ]);
     }
 
@@ -1044,19 +1046,23 @@ class OneController extends Controller
         if ($data == '') {
             return respond(__('Bu loga ait detay bulunamadı'), 201);
         }
+        $data = explode("\n", (string) $data);
         $logs = [];
-        foreach (explode("\n", (string) $data) as $row) {
+        foreach ($data as $k_ => $row) {
             $row = mb_convert_encoding($row, 'UTF-8', 'auto');
             $row = json_decode($row);
-            foreach ($row as $k => $v) {
+            foreach ($row as $k => &$v) {
                 if ($k == 'level' || $k == 'log_id') {
                     continue;
+                }
+
+                if ($k == 'ts') {
+                    $v = Carbon::parse($v)->isoFormat('LLLL');
                 }
 
                 if ($row->lmn_level == 'high_level' && $k == 'request_details') {
                     foreach ($row->request_details as $key => $val) {
                         if ($key == 'level' || $key == 'log_id' || $key == 'token') {
-
                             continue;
                         }
 
@@ -1074,7 +1080,6 @@ class OneController extends Controller
                 }
 
                 if ($row->lmn_level != 'high_level' && $k == 'request_details' && $k != 'token') {
-
                     array_push($logs, [
                         'title' => __($k),
                         'message' => json_encode($v, JSON_PRETTY_PRINT),
@@ -1086,6 +1091,12 @@ class OneController extends Controller
                 array_push($logs, [
                     'title' => __($k),
                     'message' => $v,
+                ]);                
+            }
+            if ($k_ < count($data)) {
+                array_push($logs, [
+                    'title' => '---------------------',
+                    'message' => 'Log seperator'
                 ]);
             }
         }
