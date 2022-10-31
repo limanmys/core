@@ -981,5 +981,7 @@
   "Paket Yükle": "Upload Package",
   "Paket (.rpm / .deb)": "Package (.rpm / .deb)",
   "Paketin depodaki adını giriniz. Örneğin": "Enter the package name in the repository.",
-  "Paket Lokasyonu": "Package Location"
+  "Paket Lokasyonu": "Package Location",
+  "Tümü": "All",
+  "Toplam :count kayıttan, sayfa :current/:page gösteriliyor": "Total records :count, current page :current/:page"
 }
