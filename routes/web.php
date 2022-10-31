@@ -78,10 +78,6 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     Route::post('/takip/yenile', 'ServerMonitorController@refresh')->name('monitor_refresh');
 
-    Route::post('/onbellek_temizle', 'UserController@cleanSessions')->name(
-        'clean_sessions'
-    );
-
     // Add Key Route
     Route::post('/kasa/ekle', 'UserController@addKey')->name('key_add');
 

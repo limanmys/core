@@ -246,14 +246,45 @@
                 @endif
                 <div class="tab-pane fade show" id="logsTab" role="tabpanel">
                     <div class="form-group">
-                        <label>{{ __('Arama Terimi') }}</label>
-                        <div class="input-group">
-                            <input id="logQueryFilter" type="text" class="form-control"
-                                placeholder="{{ __('Arama Terimi') }}">
-                            <span class="input-group-append">
-                                <button type="button" class="btn btn-primary btn-flat" onclick="getLogs()"><i
-                                        class="fa fa-search" aria-hidden="true"></i></button>
-                            </span>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>{{ __('Eklenti') }}</label>
+
+                                <select name="log_extension" id="log_extension" class="select2" data-placeholder="Bir eklenti seçiniz">
+                                    <option value="0">{{ __('Tümü') }}</option>
+                                    @foreach (\App\Models\Extension::all() as $extension) 
+                                        <option value="{{ $extension->id }}">
+                                            {{ isset($extension->display_name)
+                                                 ? $extension->display_name 
+                                                 : $extension->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label>{{ __('Kullanıcı') }}</label>
+
+                                <select name="log_user" id="log_user" class="select2" data-placeholder="Bir kullanıcı seçiniz">
+                                    <option value="0">{{ __('Tümü') }}</option>
+                                    @foreach (\App\User::all() as $user) 
+                                        <option value="{{ $user->id }}">
+                                            {{ $user->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label>{{ __('Arama Terimi') }}</label>
+
+                                <div class="input-group">
+                                    <input id="logQueryFilter" type="text" class="form-control"
+                                        placeholder="{{ __('Arama Terimi') }}">
+                                    <span class="input-group-append">
+                                        <button type="button" class="btn btn-primary btn-flat" onclick="getLogs()"><i
+                                                class="fa fa-search" aria-hidden="true"></i></button>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div id="logsWrapper">

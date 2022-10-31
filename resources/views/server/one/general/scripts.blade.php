@@ -589,6 +589,15 @@
             getLogs();
         }
     });
+
+    $("#log_extension").on('change', function() {
+        getLogs();
+    });
+
+    $("#log_user").on('change', function() {
+        getLogs();
+    });
+
     function getLogs(page = 1) {
         showSwal('{{__("Okunuyor...")}}','info');
         var form = new FormData();
@@ -596,6 +605,12 @@
         var query = $("#logQueryFilter").val();
         if(query.length !== 0){
             form.append('query',query);
+        }
+        if ($("#log_user").val()) {
+            form.append("log_user_id", $("#log_user").val());
+        }
+        if ($("#log_extension").val()) {
+            form.append("log_extension_id", $("#log_extension").val());
         }
         request('{{route('server_get_logs')}}', form, function (response) {
             var json = JSON.parse(response);
