@@ -21,6 +21,15 @@ use ZipArchive;
  */
 class MainController extends Controller
 {
+    public function extensions()
+    {
+        $extensions = [];
+        foreach (server()->extensions() as $extension) {
+            $extensions[$extension->id] = $extension->display_name;
+        }
+        return $extensions;
+    }
+    
     /**
      * @return BinaryFileResponse
      */

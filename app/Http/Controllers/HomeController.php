@@ -7,7 +7,6 @@ use App\Models\Extension;
 use App\Models\LimanRequest;
 use App\Models\Server;
 use App\Models\Token;
-use App\Models\Widget;
 use App\User;
 
 class HomeController extends Controller

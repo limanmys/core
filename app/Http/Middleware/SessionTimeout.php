@@ -28,7 +28,7 @@ class SessionTimeout
         $this->redirectUrl = route('login');
         $this->sessionLabel = 'warning';
         $this->lifetime = config('session.lifetime');
-        $this->exclude = ['user_notifications', 'widget_one', 'server_check'];
+        $this->exclude = ['user_notifications', 'server_check'];
     }
 
     /**

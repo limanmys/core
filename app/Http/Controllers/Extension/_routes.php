@@ -79,6 +79,11 @@ Route::post(
     'Extension\MainController@accessLogs'
 )->name('extension_access_logs');
 
+Route::post(
+    '/eklentiler',
+    'Extension\MainController@extensions'
+)->name('widget_get_extensions');
+
 // Extension Upload Page
 Route::post('/ayarlar/eklentilisans', 'Extension\SettingsController@addLicense')
     ->name('add_extension_license')
