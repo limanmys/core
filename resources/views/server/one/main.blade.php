@@ -9,23 +9,6 @@
         </ol>
     </nav>
     
-    <div class="row mb-2 serverName">
-        <div class="col-auto align-self-center">
-            @if($favorite)
-                <button onclick="favorite('false')" class="btn btn-warning btn-sm" data-toggle="tooltip" title="{{ __('Sabitlemeyi kaldır') }}">
-                    <i class="fas fa-star"></i>
-                </button>
-            @else
-                <button onclick="favorite('true')" class="btn btn-success btn-sm" data-toggle="tooltip" title="{{ __('Sunucuyu sabitle') }}">
-                    <i class="far fa-star"></i>
-                </button>
-            @endif
-        </div>
-        <div class="col-auto align-self-center">
-            <h5 class="font-weight-bold pt-2">{{$server->name}}</h5>
-        </div>
-    </div>
-
     @include('errors')
 
     @if (count(server()->extensions()) < 1)

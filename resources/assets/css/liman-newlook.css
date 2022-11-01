@@ -887,3 +887,29 @@ table.table td {
     font-family: 'FontAwesome';
     margin-top: 2px;
 }
+
+.card-header > .nav-tabs {
+  margin: -8px 10px;
+}
+
+.modal-header > .nav-tabs {
+  margin: -8px 0px !important;
+}
+
+.nav-tabs .nav-link {
+  border-radius: 0 !important;
+  border: 0 !important;
+  padding: 0.8rem 0.7rem;
+}
+
+.card-header > .nav-tabs .active {
+  background: #fff !important;
+  color: #287ed6 !important;
+  border-bottom: 3px #287ed6 solid !important;
+}
+
+.modal-header > .nav-tabs .active {
+  background: #fff !important;
+  color: #287ed6 !important;
+  border-bottom: 3px #287ed6 solid !important;
+}

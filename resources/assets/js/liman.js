@@ -8,33 +8,37 @@ let english = {
   "Sonuç bulunamadı!": "No results found!",
   "Liman ID kopyalandı!": "Liman ID copied!",
   "Liman ID başarıyla kopyalandı.": "Liman ID has been copied successfully!",
-  "Okunmamış bildiriminiz bulunmamaktadır.": "You have been read all notifications.",
+  "Okunmamış bildiriminiz bulunmamaktadır.":
+    "You have been read all notifications.",
   "/turkce.json": "/english.json",
   "Tümünü Seç": "Select All",
-  "Tümünü Kaldır": "Remove All"
-}
+  "Tümünü Kaldır": "Remove All",
+};
 
-let turkish = {}
+let turkish = {};
 
-let language = document.getElementsByTagName('html')[0].getAttribute('lang');
-let defaultLanguage = "tr"
-console.log(`🌟 Liman localization initialized: ${language}`)
+let language = document.getElementsByTagName("html")[0].getAttribute("lang");
+let defaultLanguage = "tr";
+console.log(`🌟 Liman localization initialized: ${language}`);
 
 let __ = (trans) => {
   if (language == "tr") {
-    language = "turkish"
+    language = "turkish";
   }
 
   if (language == "en") {
-    language = "english"
+    language = "english";
   }
 
-  if (language === defaultLanguage && !eval(language).hasOwnProperty(trans) || !eval(language).hasOwnProperty(trans)) {
-    return trans
+  if (
+    (language === defaultLanguage && !eval(language).hasOwnProperty(trans)) ||
+    !eval(language).hasOwnProperty(trans)
+  ) {
+    return trans;
   }
 
-  return eval(language)[trans]
-}
+  return eval(language)[trans];
+};
 
 function showSwal(message, type, timer = false) {
   var config = {
@@ -43,7 +47,7 @@ function showSwal(message, type, timer = false) {
     title: message,
     toast: true,
     showConfirmButton: false,
-    animation: false
+    animation: false,
   };
   if (timer) {
     config["timer"] = timer;
@@ -69,7 +73,7 @@ function request(url, data, next, error, requestType = "POST") {
       title: __("Yükleniyor..."),
       toast: true,
       showConfirmButton: false,
-      animation: false
+      animation: false,
     });
   }
 
@@ -320,12 +324,18 @@ function message(data) {
 function readNotifications(id) {
   var data = new FormData();
   request("/bildirimler/oku", data, function () {});
-  setTimeout(function() {
+  setTimeout(function () {
     var element = window.$("#userNotifications .menu");
-    element.parent().find(".notif-action").addClass("d-none").removeClass("d-block");
+    element
+      .parent()
+      .find(".notif-action")
+      .addClass("d-none")
+      .removeClass("d-block");
     element.html(`<a class="dropdown-item d-flex align-items-start no-notif">
         <div class="text" style="width: 100% !important; padding: 15px 0">
-            <h4 style="text-align: center; color: grey; font-size: 12px; text-transform: uppercase">${ __('Okunmamış bildiriminiz bulunmamaktadır.') }</h4>
+            <h4 style="text-align: center; color: grey; font-size: 12px; text-transform: uppercase">${__(
+              "Okunmamış bildiriminiz bulunmamaktadır."
+            )}</h4>
         </div>
     </a>`);
   }, 200);
@@ -333,13 +343,19 @@ function readNotifications(id) {
 
 function readSystemNotifications(id) {
   var data = new FormData();
-  request("/bildirim/adminOku", data, function() {});
-  setTimeout(function() {
+  request("/bildirim/adminOku", data, function () {});
+  setTimeout(function () {
     var element = window.$("#adminNotifications .menu");
-    element.parent().find(".notif-action").addClass("d-none").removeClass("d-block");
+    element
+      .parent()
+      .find(".notif-action")
+      .addClass("d-none")
+      .removeClass("d-block");
     element.html(`<a class="dropdown-item d-flex align-items-start no-notif">
         <div class="text" style="width: 100% !important; padding: 15px 0">
-            <h4 style="text-align: center; color: grey; font-size: 12px; text-transform: uppercase">${ __('Okunmamış bildiriminiz bulunmamaktadır.') }</h4>
+            <h4 style="text-align: center; color: grey; font-size: 12px; text-transform: uppercase">${__(
+              "Okunmamış bildiriminiz bulunmamaktadır."
+            )}</h4>
         </div>
     </a>`);
   }, 200);
@@ -366,40 +382,50 @@ function isJson(str) {
 }
 
 const limanEscapeHtml = (unsafe) => {
-  if (typeof unsafe === 'string' || unsafe instanceof String)
-    return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
-  else
+  if (typeof unsafe === "string" || unsafe instanceof String)
     return unsafe
-}
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  else return unsafe;
+};
 
 function renderNotifications(data, type, target, exclude) {
   var element = window.$("#" + target + " .menu");
   element.html("");
   //Set Count
   window.$("#" + target + "Count").html(data.length);
-  let language = document.getElementsByTagName('html')[0].getAttribute('lang');
+  let language = document.getElementsByTagName("html")[0].getAttribute("lang");
   data.forEach((notification) => {
-    element.parent().find(".notif-action").removeClass("d-none").addClass("d-block");
+    element
+      .parent()
+      .find(".notif-action")
+      .removeClass("d-none")
+      .addClass("d-block");
     element.parent().find(".no-notif").removeClass("d-flex").addClass("d-none");
     let notificationTitle = notification["title"];
     let notificationMsg = notification["message"];
     if (isJson(notification["title"])) {
-      let temp = JSON.parse(notification["title"])
+      let temp = JSON.parse(notification["title"]);
       notificationTitle = temp[language];
     }
     if (isJson(notification["message"])) {
-      let temp = JSON.parse(notification["message"])
+      let temp = JSON.parse(notification["message"]);
       notificationMsg = temp[language];
     }
     var errors = ["error", "health_problem"];
-    let color = errors.includes(notification['type']) ? 'color: #ff4444' : ''
-    let html = `<a class="dropdown-item d-flex align-items-start" onclick="window.location.href = '/bildirim/${notification["id"]}'" href="/bildirim/${notification["id"]}">
+    let color = errors.includes(notification["type"]) ? "color: #ff4444" : "";
+    let html = `<a class="dropdown-item d-flex align-items-start" onclick="window.location.href = '/bildirim/${
+      notification["id"]
+    }'" href="/bildirim/${notification["id"]}">
         <div class="text">
             <h4 style="${color}">${limanEscapeHtml(notificationTitle)}</h4>
             <span class="time">${notification["humanDate"]}</span>
         </div>
-    </a>`
-    element.append(html)
+    </a>`;
+    element.append(html);
     var displayedNots = [];
     if (localStorage.displayedNots) {
       displayedNots = JSON.parse(localStorage.displayedNots);
@@ -419,23 +445,23 @@ function renderNotifications(data, type, target, exclude) {
       autohide: true,
     };
 
-    if(errors.includes(notification.type)){
-      $(document).Toasts('create', {
-          ...toastOptions,
-          icon: "fa-solid fa-triangle-exclamation",
-          class: 'bg-danger'
+    if (errors.includes(notification.type)) {
+      $(document).Toasts("create", {
+        ...toastOptions,
+        icon: "fa-solid fa-triangle-exclamation",
+        class: "bg-danger",
       });
-    }else if(notification.type == "liman_update"){
-      $(document).Toasts('create', {
-          ...toastOptions,
-          icon: "fa-solid fa-triangle-exclamation",
-          class: 'bg-warning'
+    } else if (notification.type == "liman_update") {
+      $(document).Toasts("create", {
+        ...toastOptions,
+        icon: "fa-solid fa-triangle-exclamation",
+        class: "bg-warning",
       });
-    }else{
-      $(document).Toasts('create', {
-          ...toastOptions,
-          icon: "fas fa-check",
-          class: 'bg-success'
+    } else {
+      $(document).Toasts("create", {
+        ...toastOptions,
+        icon: "fas fa-check",
+        class: "bg-success",
       });
     }
 
@@ -469,7 +495,7 @@ window.Echo = new Echo({
 
 window.$(function () {
   window.$('[data-toggle="tooltip"]').tooltip({
-    container: "body"
+    container: "body",
   });
   bsCustomFileInput.init();
   window.$(".select2").select2({
@@ -477,7 +503,8 @@ window.$(function () {
   });
 
   window.$(".modal").on("show.bs.modal", function (modal) {
-    window.$("#" + modal.target.id + " .alert")
+    window
+      .$("#" + modal.target.id + " .alert")
       .not(".alert-info")
       .fadeOut(0);
   });
@@ -489,7 +516,7 @@ function getSearchResults(query) {
     method: "GET",
     url: "/liman_arama",
     data: {
-      search_query: query
+      search_query: query,
     },
     success: function (data, status, xhr) {
       if (data.length == 0) {
@@ -499,13 +526,19 @@ function getSearchResults(query) {
       }
 
       data.forEach((el, i) => {
-        window.$("#liman_search_results").append(window.$("<a />").attr("href", el.url).toggleClass("hovered", i == 0).text(el.name));
+        window.$("#liman_search_results").append(
+          window
+            .$("<a />")
+            .attr("href", el.url)
+            .toggleClass("hovered", i == 0)
+            .text(el.name)
+        );
       });
     },
     error: function (jqXhr, textStatus, error) {
       console.log(error);
-    }
-  })
+    },
+  });
 }
 
 function liman_search() {
@@ -524,12 +557,14 @@ function liman_search() {
 }
 
 window.$(document).ready(function () {
-  window.$("body").tooltip({ selector: '[data-toggle=tooltip]', container: 'body' });
+  window
+    .$("body")
+    .tooltip({ selector: "[data-toggle=tooltip]", container: "body" });
 
   let input = window.$("#liman_search_input");
   let result = window.$("#liman_search_results");
 
-  let idx = 0
+  let idx = 0;
 
   input.on("keydown", function (e) {
     if (e.keyCode == 13) {
@@ -538,20 +573,20 @@ window.$(document).ready(function () {
     }
 
     if (!(e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13)) {
-      clearTimeout(window.$.data(this, 'timer'));
+      clearTimeout(window.$.data(this, "timer"));
       let wait = setTimeout(liman_search, 150);
-      window.$(this).data('timer', wait);
-      idx = 0
+      window.$(this).data("timer", wait);
+      idx = 0;
     } else {
       e.preventDefault();
       if (!result.html().includes("Sonuç bulunamadı")) {
-        let results = result.find("a")
-        let len = results.length - 1
+        let results = result.find("a");
+        let len = results.length - 1;
         if (e.keyCode == 38) {
           if (idx <= 0) {
-            idx = 0
+            idx = 0;
           } else {
-            idx--
+            idx--;
             result.find(results[idx + 1]).removeClass("hovered");
             result.find(results[idx]).addClass("hovered");
           }
@@ -559,16 +594,16 @@ window.$(document).ready(function () {
 
         if (e.keyCode == 40) {
           if (idx >= len) {
-            idx = len
+            idx = len;
           } else {
-            idx++
+            idx++;
             result.find(results[idx - 1]).removeClass("hovered");
             result.find(results[idx]).addClass("hovered");
           }
         }
       }
     }
-  })
+  });
 
   window.$(document).on("click", function (event) {
     var $trigger = window.$("#liman_search");
@@ -600,9 +635,9 @@ function copyToClipboard(elementId) {
   document.execCommand("copy");
   document.body.removeChild(aux);
   Swal.fire(
-    __('Liman ID kopyalandı!'),
-    __('Liman ID başarıyla kopyalandı.'),
-    'success'
+    __("Liman ID kopyalandı!"),
+    __("Liman ID başarıyla kopyalandı."),
+    "success"
   );
 }
 
@@ -618,49 +653,49 @@ window.$(document).ready(function () {
   if (localStorage.getItem("collapse") == "true") {
     window.$("body").addClass("sidebar-collapse");
   }
-})
+});
 
 function isJson(str) {
   try {
-      JSON.parse(str);
+    JSON.parse(str);
   } catch (e) {
-      return false;
+    return false;
   }
   return true;
 }
 
-function dataTablePresets(type){
-if(type == "normal"){
+function dataTablePresets(type) {
+  if (type == "normal") {
     return {
-        bFilter: true,
-        "language" : {
-            url : __("/turkce.json"),
-        }
+      bFilter: true,
+      language: {
+        url: __("/turkce.json"),
+      },
     };
-}else if(type == "multiple"){
+  } else if (type == "multiple") {
     return {
-        bFilter: true,
-        select: {
-            style: 'multi',
-            selector: 'td:not(.table-menu)'
+      bFilter: true,
+      select: {
+        style: "multi",
+        selector: "td:not(.table-menu)",
+      },
+      dom: "Blfrtip",
+      buttons: {
+        buttons: [
+          { extend: "selectAll", className: "btn btn-xs btn-primary mr-1" },
+          { extend: "selectNone", className: "btn btn-xs btn-primary mr-1" },
+        ],
+        dom: {
+          button: { className: "btn" },
         },
-        dom: 'Blfrtip',
+      },
+      language: {
+        url: __("/turkce.json"),
         buttons: {
-            buttons: [
-                { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
-                { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
-            ],
-            dom: {
-                button: { className: 'btn' }
-            }
+          selectAll: __("Tümünü Seç"),
+          selectNone: __("Tümünü Kaldır"),
         },
-        language: {
-            url : __("/turkce.json"),
-            buttons: {
-                selectAll: __('Tümünü Seç'),
-                selectNone: __('Tümünü Kaldır')
-            }
-        }
+      },
     };
-}
+  }
 }
