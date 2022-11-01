@@ -1089,7 +1089,7 @@ class OneController extends Controller
                     'message' => $v,
                 ]);                
             }
-            if ($k_ < count($data)) {
+            if ($k_ < count($data) - 1) {
                 array_push($logs, [
                     'title' => '---------------------',
                     'message' => 'Log seperator'

@@ -242,7 +242,7 @@
             </div>
         </div>
         <div class="col-8">
-            <div class="tab-content" id="logContentWrapper">
+            <div class="tab-content" id="logContentWrapper" style="height: 100%">
             </div>
         </div>
     </div>

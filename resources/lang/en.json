@@ -964,7 +964,7 @@
   "Rol grubu başarıyla düzenlendi.": "Role group successfully edited.",
   "Rol grubu düzenlenemedi!": "Cannot edit role group!",
   "Doğrulama başarısız, girdiğiniz bilgileri kontrol edin.": "Cannot verify the information that you have entered, please check it again.",
-  "ts": "Timestamp (Epoch)",
+  "ts": "Timestamp",
   "msg": "Log Title",
   "lmn_level": "Log Level",
   "user_id": "User ID",
