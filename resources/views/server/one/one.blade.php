@@ -1,11 +1,11 @@
-<div class="col-md-9">
+<div class="col-md-10">
     <div class="card">
         <div class="card-header p-2">
             <ul class="nav nav-tabs" role="tablist">
                 @php($firstRendered = false)
                 @if (server()->canRunCommand() && server()->isLinux())
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="pill" onclick="getDashboard()" href="#usageTab"
+                        <a class="nav-link active" data-toggle="pill" href="#usageTab"
                             role="tab">{{ __('Sistem Durumu') }}</a>
                     </li>
                     @php($firstRendered = true)
@@ -93,23 +93,22 @@
                 @if (server()->canRunCommand() && server()->isLinux())
                     <div class="tab-pane fade show active" id="usageTab" role="tabpanel">
                         <div class="card card-primary charts-card">
-                            <div class="card-header" style="background-color: #007bff; color: #fff;">
+                            <div class="card-header" style="background-color: #f9fafb;">
                                 <h3 class="card-title">{{ __('Kaynak Kullanımı') }}</h3>
                             </div>
-                            <div class="card-body">
-                                <script src="{{ asset('js/chart3.min.js') }}"></script>
+                            <div class="card-body" style="min-height: 215px">
                                 <div class="row justify-content-center">
                                     <div class="col-md-3">
-                                        <canvas id="cpuChart"></canvas>
+                                        <div id="cpuChart"></div>
                                     </div>
                                     <div class="col-md-3">
-                                        <canvas id="ramChart"></canvas>
+                                        <div id="ramChart"></div>
                                     </div>
                                     <div class="col-md-3">
-                                        <canvas id="networkChart"></canvas>
+                                        <div id="networkChart"></div>
                                     </div>
                                     <div class="col-md-3">
-                                        <canvas id="ioChart"></canvas>
+                                        <div id="diskChart"></div>
                                     </div>
                                 </div>
                             </div>
@@ -122,13 +121,13 @@
                         <div class="row">
                             <div class="col-md-4">
                                 @include('table-card', [
-                                    'title' => __('Cpu Kullanımı'),
+                                    'title' => __('CPU Kullanımı'),
                                     'api' => 'top_cpu_processes',
                                 ])
                             </div>
                             <div class="col-md-4">
                                 @include('table-card', [
-                                    'title' => __('Ram Kullanımı'),
+                                    'title' => __('RAM Kullanımı'),
                                     'api' => 'top_memory_processes',
                                 ])
                             </div>

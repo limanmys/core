@@ -373,10 +373,9 @@ class OneController extends Controller
                 'ram' => round((float) $ramPercent, 2),
                 'io' => round((float) $ioPercent, 2),
                 'network' => [
-                    'down' => round(($secondDown - $firstDown) / 1024 / 2, 2),
-                    'up' => round(($secondUp - $firstUp) / 1024 / 2, 2),
-                ],
-                'time' => \Carbon\Carbon::now()->format('H:i:s'),
+                    'download' => round(($secondDown - $firstDown) / 1024 / 2, 2),
+                    'upload' => round(($secondUp - $firstUp) / 1024 / 2, 2),
+                ]
             ];
         }
 

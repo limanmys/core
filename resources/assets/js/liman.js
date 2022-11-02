@@ -13,6 +13,9 @@ let english = {
   "/turkce.json": "/english.json",
   "Tümünü Seç": "Select All",
   "Tümünü Kaldır": "Remove All",
+  "CPU Kullanımı": "CPU Usage",
+  "RAM Kullanımı": "RAM Usage",
+  "Disk Kullanımı": "Disk Usage",
 };
 
 let turkish = {};
@@ -815,6 +818,7 @@ const ApexChartLocalization = [
 /* === INDEX CHARTS START === */
 
 var stats;
+var server_stats;
 const CHART_INTERVAL = 2500;
 const CHART_NOW = new Date();
 CHART_NOW.setSeconds(CHART_NOW.getSeconds() - 5);
@@ -838,7 +842,7 @@ var CHARTS = {
     colors: ["#06b6d4"],
   },
   IO: {
-    title: __("IO Kullanımı"),
+    title: __("Disk Kullanımı"),
     id: "diskChart",
     key: "io",
     chart: null,
