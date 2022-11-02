@@ -67,50 +67,50 @@
       @if(user()->isAdmin())
         <script src="{{ asset('js/chart3.min.js') }}"></script>
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box shadow-sm loading chartbox">
-              <div class="overlay">
+            <div class="info-box shadow-sm loading chartbox" style="padding: 0; padding-top: 12px;">
+              <div class="overlay" style="background: white">
                 <div class="spinner-border" role="status">
                     <span class="sr-only">{{ __('Yükleniyor...') }}</span>
                 </div>
               </div>
               <div class="info-box-content">
-                <div id="cpuChart"></div>
+                <div id="cpuChart" style="min-height: 215px"></div>
               </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box shadow-sm loading chartbox">
-              <div class="overlay">
+            <div class="info-box shadow-sm loading chartbox" style="padding: 0; padding-top: 12px;">
+              <div class="overlay" style="background: white">
                 <div class="spinner-border" role="status">
                     <span class="sr-only">{{ __('Yükleniyor...') }}</span>
                 </div>
               </div>
               <div class="info-box-content">
-                <div id="ramChart"></div>
+                <div id="ramChart" style="min-height: 215px"></div>
               </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box shadow-sm loading chartbox">
-              <div class="overlay">
+            <div class="info-box shadow-sm loading chartbox" style="padding: 0; padding-top: 12px;">
+              <div class="overlay" style="background: white">
                 <div class="spinner-border" role="status">
                     <span class="sr-only">{{ __('Yükleniyor...') }}</span>
                 </div>
               </div>
               <div class="info-box-content">
-                <div id="diskChart"></div>
+                <div id="diskChart" style="min-height: 215px"></div>
               </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box shadow-sm loading chartbox">
-              <div class="overlay">
+            <div class="info-box shadow-sm loading chartbox" style="padding: 0; padding-top: 12px;">
+              <div class="overlay" style="background: white">
                 <div class="spinner-border" role="status">
                     <span class="sr-only">{{ __('Yükleniyor...') }}</span>
                 </div>
               </div>
               <div class="info-box-content">
-                <div id="networkChart"></div>
+                <div id="networkChart" style="min-height: 215px"></div>
               </div>
             </div>
         </div>
@@ -247,76 +247,27 @@
         getOnlineServers(); 
         @endif
 
-        var intervals = [];
-        var widgets = [];
-        var currentWidget = 0;
 
-        $('.limanCharts').each(function() {
-            var element = $(this);
-            widgets.push({
-                'element': element,
-                'type': 'chart'
-            });
-        });
         @if (user()->isAdmin())
-        var stats;
-        const CHART_INTERVAL = 2500;
-        const CHART_DELAY = 4500;
-        const CHART_SPEED = 12;
-        var CHARTS = {
-            CPU : {
-                title: '{{ __("Cpu Kullanımı") }}',
-                id: "cpuChart",
-                key: "cpu",
-                chart : null,
-                data: [ [Date.now(), 0]],
-                colors: ["#06d48b"]
-            },
-            RAM : {
-                title: '{{ __("Ram Kullanımı") }}',
-                id: "ramChart",
-                key: "ram",
-                chart : null,
-                data: [ [Date.now(), 0]],
-                colors: ["#06b6d4"]
-
-            },
-            IO : {
-                title: '{{ __("IO Kullanımı") }}',
-                id: "diskChart",
-                key: "io",
-                chart : null,
-                data: [ [Date.now(), 0]],
-                colors: ["#064fd4"]
-            },
-            NETWORK : {
-                title: '{{ __("Network") }}',
-                id: "networkChart",
-                key: "network",
-                chart : null,
-                data: {
-                    up: [ [Date.now(), 0]],
-                    down: [ [Date.now(), 0]]
-                },
-                colors: ["#008ffb", "#00e396"]
-            }
-        }
-
-        function retrieveStats() {
+        function retrieveStats() 
+        {
             request('{{ route("liman_stats") }}', new FormData(),
                 function(response) {
                     stats = JSON.parse(response);
-                    if (!window[`networkChart-element`]) {
+                    if (!IS_RENDERED) {
                         renderChart(CHARTS.CPU)
                         renderChart(CHARTS.RAM)
                         renderChart(CHARTS.IO)
                         renderChart(CHARTS.NETWORK, true)
+                        IS_RENDERED = true;
+                        $(".chartbox").find(".overlay").fadeOut(750);
                     }
+
                     updateChart(CHARTS.CPU)
                     updateChart(CHARTS.RAM)
                     updateChart(CHARTS.IO)
                     updateNetworkChart(CHARTS.NETWORK)
-                    $(".chartbox").find(".overlay").fadeOut(500);
+                            
                     setTimeout(() => {
                         retrieveStats();
                     }, CHART_INTERVAL);
@@ -324,155 +275,14 @@
             );
         }
         retrieveStats();
+
+        setInterval(function() {
+            CHARTS.CPU.data = CHARTS.CPU.data.slice(-20);
+            CHARTS.RAM.data = CHARTS.RAM.data.slice(-20);
+            CHARTS.IO.data = CHARTS.IO.data.slice(-20);
+            CHARTS.NETWORK.data.upload = CHARTS.NETWORK.data.upload.slice(-20);
+            CHARTS.NETWORK.data.download = CHARTS.NETWORK.data.download.slice(-20);
+        }, 60000)
         @endif
-
-        function renderChart(obj, network=false) {
-            var options = {
-                series: [
-                    (!network) ?
-                    (
-                        {
-                            data: obj.data,
-                            name: obj.title
-                        }
-                    )
-                    :
-                    (
-                        {
-                            data: obj.data.up,
-                            name: "Up"
-                        },
-                        {
-                            data: obj.data.down,
-                            name: "Down"
-                        }
-                    )
-                ],
-                chart: {
-                    id: 'realtime',
-                    height: 200,
-                    type: 'area',
-                    fontFamily: "Inter",
-                    animations: {
-                        enabled: true,
-                        easing: 'linear',
-                        dynamicAnimation: {
-                            speed: 500
-                        }
-                    },
-                    toolbar: {
-                        show: false
-                    },
-                    zoom: {
-                        enabled: false
-                    }
-                },
-                fill: {
-                    colors: obj.colors
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    curve: 'smooth'
-                },
-                title: {
-                    text: `${obj.title} %${stats[obj.key]}`,
-                    align: 'left'
-                },
-                markers: {
-                    size: 0
-                },
-                xaxis: {
-                    type: 'datetime',
-                    range: 60000,
-                    labels: {
-                        show: false
-                    }
-                },
-                tooltip: {
-                    y: {
-                        formatter: function (val) {
-                            return `%${val}`
-                        }
-                    },
-                    x: {
-                        show: false
-                    }
-                },
-                yaxis: {
-                    max: 100,
-                    min: 0,
-                    tickAmount: 5,
-                    labels: {
-                        formatter: (value) => { return value }
-                    }
-                }
-            };
-            var chart = new ApexCharts(document.querySelector(`#${obj.id}`), options);
-            chart.render();
-            obj.chart = chart;
-        }
-
-        function updateChart(obj) {
-            
-            obj.data.push([Date.now(), stats[obj.key]])
-            if(obj.data.length > 20) {
-                obj.data.shift()
-            }
-            obj.chart.updateOptions({
-                title: {
-                    text: `${obj.title} %${stats[obj.key]}`
-                },
-                series: [
-                    {
-                        data: obj.data
-                    }
-                ]
-            })
-        }
-
-        function updateNetworkChart(obj) {
-            obj.data.up.push([Date.now(), stats[obj.key].up])
-            obj.data.down.push([Date.now(), stats[obj.key].down])
-            if(obj.data.up.length > 20) {
-                obj.data.up.shift()
-                obj.data.down.shift()
-            }
-            obj.chart.updateOptions({
-                title: {
-                    text: `${obj.title} Up: ${stats[obj.key].up} kb/s Down: ${stats[obj.key].down} kb/s`
-                },
-                yaxis: {
-                    max:100,
-                    min: 0,
-                    tickAmount: 5,
-                    labels: {
-                        formatter: (value) => { return value }
-                    }
-                },
-                tooltip: {
-                    y: {
-                        formatter: function (val) {
-                            return `${val} kb/s`
-                        }
-                    }
-                },
-                legend: {
-                    show: false
-                },
-                series:[
-                    {
-                        data: obj.data.up,
-                        name: "Up"
-                    },
-                    {
-                        data: obj.data.down,
-                        name: "Down"
-                    }
-                ]
-                
-            })
-        }
     </script>
 @stop

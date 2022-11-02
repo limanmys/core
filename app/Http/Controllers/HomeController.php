@@ -80,8 +80,8 @@ class HomeController extends Controller
             'ram' => $ramUsage,
             'io' => round($ioPercent, 2),
             'network' => [
-                'down' => round(($secondDown - $firstDown) / 1024 / 2, 2),
-                'up' => round(($secondUp - $firstUp) / 1024 / 2, 2),
+                'download' => round(($secondDown - $firstDown) / 1024 / 2, 2),
+                'upload' => round(($secondUp - $firstUp) / 1024 / 2, 2),
             ]
         ]);
     }

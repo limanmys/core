@@ -699,3 +699,347 @@ function dataTablePresets(type) {
     };
   }
 }
+
+const ApexChartLocalization = [
+  {
+    name: "en",
+    options: {
+      months: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ],
+      shortMonths: [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ],
+      days: [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ],
+      shortDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      toolbar: {
+        exportToSVG: "Download SVG",
+        exportToPNG: "Download PNG",
+        menu: "Menu",
+        selection: "Selection",
+        selectionZoom: "Selection Zoom",
+        zoomIn: "Zoom In",
+        zoomOut: "Zoom Out",
+        pan: "Panning",
+        reset: "Reset Zoom",
+      },
+    },
+  },
+  {
+    name: "tr",
+    options: {
+      months: [
+        "Ocak",
+        "Şubat",
+        "Mart",
+        "Nisan",
+        "Mayıs",
+        "Haziran",
+        "Temmuz",
+        "Ağustos",
+        "Eylül",
+        "Ekim",
+        "Kasım",
+        "Aralık",
+      ],
+      shortMonths: [
+        "Oca",
+        "Şub",
+        "Mar",
+        "Nis",
+        "May",
+        "Haz",
+        "Tem",
+        "Ağu",
+        "Eyl",
+        "Eki",
+        "Kas",
+        "Ara",
+      ],
+      days: [
+        "Pazar",
+        "Pazartesi",
+        "Salı",
+        "Çarşamba",
+        "Perşembe",
+        "Cuma",
+        "Cumartesi",
+      ],
+      shortDays: ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"],
+      toolbar: {
+        exportToSVG: "SVG İndir",
+        exportToPNG: "PNG İndir",
+        exportToCSV: "CSV İndir",
+        menu: "Menü",
+        selection: "Seçim",
+        selectionZoom: "Seçim Yakınlaştır",
+        zoomIn: "Yakınlaştır",
+        zoomOut: "Uzaklaştır",
+        pan: "Kaydır",
+        reset: "Yakınlaştırmayı Sıfırla",
+      },
+    },
+  },
+];
+
+/* === INDEX CHARTS START === */
+
+var stats;
+const CHART_INTERVAL = 2500;
+const CHART_NOW = new Date();
+CHART_NOW.setSeconds(CHART_NOW.getSeconds() - 5);
+let IS_RENDERED = false;
+let CHART_FAST_LOAD = 0;
+var CHARTS = {
+  CPU: {
+    title: __("CPU Kullanımı"),
+    id: "cpuChart",
+    key: "cpu",
+    chart: null,
+    data: [[CHART_NOW, 0]],
+    colors: ["#06d48b"],
+  },
+  RAM: {
+    title: __("RAM Kullanımı"),
+    id: "ramChart",
+    key: "ram",
+    chart: null,
+    data: [[CHART_NOW, 0]],
+    colors: ["#06b6d4"],
+  },
+  IO: {
+    title: __("IO Kullanımı"),
+    id: "diskChart",
+    key: "io",
+    chart: null,
+    data: [[CHART_NOW, 0]],
+    colors: ["#064fd4"],
+  },
+  NETWORK: {
+    title: __("Network"),
+    id: "networkChart",
+    key: "network",
+    chart: null,
+    data: {
+      upload: [[CHART_NOW, 0]],
+      download: [[CHART_NOW, 0]],
+    },
+    colors: ["#008ffb", "#00e396"],
+  },
+};
+
+function renderChart(obj, network = false) {
+  var options = {
+    series: [
+      !network
+        ? {
+            data: obj.data,
+            name: obj.title,
+          }
+        : ({
+            data: obj.data.upload,
+            name: "Up",
+          },
+          {
+            data: obj.data.download,
+            name: "Down",
+          }),
+    ],
+    chart: {
+      locales: ApexChartLocalization,
+      defaultLocale: document.documentElement.lang,
+      height: 200,
+      type: "area",
+      fontFamily: "Inter",
+      animations: {
+        enabled: true,
+        easing: "linear",
+        dynamicAnimation: {
+          enabled: true,
+          speed: 1,
+        },
+      },
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+    },
+    fill: {
+      colors: obj.colors,
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      curve: "smooth",
+    },
+    title: {
+      text: `${obj.title} %${stats[obj.key]}`,
+      align: "left",
+      style: {
+        fontWeight: 600,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    markers: {
+      size: 0,
+    },
+    xaxis: {
+      type: "datetime",
+      range: 60000,
+      labels: {
+        show: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return `%${val}`;
+        },
+      },
+    },
+    yaxis: {
+      max: 100,
+      min: 0,
+      tickAmount: 5,
+      labels: {
+        formatter: (value) => {
+          return value;
+        },
+      },
+    },
+  };
+  var chart = new ApexCharts(document.querySelector(`#${obj.id}`), options);
+  chart.render();
+  obj.chart = chart;
+}
+
+function updateChart(obj) {
+  obj.data.push([Date.now(), stats[obj.key]]);
+
+  let options = {
+    title: {
+      text: `${obj.title} %${stats[obj.key]}`,
+    },
+    series: [
+      {
+        data: obj.data,
+      },
+    ],
+  };
+
+  if (CHART_FAST_LOAD < 4) {
+    obj.chart.updateOptions(options);
+    CHART_FAST_LOAD++;
+  } else {
+    obj.chart.updateOptions({
+      ...options,
+      chart: {
+        animations: {
+          dynamicAnimation: {
+            speed: 3500,
+          },
+        },
+      },
+    });
+  }
+}
+
+function updateNetworkChart(obj) {
+  let date = Date.now();
+
+  obj.data.download.push([date, stats[obj.key].download]);
+  obj.data.upload.push([date, stats[obj.key].upload]);
+
+  let options = {
+    title: {
+      text: `${obj.title} Up: ${stats[obj.key].upload} kb/s Down: ${
+        stats[obj.key].download
+      } kb/s`,
+    },
+    yaxis: {
+      min: 0,
+      tickAmount: 6,
+      labels: {
+        formatter: (value) => {
+          return value.toFixed(0);
+        },
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return `${val} kb/s`;
+        },
+      },
+    },
+    legend: {
+      show: false,
+    },
+    series: [
+      {
+        data: obj.data.upload,
+        name: "Upload",
+      },
+      {
+        data: obj.data.download,
+        name: "Download",
+      },
+    ],
+  };
+
+  if (CHART_FAST_LOAD < 4) {
+    obj.chart.updateOptions(options);
+    CHART_FAST_LOAD++;
+  } else {
+    obj.chart.updateOptions({
+      ...options,
+      chart: {
+        animations: {
+          dynamicAnimation: {
+            speed: 3500,
+          },
+        },
+      },
+    });
+  }
+}
+
+/* === INDEX CHARTS END === */
