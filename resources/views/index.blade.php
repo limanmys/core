@@ -74,7 +74,7 @@
                 </div>
               </div>
               <div class="info-box-content">
-                <canvas id="cpuChart"></canvas>
+                <div id="cpuChart"></div>
               </div>
             </div>
         </div>
@@ -86,7 +86,7 @@
                 </div>
               </div>
               <div class="info-box-content">
-                <canvas id="ramChart"></canvas>
+                <div id="ramChart"></div>
               </div>
             </div>
         </div>
@@ -98,7 +98,7 @@
                 </div>
               </div>
               <div class="info-box-content">
-                <canvas id="diskChart"></canvas>
+                <div id="diskChart"></div>
               </div>
             </div>
         </div>
@@ -110,7 +110,7 @@
                 </div>
               </div>
               <div class="info-box-content">
-                <canvas id="networkChart"></canvas>
+                <div id="networkChart"></div>
               </div>
             </div>
         </div>
@@ -263,19 +263,59 @@
         const CHART_INTERVAL = 2500;
         const CHART_DELAY = 4500;
         const CHART_SPEED = 12;
+        var CHARTS = {
+            CPU : {
+                title: '{{ __("Cpu Kullanımı") }}',
+                id: "cpuChart",
+                key: "cpu",
+                chart : null,
+                data: [ [Date.now(), 0]],
+                colors: ["#06d48b"]
+            },
+            RAM : {
+                title: '{{ __("Ram Kullanımı") }}',
+                id: "ramChart",
+                key: "ram",
+                chart : null,
+                data: [ [Date.now(), 0]],
+                colors: ["#06b6d4"]
+
+            },
+            IO : {
+                title: '{{ __("IO Kullanımı") }}',
+                id: "diskChart",
+                key: "io",
+                chart : null,
+                data: [ [Date.now(), 0]],
+                colors: ["#064fd4"]
+            },
+            NETWORK : {
+                title: '{{ __("Network") }}',
+                id: "networkChart",
+                key: "network",
+                chart : null,
+                data: {
+                    up: [ [Date.now(), 0]],
+                    down: [ [Date.now(), 0]]
+                },
+                colors: ["#008ffb", "#00e396"]
+            }
+        }
 
         function retrieveStats() {
             request('{{ route("liman_stats") }}', new FormData(),
                 function(response) {
                     stats = JSON.parse(response);
-
                     if (!window[`networkChart-element`]) {
-                        resourceChart('{{ __("Cpu Kullanımı") }}', "cpuChart", 'cpu', true, '', '6, 212, 139');
-                        resourceChart('{{ __("Ram Kullanımı") }}', "ramChart", 'ram', true, '', '6, 182, 212');
-                        resourceChart('{{ __("IO Kullanımı") }}', "diskChart", 'io', true, '', '6, 79, 212');
-                        networkChart('{{ __("Network") }}', "networkChart");
+                        renderChart(CHARTS.CPU)
+                        renderChart(CHARTS.RAM)
+                        renderChart(CHARTS.IO)
+                        renderChart(CHARTS.NETWORK, true)
                     }
-
+                    updateChart(CHARTS.CPU)
+                    updateChart(CHARTS.RAM)
+                    updateChart(CHARTS.IO)
+                    updateNetworkChart(CHARTS.NETWORK)
                     $(".chartbox").find(".overlay").fadeOut(500);
                     setTimeout(() => {
                         retrieveStats();
@@ -286,284 +326,152 @@
         retrieveStats();
         @endif
 
-        function retrieveCharts(element, next) {
-            var id = element.attr('id');
-            var form = new FormData();
-            form.append('widget_id', id);
-            form.append('server_id', element.attr('data-server-id'));
-            form.append('token', "{{ $token }}");
-            request(API('widget_one'), form, function(res) {
-                try {
-                    var response = JSON.parse(res);
-                    var data = response.message;
-                    createChart(id + 'Chart', data.labels, data.data);
-                } catch (e) {
-                    element.find('.overlay .spinner-border').remove();
-                    element.find('.overlay i').remove();
-                    element.find('.overlay span').remove();
-                    element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="' + strip(
-                            "Bir Hata Oluştu!") +
-                        '" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">' +
-                        "Bir Hata Oluştu!" + '</span>');
-                }
-                if (next) {
-                    next();
-                }
-            }, function(error) {
-                var json = {};
-                try {
-                    json = JSON.parse(error);
-                } catch (e) {
-                    json = e;
-                }
-                element.find('.overlay .spinner-border').remove();
-                element.find('.overlay i').remove();
-                element.find('.overlay span').remove();
-                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="' + strip(
-                        "Bir Hata Oluştu!") +
-                    '" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">' +
-                    "Bir Hata Oluştu!" + '</span>');
-                if (next) {
-                    next();
-                }
-            });
-        }
-
-        function strip(html) {
-            var tmp = document.createElement("DIV");
-            tmp.innerHTML = html;
-            return tmp.textContent || tmp.innerText || "";
-        }
-
-        function API(target) {
-            return "{{ route('home') }}/engine/" + target;
-        }
-
-        function resourceChart(title, chart, varname, prefix = true, postfix = "", color = "6, 182, 212") {
-            let time = new Date();
-
-            if (!window[`${chart}-element`]) {
-                window[`${chart}-element`] = new Chart($(`#${chart}`), {
-                    type: 'line',
-                    data: {
-                        datasets: [{
-                            cubicInterpolationMode: 'monotone',
-                            data: [{
-                                    x: time - CHART_INTERVAL * 2,
-                                    y: 0
-                                },
-                                {
-                                    x: time,
-                                    y: stats[varname]
-                                }
-                            ],
-                            steppedLine: false,
-                            borderColor: `rgb(${color})`,
-                            backgroundColor: `rgba(${color}, .2)`,
-                            fill: true,
-                            pointRadius: 0
-                        }, ],
-                    },
-                    options: {
-                        plugins: {
-                            responsive: true,
-                            legend: false,
-                            tooltips: {
-                                mode: 'index',
-                                intersect: false,
-                            },
-                            title: {
-                                display: true,
-                                text: `${title} ` + (prefix ? `%${stats[varname]} ${postfix}` :
-                                    `${stats[varname]} ${postfix}`),
-                            },
-                            hover: {
-                                mode: 'nearest',
-                                intersect: true
-                            },
+        function renderChart(obj, network=false) {
+            var options = {
+                series: [
+                    (!network) ?
+                    (
+                        {
+                            data: obj.data,
+                            name: obj.title
+                        }
+                    )
+                    :
+                    (
+                        {
+                            data: obj.data.up,
+                            name: "Up"
                         },
-
-                        scales: {
-                            x: {
-                                display: false,
-                                type: "realtime",
-                                realtime: {
-                                    duration: CHART_INTERVAL * CHART_SPEED,
-                                    refresh: CHART_INTERVAL,
-                                    delay: CHART_DELAY,
-                                    onRefresh: chart => {
-                                        let time = new Date();
-
-                                        let data0 = chart.data.datasets[0].data;
-
-                                        if (data0[data0.length - 1].x.getTime() > time.getTime())
-                                            return;
-
-                                        data0.push({
-                                            x: time,
-                                            y: stats[varname]
-                                        });
-
-
-                                        if (data0.length > 100) {
-                                            data0 = data0.slice(1000 - 15, 15);
-                                        }
-
-                                        chart.options.plugins.title.text = `${title} ` + (prefix ?
-                                            `%${stats[varname]} ${postfix}` : `${stats[varname]} ${postfix}`
-                                        );
-                                    }
-
-                                },
-                            },
-                            y: {
-                                suggestedMax: 100,
-                                suggestedMin: 0,
-                            }
-                        },
+                        {
+                            data: obj.data.down,
+                            name: "Down"
+                        }
+                    )
+                ],
+                chart: {
+                    id: 'realtime',
+                    height: 200,
+                    type: 'area',
+                    fontFamily: "Inter",
+                    animations: {
+                        enabled: true,
+                        easing: 'linear',
+                        dynamicAnimation: {
+                            speed: 500
+                        }
                     },
-                    interaction: {
-                        intersect: false
+                    toolbar: {
+                        show: false
+                    },
+                    zoom: {
+                        enabled: false
                     }
-                });
-            }
-        }
-
-        function networkChart(title, chart) {
-            let time = new Date();
-
-            if (!window[`${chart}-element`]) {
-                window[`${chart}-element`] = new Chart($(`#${chart}`), {
-                    type: 'line',
-                    data: {
-                        datasets: [{
-                            cubicInterpolationMode: 'monotone',
-                            label: '{{ __("Download") }}',
-                            data: [{
-                                    x: time - CHART_INTERVAL * 2,
-                                    y: 0
-                                },
-                                {
-                                    x: time,
-                                    y: stats.network.down
-                                }
-                            ],
-                            steppedLine: false,
-                            borderColor: 'rgb(6, 182, 212)',
-                            backgroundColor: 'rgba(6, 182, 212, .2)',
-                            fill: true,
-                            pointRadius: 0
-                        }, {
-                            cubicInterpolationMode: 'monotone',
-                            label: '{{ __("Upload") }}',
-                            data: [{
-                                x: time - CHART_INTERVAL * 3,
-                                y: 0
-                            }, {
-                                x: time,
-                                y: stats.network.up
-                            }],
-                            steppedLine: false,
-                            borderColor: 'rgb(6, 212, 139)',
-                            backgroundColor: 'rgba(6, 212, 139, .2)',
-                            fill: true,
-                            pointRadius: 0
-                        }],
-                    },
-                    options: {
-                        plugins: {
-                            responsive: true,
-                            legend: false,
-                            tooltips: {
-                                mode: 'index',
-                                intersect: false,
-                            },
-                            title: {
-                                display: true,
-                                text: `${title} Down: ${stats.network.down} kb/s Up: ${stats.network.up} kb/s`,
-                            },
-                        },
-
-                        scales: {
-                            x: {
-                                display: false,
-                                type: "realtime",
-                                realtime: {
-                                    duration: CHART_INTERVAL * CHART_SPEED,
-                                    refresh: CHART_INTERVAL,
-                                    delay: CHART_DELAY + 2500,
-                                    onRefresh: chart => {
-                                        let time = new Date();
-
-                                        let data0 = chart.data.datasets[0].data;
-                                        let data1 = chart.data.datasets[1].data;
-
-                                        if (data0[data0.length - 1].x.getTime() > time.getTime())
-                                            return;
-
-                                        data0.push({
-                                            x: time,
-                                            y: stats.network.down
-                                        });
-                                        data1.push({
-                                            x: time,
-                                            y: stats.network.up
-                                        });
-
-                                        if (data0.length > 100) {
-                                            data0 = data0.slice(
-                                                1000 - 15, 15);
-                                            data1 = data1.slice(
-                                                1000 - 15, 15);
-                                        }
-
-                                        chart.options.plugins.title.text =
-                                            `${title} Down: ${stats.network.down} kb/s Up: ${stats.network.up} kb/s`;
-                                    }
-                                }
-
-                            },
-                            y: {
-                                ticks: {
-                                    beginAtZero: true
-                                }
-                            }
-                        },
-                    },
-                    interaction: {
-                        intersect: false
-                    }
-                });
-            }
-        }
-
-
-        function createChart(element, time, data) {
-            $("#" + element + "Text").text("%" + data[0]);
-            window[element + "Chart"] = new Chart($("#" + element), {
-                type: 'line',
-                data: {
-                    datasets: [{
-                        data: data,
-                    }],
-                    labels: [
-                        time,
-                    ]
                 },
-                options: {
-                    animation: false,
-                    responsive: true,
-                    legend: false,
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                min: 0,
-                                max: 100
-                            }
-                        }]
+                fill: {
+                    colors: obj.colors
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth'
+                },
+                title: {
+                    text: `${obj.title} %${stats[obj.key]}`,
+                    align: 'left'
+                },
+                markers: {
+                    size: 0
+                },
+                xaxis: {
+                    type: 'datetime',
+                    range: 60000,
+                    labels: {
+                        show: false
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return `%${val}`
+                        }
                     },
+                    x: {
+                        show: false
+                    }
+                },
+                yaxis: {
+                    max: 100,
+                    min: 0,
+                    tickAmount: 5,
+                    labels: {
+                        formatter: (value) => { return value }
+                    }
                 }
+            };
+            var chart = new ApexCharts(document.querySelector(`#${obj.id}`), options);
+            chart.render();
+            obj.chart = chart;
+        }
+
+        function updateChart(obj) {
+            
+            obj.data.push([Date.now(), stats[obj.key]])
+            if(obj.data.length > 20) {
+                obj.data.shift()
+            }
+            obj.chart.updateOptions({
+                title: {
+                    text: `${obj.title} %${stats[obj.key]}`
+                },
+                series: [
+                    {
+                        data: obj.data
+                    }
+                ]
+            })
+        }
+
+        function updateNetworkChart(obj) {
+            obj.data.up.push([Date.now(), stats[obj.key].up])
+            obj.data.down.push([Date.now(), stats[obj.key].down])
+            if(obj.data.up.length > 20) {
+                obj.data.up.shift()
+                obj.data.down.shift()
+            }
+            obj.chart.updateOptions({
+                title: {
+                    text: `${obj.title} Up: ${stats[obj.key].up} kb/s Down: ${stats[obj.key].down} kb/s`
+                },
+                yaxis: {
+                    max:100,
+                    min: 0,
+                    tickAmount: 5,
+                    labels: {
+                        formatter: (value) => { return value }
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return `${val} kb/s`
+                        }
+                    }
+                },
+                legend: {
+                    show: false
+                },
+                series:[
+                    {
+                        data: obj.data.up,
+                        name: "Up"
+                    },
+                    {
+                        data: obj.data.down,
+                        name: "Down"
+                    }
+                ]
+                
             })
         }
     </script>

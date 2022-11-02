@@ -83,8 +83,7 @@ class HomeController extends Controller
             'network' => [
                 'down' => round(($secondDown - $firstDown) / 1024 / 2, 2),
                 'up' => round(($secondUp - $firstUp) / 1024 / 2, 2),
-            ],
-            'time' => \Carbon\Carbon::now()->format('H:i:s'),
+            ]
         ]);
     }
 

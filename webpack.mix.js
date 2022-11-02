@@ -39,6 +39,7 @@ mix
             'resources/assets/js/select2.full.js',
             'resources/assets/js/sweetalert2.min.js',
             'resources/assets/js/Chart.js',
+            'resources/assets/js/apexcharts.min.js',
             'resources/assets/js/jstree.js',
             'resources/assets/js/buttons.html5.min.js',
             'resources/assets/js/jquery.inputmask.min.js',
