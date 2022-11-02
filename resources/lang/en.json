@@ -983,5 +983,9 @@
   "Paketin depodaki adını giriniz. Örneğin": "Enter the package name in the repository.",
   "Paket Lokasyonu": "Package Location",
   "Tümü": "All",
-  "Toplam :count kayıttan, sayfa :current/:page gösteriliyor": "Total records :count, current page :current/:page"
+  "Toplam :count kayıttan, sayfa :current/:page gösteriliyor": "Total records :count, current page :current/:page",
+  "Sunucu Sayısı": "Server Count",
+  "Tüm Sunucuları Görüntüle": "Show All Servers",
+  "Tüm Eklentileri Görüntüle": "Show All Extensions",
+  "Tüm Kullanıcıları Görüntüle": "Show All Users"
 }

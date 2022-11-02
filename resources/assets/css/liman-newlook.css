@@ -6,6 +6,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: rgba(31, 41, 55, 1);
+  overflow-y: scroll;
 }
 
 hr {
@@ -190,7 +191,8 @@ nav[aria-label="breadcrumb"] {
 }
 
 .card-title {
-  font-weight: 600;
+  text-transform: uppercase;
+  color: #6c757d;
 }
 
 .modal-header,
@@ -263,7 +265,7 @@ nav[aria-label="breadcrumb"] {
 
 .card-header {
   border: none;
-  background-color: rgb(249, 250, 251);
+  background-color: #fff;
 }
 
 .form-control,
@@ -867,25 +869,25 @@ table.table td {
 }
 
 .previous > a {
-    font-size: 0px;
+  font-size: 0px;
 }
 
 .previous > a::before {
-    content: '\f104' !important;
-    font-size: 14px;
-    font-family: 'FontAwesome';
-    margin-top: 2px;
+  content: "\f104" !important;
+  font-size: 14px;
+  font-family: "FontAwesome";
+  margin-top: 2px;
 }
 
 .next > a {
-    font-size: 0px;
+  font-size: 0px;
 }
 
 .next > a::before {
-    content: '\f105' !important;
-    font-size: 14px;
-    font-family: 'FontAwesome';
-    margin-top: 2px;
+  content: "\f105" !important;
+  font-size: 14px;
+  font-family: "FontAwesome";
+  margin-top: 2px;
 }
 
 .card-header > .nav-tabs {
@@ -912,4 +914,38 @@ table.table td {
   background: #fff !important;
   color: #287ed6 !important;
   border-bottom: 3px #287ed6 solid !important;
+}
+
+.fs-13 {
+  font-size: 13px !important;
+}
+.fs-18 {
+  font-size: 18px !important;
+}
+.homepage-widget .col {
+  border-right: 1px solid #eee;
+}
+.homepage-widget .col:last-child {
+  border: 0;
+}
+@media (min-width: 768px) and (max-width: 1399.98px) {
+  .homepage-widget .col:nth-child(3) {
+    border-right: 0;
+  }
+  .homepage-widget .col:last-child {
+    border-right: 1px solid #eee;
+  }
+}
+@media (max-width: 767.98px) {
+  .homepage-widget .col {
+    border-right: 0;
+    border-right: 1px solid #eee;
+  }
+}
+
+.align-middle {
+  vertical-align: middle !important;
+}
+.float-end {
+  float: right !important;
 }
