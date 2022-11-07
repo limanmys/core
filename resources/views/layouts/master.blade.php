@@ -115,7 +115,7 @@ Echo.private('App.User.{{auth()->user()->id}}')
     }
 
     function initialPresets(){
-        $('table').not('.notDataTable').not(".bx--data-table").DataTable({
+        $('table').not('.notDataTable').not(".bx--data-table").not(".n-data-table-table").DataTable({
             autoFill : true,
             bFilter: true,
             destroy: true,
