@@ -262,14 +262,6 @@
                             @endif
                         </div>
 
-                        <div class="tab-pane fade show" id="changeLog" role="tabpanel">
-                            <ul>
-                                @foreach (explode("\n",$changelog) as $line)
-                                <li>{{$line}}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-
                         <div class="tab-pane fade show" id="restrictedMode" role="tabpanel">
                             <p>{{__("Liman'ı kısıtlamak ve kullanıcıların yalnızca bir eklentiyi kullanması için bu modu kullanabilirsiniz. Bu modu kullandığınız taktirde, kullanıcılar varsayılan olarak eklenti ve sunucu yetkisine sahip olacak, ancak fonksiyon yetkilerine sahip olmayacaklardır. Yöneticiler mevcut liman arayüzünü görmeye devam edecek, kullanıcılar ise yalnızca eklenti çerçevesini görüntüleyebilecektir.")}}</p>
                             <form onsubmit="return saveRestricted(this);">

@@ -29,20 +29,23 @@
     25 => 'Jackiedo\\DotenvEditor\\DotenvEditorServiceProvider',
     26 => 'Laravel\\Sail\\SailServiceProvider',
     27 => 'Laravel\\Sanctum\\SanctumServiceProvider',
-    28 => 'Laravel\\Tinker\\TinkerServiceProvider',
-    29 => 'Laravel\\Ui\\UiServiceProvider',
-    30 => 'Mews\\Captcha\\CaptchaServiceProvider',
-    31 => 'Carbon\\Laravel\\ServiceProvider',
-    32 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    33 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    34 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
-    35 => 'Spatie\\WebTinker\\WebTinkerServiceProvider',
-    36 => 'App\\Providers\\AppServiceProvider',
-    37 => 'App\\Providers\\AuthServiceProvider',
-    38 => 'App\\Providers\\BroadcastServiceProvider',
-    39 => 'App\\Providers\\EventServiceProvider',
-    40 => 'App\\Providers\\RouteServiceProvider',
-    41 => 'App\\Providers\\TusServiceProvider',
+    28 => 'Laravel\\Socialite\\SocialiteServiceProvider',
+    29 => 'Laravel\\Tinker\\TinkerServiceProvider',
+    30 => 'Laravel\\Ui\\UiServiceProvider',
+    31 => 'Mews\\Captcha\\CaptchaServiceProvider',
+    32 => 'Carbon\\Laravel\\ServiceProvider',
+    33 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
+    34 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    35 => 'SocialiteProviders\\Manager\\ServiceProvider',
+    36 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
+    37 => 'Spatie\\WebTinker\\WebTinkerServiceProvider',
+    38 => 'App\\Providers\\AppServiceProvider',
+    39 => 'App\\Providers\\AuthServiceProvider',
+    40 => 'App\\Providers\\BroadcastServiceProvider',
+    41 => 'App\\Providers\\EventServiceProvider',
+    42 => 'App\\Providers\\RouteServiceProvider',
+    43 => 'App\\Providers\\TusServiceProvider',
+    44 => 'SocialiteProviders\\Manager\\ServiceProvider',
   ),
   'eager' => 
   array (
@@ -214,6 +217,7 @@
     'command.dotenv.setkey' => 'Jackiedo\\DotenvEditor\\DotenvEditorServiceProvider',
     'Laravel\\Sail\\Console\\InstallCommand' => 'Laravel\\Sail\\SailServiceProvider',
     'Laravel\\Sail\\Console\\PublishCommand' => 'Laravel\\Sail\\SailServiceProvider',
+    'Laravel\\Socialite\\Contracts\\Factory' => 'SocialiteProviders\\Manager\\ServiceProvider',
     'command.tinker' => 'Laravel\\Tinker\\TinkerServiceProvider',
   ),
   'when' => 
@@ -260,7 +264,13 @@
     'Laravel\\Sail\\SailServiceProvider' => 
     array (
     ),
+    'Laravel\\Socialite\\SocialiteServiceProvider' => 
+    array (
+    ),
     'Laravel\\Tinker\\TinkerServiceProvider' => 
+    array (
+    ),
+    'SocialiteProviders\\Manager\\ServiceProvider' => 
     array (
     ),
   ),

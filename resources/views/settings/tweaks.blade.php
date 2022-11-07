@@ -4,6 +4,7 @@
             <a class="nav-link active" data-toggle="pill" href="#general" role="tab" aria-controls="vert-tabs-home" aria-selected="true">{{__("Genel")}}</a>
             <a class="nav-link" data-toggle="pill" href="#market" role="tab" aria-controls="vert-tabs-profile" aria-selected="false">{{__("Market Ayarları")}}</a>
             <a class="nav-link" data-toggle="pill" href="#mail" role="tab" aria-controls="vert-tabs-messages" aria-selected="false">{{__("Mail Ayarları")}}</a>
+            <a class="nav-link" data-toggle="pill" href="#keycloak" role="tab" aria-controls="vert-tabs-keycloak" aria-selected="false">{{__("Keycloak Ayarları")}}</a>
             <a class="nav-link" data-toggle="pill" href="#advanced" role="tab" aria-controls="vert-tabs-settings" aria-selected="false">{{__("Gelişmiş")}}</a>
         </div>
     </div>
@@ -111,6 +112,37 @@
                             style="text-transform: uppercase;
                             font-weight: 600;
                             width: 100%;"><i class="fa-solid fa-circle-play fa-lg mr-1"></i> Test</button>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="keycloak" role="tabpanel" aria-labelledby="vert-tabs-keycloak-tab">
+                <div>
+                    <div class="form-group">
+                        <label for="KEYCLOAK_ACTIVE">{{__("Keycloak Durumu")}}</label><br>
+                        <select id="KEYCLOAK_ACTIVE" class="select2 liman_env">
+                            <option value="true">{{__("Aktif")}}</option>
+                            <option value="false">{{__("Pasif")}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="KEYCLOAK_CLIENT_ID">{{__("Client ID")}}</label><br>
+                        <input type="text" class="form-control liman_env" id="KEYCLOAK_CLIENT_ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="KEYCLOAK_CLIENT_SECRET">{{__("Client Secret")}}</label><br>
+                        <input type="password" class="form-control liman_env" id="KEYCLOAK_CLIENT_SECRET">
+                    </div>
+                    <div class="form-group">
+                        <label for="KEYCLOAK_REDIRECT_URI">{{__("Redirect URI")}}</label><br>
+                        <input type="text" class="form-control liman_env" id="KEYCLOAK_REDIRECT_URI">
+                    </div>
+                    <div class="form-group">
+                        <label for="KEYCLOAK_BASE_URL">{{__("Base URL")}}</label><br>
+                        <input type="text" class="form-control liman_env" id="KEYCLOAK_BASE_URL">
+                    </div>
+                    <div class="form-group">
+                        <label for="KEYCLOAK_REALM">{{__("Realm")}}</label><br>
+                        <input type="text" class="form-control liman_env" id="KEYCLOAK_REALM">
                     </div>
                 </div>
             </div>

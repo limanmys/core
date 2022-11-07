@@ -172,6 +172,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\TusServiceProvider::class,
+        \SocialiteProviders\Manager\ServiceProvider::class
     ],
 
     /*

@@ -3,11 +3,16 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Facades\Socialite;
 
 /**
  * Class LoginController
@@ -80,8 +85,8 @@ class LoginController extends Controller
     protected function validateLogin(Request $request)
     {
         $request->request->add([
-            $this->username() => $request->liman_email_mert,
-            'password' => $request->liman_password_baran,
+            $this->username() => $request->liman_email_aciklab,
+            'password' => $request->liman_password_divergent,
         ]);
         if (env('EXTENSION_DEVELOPER_MODE')) {
             $request->validate([
@@ -108,5 +113,58 @@ class LoginController extends Controller
         throw ValidationException::withMessages([
             $this->username() => [trans('auth.failed')],
         ]);
+    }
+
+    public function redirectToKeycloak()
+    {
+        if (env('KEYCLOAK_ACTIVE', false) == false) {
+            return;
+        }
+
+        return Socialite::driver('keycloak')->stateless()->redirect();
+    }
+
+    public function retrieveFromKeycloak(Request $request)
+    {
+        if (env('KEYCLOAK_ACTIVE', false) == false) {
+            return;
+        }
+
+        $remote = Socialite::driver('keycloak')->stateless()->user();
+
+        $user = User::find($remote->id);
+
+        if (! $user) {
+            $emailExists = User::where('email', $remote->email)->get();
+            if (count($emailExists) < 1) {
+                $user = User::create([
+                    'id' => $remote->id,
+                    'username' => $remote->nickname,
+                    'email' => $remote->email,
+                    'auth_type' => 'keycloak',
+                    'status' => 0,
+                    'forceChange' => false,
+                    'name' => $remote->name,
+                    'password' => Hash::make(Str::random(16))
+                ]);
+            } else {
+                return redirect('/giris')->withErrors(__('Keycloak kullanıcısının e-posta adresi sistemde mevcut.'));
+            }
+        }
+
+        $user->update([
+            'last_login_at' => Carbon::now()->toDateTimeString(),
+            'last_login_ip' => $request->ip(),
+        ]);
+
+        system_log(7, 'LOGIN_SUCCESS');
+
+        hook('login_successful', [
+            'user' => $user,
+        ]);
+
+        Auth::loginUsingId($user->id, true);
+
+        return redirect('/');
     }
 }

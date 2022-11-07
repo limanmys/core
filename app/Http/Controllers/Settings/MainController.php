@@ -32,10 +32,6 @@ class MainController extends Controller
 
     public function index()
     {
-        $changelog = is_file(storage_path('changelog'))
-            ? file_get_contents(storage_path('changelog'))
-            : '';
-
         $updateAvailable = is_file(storage_path('extension_updates'));
         $extensions = extensions()->map(function ($item) {
             if (! $item['issuer']) {
@@ -47,7 +43,6 @@ class MainController extends Controller
 
         return view('settings.index', [
             'users' => User::all(),
-            'changelog' => $changelog,
             'updateAvailable' => $updateAvailable,
             'extensions' => $extensions,
         ]);
@@ -73,6 +68,11 @@ class MainController extends Controller
             'APP_LANG' => env('APP_LANG', 'tr'),
             'NAV_SERVER_COUNT' => env('NAV_SERVER_COUNT', 20),
             'EXTENSION_TIMEOUT' => env('EXTENSION_TIMEOUT', 30),
+            'KEYCLOAK_ACTIVE' => env('KEYCLOAK_ACTIVE'),
+            'KEYCLOAK_CLIENT_ID' => env('KEYCLOAK_CLIENT_ID'),
+            'KEYCLOAK_REDIRECT_URI' => env('KEYCLOAK_REDIRECT_URI'),
+            'KEYCLOAK_BASE_URL' => env('KEYCLOAK_BASE_URL'),
+            'KEYCLOAK_REALM' => env('KEYCLOAK_REALM'),
         ]);
     }
 
@@ -105,11 +105,17 @@ class MainController extends Controller
             'APP_LANG' => request('APP_LANG'),
             'NAV_SERVER_COUNT' => request('NAV_SERVER_COUNT'),
             'EXTENSION_TIMEOUT' => request('EXTENSION_TIMEOUT'),
+            'KEYCLOAK_ACTIVE' => request('KEYCLOAK_ACTIVE'),
+            'KEYCLOAK_CLIENT_ID' => request('KEYCLOAK_CLIENT_ID'),
+            'KEYCLOAK_REDIRECT_URI' => request('KEYCLOAK_REDIRECT_URI'),
+            'KEYCLOAK_BASE_URL' => request('KEYCLOAK_BASE_URL'),
+            'KEYCLOAK_REALM' => request('KEYCLOAK_REALM'),
         ]);
 
         if (request()->has('MAIL_PASSWORD')) {
             $flag = setEnv([
                 'MAIL_PASSWORD' => request('MAIL_PASSWORD'),
+                'KEYCLOAK_CLIENT_SECRET' => request('KEYCLOAK_CLIENT_SECRET'),
             ]);
         }
 

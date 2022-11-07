@@ -133,7 +133,7 @@ class UserController extends Controller
 
         $user = User::find(request('user_id'));
 
-        if ($user->auth_type == 'ldap') {
+        if ($user->auth_type == 'ldap' || $user->auth_type == 'keycloak') {
             return respond('Bu kullanıcı tipinin şifresi sıfırlanamaz', 201);
         }
 
@@ -176,7 +176,7 @@ class UserController extends Controller
      */
     public function selfUpdate()
     {
-        if (user()->auth_type == 'ldap') {
+        if (user()->auth_type == 'ldap' || user()->auth_type == 'keycloak') {
             return respond(
                 'Bu kullanıcı tipinin bilgileri değiştirilemez!',
                 201
@@ -254,7 +254,7 @@ class UserController extends Controller
         ];
         $user = User::where('id', request('user_id'))->first();
 
-        if ($user->auth_type == 'ldap') {
+        if ($user->auth_type == 'ldap' || $user->auth_type == 'keycloak') {
             unset($validations['name']);
             unset($validations['username']);
         }
@@ -271,7 +271,7 @@ class UserController extends Controller
             $data['username'] = request('username');
         }
 
-        if ($user->auth_type == 'ldap') {
+        if ($user->auth_type == 'ldap' || $user->auth_type == 'keycloak') {
             unset($data['name']);
             unset($data['username']);
         }

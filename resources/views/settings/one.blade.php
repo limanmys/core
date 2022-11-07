@@ -46,7 +46,7 @@
                                 <option value="1" @if($user->status == "1") selected @endif>{{__("Yönetici")}}</option>
                             </select>
                             </div>
-                            @if ($user->auth_type !== "ldap")
+                            @if ($user->auth_type !== "ldap" && $user->auth_type !== 'keycloak')
                             <div class="col-md-6">
                                 <label>{{__("İsim Soyisim")}}</label>
                                 <input class="form-control" type="text" value="{{$user->name}}" name="name"><br>
@@ -63,12 +63,12 @@
                         </div>
                         <div class="col-12 row align-self-center @if($user->auth_type == 'ldap') mt-3 @endif ">
                             @php
-                                $col = $user->auth_type !== "ldap" ? "4" : "6";
+                                $col = $user->auth_type !== "ldap" && $user->auth_type !== 'keycloak' ? "4" : "6";
                             @endphp
                             <div class="col-{{ $col }}">
                                 <button class="btn btn-danger btn-block" onclick="removeUser();return false;">{{__("Kullanıcıyı Sil")}}</button><br>
                             </div>
-                            @if ($user->auth_type !== "ldap")
+                            @if ($user->auth_type !== "ldap" && $user->auth_type !== 'keycloak')
                             <div class="col-{{ $col }}">
                                 <button class="btn btn-warning btn-block" onclick="resetPassword();return false;">{{__("Parola Sıfırla")}}</button><br>
                             </div>
