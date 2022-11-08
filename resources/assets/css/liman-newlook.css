@@ -6,7 +6,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: rgba(31, 41, 55, 1);
-  overflow-y: scroll;
 }
 
 hr {
