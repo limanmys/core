@@ -76,9 +76,11 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    <div class="row">
         @foreach ($apps as $app)
-            <div class="col-xl-4 col-lg-6 col-md-12">
+            <div class="col-xl-4 col-lg-6 col-md-12 d-flex">
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
