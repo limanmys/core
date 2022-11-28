@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Jackiedo\DotenvEditor\Facades\DotenvEditor;
-use Jenssegers\Blade\Blade;
+use Beebmx\Blade\Blade;
 use mervick\aesEverywhere\AES256;
 use phpseclib\Crypt\RSA;
 
