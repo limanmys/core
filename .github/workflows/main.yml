@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Getting Main Liman Repository
         uses: actions/checkout@v2
@@ -12,13 +12,13 @@ jobs:
       - name: Set up Liman Environment
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.1" 
+          php-version: "8.1"
           tools: composer
-          extensions : ssh2, curl, sqlite3, ldap, mbstring, xml, zip, posix, smbclient, gd
+          extensions: ssh2, curl, sqlite3, ldap, mbstring, xml, zip, posix, smbclient, gd
       - name: Build Liman Package
         env:
-            PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-            PASSPHRASE: ${{ secrets.PASSPHRASE }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
         run: |
           sudo apt install zip gpg curl jq wget -y
           mkdir -p /home/runner/.gnupg
@@ -37,7 +37,7 @@ jobs:
           [ "$GITHUB_REF" == "refs/heads/master" ] && PRERELEASE=false || PRERELEASE=true
           FILE_NAME="liman-$VERSION-$GITHUB_RUN_NUMBER"
           FILE_NAME=$(echo $FILE_NAME | tr / -)
-          
+
           cp package.deb $FILE_NAME.deb
           cp /tmp/package.rpm $FILE_NAME.rpm
 
@@ -47,7 +47,7 @@ jobs:
           echo "RELEASE_RUNNUMBER=$(echo $GITHUB_RUN_NUMBER)" >> $GITHUB_ENV
           echo "PRERELEASE=$(echo $PRERELEASE)" >> $GITHUB_ENV
           echo "LIMAN_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
-                    
+
       - name: Release 🚀
         id: create_release
         uses: softprops/action-gh-release@v1
