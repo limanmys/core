@@ -324,6 +324,30 @@ class UserController extends Controller
         }
     }
 
+    public function createSetting()
+    {
+        $user_id = user()->id;
+        if (request('user_id') != "" && user()->isAdmin()) {
+            $user_id = request('user_id');
+        }
+
+        $key = env('APP_KEY') . $user_id . request('server_id');
+        $encrypted = AES256::encrypt(request('setting_value'), $key);
+
+        $ok = UserSettings::create([
+            'server_id' => request('server_id'),
+            'user_id' => $user_id,
+            'name' => request('setting_name'),
+            'value' => $encrypted
+        ]);
+
+        if ($ok) {
+            return respond("Başarılı");
+        } else {
+            return respond("Eklenirken hata oluştu.", 201);
+        }
+    }
+
     /**
      * @api {post} /user/setting/update Update Vault Key
      * @apiName Update Vault Key
@@ -339,6 +363,10 @@ class UserController extends Controller
         $setting = UserSettings::where('id', request('setting_id'))->first();
         if (! $setting) {
             return respond('Ayar bulunamadı!', 201);
+        }
+
+        if (!user()->isAdmin() && user()->id != $setting->user_id) {
+            return respond('Güncellenemedi', 201);
         }
 
         if (
@@ -432,7 +460,15 @@ class UserController extends Controller
      */
     public function userKeyList()
     {
-        $settings = UserSettings::where('user_id', user()->id)->get();
+        if (request('user_id') != "") {
+            if (!user()->isAdmin()) {
+                return respond("Bu işlemi yapmak için yönetici olmalısınız!", 403);
+            }
+
+            $settings = UserSettings::where('user_id', request('user_id'))->get();
+        } else {
+            $settings = UserSettings::where('user_id', user()->id)->get();
+        }
 
         // Retrieve User servers that has permission.
         $servers = servers();
@@ -463,6 +499,8 @@ class UserController extends Controller
                 ),
                 true
             ),
+            'users' => user()->isAdmin() ? User::all() : [],
+            'selected_user' => request('user_id') != "" ? request('user_id') : user()->id
         ]);
     }
 
@@ -478,15 +516,20 @@ class UserController extends Controller
      */
     public function addKey()
     {
-        $encKey = env('APP_KEY').user()->id.server()->id;
+        $user_id = user()->id;
+        if (request('user_id') != "" && user()->isAdmin()) {
+            $user_id = request('user_id');
+        }
+
+        $encKey = env('APP_KEY').$user_id.server()->id;
         UserSettings::where([
             'server_id' => server()->id,
-            'user_id' => user()->id,
+            'user_id' => $user_id,
             'name' => 'clientUsername',
         ])->delete();
         UserSettings::where([
             'server_id' => server()->id,
-            'user_id' => user()->id,
+            'user_id' => $user_id,
             'name' => 'clientPassword',
         ])->delete();
 
@@ -497,7 +540,7 @@ class UserController extends Controller
         ];
 
         ServerKey::updateOrCreate(
-            ['server_id' => server()->id, 'user_id' => user()->id],
+            ['server_id' => server()->id, 'user_id' => $user_id],
             ['type' => request('type'), 'data' => json_encode($data)]
         );
 

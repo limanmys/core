@@ -68,7 +68,7 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     // Vault Route
 
-    Route::get('/kasa', 'UserController@userKeyList')->name('keys');
+    Route::get('/kasa/{user_id?}', 'UserController@userKeyList')->name('keys');
 
     Route::get('/takip', 'ServerMonitorController@list')->name('monitor_list');
 
@@ -128,6 +128,10 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     Route::post('/user/setting/delete', 'UserController@removeSetting')->name(
         'user_setting_remove'
+    );
+
+    Route::post('/user/setting/create', 'UserController@createSetting')->name(
+        'user_setting_create'
     );
 
     Route::post('/user/setting/update', 'UserController@updateSetting')->name(
