@@ -65,7 +65,7 @@ class OneController extends Controller
             if ($variable) {
                 if ($row->exists()) {
                     $encKey = env('APP_KEY') . user()->id . server()->id;
-                    if ($row->first()->user_id != user()->id) {
+                    if ($row->first()->user_id != user()->id && !user()->isAdmin()) {
                         return redirect(
                             route('extension_server_settings_page', [
                                 'extension_id' => extension()->id,
@@ -149,8 +149,7 @@ class OneController extends Controller
         return redirect(
             route('extension_server', [
                 'extension_id' => extension()->id,
-                'server_id' => server()->id,
-
+                'server_id' => server()->id
             ])
         );
     }
