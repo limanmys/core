@@ -37,10 +37,6 @@ return [
             'url' => '/ayarlar#externalNotifications',
         ],
         [
-            'name' => 'Sistem Ayarları / Kısıtlı Mod',
-            'url' => '/ayarlar#restrictedMode',
-        ],
-        [
             'name' => 'Sistem Ayarları / Liman Market',
             'url' => '/ayarlar#limanMarket',
         ],

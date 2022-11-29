@@ -1,30 +1,10 @@
-@if (env('LIMAN_RESTRICTED') == true && !user()->isAdmin())
-    <nav class="main-header navbar navbar-expand navbar-dark" style="margin-left:0px;height:58.86px;border:0px;">
-        <ul class="navbar-nav" style="line-height:60px;">
-            <a href="/" class="brand-link">
-                <img src="{{ asset('/images/limanlogo.svg') }}" height="30" style="opacity: .8;cursor:pointer;"
-                    title="Versiyon {{ getVersion() }}">
-            </a>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="/" class="nav-link" style="padding-top: 0px;">{{ __('Ana Sayfa') }}</a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="/ayarlar/{{ request('extension_id') }}/{{ request('server_id') }}" class="nav-link"
-                    style="padding-top: 0px;">{{ __('Ayarlar') }}</a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="mailto:{{ env('APP_NOTIFICATION_EMAIL') }}?subject={{ env('BRAND_NAME') }} {{ extension()->display_name }} {{ extension()->version }}"
-                    class="nav-link" style="padding-top: 0px;">{{ __('Destek Al') }}</a>
-            </li>
-        @else
-            <nav class="main-header navbar navbar-expand navbar-dark" style="height:58.86px;border:0px;">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tooltip" title="{{ __('Menüyü gizle') }}"
-                            data-widget="pushmenu" href="#" onclick="$('[role=tooltip]').remove(); collapseNav()"
-                            id="collapseMenu"><i class="fas fa-bars"></i></a>
-                    </li>
-@endif
+<nav class="main-header navbar navbar-expand navbar-dark" style="height:58.86px;border:0px;">
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tooltip" title="{{ __('Menüyü gizle') }}"
+                data-widget="pushmenu" href="#" onclick="$('[role=tooltip]').remove(); collapseNav()"
+                id="collapseMenu"><i class="fas fa-bars"></i></a>
+        </li>
 <li class="nav-item d-none d-md-block">
     <a href="/takip" class="nav-link" data-toggle="tooltip" title="{{ __('Sunucu Takibi') }}">
         <i class="fa-solid fa-eye"></i>

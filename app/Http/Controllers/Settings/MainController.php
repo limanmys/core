@@ -817,24 +817,6 @@ input(type="imtcp" port="514")';
         ]);
     }
 
-    public function restrictedMode()
-    {
-        $flag = setenv([
-            'LIMAN_RESTRICTED' => request('LIMAN_RESTRICTED')
-                ? 'true'
-                : 'false',
-            'LIMAN_RESTRICTED_SERVER' => request('LIMAN_RESTRICTED_SERVER'),
-            'LIMAN_RESTRICTED_EXTENSION' => request(
-                'LIMAN_RESTRICTED_EXTENSION'
-            ),
-        ]);
-        if ($flag) {
-            return respond('Kısıtlı mod ayarları başarıyla güncellendi!');
-        } else {
-            return respond('Kısıtlı mod ayarları güncellenemedi!', 201);
-        }
-    }
-
     public function getDNSServers()
     {
         $data = `grep nameserver /etc/resolv.conf | grep -v "#" | grep nameserver`;

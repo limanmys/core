@@ -20,8 +20,7 @@ class PermissionManager
         if (
             auth()
                 ->user()
-                ->isAdmin() ||
-            env('LIMAN_RESTRICTED') == true
+                ->isAdmin()
         ) {
             $this->initializeObjects();
 

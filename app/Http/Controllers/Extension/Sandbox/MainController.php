@@ -84,11 +84,7 @@ class MainController extends Controller
                 }
             }
         }
-
-        if (env('LIMAN_RESTRICTED') == true && ! user()->isAdmin()) {
-            $view = 'extension_pages.server_restricted';
-        }
-
+        
         return view($view, [
             'auth_token' => $token,
             'tokens' => user()

@@ -42,11 +42,6 @@ if (! function_exists('updateSystemSettings')) {
         );
 
         SystemSettings::updateOrCreate(
-            ['key' => 'LIMAN_RESTRICTED'],
-            ['data' => env('LIMAN_RESTRICTED', false)]
-        );
-
-        SystemSettings::updateOrCreate(
             ['key' => 'SSL_PUBLIC_KEY'],
             ['data' => file_get_contents('/liman/certs/liman.crt')]
         );
@@ -95,17 +90,7 @@ if (! function_exists('receiveSystemSettings')) {
                 'APP_KEY' => $app_key->data,
             ]);
         }
-
-        $restricted = SystemSettings::where([
-            'key' => 'LIMAN_RESTRICTED',
-        ])->first();
-
-        if ($restricted) {
-            setEnv([
-                'LIMAN_RESTRICTED' => $restricted->data,
-            ]);
-        }
-
+        
         $public_key = SystemSettings::where([
             'key' => 'SSL_PUBLIC_KEY',
         ])->first();
