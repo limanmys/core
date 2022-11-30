@@ -84,6 +84,8 @@ Artisan::command('module:add {module_name}', function ($module_name) {
             'level' => 3,
         ]);
     } else {
+        Module::where(['name' => $module_name])->first()->touch();
+
         $notification = new AdminNotification([
             'title' => $module_name.' modülü güncellendi.',
             'type' => 'new_module',

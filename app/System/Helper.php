@@ -3,6 +3,7 @@
 namespace App\System;
 
 use App\Models\SystemSettings;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 
 class Helper
@@ -88,6 +89,7 @@ class Helper
         $arr = [
             'certificate' => $contents,
             'targetName' => $targetName,
+            'updatedAt' => Carbon::now()->toDateTimeString()
         ];
 
         $current = SystemSettings::where('key', 'SYSTEM_CERTIFICATES')->first();

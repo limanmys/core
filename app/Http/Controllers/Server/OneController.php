@@ -359,7 +359,7 @@ class OneController extends Controller
             $ramPercent = server()->run(
                 "free | grep Mem | awk '{print $3/$2 * 100.0}'"
             );
-            $ioPercent = server()->run(
+            $ioPercent = (float) server()->run(
                 "iostat -d | tail -n +4 | head -n -1 | awk '{s+=$2} END {print s}'"
             );
             $firstDown = $this->calculateNetworkBytes();

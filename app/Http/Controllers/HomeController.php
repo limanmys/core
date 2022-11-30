@@ -65,7 +65,7 @@ class HomeController extends Controller
         $cpuUsage = round($cpuUsage, 2);
         $ramUsage = shell_exec("free -t | awk 'NR == 2 {printf($3/$2*100)}'");
         $ramUsage = round($ramUsage, 2);
-        $ioPercent = shell_exec(
+        $ioPercent = (float) shell_exec(
             "iostat -d | tail -n +4 | head -n -1 | awk '{s+=$2} END {print s}'"
         );
 

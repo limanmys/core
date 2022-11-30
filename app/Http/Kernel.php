@@ -48,6 +48,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'extension' => \App\Http\Middleware\Extension::class,
+        'block_except_limans' => \App\Http\Middleware\BlockExceptLimans::class
     ];
 
     protected $middlewarePriority = [

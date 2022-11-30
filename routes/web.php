@@ -3,6 +3,9 @@
 // Auth Routes
 require_once app_path('Http/Controllers/Auth/_routes.php');
 
+// HA Routes
+require_once app_path('Http/Controllers/HASync/_routes.php');
+
 Route::group(['middleware' => ['auth', 'permissions']], function () {
     // Extension Routes
 
