@@ -218,6 +218,10 @@ class HighAvailabilitySyncer implements ShouldQueue
             'path' => $path,
         ]);
 
+        Command::runSystem('rm -rf @{:file}', [
+            'file' => $path
+        ]);
+
         // Create linux user for sandbox
         $system->userAdd($extension['id']);
 
@@ -284,6 +288,10 @@ class HighAvailabilitySyncer implements ShouldQueue
         ]);
 
         Command::runSystem('rm -rf @{:file}', [
+            'file' => $path
+        ]);
+
+        Command::runSystem('rm -rf @{:file}', [
             'file' => $file
         ]);
 
@@ -337,6 +345,10 @@ class HighAvailabilitySyncer implements ShouldQueue
             'path' => $path,
         ]);
 
+        Command::runSystem('rm -rf @{:file}', [
+            'file' => $path
+        ]);
+
         Artisan::call("module:add " . $module['name']);
 
         Command::runSystem('rm -rf @{:file}', [
@@ -380,6 +392,10 @@ class HighAvailabilitySyncer implements ShouldQueue
         Command::runLiman('cp -r {:path}/* {:module_folder}/.', [
             'module_folder' => $module_folder,
             'path' => $path,
+        ]);
+
+        Command::runSystem('rm -rf @{:file}', [
+            'file' => $path
         ]);
 
         Artisan::call("module:add " . $module['name']);
