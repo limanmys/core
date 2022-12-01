@@ -121,32 +121,3 @@ Artisan::command('register_liman', function () {
         'last_ip' => env('LIMAN_IP', trim((string) `hostname -I`)),
     ]);
 })->describe('Register liman');
-
-Artisan::command('update_settings', function () {
-    updateSystemSettings();
-})->describe('Update the system settings');
-
-Artisan::command('receive_settings', function () {
-    receiveSystemSettings();
-})->describe('Receive the system settings');
-
-Artisan::command('sync_core', function () {
-    if (trim((string) `id -u`) != '0') {
-        $this->error('Bu komutu root olarak çalışmalısınız!');
-
-        return;
-    }
-
-    receiveSystemSettings();
-
-    `
-        systemctl restart nginx;
-        systemctl restart liman-render;
-        systemctl restart liman-system;
-        systemctl restart liman-socket;
-    `;
-})->describe('Sync core files.');
-
-Artisan::command('sync_safe', function () {
-    syncFiles();
-})->describe('Sync safe files without restarting');

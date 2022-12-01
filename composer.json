@@ -28,6 +28,7 @@
         "limanmys/php-smb": "^3.5",
         "mervick/aes-everywhere": "^1.1",
         "mews/captcha": "^3.2",
+        "phpseclib/phpseclib": "~3.0",
         "pusher/pusher-php-server": "^7.0",
         "socialiteproviders/keycloak": "^5.2"
     },

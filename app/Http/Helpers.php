@@ -20,7 +20,6 @@ use Illuminate\Support\Str;
 use Jackiedo\DotenvEditor\Facades\DotenvEditor;
 use Beebmx\Blade\Blade;
 use mervick\aesEverywhere\AES256;
-use phpseclib\Crypt\RSA;
 
 if (! function_exists('validate')) {
     function validate($rules, $messages = [])
@@ -54,9 +53,8 @@ if (! function_exists('updateSystemSettings')) {
             'key' => 'SSH_PUBLIC',
         ])->first();
         if (! $sshPublic) {
-            $rsa = new RSA();
-            $rsa->setPublicKeyFormat(RSA::PUBLIC_FORMAT_OPENSSH);
-            extract($rsa->createKey());
+            $privatekey = \phpseclib3\Crypt\RSA::createKey();
+            $publickey = $privatekey->getPublicKey();
             `mkdir -p /home/liman/.ssh`;
             file_put_contents('/home/liman/.ssh/authorized_keys', $publickey);
             file_put_contents('/home/liman/.ssh/liman_pub', $publickey);
@@ -157,97 +155,6 @@ if (! function_exists('respond')) {
                 ],
                 $status
             );
-        }
-    }
-}
-
-if (! function_exists('syncFiles')) {
-    function syncFiles()
-    {
-        $masterIp = env('LIMAN_MASTER_IP');
-
-        if ($masterIp == '') {
-            $firstLiman = Liman::first();
-            if ($firstLiman == null) {
-                return;
-            }
-            $masterIp = $firstLiman->last_ip;
-        }
-
-        Command::runLiman(
-            "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@".
-                "$masterIp".
-                ':/liman/extensions/ /liman/extensions/'
-        );
-        Command::runLiman(
-            "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" --exclude 'service.key' liman@".
-                "$masterIp".
-                ':/liman/keys/ /liman/keys/'
-        );
-        Command::runLiman(
-            "rsync -Pav -e \"ssh -i /home/liman/.ssh/liman_priv -o 'StrictHostKeyChecking no'\" liman@".
-                "$masterIp".
-                ':/liman/modules/ /liman/modules/'
-        );
-
-        $root = rootSystem();
-        $extensions = Extension::all();
-        $names = [];
-
-        foreach ($extensions as $extension) {
-            array_push($names, strtolower((string) $extension->name));
-            $root->userAdd($extension->id);
-            $root->fixExtensionPermissions($extension->id, $extension->name);
-            $json = getExtensionJson($extension->name);
-            if (
-                array_key_exists('dependencies', $json) &&
-                $json['dependencies'] != ''
-            ) {
-                $root->installPackages($json['dependencies']);
-            }
-        }
-
-        $scan = scandir('/liman/extensions/');
-
-        foreach ($scan as $a) {
-            if (substr((string) $a, 0, 1) == '.') {
-                continue;
-            }
-            if (! in_array($a, $names)) {
-                Command::runLiman("rm -rf '/liman/extensions/{:a}'", [
-                    'a' => $a,
-                ]);
-            }
-        }
-
-        $dns = SystemSettings::where([
-            'key' => 'SYSTEM_DNS',
-        ])->first();
-        if ($dns) {
-            $json = json_decode((string) $dns->data);
-            $root->dnsUpdate($json[0], $json[1], $json[2]);
-        }
-
-        $certificates = SystemSettings::where([
-            'key' => 'SYSTEM_CERTIFICATES',
-        ])->first();
-        if ($certificates) {
-            $json = json_decode((string) $certificates->data, true);
-            foreach ($json as $cert) {
-                if (
-                    is_file(
-                        '/usr/local/share/ca-certificates/'.
-                            $cert['targetName'].
-                            '.crt'
-                    )
-                ) {
-                    continue;
-                }
-                $root->addCertificate(
-                    $cert['certificate'],
-                    $cert['targetName']
-                );
-            }
         }
     }
 }
