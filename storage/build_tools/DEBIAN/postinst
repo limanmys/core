@@ -118,6 +118,19 @@ fi
 
 echo """
 #LIMAN_OPTIMIZATIONS
+[program:liman-high_availability_syncer]
+process_name=%(program_name)s_%(process_num)02d
+command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=high_availability_syncer --timeout=0
+autostart=true
+autorestart=true
+user=liman
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/liman/logs/high_availability.log
+    """ > /etc/supervisor/conf.d/liman-high_availability_syncer.conf
+
+echo """
+#LIMAN_OPTIMIZATIONS
 [program:liman-system-worker]
 process_name=%(program_name)s_%(process_num)02d
 command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=system_updater --timeout=0
