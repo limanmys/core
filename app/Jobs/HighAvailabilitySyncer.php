@@ -238,6 +238,10 @@ class HighAvailabilitySyncer implements ShouldQueue
         ) {
             $system->installPackages($json['dependencies']);
         }
+
+        Command::runSystem('rm -rf @{:file}', [
+            'file' => $file
+        ]);
     }
 
     /**
@@ -277,6 +281,10 @@ class HighAvailabilitySyncer implements ShouldQueue
         Command::runLiman('cp -r {:path}/* {:extension_folder}/.', [
             'extension_folder' => $extension_folder,
             'path' => $path,
+        ]);
+
+        Command::runSystem('rm -rf @{:file}', [
+            'file' => $file
         ]);
 
         // Fix permissions
@@ -330,6 +338,10 @@ class HighAvailabilitySyncer implements ShouldQueue
         ]);
 
         Artisan::call("module:add " . $module['name']);
+
+        Command::runSystem('rm -rf @{:file}', [
+            'file' => $file
+        ]);
     }
 
     /**
@@ -371,20 +383,16 @@ class HighAvailabilitySyncer implements ShouldQueue
         ]);
 
         Artisan::call("module:add " . $module['name']);
+
+        Command::runSystem('rm -rf @{:file}', [
+            'file' => $file
+        ]);
     }
-
-    /**
-     * Update certificates
-     */
-    private function updateCertificates()
-    {
-
-    }
-
+    
     /**
      * Download file and return path
      */
-    private function downloadFile($url, $format = null)
+    private function downloadFile($url, $format = "zip")
     {
         $client = new Client([
             'verify' => false
