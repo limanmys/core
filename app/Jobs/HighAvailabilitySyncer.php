@@ -111,6 +111,8 @@ class HighAvailabilitySyncer implements ShouldQueue
                 );
             }
         }
+
+        Liman::where(['last_ip' => $localIp])->first()->touch();
     }
 
     /**
