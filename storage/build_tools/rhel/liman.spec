@@ -145,6 +145,12 @@ supervisorctl start all
 #Increase Php-Fpm Memory
 sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php.ini
 
+#Change Queue Driver from Db to Redis
+sed -i "s#QUEUE_DRIVER=database#QUEUE_DRIVER=redis#g" /liman/server/.env
+
+#Change Render Engine Port
+sed -i "s#RENDER_ENGINE_ADDRESS=https://127.0.0.1:5454#RENDER_ENGINE_ADDRESS=https://127.0.0.1:2806#g" /liman/server/.env
+
 # Run Database Migration
 php /liman/server/artisan migrate --force
 php /liman/server/artisan cache:clear

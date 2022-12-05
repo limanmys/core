@@ -32,15 +32,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // Delete Old Tokens every night
-        $schedule
-            ->call(function () {
-                DB::table('tokens')->truncate();
-            })
-            ->dailyAt('23:59')
-            ->name('Token Cleanup');
-
-        // Sync files.
+        // High availability file syncer
         $schedule
             ->call(function () {
                 $job = (new HighAvailabilitySyncer())
