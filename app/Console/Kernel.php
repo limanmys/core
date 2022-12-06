@@ -39,8 +39,8 @@ class Kernel extends ConsoleKernel
                         ->onQueue('high_availability_syncer');
                 app(Dispatcher::class)->dispatch($job);
             })
-            ->everyFiveMinutes()
-            ->name('High Availability Syncer');
+            ->name('hasync')
+            ->everyFiveMinutes();
 
         // Run Health Check every hour.
         $schedule

@@ -347,6 +347,9 @@ php /liman/server/artisan storage:link
 # Enable Liman
 php /liman/server/artisan up
 
+# Flush Redis Cache
+redis-cli flushall
+
 # Create Limanctl Symlink
 chmod +x /liman/server/storage/limanctl
 cp -f /liman/server/storage/limanctl /usr/bin/limanctl
