@@ -74,7 +74,7 @@
                             data-original-title="{{ __('Liman ID Kopyala') }}" id="copy-liman-id"
                             class="far fa-copy fa-lg ml-1" style="cursor: pointer;" onclick="copyToClipboard('liman-id')"></i></h5>
                 </div>
-                <div class="row" style="border-top: 1px solid rgba(0, 0, 0, 0.05);">
+                <div class="row" style="border-top: 1px solid rgba(0, 0, 0, 0.05); margin: 0">
                     <div class="col-md-6" style="border-right: 1px solid rgba(0, 0, 0, 0.05);">
                         @if (auth()->user()->isAdmin())
                         <a class="notif-action dropdown-item text-center btn-link d-block" style="background: #fff !important" href="/talepler">

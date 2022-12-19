@@ -193,6 +193,7 @@ nav[aria-label="breadcrumb"] {
 .card-title {
   text-transform: uppercase;
   color: #6c757d;
+  font-weight: 500;
 }
 
 .modal-header,
