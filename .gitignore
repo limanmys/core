@@ -24,4 +24,7 @@ storage/extension_updates
 storage/docs
 public/docs
 storage/liman_render
-bootstrap/cache/*
+bootstrap/cache/packages.php
+bootstrap/cache/services.php
+bootstrap/cache/config.php
+bootstrap/cache/routes*
