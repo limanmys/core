@@ -24,3 +24,4 @@ storage/extension_updates
 storage/docs
 public/docs
 storage/liman_render
+bootstrap/cache/*

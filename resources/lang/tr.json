@@ -64,5 +64,11 @@
     "message": "Özel Log Mesajı",
     "server_id": "Sunucu ID",
     "title": "Özel Log Başlık",
-    "request_details": "İstek Detayları"
+    "request_details": "İstek Detayları",
+    "Set up Google Authenticator": "Google Authenticator Kurulumu",
+    "Set up your two factor authentication by scanning the barcode below. Alternatively, you can use the code": "İki aşamalı doğrulamayı uygulamaya aşağıdaki barkodu okutarak kurabilirsiniz. Alternatif olarak bu kodu da girebilirsiniz: ",
+    "You must set up your Google Authenticator app before continuing. You will be unable to login otherwise": "Devam etmeden önce Google Authenticator uygulamasını kurmalısınız. Aksi takdirde giriş yapamayacaksınız.",
+    "Complete Registration": "Kurulumu Tamamla",
+    "Provided OTP is wrong.": "Girdiğiniz doğrulama kodu yanlış, lütfen tekrar deneyiniz.",
+    "Please enter the OTP generated on your Authenticator App. Ensure you submit the current one because it refreshes every 30 seconds.": "Lütfen uygulamadaki kodu giriniz. Anlık olarak girdiğinize emin olun çünkü 30 saniyede bir yenileniyor."
 }

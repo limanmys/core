@@ -31,6 +31,13 @@
                         <input type="text" class="form-control liman_env" id="BRAND_NAME">
                     </div>
                     <div class="form-group">
+                        <label for="OTP_ENABLED">{{__("Google 2FA Sistemi")}}</label><br>
+                        <select id="OTP_ENABLED" class="select2 liman_env">
+                            <option value="true">{{__("Aktif")}}</option>
+                            <option value="false">{{__("Pasif")}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="APP_NOTIFICATION_EMAIL">{{__("İletişim Maili")}}</label><br>
                         <small>{{__("Eklenti sayfasında kullanıcıların yardım alması için oluşturulan mail adresi.")}}</small>
                         <input type="text" class="form-control liman_env" id="APP_NOTIFICATION_EMAIL">

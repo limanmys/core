@@ -6,7 +6,7 @@ require_once app_path('Http/Controllers/Auth/_routes.php');
 // HA Routes
 require_once app_path('Http/Controllers/HASync/_routes.php');
 
-Route::group(['middleware' => ['auth', 'permissions']], function () {
+Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', 'permissions']], function () {
     // Extension Routes
 
     require_once app_path('Http/Controllers/Extension/_routes.php');

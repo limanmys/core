@@ -7,6 +7,7 @@ use App\Models\Permission;
 use App\Models\Server;
 use App\Models\UsesUuid;
 use App\Support\Database\CacheQueryBuilder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -43,6 +44,7 @@ class User extends Authenticatable
         'last_login_at',
         'last_login_ip',
         'locale',
+        'google2fa_secret'
     ];
 
     /**
@@ -51,6 +53,20 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = ['password', 'remember_token'];
+
+    /** 
+     * Interact with the user's OTP secret.
+     *
+     * @param  string  $value
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function google2faSecret(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) =>  !is_null($value) ? decrypt($value) : '',
+            set: fn ($value) =>  !is_null($value) ? encrypt($value) : '',
+        );
+    }
 
     public function isAdmin()
     {

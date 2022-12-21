@@ -13,6 +13,7 @@
         "ext-xml": "*",
         "ext-zip": "*",
         "ankitpokhrel/tus-php": "^2.3",
+        "bacon/bacon-qr-code": "^2.0",
         "beebmx/blade": "^1.5",
         "beyondcode/laravel-websockets": "^1.13",
         "composer/semver": "^3.3",
@@ -29,6 +30,7 @@
         "mervick/aes-everywhere": "^1.1",
         "mews/captcha": "^3.2",
         "phpseclib/phpseclib": "~3.0",
+        "pragmarx/google2fa-laravel": "^2.0",
         "pusher/pusher-php-server": "^7.0",
         "socialiteproviders/keycloak": "^5.2"
     },

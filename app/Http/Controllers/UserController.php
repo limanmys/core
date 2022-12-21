@@ -608,4 +608,23 @@ class UserController extends Controller
 
         return respond('Anahtar Başarıyla Silindi');
     }
+
+    public function setGoogleSecret()
+    {
+        if (! env('OTP_ENABLED')) {
+            return redirect(route('home'));
+        }
+
+        $google2fa = app('pragmarx.google2fa');
+  
+        $secret = $google2fa->generateSecretKey();
+
+        $QR_Image = $google2fa->getQRCodeInline(
+            "Liman",
+            auth()->user()->email,
+            $secret
+        );
+            
+        return view('google2fa.register', ['QR_Image' => $QR_Image, 'secret' => $secret]);
+    }
 }

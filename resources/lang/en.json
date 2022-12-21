@@ -987,5 +987,9 @@
   "Sunucu Sayısı": "Server Count",
   "Tüm Sunucuları Görüntüle": "Show All Servers",
   "Tüm Eklentileri Görüntüle": "Show All Extensions",
-  "Tüm Kullanıcıları Görüntüle": "Show All Users"
+  "Tüm Kullanıcıları Görüntüle": "Show All Users",
+  "İki Aşamalı Doğrulama": "Two Factor Authentication",
+  "Doğrulama Kodu": "Verification Code",
+  "Google 2FA Sistemi": "Google 2FA System",
+  "Keycloak ile Giriş Yap": "Login using Keycloak"
 }

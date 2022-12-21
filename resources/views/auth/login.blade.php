@@ -25,7 +25,7 @@
               <img class="mx-auto h-12 w-auto" style="padding: 6px;" src="{{ asset('images/limanlogo.svg') }}" alt="Liman MYS">
             </a>
             <h2 class="text-center text-2xl font-extrabold" style="width: 300px;">
-              <hr style="border-color: rgba(255,255,255,0.2)">
+              <hr style="border-color: rgba(255,255,255,0.2) !important">
             </h2>
             <h6 style="color: #fff; font-weight: 600;">{{env("BRAND_NAME")}}</h6>
         </div>
