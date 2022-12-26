@@ -8,9 +8,9 @@ class Liman extends Model
 {
     use UsesUuid;
 
-    protected $table = "limans";
+    protected $table = 'limans';
 
     protected $fillable = [
-        "machine_id" ,"last_ip"
+        'machine_id', 'last_ip',
     ];
 }

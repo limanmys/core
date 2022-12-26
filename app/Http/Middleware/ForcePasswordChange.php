@@ -10,7 +10,6 @@ class ForcePasswordChange
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -19,7 +18,7 @@ class ForcePasswordChange
         if (
             auth()->check() &&
             user()->forceChange == true &&
-            !in_array(
+            ! in_array(
                 request()
                     ->route()
                     ->getName(),
@@ -28,6 +27,7 @@ class ForcePasswordChange
         ) {
             return redirect(route('password_change'));
         }
+
         return $next($request);
     }
 }

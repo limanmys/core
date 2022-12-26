@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateServerExtensionsTable extends Migration
 {
@@ -15,19 +15,19 @@ class CreateServerExtensionsTable extends Migration
     {
         Schema::create('server_extensions', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid("server_id");
+            $table->uuid('server_id');
             $table
-                ->foreign("server_id")
-                ->references("id")
-                ->on("servers")
-                ->onDelete("cascade")
+                ->foreign('server_id')
+                ->references('id')
+                ->on('servers')
+                ->onDelete('cascade')
                 ->nullable();
-            $table->uuid("extension_id");
+            $table->uuid('extension_id');
             $table
-                ->foreign("extension_id")
-                ->references("id")
-                ->on("extensions")
-                ->onDelete("cascade")
+                ->foreign('extension_id')
+                ->references('id')
+                ->on('extensions')
+                ->onDelete('cascade')
                 ->nullable();
             $table->timestamps();
         });

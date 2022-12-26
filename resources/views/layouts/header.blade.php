@@ -3,13 +3,13 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="/" class="brand-link">
-        <img id="limanLogo" src="{{ asset('/images/limanlogo.svg') }}" height="20" style="opacity: .9;cursor:pointer;"
+        <img id="limanLogo" src="{{ asset('/images/limanlogo.svg') }}" style="opacity: .9; cursor: pointer; max-height: 20px !important;"
             title="Versiyon {{ getVersion() . ' Build : ' . getVersionCode() }}">
     </a>
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar Search -->
-        <div id="liman_search" autocomplete="off">
+        <div id="liman_search" autocomplete="off" data-widget="sidebar-search">
             <div class="form-group has-search">
                 <span class="fa fa-search form-control-feedback"></span>
                 <input autocomplete="off" autocomplete="" type="text" id="liman_search_input" class="form-control"
@@ -21,6 +21,14 @@
         </div>
         <!-- Sidebar Menu -->
         <nav>
+            <style>
+                .icon-wrapper {
+                    width: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+            </style>
             <ul id="liman-sidebar" class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                 data-accordion="false">
                 @if (count($SERVERS) + count($USER_FAVORITES))
@@ -29,7 +37,7 @@
                 @foreach ($USER_FAVORITES as $server)
                     <li class="nav-item has-treeview @if (request('server_id') == $server->id) menu-open @endif">
                         <a href="#" class="nav-link @if (request('server_id') == $server->id) active @endif">
-                            <i class="fab {{ $server->isLinux() ? 'fa-linux' : 'fa-windows' }} nav-icon"
+                            <i class="fab fa-fw {{ $server->isLinux() ? 'fa-linux' : 'fa-windows' }} nav-icon"
                                 style="font-weight: 400"></i>
                             <p>
                                 {{ $server->name }}
@@ -42,17 +50,21 @@
                             @if (\App\Models\Permission::can(user()->id, 'liman', 'id', 'server_details'))
                                 <li class="nav-item">
                                     <a href="/sunucular/{{ $server->id }}" class="nav-link">
-                                        <i class="fa-solid fa-circle-info nav-icon"></i>
+                                        <div class="icon-wrapper">
+                                            <i class="fa-solid fa-circle-info nav-icon"></i>
+                                        </div>
                                         <p>{{ __('Sunucu Detayları') }}</p>
                                     </a>
                                 </li>
                             @endif
                             @foreach ($server->extensions() as $extension)
                                 <li class="nav-item">
-                                    <a href='/l/{{ $extension->id }}/{{ $server->city }}/{{ $server->id }}'
+                                    <a href='/l/{{ $extension->id }}/{{ $server->id }}'
                                         class="nav-link @if (request('extension_id') == $extension->id) active @endif">
-                                        <i
-                                            class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-' . $extension->icon }}"></i>
+                                        <div class="icon-wrapper">
+                                            <i
+                                                class="nav-icon {{ empty($extension->icon) ? 'fa-solid fa-puzzle-piece' : 'fas fa-' . $extension->icon }}"></i>
+                                        </div>
                                         <p>{{ __($extension->display_name) }}</p>
                                     </a>
                                 </li>
@@ -62,7 +74,7 @@
                 @foreach ($SERVERS as $server)
                     <li class="nav-item has-treeview @if (request('server_id') == $server->id) menu-open @endif">
                         <a href="#" class="nav-link @if (request('server_id') == $server->id) active @endif">
-                            <i class="fab {{ $server->isLinux() ? 'fa-linux' : 'fa-windows' }} nav-icon"
+                            <i class="fab fa-fw {{ $server->isLinux() ? 'fa-linux' : 'fa-windows' }} nav-icon"
                                 style="font-weight: 400"></i>
                             <p>
                                 {{ $server->name }}
@@ -73,17 +85,21 @@
                             @if (\App\Models\Permission::can(user()->id, 'liman', 'id', 'server_details'))
                                 <li class="nav-item">
                                     <a href="/sunucular/{{ $server->id }}" class="nav-link">
-                                        <i class="fa-solid fa-circle-info nav-icon"></i>
+                                        <div class="icon-wrapper">
+                                            <i class="fa-solid fa-circle-info nav-icon"></i>
+                                        </div>
                                         <p>{{ __('Sunucu Detayları') }}</p>
                                     </a>
                                 </li>
                             @endif
                             @foreach ($server->extensions() as $extension)
                                 <li class="nav-item">
-                                    <a href='/l/{{ $extension->id }}/{{ $server->city }}/{{ $server->id }}'
+                                    <a href='/l/{{ $extension->id }}/{{ $server->id }}'
                                         class="nav-link @if (request('extension_id') == $extension->id) active @endif">
-                                        <i
-                                            class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-' . $extension->icon }}"></i>
+                                        <div class="icon-wrapper">
+                                            <i
+                                                class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-' . $extension->icon }}"></i>
+                                        </div>
                                         <p>{{ __($extension->display_name) }}</p>
                                     </a>
                                 </li>
@@ -94,7 +110,9 @@
                     @if (\App\Models\Permission::can(user()->id, 'liman', 'id', 'server_details'))
                         <li class="nav-item">
                             <a href='/sunucular' class="nav-link">
-                                <i class="nav-icon fas fa-ellipsis-h"></i>
+                                <div class="icon-wrapper">
+                                    <i class="nav-icon fas fa-fw fa-ellipsis-h"></i>
+                                </div>
                                 <p>{{ __('Tüm sunucuları gör') }}</p>
                             </a>
                         </li>
@@ -111,7 +129,9 @@
                     @else
                         <li class="nav-item">
                             <a href='/sunucular' class="nav-link">
-                                <i class="nav-icon fas fa-plus"></i>
+                                <div class="icon-wrapper">
+                                    <i class="nav-icon fas fa-plus"></i>
+                                </div>
                                 <p>{{ __('Sunucu ekle') }}</p>
                             </a>
                         </li>
@@ -129,8 +149,8 @@
 
         <!-- /.sidebar-menu -->
     </div>
-    <div class="sidebar-bottom">
-        <div class="container">
+    <div class="sidebar-bottom" style="overflow: hidden;">
+        <div class="container" style="min-width: 190px !important; overflow: hidden;">
             <div class="row">
                 <div class="col">
                     <a href="/profil" data-toggle="tooltip" @if (request()->getRequestUri() == '/profil') class="active" @endif

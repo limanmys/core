@@ -1,4 +1,4 @@
-@if(request()->wantsJson() || $_SERVER['REMOTE_ADDR'] == "127.0.0.1")
+@if(request()->wantsJson() || request()->ip() == "127.0.0.1")
 @php(respond(__($exception->getMessage()),201))
 @else
 <!DOCTYPE html>

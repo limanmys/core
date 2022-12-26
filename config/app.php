@@ -170,12 +170,9 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
-        //App\Providers\TelescopeServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        //        Jenssegers\Mongodb\MongodbServiceProvider::class,
-        //        Jenssegers\Mongodb\MongodbQueueServiceProvider::class,
-        /*        Collective\Remote\RemoteServiceProvider::class,*/
         App\Providers\TusServiceProvider::class,
+        \SocialiteProviders\Manager\ServiceProvider::class
     ],
 
     /*
@@ -224,6 +221,5 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Captcha' => Mews\Captcha\Facades\Captcha::class,
-        /*        'SSH' => Collective\Remote\RemoteFacade::class,*/
     ],
 ];

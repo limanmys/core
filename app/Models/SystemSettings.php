@@ -9,6 +9,6 @@ class SystemSettings extends Model
     use UsesUuid;
 
     protected $fillable = [
-        "key", "data"
+        'key', 'data',
     ];
 }

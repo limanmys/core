@@ -25,7 +25,7 @@
               <img class="mx-auto h-12 w-auto" style="padding: 6px;" src="{{ asset('images/limanlogo.svg') }}" alt="Liman MYS">
             </a>
             <h2 class="text-center text-2xl font-extrabold" style="width: 300px;">
-              <hr style="border-color: rgba(255,255,255,0.2)">
+              <hr style="border-color: rgba(255,255,255,0.2) !important">
             </h2>
             <h6 style="color: #fff; font-weight: 600;">{{env("BRAND_NAME")}}</h6>
         </div>
@@ -63,11 +63,11 @@
             <div class="rounded-md shadow-sm -space-y-px">
               <div>
                 <label for="email-address" class="sr-only">{{__('Email Adresi')}}</label>
-                <input  id="email-address" name="liman_email_mert" type="text" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="{{__('Email Adresi')}}" value="{{ old('liman_email_mert') }}">
+                <input  id="email-address" name="liman_email_aciklab" type="text" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="{{__('Email Adresi')}}" value="{{ old('liman_email_aciklab') }}">
               </div>
               <div>
                 <label for="password" class="sr-only">{{__('Parola')}}</label>
-                <input id="password" name="liman_password_baran" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="{{__('Parola')}}">
+                <input id="password" name="liman_password_divergent" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="{{__('Parola')}}">
               </div>
             </div>
             @if (!env('EXTENSION_DEVELOPER_MODE'))
@@ -100,6 +100,15 @@
                 </span>
                 {{__("Giriş Yap ")}}
               </button>
+
+              @if (env('KEYCLOAK_ACTIVE') == true)
+              <button onclick="window.location = '/keycloak/auth'" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" style="margin-top: 15px;">
+                <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                  <i class="fa-solid fa-key text-indigo-500 group-hover:text-indigo-400" style="margin-left: 3px;"></i>
+                </span>
+                {{__("Keycloak ile Giriş Yap")}}
+              </button>
+              @endif
             </div>
             <div class="flex align-items-center justify-center">
               <a href="https://aciklab.org" target="_blank">

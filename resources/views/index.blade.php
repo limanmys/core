@@ -2,115 +2,117 @@
 
 @section('content')
     @include('errors')
-    <div class="callout callout-info shadow-sm">
-        <h5>{{__("Liman MYS'ye Hoşgeldiniz")}}</h5>
-        {{__("Kullanım rehberine ulaşmak için")}} <a href="https://docs.liman.dev/" target="_blank">https://docs.liman.dev/</a> {{__("adresini ziyaret edebilirsiniz.")}}
-    </div>
-    <div class="row" style="padding-top: 15px;">
-      <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="small-box shadow-sm bg-info">
-            <div class="inner">
-              <h3>{{$server_count}}</h3>
-              <p>{{__("Limandaki Sunucu Sayısı")}}</p>
-            </div>
-            <div class="icon">
-              <i class="fas fa-server"></i>
-            </div>
-            <a href="/sunucular" class="small-box-footer">
-              {{ __("Sunucuları listele") }} <i class="fas fa-arrow-circle-right"></i>
-            </a>
-          </div>
+    <div class="row">
+      <div class="col-md-12">
+      <div class="card homepage-widget">
+        <div class="card-body p-0">
+          <div class="row row-cols-xxl-5 row-cols-md-3 row-cols-1 g-0">
+                <div class="col">
+                    <div class="mt-3 mt-md-0 py-4 px-3">
+                        <h5 class="text-muted text-uppercase fs-13">{{ __('Sunucu Sayısı')}} <i class="fa-solid fa-server text-success fs-18 float-end align-middle"></i></h5>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="ri-exchange-dollar-line display-6 text-muted"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h2 class="mb-2"><span class="counter-value">{{ $server_count }}</span></h2>
+                                <a href="{{ route('servers') }}" class="text-muted text-uppercase" style="font-size: 11px">{{ __("Tüm Sunucuları Görüntüle") }} <i class="fa-solid fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- end col -->
+                <div class="col">
+                    <div class="mt-3 mt-md-0 py-4 px-3">
+                        <h5 class="text-muted text-uppercase fs-13">{{ __('Eklenti Sayısı')}} <i class="fa-solid fa-plug text-primary fs-18 float-end align-middle"></i></h5>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="ri-exchange-dollar-line display-6 text-muted"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h2 class="mb-2"><span class="counter-value">{{ $extension_count }}</span></h2>
+                                <a href="{{ route('settings') }}#extensions" class="text-muted text-uppercase" style="font-size: 11px">{{ __("Tüm Eklentileri Görüntüle") }} <i class="fa-solid fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- end col -->
+                <div class="col">
+                    <div class="mt-3 mt-md-0 py-4 px-3">
+                        <h5 class="text-muted text-uppercase fs-13">{{ __('Kullanıcı Sayısı')}} <i class="fa-solid fa-users text-navy fs-18 float-end align-middle"></i></h5>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="ri-exchange-dollar-line display-6 text-muted"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h2 class="mb-2"><span class="counter-value">{{ $user_count }}</span></h2>
+                                <a href="{{ route('settings') }}" class="text-muted text-uppercase" style="font-size: 11px">{{ __("Tüm Kullanıcıları Görüntüle") }} <i class="fa-solid fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- end col -->
+                <div class="col">
+                    <div class="mt-3 mt-md-0 py-4 px-3">
+                        <h5 class="text-muted text-uppercase fs-13">{{ __('Liman Versiyonu')}} <i class="fa-solid fa-cogs text-indigo fs-18 float-end align-middle"></i></h5>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="ri-exchange-dollar-line display-6 text-muted"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h2 class="mb-0"><span class="counter-value">{{ $version }}</span></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- end col -->
+            </div><!-- end row -->
+          </div><!-- end card body -->
+        </div>
       </div>
-      
-      <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="small-box shadow-sm bg-info">
-            <div class="inner">
-              <h3>{{$extension_count}}</h3>
-              <p>{{__("Limandaki Eklenti Sayısı")}}</p>
-            </div>
-            <div class="icon">
-              <i class="fas fa-plug"></i>
-            </div>
-            <a href="/ayarlar#extensions" class="small-box-footer">
-              {{ __("Eklentileri yönet") }} <i class="fas fa-arrow-circle-right"></i>
-            </a>
-          </div>
-      </div>
-      <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="small-box shadow-sm bg-info">
-            <div class="inner">
-              <h3>{{$user_count}}</h3>
-              <p>{{__("Limandaki Kullanıcı Sayısı")}}</p>
-            </div>
-            <div class="icon">
-              <i class="fas fa-users"></i>
-            </div>
-            <a href="/ayarlar#users" class="small-box-footer">
-              {{ __("Kullanıcıları yönet") }} <i class="fas fa-arrow-circle-right"></i>
-            </a>
-          </div>
-      </div>
-      <div class="col-md-3 col-sm-4 col-xs-12">
-          <div class="small-box shadow-sm bg-info">
-            <div class="inner">
-              <h3>{{$version}}</h3>
-              <p>{{__("Liman Versiyonu")}}</p>
-            </div>
-            <div class="icon">
-              <i class="fas fa-cogs"></i>
-            </div>
-            <div class="small-box-footer">
-              &nbsp;
-            </div>
-          </div>
-      </div>
+
       @if(user()->isAdmin())
-        <script src="{{ asset('js/chart3.min.js') }}"></script>
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box shadow-sm loading chartbox">
-              <div class="overlay">
+            <div class="info-box shadow-sm loading chartbox" style="padding: 0; padding-top: 12px;">
+              <div class="overlay" style="background: white">
                 <div class="spinner-border" role="status">
                     <span class="sr-only">{{ __('Yükleniyor...') }}</span>
                 </div>
               </div>
               <div class="info-box-content">
-                <canvas id="cpuChart"></canvas>
+                <div id="cpuChart" style="min-height: 215px"></div>
               </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box shadow-sm loading chartbox">
-              <div class="overlay">
+            <div class="info-box shadow-sm loading chartbox" style="padding: 0; padding-top: 12px;">
+              <div class="overlay" style="background: white">
                 <div class="spinner-border" role="status">
                     <span class="sr-only">{{ __('Yükleniyor...') }}</span>
                 </div>
               </div>
               <div class="info-box-content">
-                <canvas id="ramChart"></canvas>
+                <div id="ramChart" style="min-height: 215px"></div>
               </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box shadow-sm loading chartbox">
-              <div class="overlay">
+            <div class="info-box shadow-sm loading chartbox" style="padding: 0; padding-top: 12px;">
+              <div class="overlay" style="background: white">
                 <div class="spinner-border" role="status">
                     <span class="sr-only">{{ __('Yükleniyor...') }}</span>
                 </div>
               </div>
               <div class="info-box-content">
-                <canvas id="diskChart"></canvas>
+                <div id="diskChart" style="min-height: 215px"></div>
               </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="info-box shadow-sm loading chartbox">
-              <div class="overlay">
+            <div class="info-box shadow-sm loading chartbox" style="padding: 0; padding-top: 12px;">
+              <div class="overlay" style="background: white">
                 <div class="spinner-border" role="status">
                     <span class="sr-only">{{ __('Yükleniyor...') }}</span>
                 </div>
               </div>
               <div class="info-box-content">
-                <canvas id="networkChart"></canvas>
+                <div id="networkChart" style="min-height: 215px"></div>
               </div>
             </div>
         </div>
@@ -118,7 +120,7 @@
           <div class="col-md-6 col-sm-12">
             <div class="card shadow-sm loading online-servers" style="height: 100%; min-height: 200px;">
                 <div class="card-header">
-                  <h3 class="card-title">{{ __("Sunucu Durumları") }}</h3>
+                  <h3 class="card-title" style="font-size: 15px">{{ __("Sunucu Durumları") }}</h3>
                 </div>
                 <div class="overlay">
                     <div class="spinner-border" role="status">
@@ -140,7 +142,7 @@
           <div class="col-md-6 col-sm-12">
             <div class="card shadow-sm loading market-widget" style="height: 100%; min-height: 200px;">
                 <div class="card-header p-0">
-                  <h3 class="card-title" style="padding: 12px; padding-left: 1.25rem">{{ __("Önerilen Eklentiler") }}</h3>
+                  <h3 class="card-title" style="padding: 12px; padding-left: 1.25rem; font-size: 15px">{{ __("Önerilen Eklentiler") }}</h3>
                   <div class="float-right">
                     <button style="margin: 5px" class="btn btn-sm btn-success" onclick="window.location.href='/market'"><i class="fas fa-shopping-cart mr-1"></i>{{ __("Eklenti Mağazası") }}</button>
                   </div>
@@ -165,55 +167,6 @@
         </div>
       @endif
     </div>
-    @if($widgets->count())
-    <div class="row sortable-widget mt-4">
-      
-        @foreach($widgets as $widget)
-          @if($widget->type==="count_box" || $widget->type==="")
-            <div class="col-md-3 col-sm-4 col-xs-12" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
-                <div class="info-box" title="{{$widget->server_name . " " . __("Sunucusu")}} -> {{$widget->title}}">
-                  <span class="info-box-icon bg-info"><i class="fas fa-{{$widget->text}}"></i></span>
-                  <div class="info-box-content">
-                    <span class="info-box-text">{{__($widget->title)}}</span>
-                    <span class="info-box-number limanWidget" id="{{$widget->id}}" title="{{__($widget->title)}}" data-server-id="{{$widget->server_id}}">{{__('Yükleniyor..')}}</span>
-                    <span class="progress-description" title="{{$widget->server_name . " " . __("Sunucusu")}}">{{$widget->server_name . " " . __("Sunucusu")}}</span>
-                  </div>
-                  <div class="overlay" style="background: rgba(255,255,255,.9);">
-                      <div class="spinner-border" role="status">
-                        <span class="sr-only">{{__("Yükleniyor")}}</span>
-                      </div>
-                  </div>
-                </div>
-            </div>
-          @elseif ($widget->type==="chart")
-            <div class="col-md-6 limanCharts mb-3" id="{{$widget->id}}" data-server-id="{{$widget->server_id}}">
-                <div class="card h-100" id="{{$widget->id}}Chart">
-                  <div class="card-header ui-sortable-handle" style="cursor: move;">
-                    <h3 class="card-title">
-                      <i class="fas fa-chart-pie mr-1"></i>
-                      {{$widget->server_name . " " . __("Sunucusu")}} {{__($widget->title)}}
-                    </h3>
-                  </div>
-                  <div class="card-body">
-                    <canvas class="chartjs-render-monitor"></canvas>
-                  </div>
-                  <div class="overlay" style="background: rgba(255,255,255,.9);">
-                      <div class="spinner-border" role="status">
-                        <span class="sr-only">{{__("Yükleniyor")}}</span>
-                      </div>
-                  </div>
-                </div>
-            </div>
-          @endif
-        @endforeach
-    </div>
-    <div class="row my-2"></div>
-    @endif
-    <style>
-    .sortable-widget{
-      cursor: default;
-    }
-    </style>
    <script>
         @if(user()->isAdmin())
         function appendApp(item) {
@@ -267,18 +220,18 @@
                                 <li class="list-group-item">
                                 <a style="color:#222">
                                     <i class="fab mr-1"></i>
-                                    <span class="text-bold"></span>
+                                    <span style="font-weight: 600"></span>
                                 </a>
                                 <div class="float-right">
                                     <span class="text-xs"></span>  
-                                    <span class="ml-1 badge"></span>
+                                    <i class="fa-solid fa-circle ml-1" style="font-size: 12px"></i>
                                 </div>
                                 </li>`
                             );
                             $(el).find("a").attr("href", `/sunucular/${item.id}`).find("i").addClass(item.icon);
                             $(el).find("span").text(item.name);
                             $(el).find("div>span:first-child").text(item.uptime || "");
-                            $(el).find("div>span:last-child").addClass(item.badge_class).text(item.status ? "Online" : "Offline");
+                            $(el).find(".fa-circle").css(item.status ? {"color": "green"} : {"color": "#ff4444"});
 
                             $(".srvlist").append(el);
                         });
@@ -296,83 +249,27 @@
         getOnlineServers(); 
         @endif
 
-        var limanEnableWidgets = true;
-        $(".sortable-widget").sortable({
-            stop: function(event, ui) {
-                var data = [];
-                $(".sortable-widget > div").each(function(i, el) {
-                    $(el).attr('data-order', $(el).index());
-                    data.push({
-                        id: $(el).attr('id'),
-                        order: $(el).index()
-                    });
-                });
-                var form = new FormData();
-                form.append('widgets', JSON.stringify(data));
-                request('{{ route("update_orders") }}', form, function(response) {});
-            }
-        });
-        $(".sortable-widget").disableSelection();
-        var intervals = [];
-        var widgets = [];
-        var currentWidget = 0;
 
-        $(".limanWidget").each(function() {
-            var element = $(this);
-            widgets.push({
-                'element': element,
-                'type': 'countBox'
-            });
-        });
-        $('.limanCharts').each(function() {
-            var element = $(this);
-            widgets.push({
-                'element': element,
-                'type': 'chart'
-            });
-        });
-        startQueue()
-        setInterval(function() {
-            startQueue()
-        }, {{ config("liman.widget_refresh_time") }});
-
-        function startQueue() {
-            if (!limanEnableWidgets) {
-                return;
-            }
-            currentWidget = 0;
-            if (currentWidget >= widgets.length || widgets.length === 0) {
-                return;
-            }
-            if (widgets[currentWidget].type === 'countBox') {
-                retrieveWidgets(widgets[currentWidget].element, nextWidget)
-            } else if (widgets[currentWidget].type === 'chart') {
-                retrieveCharts(widgets[currentWidget].element, nextWidget)
-            }
-        }
         @if (user()->isAdmin())
-        var stats;
-        const CHART_INTERVAL = 2500;
-        const CHART_DELAY = 4500;
-        const CHART_SPEED = 12;
-
-        function retrieveStats() {
-            if (!limanEnableWidgets) {
-                return;
-            }
-
+        function retrieveStats() 
+        {
             request('{{ route("liman_stats") }}', new FormData(),
                 function(response) {
                     stats = JSON.parse(response);
-
-                    if (!window[`networkChart-element`]) {
-                        resourceChart('{{ __("Cpu Kullanımı") }}', "cpuChart", 'cpu', true, '', '6, 212, 139');
-                        resourceChart('{{ __("Ram Kullanımı") }}', "ramChart", 'ram', true, '', '6, 182, 212');
-                        resourceChart('{{ __("IO Kullanımı") }}', "diskChart", 'io', true, '', '6, 79, 212');
-                        networkChart('{{ __("Network") }}', "networkChart");
+                    if (!IS_RENDERED) {
+                        renderChart(CHARTS.CPU)
+                        renderChart(CHARTS.RAM)
+                        renderChart(CHARTS.IO)
+                        renderChart(CHARTS.NETWORK, true)
+                        IS_RENDERED = true;
+                        $(".chartbox").find(".overlay").fadeOut(750);
                     }
 
-                    $(".chartbox").find(".overlay").fadeOut(500);
+                    updateChart(CHARTS.CPU)
+                    updateChart(CHARTS.RAM)
+                    updateChart(CHARTS.IO)
+                    updateNetworkChart(CHARTS.NETWORK)
+                            
                     setTimeout(() => {
                         retrieveStats();
                     }, CHART_INTERVAL);
@@ -380,344 +277,14 @@
             );
         }
         retrieveStats();
+
+        setInterval(function() {
+            CHARTS.CPU.data = CHARTS.CPU.data.slice(-20);
+            CHARTS.RAM.data = CHARTS.RAM.data.slice(-20);
+            CHARTS.IO.data = CHARTS.IO.data.slice(-20);
+            CHARTS.NETWORK.data.upload = CHARTS.NETWORK.data.upload.slice(-20);
+            CHARTS.NETWORK.data.download = CHARTS.NETWORK.data.download.slice(-20);
+        }, 60000)
         @endif
-
-        function nextWidget() {
-            currentWidget++;
-            if (currentWidget >= widgets.length || widgets.length === 0) {
-                return;
-            }
-            if (widgets[currentWidget].type === 'countBox') {
-                retrieveWidgets(widgets[currentWidget].element, nextWidget)
-            } else if (widgets[currentWidget].type === 'chart') {
-                retrieveCharts(widgets[currentWidget].element, nextWidget)
-            }
-        }
-
-        function retrieveWidgets(element, next) {
-            var info_box = element.closest('.info-box');
-            var form = new FormData();
-            form.append('widget_id', element.attr('id'));
-            form.append('token', "{{ $token }}");
-            form.append('server_id', element.attr('data-server-id'));
-            request(API('widget_one'), form, function(response) {
-                try {
-                    var json = JSON.parse(response);
-                    element.html(json["message"]);
-                    info_box.find('.info-box-icon').show();
-                    info_box.find('.info-box-content').show();
-                    info_box.find('.overlay').remove();
-                } catch (e) {
-                    info_box.find('.overlay i').remove();
-                    info_box.find('.overlay .spinner-border').remove();
-                    info_box.find('.overlay span').remove();
-                    info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="' + strip(
-                            "Bir Hata Oluştu!") +
-                        '" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">' +
-                        "Bir Hata Oluştu!" + '</span>');
-                }
-                if (next) {
-                    next();
-                }
-            }, function(error) {
-                var json = {};
-                try {
-                    json = JSON.parse(error);
-                } catch (e) {
-                    json = e;
-                }
-                info_box.find('.overlay .spinner-border').remove();
-                info_box.find('.overlay i').remove();
-                info_box.find('.overlay span').remove();
-                info_box.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="' + strip(
-                        "Bir Hata Oluştu!") +
-                    '" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">' +
-                    "Bir Hata Oluştu!" + '</span>');
-                if (next) {
-                    next();
-                }
-            });
-        }
-
-        function retrieveCharts(element, next) {
-            var id = element.attr('id');
-            var form = new FormData();
-            form.append('widget_id', id);
-            form.append('server_id', element.attr('data-server-id'));
-            form.append('token', "{{ $token }}");
-            request(API('widget_one'), form, function(res) {
-                try {
-                    var response = JSON.parse(res);
-                    var data = response.message;
-                    createChart(id + 'Chart', data.labels, data.data);
-                } catch (e) {
-                    element.find('.overlay .spinner-border').remove();
-                    element.find('.overlay i').remove();
-                    element.find('.overlay span').remove();
-                    element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="' + strip(
-                            "Bir Hata Oluştu!") +
-                        '" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">' +
-                        "Bir Hata Oluştu!" + '</span>');
-                }
-                if (next) {
-                    next();
-                }
-            }, function(error) {
-                var json = {};
-                try {
-                    json = JSON.parse(error);
-                } catch (e) {
-                    json = e;
-                }
-                element.find('.overlay .spinner-border').remove();
-                element.find('.overlay i').remove();
-                element.find('.overlay span').remove();
-                element.find('.overlay').prepend('<i class="fa fa-exclamation-circle" title="' + strip(
-                        "Bir Hata Oluştu!") +
-                    '" style="color: red; margin-left: 15px; margin-right: 10px;"></i><span style="word-break: break-word;">' +
-                    "Bir Hata Oluştu!" + '</span>');
-                if (next) {
-                    next();
-                }
-            });
-        }
-
-        function strip(html) {
-            var tmp = document.createElement("DIV");
-            tmp.innerHTML = html;
-            return tmp.textContent || tmp.innerText || "";
-        }
-
-        function API(target) {
-            return "{{ route('home') }}/extensionRun/" + target;
-        }
-
-        function resourceChart(title, chart, varname, prefix = true, postfix = "", color = "6, 182, 212") {
-            let time = new Date();
-
-            if (!window[`${chart}-element`]) {
-                window[`${chart}-element`] = new Chart($(`#${chart}`), {
-                    type: 'line',
-                    data: {
-                        datasets: [{
-                            cubicInterpolationMode: 'monotone',
-                            data: [{
-                                    x: time - CHART_INTERVAL * 2,
-                                    y: 0
-                                },
-                                {
-                                    x: time,
-                                    y: stats[varname]
-                                }
-                            ],
-                            steppedLine: false,
-                            borderColor: `rgb(${color})`,
-                            backgroundColor: `rgba(${color}, .2)`,
-                            fill: true,
-                            pointRadius: 0
-                        }, ],
-                    },
-                    options: {
-                        plugins: {
-                            responsive: true,
-                            legend: false,
-                            tooltips: {
-                                mode: 'index',
-                                intersect: false,
-                            },
-                            title: {
-                                display: true,
-                                text: `${title} ` + (prefix ? `%${stats[varname]} ${postfix}` :
-                                    `${stats[varname]} ${postfix}`),
-                            },
-                            hover: {
-                                mode: 'nearest',
-                                intersect: true
-                            },
-                        },
-
-                        scales: {
-                            x: {
-                                display: false,
-                                type: "realtime",
-                                realtime: {
-                                    duration: CHART_INTERVAL * CHART_SPEED,
-                                    refresh: CHART_INTERVAL,
-                                    delay: CHART_DELAY,
-                                    onRefresh: chart => {
-                                        let time = new Date();
-
-                                        let data0 = chart.data.datasets[0].data;
-
-                                        if (data0[data0.length - 1].x.getTime() > time.getTime())
-                                            return;
-
-                                        data0.push({
-                                            x: time,
-                                            y: stats[varname]
-                                        });
-
-
-                                        if (data0.length > 100) {
-                                            data0 = data0.slice(1000 - 15, 15);
-                                        }
-
-                                        chart.options.plugins.title.text = `${title} ` + (prefix ?
-                                            `%${stats[varname]} ${postfix}` : `${stats[varname]} ${postfix}`
-                                        );
-                                    }
-
-                                },
-                            },
-                            y: {
-                                suggestedMax: 100,
-                                suggestedMin: 0,
-                            }
-                        },
-                    },
-                    interaction: {
-                        intersect: false
-                    }
-                });
-            }
-        }
-
-        function networkChart(title, chart) {
-            let time = new Date();
-
-            if (!window[`${chart}-element`]) {
-                window[`${chart}-element`] = new Chart($(`#${chart}`), {
-                    type: 'line',
-                    data: {
-                        datasets: [{
-                            cubicInterpolationMode: 'monotone',
-                            label: '{{ __("Download") }}',
-                            data: [{
-                                    x: time - CHART_INTERVAL * 2,
-                                    y: 0
-                                },
-                                {
-                                    x: time,
-                                    y: stats.network.down
-                                }
-                            ],
-                            steppedLine: false,
-                            borderColor: 'rgb(6, 182, 212)',
-                            backgroundColor: 'rgba(6, 182, 212, .2)',
-                            fill: true,
-                            pointRadius: 0
-                        }, {
-                            cubicInterpolationMode: 'monotone',
-                            label: '{{ __("Upload") }}',
-                            data: [{
-                                x: time - CHART_INTERVAL * 3,
-                                y: 0
-                            }, {
-                                x: time,
-                                y: stats.network.up
-                            }],
-                            steppedLine: false,
-                            borderColor: 'rgb(6, 212, 139)',
-                            backgroundColor: 'rgba(6, 212, 139, .2)',
-                            fill: true,
-                            pointRadius: 0
-                        }],
-                    },
-                    options: {
-                        plugins: {
-                            responsive: true,
-                            legend: false,
-                            tooltips: {
-                                mode: 'index',
-                                intersect: false,
-                            },
-                            title: {
-                                display: true,
-                                text: `${title} Down: ${stats.network.down} kb/s Up: ${stats.network.up} kb/s`,
-                            },
-                        },
-
-                        scales: {
-                            x: {
-                                display: false,
-                                type: "realtime",
-                                realtime: {
-                                    duration: CHART_INTERVAL * CHART_SPEED,
-                                    refresh: CHART_INTERVAL,
-                                    delay: CHART_DELAY + 2500,
-                                    onRefresh: chart => {
-                                        let time = new Date();
-
-                                        let data0 = chart.data.datasets[0].data;
-                                        let data1 = chart.data.datasets[1].data;
-
-                                        if (data0[data0.length - 1].x.getTime() > time.getTime())
-                                            return;
-
-                                        data0.push({
-                                            x: time,
-                                            y: stats.network.down
-                                        });
-                                        data1.push({
-                                            x: time,
-                                            y: stats.network.up
-                                        });
-
-                                        if (data0.length > 100) {
-                                            data0 = data0.slice(
-                                                1000 - 15, 15);
-                                            data1 = data1.slice(
-                                                1000 - 15, 15);
-                                        }
-
-                                        chart.options.plugins.title.text =
-                                            `${title} Down: ${stats.network.down} kb/s Up: ${stats.network.up} kb/s`;
-                                    }
-                                }
-
-                            },
-                            y: {
-                                ticks: {
-                                    beginAtZero: true
-                                }
-                            }
-                        },
-                    },
-                    interaction: {
-                        intersect: false
-                    }
-                });
-            }
-        }
-
-
-        function createChart(element, time, data) {
-            $("#" + element + "Text").text("%" + data[0]);
-            window[element + "Chart"] = new Chart($("#" + element), {
-                type: 'line',
-                data: {
-                    datasets: [{
-                        data: data,
-                    }],
-                    labels: [
-                        time,
-                    ]
-                },
-                options: {
-                    animation: false,
-                    responsive: true,
-                    legend: false,
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                min: 0,
-                                max: 100
-                            }
-                        }]
-                    },
-                }
-            })
-        }
     </script>
 @stop

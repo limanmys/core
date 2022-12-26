@@ -9,11 +9,11 @@ class LimanRequest extends Model
     use UsesUuid;
 
     protected $fillable = [
-        "user_id",
-        "status",
-        "speed",
-        "type",
-        "note",
-        "email",
+        'user_id',
+        'status',
+        'speed',
+        'type',
+        'note',
+        'email',
     ];
 }

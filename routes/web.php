@@ -3,7 +3,10 @@
 // Auth Routes
 require_once app_path('Http/Controllers/Auth/_routes.php');
 
-Route::group(['middleware' => ['auth', 'permissions']], function () {
+// HA Routes
+require_once app_path('Http/Controllers/HASync/_routes.php');
+
+Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', 'permissions']], function () {
     // Extension Routes
 
     require_once app_path('Http/Controllers/Extension/_routes.php');
@@ -28,16 +31,12 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     require_once app_path('Http/Controllers/Settings/_routes.php');
 
-    // Widgets Routes
-
-    require_once app_path('Http/Controllers/Widgets/_routes.php');
-
     // Market Routes
 
     require_once app_path('Http/Controllers/Market/__routes.php');
 
     // Wizard Routes
-    
+
     require_once app_path('Http/Controllers/Wizard/_routes.php');
 
     // Modules Routes
@@ -72,7 +71,7 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
     // Vault Route
 
-    Route::get('/kasa', 'UserController@userKeyList')->name('keys');
+    Route::get('/kasa/{user_id?}', 'UserController@userKeyList')->name('keys');
 
     Route::get('/takip', 'ServerMonitorController@list')->name('monitor_list');
 
@@ -81,10 +80,6 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
     Route::post('/takip/ekle', 'ServerMonitorController@add')->name('monitor_add');
 
     Route::post('/takip/yenile', 'ServerMonitorController@refresh')->name('monitor_refresh');
-
-    Route::post('/onbellek_temizle', 'UserController@cleanSessions')->name(
-        'clean_sessions'
-    );
 
     // Add Key Route
     Route::post('/kasa/ekle', 'UserController@addKey')->name('key_add');
@@ -138,6 +133,10 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
         'user_setting_remove'
     );
 
+    Route::post('/user/setting/create', 'UserController@createSetting')->name(
+        'user_setting_create'
+    );
+
     Route::post('/user/setting/update', 'UserController@updateSetting')->name(
         'user_setting_update'
     );
@@ -147,19 +146,24 @@ Route::group(['middleware' => ['auth', 'permissions']], function () {
 
 Route::any('/upload/{any?}', function () {
     $server = app('tus-server');
-    $extension_id = request("extension_id");
+    $extension_id = request('extension_id');
     $extension = \App\Models\Extension::find($extension_id);
     if ($extension) {
-        $path = "/liman/extensions/" . strtolower($extension->name);
+        $path = '/liman/extensions/'.strtolower((string) $extension->name);
     } else {
         $path = storage_path();
     }
-    if (!file_exists($path . "/uploads")) {
-        mkdir($path . "/uploads");
-        rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
+    if (! file_exists($path.'/uploads')) {
+        mkdir($path.'/uploads');
+        if ($extension) {
+            rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
+        } else {
+            rootSystem()->fixExtensionPermissions('liman', 'liman');
+        }
     }
-    $server->setUploadDir($path . "/uploads");
+    $server->setUploadDir($path.'/uploads');
     $response = $server->serve();
+
     return $response->send();
 })
     ->where('any', '.*')
@@ -172,21 +176,21 @@ Route::post('/upload_info', function () {
     $key = request('key');
     $server = app('tus-server');
     $info = $server->getCache()->get($key);
-    $extension_id = request("extension_id");
+    $extension_id = request('extension_id');
     $extension = \App\Models\Extension::find($extension_id);
     if ($extension_id) {
-        $extension_path = explode("/uploads/", $info['file_path'], 2)[0];
+        $extension_path = explode('/uploads/', (string) $info['file_path'], 2)[0];
         $info['file_path'] = str_replace(
             $extension_path,
             '',
-            $info['file_path']
+            (string) $info['file_path']
         );
         rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
     }
+
     return $info;
 })->middleware(['auth', 'permissions']);
 
 registerModuleRoutes();
 
-
-Route::get('/bildirimYolla','Notification\ExternalNotificationController@accept');
+Route::get('/bildirimYolla', 'Notification\ExternalNotificationController@accept');

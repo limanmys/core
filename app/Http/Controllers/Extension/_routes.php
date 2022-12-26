@@ -2,7 +2,7 @@
 
 Route::match(
     ['GET', 'POST'],
-    '/l/{extension_id}/{city}/{server_id}/{target_function?}',
+    '/l/{extension_id}/{server_id}/{target_function?}',
     'Extension\Sandbox\MainController@API'
 )
     ->name('extension_server')
@@ -12,16 +12,6 @@ Route::match(
 Route::post('/extension/run/{unique_code}', 'Extension\OneController@route')
     ->name('extension_api')
     ->middleware(['server_api', 'extension']);
-
-// Extension Page (City Select) Route
-Route::get('/l/{extension_id}', 'Extension\MainController@allServers')->name(
-    'extension_map'
-);
-
-// Extension City Servers Route
-Route::view('/l/{extension_id}/{city}', 'extension_pages.city')->name(
-    'extension_city'
-);
 
 // Extensions List Route
 Route::get('/eklentiler', 'Extension\SettingsController@settings_all')
@@ -36,12 +26,12 @@ Route::post(
 Route::post(
     '/ayarlar/eklenti/zorlaBagimlilikKur',
     'Extension\OneController@forceDepInstall'
-)->name('extension_force_dep_install')->middleware("admin");
+)->name('extension_force_dep_install')->middleware('admin');
 
 Route::post(
     '/ayarlar/eklenti/zorlaAktiflestir',
     'Extension\OneController@forceEnableExtension'
-)->name('extension_force_enable')->middleware("admin");
+)->name('extension_force_enable')->middleware('admin');
 
 // Extension Details Route
 Route::get(
@@ -88,6 +78,11 @@ Route::post(
     '/eklenti/accessLogs',
     'Extension\MainController@accessLogs'
 )->name('extension_access_logs');
+
+Route::post(
+    '/eklentiler',
+    'Extension\MainController@extensions'
+)->name('widget_get_extensions');
 
 // Extension Upload Page
 Route::post('/ayarlar/eklentilisans', 'Extension\SettingsController@addLicense')

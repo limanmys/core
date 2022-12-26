@@ -58,316 +58,53 @@
     @if($installed_extensions->count() > 0)
         @foreach($installed_extensions as $service)
         checkStatus('{{$service->id}}');
-        setInterval(function () {
-            checkStatus('{{$service->id}}');
-        }, 15000);
         @endforeach
     @endif
 
     @if(server()->canRunCommand())
 
-    function resourceChart(title, chart, varname, prefix = true, postfix = "", color = "6, 182, 212") {
-        let time = new Date();
-
-        if (!window[`${chart}-element`]) {
-            window[`${chart}-element`] = new Chart($(`#${chart}`), {
-                type: 'line',
-                data: {
-                    datasets: [{
-                        cubicInterpolationMode: 'monotone',
-                        data: [{
-                                x: time - CHART_INTERVAL * 2,
-                                y: 0
-                            },
-                            {
-                                x: time,
-                                y: stats[varname]
-                            }
-                        ],
-                        steppedLine: false,
-                        borderColor: `rgb(${color})`,
-                        backgroundColor: `rgba(${color}, .2)`,
-                        fill: true,
-                        pointRadius: 0
-                    }, ],
-                },
-                options: {
-                    plugins: {
-                        responsive: true,
-                        legend: false,
-                        tooltips: {
-                            mode: 'index',
-                            intersect: false,
-                        },
-                        title: {
-                            display: true,
-                            text: `${title} ` + (prefix ? `%${stats[varname]} ${postfix}` :
-                                `${stats[varname]} ${postfix}`),
-                        },
-                        hover: {
-                            mode: 'nearest',
-                            intersect: true
-                        },
-                    },
-
-                    scales: {
-                        x: {
-                            display: false,
-                            type: "realtime",
-                            realtime: {
-                                duration: CHART_INTERVAL * CHART_SPEED,
-                                refresh: CHART_INTERVAL,
-                                delay: CHART_DELAY,
-                                onRefresh: chart => {
-                                    let time = new Date();
-
-                                    let data0 = chart.data.datasets[0].data;
-
-                                    if (data0[data0.length - 1].x.getTime() > time.getTime())
-                                        return;
-
-                                    data0.push({
-                                        x: time,
-                                        y: stats[varname]
-                                    });
-
-
-                                    if (data0.length > 100) {
-                                        data0 = data0.slice(1000 - 15, 15);
-                                    }
-
-                                    chart.options.plugins.title.text = `${title} ` + (prefix ?
-                                        `%${stats[varname]} ${postfix}` : `${stats[varname]} ${postfix}`
-                                    );
-                                }
-
-                            },
-                        },
-                        y: {
-                            suggestedMax: 100,
-                            suggestedMin: 0,
-                        }
-                    },
-                },
-                interaction: {
-                    intersect: false
-                }
-            });
-        }
-    }
-
-    function networkChart(title, chart) {
-            let time = new Date();
-
-            if (!window[`${chart}-element`]) {
-                window[`${chart}-element`] = new Chart($(`#${chart}`), {
-                    type: 'line',
-                    data: {
-                        datasets: [{
-                            cubicInterpolationMode: 'monotone',
-                            label: '{{ __("Download") }}',
-                            data: [{
-                                    x: time - CHART_INTERVAL * 2,
-                                    y: 0
-                                },
-                                {
-                                    x: time,
-                                    y: stats.network.down
-                                }
-                            ],
-                            steppedLine: false,
-                            borderColor: 'rgb(6, 182, 212)',
-                            backgroundColor: 'rgba(6, 182, 212, .2)',
-                            fill: true,
-                            pointRadius: 0
-                        }, {
-                            cubicInterpolationMode: 'monotone',
-                            label: '{{ __("Upload") }}',
-                            data: [{
-                                x: time - CHART_INTERVAL * 3,
-                                y: 0
-                            }, {
-                                x: time,
-                                y: stats.network.up
-                            }],
-                            steppedLine: false,
-                            borderColor: 'rgb(6, 212, 139)',
-                            backgroundColor: 'rgba(6, 212, 139, .2)',
-                            fill: true,
-                            pointRadius: 0
-                        }],
-                    },
-                    options: {
-                        plugins: {
-                            responsive: true,
-                            legend: false,
-                            tooltips: {
-                                mode: 'index',
-                                intersect: false,
-                            },
-                            title: {
-                                display: true,
-                                text: `${title} Down: ${stats.network.down} kb/s Up: ${stats.network.up} kb/s`,
-                            },
-                        },
-
-                        scales: {
-                            x: {
-                                display: false,
-                                type: "realtime",
-                                realtime: {
-                                    duration: CHART_INTERVAL * CHART_SPEED,
-                                    refresh: CHART_INTERVAL,
-                                    delay: CHART_DELAY + 2500,
-                                    onRefresh: chart => {
-                                        let time = new Date();
-
-                                        let data0 = chart.data.datasets[0].data;
-                                        let data1 = chart.data.datasets[1].data;
-
-                                        if (data0[data0.length - 1].x.getTime() > time.getTime())
-                                            return;
-
-                                        data0.push({
-                                            x: time,
-                                            y: stats.network.down
-                                        });
-                                        data1.push({
-                                            x: time,
-                                            y: stats.network.up
-                                        });
-
-                                        if (data0.length > 100) {
-                                            data0 = data0.slice(
-                                                1000 - 15, 15);
-                                            data1 = data1.slice(
-                                                1000 - 15, 15);
-                                        }
-
-                                        chart.options.plugins.title.text =
-                                            `${title} Down: ${stats.network.down} kb/s Up: ${stats.network.up} kb/s`;
-                                    }
-                                }
-
-                            },
-                            y: {
-                                ticks: {
-                                    beginAtZero: true
-                                }
-                            }
-                        },
-                    },
-                    interaction: {
-                        intersect: false
-                    }
-                });
-            }
-        }
-
-    function updateChart(element, time, data) {
-        // First, Update Text
-        $("#" + element + "Text").text("%" + data);
-        window[element + "Chart"].data.labels.push(time);
-        window[element + "Chart"].data.datasets.forEach((dataset) => {
-            dataset.data.push(data);
-        });
-        window[element + "Chart"].update();
-    }
-
-    function createChart(element, time, data) {
-        $("#" + element + "Text").text("%" + data[0]);
-        window[element + "Chart"] = new Chart($("#" + element), {
-            type: 'line',
-            data: {
-                datasets: [{
-                    data: data,
-                }],
-                labels: [
-                    time,
-                ]
-            },
-            options: {
-                animation: false,
-                responsive: true,
-                legend: false,
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            min: 0,
-                            max: 100
-                        }
-                    }]
-                },
-            }
-        })
-    }
     function getDashboard()
     {
-        stats();
+        retrieveStats();
         $('.table-card').find('.refresh-button').click();
+        setInterval(function() {
+            CHARTS.CPU.data = CHARTS.CPU.data.slice(-20);
+            CHARTS.RAM.data = CHARTS.RAM.data.slice(-20);
+            CHARTS.IO.data = CHARTS.IO.data.slice(-20);
+            CHARTS.NETWORK.data.upload = CHARTS.NETWORK.data.upload.slice(-20);
+            CHARTS.NETWORK.data.download = CHARTS.NETWORK.data.download.slice(-20);
+        }, 60000)
     }
 
     var firstStats = true;
     var statTimeout;
-    function stats(noSpinner = false) {
-        !noSpinner && $('.charts-card').find('.overlay').show();
-        var form = new FormData();
-        form.append('server_id', '{{server()->id}}');
-        var time = "{{\Carbon\Carbon::now()->format("H:i:s")}}";
-        @if(server()->isLinux())
-        request('{{route('server_stats')}}', form, function (response) {
-            data = JSON.parse(response);
-            @if(!server()->isLinux())
-            /*
-                if(firstStats){
-                    firstStats = false;
-                    createChart("ram", time, [data['ram']]);
-                    createChart("cpu", time, [data['cpu']]);
-                    createChart("disk", time, [data['disk']]);
-                }
-                updateChart("disk", data['time'], data['disk']);
-                updateChart("ram", data['time'], data['ram']);
-                updateChart("cpu", data['time'], data['cpu']);
-                */
-            @endif
-            !noSpinner && $('.charts-card').find('.overlay').hide();
-            statTimeout && clearTimeout(statTimeout);
-            statTimeout = setTimeout(function(){
-                if($("a[href=\"#usageTab\"]").hasClass("active")){
-                    stats(true);
-                }
-            }, 500);
-        })
-        @endif
-    }
 
-    var stats;
-    const CHART_INTERVAL = 2500;
-    const CHART_DELAY = 4500;
-    const CHART_SPEED = 12;
     function retrieveStats() {
         @if(server()->isLinux())
         request('{{ route("server_stats") }}', new FormData(),
             function(response) {
-                stats = JSON.parse(response);
+                    stats = JSON.parse(response);
+                    if (!IS_RENDERED) {
+                        renderChart(CHARTS.CPU)
+                        renderChart(CHARTS.RAM)
+                        renderChart(CHARTS.IO)
+                        renderChart(CHARTS.NETWORK, true)
+                        IS_RENDERED = true;
+                        $('.charts-card').find('.overlay').hide();
+                    }
 
-                if (!window[`networkChart-element`]) {
-                    resourceChart('{{ __("Cpu Kullanımı") }}', "cpuChart", 'cpu', true, '', '6, 212, 139');
-                    resourceChart('{{ __("Ram Kullanımı") }}', "ramChart", 'ram', true, '', '6, 182, 212');
-                    resourceChart('{{ __("IO Kullanımı") }}', "ioChart", 'io', true, '', '6, 79, 212');
-                    networkChart('{{ __("Network") }}', "networkChart");
+                    updateChart(CHARTS.CPU)
+                    updateChart(CHARTS.RAM)
+                    updateChart(CHARTS.IO)
+                    updateNetworkChart(CHARTS.NETWORK)
+                            
+                    setTimeout(() => {
+                        retrieveStats();
+                    }, CHART_INTERVAL);
                 }
-
-                $(".chartbox").find(".overlay").hide();
-                setTimeout(() => {
-                    retrieveStats();
-                }, CHART_INTERVAL);
-            }
         );
         @endif
     }
-    retrieveStats();
 
     function downloadFile(form) {
         window.location.assign('/sunucu/indir?path=' + form.getElementsByTagName('input')[0].value + '&server_id=' + form.getElementsByTagName('input')[1].value);
@@ -592,6 +329,15 @@
             getLogs();
         }
     });
+
+    $("#log_extension").on('change', function() {
+        getLogs();
+    });
+
+    $("#log_user").on('change', function() {
+        getLogs();
+    });
+
     function getLogs(page = 1) {
         showSwal('{{__("Okunuyor...")}}','info');
         var form = new FormData();
@@ -599,6 +345,12 @@
         var query = $("#logQueryFilter").val();
         if(query.length !== 0){
             form.append('query',query);
+        }
+        if ($("#log_user").val()) {
+            form.append("log_user_id", $("#log_user").val());
+        }
+        if ($("#log_extension").val()) {
+            form.append("log_extension_id", $("#log_extension").val());
         }
         request('{{route('server_get_logs')}}', form, function (response) {
             var json = JSON.parse(response);
@@ -626,11 +378,22 @@
             logContentWrapper.html("");
             $.each(json.message,function (index,current) {
                 current.id =  "a" + Math.random().toString(36).substr(2, 9);
-                const titleEl = $("<a class='list-group-item list-group-item-action' id='"+ current.id + "_title' href='#" + current.id + "_content' data-toggle='list' role='tab' aria-controls='home' />").text(current.title);
-                logTitleWrapper.append(titleEl);
-                const contentEl = $("<div class='tab-pane fade' id='" + current.id + "_content' role='tabpanel' aria-labelledby='" + current.id +"_title'><pre style='white-space:pre-wrap;' /></div>");
+                let titleEl = "";
+                if (current.title == "---------------------") {
+                    current.title = `<center><hr /></center>`
+                    titleEl = $("<a class='disabled list-group-item list-group-item-action' id='"+ current.id + "_title' href='#" + current.id + "_content' data-toggle='list' role='tab' aria-controls='home' />").html(current.title);
+                    logTitleWrapper.append(titleEl);
+                } else {
+                    titleEl = $("<a class='list-group-item list-group-item-action' id='"+ current.id + "_title' href='#" + current.id + "_content' data-toggle='list' role='tab' aria-controls='home' />").html(current.title);
+                    logTitleWrapper.append(titleEl);
+                }
+                const contentEl = $("<div style='background: #1a202c;border-radius: 5px;height: 100%;' class='tab-pane fade' id='" + current.id + "_content' role='tabpanel' aria-labelledby='" + current.id +"_title'><pre style='white-space:pre-wrap; color: limegreen' /></div>");
                 contentEl.find("pre").text(current.message);
                 logContentWrapper.append(contentEl);
+
+                if (index == 0) {
+                    titleEl.click();
+                }
             });
             modal.modal("show");
             setTimeout(function () {

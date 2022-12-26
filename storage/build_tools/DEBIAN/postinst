@@ -79,7 +79,7 @@ else
 fi
 
 # Update Php and Fpm to run as liman user.
-sed -i "s/www-data/liman/g" /etc/php/7.3/fpm/pool.d/www.conf
+sed -i "s/www-data/liman/g" /etc/php/8.1/fpm/pool.d/www.conf
 sed -i "s/www-data/liman/g" /etc/nginx/nginx.conf
 
 # Crontab Setting
@@ -118,6 +118,19 @@ fi
 
 echo """
 #LIMAN_OPTIMIZATIONS
+[program:liman-high_availability_syncer]
+process_name=%(program_name)s_%(process_num)02d
+command=php /liman/server/artisan queue:work --sleep=1 --tries=1 --queue=high_availability_syncer --timeout=0
+autostart=true
+autorestart=true
+user=liman
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/liman/logs/high_availability.log
+    """ > /etc/supervisor/conf.d/liman-high_availability_syncer.conf
+
+echo """
+#LIMAN_OPTIMIZATIONS
 [program:liman-system-worker]
 process_name=%(program_name)s_%(process_num)02d
 command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=system_updater --timeout=0
@@ -146,7 +159,13 @@ supervisorctl update
 supervisorctl start all
 
 #Increase Php-Fpm Memory
-sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php/7.3/fpm/php.ini
+sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php/8.1/fpm/php.ini
+
+#Change Queue Driver from Db to Redis
+sed -i "s#QUEUE_DRIVER=database#QUEUE_DRIVER=redis#g" /liman/server/.env
+
+#Change Render Engine Port
+sed -i "s#RENDER_ENGINE_ADDRESS=https://127.0.0.1:5454#RENDER_ENGINE_ADDRESS=https://127.0.0.1:2806#g" /liman/server/.env
 
 # Run Database Migration
 php /liman/server/artisan migrate --force
@@ -280,8 +299,8 @@ if (systemctl -q is-active systemd-resolved.service); then
     /usr/bin/python3 /liman/server/storage/smb-dhcp-client 2> /dev/null | grep "Domain Name Server(s)" | cut -d : -f 2 |  xargs  | sed 's/ /\n/g' |sed 's/.*\..*\..*\..*/nameserver &/g' > /etc/resolv.conf
 fi
 
-sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/7.3/fpm/php.ini
-sed -i "s/post_max_size.*/post_max_size = 100M/g" /etc/php/7.3/fpm/php.ini
+sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/8.1/fpm/php.ini
+sed -i "s/post_max_size.*/post_max_size = 100M/g" /etc/php/8.1/fpm/php.ini
 
 # Prepare Folders for vnc
 rm -rf /liman/keys/vnc
@@ -306,7 +325,9 @@ systemctl enable liman-render 2>/dev/null
 systemctl disable liman-connector 2>/dev/null
 systemctl enable liman-socket 2>/dev/null
 systemctl enable nginx 2>/dev/null
-systemctl enable php7.3-fpm 2>/dev/null
+systemctl stop php7.3-fpm 2>/dev/null
+systemctl disable php7.3-fpm 2>/dev/null
+systemctl enable php8.1-fpm 2>/dev/null
 
 systemctl stop liman-connector
 systemctl restart liman-system
@@ -315,7 +336,7 @@ systemctl restart liman-vnc
 systemctl restart liman-webssh
 systemctl restart liman-socket
 systemctl restart nginx
-systemctl restart php7.3-fpm
+systemctl restart php8.1-fpm
 
 # Optimize Liman
 php /liman/server/artisan optimize:clear
@@ -325,6 +346,9 @@ php /liman/server/artisan storage:link
 
 # Enable Liman
 php /liman/server/artisan up
+
+# Flush Redis Cache
+redis-cli flushall
 
 # Create Limanctl Symlink
 chmod +x /liman/server/storage/limanctl

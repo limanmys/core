@@ -26,17 +26,17 @@
     </div>
 @endif
 
-<div id="accordion">
+<div>
     @if (isset(collect($extension["database"])->keyBy("required")[1]))
     <div class="card card-primary">
         <div class="card-header">
             <h3 class="card-title w-100">
-                <a class="d-block w-100" data-toggle="collapse" href="#reqSettings">
+                <a class="d-block w-100">
                     {{ __('Zorunlu Ayarlar') }}
                 </a>
             </h3>
         </div>
-        <div id="reqSettings" class="collapse show" data-parent="#accordion">
+        <div id="reqSettings">
             <form name="reqSettings"
                 action="{{ route('extension_server_settings', [
                     'extension_id' => request()->route('extension_id'),
@@ -55,7 +55,7 @@
                         </div>
                     @endif
 
-                    @if (count($globalVars))
+                    @if (count($globalVars) && !(bool) user()->status)
                         <div class="alert alert-info" role="alert">
                             {{ __('Bazı ayarlar sadece eklentiyi kuran kullanıcı tarafından değiştirilebilir.') }}
                         </div>
@@ -63,7 +63,7 @@
 
                     @if ($extension['database'])
                         @foreach ($extension['database'] as $item)
-                            @if (in_array($item['variable'], $globalVars))
+                            @if (in_array($item['variable'], $globalVars) && !(bool) user()->status)
                                 @continue
                             @endif
 
@@ -142,12 +142,12 @@
 <div class="card card-danger">
     <div class="card-header">
         <h4 class="card-title w-100">
-            <a class="d-block w-100" data-toggle="collapse" href="#advSettings">
+            <a class="d-block w-100">
                 {{ __('Gelişmiş Ayarlar') }}
             </a>
         </h4>
     </div>
-    <div id="advSettings" class="collapse @if (!isset(collect($extension['database'])->keyBy('required')[1])) show @endif" data-parent="#accordion">
+    <div id="advSettings">
         <form name="advSettings"
             action="{{ route('extension_server_settings', [
                 'extension_id' => request()->route('extension_id'),
@@ -166,7 +166,7 @@
                     </div>
                 @endif
 
-                @if (count($globalVars))
+                @if (count($globalVars) && !(bool) user()->status)
                     <div class="alert alert-info" role="alert">
                         {{ __('Bazı ayarlar sadece eklentiyi kuran kullanıcı tarafından değiştirilebilir.') }}
                     </div>
@@ -174,7 +174,7 @@
 
                 @if ($extension['database'])
                     @foreach ($extension['database'] as $item)
-                        @if (in_array($item['variable'], $globalVars))
+                        @if (in_array($item['variable'], $globalVars) && !(bool) user()->status)
                             @continue
                         @endif
 

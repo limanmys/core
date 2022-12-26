@@ -2,83 +2,53 @@
 
 namespace App\Connectors;
 
-use GuzzleHttp\Client;
 use App\Models\Token;
+use GuzzleHttp\Client;
 
 class GenericConnector
 {
-    public $server, $user;
-
-    public function __construct(\App\Models\Server $server = null, $user = null)
+    public function __construct(public $server = null, public $user = null)
     {
-        $this->server = $server;
-        $this->user = $user;
     }
 
-    public function execute($command)
+    public function execute($command): string
     {
         return trim(
-            self::request('runCommand', [
-                "command" => $command,
+            (string) self::request('command', [
+                'command' => $command,
             ])
         );
     }
 
-    public function sendFile($localPath, $remotePath, $permissions = 0644)
+    public function sendFile($localPath, $remotePath, $permissions = 0644): string
     {
         return trim(
-            self::request('putFile', [
-                "localPath" => $localPath,
-                "remotePath" => $remotePath,
+            (string) self::request('putFile', [
+                'local_path' => $localPath,
+                'remote_path' => $remotePath,
             ])
         );
     }
 
-    public function receiveFile($localPath, $remotePath)
+    public function receiveFile($localPath, $remotePath): string
     {
         return trim(
-            self::request('getFile', [
-                "localPath" => $localPath,
-                "remotePath" => $remotePath,
+            (string) self::request('getFile', [
+                'local_path' => $localPath,
+                'remote_path' => $remotePath,
             ])
         );
     }
 
-    public function runScript($script, $parameters, $runAsRoot = false)
+    public function verify($ip_address, $username, $password, $port, $type): string
     {
         return trim(
-            self::request('getFile', [
-                "script" => $script,
-                "parameters" => $parameters,
-                "runAsRoot" => $runAsRoot,
-            ])
-        );
-        $remotePath = "/tmp/" . Str::random();
-
-        $this->sendFile($script, $remotePath);
-        $output = $this->execute("[ -f '$remotePath' ] && echo 1 || echo 0");
-        if ($output != "1") {
-            abort(504, "Betik gönderilemedi");
-        }
-        $this->execute("chmod +x " . $remotePath);
-
-        // Run Part Of The Script
-        $query = $runAsRoot ? sudo() : '';
-        $query = $query . $remotePath . " " . $parameters . " 2>&1";
-        $output = $this->execute($query);
-
-        return $output;
-    }
-
-    public function verify($ip_address, $username, $password, $port, $type)
-    {
-        return trim(
-            self::request('verify', [
-                "ip_address" => $ip_address,
-                "username" => $username,
-                "password" => $password,
-                "port" => $port,
-                "keyType" => $type,
+            (string) self::request('verify', [
+                'ip_address' => $ip_address,
+                'username' => $username,
+                'password' => $password,
+                'port' => $port,
+                'key_type' => $type,
             ])
         );
     }
@@ -97,35 +67,56 @@ class GenericConnector
     {
         $client = new Client([
             'verify' => false,
-            'connect_timeout' => env("EXTENSION_TIMEOUT", 30)
+            'connect_timeout' => env('EXTENSION_TIMEOUT', 30),
         ]);
 
         if ($this->server != null) {
-            $params["server_id"] = $this->server->id;
+            $params['server_id'] = $this->server->id;
         }
 
         if ($this->user == null) {
-            $params["token"] = Token::create(user()->id);
+            $params['token'] = Token::create(user()->id);
         } else {
-            $params["token"] = Token::create($this->user->id);
+            $params['token'] = Token::create($this->user->id);
         }
 
         try {
             $response = $client->request(
                 'POST',
-                env("RENDER_ENGINE_ADDRESS","https://127.0.0.1:5454"). "/$url",
+                env('RENDER_ENGINE_ADDRESS', 'https://127.0.0.1:2806')."/$url",
                 [
-                    "form_params" => $params,
+                    'form_params' => $params,
                 ]
             );
+
             return $response->getBody()->getContents();
         } catch (\Exception $exception) {
-            if (!env("APP_DEBUG")) {
-                abort(504,"Liman Go Servisinde bir sorun oluştu, lütfen yöneticinizle iletişime geçin.");
-                return null;
+            $code = 504;
+            try {
+                if ($exception->getResponse() && $exception->getResponse()->getStatusCode() >= 400) {
+                    $code = $exception->getResponse()->getStatusCode();
+
+                    $message = json_decode((string) $exception->getResponse()->getBody()->getContents())->message;
+                    if ($message == '') {
+                        $message = $exception->getMessage();
+                    }
+                } else {
+                    $message = $exception->getMessage();
+                }
+            } catch (\Throwable) {
+                $message = $exception->getMessage();
+            }
+
+            if (env('APP_DEBUG', false)) {
+                return abort(
+                    504,
+                    __('Liman render service is not working or crashed. ').$message,
+                );
             } else {
-                abort(504,"Liman Go Servisinde bir sorun oluştu, lütfen yöneticinizle iletişime geçin." . $exception->getMessage());
-                return null;
+                return abort(
+                    504,
+                    __('Liman render service is not working or crashed. '),
+                );
             }
         }
     }

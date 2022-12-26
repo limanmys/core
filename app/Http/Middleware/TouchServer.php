@@ -8,7 +8,7 @@ class TouchServer
 {
     /**
      * Handle an incoming request.
-     * 
+     *
      * Bu middleware en son bakılan sunucuya dokunur ve sürekli SQL sorgusu atılmaması için
      * onu session içerisine yerleştirir. Başka bir sunucuya bakılana kadar güncelleme için
      * sorgu atılmaz.
@@ -23,16 +23,17 @@ class TouchServer
             if (
                 ($request->session()->get('last_touched')
                 && $request->server_id != $request->session()->get('last_touched'))
-                || !$request->session()->get('last_touched')
+                || ! $request->session()->get('last_touched')
             ) {
                 try {
                     \App\Models\Server::where('id', $request->server_id)->firstOrFail()->touch();
                     $request->session()->put('last_touched', $request->server_id);
-                } catch (\Throwable $e) {
+                } catch (\Throwable) {
                     return $next($request);
                 }
             }
         }
+
         return $next($request);
     }
 }

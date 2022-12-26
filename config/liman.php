@@ -1,92 +1,86 @@
 <?php
 
 return [
-    "server_connection_timeout" => 5000, //ms
-    "user_widget_count" => 10,
-    "wizard_max_steps" => 4,
-    "widget_refresh_time" => 30000, //ms
-    "admin_searchable" => [
+    'server_connection_timeout' => 5000, //ms
+    'wizard_max_steps' => 4,
+    'admin_searchable' => [
         [
             'name' => 'Sistem Ayarları',
-            'url' =>  '/ayarlar'     
+            'url' => '/ayarlar',
         ],
         [
             'name' => 'Kullanıcı Ayarları',
-            'url' => '/ayarlar#users'
+            'url' => '/ayarlar#users',
         ],
         [
             'name' => 'Sistem Ayarları / Eklentiler',
-            'url' => '/ayarlar#extensions'
+            'url' => '/ayarlar#extensions',
         ],
         [
             'name' => 'Sistem Ayarları / Rol Grupları',
-            'url' => '/ayarlar#roles'
+            'url' => '/ayarlar#roles',
         ],
         [
             'name' => 'Sistem Ayarları / Sunucu Grupları',
-            'url' => '/ayarlar#serverGroups'
+            'url' => '/ayarlar#serverGroups',
         ],
         [
             'name' => 'Sistem Ayarları / Sertifikalar',
-            'url' => '/ayarlar#certificates'
+            'url' => '/ayarlar#certificates',
         ],
         [
             'name' => 'Sistem Ayarları / Sağlık Durumu',
-            'url' => '/ayarlar#health'
+            'url' => '/ayarlar#health',
         ],
         [
             'name' => 'Sistem Ayarları / Dış Bildirimler',
-            'url' => '/ayarlar#externalNotifications'
-        ],
-        [
-            'name' => 'Sistem Ayarları / Kısıtlı Mod',
-            'url' => '/ayarlar#restrictedMode'
+            'url' => '/ayarlar#externalNotifications',
         ],
         [
             'name' => 'Sistem Ayarları / Liman Market',
-            'url' => '/ayarlar#limanMarket'
+            'url' => '/ayarlar#limanMarket',
         ],
         [
             'name' => 'Sistem Ayarları / DNS',
-            'url' => '/ayarlar#dnsSettings'
+            'url' => '/ayarlar#dnsSettings',
         ],
         [
             'name' => 'Sistem Ayarları / Mail Ayarları',
-            'url' => '/ayarlar#mailSettings'
+            'url' => '/ayarlar#mailSettings',
         ],
         [
             'name' => 'Sistem Ayarları / İnce Ayarlar',
-            'url' => '/ayarlar#limanTweaks'
+            'url' => '/ayarlar#limanTweaks',
         ],
         [
             'name' => 'Eklenti Mağazası',
-            'url' =>  '/market'   
+            'url' => '/market',
         ],
         [
             'name' => 'Market',
-            'url' => '/market'
+            'url' => '/market',
         ],
         [
             'name' => 'Yetki Talepleri',
-            'url' => '/talepler'
+            'url' => '/talepler',
         ],
     ],
-    "user_searchable" => [
+    'user_searchable' => [
         [
             'name' => 'Kullanıcı Profili',
-            'url' => '/profil'
+            'url' => '/profil',
         ],
         [
             'name' => 'Kasa',
-            'url' => '/kasa'
+            'url' => '/kasa',
         ],
         [
             'name' => 'Erişim Anahtarları',
-            'url' => '/profil/anahtarlarim'
+            'url' => '/profil/anahtarlarim',
         ],
         [
             'name' => 'Yetki Talebi',
-            'url' => '/taleplerim'
+            'url' => '/taleplerim',
         ],
-    ]
+    ],
 ];

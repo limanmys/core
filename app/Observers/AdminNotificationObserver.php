@@ -2,10 +2,10 @@
 
 namespace App\Observers;
 
-use App\Models\AdminNotification;
-use App\User;
-use App\Notifications\NotificationSent;
 use App\Mail\BasicNotification;
+use App\Models\AdminNotification;
+use App\Notifications\NotificationSent;
+use App\User;
 use Illuminate\Support\Facades\Mail;
 
 class AdminNotificationObserver
@@ -15,7 +15,7 @@ class AdminNotificationObserver
         $adminUsers = User::where('status', 1)->get();
         foreach ($adminUsers as $user) {
             $user->notify(new NotificationSent($adminNotification));
-            if (env('MAIL_ENABLED') == true && $adminNotification && $adminNotification->type == "external_notification") {
+            if (env('MAIL_ENABLED') == true && $adminNotification && $adminNotification->type == 'external_notification') {
                 Mail::to($user)->send(new BasicNotification($adminNotification));
             }
         }
@@ -24,7 +24,6 @@ class AdminNotificationObserver
     /**
      * Handle the admin notification "created" event.
      *
-     * @param  \App\Models\AdminNotification  $adminNotification
      * @return void
      */
     public function created(AdminNotification $adminNotification)
@@ -35,7 +34,6 @@ class AdminNotificationObserver
     /**
      * Handle the admin notification "updated" event.
      *
-     * @param  \App\Models\AdminNotification  $adminNotification
      * @return void
      */
     public function updated(AdminNotification $adminNotification)
@@ -46,7 +44,6 @@ class AdminNotificationObserver
     /**
      * Handle the admin notification "deleted" event.
      *
-     * @param  \App\Models\AdminNotification  $adminNotification
      * @return void
      */
     public function deleted(AdminNotification $adminNotification)
@@ -57,7 +54,6 @@ class AdminNotificationObserver
     /**
      * Handle the admin notification "restored" event.
      *
-     * @param  \App\Models\AdminNotification  $adminNotification
      * @return void
      */
     public function restored(AdminNotification $adminNotification)
@@ -68,7 +64,6 @@ class AdminNotificationObserver
     /**
      * Handle the admin notification "force deleted" event.
      *
-     * @param  \App\Models\AdminNotification  $adminNotification
      * @return void
      */
     public function forceDeleted(AdminNotification $adminNotification)

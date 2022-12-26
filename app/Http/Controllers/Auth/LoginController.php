@@ -3,15 +3,19 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Facades\Socialite;
 
 /**
  * Class LoginController
- * @package App\Http\Controllers\Auth
  */
 class LoginController extends Controller
 {
@@ -34,26 +38,26 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function captcha(){
+    public function captcha()
+    {
         return captcha_img();
     }
 
     public function authenticated(Request $request, $user)
     {
         $user->update([
-            "last_login_at" => Carbon::now()->toDateTimeString(),
-            "last_login_ip" => $request->ip(),
+            'last_login_at' => Carbon::now()->toDateTimeString(),
+            'last_login_ip' => $request->ip(),
         ]);
 
-        system_log(7, "LOGIN_SUCCESS");
+        system_log(7, 'LOGIN_SUCCESS');
 
-        hook("login_successful", [
-            "user" => $user,
+        hook('login_successful', [
+            'user' => $user,
         ]);
 
-        if (env("WIZARD_STEP", 1) != config("liman.wizard_max_steps") && $user->status)
-        {
-            return redirect()->route("wizard", env("WIZARD_STEP", 1));
+        if (env('WIZARD_STEP', 1) != config('liman.wizard_max_steps') && $user->status) {
+            return redirect()->route('wizard', env('WIZARD_STEP', 1));
         }
     }
 
@@ -71,7 +75,7 @@ class LoginController extends Controller
             $flag = true;
         });
 
-        if (!$flag) {
+        if (! $flag) {
             event('login_attempt', $credientials);
         }
 
@@ -81,34 +85,86 @@ class LoginController extends Controller
     protected function validateLogin(Request $request)
     {
         $request->request->add([
-            $this->username() => $request->liman_email_mert,
-            "password" => $request->liman_password_baran,
+            $this->username() => $request->liman_email_aciklab,
+            'password' => $request->liman_password_divergent,
         ]);
-        if (env('EXTENSION_DEVELOPER_MODE'))
-        {
+        if (env('EXTENSION_DEVELOPER_MODE')) {
             $request->validate([
                 $this->username() => 'required|string',
-                'password' => 'required|string'
+                'password' => 'required|string',
             ]);
         } else {
             $request->validate([
                 $this->username() => 'required|string',
                 'password' => 'required|string',
-                'captcha' => 'required|captcha'
+                'captcha' => 'required|captcha',
             ]);
         }
     }
 
-    protected function sendFailedLoginResponse(Request $request)
+    protected function sendFailedLoginResponse(Request $request): never
     {
         $credientials = (object) $this->credentials($request);
         hook('login_failed', [
-            "email" => $credientials->email,
-            "password" => $credientials->password,
+            'email' => $credientials->email,
+            'password' => $credientials->password,
         ]);
 
         throw ValidationException::withMessages([
             $this->username() => [trans('auth.failed')],
         ]);
+    }
+
+    public function redirectToKeycloak()
+    {
+        if (env('KEYCLOAK_ACTIVE', false) == false) {
+            return;
+        }
+
+        return Socialite::driver('keycloak')->stateless()->redirect();
+    }
+
+    public function retrieveFromKeycloak(Request $request)
+    {
+        if (env('KEYCLOAK_ACTIVE', false) == false) {
+            return;
+        }
+
+        $remote = Socialite::driver('keycloak')->stateless()->user();
+
+        $user = User::find($remote->id);
+
+        if (! $user) {
+            $emailExists = User::where('email', $remote->email)->get();
+            if (count($emailExists) < 1) {
+                $user = User::create([
+                    'id' => $remote->id,
+                    'username' => $remote->nickname,
+                    'email' => $remote->email,
+                    'auth_type' => 'keycloak',
+                    'status' => 0,
+                    'forceChange' => false,
+                    'name' => $remote->name,
+                    'password' => Hash::make(Str::random(16))
+                ]);
+            } else {
+                return redirect('/giris')->withErrors(__('Keycloak kullanıcısının e-posta adresi sistemde mevcut.'));
+            }
+        }
+
+        $user->update([
+            'last_login_at' => Carbon::now()->toDateTimeString(),
+            'last_login_ip' => $request->ip(),
+        ]);
+
+        system_log(7, 'LOGIN_SUCCESS');
+
+        hook('login_successful', [
+            'user' => $user,
+        ]);
+
+        Auth::loginUsingId($user->id, true);
+
+        return redirect('/');
     }
 }

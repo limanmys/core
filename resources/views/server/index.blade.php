@@ -119,13 +119,6 @@
                                 <label class="text-md">{{ __('Sunucunuzun Adı') }}</label>
                                 <input id="server_name" type="text" name="server_name" class="form-control"
                                     placeholder="{{ __('Sunucunuzun Adı') }}" required><br>
-                                <label class="text-md mb-0" style="width: 100%;">{{ __('Şehir') }}</label>
-                                <small>{{ __('Sunucunuza bir şehir atayarak, eklentileri kullanırken Türkiye haritası üzerinde erişiminizi kolaylaştırabilirsiniz.') }}</small><br>
-                                <select name="server_city" id="serverCity" class="form-control select2" required>
-                                    @foreach (cities() as $name => $code)
-                                        <option value="{{ $code }}">{{ __($name) }}</option>
-                                    @endforeach
-                                </select><br>
                                 <label class="text-md">{{ __('Sunucunuzun İşletim Sistemi') }}</label>
                                 <div class="form-group">
                                     <div class="radio">
@@ -163,10 +156,6 @@
                                 <tr>
                                     <td>{{ __('Sunucu Adı') }}</td>
                                     <td id="tableServerName"></td>
-                                </tr>
-                                <tr>
-                                    <td>{{ __('Şehir') }}</td>
-                                    <td id="tableServerCity"></td>
                                 </tr>
                                 <tr>
                                     <td>{{ __('İşletim Sistemi') }}</td>
@@ -318,7 +307,6 @@
             'Kontrol Portu' => 'control_port:number',
             "Sunucu Id:''" => 'server_id:hidden',
             'IP Adresi' => 'ip_address:text',
-            'Şehir:city' => cities(),
         ],
         'submit_text' => 'Düzenle',
     ])

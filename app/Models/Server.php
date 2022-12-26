@@ -4,14 +4,14 @@ namespace App\Models;
 
 use App\Connectors\GenericConnector;
 use App\Connectors\SNMPConnector;
-use Illuminate\Database\Eloquent\Model;
+use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
-use App\Models\UserFavorites;
 
 class Server extends Model
 {
-    use UsesUuid;
+    use UsesUuid, CacheQueryBuilder;
 
     /**
      * @var array
@@ -19,11 +19,11 @@ class Server extends Model
     protected $fillable = [
         'name',
         'ip_address',
-        'city',
         'type',
         'control_port',
         'os',
     ];
+
     /**
      * @var
      */
@@ -37,12 +37,13 @@ class Server extends Model
         if ($this->key() == null) {
             abort(
                 504,
-                "Bu sunucuda komut çalıştırmak için bir bağlantınız yok."
+                'Bu sunucuda komut çalıştırmak için bir bağlantınız yok.'
             );
         }
-        if ($this->key()->type == "snmp") {
+        if ($this->key()->type == 'snmp') {
             return new SNMPConnector($this, user()->id);
         }
+
         return new GenericConnector($this, user());
     }
 
@@ -53,8 +54,8 @@ class Server extends Model
      */
     public function run($command, $log = true)
     {
-        if (!$this->canRunCommand()) {
-            return respond("Bu sunucuda komut çalıştıramazsınız!", 504);
+        if (! $this->canRunCommand()) {
+            return respond('Bu sunucuda komut çalıştıramazsınız!', 504);
         }
 
         // Execute and return outputs.
@@ -65,6 +66,7 @@ class Server extends Model
      * @param $file
      * @param $path
      * @return bool
+     *
      * @throws \Throwable
      */
     public function putFile($file, $path)
@@ -83,29 +85,16 @@ class Server extends Model
     }
 
     /**
-     * @param $script
-     * @param $parameters
-     * @param false $runAsRoot
-     * @return string
-     */
-    public function runScript($script, $parameters, $runAsRoot = false)
-    {
-        // Create Connector Object
-        $connector = $this->connector();
-
-        return $connector->runScript($script, $parameters, $runAsRoot);
-    }
-
-    /**
      * @param $service_name
      * @return bool
      */
     public function isRunning($service_name)
     {
-        if (!$this->canRunCommand()) {
+        if (! $this->canRunCommand()) {
             if ($this->control_port == -1) {
                 return true;
             }
+
             return is_resource(
                 @fsockopen(
                     $this->ip_address,
@@ -117,18 +106,15 @@ class Server extends Model
             );
         }
         // Check if services are alive or not.
-        $query = "systemctl is-failed " . $service_name;
+        $query = 'systemctl is-failed '.$service_name;
 
         // Execute and return outputs.
-        return $this->connector()->execute($query, false) == "active"
+        return $this->connector()->execute($query, false) == 'active'
             ? true
             : false;
     }
 
-    /**
-     * @return bool
-     */
-    public function isAlive()
+    public function isAlive(): bool
     {
         if ($this->control_port == -1) {
             return true;
@@ -148,15 +134,16 @@ class Server extends Model
             return true;
         } else {
             // Abort, Since server is unavailable.
-            abort(504, __("Sunucuya Bağlanılamadı."));
+            abort(504, __('Sunucuya Bağlanılamadı.'));
         }
+
         return false;
     }
 
     /**
      * @return Server|Server[]|Collection|Builder
      */
-    public static function getAll()
+    public static function getAll(): Server|array|\Collection|\Builder
     {
         return Server::get()->filter(function ($server) {
             return Permission::can(user()->id, 'server', 'id', $server->id);
@@ -183,8 +170,8 @@ class Server extends Model
     public function isFavorite()
     {
         return UserFavorites::where([
-            "user_id" => user()->id,
-            "server_id" => server()->id,
+            'user_id' => user()->id,
+            'server_id' => server()->id,
         ])->exists();
     }
 
@@ -195,89 +182,93 @@ class Server extends Model
 
     public function isLinux()
     {
-        return $this->os == "linux";
+        return $this->os == 'linux';
     }
 
     public function isWindows()
     {
-        return $this->os == "windows";
+        return $this->os == 'windows';
     }
 
     public function getVersion()
     {
-        if (!$this->canRunCommand()) {
-            return "";
+        if (! $this->canRunCommand()) {
+            return '';
         }
 
         if ($this->isLinux()) {
             return $this->run("cat /etc/os-release | grep ^PRETTY_NAME= | cut -d\"=\" -f2 | sed 's/\"//g'");
         }
+
         return explode(
-            "|",
-            $this->run("(Get-WmiObject Win32_OperatingSystem).name")
+            '|',
+            $this->run('(Get-WmiObject Win32_OperatingSystem).name')
         )[0];
     }
 
     public function getUptime()
     {
-        if (!$this->canRunCommand()) {
-            return "";
+        if (! $this->canRunCommand()) {
+            return '';
         }
 
         if ($this->isLinux()) {
-            return $this->run("uptime -s");
+            return $this->run('uptime -s');
         }
+
         return explode(
-            "|",
-            $this->run("wmic path Win32_OperatingSystem get LastBootUpTime")
+            '|',
+            $this->run('wmic path Win32_OperatingSystem get LastBootUpTime')
         )[0];
     }
 
     public function getNoOfServices()
     {
-        if (!$this->canRunCommand()) {
-            return "";
+        if (! $this->canRunCommand()) {
+            return '';
         }
 
         if ($this->isLinux()) {
-            return $this->run("systemctl list-units --type=service --state=active | wc -l");
+            return $this->run('systemctl list-units --type=service --state=active | wc -l');
         }
+
         return $this->run('(Get-Service | Measure-Object).Count');
     }
 
     public function getNoOfProcesses()
     {
-        if (!$this->canRunCommand()) {
-            return "";
+        if (! $this->canRunCommand()) {
+            return '';
         }
 
         if ($this->isLinux()) {
-            return $this->run("ps -aux | wc -l");
+            return $this->run('ps -aux | wc -l');
         }
+
         return explode(
-            "|",
-            $this->run("(Get-Process).Count")
+            '|',
+            $this->run('(Get-Process).Count')
         )[0];
     }
 
     public function getHostname()
     {
-        if (!$this->canRunCommand()) {
-            return "";
+        if (! $this->canRunCommand()) {
+            return '';
         }
 
-        return $this->run("hostname");
+        return $this->run('hostname');
     }
 
     public function key()
     {
         if ($this->shared_key == 1) {
-            return ServerKey::where("server_id", $this->id)->first();
+            return ServerKey::where('server_id', $this->id)->first();
         }
 
         return ServerKey::where([
-            "server_id" => $this->id,
-            "user_id" => user()->id
+            'server_id' => $this->id,
+            'user_id' => user()->id,
         ])->first();
     }
 }

@@ -1,6 +1,6 @@
 # Liman Core
 
-Liman Core allows you to centrally manage all servers in your IT processes remotely, with stable and secure. You can improve the features with expandable extensions and modules. 
+Liman Core allows you to centrally manage all servers in your IT processes remotely, with stable and secure way. You can improve the features with expandable extensions and modules. 
 
 More information on the Liman [website](https://liman.dev).
 
@@ -29,5 +29,3 @@ Liman Core is sponsored by [HAVELSAN](https://havelsan.com.tr/en).
 MIT License
 
 See [LICENSE](https://github.com/limanmys/core/blob/master/LICENSE) the full text.
-
-

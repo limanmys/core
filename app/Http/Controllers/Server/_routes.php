@@ -11,13 +11,13 @@ Route::get('/sunucuDetayi/{server_id}', 'Server\MainController@oneData')->name('
 
 Route::post('/sunucu/ekle', 'Server\AddController@main')
     ->name('server_add')
-    ->middleware('parameters:name,ip_address,control_port,city');
+    ->middleware('parameters:name,ip_address,control_port');
 
 // Server Update Route
 
 Route::post('/sunucu/guncelle', 'Server\OneController@update')
     ->name('server_update')
-    ->middleware('parameters:server_id,name,control_port,city');
+    ->middleware('parameters:server_id,name,control_port');
 
 Route::post('/sunucu/erisimKontrolu', 'Server\MainController@checkAccess')
     ->name('server_check_access')

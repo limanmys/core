@@ -37,9 +37,6 @@
                             <a class="nav-link" data-toggle="tab" href="#externalNotifications" onclick="">{{__("Dış Bildirimler")}}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#restrictedMode" onclick="">{{__("Kısıtlı Mod")}}</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#limanMarket" onclick="checkMarketAccess()">{{__("Liman Market")}}</a>
                         </li>
                         <li class="nav-item">
@@ -262,59 +259,6 @@
                             @endif
                         </div>
 
-                        <div class="tab-pane fade show" id="changeLog" role="tabpanel">
-                            <ul>
-                                @foreach (explode("\n",$changelog) as $line)
-                                <li>{{$line}}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-
-                        <div class="tab-pane fade show" id="restrictedMode" role="tabpanel">
-                            <p>{{__("Liman'ı kısıtlamak ve kullanıcıların yalnızca bir eklentiyi kullanması için bu modu kullanabilirsiniz. Bu modu kullandığınız taktirde, kullanıcılar varsayılan olarak eklenti ve sunucu yetkisine sahip olacak, ancak fonksiyon yetkilerine sahip olmayacaklardır. Yöneticiler mevcut liman arayüzünü görmeye devam edecek, kullanıcılar ise yalnızca eklenti çerçevesini görüntüleyebilecektir.")}}</p>
-                            <form onsubmit="return saveRestricted(this);">
-                                <div class="form-check">
-                                    <input name="LIMAN_RESTRICTED" type="checkbox" class="form-check-input" id="rectricedModeToggle" @if(env("LIMAN_RESTRICTED")) checked @endif>
-                                    <label class="form-check-label" for="rectricedModeToggle">{{__("Kısıtlı Modu Aktifleştir.")}}</label>
-                                </div><br>
-
-                                <div class="form-group">
-                                    <label for="restrictedServer">{{__("Gösterilecek Sunucu")}}</label>
-                                    <select name="LIMAN_RESTRICTED_SERVER" id="restrictedServer" class="form-control select2" required>
-                                        <option value="" disabled selected>{{__('Lütfen bir sunucu seçin.')}}</option>
-                                                @foreach(servers() as $server)
-                                                    <option value="{{$server->id}}" @if(env("LIMAN_RESTRICTED_SERVER") == $server->id) selected @endif>{{$server->name}}</option>
-                                                @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                <label for="restrictedExtension">{{__("Gösterilecek Eklenti")}}</label>
-                                    <select name="LIMAN_RESTRICTED_EXTENSION" id="restrictedExtension" class="form-control select2" required>
-                                        <option value="" disabled selected>{{__('Lütfen bir eklenti seçin.')}}</option>
-                                                @foreach(extensions() as $extension)
-                                                    <option value="{{$extension->id}}" @if(env("LIMAN_RESTRICTED_EXTENSION") == $extension->id) selected @endif>{{$extension->display_name}}</option>
-                                                @endforeach
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn btn-primary">{{__("Ayarları Kaydet")}}</button>
-                            </form>
-                            <script>
-                                function saveRestricted(form){
-                                    return request('{{route("restricted_mode_update")}}',form,function(success){
-                                        var json = JSON.parse(success);
-                                        showSwal(json.message,'success');
-                                        setTimeout(() => {
-                                            reload();
-                                        }, 2000);
-                                    },function(error){
-                                        var json = JSON.parse(error);
-                                        showSwal(json.message,'danger',2000);
-                                    });
-                                }
-                            </script>
-                        </div>
-
                         <div class="tab-pane fade show" id="externalNotifications" role="tabpanel">
                         @include('modal-button',[
                                 "class" => "btn-primary",
@@ -461,7 +405,7 @@
         "id"=>"add_role",
         "title" => "Rol Grubu Ekle",
         "url" => route('role_add'),
-        "next" => "getRoleList",
+        "next" => "reload",
         "inputs" => [
             "Adı" => "name:text"
         ],
@@ -942,8 +886,13 @@
                 }
 
             }, function (error) {
+                console.log(error);
+                var box = $("#output");
+                box.html("");
+                box.append("<div class='alert alert-" + "success" + "' role='alert'>" +
+                        "Hata bulunamadı" +
+                        "</div>");
                 Swal.close();
-                alert("hata");
             });
         }
 

@@ -17,14 +17,14 @@ class CreateAccessTokensTable extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->uuid('user_id');
-            $table->date("last_used_at")->nullable();
-            $table->ipAddress("last_used_ip")->nullable();
+            $table->date('last_used_at')->nullable();
+            $table->ipAddress('last_used_ip')->nullable();
             $table
-                ->foreign("user_id")
-                ->references("id")
-                ->on("users")
-                ->onDelete("cascade");
-            $table->string("token");
+                ->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+            $table->string('token');
             $table->timestamps();
         });
     }

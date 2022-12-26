@@ -14,7 +14,7 @@ class IncreaseSizeOnLicenses extends Migration
     public function up()
     {
         Schema::table('licenses', function (Blueprint $table) {
-            $table->string("data", 25555)->change();
+            $table->string('data', 25555)->change();
         });
     }
 

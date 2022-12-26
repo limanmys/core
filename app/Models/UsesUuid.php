@@ -9,18 +9,21 @@ trait UsesUuid
     protected static function bootUsesUuid()
     {
         static::creating(function ($model) {
-            if (!$model->getKey()) {
+            if (isset($model->id)) {
+                return;
+            }
+            if (! $model->getKey()) {
                 $model->{$model->getKeyName()} = (string) Str::uuid();
             }
         });
     }
 
-    public function getIncrementing()
+    public function getIncrementing(): bool
     {
         return false;
     }
 
-    public function getKeyType()
+    public function getKeyType(): string
     {
         return 'string';
     }

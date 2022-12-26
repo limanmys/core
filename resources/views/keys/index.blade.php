@@ -22,10 +22,34 @@
         <div class="col-md-9">
             <div class="card">
                 <div class="card-body">
-                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add_settings"><i
-                            class="fa fa-key "></i> {{ __('Anahtar Ekle') }}</button>
-                    <button type="button" class="btn btn-secondary"
-                        onclick="cleanSessions()">{{ __('Önbelleği Temizle') }}</button>
+                    <div class="d-flex justify-content-between">
+                        <div class="buttons">
+                            <button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#add_settings"><i
+                                class="fa fa-key "></i> {{ __('Anahtar Ekle') }}</button>
+                            
+                            @if (user()->isAdmin())
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#add_setting"><i
+                                class="fa fa-cogs "></i> {{ __('Ayar Ekle') }}</button>
+                            @endif
+                        </div>
+                        
+                        @if (user()->isAdmin())
+                        <div class="selectbox d-flex align-items-center">
+                            <span class="mr-2" style="font-weight: 600">{{ __("Kullanıcı") }}</span>
+                            <select class="select2" onchange="handleSelect(this)">
+                                @foreach ($users as $user)
+                                <option 
+                                    value="{{ $user->id }}" 
+                                    @if($selected_user == $user->id) selected @endif
+                                >
+                                    {{ $user->name }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
+                    </div>
+                    
                     <div class="tab-pane active" id="settings" style="margin-top: 15px;">
                         <div class="alert alert-info alert-dismissible">
                             <h5><i class="icon fas fa-info"></i> {{ __('Bilgilendirme!') }}</h5>
@@ -67,6 +91,29 @@
         @include('keys.add', ['success' => 'addServerKey()'])
     @endcomponent
 
+    @if (user()->isAdmin())
+        @component('modal-component', [
+            'id' => 'add_setting',
+            'title' => 'Ayar Ekle',
+            ])
+                <label>{{ __('Sunucu') }}</label>
+                <select name="server_id" id="add_server_id" class="select2 form-control mb-2">
+                    @foreach (servers() as $server)
+                        <option value="{{ $server->id }}">{{ $server->name }}</option>
+                    @endforeach
+                </select>
+                <div class="form-group mt-3">
+                    <label>Ayar Adı</label>
+                    <input type="name" name="setting_name" id="add_setting_name" class="form-control" required>                                                
+                </div>
+                <div class="form-group">
+                    <label>Ayar Değeri</label>
+                    <input type="password" name="setting_value" id="add_setting_value" class="form-control" required>                                                
+                </div>
+                <button type="submit" class="btn btn-success" onclick="createSetting()">{{ __("Ayar Ekle") }}</button>
+        @endcomponent
+    @endif
+
     @include('modal', [
         'id' => 'update_settings',
         'title' => 'Veriyi Güncelle',
@@ -75,6 +122,7 @@
         'inputs' => [
             'Yeni Değer' => 'new_value:password',
             'id:-' => 'setting_id:hidden',
+            'user_id:-' => 'user_id:hidden', 
             'type:-' => 'type:hidden',
         ],
         'submit_text' => 'Veriyi Güncelle',
@@ -94,16 +142,30 @@
     ])
 
     <script>
+        const user = '{{ $selected_user }}';
+
+        function handleSelect(element) {
+            window.location = "/kasa/" + element.value;
+        }
+
         $("#useKeyLabel").fadeOut();
         keySettingsChanged();
 
-        function cleanSessions() {
-            request('{{ route('clean_sessions') }}', new FormData(), function(response) {
-                showSwal("{{ __('Önbellek temizlendi!') }}", 'success', 2000);
-                reload();
-            }, function(response) {
-                var error = JSON.parse(response);
-                showSwal(error.message, 'error', 2000);
+        function createSetting() {
+            showSwal('{{ __('Ekleniyor...') }}', "info");
+            let form = new FormData();
+            form.append('server_id', $("#add_server_id").val());
+            form.append('setting_name', $("#add_setting_name").val());
+            form.append('setting_value', $("#add_setting_value").val());
+            form.append('user_id', user);
+            request("{{ route('user_setting_create') }}", form, function() {
+                showSwal("{{ __('Başarılı') }}", 'success', '2000');
+                setTimeout(() => {
+                    reload();
+                }, 1500);
+            }, function(error) {
+                let json = JSON.parse(error);
+                showSwal(json.message, 'error', 2000);
             });
         }
 
@@ -137,6 +199,7 @@
             } else {
                 form.append('password', $("#keyPasswordCert").val());
             }
+            form.append('user_id', user);
             form.append('type', $("#keyType").val());
             form.append('key_port', $("#port").val());
             form.append('server_id', $("#targetServer").val().split(":")[1]);

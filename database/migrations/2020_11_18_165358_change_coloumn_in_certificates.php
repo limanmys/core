@@ -14,7 +14,7 @@ class ChangeColoumnInCertificates extends Migration
     public function up()
     {
         Schema::table('certificates', function (Blueprint $table) {
-            $table->string("server_hostname")->change();
+            $table->string('server_hostname')->change();
         });
     }
 

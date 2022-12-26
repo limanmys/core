@@ -4,6 +4,7 @@
             <a class="nav-link active" data-toggle="pill" href="#general" role="tab" aria-controls="vert-tabs-home" aria-selected="true">{{__("Genel")}}</a>
             <a class="nav-link" data-toggle="pill" href="#market" role="tab" aria-controls="vert-tabs-profile" aria-selected="false">{{__("Market Ayarları")}}</a>
             <a class="nav-link" data-toggle="pill" href="#mail" role="tab" aria-controls="vert-tabs-messages" aria-selected="false">{{__("Mail Ayarları")}}</a>
+            <a class="nav-link" data-toggle="pill" href="#keycloak" role="tab" aria-controls="vert-tabs-keycloak" aria-selected="false">{{__("Keycloak Ayarları")}}</a>
             <a class="nav-link" data-toggle="pill" href="#advanced" role="tab" aria-controls="vert-tabs-settings" aria-selected="false">{{__("Gelişmiş")}}</a>
         </div>
     </div>
@@ -28,6 +29,13 @@
                         <label for="BRAND_NAME">{{__("Özel İsim")}}</label><br>
                         <small>{{__("Giriş ekranında gözükecek özel isim.")}}</small>
                         <input type="text" class="form-control liman_env" id="BRAND_NAME">
+                    </div>
+                    <div class="form-group">
+                        <label for="OTP_ENABLED">{{__("Google 2FA Sistemi")}}</label><br>
+                        <select id="OTP_ENABLED" class="select2 liman_env">
+                            <option value="true">{{__("Aktif")}}</option>
+                            <option value="false">{{__("Pasif")}}</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="APP_NOTIFICATION_EMAIL">{{__("İletişim Maili")}}</label><br>
@@ -114,6 +122,37 @@
                     </div>
                 </div>
             </div>
+            <div class="tab-pane fade" id="keycloak" role="tabpanel" aria-labelledby="vert-tabs-keycloak-tab">
+                <div>
+                    <div class="form-group">
+                        <label for="KEYCLOAK_ACTIVE">{{__("Keycloak Durumu")}}</label><br>
+                        <select id="KEYCLOAK_ACTIVE" class="select2 liman_env">
+                            <option value="true">{{__("Aktif")}}</option>
+                            <option value="false">{{__("Pasif")}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="KEYCLOAK_CLIENT_ID">{{__("Client ID")}}</label><br>
+                        <input type="text" class="form-control liman_env" id="KEYCLOAK_CLIENT_ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="KEYCLOAK_CLIENT_SECRET">{{__("Client Secret")}}</label><br>
+                        <input type="password" class="form-control liman_env" id="KEYCLOAK_CLIENT_SECRET">
+                    </div>
+                    <div class="form-group">
+                        <label for="KEYCLOAK_REDIRECT_URI">{{__("Redirect URI")}}</label><br>
+                        <input type="text" class="form-control liman_env" id="KEYCLOAK_REDIRECT_URI">
+                    </div>
+                    <div class="form-group">
+                        <label for="KEYCLOAK_BASE_URL">{{__("Base URL")}}</label><br>
+                        <input type="text" class="form-control liman_env" id="KEYCLOAK_BASE_URL">
+                    </div>
+                    <div class="form-group">
+                        <label for="KEYCLOAK_REALM">{{__("Realm")}}</label><br>
+                        <input type="text" class="form-control liman_env" id="KEYCLOAK_REALM">
+                    </div>
+                </div>
+            </div>
             <div class="tab-pane fade" id="advanced" role="tabpanel" aria-labelledby="vert-tabs-settings-tab">
                 <div>
                     <div class="form-group">
@@ -137,17 +176,13 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="LOG_LEVEL">{{__("Log Seviyesi")}}</label><br>
+                        <label for="NEW_LOG_LEVEL">{{__("Log Seviyesi")}}</label><br>
                         <small>{{__("Log Seviyesini düzenle.")}}</small>
-                        <select id="LOG_LEVEL" class="select2 liman_env">
-                            <option value="emergency">{{__("Emergency")}}</option>
-                            <option value="alert">{{__("Alert")}}</option>
-                            <option value="critical">{{__("Critical")}}</option>
-                            <option value="error">{{__("Error")}}</option>
-                            <option value="warning">{{__("Warning")}}</option>
-                            <option value="notice">{{__("Notice")}}</option>
-                            <option value="info">{{__("Info")}}</option>
-                            <option value="debug">{{__("Debug")}}</option>
+                        <select id="NEW_LOG_LEVEL" class="select2 liman_env">
+                            <option value="1">{{__("Minimal")}}</option>
+                            <option value="2">{{__("Eklenti Log")}}</option>
+                            <option value="3">{{__("Detaylı Eklenti Logları")}}</option>
+                            <option value="0">{{__("Tüm İşlemleri Logla")}}</option>
                         </select>
                     </div>
                 </div>
@@ -190,7 +225,7 @@
             let json = JSON.parse(success);
             showSwal(json.message,"success",2000);
             setTimeout(function () {
-                getLimanTweaks();
+                location.reload();
             },2000);
         },function (error) {
             let json = JSON.parse(error);

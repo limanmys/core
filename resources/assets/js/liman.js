@@ -7,30 +7,41 @@ let english = {
   "Yükleniyor...": "Loading...",
   "Sonuç bulunamadı!": "No results found!",
   "Liman ID kopyalandı!": "Liman ID copied!",
-  "Liman ID başarıyla kopyalandı.": "Liman ID has been copied successfully!"
-}
+  "Liman ID başarıyla kopyalandı.": "Liman ID has been copied successfully!",
+  "Okunmamış bildiriminiz bulunmamaktadır.":
+    "You have been read all notifications.",
+  "/turkce.json": "/english.json",
+  "Tümünü Seç": "Select All",
+  "Tümünü Kaldır": "Remove All",
+  "CPU Kullanımı": "CPU Usage",
+  "RAM Kullanımı": "RAM Usage",
+  "Disk Kullanımı": "Disk Usage",
+};
 
-let turkish = {}
+let turkish = {};
 
-let language = document.getElementsByTagName('html')[0].getAttribute('lang');
-let defaultLanguage = "tr"
-console.log(`🌟 Liman localization initialized: ${language}`)
+let language = document.getElementsByTagName("html")[0].getAttribute("lang");
+let defaultLanguage = "tr";
+console.log(`🌟 Liman localization initialized: ${language}`);
 
 let __ = (trans) => {
   if (language == "tr") {
-    language = "turkish"
+    language = "turkish";
   }
 
   if (language == "en") {
-    language = "english"
+    language = "english";
   }
 
-  if (language === defaultLanguage && !eval(language).hasOwnProperty(trans) || !eval(language).hasOwnProperty(trans)) {
-    return trans
+  if (
+    (language === defaultLanguage && !eval(language).hasOwnProperty(trans)) ||
+    !eval(language).hasOwnProperty(trans)
+  ) {
+    return trans;
   }
 
-  return eval(language)[trans]
-}
+  return eval(language)[trans];
+};
 
 function showSwal(message, type, timer = false) {
   var config = {
@@ -39,7 +50,7 @@ function showSwal(message, type, timer = false) {
     title: message,
     toast: true,
     showConfirmButton: false,
-    animation: false
+    animation: false,
   };
   if (timer) {
     config["timer"] = timer;
@@ -65,17 +76,17 @@ function request(url, data, next, error, requestType = "POST") {
       title: __("Yükleniyor..."),
       toast: true,
       showConfirmButton: false,
-      animation: false
+      animation: false,
     });
   }
 
   modalData = data;
   if (
-    url.startsWith(window.location.origin + "/extensionRun/") ||
-    url.startsWith("/extensionRun/")
+    url.startsWith(window.location.origin + "/engine/") ||
+    url.startsWith("/engine/")
   ) {
-    data.append("lmntargetFunction", url.split("/extensionRun/")[1]);
-    url = window.location.origin + "/extensionRun/";
+    data.append("lmntargetFunction", url.split("/engine/")[1]);
+    url = window.location.origin + "/engine/";
   }
 
   var server_id = window.$("meta[name=server_id]").attr("content");
@@ -110,9 +121,7 @@ function request(url, data, next, error, requestType = "POST") {
   r.open(requestType, url);
   r.setRequestHeader("X-CSRF-TOKEN", csrf);
   r.setRequestHeader("Accept", "text/json");
-  setTimeout(function () {
-    r.send(data);
-  }, 300);
+  r.send(data);
   r.onreadystatechange = function () {
     if (r.readyState === 4) {
       if (
@@ -128,9 +137,6 @@ function request(url, data, next, error, requestType = "POST") {
       if (id != null && (r.status !== 200 || r.status !== 300)) {
         message(r.responseText);
       }
-      if (id != null) {
-        // loading();
-      }
       if (r.getResponseHeader("content-type") !== "application/json") {
         return next(r.responseText);
       }
@@ -139,14 +145,12 @@ function request(url, data, next, error, requestType = "POST") {
         case 200:
           return next(r.responseText);
           break;
-        case 201:
-          if (error) return error(r.responseText);
-          break;
         case 300:
           return (window.location = response["message"]);
           break;
         case 403:
           showSwal(response["message"], "error", 2000);
+          if (error) return error(r.responseText);
           break;
         default:
           if (error) return error(r.responseText);
@@ -322,16 +326,42 @@ function message(data) {
 
 function readNotifications(id) {
   var data = new FormData();
-  request("/bildirimler/oku", data, function () {
-    checkNotifications();
-  });
+  request("/bildirimler/oku", data, function () {});
+  setTimeout(function () {
+    var element = window.$("#userNotifications .menu");
+    element
+      .parent()
+      .find(".notif-action")
+      .addClass("d-none")
+      .removeClass("d-block");
+    element.html(`<a class="dropdown-item d-flex align-items-start no-notif">
+        <div class="text" style="width: 100% !important; padding: 15px 0">
+            <h4 style="text-align: center; color: grey; font-size: 12px; text-transform: uppercase">${__(
+              "Okunmamış bildiriminiz bulunmamaktadır."
+            )}</h4>
+        </div>
+    </a>`);
+  }, 200);
 }
 
 function readSystemNotifications(id) {
   var data = new FormData();
-  request("/bildirim/adminOku", data, function () {
-    checkNotifications();
-  });
+  request("/bildirim/adminOku", data, function () {});
+  setTimeout(function () {
+    var element = window.$("#adminNotifications .menu");
+    element
+      .parent()
+      .find(".notif-action")
+      .addClass("d-none")
+      .removeClass("d-block");
+    element.html(`<a class="dropdown-item d-flex align-items-start no-notif">
+        <div class="text" style="width: 100% !important; padding: 15px 0">
+            <h4 style="text-align: center; color: grey; font-size: 12px; text-transform: uppercase">${__(
+              "Okunmamış bildiriminiz bulunmamaktadır."
+            )}</h4>
+        </div>
+    </a>`);
+  }, 200);
 }
 
 var inputs = [];
@@ -354,24 +384,51 @@ function isJson(str) {
   return true;
 }
 
+const limanEscapeHtml = (unsafe) => {
+  if (typeof unsafe === "string" || unsafe instanceof String)
+    return unsafe
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  else return unsafe;
+};
+
 function renderNotifications(data, type, target, exclude) {
   var element = window.$("#" + target + " .menu");
   element.html("");
   //Set Count
   window.$("#" + target + "Count").html(data.length);
+  let language = document.getElementsByTagName("html")[0].getAttribute("lang");
   data.forEach((notification) => {
+    element
+      .parent()
+      .find(".notif-action")
+      .removeClass("d-none")
+      .addClass("d-block");
+    element.parent().find(".no-notif").removeClass("d-flex").addClass("d-none");
     let notificationTitle = notification["title"];
     let notificationMsg = notification["message"];
     if (isJson(notification["title"])) {
-      let temp = JSON.parse(notification["title"])
+      let temp = JSON.parse(notification["title"]);
       notificationTitle = temp[language];
     }
     if (isJson(notification["message"])) {
-      let temp = JSON.parse(notification["message"])
+      let temp = JSON.parse(notification["message"]);
       notificationMsg = temp[language];
     }
     var errors = ["error", "health_problem"];
-    element.append([...window.$("<div />").addClass("dropdown-divider").append("<a />").find("a").addClass("dropdown-item").attr("href", `/bildirim/${notification["id"]}`).append("<span />").find("span").css("color", errors.includes(notification["type"]) ? "#f56954" : "#00a65a").css("width", "100%").text(notificationTitle).parents()].reverse())
+    let color = errors.includes(notification["type"]) ? "color: #ff4444" : "";
+    let html = `<a class="dropdown-item d-flex align-items-start" onclick="window.location.href = '/bildirim/${
+      notification["id"]
+    }'" href="/bildirim/${notification["id"]}">
+        <div class="text">
+            <h4 style="${color}">${limanEscapeHtml(notificationTitle)}</h4>
+            <span class="time">${notification["humanDate"]}</span>
+        </div>
+    </a>`;
+    element.append(html);
     var displayedNots = [];
     if (localStorage.displayedNots) {
       displayedNots = JSON.parse(localStorage.displayedNots);
@@ -382,22 +439,35 @@ function renderNotifications(data, type, target, exclude) {
     if (displayedNots.includes(notification.id)) {
       return;
     }
+
+    let toastOptions = {
+      title: notificationTitle,
+      subtitle: "Liman",
+      body: notificationMsg,
+      delay: 5000,
+      autohide: true,
+    };
+
     if (errors.includes(notification.type)) {
-      toastElement = toastr.error(notificationMsg, notificationTitle, {
-        timeOut: 5000,
+      $(document).Toasts("create", {
+        ...toastOptions,
+        icon: "fa-solid fa-triangle-exclamation",
+        class: "bg-danger",
       });
     } else if (notification.type == "liman_update") {
-      toastElement = toastr.warning(notificationMsg, notificationTitle, {
-        timeOut: 5000,
+      $(document).Toasts("create", {
+        ...toastOptions,
+        icon: "fa-solid fa-triangle-exclamation",
+        class: "bg-warning",
       });
     } else {
-      toastElement = toastr.success(notificationMsg, notificationTitle, {
-        timeOut: 5000,
+      $(document).Toasts("create", {
+        ...toastOptions,
+        icon: "fas fa-check",
+        class: "bg-success",
       });
     }
-    window.$(toastElement).click(function () {
-      location.href = "/bildirim/" + notification.id;
-    });
+
     displayedNots.push(notification.id);
     localStorage.displayedNots = JSON.stringify(displayedNots);
   });
@@ -414,35 +484,6 @@ function fixer(val) {
   if (!val) return val;
   return val.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-var currentlyDark =
-  window.localStorage.getItem("dark") == "true" ? true : false;
-
-function toggleDarkMode() {
-  currentlyDark = !currentlyDark;
-  if (currentlyDark == true) {
-    setDarkMode();
-  } else {
-    setLightMode();
-  }
-}
-
-function setDarkMode() {
-  document.getElementById("darkModeIcon").className = "fas fa-moon";
-  var link = document.createElement("link");
-  link.href = "/css/dark.css";
-  link.type = "text/css";
-  link.id = "darkModeCss";
-  link.rel = "stylesheet";
-  link.media = "screen,print";
-  document.getElementsByTagName("head")[0].appendChild(link);
-  window.localStorage.setItem("dark", "true");
-}
-
-function setLightMode() {
-  document.getElementById("darkModeIcon").className = "fas fa-sun";
-  window.$("#darkModeCss").remove();
-  window.localStorage.setItem("dark", "false");
-}
 
 window.Echo = new Echo({
   broadcaster: "pusher",
@@ -457,7 +498,7 @@ window.Echo = new Echo({
 
 window.$(function () {
   window.$('[data-toggle="tooltip"]').tooltip({
-    container: "body"
+    container: "body",
   });
   bsCustomFileInput.init();
   window.$(".select2").select2({
@@ -465,7 +506,8 @@ window.$(function () {
   });
 
   window.$(".modal").on("show.bs.modal", function (modal) {
-    window.$("#" + modal.target.id + " .alert")
+    window
+      .$("#" + modal.target.id + " .alert")
       .not(".alert-info")
       .fadeOut(0);
   });
@@ -477,7 +519,7 @@ function getSearchResults(query) {
     method: "GET",
     url: "/liman_arama",
     data: {
-      search_query: query
+      search_query: query,
     },
     success: function (data, status, xhr) {
       if (data.length == 0) {
@@ -487,13 +529,19 @@ function getSearchResults(query) {
       }
 
       data.forEach((el, i) => {
-        window.$("#liman_search_results").append(window.$("<a />").attr("href", el.url).toggleClass("hovered", i == 0).text(el.name));
+        window.$("#liman_search_results").append(
+          window
+            .$("<a />")
+            .attr("href", el.url)
+            .toggleClass("hovered", i == 0)
+            .text(el.name)
+        );
       });
     },
     error: function (jqXhr, textStatus, error) {
       console.log(error);
-    }
-  })
+    },
+  });
 }
 
 function liman_search() {
@@ -512,12 +560,14 @@ function liman_search() {
 }
 
 window.$(document).ready(function () {
-  window.$("body").tooltip({ selector: '[data-toggle=tooltip]', container: 'body' });
+  window
+    .$("body")
+    .tooltip({ selector: "[data-toggle=tooltip]", container: "body" });
 
   let input = window.$("#liman_search_input");
   let result = window.$("#liman_search_results");
 
-  let idx = 0
+  let idx = 0;
 
   input.on("keydown", function (e) {
     if (e.keyCode == 13) {
@@ -526,20 +576,20 @@ window.$(document).ready(function () {
     }
 
     if (!(e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13)) {
-      clearTimeout(window.$.data(this, 'timer'));
+      clearTimeout(window.$.data(this, "timer"));
       let wait = setTimeout(liman_search, 150);
-      window.$(this).data('timer', wait);
-      idx = 0
+      window.$(this).data("timer", wait);
+      idx = 0;
     } else {
       e.preventDefault();
       if (!result.html().includes("Sonuç bulunamadı")) {
-        let results = result.find("a")
-        let len = results.length - 1
+        let results = result.find("a");
+        let len = results.length - 1;
         if (e.keyCode == 38) {
           if (idx <= 0) {
-            idx = 0
+            idx = 0;
           } else {
-            idx--
+            idx--;
             result.find(results[idx + 1]).removeClass("hovered");
             result.find(results[idx]).addClass("hovered");
           }
@@ -547,16 +597,16 @@ window.$(document).ready(function () {
 
         if (e.keyCode == 40) {
           if (idx >= len) {
-            idx = len
+            idx = len;
           } else {
-            idx++
+            idx++;
             result.find(results[idx - 1]).removeClass("hovered");
             result.find(results[idx]).addClass("hovered");
           }
         }
       }
     }
-  })
+  });
 
   window.$(document).on("click", function (event) {
     var $trigger = window.$("#liman_search");
@@ -588,9 +638,9 @@ function copyToClipboard(elementId) {
   document.execCommand("copy");
   document.body.removeChild(aux);
   Swal.fire(
-    __('Liman ID kopyalandı!'),
-    __('Liman ID başarıyla kopyalandı.'),
-    'success'
+    __("Liman ID kopyalandı!"),
+    __("Liman ID başarıyla kopyalandı."),
+    "success"
   );
 }
 
@@ -606,4 +656,394 @@ window.$(document).ready(function () {
   if (localStorage.getItem("collapse") == "true") {
     window.$("body").addClass("sidebar-collapse");
   }
-})
+});
+
+function isJson(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
+function dataTablePresets(type) {
+  if (type == "normal") {
+    return {
+      bFilter: true,
+      language: {
+        url: __("/turkce.json"),
+      },
+    };
+  } else if (type == "multiple") {
+    return {
+      bFilter: true,
+      select: {
+        style: "multi",
+        selector: "td:not(.table-menu)",
+      },
+      dom: "Blfrtip",
+      buttons: {
+        buttons: [
+          { extend: "selectAll", className: "btn btn-xs btn-primary mr-1" },
+          { extend: "selectNone", className: "btn btn-xs btn-primary mr-1" },
+        ],
+        dom: {
+          button: { className: "btn" },
+        },
+      },
+      language: {
+        url: __("/turkce.json"),
+        buttons: {
+          selectAll: __("Tümünü Seç"),
+          selectNone: __("Tümünü Kaldır"),
+        },
+      },
+    };
+  }
+}
+
+const ApexChartLocalization = [
+  {
+    name: "en",
+    options: {
+      months: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ],
+      shortMonths: [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ],
+      days: [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ],
+      shortDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      toolbar: {
+        exportToSVG: "Download SVG",
+        exportToPNG: "Download PNG",
+        menu: "Menu",
+        selection: "Selection",
+        selectionZoom: "Selection Zoom",
+        zoomIn: "Zoom In",
+        zoomOut: "Zoom Out",
+        pan: "Panning",
+        reset: "Reset Zoom",
+      },
+    },
+  },
+  {
+    name: "tr",
+    options: {
+      months: [
+        "Ocak",
+        "Şubat",
+        "Mart",
+        "Nisan",
+        "Mayıs",
+        "Haziran",
+        "Temmuz",
+        "Ağustos",
+        "Eylül",
+        "Ekim",
+        "Kasım",
+        "Aralık",
+      ],
+      shortMonths: [
+        "Oca",
+        "Şub",
+        "Mar",
+        "Nis",
+        "May",
+        "Haz",
+        "Tem",
+        "Ağu",
+        "Eyl",
+        "Eki",
+        "Kas",
+        "Ara",
+      ],
+      days: [
+        "Pazar",
+        "Pazartesi",
+        "Salı",
+        "Çarşamba",
+        "Perşembe",
+        "Cuma",
+        "Cumartesi",
+      ],
+      shortDays: ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"],
+      toolbar: {
+        exportToSVG: "SVG İndir",
+        exportToPNG: "PNG İndir",
+        exportToCSV: "CSV İndir",
+        menu: "Menü",
+        selection: "Seçim",
+        selectionZoom: "Seçim Yakınlaştır",
+        zoomIn: "Yakınlaştır",
+        zoomOut: "Uzaklaştır",
+        pan: "Kaydır",
+        reset: "Yakınlaştırmayı Sıfırla",
+      },
+    },
+  },
+];
+
+/* === INDEX CHARTS START === */
+
+var stats;
+var server_stats;
+const CHART_INTERVAL = 2500;
+const CHART_NOW = new Date();
+CHART_NOW.setSeconds(CHART_NOW.getSeconds() - 5);
+let IS_RENDERED = false;
+let CHART_FAST_LOAD = 0;
+var CHARTS = {
+  CPU: {
+    title: __("CPU Kullanımı"),
+    id: "cpuChart",
+    key: "cpu",
+    chart: null,
+    data: [[CHART_NOW, 0]],
+    colors: ["#06d48b"],
+  },
+  RAM: {
+    title: __("RAM Kullanımı"),
+    id: "ramChart",
+    key: "ram",
+    chart: null,
+    data: [[CHART_NOW, 0]],
+    colors: ["#06b6d4"],
+  },
+  IO: {
+    title: __("Disk Kullanımı"),
+    id: "diskChart",
+    key: "io",
+    chart: null,
+    data: [[CHART_NOW, 0]],
+    colors: ["#064fd4"],
+  },
+  NETWORK: {
+    title: __("Network"),
+    id: "networkChart",
+    key: "network",
+    chart: null,
+    data: {
+      upload: [[CHART_NOW, 0]],
+      download: [[CHART_NOW, 0]],
+    },
+    colors: ["#008ffb", "#00e396"],
+  },
+};
+
+function renderChart(obj, network = false) {
+  var options = {
+    series: [
+      !network
+        ? {
+            data: obj.data,
+            name: obj.title,
+          }
+        : ({
+            data: obj.data.upload,
+            name: "Up",
+          },
+          {
+            data: obj.data.download,
+            name: "Down",
+          }),
+    ],
+    chart: {
+      locales: ApexChartLocalization,
+      defaultLocale: document.documentElement.lang,
+      height: 200,
+      type: "area",
+      fontFamily: "Inter",
+      animations: {
+        enabled: true,
+        easing: "linear",
+        dynamicAnimation: {
+          enabled: true,
+          speed: 1,
+        },
+      },
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+    },
+    fill: {
+      colors: obj.colors,
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      curve: "smooth",
+    },
+    title: {
+      text: `${obj.title} %${stats[obj.key]}`,
+      align: "left",
+      style: {
+        fontWeight: 600,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    markers: {
+      size: 0,
+    },
+    xaxis: {
+      type: "datetime",
+      range: 60000,
+      labels: {
+        show: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return `%${val}`;
+        },
+      },
+    },
+    yaxis: {
+      max: 100,
+      min: 0,
+      tickAmount: 5,
+      labels: {
+        formatter: (value) => {
+          return value;
+        },
+      },
+    },
+  };
+  var chart = new ApexCharts(document.querySelector(`#${obj.id}`), options);
+  chart.render();
+  obj.chart = chart;
+}
+
+function updateChart(obj) {
+  obj.data.push([Date.now(), stats[obj.key]]);
+
+  let options = {
+    title: {
+      text: `${obj.title} %${stats[obj.key]}`,
+    },
+    series: [
+      {
+        data: obj.data,
+      },
+    ],
+  };
+
+  if (CHART_FAST_LOAD < 4) {
+    obj.chart.updateOptions(options);
+    CHART_FAST_LOAD++;
+  } else {
+    obj.chart.updateOptions({
+      ...options,
+      chart: {
+        animations: {
+          dynamicAnimation: {
+            speed: 3500,
+          },
+        },
+      },
+    });
+  }
+}
+
+function updateNetworkChart(obj) {
+  let date = Date.now();
+
+  obj.data.download.push([date, stats[obj.key].download]);
+  obj.data.upload.push([date, stats[obj.key].upload]);
+
+  let options = {
+    title: {
+      text: `${obj.title} Up: ${stats[obj.key].upload} kb/s Down: ${
+        stats[obj.key].download
+      } kb/s`,
+    },
+    yaxis: {
+      min: 0,
+      tickAmount: 6,
+      labels: {
+        formatter: (value) => {
+          return value.toFixed(0);
+        },
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return `${val} kb/s`;
+        },
+      },
+    },
+    legend: {
+      show: false,
+    },
+    series: [
+      {
+        data: obj.data.upload,
+        name: "Upload",
+      },
+      {
+        data: obj.data.download,
+        name: "Download",
+      },
+    ],
+  };
+
+  if (CHART_FAST_LOAD < 4) {
+    obj.chart.updateOptions(options);
+    CHART_FAST_LOAD++;
+  } else {
+    obj.chart.updateOptions({
+      ...options,
+      chart: {
+        animations: {
+          dynamicAnimation: {
+            speed: 3500,
+          },
+        },
+      },
+    });
+  }
+}
+
+/* === INDEX CHARTS END === */

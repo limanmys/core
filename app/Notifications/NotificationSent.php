@@ -2,33 +2,26 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Notification;
 
 class NotificationSent extends Notification
 {
-    private $notification;
-
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($notification)
+    public function __construct(private $notification)
     {
-        $this->notification = $notification;
     }
 
     /**
      * Get the notification's delivery channels.
      *
-     * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via(mixed $notifiable)
     {
         return ['broadcast'];
     }
@@ -36,10 +29,9 @@ class NotificationSent extends Notification
     /**
      * Get the broadcastable representation of the notification.
      *
-     * @param  mixed  $notifiable
      * @return BroadcastMessage
      */
-    public function toBroadcast($notifiable)
+    public function toBroadcast(mixed $notifiable)
     {
         return (new BroadcastMessage(
             (array) $this->notification
@@ -49,10 +41,9 @@ class NotificationSent extends Notification
     /**
      * Get the array representation of the notification.
      *
-     * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray(mixed $notifiable)
     {
         return (array) $this->notification;
     }

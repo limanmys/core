@@ -12,7 +12,7 @@
             <a class="nav-link active" href="#fromRepo" data-toggle="tab">{{__("Depodan Yükle")}}</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#fromDeb" data-toggle="tab">{{__("Paket Yükle (.deb)")}}</a>
+            <a class="nav-link" href="#fromDeb" data-toggle="tab">{{__("Paket Yükle")}}</a>
         </li>
     </ul>
     <div class="tab-content">
@@ -25,7 +25,7 @@
         </div>
         <div class="tab-pane fade show" id="fromDeb" role="tabpanel">
             @include('file-input', [
-                'title' => 'Deb Paketi',
+                'title' => 'Paket (.rpm / .deb)',
                 'name' => 'debUpload',
                 'callback' => 'onDebUploadSuccess'
             ])
@@ -58,7 +58,7 @@
         "url" => route('server_add_local_user'),
         "next" => "reload",
         "inputs" => [
-            "İsim" => "user_name:text",
+            "Kullanıcı Adı" => "user_name:text",
             "Şifre" => "user_password:password",
             "Şifre Onayı" => "user_password_confirmation:password"
         ],
@@ -71,9 +71,9 @@
         "url" => route('server_add_sudoers'),
         "next" => "getSudoers",
         "inputs" => [
-            "İsim" => "name:text:Grup veya kullanıcı ekleyebilirsiniz. Örneğin: kullanıcı adı veya %grupadı"
+            "İsim" => "name:text:Grup veya kullanıcı ekleyebilirsiniz. Örneğin, kullanıcı adı veya %grupadı"
         ],
-        "submit_text" => "Grup Ekle"
+        "submit_text" => "Ekle"
     ])
 
     @include('modal',[
@@ -242,7 +242,7 @@
             </div>
         </div>
         <div class="col-8">
-            <div class="tab-content" id="logContentWrapper">
+            <div class="tab-content" id="logContentWrapper" style="height: 100%">
             </div>
         </div>
     </div>

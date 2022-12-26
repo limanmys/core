@@ -14,7 +14,7 @@ class AlterTableServerKeysChangeData extends Migration
     public function up()
     {
         Schema::table('server_keys', function (Blueprint $table) {
-            $table->longText("data")->change();
+            $table->longText('data')->change();
         });
     }
 

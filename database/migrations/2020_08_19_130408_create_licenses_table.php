@@ -16,12 +16,12 @@ class CreateLicensesTable extends Migration
         Schema::create('licenses', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('data');
-            $table->uuid("extension_id");
+            $table->uuid('extension_id');
             $table
-                ->foreign("extension_id")
-                ->references("id")
-                ->on("extensions")
-                ->onDelete("cascade");
+                ->foreign('extension_id')
+                ->references('id')
+                ->on('extensions')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -2,11 +2,8 @@
 
 namespace App\Connectors;
 
-use App\Models\UserSettings;
-
 /**
  * Class SNMPConnector
- * @package App\Classes
  */
 class SNMPConnector implements Connector
 {
@@ -14,37 +11,42 @@ class SNMPConnector implements Connector
      * @var mixed
      */
     protected $connection;
-    protected $server;
+
     protected $ssh;
+
     protected $key;
+
     protected $user_id;
+
     protected $username;
-    protected $securityLevel;
-    protected $authProtocol;
+
+    protected $securityLevel = 'authPriv';
+
+    protected $authProtocol = 'SHA';
+
     protected $authPassword;
-    protected $privacyProtocol;
+
+    protected $privacyProtocol = 'AES';
+
     protected $privacyPassword;
 
-    public static $verifyCommands = ["iso.3.6.1.2.1.1.1.0"];
+    public static $verifyCommands = ['iso.3.6.1.2.1.1.1.0'];
 
     /**
      * SNMPConnector constructor.
-     * @param \App\Models\Server $server
-     * @param null $user_id
+     *
+     * @param  \App\Models\Server  $server
+     * @param  null  $user_id
      */
-    public function __construct(\App\Models\Server $server, $user_id)
+    public function __construct(protected \App\Models\Server $server, $user_id)
     {
-        list($username, $password, $port) = self::retrieveCredentials();
-        $this->server = $server;
+        [$username, $password, $port] = self::retrieveCredentials();
         $this->username = $username;
-        $this->securityLevel = 'authPriv';
-        $this->authProtocol = 'SHA';
         $this->authPassword = $password;
-        $this->privacyProtocol = 'AES';
         $this->privacyPassword = $password;
     }
 
-    public function execute($command, $flag = true)
+    public function execute($command, $flag = true): string|bool
     {
         return snmp3_get(
             $this->server->ip_address,
@@ -58,16 +60,6 @@ class SNMPConnector implements Connector
         );
     }
 
-    /**
-     * @param $script
-     * @param $parameters
-     * @param null $extra
-     * @return string
-     */
-    public function runScript($script, $parameters, $runAsRoot = false)
-    {
-    }
-
     public function sendFile($localPath, $remotePath, $permissions = 0644)
     {
     }
@@ -77,7 +69,6 @@ class SNMPConnector implements Connector
     }
 
     /**
-     * @param \App\Models\Server $server
      * @param $username
      * @param $password
      * @param $user_id
@@ -98,7 +89,7 @@ class SNMPConnector implements Connector
     {
     }
 
-    public static function createSnmp()
+    public static function createSnmp(): bool
     {
         return true;
     }
@@ -123,9 +114,10 @@ class SNMPConnector implements Connector
         }
 
         if (isset($flag)) {
-            return "ok";
+            return 'ok';
         }
-        return "nok";
+
+        return 'nok';
     }
 
     public static function retrieveCredentials()
@@ -133,16 +125,16 @@ class SNMPConnector implements Connector
         if (server()->key() == null) {
             abort(
                 504,
-                "Bu sunucu için SNMP anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz."
+                'Bu sunucu için SNMP anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.'
             );
         }
-        $data = json_decode(server()->key()->data, true);
+        $data = json_decode((string) server()->key()->data, true);
 
         return [
-            lDecrypt($data["clientUsername"]),
-            lDecrypt($data["clientPassword"]),
-            array_key_exists("key_port", $data)
-                ? intval($data["key_port"])
+            lDecrypt($data['clientUsername']),
+            lDecrypt($data['clientPassword']),
+            array_key_exists('key_port', $data)
+                ? intval($data['key_port'])
                 : 161,
         ];
     }

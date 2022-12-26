@@ -11,105 +11,77 @@
     <meta name="server_id" content="{{request('server_id') ? request('server_id') : ''}}">
     <meta name="extension_id" content="{{request('extension_id') ? request('extension_id') : ''}}">
 </head>
-<div class="il-isimleri"></div>
 <body class="hold-transition @yield('body_class')">
 <script>
     var module = { };
 </script>
 <script src="{{mix('/js/liman.js')}}"></script>
-<!-- Admin Password Recovery : https://www.youtube.com/watch?v=dQw4w9WgXcQ -->
 @if(auth()->check())
 <script>
-    toastr.options.closeButton = true;
-    function isJson(str) {
-        try {
-            JSON.parse(str);
-        } catch (e) {
-            return false;
-        }
-        return true;
-    }
-    Echo.private('App.User.{{auth()->user()->id}}')
-        .notification((notification) => {
-            var data = notification['\u0000*\u0000attributes'];
-            if(data){
-                var errors = [
-                    "error" , "health_problem"
-                ];
-                let notificationTitle = decodeURIComponent(JSON.parse('"' + data["title"].replace(/\"/g, '\\"') + '"'));
-                let notificationMsg = decodeURIComponent(JSON.parse('"' + data["message"].replace(/\"/g, '\\"') + '"'));
+Echo.private('App.User.{{auth()->user()->id}}')
+    .notification((notification) => {
+        var data = notification['\u0000*\u0000attributes'];
+        if(data){
+            var errors = [
+                "error" , "health_problem"
+            ];
+            
+            let language = document.getElementsByTagName('html')[0].getAttribute('lang');
 
-                if (isJson(notificationTitle)) {
-                    let temp = JSON.parse(notificationTitle)
-                    notificationTitle = temp[language];
-                } else {
-                    notificationTitle = data["title"];
-                }
+            let notificationTitle = decodeURIComponent(JSON.parse('"' + data["title"].replace(/\"/g, '\\"') + '"'));
+            let notificationMsg = decodeURIComponent(JSON.parse('"' + data["message"].replace(/\"/g, '\\"') + '"'));
 
-                if (isJson(notificationMsg)) {
-                    let temp = JSON.parse(notificationMsg)
-                    notificationMsg = temp[language];
-                } else {
-                    notificationMsg = data["message"];
-                }
+            if (isJson(notificationTitle)) {
+                let temp = JSON.parse(notificationTitle)
+                notificationTitle = temp[language];
+            } else {
+                notificationTitle = data["title"];
+            }
 
-                if(errors.includes(data.type)){
-                    toastElement = toastr.error(notificationMsg, notificationTitle, {timeOut: 5000});
-                }else if(data.type == "liman_update"){
-                    toastElement = toastr.warning(notificationMsg, notificationTitle, {timeOut: 5000})
-                }else{
-                    toastElement = toastr.success(notificationMsg, notificationTitle, {timeOut: 5000})
-                }
-                var displayedNots = [];
+            if (isJson(notificationMsg)) {
+                let temp = JSON.parse(notificationMsg)
+                notificationMsg = temp[language];
+            } else {
+                notificationMsg = data["message"];
+            }
 
-                if(localStorage.displayedNots){
-                    displayedNots = JSON.parse(localStorage.displayedNots);
-                } 
-                displayedNots.push(data.id);
-                localStorage.displayedNots = JSON.stringify(displayedNots);
-                
-                $(toastElement).click(function(){
-                    window.location.href = "/bildirim/" + data.id;
+            let toastOptions = {
+                    title: notificationTitle,
+                    subtitle: "Liman",
+                    body: notificationMsg,
+                    delay: 5000,
+                    autohide: true,
+            };
+
+            if(errors.includes(data.type)){
+                $(document).Toasts('create', {
+                    ...toastOptions,
+                    icon: "fa-solid fa-triangle-exclamation",
+                    class: 'bg-danger'
+                });
+            }else if(data.type == "liman_update"){
+                $(document).Toasts('create', {
+                    ...toastOptions,
+                    icon: "fa-solid fa-triangle-exclamation",
+                    class: 'bg-warning'
+                });
+            }else{
+                $(document).Toasts('create', {
+                    ...toastOptions,
+                    icon: "fas fa-check",
+                    class: 'bg-success'
                 });
             }
-            checkNotifications(data ? data.id : null);
-    });
+            var displayedNots = [];
 
-    function dataTablePresets(type){
-        if(type == "normal"){
-            return {
-                bFilter: true,
-                "language" : {
-                    url : "{{__("/turkce.json")}}"
-                }
-            };
-        }else if(type == "multiple"){
-            return {
-                bFilter: true,
-                select: {
-                    style: 'multi',
-                    selector: 'td:not(.table-menu)'
-                },
-                dom: 'Blfrtip',
-                buttons: {
-                    buttons: [
-                        { extend: 'selectAll', className: 'btn btn-xs btn-primary mr-1' },
-                        { extend: 'selectNone', className: 'btn btn-xs btn-primary mr-1' }
-                    ],
-                    dom: {
-                        button: { className: 'btn' }
-                    }
-                },
-                language: {
-                    url : "{{__("/turkce.json")}}",
-                    buttons: {
-                        selectAll: "{{ __('Tümünü Seç') }}",
-                        selectNone: "{{ __('Tümünü Kaldır') }}"
-                    }
-                }
-            };
+            if(localStorage.displayedNots){
+                displayedNots = JSON.parse(localStorage.displayedNots);
+            } 
+            displayedNots.push(data.id);
+            localStorage.displayedNots = JSON.stringify(displayedNots);
         }
-    }
+        checkNotifications(data ? data.id : null);
+    });
 </script>
 @endif
 @yield('body')
@@ -123,7 +95,6 @@
         $(".nav.nav-tabs a").on('click',function () {
             window.location.hash = $(this).attr("href");
         });
-        initialPresets();
         navigateButtons();
         activeTab();
         var title = $(".breadcrumb-item.active").text();
@@ -133,6 +104,7 @@
         @if(auth()->check())
             checkNotifications();
         @endif
+        initialPresets();
     };
 
     function publicPath(path, extension_id=null){
@@ -143,7 +115,7 @@
     }
 
     function initialPresets(){
-        $('table').not('.notDataTable').not(".bx--data-table").DataTable({
+        $('table').not('.notDataTable').not(".bx--data-table").not(".n-data-table-table").DataTable({
             autoFill : true,
             bFilter: true,
             destroy: true,

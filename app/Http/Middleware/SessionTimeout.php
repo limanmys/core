@@ -5,18 +5,19 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Session\Store;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 
 class SessionTimeout
 {
     /**
      * Instance of Session Store
+     *
      * @var session
      */
     protected $session;
 
     /**
      * Time for user to remain active, set to 900secs( 15minutes )
+     *
      * @var timeout
      */
     protected $timeout = 900;
@@ -27,7 +28,7 @@ class SessionTimeout
         $this->redirectUrl = route('login');
         $this->sessionLabel = 'warning';
         $this->lifetime = config('session.lifetime');
-        $this->exclude = ['user_notifications', 'widget_one', 'server_check'];
+        $this->exclude = ['user_notifications', 'server_check'];
     }
 
     /**
@@ -39,11 +40,12 @@ class SessionTimeout
      */
     public function handle($request, Closure $next)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             $this->session->forget('lastActivityTime');
+
             return $next($request);
         }
-        if (!$this->session->has('lastActivityTime')) {
+        if (! $this->session->has('lastActivityTime')) {
             $this->session->put('lastActivityTime', time());
         } elseif (
             time() - $this->session->get('lastActivityTime') >
@@ -57,6 +59,7 @@ class SessionTimeout
             );
             if ($request->wantsJson()) {
                 $this->session->flash($this->getSessionLabel(), $message);
+
                 return respond($this->getRedirectUrl(), 300);
             } else {
                 return redirect($this->getRedirectUrl())->with([
@@ -64,14 +67,16 @@ class SessionTimeout
                 ]);
             }
         }
-        if (!in_array($request->route()->getName(), $this->exclude)) {
+        if (! in_array($request->route()->getName(), $this->exclude)) {
             $this->session->put('lastActivityTime', time());
         }
+
         return $next($request);
     }
 
     /**
      * Get timeout from laravel default's session lifetime, if it's not set/empty, set timeout to 15 minutes
+     *
      * @return int
      */
     private function getTimeOut()
@@ -81,6 +86,7 @@ class SessionTimeout
 
     /**
      * Get redirect url from env file
+     *
      * @return string
      */
     private function getRedirectUrl()
@@ -90,6 +96,7 @@ class SessionTimeout
 
     /**
      * Get Session label from env file
+     *
      * @return string
      */
     private function getSessionLabel()

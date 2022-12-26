@@ -23,7 +23,12 @@ mv extension_templates-$2/* package/liman/server/storage/extension_templates/
 rm -rf $2.zip extension_templates-$2
 
 #Render Engine
-wget "https://github.com/limanmys/render-engine/raw/$3/liman_render" -q
+curl -s https://api.github.com/repos/limanmys/fiber-render-engine/releases/latest \
+| grep "browser_download_url.*zip" \
+| cut -d : -f 2,3 \
+| tr -d \" \
+| wget -qi -
+unzip liman_render*.zip
 mv liman_render package/liman/server/storage/liman_render
 
 #WebSSH
@@ -46,6 +51,7 @@ mv package/liman/server/storage/build_tools/DEBIAN package/
 mv package/liman/server/storage/build_tools/rhel/liman.spec liman.spec
 mv package/liman/server/storage/build_tools/rhel/liman-cron-mail.ini liman-cron-mail.ini
 mv package/liman/server/storage/build_tools/rhel/liman-system-worker.ini liman-system-worker.ini
+mv package/liman/server/storage/build_tools/rhel/liman-high-availability-syncer.ini liman-high-availability-syncer.ini
 rm -rf package/liman/server/storage/build_tools
 
 #Build Package
@@ -75,7 +81,7 @@ Date : $DATE
 Architecture: amd64
 Priority: important
 Description: Liman MYS
-Depends: curl, gpg, zip, unzip, nginx, redis, php7.3-redis | php-redis, php7.3-fpm, php7.3-gd, php7.3-curl, php7.3, php7.3-sqlite3, php7.3-snmp, php7.3-mbstring, php7.3-xml, php7.3-zip, php7.3-posix, libnginx-mod-http-headers-more-filter, libssl1.1 | libssl3, supervisor, postgresql-13, php7.3-pgsql, pgloader, php7.3-bcmath, rsync, dnsutils, php7.3-ldap, php7.3-smbclient | php-smbclient, krb5-user, php7.3-ssh2 | php-ssh2, smbclient, novnc, python3.7 | python3.8 | python3.9 | python3.10, python3-paramiko, python3-tornado""" > DEBIAN/control
+Depends: curl, gpg, zip, unzip, nginx, redis, php8.1-redis, php8.1-fpm, php8.1-gd, php8.1-curl, php8.1, php8.1-sqlite3, php8.1-snmp, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-posix, libnginx-mod-http-headers-more-filter, libssl1.1 | libssl3, supervisor, postgresql-15, php8.1-pgsql, pgloader, php8.1-bcmath, rsync, dnsutils, php8.1-ldap, php8.1-smbclient | php-smbclient, krb5-user, php8.1-ssh2 | php-ssh2, smbclient, novnc, python3.8 | python3.9 | python3.10, python3-paramiko, python3-tornado""" > DEBIAN/control
 cat DEBIAN/control
 cd ../
 dpkg-deb -Zgzip --build package
@@ -86,5 +92,6 @@ sed -i s/%VERSION%/$VERSION.$5/g liman.spec
 mkdir -p ./package/etc/supervisord.d
 cp liman-cron-mail.ini ./package/etc/supervisord.d/liman-cron-mail.ini
 cp liman-system-worker.ini ./package/etc/supervisord.d/liman-system-worker.ini
+cp liman-high-availability-syncer.ini ./package/etc/supervisord.d/liman-high-availability-syncer.ini
 rpmbuild -ba liman.spec --define "_app_dir $(pwd)/package" --define "_rpmdir /tmp" --define "_rpmfilename package.rpm"
 rm -rf package

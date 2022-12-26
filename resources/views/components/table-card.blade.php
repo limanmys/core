@@ -2,10 +2,10 @@
     $random = str_random(20)
 @endphp
 <div class="card card-primary table-card" id="card-{{ $random }}">
-    <div class="card-header" style="background-color: #007bff; color: #fff;">
+    <div class="card-header" style="background-color: #f9fafb;">
         <h3 class="card-title">{{ $title }}</h3>
         <div class="card-tools">
-            <button type="button" onclick="func_{{ $random }}()" class="btn btn-tool refresh-button"><i class="fas fa-sync-alt"></i></button>
+            <button type="button" onclick="func_{{ $random }}()" class="btn btn-tool refresh-button"><i class="fas fa-sync-alt" style="color: #2a2e32;"></i></button>
         </div>
     </div>
     <div class="card-body p-0">

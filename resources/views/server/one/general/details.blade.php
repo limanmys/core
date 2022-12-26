@@ -1,7 +1,22 @@
-<div class="col-md-3">
+<div class="col-md-2">
     <div class="card card-primary">
     <div class="card-header">
-        <h3 class="card-title">{{ __('Sunucu Bilgileri') }}</h3>
+        <h3 class="card-title" style="width: 100%;">
+            <div class="float-left">
+                {{$server->name}}
+            </div>
+            <div class="float-right">
+            @if($favorite)
+                <a onclick="favorite('false')" data-toggle="tooltip" title="{{ __('Sabitlemeyi kaldır') }}" style="color: orange;">
+                    <i class="fas fa-star"></i>
+                </a>
+            @else
+                <a onclick="favorite('true')" data-toggle="tooltip" title="{{ __('Sunucuyu sabitle') }}" style="color: orange;">
+                    <i class="far fa-star"></i>
+                </a>
+            @endif
+            </div>
+        </h3>
     </div>
     <div class="card-body">
         @if(server()->canRunCommand())
@@ -17,11 +32,6 @@
             {{ $server->ip_address }}
         </p>
         <hr>
-        <strong>{{ __('Şehir') }}</strong>
-        <p class="text-muted">
-            {{ __(cities($server->city)) }}
-        </p>
-        <hr>
         @isset($outputs["user"])
         <strong>{{ __('Giriş Yapmış Kullanıcı') }}</strong>
         <p class="text-muted">
@@ -29,23 +39,7 @@
         </p>
         <hr>
         @endisset
-        <strong>{{ __('Eklenti Durumları') }}</strong>
-        <p class="text-muted">
-            @if($installed_extensions->count() > 0)
-                @foreach($installed_extensions as $extension)
-                    <span 
-                        class="badge btn-secondary status_{{$extension->id}}"
-                        style="cursor:pointer; font-size: 14px; margin-bottom: 5px"
-                        onclick="window.location.href = '{{route('extension_server',["extension_id" => $extension->id, "city" => $server->city, "server_id" => $server->id])}}'">
-                        {{$extension->display_name}}
-                    </span>
-                @endforeach
-            @else
-                {{__("Yüklü eklenti yok.")}}
-            @endif
-        </p>
         @if(server()->canRunCommand())
-        <hr>
             <strong>{{ __('Açık Kalma') }}</strong>
             <p class="text-muted">{{ $outputs["uptime"] }}</p>
             <hr>

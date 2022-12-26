@@ -10,7 +10,6 @@ class Admin
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -21,7 +20,7 @@ class Admin
                 ->user()
                 ->isAdmin() == false
         ) {
-            return respond("Bu işlemi yapmak için yetkiniz yok", 403);
+            return respond('Bu işlemi yapmak için yetkiniz yok', 403);
         }
 
         // Since user is admin, forward request to next target.

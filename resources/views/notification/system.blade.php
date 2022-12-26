@@ -11,7 +11,7 @@ switch ($notification->type) {
     case "cert_request":
         list($hostname, $port, $server_id) = explode(
             ":",
-            $notification->message
+            (string) $notification->message
         );
         $url =
             route('certificate_add_page') .
