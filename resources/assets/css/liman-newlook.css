@@ -750,7 +750,7 @@ table.table td {
   margin-left: 0;
 }
 .page-item.active .page-link {
-  z-index: 3;
+  z-index: 1;
   color: #fff;
   background-color: #009ef7;
   border-color: transparent;

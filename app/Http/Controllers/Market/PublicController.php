@@ -329,8 +329,8 @@ class PublicController extends Controller
         $items = $this->updateFilter($json->items);
 
         $final = [];
-        $keys = array_rand($items, 8);
-        $keys = array_rand($keys, 4);
+        $keys = array_rand($items, count($items));
+        $keys = array_rand($keys, count($items) < 4 ? count($items) : 4);
         shuffle($keys);
         shuffle($keys);
         shuffle($keys);

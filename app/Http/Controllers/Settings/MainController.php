@@ -410,6 +410,10 @@ class MainController extends Controller
     public function removeVariable()
     {
         $flag = false;
+        if (request('variables') == "") {
+            return respond('Veri(ler) silinemedi!', 201);
+        }
+
         foreach (explode(',', (string) request('variables')) as $id) {
             $flag = Permission::find($id)->delete();
         }

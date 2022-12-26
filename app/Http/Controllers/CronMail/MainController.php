@@ -56,7 +56,7 @@ class MainController extends Controller
 
         $cron_mail = CronMail::create($request);
         if ($cron_mail) {
-            return respond('Mail ayarı başarıyla eklendi');
+            return redirect('/ayarlar#mailSettings');
         } else {
             return respond('Mail ayarı eklenemedi!', 201);
         }
