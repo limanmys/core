@@ -461,7 +461,11 @@ if (! function_exists('knownPorts')) {
      */
     function knownPorts()
     {
-        return ['5986', '636', '443'];
+        $ports = ['5986', '443'];
+        if(! env('LDAP_IGNORE_CERT', false)) {
+            array_push($ports, '636');
+        }
+        return $ports;
     }
 }
 

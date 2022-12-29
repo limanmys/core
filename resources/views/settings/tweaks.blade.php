@@ -185,6 +185,13 @@
                             <option value="0">{{__("Tüm İşlemleri Logla")}}</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="LDAP_IGNORE_CERT">{{__("Ldap Sertifika Kontrolünü Devre Dışı Bırak")}}</label><br>
+                        <select id="LDAP_IGNORE_CERT" class="select2 liman_env">
+                            <option value="true">{{__("Aktif")}}</option>
+                            <option value="false">{{__("Pasif")}}</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
