@@ -979,8 +979,14 @@ if (! function_exists('checkHealth')) {
             'modules' => '0700',
             'packages' => '0700',
             'hashes' => '0700',
-            'sql-backups' => '0750',
         ];
+
+        $services = [
+            "liman-render",
+            "liman-socket",
+            "liman-system"
+        ];
+
         $messages = [];
 
         // Check Permissions and Owners
@@ -1016,17 +1022,19 @@ if (! function_exists('checkHealth')) {
             }
         }
 
-        // Check Extra Files
-        $extra = array_diff(
-            array_diff(scandir('/liman'), ['..', '.']),
-            array_keys($allowed)
-        );
-        foreach ($extra as $item) {
-            array_push($messages, [
-                'type' => 'warning',
-                'message' => "'/liman/$item' dosyasina izin verilmiyor.",
+        foreach ($services as $service) {
+            $status = Command::runLiman("systemctl is-active --quiet @{:service} && echo 1 || echo 0", [
+                "service" => $service
             ]);
+
+            if ($status == "0") {
+                array_push($messages, [
+                    'type' => 'danger',
+                    'message' => "$service kritik servis kapalı durumdadır. Lütfen kontrol ediniz.",
+                ]);
+            }
         }
+
         if (empty($messages)) {
             array_push($messages, [
                 'type' => 'success',
