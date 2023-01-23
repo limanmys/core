@@ -23,6 +23,12 @@ class Extension
         }
         $ports = explode(',', (string) extension()->sslPorts);
         foreach ($ports as $port) {
+            if ((int) $port == 636) {
+                if (env('LDAP_IGNORE_CERT', false)) {
+                    return $next($request);
+                }
+            }
+
             if (
                 Certificate::where([
                     'server_hostname' => strtolower((string) $server->ip_address),
