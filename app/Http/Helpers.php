@@ -967,6 +967,17 @@ if (! function_exists('setEnv')) {
 if (! function_exists('checkHealth')) {
     function checkHealth()
     {
+        $messages = [];
+
+        if (! env('CONTAINER_MODE', true)) {
+            array_push($messages, [
+                'type' => 'success',
+                'message' => __('Her şey Yolunda, sıkıntı yok!'),
+            ]);
+
+            return $messages;
+        }
+
         $allowed = [
             'certs' => '0700',
             'database' => '0700',
@@ -986,8 +997,6 @@ if (! function_exists('checkHealth')) {
             "liman-socket",
             "liman-system"
         ];
-
-        $messages = [];
 
         // Check Permissions and Owners
         foreach ($allowed as $name => $permission) {
