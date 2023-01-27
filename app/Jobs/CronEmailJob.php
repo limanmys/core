@@ -15,6 +15,11 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * Cron Email Job
+ *
+ * @implements ShouldQueue
+ */
 class CronEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -29,6 +34,13 @@ class CronEmailJob implements ShouldQueue
 
     protected $target;
 
+    private $tagTexts = [];
+
+    /**
+     * Construct Cron Mail Job
+     *
+     * @param CronMail $obj
+     */
     public function __construct(protected CronMail $obj)
     {
         $this->users = User::find(json_decode((string) $obj->user_id));
@@ -153,31 +165,11 @@ class CronEmailJob implements ShouldQueue
         ]);
     }
 
-    private $tagTexts = [];
-
-    private function getTagText($key, $extension_name)
-    {
-        if (!array_key_exists($extension_name, $this->tagTexts)) {
-            $file = file_get_contents('/liman/extensions/' . strtolower((string) $extension_name) . '/db.json');
-            $json = json_decode($file, true);
-            if (json_last_error() != JSON_ERROR_NONE) {
-                return $key;
-            }
-            $this->tagTexts[$extension_name] = $json;
-        }
-
-        if (!array_key_exists('mail_tags', $this->tagTexts[$extension_name])) {
-            return $key;
-        }
-        foreach ($this->tagTexts[$extension_name]['mail_tags'] as $obj) {
-            if ($obj['tag'] == $key) {
-                return $obj['description'];
-            }
-        }
-
-        return $key;
-    }
-
+    /**
+     * Double Check Time is True
+     *
+     * @return bool
+     */
     public function doubleCheckTime()
     {
         $now = Carbon::now();
@@ -210,5 +202,35 @@ class CronEmailJob implements ShouldQueue
         }
 
         return $flag;
+    }
+
+    /**
+     * Get Mail Tag Text from Extension
+     *
+     * @param $key
+     * @param $extension_name
+     * @return mixed
+     */
+    private function getTagText($key, $extension_name)
+    {
+        if (! array_key_exists($extension_name, $this->tagTexts)) {
+            $file = file_get_contents('/liman/extensions/' . strtolower((string) $extension_name) . '/db.json');
+            $json = json_decode($file, true);
+            if (json_last_error() != JSON_ERROR_NONE) {
+                return $key;
+            }
+            $this->tagTexts[$extension_name] = $json;
+        }
+
+        if (! array_key_exists('mail_tags', $this->tagTexts[$extension_name])) {
+            return $key;
+        }
+        foreach ($this->tagTexts[$extension_name]['mail_tags'] as $obj) {
+            if ($obj['tag'] == $key) {
+                return $obj['description'];
+            }
+        }
+
+        return $key;
     }
 }

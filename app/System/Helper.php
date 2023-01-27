@@ -5,13 +5,22 @@ namespace App\System;
 use App\Models\SystemSettings;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Translation\Translator;
 
+/**
+ * System Helper
+ */
 class Helper
 {
     private $authKey;
 
     private $client;
 
+    /**
+     * Construct system helper service
+     */
     public function __construct()
     {
         $this->authKey = file_get_contents('/liman/keys/service.key');
@@ -20,6 +29,13 @@ class Helper
         ]);
     }
 
+    /**
+     * Create linux user
+     *
+     * @param $extension_id
+     * @return bool
+     * @throws GuzzleException
+     */
     public function userAdd($extension_id): bool
     {
         try {
@@ -29,13 +45,20 @@ class Helper
                     'liman_token' => $this->authKey,
                 ],
             ]);
-        } catch(\Exception) {
+        } catch (\Exception) {
             return false;
         }
 
         return true;
     }
 
+    /**
+     * Remove linux user
+     *
+     * @param $extension_id
+     * @return bool
+     * @throws GuzzleException
+     */
     public function userRemove($extension_id): bool
     {
         try {
@@ -45,13 +68,22 @@ class Helper
                     'liman_token' => $this->authKey,
                 ],
             ]);
-        } catch(\Exception) {
+        } catch (\Exception) {
             return false;
         }
 
         return true;
     }
 
+    /**
+     * Update dns
+     *
+     * @param $server1
+     * @param $server2
+     * @param $server3
+     * @return bool
+     * @throws GuzzleException
+     */
     public function dnsUpdate($server1, $server2, $server3): bool
     {
         try {
@@ -63,7 +95,7 @@ class Helper
                     'server3' => $server3 ?: '',
                 ],
             ]);
-        } catch(\Exception) {
+        } catch (\Exception) {
             return false;
         }
 
@@ -77,13 +109,21 @@ class Helper
         return true;
     }
 
+    /**
+     * Add certificate to Liman
+     *
+     * @param $tmpPath
+     * @param $targetName
+     * @return bool
+     * @throws GuzzleException
+     */
     public function addCertificate($tmpPath, $targetName): bool
     {
         $contents = $tmpPath;
         if (is_file($tmpPath)) {
             $contents = file_get_contents($tmpPath);
         } else {
-            $tmpPath = '/tmp/'.str_random(16);
+            $tmpPath = '/tmp/' . str_random(16);
             file_put_contents($tmpPath, $contents);
         }
         $arr = [
@@ -127,13 +167,20 @@ class Helper
                     'targetName' => $targetName,
                 ],
             ]);
-        } catch(\Exception) {
+        } catch (\Exception) {
             return false;
         }
 
         return true;
     }
 
+    /**
+     * Remove certificate from Liman
+     *
+     * @param $targetName
+     * @return bool
+     * @throws GuzzleException
+     */
     public function removeCertificate($targetName): bool
     {
         $arr = [
@@ -163,13 +210,21 @@ class Helper
                     'targetName' => $targetName,
                 ],
             ]);
-        } catch(\Exception) {
+        } catch (\Exception) {
             return false;
         }
 
         return true;
     }
 
+    /**
+     * Fix extension file permissions
+     *
+     * @param $extension_id
+     * @param $extension_name
+     * @return bool
+     * @throws GuzzleException
+     */
     public function fixExtensionPermissions($extension_id, $extension_name): bool
     {
         try {
@@ -180,13 +235,20 @@ class Helper
                     'extension_name' => strtolower((string) $extension_name),
                 ],
             ]);
-        } catch(\Exception) {
+        } catch (\Exception) {
             return false;
         }
 
         return true;
     }
 
+    /**
+     * Install packages to Liman server
+     *
+     * @param $packages
+     * @return bool
+     * @throws GuzzleException
+     */
     public function installPackages($packages): bool
     {
         try {
@@ -196,13 +258,20 @@ class Helper
                     'packages' => $packages,
                 ],
             ]);
-        } catch(\Exception) {
+        } catch (\Exception) {
             return false;
         }
 
         return true;
     }
 
+    /**
+     * Run command on Liman server
+     *
+     * @param $command
+     * @return array|Application|Translator|string|null
+     * @throws GuzzleException
+     */
     public function runCommand($command)
     {
         try {
@@ -212,7 +281,7 @@ class Helper
                     'command' => $command,
                 ],
             ]);
-        } catch(\Exception) {
+        } catch (\Exception) {
             return __('Liman Sistem Servisine Erişilemiyor!');
         }
 

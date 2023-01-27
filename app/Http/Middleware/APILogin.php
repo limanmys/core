@@ -7,12 +7,15 @@ use Carbon\Carbon;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * API Token Checker Middleware
+ */
 class APILogin
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return mixed
      */
     public function handle($request, Closure $next)

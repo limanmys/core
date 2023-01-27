@@ -9,8 +9,16 @@ use App\Models\Notification;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\ServerKey;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use mervick\aesEverywhere\AES256;
 
+/**
+ * Server Add Controller
+ *
+ * @extends Controller
+ */
 class AddController extends Controller
 {
     /**
@@ -18,6 +26,12 @@ class AddController extends Controller
      */
     public $server;
 
+    /**
+     * This function creates server in Liman database
+     *
+     * @return JsonResponse|Response
+     * @throws \Exception|GuzzleException
+     */
     public function main()
     {
         if (! Permission::can(user()->id, 'liman', 'id', 'add_server')) {
@@ -53,12 +67,14 @@ class AddController extends Controller
         request('key_port')
             ? ($this->server->key_port = request('key_port'))
             : null;
+
         // Check if Server is online or not.
         if (! $this->server->isAlive()) {
             return respond('Sunucuyla bağlantı kurulamadı.', 406);
         }
-
         $this->server->save();
+
+        // Send notifications
         Notification::new(
             'Yeni sunucu eklendi.',
             'notify',
@@ -73,11 +89,12 @@ class AddController extends Controller
                 ], 'en'),
             ])
         );
+
         // Add Server to request object to use it later.
         request()->request->add(['server' => $this->server]);
 
         if (request('type')) {
-            $encKey = env('APP_KEY').user()->id.server()->id;
+            $encKey = env('APP_KEY') . user()->id . server()->id;
             $data = [
                 'clientUsername' => AES256::encrypt(
                     request('username'),
@@ -99,6 +116,13 @@ class AddController extends Controller
         return $this->grantPermissions();
     }
 
+    /**
+     * Grant server certificate
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     private function grantPermissions()
     {
         Permission::grant(user()->id, 'server', 'id', $this->server->id);
@@ -142,10 +166,10 @@ class AddController extends Controller
                             'en' => __('Yeni Sertifika Onayı', [], 'en'),
                         ]),
                         'type' => 'cert_request',
-                        'message' => $this->server->ip_address.
-                            ':'.
-                            $this->server->control_port.
-                            ':'.
+                        'message' => $this->server->ip_address .
+                            ':' .
+                            $this->server->control_port .
+                            ':' .
                             $this->server->id,
                         'level' => 3,
                     ]);

@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Job History Model
+ *
+ * @extends Model
+ */
 class JobHistory extends Model
 {
     use UsesUuid;

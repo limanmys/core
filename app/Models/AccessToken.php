@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Access Token Eloquent Model
+ *
+ * @extends Model
+ */
 class AccessToken extends Model
 {
     use UsesUuid;

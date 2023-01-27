@@ -5,6 +5,12 @@ namespace App\Support\Database;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * Database Builder
+ * This class stands for caching duplicate queries.
+ *
+ * @extends QueryBuilder
+ */
 class Builder extends QueryBuilder
 {
     /**
@@ -26,7 +32,7 @@ class Builder extends QueryBuilder
     /**
      * Returns a Unique String that can identify this Query.
      *
-     * @return string
+     * @return string|bool
      */
     protected function getCacheKey(): string|bool
     {

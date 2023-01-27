@@ -5,8 +5,12 @@ namespace App\Providers;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
+/**
+ * Event Service Provider
+ *
+ * @extends ServiceProvider
+ */
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -19,7 +23,7 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class
         ],
         \SocialiteProviders\Manager\SocialiteWasCalled::class => [
-            \SocialiteProviders\Keycloak\KeycloakExtendSocialite::class.'@handle',
+            \SocialiteProviders\Keycloak\KeycloakExtendSocialite::class . '@handle',
         ],
     ];
 
@@ -34,11 +38,21 @@ class EventServiceProvider extends ServiceProvider
         registerModuleListeners();
     }
 
+    /**
+     * Laravel Event Discover Toggle
+     *
+     * @return bool
+     */
     public function shouldDiscoverEvents(): bool
     {
         return true;
     }
 
+    /**
+     * Discover Events on this Directories
+     *
+     * @return string[]
+     */
     protected function discoverEventsWithin()
     {
         return ['/liman/modules/'];

@@ -7,12 +7,18 @@ use App\Models\AdminNotification;
 use App\Models\Extension;
 use App\System\Command;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Extension Updater Job
+ *
+ * @implements ShouldQueue
+ */
 class ExtensionUpdaterJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -34,7 +40,8 @@ class ExtensionUpdaterJob implements ShouldQueue
         private $download,
         private $hash,
         private $forceUpdate = false
-    ) {
+    )
+    {
         $this->extension = Extension::find($extension_id);
     }
 
@@ -42,11 +49,13 @@ class ExtensionUpdaterJob implements ShouldQueue
      * Execute the job.
      *
      * @return void
+     * @throws GuzzleException
+     * @throws GuzzleException
      */
     public function handle()
     {
         $downloadPath =
-            '/tmp/'.$this->extension->id.'-'.$this->version_code;
+            '/tmp/' . $this->extension->id . '-' . $this->version_code;
         $exists = Command::runLiman('[ -e @{:downloadPath} ] && echo 1 || echo 0', [
             'downloadPath' => $downloadPath,
         ]);
@@ -65,15 +74,15 @@ class ExtensionUpdaterJob implements ShouldQueue
             );
             AdminNotification::create([
                 'title' => json_encode([
-                    'tr' => $this->extension->display_name.__(' eklentisi güncellendi!', [], 'tr'),
-                    'en' => $this->extension->display_name.__(' eklentisi güncellendi!', [], 'en'),
+                    'tr' => $this->extension->display_name . __(' eklentisi güncellendi!', [], 'tr'),
+                    'en' => $this->extension->display_name . __(' eklentisi güncellendi!', [], 'en'),
                 ]),
                 'type' => 'extension_update',
                 'message' => json_encode([
-                    'tr' => $this->extension->display_name.
-                    __(' eklentisinin yeni bir sürümü indirildi ve yüklendi.', [], 'tr'),
-                    'en' => $this->extension->display_name.
-                    __(' eklentisinin yeni bir sürümü indirildi ve yüklendi.', [], 'en'),
+                    'tr' => $this->extension->display_name .
+                        __(' eklentisinin yeni bir sürümü indirildi ve yüklendi.', [], 'tr'),
+                    'en' => $this->extension->display_name .
+                        __(' eklentisinin yeni bir sürümü indirildi ve yüklendi.', [], 'en'),
                 ]),
                 'level' => 3,
             ]);
@@ -83,11 +92,18 @@ class ExtensionUpdaterJob implements ShouldQueue
         return $flag;
     }
 
+    /**
+     * Download file from Liman Market
+     *
+     * @param $downloadPath
+     * @return bool
+     * @throws GuzzleException
+     */
     private function downloadFile($downloadPath)
     {
         $client = new Client([
             'headers' => [
-                'Authorization' => 'Bearer '.env('MARKET_ACCESS_TOKEN'),
+                'Authorization' => 'Bearer ' . env('MARKET_ACCESS_TOKEN'),
             ],
             'verify' => false,
         ]);
@@ -102,7 +118,7 @@ class ExtensionUpdaterJob implements ShouldQueue
             if (substr($arr[1], -7) == '.signed') {
                 $this->signed = true;
             }
-        } catch(\Exception) {
+        } catch (\Exception) {
             return false;
         }
 
@@ -111,7 +127,7 @@ class ExtensionUpdaterJob implements ShouldQueue
         ]);
         if (is_file($downloadPath) && $fileHash == $this->hash) {
             if ($this->signed) {
-                $tmp2 = '/tmp/'.str_random();
+                $tmp2 = '/tmp/' . str_random();
                 Command::runLiman(
                     'gpg --status-fd 1 -d -o @{:tmp2} @{:downloadPath} >/dev/null 2>/dev/null', [
                         'tmp2' => $tmp2,
@@ -135,6 +151,11 @@ class ExtensionUpdaterJob implements ShouldQueue
         }
     }
 
+    /**
+     * Update extension updates file
+     *
+     * @return void
+     */
     private function updateUpdatesFile()
     {
         $json = array_values(json_decode(

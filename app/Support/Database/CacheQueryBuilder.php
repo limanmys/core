@@ -2,6 +2,9 @@
 
 namespace App\Support\Database;
 
+/**
+ * Cache Query Builder Trait
+ */
 trait CacheQueryBuilder
 {
     /**

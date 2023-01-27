@@ -6,6 +6,11 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Extension Mail Template
+ *
+ * @extends Mailable
+ */
 class ExtensionMail extends Mailable
 {
     use Queueable, SerializesModels;

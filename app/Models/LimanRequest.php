@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Liman Request
+ *
+ * @extends Model
+ */
 class LimanRequest extends Model
 {
     use UsesUuid;

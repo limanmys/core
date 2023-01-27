@@ -8,7 +8,15 @@ use App\Models\LimanRequest;
 use App\Models\Server;
 use App\Models\Token;
 use App\User;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 
+/**
+ * Home Controller
+ */
 class HomeController extends Controller
 {
     /**
@@ -22,40 +30,52 @@ class HomeController extends Controller
     }
 
     /**
-     * @api {get} / Homepage
-     * @apiName HomePage
-     * @apiDescription Liman' database stats.
-     * @apiGroup General
+     * Creates Liman dashboard
      *
-     * @apiSuccess {Integer} server_count Count of the servers in Liman.
-     * @apiSuccess {Integer} extension_count Count of the extensions in Liman.
-     * @apiSuccess {Integer} user_count Count of the users in Liman.
-     * @apiSuccess {Integer} version Liman Version.
+     * @return JsonResponse|Response
      */
     public function index()
     {
-        system_log(7, 'HOMEPAGE');    
+        system_log(7, 'HOMEPAGE');
 
         return magicView('index', [
             'token' => Token::create(user()->id),
             'server_count' => Server::all()->count(),
             'extension_count' => Extension::all()->count(),
             'user_count' => User::all()->count(),
-            'version' => getVersion().' - '.getVersionCode(),
+            'version' => getVersion() . ' - ' . getVersionCode(),
         ]);
     }
 
+
     /**
-     * @api {post} / Liman Stats
-     * @apiName Liman Stats
-     * @apiDescription Hardware stats of Liman.
-     * @apiGroup General
+     * Returns ticket requests page
      *
-     * @apiSuccess {String} cpu CPU Usage of Liman.
-     * @apiSuccess {String} ram Ram Usage of Liman.
-     * @apiSuccess {String} io IO Usage of Liman.
-     * @apiSuccess {String} network Network Usage of Liman.
-     * @apiSuccess {String} time Date when data fetched.
+     * @return JsonResponse|Response
+     */
+    public function all()
+    {
+        $requests = LimanRequest::where('user_id', auth()->id())->get();
+        foreach ($requests as $request) {
+            $request->status = match ($request->status) {
+                '0' => __('Talep Alındı'),
+                '1' => __('İşleniyor'),
+                '2' => __('Tamamlandı.'),
+                '3' => __('Reddedildi.'),
+                default => __('Bilinmeyen.'),
+            };
+        }
+
+        return magicView('permission.all', [
+            'requests' => $requests,
+        ]);
+    }
+
+
+    /**
+     * Get liman server stats
+     *
+     * @return Application|ResponseFactory|Response
      */
     public function getLimanStats()
     {
@@ -86,6 +106,34 @@ class HomeController extends Controller
         ]);
     }
 
+    /**
+     * Calculates network bytes
+     *
+     * @param $download
+     * @return int|string
+     */
+    private function calculateNetworkBytes($download = true)
+    {
+        $text = $download ? 'rx_bytes' : 'tx_bytes';
+        if ($text == 'rx_bytes' || $text == 'tx_bytes') {
+            $count = 0;
+            $raw = trim(shell_exec("cat /sys/class/net/*/statistics/$text"));
+
+            foreach (explode("\n", trim($raw)) as $data) {
+                $count += intval($data);
+            }
+
+            return $count;
+        } else {
+            return 'Invalid data';
+        }
+    }
+
+    /**
+     * Sets locale for user
+     *
+     * @return Application|ResponseFactory|RedirectResponse|Response
+     */
     public function setLocale()
     {
         system_log(7, 'SET_LOCALE');
@@ -105,56 +153,11 @@ class HomeController extends Controller
         }
     }
 
-    private function calculateNetworkBytes($download = true)
-    {
-        $text = $download ? 'rx_bytes' : 'tx_bytes';
-        if ($text == 'rx_bytes' || $text == 'tx_bytes') {
-            $count = 0;
-            $raw = trim(shell_exec("cat /sys/class/net/*/statistics/$text"));
-
-            foreach (explode("\n", trim($raw)) as $data) {
-                $count += intval($data);
-            }
-
-            return $count;
-        } else {
-            return 'Invalid data';
-        }
-    }
 
     /**
-     * @api {get} /taleplerim Personal Liman Requests List
-     * @apiName Personal Liman Requests List
-     * @apiGroup General
+     * Create a new ticket
      *
-     * @apiSuccess {Array} requests Array of request objects.
-     */
-    public function all()
-    {
-        $requests = LimanRequest::where('user_id', auth()->id())->get();
-        foreach ($requests as $request) {
-            $request->status = match ($request->status) {
-                '0' => __('Talep Alındı'),
-                '1' => __('İşleniyor'),
-                '2' => __('Tamamlandı.'),
-                '3' => __('Reddedildi.'),
-                default => __('Bilinmeyen.'),
-            };
-        }
-
-        return magicView('permission.all', [
-            'requests' => $requests,
-        ]);
-    }
-
-    /**
-     * @api {post} /talep Send Personal Liman Request
-     * @apiName Send Personal Liman Request
-     * @apiGroup General
-     *
-     * @apiParam {String} note Note of the request
-     * @apiParam {String} type server,extension,other
-     * @apiParam {String} speed normal,urgent
+     * @return JsonResponse|Response
      */
     public function request()
     {
@@ -177,8 +180,8 @@ class HomeController extends Controller
             AdminNotification::create([
                 'user_id' => $user->id,
                 'title' => json_encode([
-                    'tr' => __('İzin isteği: ', [], 'tr').auth()->user()->name,
-                    'en' => __('İzin isteği: ', [], 'en').auth()->user()->name,
+                    'tr' => __('İzin isteği: ', [], 'tr') . auth()->user()->name,
+                    'en' => __('İzin isteği: ', [], 'en') . auth()->user()->name,
                 ]),
                 'type' => 'auth_request',
                 'message' => request('note'),
@@ -192,6 +195,12 @@ class HomeController extends Controller
         return respond('Talebiniz başarıyla alındı.', 200);
     }
 
+    /**
+     * Get server uptime status
+     *
+     * @param $count
+     * @return array
+     */
     public function getServerStatus($count = 6)
     {
         $servers = Server::orderBy('updated_at', 'DESC')->limit($count)->get();

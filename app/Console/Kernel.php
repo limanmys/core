@@ -12,8 +12,13 @@ use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Facades\DB;
 
+/**
+ * Kernel
+ * Artisan console commands
+ *
+ * @extends ConsoleKernel
+ */
 class Kernel extends ConsoleKernel
 {
     /**
@@ -36,7 +41,7 @@ class Kernel extends ConsoleKernel
         $schedule
             ->call(function () {
                 $job = (new HighAvailabilitySyncer())
-                        ->onQueue('high_availability_syncer');
+                    ->onQueue('high_availability_syncer');
                 app(Dispatcher::class)->dispatch($job);
             })
             ->name('hasync')
@@ -79,7 +84,7 @@ class Kernel extends ConsoleKernel
                 $client = $controller->getClient();
                 try {
                     $response = $client->post(
-                        env('MARKET_URL').'/api/users/me'
+                        env('MARKET_URL') . '/api/users/me'
                     );
                 } catch (\Exception) {
                     return;
@@ -166,7 +171,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

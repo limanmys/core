@@ -4,12 +4,16 @@ namespace App\Http\Middleware;
 
 use Closure;
 
+/**
+ * Force Password Change Middleware
+ * Redirects to password change page if it's set as true
+ */
 class ForcePasswordChange
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return mixed
      */
     public function handle($request, Closure $next)

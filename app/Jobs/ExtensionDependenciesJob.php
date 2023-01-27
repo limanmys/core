@@ -4,12 +4,17 @@ namespace App\Jobs;
 
 use App\Models\AdminNotification;
 use App\System\Command;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Extension Dependencies Job
+ * Installs system dependencies for extension
+ */
 class ExtensionDependenciesJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -30,11 +35,13 @@ class ExtensionDependenciesJob implements ShouldQueue
      * Execute the job.
      *
      * @return void
+     * @throws GuzzleException
+     * @throws GuzzleException
      */
     public function handle()
     {
         $package = $this->dependencies;
-        $tmp = '/tmp/'.str_random(16);
+        $tmp = '/tmp/' . str_random(16);
         $installCommand = "if [ -z '\$(find /var/cache/apt/pkgcache.bin -mmin -60)' ]; then sudo apt-get update; fi;DEBIAN_FRONTEND=noninteractive sudo apt-get install -o Dpkg::Use-Pty=0 -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' @{:package} -qqy --force-yes > @{:tmp} 2>&1";
         Command::runSystem($installCommand, [
             'package' => $package,
@@ -57,27 +64,27 @@ class ExtensionDependenciesJob implements ShouldQueue
 
             AdminNotification::create([
                 'title' => json_encode([
-                    'tr' => $this->extension->display_name.__(' eklentisi hazır!', [], 'tr'),
-                    'en' => $this->extension->display_name.__(' eklentisi hazır!', [], 'en'),
+                    'tr' => $this->extension->display_name . __(' eklentisi hazır!', [], 'tr'),
+                    'en' => $this->extension->display_name . __(' eklentisi hazır!', [], 'en'),
                 ]),
                 'type' => '',
                 'message' => json_encode([
-                    'tr' => $this->extension->display_name.
-                    __(' eklentisinin bağımlılıkları başarıyla yüklendi, hemen kullanmaya başlayabilirsiniz.', [], 'tr'),
-                    'en' => $this->extension->display_name.
-                    __(' eklentisinin bağımlılıkları başarıyla yüklendi, hemen kullanmaya başlayabilirsiniz.', [], 'en'),
+                    'tr' => $this->extension->display_name .
+                        __(' eklentisinin bağımlılıkları başarıyla yüklendi, hemen kullanmaya başlayabilirsiniz.', [], 'tr'),
+                    'en' => $this->extension->display_name .
+                        __(' eklentisinin bağımlılıkları başarıyla yüklendi, hemen kullanmaya başlayabilirsiniz.', [], 'en'),
                 ]),
                 'level' => 3,
             ]);
         } else {
             AdminNotification::create([
                 'title' => json_encode([
-                    'tr' => $this->extension->display_name.__(' eklentisi kurulamadı!', [], 'tr'),
-                    'en' => $this->extension->display_name.__(' eklentisi kurulamadı!', [], 'en'),
+                    'tr' => $this->extension->display_name . __(' eklentisi kurulamadı!', [], 'tr'),
+                    'en' => $this->extension->display_name . __(' eklentisi kurulamadı!', [], 'en'),
                 ]),
                 'type' => 'error',
-                'message' => $this->extension->display_name.
-                    __(' eklentisinin bağımlılıkları yüklenemedi,').'detayları '.$tmp.' dosyasından inceleyebilirsiniz.',
+                'message' => $this->extension->display_name .
+                    __(' eklentisinin bağımlılıkları yüklenemedi,') . 'detayları ' . $tmp . ' dosyasından inceleyebilirsiniz.',
                 'level' => 3,
             ]);
         }

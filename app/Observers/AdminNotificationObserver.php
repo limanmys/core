@@ -8,8 +8,27 @@ use App\Notifications\NotificationSent;
 use App\User;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * Admin Notification Observer
+ */
 class AdminNotificationObserver
 {
+    /**
+     * Handle the admin notification "created" event.
+     *
+     * @return void
+     */
+    public function created(AdminNotification $adminNotification)
+    {
+        $this->sendBroadcast($adminNotification);
+    }
+
+    /**
+     * Send notification as broadcast
+     *
+     * @param $adminNotification
+     * @return void
+     */
     private function sendBroadcast($adminNotification)
     {
         $adminUsers = User::where('status', 1)->get();
@@ -19,16 +38,6 @@ class AdminNotificationObserver
                 Mail::to($user)->send(new BasicNotification($adminNotification));
             }
         }
-    }
-
-    /**
-     * Handle the admin notification "created" event.
-     *
-     * @return void
-     */
-    public function created(AdminNotification $adminNotification)
-    {
-        $this->sendBroadcast($adminNotification);
     }
 
     /**
