@@ -5,6 +5,11 @@ namespace App\Notifications;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
+/**
+ * Notification Sent Event
+ *
+ * @extends Notification
+ */
 class NotificationSent extends Notification
 {
     /**

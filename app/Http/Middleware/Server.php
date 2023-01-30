@@ -4,9 +4,22 @@ namespace App\Http\Middleware;
 
 use App\Models\Certificate;
 use Closure;
+use Illuminate\Http\RedirectResponse;
 
+/**
+ * Server Middleware
+ */
 class Server
 {
+    /**
+     * Handles requests that we make on server dependent pages
+     *
+     * This middleware checks if server has certificate and is online
+     *
+     * @param $request
+     * @param Closure $next
+     * @return RedirectResponse|mixed
+     */
     public function handle($request, Closure $next)
     {
         if (
@@ -19,7 +32,7 @@ class Server
             $message = __(
                 ':server_name isimli sunucu için gerekli SSL sertifikası henüz eklenmemiş!',
                 [
-                    'server_name' => server()->name.'('.server()->ip_address.')',
+                    'server_name' => server()->name . '(' . server()->ip_address . ')',
                 ]
             );
             abort(504, $message);
@@ -41,7 +54,7 @@ class Server
             return $next($request);
         } else {
             $message = __(':server_name isimli sunucuya erişim sağlanamadı!', [
-                'server_name' => server()->name.'('.server()->ip_address.')',
+                'server_name' => server()->name . '(' . server()->ip_address . ')',
             ]);
             abort(504, $message);
 

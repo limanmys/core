@@ -5,17 +5,22 @@ namespace App\Http\Controllers\Permission;
 use App\Http\Controllers\Controller;
 use App\Models\LimanRequest;
 use App\Models\Notification;
-use App\Models\Permission;
 use App\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
+/**
+ * Permission Controller
+ *
+ * @extends Controller
+ */
 class MainController extends Controller
 {
+
     /**
-     * @api {get} /talepler Get System Requests
-     * @apiName Get System Requests
-     * @apiGroup Notification
+     * Get all requests list
      *
-     * @apiSuccess {JSON} message Message with randomly notification token.
+     * @return JsonResponse|Response
      */
     public function all()
     {
@@ -59,13 +64,11 @@ class MainController extends Controller
     }
 
     /**
-     * @api {get} /talep/{permission_id} Get Request
-     * @apiName Get Request
-     * @apiGroup Notification
+     * Get request
      *
-     * @apiParam {String} permission_id ID of the permission
+     * Add permission_id to request body to retrieve data as JSON
      *
-     * @apiSuccess {JSON} message Message with randomly notification token.
+     * @return JsonResponse|Response
      */
     public function one()
     {
@@ -79,20 +82,18 @@ class MainController extends Controller
             'request_id' => $request,
         ]);
 
-        return magicView('permission.requests.'.$request->type, [
+        return magicView('permission.requests.' . $request->type, [
             'request' => $request,
         ]);
     }
 
     /**
-     * @api {post} /talep/guncelle Update System Request
-     * @apiName Update System Request
-     * @apiGroup Notification
+     * Update request
      *
-     * @apiParam {String} request_id ID of the request
-     * @apiParam {String} status 1:In Progress, 2:Completed, 3:Deny, 4:Delete
+     * Send request_id
+     * Send status (1:In Progress, 2:Completed, 3:Deny, 4:Delete)
      *
-     * @apiSuccess {JSON} message Message with randomly notification token.
+     * @return JsonResponse|Response
      */
     public function requestUpdate()
     {

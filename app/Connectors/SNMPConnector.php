@@ -2,41 +2,34 @@
 
 namespace App\Connectors;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+
 /**
- * Class SNMPConnector
+ * SNMP Connector
  */
 class SNMPConnector implements Connector
 {
-    /**
-     * @var mixed
-     */
-    protected $connection;
-
-    protected $ssh;
-
-    protected $key;
-
-    protected $user_id;
-
-    protected $username;
-
-    protected $securityLevel = 'authPriv';
-
-    protected $authProtocol = 'SHA';
-
-    protected $authPassword;
-
-    protected $privacyProtocol = 'AES';
-
-    protected $privacyPassword;
-
     public static $verifyCommands = ['iso.3.6.1.2.1.1.1.0'];
+
+    protected $connection;
+    protected $ssh;
+    protected $key;
+    protected $user_id;
+    protected $username;
+    protected $securityLevel = 'authPriv';
+    protected $authProtocol = 'SHA';
+    protected $authPassword;
+    protected $privacyProtocol = 'AES';
+    protected $privacyPassword;
 
     /**
      * SNMPConnector constructor.
      *
-     * @param  \App\Models\Server  $server
-     * @param  null  $user_id
+     * @param \App\Models\Server $server
+     * @param string $user_id
+     * @throws \Exception
+     * @throws \Exception
      */
     public function __construct(protected \App\Models\Server $server, $user_id)
     {
@@ -46,54 +39,73 @@ class SNMPConnector implements Connector
         $this->privacyPassword = $password;
     }
 
-    public function execute($command, $flag = true): string|bool
+    /**
+     * Retrieves credential for server
+     *
+     * @return array
+     * @throws \Exception
+     * @throws \Exception
+     */
+    public static function retrieveCredentials()
     {
-        return snmp3_get(
-            $this->server->ip_address,
-            $this->username,
-            $this->securityLevel,
-            $this->authProtocol,
-            $this->authPassword,
-            $this->privacyProtocol,
-            $this->privacyPassword,
-            $command
-        );
+        if (server()->key() == null) {
+            abort(
+                504,
+                'Bu sunucu için SNMP anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.'
+            );
+        }
+        $data = json_decode((string) server()->key()->data, true);
+
+        return [
+            lDecrypt($data['clientUsername']),
+            lDecrypt($data['clientPassword']),
+            array_key_exists('key_port', $data)
+                ? intval($data['key_port'])
+                : 161,
+        ];
     }
 
-    public function sendFile($localPath, $remotePath, $permissions = 0644)
-    {
-    }
-
-    public function receiveFile($localPath, $remotePath)
+    /**
+     * @return void
+     */
+    public static function create(
+        \App\Models\Server $server,
+                           $username,
+                           $password,
+                           $user_id,
+                           $key,
+                           $port = null
+    )
     {
     }
 
     /**
+     * @param $ip_address
      * @param $username
      * @param $password
-     * @param $user_id
-     * @param $key
-     * @return bool
+     * @param $port
+     * @return void
      */
-    public static function create(
-        \App\Models\Server $server,
-        $username,
-        $password,
-        $user_id,
-        $key,
-        $port = null
-    ) {
-    }
-
     public static function verify($ip_address, $username, $password, $port)
     {
     }
 
+    /**
+     * @return true
+     */
     public static function createSnmp(): bool
     {
         return true;
     }
 
+    /**
+     * Verify SNMP connection is valid
+     *
+     * @param $ip_address
+     * @param $username
+     * @param $authPassword
+     * @return JsonResponse|Response|string
+     */
     public static function verifySnmp($ip_address, $username, $authPassword)
     {
         foreach (SNMPConnector::$verifyCommands as $command) {
@@ -120,22 +132,43 @@ class SNMPConnector implements Connector
         return 'nok';
     }
 
-    public static function retrieveCredentials()
+    /**
+     * Execute SNMP command
+     *
+     * @param $command
+     * @param $flag
+     * @return string|bool
+     */
+    public function execute($command, $flag = true): string | bool
     {
-        if (server()->key() == null) {
-            abort(
-                504,
-                'Bu sunucu için SNMP anahtarınız yok. Kasa üzerinden bir anahtar ekleyebilirsiniz.'
-            );
-        }
-        $data = json_decode((string) server()->key()->data, true);
+        return snmp3_get(
+            $this->server->ip_address,
+            $this->username,
+            $this->securityLevel,
+            $this->authProtocol,
+            $this->authPassword,
+            $this->privacyProtocol,
+            $this->privacyPassword,
+            $command
+        );
+    }
 
-        return [
-            lDecrypt($data['clientUsername']),
-            lDecrypt($data['clientPassword']),
-            array_key_exists('key_port', $data)
-                ? intval($data['key_port'])
-                : 161,
-        ];
+    /**
+     * @param $localPath
+     * @param $remotePath
+     * @param $permissions
+     * @return void
+     */
+    public function sendFile($localPath, $remotePath, $permissions = 0644)
+    {
+    }
+
+    /**
+     * @param $localPath
+     * @param $remotePath
+     * @return void
+     */
+    public function receiveFile($localPath, $remotePath)
+    {
     }
 }

@@ -3,9 +3,21 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
+/**
+ * Server API Middleware
+ */
 class ServerApi
 {
+    /**
+     * Handle if server is online when creating API calls
+     *
+     * @param $request
+     * @param Closure $next
+     * @return JsonResponse|Response|mixed
+     */
     public function handle($request, Closure $next)
     {
         $status = @fsockopen(
@@ -20,7 +32,7 @@ class ServerApi
         } else {
             return respond(
                 __(':server_name isimli sunucuya erişim sağlanamadı!', [
-                    'server_name' => server()->name.'('.server()->ip_address.')',
+                    'server_name' => server()->name . '(' . server()->ip_address . ')',
                 ]),
                 201
             );

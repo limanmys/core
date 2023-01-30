@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
@@ -16,6 +19,8 @@ use Laravel\Socialite\Facades\Socialite;
 
 /**
  * Class LoginController
+ *
+ * @extends Controller
  */
 class LoginController extends Controller
 {
@@ -32,17 +37,31 @@ class LoginController extends Controller
 
     /**
      * LoginController constructor.
+     *
+     * @return void
      */
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
     }
 
+    /**
+     * Return captcha image
+     *
+     * @return string
+     */
     public function captcha()
     {
         return captcha_img();
     }
 
+    /**
+     * Determines what to do when authentication is successfull
+     *
+     * @param Request $request
+     * @param $user
+     * @return RedirectResponse|void
+     */
     public function authenticated(Request $request, $user)
     {
         $user->update([
@@ -61,6 +80,12 @@ class LoginController extends Controller
         }
     }
 
+    /**
+     * Event that fired when someone is trying to login
+     *
+     * @param Request $request
+     * @return bool
+     */
     public function attemptLogin(Request $request)
     {
         $credientials = (object) $this->credentials($request);
@@ -82,39 +107,11 @@ class LoginController extends Controller
         return $flag;
     }
 
-    protected function validateLogin(Request $request)
-    {
-        $request->request->add([
-            $this->username() => $request->liman_email_aciklab,
-            'password' => $request->liman_password_divergent,
-        ]);
-        if (env('EXTENSION_DEVELOPER_MODE')) {
-            $request->validate([
-                $this->username() => 'required|string',
-                'password' => 'required|string',
-            ]);
-        } else {
-            $request->validate([
-                $this->username() => 'required|string',
-                'password' => 'required|string',
-                'captcha' => 'required|captcha',
-            ]);
-        }
-    }
-
-    protected function sendFailedLoginResponse(Request $request): never
-    {
-        $credientials = (object) $this->credentials($request);
-        hook('login_failed', [
-            'email' => $credientials->email,
-            'password' => $credientials->password,
-        ]);
-
-        throw ValidationException::withMessages([
-            $this->username() => [trans('auth.failed')],
-        ]);
-    }
-
+    /**
+     * Redirect to keycloak
+     *
+     * @return void
+     */
     public function redirectToKeycloak()
     {
         if (env('KEYCLOAK_ACTIVE', false) == false) {
@@ -124,6 +121,12 @@ class LoginController extends Controller
         return Socialite::driver('keycloak')->stateless()->redirect();
     }
 
+    /**
+     * Keycloak login checks
+     *
+     * @param Request $request
+     * @return Application|RedirectResponse|Redirector|void
+     */
     public function retrieveFromKeycloak(Request $request)
     {
         if (env('KEYCLOAK_ACTIVE', false) == false) {
@@ -166,5 +169,51 @@ class LoginController extends Controller
         Auth::loginUsingId($user->id, true);
 
         return redirect('/');
+    }
+
+    /**
+     * Validate login requests
+     *
+     * @param Request $request
+     * @return void
+     */
+    protected function validateLogin(Request $request)
+    {
+        $request->request->add([
+            $this->username() => $request->liman_email_aciklab,
+            'password' => $request->liman_password_divergent,
+        ]);
+        if (env('EXTENSION_DEVELOPER_MODE')) {
+            $request->validate([
+                $this->username() => 'required|string',
+                'password' => 'required|string',
+            ]);
+        } else {
+            $request->validate([
+                $this->username() => 'required|string',
+                'password' => 'required|string',
+                'captcha' => 'required|captcha',
+            ]);
+        }
+    }
+
+    /**
+     * Send failed login response
+     *
+     * @param Request $request
+     * @return never
+     * @throws ValidationException
+     */
+    protected function sendFailedLoginResponse(Request $request): never
+    {
+        $credientials = (object) $this->credentials($request);
+        hook('login_failed', [
+            'email' => $credientials->email,
+            'password' => $credientials->password,
+        ]);
+
+        throw ValidationException::withMessages([
+            $this->username() => [trans('auth.failed')],
+        ]);
     }
 }

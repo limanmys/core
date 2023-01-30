@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Notification Model
+ *
+ * @extends Model
+ */
 class Notification extends Model
 {
     use UsesUuid;
@@ -19,6 +24,17 @@ class Notification extends Model
         'read',
     ];
 
+    /**
+     * Creates new notification
+     *
+     * @param $title
+     * @param $type "notify | certificate | health"
+     * @param $message
+     * @param $server_id
+     * @param $extension_id
+     * @param $level "0 | 2"
+     * @return mixed
+     */
     public static function new(
         $title,
         $type,
@@ -26,7 +42,8 @@ class Notification extends Model
         $server_id = null,
         $extension_id = null,
         $level = 0
-    ) {
+    )
+    {
         // Create a notification object and fill values.
         // Before we return the notification, check if it's urgent. If so, send an email.
         return Notification::create([
@@ -44,6 +61,18 @@ class Notification extends Model
         ]);
     }
 
+    /**
+     * Sends new notification
+     *
+     * @param $title
+     * @param $type "notify | certificate | health"
+     * @param $message
+     * @param $user_id
+     * @param $server_id
+     * @param $extension_id
+     * @param $level "0 | 2"
+     * @return mixed
+     */
     public static function send(
         $title,
         $type,
@@ -52,7 +81,8 @@ class Notification extends Model
         $server_id = null,
         $extension_id = null,
         $level = 0
-    ) {
+    )
+    {
         // Create a notification object and fill values.
         return Notification::create([
             'user_id' => $user_id,

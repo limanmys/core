@@ -7,6 +7,9 @@ use App\Models\Server;
 use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
+/**
+ * Server Policy
+ */
 class ServerPolicy
 {
     use HandlesAuthorization;
@@ -14,7 +17,7 @@ class ServerPolicy
     /**
      * Determine whether the user can view any servers.
      *
-     * @return mixed
+     * @return bool
      */
     public function viewAny(User $user)
     {
@@ -24,7 +27,7 @@ class ServerPolicy
     /**
      * Determine whether the user can view the server.
      *
-     * @return mixed
+     * @return bool
      */
     public function view(User $user, Server $server)
     {
@@ -34,18 +37,17 @@ class ServerPolicy
     /**
      * Determine whether the user can create servers.
      *
-     * @return mixed
+     * @return true
      */
     public function create(User $user): bool
     {
         return true;
-        // return Permission::can($user->id,'liman','serverCreate','true');
     }
 
     /**
      * Determine whether the user can update the server.
      *
-     * @return mixed
+     * @return bool
      */
     public function update(User $user, Server $server)
     {
@@ -55,7 +57,7 @@ class ServerPolicy
     /**
      * Determine whether the user can delete the server.
      *
-     * @return mixed
+     * @return bool
      */
     public function delete(User $user, Server $server)
     {
@@ -65,7 +67,7 @@ class ServerPolicy
     /**
      * Determine whether the user can restore the server.
      *
-     * @return mixed
+     * @return bool
      */
     public function restore(User $user, Server $server)
     {
@@ -75,7 +77,7 @@ class ServerPolicy
     /**
      * Determine whether the user can permanently delete the server.
      *
-     * @return mixed
+     * @return bool
      */
     public function forceDelete(User $user, Server $server)
     {

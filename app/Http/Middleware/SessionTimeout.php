@@ -6,6 +6,9 @@ use Closure;
 use Illuminate\Session\Store;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Session Timeout Middleware
+ */
 class SessionTimeout
 {
     /**
@@ -22,6 +25,9 @@ class SessionTimeout
      */
     protected $timeout = 900;
 
+    /**
+     * @param Store $session
+     */
     public function __construct(Store $session)
     {
         $this->session = $session;
@@ -34,8 +40,8 @@ class SessionTimeout
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -85,16 +91,6 @@ class SessionTimeout
     }
 
     /**
-     * Get redirect url from env file
-     *
-     * @return string
-     */
-    private function getRedirectUrl()
-    {
-        return env('SESSION_TIMEOUT_REDIRECTURL') ?: $this->redirectUrl;
-    }
-
-    /**
      * Get Session label from env file
      *
      * @return string
@@ -102,5 +98,15 @@ class SessionTimeout
     private function getSessionLabel()
     {
         return env('SESSION_LABEL') ?: $this->sessionLabel;
+    }
+
+    /**
+     * Get redirect url from env file
+     *
+     * @return string
+     */
+    private function getRedirectUrl()
+    {
+        return env('SESSION_TIMEOUT_REDIRECTURL') ?: $this->redirectUrl;
     }
 }

@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Server Group Model
+ *
+ * @extends Model
+ */
 class ServerGroup extends Model
 {
     use UsesUuid;

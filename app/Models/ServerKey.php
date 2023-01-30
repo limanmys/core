@@ -5,6 +5,11 @@ namespace App\Models;
 use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Server Key Model
+ *
+ * @extends Model
+ */
 class ServerKey extends Model
 {
     use UsesUuid, CacheQueryBuilder;

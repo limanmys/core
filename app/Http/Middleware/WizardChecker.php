@@ -4,12 +4,17 @@ namespace App\Http\Middleware;
 
 use Closure;
 
+/**
+ * Wizard Checker Middleware
+ *
+ * This middleware checks if user completed the setup wizard or not
+ */
 class WizardChecker
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return mixed
      */
     public function handle($request, Closure $next)

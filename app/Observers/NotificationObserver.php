@@ -8,8 +8,28 @@ use App\Notifications\NotificationSent;
 use App\User;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * Notification Observer
+ */
 class NotificationObserver
 {
+    /**
+     * Handle the notification "created" event.
+     *
+     * @return void
+     */
+    public function created(Notification $notification)
+    {
+        $this->sendBroadcast($notification);
+    }
+
+    /**
+     * Send broadcast for notification event
+     *
+     * @param $notification
+     * @param $user_id
+     * @return void
+     */
     private function sendBroadcast($notification, $user_id = null)
     {
         $user = User::find(
@@ -19,16 +39,6 @@ class NotificationObserver
         if (env('MAIL_ENABLED') == true && $notification && $notification->type == 'external_notification') {
             Mail::to($user)->send(new BasicNotification($notification));
         }
-    }
-
-    /**
-     * Handle the notification "created" event.
-     *
-     * @return void
-     */
-    public function created(Notification $notification)
-    {
-        $this->sendBroadcast($notification);
     }
 
     /**

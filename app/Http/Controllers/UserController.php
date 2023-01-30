@@ -9,22 +9,29 @@ use App\Models\Server;
 use App\Models\ServerKey;
 use App\Models\UserSettings;
 use App\User;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use mervick\aesEverywhere\AES256;
 
+/**
+ * User Controller
+ *
+ * @extends Controller
+ */
 class UserController extends Controller
 {
     /**
-     * @api {post} /kullanici/ekle Add Liman User
-     * @apiName Add Liman User
-     * @apiGroup Users
+     * Creates a new user
      *
-     * @apiParam {String} name User name
-     * @apiParam {String} email User Email
-     *
-     * @apiSuccess {JSON} message Message with randomly created user password.
+     * @return JsonResponse|Response
      */
     public function add()
     {
@@ -79,51 +86,15 @@ class UserController extends Controller
 
         // Respond
         return respond(
-            __('Kullanıcı Başarıyla Eklendi. Parola : ').$password,
+            __('Kullanıcı Başarıyla Eklendi. Parola : ') . $password,
             200
         );
     }
 
     /**
-     * @api {post} /kullanici/sil Remove Liman User
-     * @apiName Remove Liman User
-     * @apiGroup Users
+     * Reset password of user
      *
-     * @apiParam {String} user_id User's ID
-     *
-     * @apiSuccess {JSON} message
-     */
-    public function remove()
-    {
-        hook('user_delete_attempt', [
-            'user' => request('user_id'),
-        ]);
-
-        // Delete Permissions
-        Permission::where('morph_id', request('user_id'))->delete();
-
-        //Delete user roles
-        RoleUser::where('user_id', request('user_id'))->delete();
-
-        // Delete User
-        User::where('id', request('user_id'))->delete();
-
-        hook('user_delete_successful', [
-            'user' => request('user_id'),
-        ]);
-
-        // Respond
-        return respond('Kullanıcı Başarıyla Silindi!', 200);
-    }
-
-    /**
-     * @api {post} /kullanici/parola/sifirla Reset Liman User' Password
-     * @apiName Reset Liman User' Password
-     * @apiGroup Users
-     *
-     * @apiParam {String} user_id User's ID
-     *
-     * @apiSuccess {JSON} message Message with new random password.
+     * @return JsonResponse|Response
      */
     public function passwordReset()
     {
@@ -160,19 +131,13 @@ class UserController extends Controller
             'password' => $password,
         ]);
 
-        return respond(__('Yeni Parola: ').$password, 200);
+        return respond(__('Yeni Parola: ') . $password, 200);
     }
 
     /**
-     * @api {post} /profil Update Self Password
-     * @apiName Update Self Password
-     * @apiGroup Users
+     * User password change
      *
-     * @apiParam {String} old_password User' old password
-     * @apiParam {String} password New Password
-     * @apiParam {String} password_confirmation New Password Confirmation
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function selfUpdate()
     {
@@ -235,15 +200,9 @@ class UserController extends Controller
     }
 
     /**
-     * @api {post} /user/update Update User Data
-     * @apiName Update User Data
-     * @apiGroup Users
+     * Admin update user
      *
-     * @apiParam {String} username User' new username
-     * @apiParam {String} email User' new email
-     * @apiParam {String} status User' new status, 0 for regular, 1 for administrator.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function adminUpdate()
     {
@@ -282,13 +241,9 @@ class UserController extends Controller
     }
 
     /**
-     * @api {post} /user/setting/delete Delete Vault Key
-     * @apiName Delete Vault Key
-     * @apiGroup Vault
+     * Delete vault key
      *
-     * @apiParam {String} setting_id Target setting to delete.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function removeSetting()
     {
@@ -308,7 +263,7 @@ class UserController extends Controller
             $server = Server::find($first->server_id);
 
             if ($server) {
-                $ip_address = 'cn_'.str_replace('.', '_', (string) $server->server_id);
+                $ip_address = 'cn_' . str_replace('.', '_', (string) $server->server_id);
                 if (session($ip_address)) {
                     session()->remove($ip_address);
                 }
@@ -324,6 +279,40 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * Remove user from system
+     *
+     * @return JsonResponse|Response
+     */
+    public function remove()
+    {
+        hook('user_delete_attempt', [
+            'user' => request('user_id'),
+        ]);
+
+        // Delete Permissions
+        Permission::where('morph_id', request('user_id'))->delete();
+
+        //Delete user roles
+        RoleUser::where('user_id', request('user_id'))->delete();
+
+        // Delete User
+        User::where('id', request('user_id'))->delete();
+
+        hook('user_delete_successful', [
+            'user' => request('user_id'),
+        ]);
+
+        // Respond
+        return respond('Kullanıcı Başarıyla Silindi!', 200);
+    }
+
+    /**
+     * Create a new key inside of vault
+     *
+     * @return JsonResponse|Response
+     * @throws \Exception
+     */
     public function createSetting()
     {
         $user_id = user()->id;
@@ -349,14 +338,10 @@ class UserController extends Controller
     }
 
     /**
-     * @api {post} /user/setting/update Update Vault Key
-     * @apiName Update Vault Key
-     * @apiGroup Vault
+     * Update a key from vault
      *
-     * @apiParam {String} setting_id Target setting to update.
-     * @apiParam {String} new_value New Value of the setting.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
+     * @throws \Exception
      */
     public function updateSetting()
     {
@@ -376,14 +361,14 @@ class UserController extends Controller
             $server = Server::find($setting->server_id);
 
             if ($server) {
-                $ip_address = 'cn_'.str_replace('.', '_', (string) $server->server_id);
+                $ip_address = 'cn_' . str_replace('.', '_', (string) $server->server_id);
                 if (session($ip_address)) {
                     session()->remove($ip_address);
                 }
             }
         }
 
-        $key = env('APP_KEY').$setting->user_id.$setting->server_id;
+        $key = env('APP_KEY') . $setting->user_id . $setting->server_id;
         $encrypted = AES256::encrypt(request('new_value'), $key);
 
         $flag = $setting->update([
@@ -396,6 +381,11 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * Reset user password
+     *
+     * @return RedirectResponse
+     */
     public function forcePasswordChange()
     {
         if (
@@ -451,12 +441,9 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} /kasa Get Vault Keys
-     * @apiName Get Vault Keys
-     * @apiGroup Vault
+     * Retrieve user vault keys
      *
-     * @apiSuccess {Array} settings User's Settings/Keys
-     * @apiSuccess {Array} servers User's granted servers list.
+     * @return JsonResponse|Response
      */
     public function userKeyList()
     {
@@ -505,14 +492,10 @@ class UserController extends Controller
     }
 
     /**
-     * @api {post} /kasa/ekle Add Key
-     * @apiName Add Key
-     * @apiGroup Vault
+     * Create a key inside of vault
      *
-     * @apiParam {String} username Key Username.
-     * @apiParam {String} password New Password.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
+     * @throws \Exception
      */
     public function addKey()
     {
@@ -521,7 +504,7 @@ class UserController extends Controller
             $user_id = request('user_id');
         }
 
-        $encKey = env('APP_KEY').$user_id.server()->id;
+        $encKey = env('APP_KEY') . $user_id . server()->id;
         UserSettings::where([
             'server_id' => server()->id,
             'user_id' => $user_id,
@@ -552,11 +535,9 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} /profil/anahtarlarim User' Access Tokens
-     * @apiName User' Access Tokens
-     * @apiGroup Access Tokens
+     * Get access tokens
      *
-     * @apiSuccess {Array} access_tokens User's access tokens.
+     * @return JsonResponse|Response
      */
     public function myAccessTokens()
     {
@@ -568,13 +549,9 @@ class UserController extends Controller
     }
 
     /**
-     * @api {post} /profil/anahtarlarim/ekle Create Access Tokens
-     * @apiName Create Access Tokens
-     * @apiGroup Access Tokens
+     * Create access tokens
      *
-     * @apiParam {String} name Name of the access token.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function createAccessToken()
     {
@@ -590,13 +567,9 @@ class UserController extends Controller
     }
 
     /**
-     * @api {post} /profil/anahtarlarim/sil Delete Access Tokens
-     * @apiName Delete Access Tokens
-     * @apiGroup Access Tokens
+     * Revoke access tokens
      *
-     * @apiParam {String} token_id ID of the token.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function revokeAccessToken()
     {
@@ -609,6 +582,11 @@ class UserController extends Controller
         return respond('Anahtar Başarıyla Silindi');
     }
 
+    /**
+     * Set users google secret
+     *
+     * @return Application|Factory|View|RedirectResponse|Redirector
+     */
     public function setGoogleSecret()
     {
         if (! env('OTP_ENABLED')) {
@@ -616,7 +594,7 @@ class UserController extends Controller
         }
 
         $google2fa = app('pragmarx.google2fa');
-  
+
         $secret = $google2fa->generateSecretKey();
 
         $QR_Image = $google2fa->getQRCodeInline(
@@ -624,7 +602,7 @@ class UserController extends Controller
             auth()->user()->email,
             $secret
         );
-            
+
         return view('google2fa.register', ['QR_Image' => $QR_Image, 'secret' => $secret]);
     }
 }

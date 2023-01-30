@@ -10,12 +10,31 @@ use App\Models\Server;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Redirector;
 
+/**
+ * Cron Mail Controller
+ *
+ * @extends Controller
+ */
 class MainController extends Controller
 {
+    private $tagTexts = [];
+
+    /**
+     * Get mail tags from extension
+     *
+     * @return JsonResponse|Response
+     */
     public function getMailTags()
     {
-        $path = '/liman/extensions/'.strtolower((string) extension()->name).'/db.json';
+        $path = '/liman/extensions/' . strtolower((string) extension()->name) . '/db.json';
         if (! is_file($path)) {
             return respond('Bu eklentinin bir veritabanı yok!', 201);
         }
@@ -35,6 +54,11 @@ class MainController extends Controller
         }
     }
 
+    /**
+     * Create cron mail
+     *
+     * @return Application|JsonResponse|RedirectResponse|Response|Redirector
+     */
     public function addCronMail()
     {
         validate([
@@ -62,6 +86,11 @@ class MainController extends Controller
         }
     }
 
+    /**
+     * Delete cron mail
+     *
+     * @return JsonResponse|Response
+     */
     public function deleteCronMail()
     {
         $obj = CronMail::find(request('cron_id'));
@@ -77,31 +106,11 @@ class MainController extends Controller
         }
     }
 
-    private $tagTexts = [];
-
-    private function getTagText($key, $extension_name)
-    {
-        if (! array_key_exists($extension_name, $this->tagTexts)) {
-            $file = file_get_contents('/liman/extensions/'.strtolower((string) $extension_name).'/db.json');
-            $json = json_decode($file, true);
-            if (json_last_error() != JSON_ERROR_NONE) {
-                return $key;
-            }
-            $this->tagTexts[$extension_name] = $json;
-        }
-
-        if (! array_key_exists('mail_tags', $this->tagTexts[$extension_name])) {
-            return $key;
-        }
-        foreach ($this->tagTexts[$extension_name]['mail_tags'] as $obj) {
-            if ($obj['tag'] == $key) {
-                return $obj['description'];
-            }
-        }
-
-        return $key;
-    }
-
+    /**
+     * Get cron mail object
+     *
+     * @return Application|Factory|View
+     */
     public function getCronMail()
     {
         $mails = CronMail::all()->map(function ($obj) {
@@ -148,6 +157,41 @@ class MainController extends Controller
         ]);
     }
 
+    /**
+     * Get tag text as human readable format
+     *
+     * @param $key
+     * @param $extension_name
+     * @return mixed
+     */
+    private function getTagText($key, $extension_name)
+    {
+        if (! array_key_exists($extension_name, $this->tagTexts)) {
+            $file = file_get_contents('/liman/extensions/' . strtolower((string) $extension_name) . '/db.json');
+            $json = json_decode($file, true);
+            if (json_last_error() != JSON_ERROR_NONE) {
+                return $key;
+            }
+            $this->tagTexts[$extension_name] = $json;
+        }
+
+        if (! array_key_exists('mail_tags', $this->tagTexts[$extension_name])) {
+            return $key;
+        }
+        foreach ($this->tagTexts[$extension_name]['mail_tags'] as $obj) {
+            if ($obj['tag'] == $key) {
+                return $obj['description'];
+            }
+        }
+
+        return $key;
+    }
+
+    /**
+     * Run cron mail job instantly
+     *
+     * @return JsonResponse|Response
+     */
     public function sendNow()
     {
         $obj = CronMail::find(request('cron_id'));
@@ -168,11 +212,21 @@ class MainController extends Controller
         return respond('İşlem başlatıldı, tamamlandığında size mail ulaşacaktır.');
     }
 
+    /**
+     * Create cron mail view
+     *
+     * @return Application|Factory|View
+     */
     public function getView()
     {
         return view('settings.add_mail');
     }
 
+    /**
+     * Edit cron mail view
+     *
+     * @return Application|Factory|View
+     */
     public function editView()
     {
         $id = request()->id;
@@ -188,6 +242,11 @@ class MainController extends Controller
         return view('settings.edit_mail', compact(['cron_mail', 'users', 'to', 'target']));
     }
 
+    /**
+     * Edit cron mail settings
+     *
+     * @return JsonResponse|Response
+     */
     public function edit()
     {
         validate([

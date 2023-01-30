@@ -8,19 +8,27 @@ use App\Models\Extension;
 use App\Models\Permission;
 use App\System\Command;
 use App\User;
-use Carbon\Carbon;
 use Exception;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use ZipArchive;
 
 /**
- * Class MainController
+ * Extension Main Controller
+ *
+ * @extends Controller
  */
 class MainController extends Controller
 {
+    /**
+     * Get extension list
+     *
+     * @return array
+     */
     public function extensions()
     {
         $extensions = [];
@@ -29,15 +37,17 @@ class MainController extends Controller
         }
         return $extensions;
     }
-    
+
     /**
+     * Download extension from Liman
+     *
      * @return BinaryFileResponse
      */
     public function download()
     {
         // Generate Extension Folder Path
-        $path = '/liman/extensions/'.strtolower((string) extension()->name);
-        $tempPath = '/tmp/'.Str::random().'.zip';
+        $path = '/liman/extensions/' . strtolower((string) extension()->name);
+        $tempPath = '/tmp/' . Str::random() . '.zip';
 
         // Zip the current extension
         Command::runLiman('cd @{:path} && zip -r @{:tempPath} .', [
@@ -53,13 +63,16 @@ class MainController extends Controller
         return response()
             ->download(
                 $tempPath,
-                extension()->name.'-'.extension()->version.'.lmne'
+                extension()->name . '-' . extension()->version . '.lmne'
             )
             ->deleteFileAfterSend();
     }
 
     /**
+     * Upload an extension to Liman systsem
+     *
      * @throws Exception
+     * @throws GuzzleException
      */
     public function upload()
     {
@@ -91,7 +104,7 @@ class MainController extends Controller
             $decrypt = Command::runLiman(
                 "gpg --status-fd 1 -d -o '/tmp/{:originalName}' @{:extension} | grep FAILURE > /dev/null && echo 0 || echo 1",
                 [
-                    'originalName' => 'ext-'.basename((string) request()->file('extension')->path()),
+                    'originalName' => 'ext-' . basename((string) request()->file('extension')->path()),
                     'extension' => request()->file('extension')->path(),
                 ]
             );
@@ -102,7 +115,7 @@ class MainController extends Controller
                 );
             }
             $zipFile =
-                '/tmp/ext-'.
+                '/tmp/ext-' .
                 basename(
                     (string) request()->file('extension')->path()
                 );
@@ -127,6 +140,16 @@ class MainController extends Controller
         return respond('Eklenti Başarıyla yüklendi.', 200);
     }
 
+    /**
+     * Setup new extension
+     *
+     * This function handles extension setup steps (setting perms etc.)
+     *
+     * @param $zipFile
+     * @param $verify
+     * @return array
+     * @throws GuzzleException
+     */
     public function setupNewExtension($zipFile, $verify = false)
     {
         // Initialize Zip Archive Object to use it later.
@@ -140,7 +163,7 @@ class MainController extends Controller
         }
 
         // Determine a random tmp folder to extract files
-        $path = '/tmp/'.Str::random();
+        $path = '/tmp/' . Str::random();
         // Extract Zip to the Temp Folder.
         try {
             $zip->extractTo($path);
@@ -149,11 +172,11 @@ class MainController extends Controller
         }
 
         if (count(scandir($path)) == 3) {
-            $path = $path.'/'.scandir($path)[2];
+            $path = $path . '/' . scandir($path)[2];
         }
 
         // Now that we have everything, let's extract database.
-        $file = file_get_contents($path.'/db.json');
+        $file = file_get_contents($path . '/db.json');
 
         $json = json_decode($file, true);
 
@@ -168,8 +191,8 @@ class MainController extends Controller
         ) {
             return [
                 respond(
-                    __("Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu").' '.
-                        intval($json['supportedLiman']),
+                    __("Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu") . ' ' .
+                    intval($json['supportedLiman']),
                     201
                 ),
                 null,
@@ -214,7 +237,7 @@ class MainController extends Controller
 
         $system->userAdd($new->id);
 
-        $passPath = '/liman/keys'.DIRECTORY_SEPARATOR.$new->id;
+        $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $new->id;
 
         Command::runSystem('chmod 760 @{:path}', [
             'path' => $passPath,
@@ -222,7 +245,7 @@ class MainController extends Controller
 
         file_put_contents($passPath, Str::random(32));
 
-        $extension_folder = '/liman/extensions/'.strtolower((string) $json['name']);
+        $extension_folder = '/liman/extensions/' . strtolower((string) $json['name']);
 
         Command::runLiman('mkdir -p @{:extension_folder}', [
             'extension_folder' => $extension_folder,
@@ -237,10 +260,16 @@ class MainController extends Controller
         return [null, $new];
     }
 
+    /**
+     * Create new extension on Liman
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function newExtension()
     {
         $name = trim((string) request('name'));
-        $folder = '/liman/extensions/'.strtolower($name);
+        $folder = '/liman/extensions/' . strtolower($name);
 
         preg_match('/[A-Za-z-]+/', (string) request('name'), $output);
         if (empty($output) || $output[0] != $name) {
@@ -259,7 +288,7 @@ class MainController extends Controller
         }
 
         $template = request('template');
-        $template_folder = storage_path('extension_templates/'.$template.'/');
+        $template_folder = storage_path('extension_templates/' . $template . '/');
         Command::runLiman('cp -r @{:template_folder} @{:folder}', [
             'template_folder' => $template_folder,
             'folder' => $folder,
@@ -294,7 +323,7 @@ class MainController extends Controller
 
         $system->userAdd($ext->id);
 
-        $passPath = '/liman/keys'.DIRECTORY_SEPARATOR.$ext->id;
+        $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $ext->id;
 
         Command::runSystem('chmod 760 @{:path}', [
             'path' => $passPath,
@@ -314,6 +343,11 @@ class MainController extends Controller
         return respond(route('extension_one', $ext->id), 300);
     }
 
+    /**
+     * Update extension order
+     *
+     * @return JsonResponse|Response
+     */
     public function updateExtOrders()
     {
         foreach (json_decode((string) request('data')) as $extension) {
@@ -325,6 +359,11 @@ class MainController extends Controller
         return respond('Sıralamalar güncellendi', 200);
     }
 
+    /**
+     * Auto update extension
+     *
+     * @return JsonResponse|Response
+     */
     public function autoUpdateExtension()
     {
         $json = json_decode(
@@ -357,16 +396,18 @@ class MainController extends Controller
     }
 
     /**
-     * @api {post} /eklenti/accessLogs Access Logs
-     * @apiName Access Logs
-     * @apiGroup Extension
+     * Get extension access logs
      *
-     * @apiParam {String} page Page number.
-     * @apiParam {String} count How much records will be retrieved.
-     * @apiParam {String} query Search query (OPTIONAL)
-     * @apiParam {String} extension_id Server Id
+     * You can request this function from a remote API with an access token
+     * Needed form values:
+     *  - extension_id (*)
+     *  - query
+     *  - page
+     *  - log_user_id
+     *  - count
+     *  - liman-token
      *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function accessLogs()
     {
@@ -442,7 +483,7 @@ class MainController extends Controller
                     $knownUsers[$row->user_id] = $row->user_id;
                 }
             }
-                            
+
             $row->user_id = $knownUsers[$row->user_id];
 
             if (isset($row->request_details->lmntargetFunction)) {

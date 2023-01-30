@@ -7,19 +7,23 @@ use App\Jobs\ExtensionUpdaterJob;
 use App\Jobs\LimanUpdaterJob;
 use App\Models\Extension;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 /**
- * Class Market
+ * Market Controller
+ *
+ * @extends Controller
  */
 class MarketController extends Controller
 {
     /**
-     * @api {post} /market/kontrol Check Market Access
-     * @apiName Check Market Access
-     * @apiGroup Updates
+     * Verify market connection
      *
-     * @apiSuccess {JSON} message Status of the connection.
+     * @return JsonResponse|Response
+     * @throws GuzzleException
      */
     public function verifyMarketConnection()
     {
@@ -28,7 +32,7 @@ class MarketController extends Controller
         }
         $client = self::getClient();
         try {
-            $response = $client->post(env('MARKET_URL').'/api/users/me');
+            $response = $client->post(env('MARKET_URL') . '/api/users/me');
         } catch (\Exception) {
             return respond("Anahtarınız ile Market'e bağlanılamadı!", 201);
         }
@@ -36,6 +40,39 @@ class MarketController extends Controller
         return respond('Market Bağlantısı Başarıyla Sağlandı.');
     }
 
+    /**
+     * Get market guzzle instance
+     *
+     * @return Client
+     */
+    public static function getClient()
+    {
+        if (! self::checkAccess(parse_url((string) env('MARKET_URL'))['host'])) {
+            if (env('MARKET_URL') == null) {
+                abort(504, 'Market bağlantısı ayarlanmamış.');
+            }
+            abort(
+                504,
+                env('MARKET_URL') . ' adresindeki markete bağlanılamadı!'
+            );
+        }
+
+        return new Client([
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . env('MARKET_ACCESS_TOKEN'),
+            ],
+            'verify' => false,
+        ]);
+    }
+
+    /**
+     * Check access is active
+     *
+     * @param $hostname
+     * @param $port
+     * @return bool
+     */
     private static function checkAccess($hostname, $port = 443): bool
     {
         return is_resource(
@@ -50,11 +87,11 @@ class MarketController extends Controller
     }
 
     /**
-     * @api {post} /market/guncellemeKontrol Check Liman Updates
-     * @apiName Check Liman Updates
-     * @apiGroup Updates
+     * Check updates
      *
-     * @apiSuccess {Array} array all components of the liman with update statuses.
+     * @param $returnRaw
+     * @return array|JsonResponse|Response
+     * @throws GuzzleException
      */
     public function checkMarketUpdates($returnRaw = false)
     {
@@ -74,15 +111,15 @@ class MarketController extends Controller
         foreach ($extensions as $extension) {
             $obj = json_decode(
                 file_get_contents(
-                    '/liman/extensions/'.
-                        strtolower((string) $extension->name).
-                        DIRECTORY_SEPARATOR.
-                        'db.json'
+                    '/liman/extensions/' .
+                    strtolower((string) $extension->name) .
+                    DIRECTORY_SEPARATOR .
+                    'db.json'
                 ),
                 true
             );
             array_push($params, [
-                'packageName' => 'Liman.'.$obj['name'],
+                'packageName' => 'Liman.' . $obj['name'],
                 'versionCode' => array_key_exists('version_code', $obj)
                     ? $obj['version_code']
                     : 0,
@@ -93,7 +130,7 @@ class MarketController extends Controller
 
         try {
             $response = $client->get(
-                env('MARKET_URL').'/api/application/check_version',
+                env('MARKET_URL') . '/api/application/check_version',
                 [
                     'json' => $params,
                 ]
@@ -114,7 +151,7 @@ class MarketController extends Controller
             } else {
                 $obj = json_decode(json_encode($obj), true);
                 $params[$i]['status'] =
-                    $obj['version']['versionName'].__(' sürümü mevcut');
+                    $obj['version']['versionName'] . __(' sürümü mevcut');
                 $params[$i]['updateAvailable'] = 1;
                 if (
                     $params[$i]['extension_id'] != null &&
@@ -164,26 +201,5 @@ class MarketController extends Controller
         }
 
         return respond($params);
-    }
-
-    public static function getClient()
-    {
-        if (! self::checkAccess(parse_url((string) env('MARKET_URL'))['host'])) {
-            if (env('MARKET_URL') == null) {
-                abort(504, 'Market bağlantısı ayarlanmamış.');
-            }
-            abort(
-                504,
-                env('MARKET_URL').' adresindeki markete bağlanılamadı!'
-            );
-        }
-
-        return new Client([
-            'headers' => [
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer '.env('MARKET_ACCESS_TOKEN'),
-            ],
-            'verify' => false,
-        ]);
     }
 }

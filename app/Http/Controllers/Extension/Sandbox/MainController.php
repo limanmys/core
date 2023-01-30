@@ -9,8 +9,19 @@ use App\Models\ServerKey;
 use App\Models\Token;
 use App\Models\UserSettings;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Extension Sandbox Controller
+ *
+ * @extends Controller
+ */
 class MainController extends Controller
 {
     private $extension;
@@ -24,6 +35,11 @@ class MainController extends Controller
         });
     }
 
+    /**
+     * Constructive events for extension
+     *
+     * @return void
+     */
     public function initializeClass()
     {
         $this->extension = getExtensionJson(extension()->name);
@@ -33,6 +49,121 @@ class MainController extends Controller
         $this->checkPermissions();
     }
 
+    /**
+     * Check if existing settings is valid for extension
+     *
+     * @return void
+     */
+    private function checkForMissingSettings()
+    {
+        $key = ServerKey::where([
+            'server_id' => server()->id,
+            'user_id' => user()->id,
+        ])->first();
+        $extra = [];
+        if ($key) {
+            $extra = ['clientUsername', 'clientPassword'];
+        }
+        foreach ($this->extension['database'] as $setting) {
+            if (isset($setting['required']) && $setting['required'] === false) {
+                continue;
+            }
+            $opts = [
+                'server_id' => server()->id,
+                'name' => $setting['variable'],
+            ];
+
+            if (! isset($setting['global']) || $setting['global'] === false) {
+                $opts['user_id'] = user()->id;
+            }
+
+            if (
+                ! in_array($setting['variable'], $extra) &&
+                ! UserSettings::where($opts)->exists()
+            ) {
+                system_log(7, 'EXTENSION_MISSING_SETTINGS', [
+                    'extension_id' => extension()->id,
+                ]);
+                redirect_now(
+                    route('extension_server_settings_page', [
+                        'server_id' => server()->id,
+                        'extension_id' => extension()->id,
+                    ])
+                );
+            }
+        }
+    }
+
+    /**
+     * Control if user is eligible to use this extension
+     *
+     * @return bool
+     */
+    private function checkPermissions(): bool
+    {
+        if (
+            ! Permission::can(
+                auth()->id(),
+                'function',
+                'name',
+                strtolower((string) extension()->name),
+                request('function_name')
+            )
+        ) {
+            system_log(7, 'EXTENSION_NO_PERMISSION', [
+                'extension_id' => extension()->id,
+                'target_name' => request('function_name'),
+            ]);
+            $function = request('function_name');
+            $extensionJson = json_decode(
+                file_get_contents(
+                    '/liman/extensions/' .
+                    strtolower((string) extension()->name) .
+                    DIRECTORY_SEPARATOR .
+                    'db.json'
+                ),
+                true
+            );
+
+            $functions = collect([]);
+
+            if (array_key_exists('functions', $extensionJson)) {
+                $functions = collect($extensionJson['functions']);
+            }
+
+            $isActive = 'false';
+            $functionOptions = $functions
+                ->where('name', request('function_name'))
+                ->first();
+            if ($functionOptions) {
+                $isActive = $functionOptions['isActive'];
+            }
+            if (
+                $isActive == 'true' &&
+                ! Permission::can(
+                    user()->id,
+                    'function',
+                    'name',
+                    strtolower((string) extension()->name),
+                    $function
+                )
+            ) {
+                abort(403, $function . ' için yetkiniz yok.');
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Calls extension from render engine
+     *
+     * This function renders extension files in a isolated space from Liman.
+     * This wrapper handles necessary events to run an extension.
+     *
+     * @return Application|Factory|View|JsonResponse|Response|never
+     * @throws GuzzleException
+     */
     public function API()
     {
         if (extension()->status == '0') {
@@ -74,7 +205,7 @@ class MainController extends Controller
                 if (env('APP_DEBUG', false)) {
                     return abort(
                         504,
-                        __('Liman render service is not working or crashed. ').$e->getMessage(),
+                        __('Liman render service is not working or crashed. ') . $e->getMessage(),
                     );
                 } else {
                     return abort(
@@ -84,7 +215,7 @@ class MainController extends Controller
                 }
             }
         }
-        
+
         return view($view, [
             'auth_token' => $token,
             'tokens' => user()
@@ -96,106 +227,15 @@ class MainController extends Controller
         ]);
     }
 
-    private function checkForMissingSettings()
-    {
-        $key = ServerKey::where([
-            'server_id' => server()->id,
-            'user_id' => user()->id,
-        ])->first();
-        $extra = [];
-        if ($key) {
-            $extra = ['clientUsername', 'clientPassword'];
-        }
-        foreach ($this->extension['database'] as $setting) {
-            if (isset($setting['required']) && $setting['required'] === false) {
-                continue;
-            }
-            $opts = [
-                'server_id' => server()->id,
-                'name' => $setting['variable'],
-            ];
-
-            if (! isset($setting['global']) || $setting['global'] === false) {
-                $opts['user_id'] = user()->id;
-            }
-
-            if (
-                ! in_array($setting['variable'], $extra) &&
-                ! UserSettings::where($opts)->exists()
-            ) {
-                system_log(7, 'EXTENSION_MISSING_SETTINGS', [
-                    'extension_id' => extension()->id,
-                ]);
-                redirect_now(
-                    route('extension_server_settings_page', [
-                        'server_id' => server()->id,
-                        'extension_id' => extension()->id,
-                    ])
-                );
-            }
-        }
-    }
-
-    private function checkPermissions(): bool
-    {
-        if (
-            ! Permission::can(
-                auth()->id(),
-                'function',
-                'name',
-                strtolower((string) extension()->name),
-                request('function_name')
-            )
-        ) {
-            system_log(7, 'EXTENSION_NO_PERMISSION', [
-                'extension_id' => extension()->id,
-                'target_name' => request('function_name'),
-            ]);
-            $function = request('function_name');
-            $extensionJson = json_decode(
-                file_get_contents(
-                    '/liman/extensions/'.
-                        strtolower((string) extension()->name).
-                        DIRECTORY_SEPARATOR.
-                        'db.json'
-                ),
-                true
-            );
-
-            $functions = collect([]);
-
-            if (array_key_exists('functions', $extensionJson)) {
-                $functions = collect($extensionJson['functions']);
-            }
-
-            $isActive = 'false';
-            $functionOptions = $functions
-                ->where('name', request('function_name'))
-                ->first();
-            if ($functionOptions) {
-                $isActive = $functionOptions['isActive'];
-            }
-            if (
-                $isActive == 'true' &&
-                ! Permission::can(
-                    user()->id,
-                    'function',
-                    'name',
-                    strtolower((string) extension()->name),
-                    $function
-                )
-            ) {
-                abort(403, $function.' için yetkiniz yok.');
-            }
-        }
-
-        return true;
-    }
-
+    /**
+     * Get navigation servers
+     *
+     * @return array
+     */
     private function getNavigationServers()
     {
         $navServers = DB::table('server_groups')
-            ->where('servers', 'like', '%'.server()->id.'%')
+            ->where('servers', 'like', '%' . server()->id . '%')
             ->get();
         $cleanServers = [];
         foreach ($navServers as $rawServers) {
@@ -213,13 +253,13 @@ class MainController extends Controller
         $serverObjects = Server::find($cleanServers);
         unset($cleanServers);
         foreach ($serverObjects as $server) {
-            $cleanExtensions[$server->id.':'.$server->name] = $server
+            $cleanExtensions[$server->id . ':' . $server->name] = $server
                 ->extensions()
                 ->pluck('display_name', 'id')
                 ->toArray();
         }
         if (empty($cleanExtensions)) {
-            $cleanExtensions[server()->id.':'.server()->name] = server()
+            $cleanExtensions[server()->id . ':' . server()->name] = server()
                 ->extensions()
                 ->pluck('display_name', 'id')
                 ->toArray();
@@ -230,7 +270,7 @@ class MainController extends Controller
         foreach ($cleanExtensions as $serverobj => $extensions) {
             [$server_id, $server_name] = explode(':', $serverobj);
             foreach ($extensions as $extension_id => $extension_name) {
-                $prefix = $extension_id.':'.$extension_name;
+                $prefix = $extension_id . ':' . $extension_name;
                 $current = array_key_exists($prefix, $last)
                     ? $last[$prefix]
                     : [];

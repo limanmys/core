@@ -7,15 +7,20 @@ use App\Models\AdminNotification;
 use App\Models\Notification;
 use App\Notifications\NotificationSent;
 use App\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
+/**
+ * Notification Controller
+ *
+ * @extends Controller
+ */
 class MainController extends Controller
 {
     /**
-     * @api {get} /bildirimler Get User Notifications
-     * @apiName Get User Notifications
-     * @apiGroup Notification
+     * Get notification list
      *
-     * @apiSuccess {Array} notifications getNotifications
+     * @return JsonResponse|Response
      */
     public function all()
     {
@@ -38,13 +43,26 @@ class MainController extends Controller
     }
 
     /**
-     * @api {post} /bildirim/sil Remove Notification
-     * @apiName Remove Notification
-     * @apiGroup Notification
+     * Remove read notifications
      *
-     * @apiParam {String} notification_id ID of the notification
+     * @return JsonResponse|Response
+     */
+    public function delete_read()
+    {
+        Notification::where([
+            'user_id' => auth()->id(),
+            'read' => true,
+        ])->delete();
+
+        return respond('Bildirimler silindi.');
+    }
+
+    /**
+     * Delete specific notification
      *
-     * @apiSuccess {JSON} message Message with status.
+     * Send notification_id on request body to delete
+     *
+     * @return JsonResponse|Response
      */
     public function delete()
     {
@@ -58,29 +76,9 @@ class MainController extends Controller
     }
 
     /**
-     * @api {post} /bildirim/okunanlar/sil Remove Read Notifications
-     * @apiName Remove Read Notifications
-     * @apiGroup Notification
+     * Retrieve new notifications
      *
-     * @apiSuccess {JSON} message Message with status.
-     */
-    public function delete_read()
-    {
-        Notification::where([
-            'user_id' => auth()->id(),
-            'read' => true,
-        ])->delete();
-
-        return respond('Bildirimler silindi.');
-    }
-
-    /**
-     * @api {post} /bildirimler Get New Notifications
-     * @apiName Get New Notifications
-     * @apiGroup Notification
-     *
-     * @apiSuccess {Array} user User Notifications
-     * @apiSuccess {Array} admin Admin Notifications
+     * @return JsonResponse|Response
      */
     public function check()
     {
@@ -119,13 +117,11 @@ class MainController extends Controller
     }
 
     /**
-     * @api {post} /bildirim/oku Read Notification
-     * @apiName Read Notification
-     * @apiGroup Notification
+     * Read notification
      *
-     * @apiParam {String} notification_id ID of the notification
+     * Send notification_id on request body to read notification
      *
-     * @apiSuccess {String} string ID of the notification
+     * @return JsonResponse|Response
      */
     public function read()
     {
@@ -150,11 +146,9 @@ class MainController extends Controller
     }
 
     /**
-     * @api {post} /bildirimler/oku Read All Notifications
-     * @apiName Read All Notifications
-     * @apiGroup Notification
+     * Read all notifications
      *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function readAll()
     {
@@ -171,11 +165,9 @@ class MainController extends Controller
     }
 
     /**
-     * @api {post} /bildirim/adminOku Read All Admin Notifications
-     * @apiName Read All Admin Notifications
-     * @apiGroup Notification
+     * Read all admin notifications
      *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function adminRead()
     {
@@ -193,11 +185,9 @@ class MainController extends Controller
     }
 
     /**
-     * @api {get} /bildirimlerSistem Get Admin Notifications
-     * @apiName Get Admin Notifications
-     * @apiGroup Notification
+     * Retrieve all system notifications
      *
-     * @apiSuccess {Array} notifications getNotifications
+     * @return JsonResponse|Response
      */
     public function allSystem()
     {

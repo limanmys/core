@@ -5,7 +5,13 @@ namespace App\Models;
 use App\Support\Database\CacheQueryBuilder;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * Permission Model
+ *
+ * @extends Model
+ */
 class Permission extends Model
 {
     use UsesUuid, CacheQueryBuilder;
@@ -22,6 +28,16 @@ class Permission extends Model
         'blame',
     ];
 
+    /**
+     * Determine if user is eligible to do this type of event
+     *
+     * @param $user_id
+     * @param $type
+     * @param $key
+     * @param $value
+     * @param $extra
+     * @return true
+     */
     public static function can($user_id, $type, $key, $value, $extra = null)
     {
         $user = User::find($user_id);
@@ -43,6 +59,17 @@ class Permission extends Model
             ->exists();
     }
 
+    /**
+     * Grant user a permission
+     *
+     * @param $morph_id
+     * @param $type
+     * @param $key
+     * @param $value
+     * @param $extra
+     * @param $morph_type
+     * @return false
+     */
     public static function grant(
         $morph_id,
         $type,
@@ -50,7 +77,8 @@ class Permission extends Model
         $value,
         $extra = null,
         $morph_type = 'users'
-    ) {
+    )
+    {
         try {
             return Permission::firstOrCreate([
                 'morph_id' => $morph_id,
@@ -66,6 +94,16 @@ class Permission extends Model
         }
     }
 
+    /**
+     * Revoke permission from user
+     *
+     * @param $morph_id
+     * @param $type
+     * @param $key
+     * @param $value
+     * @param $extra
+     * @return false
+     */
     public static function revoke($morph_id, $type, $key, $value, $extra = null)
     {
         $permission = Permission::where([
@@ -82,11 +120,17 @@ class Permission extends Model
         return false;
     }
 
+    /**
+     * @return MorphTo
+     */
     public function morph()
     {
         return $this->morphTo();
     }
 
+    /**
+     * @return array
+     */
     public function getRelatedObject()
     {
         switch ($this->type) {
@@ -113,7 +157,7 @@ class Permission extends Model
                 break;
             case 'function':
                 $permType = __('Fonksiyon');
-                $permValue = $this->value.' - '.$this->extra;
+                $permValue = $this->value . ' - ' . $this->extra;
                 break;
             default:
                 $permType = '-';

@@ -4,15 +4,20 @@ namespace App\Http\Controllers\Module;
 
 use App\Http\Controllers\Controller;
 use App\Models\Module;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
+/**
+ * Module Controller
+ *
+ * @extends Controller
+ */
 class MainController extends Controller
 {
     /**
-     * @api {get} /modules Get Modules List
-     * @apiName Get Modules List
-     * @apiGroup Module
+     * Returns modules view
      *
-     * @apiSuccess {Array} modules List of modules array.
+     * @return JsonResponse|Response
      */
     public function index()
     {
@@ -28,6 +33,11 @@ class MainController extends Controller
         ]);
     }
 
+    /**
+     * Enable or disable module
+     *
+     * @return JsonResponse|Response
+     */
     public function modifyModuleStatus()
     {
         $module = Module::findOrFail(request('module_id'))->first();
@@ -39,16 +49,21 @@ class MainController extends Controller
         if ($flag) {
             return respond('Modül güncellendi.');
         } else {
-            return respond(__('Bir hata oluştu. ').$flag, 201);
+            return respond(__('Bir hata oluştu. ') . $flag, 201);
         }
     }
 
+    /**
+     * Returns module settings
+     *
+     * @return JsonResponse|Response
+     */
     public function getModuleSettings()
     {
         $module = Module::findOrFail(request('module_id'))->first();
 
         $template = file_get_contents(
-            '/liman/modules/'.$module->name.'/template.json'
+            '/liman/modules/' . $module->name . '/template.json'
         );
         $template = json_decode($template, true);
         if (json_last_error() != JSON_ERROR_NONE) {
@@ -63,7 +78,7 @@ class MainController extends Controller
 
         $data = [];
 
-        $settingsPath = '/liman/modules/'.$module->name.'/settings.json';
+        $settingsPath = '/liman/modules/' . $module->name . '/settings.json';
         if (is_file($settingsPath)) {
             $data = file_get_contents($settingsPath);
             $data = json_decode($data, true);
@@ -78,11 +93,16 @@ class MainController extends Controller
         ]);
     }
 
+    /**
+     * Save module settings
+     *
+     * @return JsonResponse|Response
+     */
     public function saveModuleSettings()
     {
         $module = Module::findOrFail(request('module_id'))->first();
 
-        $filePath = '/liman/modules/'.$module->name.'/settings.json';
+        $filePath = '/liman/modules/' . $module->name . '/settings.json';
         $data = [
             'variables' => [],
         ];

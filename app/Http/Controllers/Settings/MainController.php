@@ -9,27 +9,43 @@ use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\PermissionData;
 use App\Models\Role;
-use App\Models\RoleMapping;
-use App\Models\RoleUser;
 use App\Models\Server;
 use App\Models\ServerGroup;
 use App\System\Command;
 use App\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+ * Settings Controller
+ *
+ * @extends Controller
+ */
 class MainController extends Controller
 {
     public function __construct()
     {
-        // Specifiy that this controller requires admin middleware in all functions.
+        // Specify that this controller requires admin middleware in all functions.
         $this->middleware('admin');
     }
 
+    /**
+     * Return setting index view
+     *
+     * @return Application|Factory|View
+     */
     public function index()
     {
         $updateAvailable = is_file(storage_path('extension_updates'));
@@ -48,6 +64,11 @@ class MainController extends Controller
         ]);
     }
 
+    /**
+     * Get Liman tweaks data
+     *
+     * @return JsonResponse|Response
+     */
     public function getLimanTweaks()
     {
         return respond([
@@ -78,6 +99,13 @@ class MainController extends Controller
         ]);
     }
 
+    /**
+     * Set liman tweaks
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function setLimanTweaks()
     {
         validate([
@@ -91,7 +119,7 @@ class MainController extends Controller
 
         $flag = setEnv([
             'APP_DEBUG' => request('APP_DEBUG'),
-            'BRAND_NAME' => '"'.request('BRAND_NAME').'"',
+            'BRAND_NAME' => '"' . request('BRAND_NAME') . '"',
             'APP_NOTIFICATION_EMAIL' => request('APP_NOTIFICATION_EMAIL'),
             'NEW_LOG_LEVEL' => request('NEW_LOG_LEVEL'),
             'APP_URL' => request('APP_URL'),
@@ -132,6 +160,11 @@ class MainController extends Controller
         }
     }
 
+    /**
+     * Test mail settings
+     *
+     * @return JsonResponse|Response
+     */
     public function testMailSettings()
     {
         $flag = setEnv([
@@ -163,6 +196,12 @@ class MainController extends Controller
         return respond('Mail ayarları geçerlidir.');
     }
 
+    /**
+     * Retrieve system settings
+     *
+     * @param User $user
+     * @return Application|Factory|View
+     */
     public function one(User $user)
     {
         return view('settings.one', [
@@ -182,6 +221,11 @@ class MainController extends Controller
         ]);
     }
 
+    /**
+     * Get user list
+     *
+     * @return Application|Factory|View
+     */
     public function getUserList()
     {
         return view('table', [
@@ -202,6 +246,11 @@ class MainController extends Controller
         ]);
     }
 
+    /**
+     * Get simple user list
+     *
+     * @return Application|Factory|View
+     */
     public function getSimpleUserList()
     {
         return view('table', [
@@ -212,6 +261,11 @@ class MainController extends Controller
         ]);
     }
 
+    /**
+     * Permission list
+     *
+     * @return Application|Factory|View
+     */
     public function getList()
     {
         $user = User::find(request('user_id'));
@@ -302,18 +356,23 @@ class MainController extends Controller
         ]);
     }
 
+    /**
+     * Retrieve all roles
+     *
+     * @return Application|Factory|View
+     */
     public function allRoles()
     {
         $data = [];
 
         $permissionData =
             Permission::with('morph')
-                        ->get()->each(function ($row) {
-                            $row->details = $row->getRelatedObject();
-                            if ($row->morph_type == 'roles') {
-                                $row->users = $row->morph->users()->get();
-                            }
-                        });
+                ->get()->each(function ($row) {
+                    $row->details = $row->getRelatedObject();
+                    if ($row->morph_type == 'roles') {
+                        $row->users = $row->morph->users()->get();
+                    }
+                });
 
         foreach ($permissionData as $row) {
             if ($row->details['value'] == '-' || $row->details['type'] == '-') {
@@ -350,6 +409,11 @@ class MainController extends Controller
         ]);
     }
 
+    /**
+     * Permission grant view
+     *
+     * @return JsonResponse|Response
+     */
     public function addList()
     {
         $arr = [];
@@ -364,6 +428,11 @@ class MainController extends Controller
         return respond(__('Başarılı'), 200);
     }
 
+    /**
+     * Revoke permission
+     *
+     * @return JsonResponse|Response
+     */
     public function removeFromList()
     {
         $arr = [];
@@ -393,6 +462,11 @@ class MainController extends Controller
         }
     }
 
+    /**
+     * Add variable
+     *
+     * @return JsonResponse|Response
+     */
     public function addVariable()
     {
         if (Permission::grant(
@@ -409,6 +483,11 @@ class MainController extends Controller
         }
     }
 
+    /**
+     * Remove variable
+     *
+     * @return JsonResponse|Response
+     */
     public function removeVariable()
     {
         $flag = false;
@@ -427,13 +506,18 @@ class MainController extends Controller
         return respond('Veri(ler) silinemedi!', 201);
     }
 
+    /**
+     * Get extension functions as of human readable format
+     *
+     * @return Application|Factory|View
+     */
     public function getExtensionFunctions()
     {
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                strtolower((string) extension()->name).
-                DIRECTORY_SEPARATOR.
+                '/liman/extensions/' .
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
                 'db.json'
             ),
             true
@@ -443,10 +527,10 @@ class MainController extends Controller
             : [];
         $lang = session('locale');
         $file =
-            '/liman/extensions/'.
-            strtolower((string) extension()->name).
-            '/lang/'.
-            $lang.
+            '/liman/extensions/' .
+            strtolower((string) extension()->name) .
+            '/lang/' .
+            $lang .
             '.json';
 
         //Translate Items.
@@ -480,6 +564,11 @@ class MainController extends Controller
         ]);
     }
 
+    /**
+     * Add permission to extension function
+     *
+     * @return JsonResponse|Response
+     */
     public function addFunctionPermissions()
     {
         foreach (explode(',', (string) request('functions')) as $function) {
@@ -495,6 +584,9 @@ class MainController extends Controller
         return respond(__('Başarılı'), 200);
     }
 
+    /**
+     * @return JsonResponse|Response
+     */
     public function removeFunctionPermissions()
     {
         foreach (explode(',', (string) request('functions')) as $function) {
@@ -504,11 +596,23 @@ class MainController extends Controller
         return respond(__('Başarılı'), 200);
     }
 
+    /**
+     * Check health status
+     *
+     * @return JsonResponse|Response
+     */
     public function health()
     {
         return respond(checkHealth(), 200);
     }
 
+    /**
+     * Save LDAP configuration
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function saveLDAPConf()
     {
         $cert = Certificate::where([
@@ -549,13 +653,18 @@ class MainController extends Controller
         return respond(__('Kaydedildi!'), 200);
     }
 
+    /**
+     * Get permission data
+     *
+     * @return JsonResponse|Response
+     */
     public function getPermisssionData()
     {
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                strtolower((string) request('extension_name')).
-                DIRECTORY_SEPARATOR.
+                '/liman/extensions/' .
+                strtolower((string) request('extension_name')) .
+                DIRECTORY_SEPARATOR .
                 'db.json'
             ),
             true
@@ -587,7 +696,7 @@ class MainController extends Controller
         $inputs = view('inputs', [
             'inputs' => $parameters->mapWithKeys(function ($item) {
                 return [
-                    $item['name'] => $item['variable'].':'.$item['type'],
+                    $item['name'] => $item['variable'] . ':' . $item['type'],
                 ];
             }),
         ])->render();
@@ -598,6 +707,11 @@ class MainController extends Controller
         ]);
     }
 
+    /**
+     * Write permission data
+     *
+     * @return JsonResponse|Response
+     */
     public function writePermisssionData()
     {
         $data = PermissionData::where('permission_id', request('id'))->first();
@@ -617,6 +731,11 @@ class MainController extends Controller
         return respond('Başarıyla eklendi!');
     }
 
+    /**
+     * Add server group
+     *
+     * @return JsonResponse|Response
+     */
     public function addServerGroup()
     {
         if (! request('name') || strlen((string) request('name')) < 1) {
@@ -635,6 +754,11 @@ class MainController extends Controller
             : respond('Grup Eklenemedi!', 201);
     }
 
+    /**
+     * Modify server group
+     *
+     * @return JsonResponse|Response
+     */
     public function modifyServerGroup()
     {
         $group = ServerGroup::find(request('server_group_id'));
@@ -651,6 +775,11 @@ class MainController extends Controller
             : respond('Grup Düzenlenemedi!', 201);
     }
 
+    /**
+     * Delete server group
+     *
+     * @return JsonResponse|Response
+     */
     public function deleteServerGroup()
     {
         $group = ServerGroup::find(request('server_group_id'));
@@ -664,6 +793,13 @@ class MainController extends Controller
             : respond('Grup Silinemedi!', 201);
     }
 
+    /**
+     * Save log system
+     *
+     * This function utilizes Rsyslog integration on system
+     *
+     * @return JsonResponse|Response
+     */
     public function saveLogSystem()
     {
         $flag = request()->validate([
@@ -677,18 +813,18 @@ class MainController extends Controller
 
         $text =
             '
-*.*     @@'.
-            request('targetHostname').
-            ':'.
-            request('targetPort').
+*.*     @@' .
+            request('targetHostname') .
+            ':' .
+            request('targetPort') .
             '
 \\$ModLoad imfile
-\\$InputFilePollInterval '.
-            request('logInterval').
+\\$InputFilePollInterval ' .
+            request('logInterval') .
             '
 \\$PrivDropToGroup adm
-\\$InputFileName '.
-            env('LOG_PATH').
+\\$InputFileName ' .
+            env('LOG_PATH') .
             '
 \\$InputFileTag LimanApp
 \\$InputFileStateFile Stat-APP
@@ -723,6 +859,11 @@ input(type="imtcp" port="514")';
         return respond('Başarıyla Kaydedildi!');
     }
 
+    /**
+     * Redirect to market
+     *
+     * @return Application|RedirectResponse|Redirector
+     */
     public function redirectMarket()
     {
         $auth_code = Str::random(15);
@@ -731,16 +872,22 @@ input(type="imtcp" port="514")';
         ]);
 
         return redirect(
-            env('MARKET_URL').
-            '/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri='.
+            env('MARKET_URL') .
+            '/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri=' .
             urlencode(
-                env('APP_URL').'/api/market/bagla?auth='.$auth_code
-            ).
-            '&client_id='.
+                env('APP_URL') . '/api/market/bagla?auth=' . $auth_code
+            ) .
+            '&client_id=' .
             env('MARKET_CLIENT_ID')
         );
     }
 
+    /**
+     * Connect market API
+     *
+     * @return Application|RedirectResponse|Redirector
+     * @throws GuzzleException
+     */
     public function connectMarket()
     {
         if (session('market_auth') != request('auth')) {
@@ -758,15 +905,15 @@ input(type="imtcp" port="514")';
             $params = [
                 'code' => request('code'),
                 'grant_type' => 'authorization_code',
-                'redirect_uri' => env('APP_URL').
-                    '/api/market/bagla?auth='.
+                'redirect_uri' => env('APP_URL') .
+                    '/api/market/bagla?auth=' .
                     request('auth'),
                 'client_id' => env('MARKET_CLIENT_ID'),
                 'client_secret' => env('MARKET_CLIENT_SECRET'),
             ];
             $res = $client->request(
                 'POST',
-                env('MARKET_URL').'/connect/token',
+                env('MARKET_URL') . '/connect/token',
                 ['form_params' => $params]
             );
         } catch (BadResponseException) {
@@ -789,9 +936,14 @@ input(type="imtcp" port="514")';
             'MARKET_REFRESH_TOKEN' => $json->refresh_token,
         ]);
 
-        return redirect(route('settings').'#limanMarket');
+        return redirect(route('settings') . '#limanMarket');
     }
 
+    /**
+     * Get Rsyslog settings
+     *
+     * @return JsonResponse|Response
+     */
     public function getLogSystem()
     {
         $status =
@@ -825,6 +977,11 @@ input(type="imtcp" port="514")';
         ]);
     }
 
+    /**
+     * Get DNS information on Liman
+     *
+     * @return JsonResponse|Response
+     */
     public function getDNSServers()
     {
         $data = `grep nameserver /etc/resolv.conf | grep -v "#" | grep nameserver`;
@@ -845,6 +1002,12 @@ input(type="imtcp" port="514")';
         return respond($clean);
     }
 
+    /**
+     * Set DNS settings on Liman
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function setDNSServers()
     {
         $system = rootSystem();
@@ -860,6 +1023,12 @@ input(type="imtcp" port="514")';
         }
     }
 
+    /**
+     * Upload a logo to login screen
+     *
+     * @param Request $request
+     * @return JsonResponse|Response
+     */
     public function uploadLoginLogo(Request $request)
     {
         try {
@@ -871,7 +1040,7 @@ input(type="imtcp" port="514")';
         }
 
         $uploadedFile = $request->file('photo');
-        $filename = time().$uploadedFile->getClientOriginalName();
+        $filename = time() . $uploadedFile->getClientOriginalName();
 
         try {
             Storage::disk('local')->putFileAs(
@@ -883,7 +1052,7 @@ input(type="imtcp" port="514")';
             return respond('Dosya yükleme başarısız!', 201);
         }
 
-        setEnv(['BRANDING' => '/storage/files/'.$filename]);
+        setEnv(['BRANDING' => '/storage/files/' . $filename]);
 
         return respond('Dosya yükleme başarılı!', 200);
     }

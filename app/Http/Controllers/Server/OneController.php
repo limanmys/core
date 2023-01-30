@@ -11,11 +11,30 @@ use App\System\Command;
 use App\User;
 use Carbon\Carbon;
 use Exception;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/**
+ * Server One Controller
+ *
+ * @extends Controller
+ */
 class OneController extends Controller
 {
+    /**
+     * Get server details page
+     *
+     * @return Application|Factory|View|JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function one()
     {
         $server = server();
@@ -58,10 +77,10 @@ class OneController extends Controller
             $arr = [];
             if (isset($extension->install)) {
                 foreach ($extension->install as $key => $parameter) {
-                    $arr[$parameter['name']] = $key.':'.$parameter['type'];
+                    $arr[$parameter['name']] = $key . ':' . $parameter['type'];
                 }
             }
-            $arr[$extension->display_name.':'.$extension->id] =
+            $arr[$extension->display_name . ':' . $extension->id] =
                 'extension_id:hidden';
             $input_extensions[] = [
                 'name' => $extension->display_name,
@@ -79,6 +98,39 @@ class OneController extends Controller
         ]);
     }
 
+    /**
+     * Get available extensions
+     *
+     * @return mixed
+     */
+    private function availableExtensions()
+    {
+        return Extension::getAll()->whereNotIn(
+            'id',
+            DB::table('server_extensions')
+                ->where([
+                    'server_id' => server()->id,
+                ])
+                ->pluck('extension_id')
+                ->toArray()
+        );
+    }
+
+    /**
+     * Get extensions that used by server
+     *
+     * @return Collection
+     */
+    private function installedExtensions()
+    {
+        return server()->extensions();
+    }
+
+    /**
+     * Delete server from Liman
+     *
+     * @return JsonResponse|Response
+     */
     public function remove()
     {
         hook('server_delete', [
@@ -117,6 +169,13 @@ class OneController extends Controller
         return respond(route('servers'), 300);
     }
 
+    /**
+     * DEPRECATED
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function serviceCheck()
     {
         if (is_numeric(extension()->service)) {
@@ -143,6 +202,12 @@ class OneController extends Controller
         }
     }
 
+    /**
+     * Service operations on server
+     *
+     * @return array
+     * @throws GuzzleException
+     */
     public function service()
     {
         // Retrieve Service name from extension.
@@ -163,6 +228,11 @@ class OneController extends Controller
         ];
     }
 
+    /**
+     * Enable extension on server
+     *
+     * @return JsonResponse|Response
+     */
     public function enableExtension()
     {
         hook('server_extension_add', [
@@ -189,8 +259,8 @@ class OneController extends Controller
             ];
             if (
                 DB::table('server_extensions')
-                ->where($data)
-                ->doesntExist()
+                    ->where($data)
+                    ->doesntExist()
             ) {
                 $data['id'] = Str::uuid();
                 DB::table('server_extensions')->insert($data);
@@ -200,6 +270,11 @@ class OneController extends Controller
         return respond('Eklenti başarıyla eklendi.');
     }
 
+    /**
+     * Update server object
+     *
+     * @return array|JsonResponse|Response
+     */
     public function update()
     {
         if (! Permission::can(user()->id, 'liman', 'id', 'update_server')) {
@@ -249,10 +324,21 @@ class OneController extends Controller
         ];
     }
 
+    /**
+     * DEPRECATED
+     *
+     * @return void
+     */
     public function terminal()
     {
     }
 
+    /**
+     * Upload file to server
+     *
+     * @return JsonResponse|Response
+     * @throws \Throwable
+     */
     public function upload()
     {
         // Store file in /tmp directory.
@@ -267,8 +353,8 @@ class OneController extends Controller
 
         // Send file to the server.
         server()->putFile(
-            '/tmp/'.
-                request()
+            '/tmp/' .
+            request()
                 ->file('file')
                 ->getClientOriginalName(),
             \request('path')
@@ -290,39 +376,33 @@ class OneController extends Controller
         return respond('Dosya yüklenemedi.', 201);
     }
 
+    /**
+     * Download file from servers tmp dir
+     *
+     * @return BinaryFileResponse
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function download()
     {
         // Generate random file name
         $file = Str::random();
-        server()->getFile(request('path'), '/tmp/'.$file);
+        server()->getFile(request('path'), '/tmp/' . $file);
 
         // Extract file name from path.
         $file_name = explode('/', (string) request('path'));
 
         // Send file to the user then delete it.
         return response()
-            ->download('/tmp/'.$file, $file_name[count($file_name) - 1])
+            ->download('/tmp/' . $file, $file_name[count($file_name) - 1])
             ->deleteFileAfterSend();
     }
 
-    private function availableExtensions()
-    {
-        return Extension::getAll()->whereNotIn(
-            'id',
-            DB::table('server_extensions')
-                ->where([
-                    'server_id' => server()->id,
-                ])
-                ->pluck('extension_id')
-                ->toArray()
-        );
-    }
-
-    private function installedExtensions()
-    {
-        return server()->extensions();
-    }
-
+    /**
+     * Toggle favorite mode
+     *
+     * @return JsonResponse|Response
+     */
     public function favorite()
     {
         $current = DB::table('user_favorites')
@@ -350,6 +430,13 @@ class OneController extends Controller
         return respond('Düzenlendi.', 200);
     }
 
+    /**
+     * Get server stats
+     *
+     * @return array|int[]
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function stats()
     {
         if (server()->isLinux()) {
@@ -387,6 +474,55 @@ class OneController extends Controller
         ];
     }
 
+    /**
+     * Calculate network flow as bytes
+     *
+     * @param $download
+     * @return int
+     * @throws GuzzleException
+     */
+    private function calculateNetworkBytes($download = true)
+    {
+        $text = $download ? 'rx_bytes' : 'tx_bytes';
+        $count = 0;
+        $raw = Command::runSudo('cat /sys/class/net/*/statistics/:text:', [
+            'text' => $text,
+        ]);
+        foreach (explode("\n", trim((string) $raw)) as $data) {
+            $count += intval($data);
+        }
+
+        return $count;
+    }
+
+    /**
+     * Get top memory processes
+     *
+     * @return Application|Factory|View
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
+    public function topMemoryProcesses()
+    {
+        $output = trim(
+            server()->run(
+                "ps -eo pid,%mem,user,cmd --sort=-%mem --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
+            )
+        );
+
+        return view('table', [
+            'value' => $this->parsePsOutput($output),
+            'title' => [__('Kullanıcı'), __('İşlem'), '%'],
+            'display' => ['user', 'cmd', 'percent'],
+        ]);
+    }
+
+    /**
+     * Parse ps-aux output
+     *
+     * @param $output
+     * @return array
+     */
     private function parsePsOutput($output)
     {
         $data = [];
@@ -405,6 +541,56 @@ class OneController extends Controller
         return $data;
     }
 
+    /**
+     * Top CPU using processes
+     *
+     * @return Application|Factory|View
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
+    public function topCpuProcesses()
+    {
+        $output = trim(
+            server()->run(
+                "ps -eo pid,%cpu,user,cmd --sort=-%cpu --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
+            )
+        );
+
+        return view('table', [
+            'value' => $this->parsePsOutput($output),
+            'title' => [__('Kullanıcı'), __('İşlem'), '%'],
+            'display' => ['user', 'cmd', 'percent'],
+        ]);
+    }
+
+    /**
+     * Top disk usage
+     *
+     * @return Application|Factory|View
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
+    public function topDiskUsage()
+    {
+        $output = trim(
+            server()->run(
+                "df --output=pcent,source,size,used -hl -x squashfs -x tmpfs -x devtmpfs | sed -n '1!p' | head -n 5 | sort -hr | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
+            )
+        );
+
+        return view('table', [
+            'value' => $this->parseDfOutput($output),
+            'title' => [__('Disk'), __('Boyut'), __('Dolu'), '%'],
+            'display' => ['source', 'size', 'used', 'percent'],
+        ]);
+    }
+
+    /**
+     * Parse df-h output
+     *
+     * @param $output
+     * @return array
+     */
     private function parseDfOutput($output)
     {
         $data = [];
@@ -423,65 +609,13 @@ class OneController extends Controller
         return $data;
     }
 
-    public function topMemoryProcesses()
-    {
-        $output = trim(
-            server()->run(
-                "ps -eo pid,%mem,user,cmd --sort=-%mem --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
-            )
-        );
-
-        return view('table', [
-            'value' => $this->parsePsOutput($output),
-            'title' => [__('Kullanıcı'), __('İşlem'), '%'],
-            'display' => ['user', 'cmd', 'percent'],
-        ]);
-    }
-
-    public function topCpuProcesses()
-    {
-        $output = trim(
-            server()->run(
-                "ps -eo pid,%cpu,user,cmd --sort=-%cpu --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
-            )
-        );
-
-        return view('table', [
-            'value' => $this->parsePsOutput($output),
-            'title' => [__('Kullanıcı'), __('İşlem'), '%'],
-            'display' => ['user', 'cmd', 'percent'],
-        ]);
-    }
-
-    public function topDiskUsage()
-    {
-        $output = trim(
-            server()->run(
-                "df --output=pcent,source,size,used -hl -x squashfs -x tmpfs -x devtmpfs | sed -n '1!p' | head -n 5 | sort -hr | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
-            )
-        );
-
-        return view('table', [
-            'value' => $this->parseDfOutput($output),
-            'title' => [__('Disk'), __('Boyut'), __('Dolu'), '%'],
-            'display' => ['source', 'size', 'used', 'percent'],
-        ]);
-    }
-
-    private function calculateNetworkBytes($download = true)
-    {
-        $text = $download ? 'rx_bytes' : 'tx_bytes';
-        $count = 0;
-        $raw = Command::runSudo('cat /sys/class/net/*/statistics/:text:', [
-            'text' => $text,
-        ]);
-        foreach (explode("\n", trim((string) $raw)) as $data) {
-            $count += intval($data);
-        }
-
-        return $count;
-    }
-
+    /**
+     * Get local users on system
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function getLocalUsers()
     {
         if (server()->isLinux()) {
@@ -528,6 +662,12 @@ class OneController extends Controller
         ]);
     }
 
+    /**
+     * Create local user on server
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function addLocalUser()
     {
         $user_name = request('user_name');
@@ -547,6 +687,13 @@ class OneController extends Controller
         return respond('Kullanıcı başarıyla eklendi!', 200);
     }
 
+    /**
+     * Get local groups
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function getLocalGroups()
     {
         if (server()->isLinux()) {
@@ -599,6 +746,12 @@ class OneController extends Controller
         }
     }
 
+    /**
+     * Get local group details
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function getLocalGroupDetails()
     {
         $group = request('group');
@@ -620,6 +773,12 @@ class OneController extends Controller
         ]);
     }
 
+    /**
+     * Create local group on server
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function addLocalGroup()
     {
         $group_name = request('group_name');
@@ -633,6 +792,12 @@ class OneController extends Controller
         return respond('Grup başarıyla eklendi!', 200);
     }
 
+    /**
+     * Add user to group
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function addLocalGroupUser()
     {
         $group = request('group');
@@ -648,12 +813,19 @@ class OneController extends Controller
         return respond('Kullanıcı gruba başarıyla eklendi!');
     }
 
+    /**
+     * Get sudoers list
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function getSudoers()
     {
         $output = trim(
             server()->run(
-                sudo().
-                    "cat /etc/sudoers /etc/sudoers.d/* | grep -v '^#\|^Defaults' | sed '/^$/d' | awk '{ print $1 \"*-*\" $2 \" \" $3 }'"
+                sudo() .
+                "cat /etc/sudoers /etc/sudoers.d/* | grep -v '^#\|^Defaults' | sed '/^$/d' | awk '{ print $1 \"*-*\" $2 \" \" $3 }'"
             )
         );
 
@@ -679,6 +851,12 @@ class OneController extends Controller
         ]);
     }
 
+    /**
+     * Create sudoer on server
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function addSudoers()
     {
         $name = request('name');
@@ -702,6 +880,12 @@ class OneController extends Controller
         return respond('Tam yetkili kullanıcı başarıyla eklendi!', 200);
     }
 
+    /**
+     * Delete sudoer
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function deleteSudoers()
     {
         $name = request('name');
@@ -719,6 +903,13 @@ class OneController extends Controller
         return respond('Tam yetkili kullanıcı başarıyla silindi!', 200);
     }
 
+    /**
+     * Retrieve service list that exist on server
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function serviceList()
     {
         if (! Permission::can(user()->id, 'liman', 'id', 'server_services')) {
@@ -795,16 +986,16 @@ class OneController extends Controller
     }
 
     /**
-     * @api {post} /sunucu/accessLogs Access Logs
-     * @apiName Access Logs
-     * @apiGroup Server
+     * Returns server access logs
      *
-     * @apiParam {String} page Page number.
-     * @apiParam {String} count How much records will be retrieved.
-     * @apiParam {String} query Search query (OPTIONAL)
-     * @apiParam {String} server_id Server Id
+     * You can use API calls on this endpoint
+     * Parameters
+     *  - page Page number.
+     *  - count How much records will be retrieved.
+     *  - query Search query (OPTIONAL)
+     *  - server_id Server Id
      *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function accessLogs()
     {
@@ -880,7 +1071,7 @@ class OneController extends Controller
                     $knownUsers[$row->user_id] = $row->user_id;
                 }
             }
-                            
+
             $row->user_id = $knownUsers[$row->user_id];
 
             if (isset($row->request_details->lmntargetFunction)) {
@@ -906,6 +1097,11 @@ class OneController extends Controller
         ]);
     }
 
+    /**
+     * Retrieves access logs to frontend
+     *
+     * @return JsonResponse|Response
+     */
     public function getLogs()
     {
         if (! Permission::can(user()->id, 'liman', 'id', 'view_logs')) {
@@ -981,7 +1177,7 @@ class OneController extends Controller
                     $knownUsers[$row->user_id] = $row->user_id;
                 }
             }
-                            
+
             $row->user_id = $knownUsers[$row->user_id];
 
             if (isset($row->request_details->lmntargetFunction)) {
@@ -1032,6 +1228,11 @@ class OneController extends Controller
         ]);
     }
 
+    /**
+     * Shows log detail modal
+     *
+     * @return JsonResponse|Response
+     */
     public function getLogDetails()
     {
         $query = request('log_id');
@@ -1086,7 +1287,7 @@ class OneController extends Controller
                 array_push($logs, [
                     'title' => __($k),
                     'message' => $v,
-                ]);                
+                ]);
             }
             if ($k_ < count($data) - 1) {
                 array_push($logs, [
@@ -1099,6 +1300,13 @@ class OneController extends Controller
         return respond($logs);
     }
 
+    /**
+     * Install package to server
+     *
+     * @return string
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function installPackage()
     {
         if (server()->isLinux()) {
@@ -1123,7 +1331,7 @@ class OneController extends Controller
                     ]
                 );
             }
-            
+
             system_log(7, 'Paket Güncelleme', [
                 'package_name' => request('package_name'),
             ]);
@@ -1134,6 +1342,13 @@ class OneController extends Controller
         return $raw;
     }
 
+    /**
+     * Check package install is going on
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function checkPackage()
     {
         $mode = request('mode') ? request('mode') : 'update';
@@ -1163,7 +1378,7 @@ class OneController extends Controller
                 $package = Command::runSudo('dpkg -I @{:package} | grep Package: | cut -d\':\' -f2 | tr -d \'[:space:]\'', [
                     'package' => $package,
                 ]);
-            } 
+            }
             if (endsWith($package, '.rpm')) {
                 $package = Command::runSudo('rpm -qip @{:package} 2>/dev/null | grep "Name" | cut -d\':\' -f2 | tr -d \'[:space:]\'', [
                     'package' => $package,
@@ -1171,28 +1386,28 @@ class OneController extends Controller
             }
             if ($pkgman == "apt") {
                 $package = Command::runSudo(
-                    'apt list '.
-                        $list_method.
-                        ' 2>/dev/null | grep '.
-                        '@{:package}'.
-                        ' && echo 1 || echo 0',
+                    'apt list ' .
+                    $list_method .
+                    ' 2>/dev/null | grep ' .
+                    '@{:package}' .
+                    ' && echo 1 || echo 0',
                     [
                         'package' => $package,
                     ]
                 );
             } else {
                 $package = Command::runSudo(
-                    'yum list '.
-                        $list_method.
-                        ' 2>/dev/null | grep '.
-                        '@{:package}'.
-                        ' && echo 1 || echo 0',
+                    'yum list ' .
+                    $list_method .
+                    ' 2>/dev/null | grep ' .
+                    '@{:package}' .
+                    ' && echo 1 || echo 0',
                     [
                         'package' => $package,
                     ]
                 );
             }
-            
+
             if (
                 ($mode == 'update' && $output == '0') ||
                 ($mode == 'install' && $output == '0')
@@ -1235,6 +1450,12 @@ class OneController extends Controller
         return $output;
     }
 
+    /**
+     * Upload deb/rpm file
+     *
+     * @return JsonResponse|Response
+     * @throws \Throwable
+     */
     public function uploadDebFile()
     {
         if (server()->isLinux()) {
@@ -1242,15 +1463,22 @@ class OneController extends Controller
             if (! $filePath) {
                 return respond('Dosya yolu zorunludur.', 403);
             }
-            server()->putFile($filePath, '/tmp/'.basename((string) $filePath));
+            server()->putFile($filePath, '/tmp/' . basename((string) $filePath));
             unlink($filePath);
 
-            return respond('/tmp/'.basename((string) $filePath), 200);
+            return respond('/tmp/' . basename((string) $filePath), 200);
         } else {
             return respond('Bu sunucuya deb paketi kuramazsınız.', 403);
         }
     }
 
+    /**
+     * Retrieve server updates
+     *
+     * @return array|void
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function updateList()
     {
         $pkgman = server()->run(
@@ -1260,10 +1488,10 @@ class OneController extends Controller
         if ($pkgman == "apt") {
             $updates = [];
             $raw = server()->run(
-                sudo().
-                    'apt-get -qq update 2> /dev/null > /dev/null; '.
-                    sudo().
-                    "apt list --upgradable 2>/dev/null | sed '1,1d'"
+                sudo() .
+                'apt-get -qq update 2> /dev/null > /dev/null; ' .
+                sudo() .
+                "apt list --upgradable 2>/dev/null | sed '1,1d'"
             );
             foreach (explode("\n", $raw) as $package) {
                 if ($package == '' || str_contains($package, 'List')) {
@@ -1280,7 +1508,7 @@ class OneController extends Controller
                 } catch (\Exception) {
                 }
             }
-    
+
             return [
                 'count' => count($updates),
                 'list' => $updates,
@@ -1302,8 +1530,8 @@ class OneController extends Controller
         if ($pkgman == "rpm") {
             $updates = [];
             $raw = server()->run(
-                sudo().
-                    "yum list upgrades --exclude=*.src 2>/dev/null | awk {'print $1 \" \" $2 \" \" $3'} | sed '1,3d'"
+                sudo() .
+                "yum list upgrades --exclude=*.src 2>/dev/null | awk {'print $1 \" \" $2 \" \" $3'} | sed '1,3d'"
             );
             foreach (explode("\n", $raw) as $package) {
                 if ($package == '' || str_contains($package, 'List')) {
@@ -1319,7 +1547,7 @@ class OneController extends Controller
                 } catch (\Exception) {
                 }
             }
-    
+
             return [
                 'count' => count($updates),
                 'list' => $updates,
@@ -1339,6 +1567,12 @@ class OneController extends Controller
         }
     }
 
+    /**
+     * Retrieve installed package list
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function packageList()
     {
         $pkgman = server()->run(
@@ -1347,7 +1581,7 @@ class OneController extends Controller
 
         if ($pkgman == "apt") {
             $raw = server()->run(
-                sudo()."apt list --installed 2>/dev/null | sed '1,1d'",
+                sudo() . "apt list --installed 2>/dev/null | sed '1,1d'",
                 false
             );
             $packages = [];
@@ -1366,7 +1600,7 @@ class OneController extends Controller
                 } catch (Exception) {
                 }
             }
-    
+
             return magicView('table', [
                 'value' => $packages,
                 'title' => ['Paket Adı', 'Versiyon', 'Tip', 'Durumu'],
@@ -1374,7 +1608,7 @@ class OneController extends Controller
             ]);
         } else {
             $raw = server()->run(
-                sudo()."yum list --installed 2>/dev/null | awk {'print $1 \" \" $2 \" \"  $3'} | sed '1,1d'",
+                sudo() . "yum list --installed 2>/dev/null | awk {'print $1 \" \" $2 \" \"  $3'} | sed '1,1d'",
                 false
             );
             $packages = [];
@@ -1392,7 +1626,7 @@ class OneController extends Controller
                 } catch (Exception) {
                 }
             }
-    
+
             return magicView('table', [
                 'value' => $packages,
                 'title' => ['Paket Adı', 'Versiyon', 'Paket Lokasyonu'],
@@ -1401,6 +1635,11 @@ class OneController extends Controller
         }
     }
 
+    /**
+     * Unassign extension from server
+     *
+     * @return JsonResponse|Response
+     */
     public function removeExtension()
     {
         hook('server_extension_remove', [
@@ -1432,10 +1671,16 @@ class OneController extends Controller
         return respond('Eklentiler Başarıyla Silindi');
     }
 
+    /**
+     * Start service
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function startService()
     {
         if (server()->isLinux()) {
-            $command = sudo().'systemctl start @{:name}';
+            $command = sudo() . 'systemctl start @{:name}';
         } else {
             $command = 'Start-Service @{:name}';
         }
@@ -1446,10 +1691,16 @@ class OneController extends Controller
         return respond('Servis Baslatildi', 200);
     }
 
+    /**
+     * Stop service
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function stopService()
     {
         if (server()->isLinux()) {
-            $command = sudo().'systemctl stop @{:name}';
+            $command = sudo() . 'systemctl stop @{:name}';
         } else {
             $command = 'Stop-Service @{:name}';
         }
@@ -1460,10 +1711,16 @@ class OneController extends Controller
         return respond('Servis Durduruldu', 200);
     }
 
+    /**
+     * Restart service
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function restartService()
     {
         if (server()->isLinux()) {
-            $command = sudo().'systemctl restart @{:name}';
+            $command = sudo() . 'systemctl restart @{:name}';
         } else {
             $command = 'Restart-Service @{:name}';
         }
@@ -1474,10 +1731,16 @@ class OneController extends Controller
         return respond('Servis Yeniden Başlatıldı', 200);
     }
 
+    /**
+     * Get status of service
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function statusService()
     {
         if (server()->isLinux()) {
-            $command = sudo().'systemctl status @{:name}';
+            $command = sudo() . 'systemctl status @{:name}';
         } else {
             return respond(
                 'Windows Sunucularda yalnızca servis durumu görüntülenmektedir.',
@@ -1491,6 +1754,13 @@ class OneController extends Controller
         return respond($output, 200);
     }
 
+    /**
+     * Get open ports on server
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function getOpenPorts()
     {
         if (server()->os != 'linux') {
@@ -1499,8 +1769,8 @@ class OneController extends Controller
 
         $output = trim(
             server()->run(
-                sudo().
-                    "lsof -i -P -n | grep -v '\-'| awk -F' ' '{print $1,$3,$5,$8,$9}' | sed 1,1d"
+                sudo() .
+                "lsof -i -P -n | grep -v '\-'| awk -F' ' '{print $1,$3,$5,$8,$9}' | sed 1,1d"
             )
         );
 
@@ -1513,9 +1783,9 @@ class OneController extends Controller
                         'title' => 'Bilgilendirme',
                         'message' => 'Açık portları görüntüleyebilmek için sunucunuza <b>lsof</b> paketini kurmanız gerekmektedir.',
                     ]
-                )->render().
-                    "<button class='w-100 btn btn-info' onclick='installLsof()'><i class='fas fa-download mr-1'></i> 
-            ".__('Lsof paketini yükle').'</button>',
+                )->render() .
+                "<button class='w-100 btn btn-info' onclick='installLsof()'><i class='fas fa-download mr-1'></i> 
+            " . __('Lsof paketini yükle') . '</button>',
                 201
             );
         }

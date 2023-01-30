@@ -4,10 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\Permission;
 use App\Models\Server;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Search Controller
+ *
+ * Manages the search input on sidebar
+ *
+ * @extends Controller
+ */
 class SearchController extends Controller
 {
+    /**
+     * Search retrieved query and return results
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function search(Request $request)
     {
         $searchable = [];
@@ -27,9 +41,9 @@ class SearchController extends Controller
 
         // Server searching
         $servers = Server::select('id', 'name')->get()
-                ->filter(function ($server) {
-                    return Permission::can(user()->id, 'server', 'id', $server->id);
-                });
+            ->filter(function ($server) {
+                return Permission::can(user()->id, 'server', 'id', $server->id);
+            });
         foreach ($servers as $server) {
             if (Permission::can(user()->id, 'liman', 'id', 'server_details')) {
                 array_push($searchable, [
@@ -44,13 +58,13 @@ class SearchController extends Controller
             foreach ($extensions as $extension) {
                 if (! empty($extension->display_name)) {
                     array_push($searchable, [
-                        'name' => $server->name.' / '.$extension->display_name,
+                        'name' => $server->name . ' / ' . $extension->display_name,
                         'url' => route('extension_server', [$extension->id, $server->id]),
                     ]);
                     continue;
                 }
                 array_push($searchable, [
-                    'name' => $server->name.' / '.$extension->name,
+                    'name' => $server->name . ' / ' . $extension->name,
                     'url' => route('extension_server', [$extension->id, $server->id]),
                 ]);
             }
