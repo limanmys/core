@@ -30,18 +30,22 @@
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#certificates" >{{__("Sertifikalar")}}</a>
                         </li>
+                        @if(! env('CONTAINER_MODE', false))
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#health" onclick="checkHealth()">{{__("Sağlık Durumu")}}</a>
                         </li>
+                        @endif
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#externalNotifications" onclick="">{{__("Dış Bildirimler")}}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#limanMarket" onclick="checkMarketAccess()">{{__("Liman Market")}}</a>
                         </li>
+                        @if(! env('CONTAINER_MODE', false))
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#dnsSettings" onclick="getDNS()">{{__("DNS Ayarları")}}</a>
                         </li>
+                        @endif
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#mailSettings" onclick="getCronMails()">{{__("Mail Ayarları")}}</a>
                         </li>
