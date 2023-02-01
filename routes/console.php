@@ -118,6 +118,6 @@ Artisan::command('register_liman', function () {
     Liman::updateOrCreate([
         'machine_id' => getLimanId(),
     ], [
-        'last_ip' => env('LIMAN_IP', trim((string) `hostname -I`)),
+        'last_ip' => env('LIMAN_IP', trim((string) `hostname -I | cut -d' ' -f1 | xargs`)),
     ]);
 })->describe('Register liman');
