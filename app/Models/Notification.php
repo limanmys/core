@@ -22,6 +22,7 @@ class Notification extends Model
         'extension_id',
         'level',
         'read',
+        'mail'
     ];
 
     /**

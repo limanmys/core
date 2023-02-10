@@ -13,5 +13,5 @@ class AdminNotification extends Model
 {
     use UsesUuid;
 
-    protected $fillable = ['read', 'title', 'message', 'type', 'level'];
+    protected $fillable = ['read', 'title', 'message', 'type', 'level', 'mail'];
 }

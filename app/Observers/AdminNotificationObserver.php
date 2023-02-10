@@ -32,10 +32,13 @@ class AdminNotificationObserver
     private function sendBroadcast($adminNotification)
     {
         $adminUsers = User::where('status', 1)->get();
-        foreach ($adminUsers as $user) {
-            $user->notify(new NotificationSent($adminNotification));
+        for($i = 0; $i < count($adminUsers); $i++) {
+            $adminUsers[$i]->notify(new NotificationSent($adminNotification));
             if (env('MAIL_ENABLED') == true && $adminNotification && $adminNotification->type == 'external_notification') {
-                Mail::to($user)->send(new BasicNotification($adminNotification));
+                if (isset($adminNotification->mail) && ! filter_var($adminNotification->mail, FILTER_VALIDATE_BOOLEAN)) {
+                    continue;
+                }
+                Mail::to($adminUsers[$i])->send(new BasicNotification($adminNotification));
             }
         }
     }

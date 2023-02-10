@@ -173,7 +173,7 @@ class User extends Authenticatable
      * @param string $value
      * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
-    protected function google2faSecret(string $value): Attribute
+    protected function google2faSecret(string $value = null): Attribute
     {
         return new Attribute(
             get: fn($value) => ! is_null($value) ? decrypt($value) : '',

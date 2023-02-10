@@ -25,7 +25,7 @@ class ExternalNotificationController extends Controller
     public function revoke()
     {
         $obj = ExternalNotification::find(request('id'));
-        if (! $obj) {
+        if (!$obj) {
             return respond('Bu istemci bulunamadı!', 201);
         }
 
@@ -39,7 +39,7 @@ class ExternalNotificationController extends Controller
     public function renew()
     {
         $obj = ExternalNotification::find(request('id'));
-        if (! $obj) {
+        if (!$obj) {
             return respond('Bu istemci bulunamadı!', 201);
         }
         $token = (string) Str::uuid();
@@ -55,7 +55,7 @@ class ExternalNotificationController extends Controller
     public function edit()
     {
         $obj = ExternalNotification::find(request('id'));
-        if (! $obj) {
+        if (!$obj) {
             return respond('Bu istemci bulunamadı!', 201);
         }
         if ($obj->update(request()->all())) {
@@ -75,7 +75,7 @@ class ExternalNotificationController extends Controller
     {
         try {
             $channel = ExternalNotification::where('token', request('token'))->first();
-            if (! $channel) {
+            if (!$channel) {
                 return response()->json([
                     'Not authorized, token missing',
                 ], 403);
@@ -98,6 +98,7 @@ class ExternalNotificationController extends Controller
             }
 
             $data = json_decode((string) $request->get('message'));
+            $mail = filter_var(request('mail'), FILTER_VALIDATE_BOOLEAN);
 
             if (isset($data->notifyUser)) {
                 $user = User::where('email', $data->notifyUser)->firstOrFail();
@@ -109,10 +110,11 @@ class ExternalNotificationController extends Controller
                     ]),
                     'type' => 'external_notification',
                     'message' => json_encode([
-                        'tr' => (isset($data->notification) ? $data->notification : $data->notification_tr) . '. ' . __('Kullanıcı', [], 'tr') . ': ' . $data->user . ' ' . __('Makine', [], 'tr') . ': ' . $data->machine,
-                        'en' => (isset($data->notification) ? $data->notification : $data->notification_en) . '. ' . __('Kullanıcı', [], 'en') . ': ' . $data->user . ' ' . __('Makine', [], 'en') . ': ' . $data->machine,
+                        'tr' => (isset($data->notification) ? $data->notification : $data->notification_tr) . '. ' . __('Kullanıcı', [], 'tr') . ': ' . (isset($data->user) ? $data->user : '') . ' ' . __('Makine', [], 'tr') . ': ' . (isset($data->machine) ? $data->machine : ''),
+                        'en' => (isset($data->notification) ? $data->notification : $data->notification_en) . '. ' . __('Kullanıcı', [], 'en') . ': ' . (isset($data->user) ? $data->user : '') . ' ' . __('Makine', [], 'en') . ': ' . (isset($data->machine) ? $data->machine : ''),
                     ]),
                     'level' => 3,
+                    'mail' => $mail,
                 ]);
             } elseif (isset($data->notifyGroup)) {
                 $role = Role::where('name', $data->notifyGroup)->firstOrFail();
@@ -125,18 +127,19 @@ class ExternalNotificationController extends Controller
                         ]),
                         'type' => 'external_notification',
                         'message' => json_encode([
-                            'tr' => (isset($data->notification) ? $data->notification : $data->notification_tr) . '. ' . __('Kullanıcı', [], 'tr') . ': ' . $data->user . ' ' . __('Makine', [], 'tr') . ': ' . $data->machine,
-                            'en' => (isset($data->notification) ? $data->notification : $data->notification_en) . '. ' . __('Kullanıcı', [], 'en') . ': ' . $data->user . ' ' . __('Makine', [], 'en') . ': ' . $data->machine,
+                            'tr' => (isset($data->notification) ? $data->notification : $data->notification_tr) . '. ' . __('Kullanıcı', [], 'tr') . ': ' . (isset($data->user) ? $data->user : '') . ' ' . __('Makine', [], 'tr') . ': ' . (isset($data->machine) ? $data->machine : ''),
+                            'en' => (isset($data->notification) ? $data->notification : $data->notification_en) . '. ' . __('Kullanıcı', [], 'en') . ': ' . (isset($data->user) ? $data->user : '') . ' ' . __('Makine', [], 'en') . ': ' . (isset($data->machine) ? $data->machine : ''),
                         ]),
                         'level' => 3,
+                        'mail' => $mail,
                     ]);
                 }
             } else {
                 $message = $request->get('message');
                 if (isJson($message) && (isset($data->notification) || isset($data->notification_tr) || isset($data->notification_en))) {
                     $message = json_encode([
-                        'tr' => (isset($data->notification) ? $data->notification : $data->notification_tr) . '. ' . __('Kullanıcı', [], 'tr') . ': ' . $data->user . ' ' . __('Makine', [], 'tr') . ': ' . $data->machine,
-                        'en' => (isset($data->notification) ? $data->notification : $data->notification_en) . '. ' . __('Kullanıcı', [], 'en') . ': ' . $data->user . ' ' . __('Makine', [], 'en') . ': ' . $data->machine,
+                        'tr' => (isset($data->notification) ? $data->notification : $data->notification_tr) . '. ' . __('Kullanıcı', [], 'tr') . ': ' . (isset($data->user) ? $data->user : '') . ' ' . __('Makine', [], 'tr') . ': ' . (isset($data->machine) ? $data->machine : ''),
+                        'en' => (isset($data->notification) ? $data->notification : $data->notification_en) . '. ' . __('Kullanıcı', [], 'en') . ': ' . (isset($data->user) ? $data->user : '') . ' ' . __('Makine', [], 'en') . ': ' . (isset($data->machine) ? $data->machine : ''),
                     ]);
                 }
                 AdminNotification::create([
@@ -147,6 +150,7 @@ class ExternalNotificationController extends Controller
                     'type' => 'external_notification',
                     'message' => $message,
                     'level' => 3,
+                    'mail' => $mail,
                 ]);
             }
 

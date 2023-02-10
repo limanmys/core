@@ -37,6 +37,12 @@ class NotificationObserver
         );
         $user->notify(new NotificationSent($notification));
         if (env('MAIL_ENABLED') == true && $notification && $notification->type == 'external_notification') {
+            if (
+                isset($notification->mail) &&
+                !filter_var($notification->mail, FILTER_VALIDATE_BOOLEAN)
+            ) {
+                return;
+            }
             Mail::to($user)->send(new BasicNotification($notification));
         }
     }
