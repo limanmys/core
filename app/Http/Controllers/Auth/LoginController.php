@@ -201,10 +201,9 @@ class LoginController extends Controller
      * Send failed login response
      *
      * @param Request $request
-     * @return never
      * @throws ValidationException
      */
-    protected function sendFailedLoginResponse(Request $request): never
+    protected function sendFailedLoginResponse(Request $request)
     {
         $credientials = (object) $this->credentials($request);
         hook('login_failed', [
@@ -212,8 +211,10 @@ class LoginController extends Controller
             'password' => $credientials->password,
         ]);
 
-        throw ValidationException::withMessages([
-            $this->username() => [trans('auth.failed')],
+        return redirect()->route('login')->withErrors([
+            "messages" => [
+                $this->username() => [trans('auth.failed')],
+            ]
         ]);
     }
 }

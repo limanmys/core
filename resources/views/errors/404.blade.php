@@ -314,7 +314,7 @@ h2 {
                   <h2>{{__("Sayfa bulunamadı.")}}</h2>
                   <p>{{ $exception->getMessage() ? $exception->getMessage() : __("Önceki sayfaya geri dönerek işleminize devam edebilirsiniz.") }}
                   </p>
-                  <button class="btn green" onclick="location.href='{{ URL::previous() }}'"><i class="fas fa-chevron-left"></i> {{ __("Geri") }} </button>
+                  <button class="btn green" onclick="history.back()"><i class="fas fa-chevron-left"></i> {{ __("Geri") }} </button>
                </div>
             </div>
          </div>
