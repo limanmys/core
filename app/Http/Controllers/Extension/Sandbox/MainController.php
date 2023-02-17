@@ -201,6 +201,14 @@ class MainController extends Controller
                     'timeout' => 30,
                 ]);
                 $output = (string) $res->getBody();
+
+                $isJson = isJson($output, true);
+                if ($isJson && isset($isJson->status) && $isJson->status != 200) {
+                    return respond(
+                        $isJson->message,
+                        $isJson->status,
+                    );
+                }
             } catch (\Exception $e) {
                 if (env('APP_DEBUG', false)) {
                     return abort(
