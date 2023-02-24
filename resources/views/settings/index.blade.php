@@ -69,13 +69,18 @@
                                     "value" => \App\User::all()->map(function($user) {
                                         $user->status = (bool) $user->status ? __("Yönetici") : __("Kullanıcı");
                                         $user->username = empty($user->username) ? "-" : $user->username;
+                                        $user->auth_type = ! empty($user->auth_type) ? (
+                                            $user->auth_type == "local" ? "Liman" : (
+                                                $user->auth_type == "ldap" ? "LDAP" : "Keycloak"
+                                            )
+                                        ) : "-";
                                         return $user;
                                     }),
                                     "title" => [
-                                        "İsim Soyisim", "Kullanıcı Adı", "Email", "Yetki", "*hidden*" ,
+                                        "İsim Soyisim", "Kullanıcı Adı", "Email", "Yetki", "Giriş Türü", "*hidden*" ,
                                     ],
                                     "display" => [
-                                        "name", "username", "email", "id:user_id", "status"
+                                        "name", "username", "email", "id:user_id", "status", "auth_type"
                                     ],
                                     "menu" => [
                                         "Parolayı Sıfırla" => [
