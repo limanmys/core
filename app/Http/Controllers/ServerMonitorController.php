@@ -22,6 +22,12 @@ class ServerMonitorController extends Controller
      */
     public function add()
     {
+        validate([
+            'name' => 'required',
+            'ip_address' => 'required',
+            'port' => 'required|numeric|min:-1|max:65537'
+        ]);
+
         $obj = MonitorServer::where([
             'ip_address' => request('ip_address'),
             'port' => request('port'),
