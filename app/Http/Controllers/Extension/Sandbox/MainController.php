@@ -242,24 +242,7 @@ class MainController extends Controller
      */
     private function getNavigationServers()
     {
-        $navServers = DB::table('server_groups')
-            ->where('servers', 'like', '%' . server()->id . '%')
-            ->get();
-        $cleanServers = [];
-        foreach ($navServers as $rawServers) {
-            $servers = explode(',', (string) $rawServers->servers);
-            foreach ($servers as $server) {
-                if (Permission::can(user()->id, 'server', 'id', $server)) {
-                    array_push($cleanServers, $server);
-                }
-            }
-        }
-
-        $cleanServers = array_unique($cleanServers);
-        $cleanExtensions = [];
-
-        $serverObjects = Server::find($cleanServers);
-        unset($cleanServers);
+        $serverObjects = Server::getAll();
         foreach ($serverObjects as $server) {
             $cleanExtensions[$server->id . ':' . $server->name] = $server
                 ->extensions()

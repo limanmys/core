@@ -10,7 +10,6 @@ use App\Models\Permission;
 use App\Models\PermissionData;
 use App\Models\Role;
 use App\Models\Server;
-use App\Models\ServerGroup;
 use App\System\Command;
 use App\User;
 use GuzzleHttp\Client;
@@ -730,69 +729,7 @@ class MainController extends Controller
 
         return respond('Başarıyla eklendi!');
     }
-
-    /**
-     * Add server group
-     *
-     * @return JsonResponse|Response
-     */
-    public function addServerGroup()
-    {
-        if (! request('name') || strlen((string) request('name')) < 1) {
-            return respond('Lütfen bir grup ismi girin.', 201);
-        }
-        if (ServerGroup::where('name', request('name'))->exists()) {
-            return respond('Bu isimle zaten bir grup var.', 201);
-        }
-        $flag = ServerGroup::create([
-            'name' => request('name'),
-            'servers' => request('servers'),
-        ]);
-
-        return $flag
-            ? respond('Grup başarıyla eklendi!')
-            : respond('Grup Eklenemedi!', 201);
-    }
-
-    /**
-     * Modify server group
-     *
-     * @return JsonResponse|Response
-     */
-    public function modifyServerGroup()
-    {
-        $group = ServerGroup::find(request('server_group_id'));
-        if (! $group) {
-            return respond('Grup bulunamadı!', 201);
-        }
-        $flag = $group->update([
-            'name' => request('name'),
-            'servers' => request('servers'),
-        ]);
-
-        return $flag
-            ? respond('Grup başarıyla düzenlendi!')
-            : respond('Grup Düzenlenemedi!', 201);
-    }
-
-    /**
-     * Delete server group
-     *
-     * @return JsonResponse|Response
-     */
-    public function deleteServerGroup()
-    {
-        $group = ServerGroup::find(request('server_group_id'));
-        if (! $group) {
-            return respond('Grup bulunamadı!', 201);
-        }
-        $flag = $group->delete();
-
-        return $flag
-            ? respond('Grup başarıyla silindi!')
-            : respond('Grup Silinemedi!', 201);
-    }
-
+    
     /**
      * Save log system
      *

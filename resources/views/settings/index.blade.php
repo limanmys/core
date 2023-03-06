@@ -22,9 +22,6 @@
                             <a class="nav-link" data-toggle="tab" href="#roles" onclick="getRoleList()" aria-selected="true">{{__("Rol Grupları")}}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#serverGroups" aria-selected="true">{{__("Sunucu Grupları")}}</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#roleList" onclick="allRoles()" aria-selected="true">{{__("İzin Listesi")}}</a>
                         </li>
                         <li class="nav-item">
@@ -321,34 +318,6 @@
                                 <button type="submit" class="btn btn-success">{{__("Ayarları Kaydet")}}</button>
                             </form>
                         </div>
-                        <div class="tab-pane fade show" id="serverGroups" role="tabpanel">
-                        @include('modal-button',[
-                                "class" => "btn-success",
-                                "target_id" => "addServerGroup",
-                                "text" => "Sunucu Grubu Ekle"
-                        ])<br><br>
-
-                        <p>{{__("Sunucuları bir gruba ekleyerek eklentiler arası geçişi daha akıcı yapabilirsiniz.")}}</p>
-                        @include('table',[
-                                    "value" => \App\Models\ServerGroup::all(),
-                                    "title" => [
-                                        "Adı", "*hidden*" , "*hidden*"
-                                    ],
-                                    "display" => [
-                                        "name" , "id:server_group_id" , "servers:servers"
-                                    ],
-                                    "menu" => [
-                                        "Düzenle" => [
-                                            "target" => "modifyServerGroupHandler",
-                                            "icon" => " context-menu-icon-edit"
-                                        ],
-                                        "Sil" => [
-                                            "target" => "deleteServerGroup",
-                                            "icon" => " context-menu-icon-delete"
-                                        ]
-                                    ],
-                                ])
-                        </div>
                         <div class="tab-pane fade show" id="roleList" role="tabpanel">
                             <div id="roleListInner"></div>  
                         </div>
@@ -555,81 +524,6 @@
        "submit_text" => "Parolayı Sıfırla"
    ])
 
-   @include('modal',[
-        "id"=>"deleteServerGroup",
-        "title" =>"Sunucu Grubunu Sil",
-        "url" => route('delete_server_group'),
-        "text" => "Sunucu grubunu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-        "next" => "reload",
-        "inputs" => [
-            "-:-" => "server_group_id:hidden"
-        ],
-        "submit_text" => "Sunucu Grubunu Sil"
-    ])
-
-
-
-
-    @component('modal-component',[
-        "id" => "addServerGroup",
-        "title" => "Sunucuları Gruplama",
-        "footer" => [
-            "class" => "btn-success",
-            "onclick" => "addServerGroup()",
-            "text" => "Ekle"
-        ],
-    ])
-    <div class="form-group">
-        <label>{{__("Sunucu Grubu Adı")}}</label><br>
-        <small>{{__("Görsel olarak hiçbir yerde gösterilmeyecektir, yalnızca düzenleme kısmındak kolay erişim için eklenmiştir.")}}</small>
-        <input type="text" class="form-control" id="serverGroupName">
-    </div>
-    <label>{{__("Sunucular")}}</label><br>
-    <small>{{__("Bu gruba eklemek istediğiniz sunucuları seçin.")}}</small>
-    @include('table',[
-        "id" => "serverGroupServers",
-        "value" => servers(),
-        "title" => [
-            "Sunucu Adı" , "İp Adresi" , "*hidden*"
-        ],
-        "display" => [
-            "name" , "ip_address", "id:server_id"
-        ],
-        "noInitialize" => "true"
-    ])
-
-    @endcomponent
-
-    @component('modal-component',[
-        "id" => "modifyServerGroupModal",
-        "title" => "Sunucu Grubu Düzenleme",
-        "footer" => [
-            "class" => "btn-success",
-            "onclick" => "modifyServerGroup()",
-            "text" => "Ekle"
-        ],
-    ])
-    <div class="form-group">
-        <label>{{__("Sunucu Grubu Adı")}}</label><br>
-        <small>{{__("Görsel olarak hiçbir yerde gösterilmeyecektir, yalnızca düzenleme kısmındak kolay erişim için eklenmiştir.")}}</small>
-        <input type="text" class="form-control" id="serverGroupNameModify">
-    </div>
-    <label>{{__("Sunucular")}}</label><br>
-    <small>{{__("Bu gruba eklemek istediğiniz sunucuları seçin.")}}</small>
-    @include('table',[
-        "id" => "modifyServerGroupTable",
-        "value" => servers(),
-        "title" => [
-            "Sunucu Adı" , "İp Adresi" , "*hidden*"
-        ],
-        "display" => [
-            "name" , "ip_address", "id:server_id"
-        ],
-        "noInitialize" => "true"
-    ])
-
-    @endcomponent
-
     @include('modal',[
         "id"=>"addNewNotificationSource",
         "title" => "Yeni Bildirim İstemcisi Ekle",
@@ -730,69 +624,6 @@
             });
         }
 
-        function addServerGroup(){
-            showSwal('{{__("Ekleniyor...")}}','info');
-            var data = new FormData();
-            var tableData = [];
-            var table = $("#serverGroupServers").DataTable();
-            table.rows( { selected: true } ).data().each(function(element){
-                tableData.push(element[3]);
-            });
-            data.append('name', $('#serverGroupName').val());
-            data.append('servers', tableData.join());
-            request("{{route("add_server_group")}}", data, function(response) {
-                var res = JSON.parse(response);
-                showSwal(res.message,'success',2000);
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
-            }, function(response){
-                var error = JSON.parse(response);
-                showSwal(error.message,'error',2000);
-            });
-        }
-        function modifyServerGroupHandler(row){
-            var server_group_id = row.querySelector('#server_group_id').innerHTML;
-            var server_ids = row.querySelector('#servers').innerHTML.split(",");
-            current_server_group = server_group_id;
-            $('#serverGroupNameModify').val(row.querySelector('#name').innerHTML);
-            var table = $("#modifyServerGroupTable").DataTable();
-            table.rows().deselect();
-            table.rows().every(function(){
-                var data = this.data();
-                var current = this;
-                if(server_ids.includes(data[3])){
-                    current.select();
-                }
-                this.draw();
-            });
-            $("#modifyServerGroupModal").modal('show');
-        }
-
-        var current_server_group = null;
-        function modifyServerGroup(){
-            showSwal('{{__("Düzenleniyor...")}}','center');
-            var data = new FormData();
-            var tableData = [];
-            var table = $("#modifyServerGroupTable").DataTable();
-            table.rows( { selected: true } ).data().each(function(element){
-                tableData.push(element[3]);
-            });
-            data.append('name', $('#serverGroupNameModify').val());
-            data.append('servers', tableData.join());
-            data.append('server_group_id',current_server_group);
-            request("{{route("modify_server_group")}}", data, function(response) {
-                var res = JSON.parse(response);
-                showSwal(res.message,'success',2000);
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
-            }, function(response){
-                var error = JSON.parse(response);
-                showSwal(error.message,'error',2000);
-            });
-        }
-
         function afterUserAdd(response) {
             var json = JSON.parse(response);
             $("#add_user button[type='submit']").attr("disabled","true")
@@ -801,10 +632,6 @@
 
         $(function () {
             $("#add_user").find("input[name='username']").attr('required', false);
-
-            $("#serverGroupServers").DataTable(dataTablePresets('multiple'));
-
-            $("#modifyServerGroupTable").DataTable(dataTablePresets('multiple'));
         });
         function getUserList(){
             request('{{route('get_user_list_admin')}}', new FormData(), function (response) {
