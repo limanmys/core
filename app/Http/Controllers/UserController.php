@@ -323,10 +323,11 @@ class UserController extends Controller
         $key = env('APP_KEY') . $user_id . request('server_id');
         $encrypted = AES256::encrypt(request('setting_value'), $key);
 
-        $ok = UserSettings::create([
+        $ok = UserSettings::updateOrCreate([
             'server_id' => request('server_id'),
             'user_id' => $user_id,
             'name' => request('setting_name'),
+        ], [
             'value' => $encrypted
         ]);
 
