@@ -109,6 +109,7 @@ class MainController extends Controller
     {
         validate([
             'NAV_SERVER_COUNT' => 'required|numeric|digits_between:1,2|min:1',
+            'EXTENSION_TIMEOUT' => 'required|numeric|min:30'
         ]);
 
         auth()->user()->update([
