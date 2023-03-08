@@ -181,7 +181,12 @@ class RoleController extends Controller
      */
     public function removeRolesToUser()
     {
-        RoleUser::whereIn('role_id', json_decode((string) request('ids')))
+        $ids = json_decode((string) request('ids'));
+        if (count($ids) == 0) {
+            return respond(__('Rol grubu silinemedi.'), 201);
+        }
+
+        RoleUser::whereIn('role_id', $ids)
             ->where([
                 'user_id' => request('user_id'),
             ])

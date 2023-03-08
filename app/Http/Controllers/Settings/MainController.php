@@ -947,6 +947,10 @@ input(type="imtcp" port="514")';
      */
     public function setDNSServers()
     {
+        if (trim(strlen(request("dns1"))) == 0 && trim(strlen(request("dns2"))) == 0 && trim(strlen(request("dns3"))) == 0) {
+            return respond('DNS Ayarları güncellenemedi!', 201);
+        }
+
         $system = rootSystem();
         $flag = $system->dnsUpdate(
             request('dns1'),

@@ -32,9 +32,9 @@ class Server extends Model
     /**
      * Get all servers
      *
-     * @return Server|Server[]|Collection|Builder
+     * @return Server| array | Collection | Builder
      */
-    public static function getAll(): Server | array | \Collection | \Builder
+    public static function getAll(): Server | array | Collection | Builder
     {
         return Server::get()->filter(function ($server) {
             return Permission::can(user()->id, 'server', 'id', $server->id);
