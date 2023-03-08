@@ -24,7 +24,7 @@
                 </div>
                 <div class="col-md-4">
                     <label for="port">{{__("Port")}}</label>
-                    <input type="number" name="port" class="form-control" aria-valuemin="1" aria-valuemax="65555" id="port" value="{{request('port')}}">
+                    <input type="number" name="port" class="form-control" min="1" max="65536" aria-valuemin="1" aria-valuemax="65555" id="port" value="{{request('port')}}">
                 </div>
                 <div class="col-md-4" style="line-height: 95px">
                     <button onclick="retrieveCertificate()" class="btn btn-success">{{__("Al")}}</button>

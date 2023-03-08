@@ -132,6 +132,11 @@ class MainController extends Controller
      */
     public function requestCert()
     {
+        validate([
+            'hostname' => 'required',
+            'port' => 'required|numeric|min:1|max:65537',
+        ]);
+
         [$flag, $message] = retrieveCertificate(
             request('hostname'),
             request('port')

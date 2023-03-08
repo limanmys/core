@@ -277,6 +277,11 @@ class OneController extends Controller
      */
     public function update()
     {
+        validate([
+            'name' => 'required',
+            'control_port' => 'required|numeric|min:1|max:65537'
+        ]);
+
         if (! Permission::can(user()->id, 'liman', 'id', 'update_server')) {
             return respond('Bu işlemi yapmak için yetkiniz yok!', 201);
         }
