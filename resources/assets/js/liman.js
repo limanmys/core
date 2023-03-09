@@ -503,6 +503,7 @@ window.$(function () {
   bsCustomFileInput.init();
   window.$(".select2").select2({
     theme: "bootstrap4",
+    language: document.getElementsByTagName("html")[0].getAttribute("lang")
   });
 
   window.$(".modal").on("show.bs.modal", function (modal) {
