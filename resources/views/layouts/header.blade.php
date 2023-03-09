@@ -65,7 +65,7 @@
                                             <i
                                                 class="nav-icon {{ empty($extension->icon) ? 'fa-solid fa-puzzle-piece' : 'fas fa-' . $extension->icon }}"></i>
                                         </div>
-                                        <p>{{ __($extension->display_name) }}</p>
+                                        <p>{{ strlen($extension->display_name) > 16 ? substr($extension->display_name, 0, 18) . "..." : $extension->display_name }}</p>
                                     </a>
                                 </li>
                             @endforeach
@@ -100,7 +100,7 @@
                                             <i
                                                 class="nav-icon {{ empty($extension->icon) ? 'fab fa-etsy' : 'fas fa-' . $extension->icon }}"></i>
                                         </div>
-                                        <p>{{ __($extension->display_name) }}</p>
+                                        <p>{{ strlen($extension->display_name) > 16 ? substr($extension->display_name, 0, 18) . "..." : $extension->display_name }}</p>
                                     </a>
                                 </li>
                             @endforeach
