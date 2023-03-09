@@ -1121,7 +1121,7 @@ class OneController extends Controller
         $server_id = request('server_id');
         $count = intval(
             Command::runLiman(
-                'cat /liman/logs/liman_new.log | grep @{:user_id} | grep @{:extension_id} | grep @{:query} | grep -v "recover middleware catch" | grep @{:server_id} | wc -l',
+                'cat /liman/logs/liman_new.log | grep @{:user_id} | grep @{:extension_id} | grep -i @{:query} | grep -v "recover middleware catch" | grep @{:server_id} | wc -l',
                 [
                     'query' => $query,
                     'server_id' => $server_id,
@@ -1132,7 +1132,7 @@ class OneController extends Controller
         );
         $head = $page > $count ? $count % 10 : 10;
         $data = Command::runLiman(
-            'cat /liman/logs/liman_new.log | grep @{:user_id} | grep @{:extension_id} | grep @{:query} | grep @{:server_id} | grep -v "recover middleware catch" | tail -{:page} | head -{:head} | tac',
+            'cat /liman/logs/liman_new.log | grep @{:user_id} | grep @{:extension_id} | grep -i @{:query} | grep @{:server_id} | grep -v "recover middleware catch" | tail -{:page} | head -{:head} | tac',
             [
                 'query' => $query,
                 'server_id' => $server_id,
