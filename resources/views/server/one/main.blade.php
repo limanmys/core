@@ -15,9 +15,9 @@
     <div class="alert alert-success alert-dismissible">
         <h5><i class="icon fas fa-smile-beam"></i> {{ __("Tavsiye") }}</h5>
         @if (session('locale') == "tr")
-        Bu sunucuya hiç eklenti eklememişsiniz. Limanı daha verimli kullanabilmek için <a data-toggle='pill' href='#extensionsTab' role='tab'><i class='fas fa-plug'></i> eklentiler</a> sekmesinden eklenti ekleyebilirsiniz veya <a href='/market'><i class='fas fa-shopping-cart'></i> eklenti mağazamızı</a> kullanarak açık kaynaklı eklentileri tek tuş ile yükleyebilirsiniz.
+        Bu sunucuya hiç eklenti eklememişsiniz. Limanı daha verimli kullanabilmek için <i class='fas fa-plug'></i> eklentiler sekmesinden eklenti ekleyebilirsiniz veya <a href='/market'><i class='fas fa-shopping-cart'></i> eklenti mağazamızı</a> kullanarak açık kaynaklı eklentileri tek tuş ile yükleyebilirsiniz.
         @else
-        You haven't added any extensions on this server. For using Liman more effectively add<a data-toggle='pill' href='#extensionsTab' role='tab'><i class='fas fa-plug'></i> extensions</a> or download and install with one click from our <a href='/market'><i class='fas fa-shopping-cart'></i> extension store</a>
+        You haven't added any extensions on this server. For using Liman more effectively add <i class='fas fa-plug'></i> extensions or download and install with one click from our <a href='/market'><i class='fas fa-shopping-cart'></i> extension store</a>
         @endif
     </div>
     @endif

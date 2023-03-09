@@ -293,7 +293,7 @@
                 </div>
 
                 <div class="tab-pane fade show" id="settingsTab" role="tabpanel">
-                    <form id="edit_form" onsubmit="return request('{{ route('server_update') }}',this,reload)"
+                    <form id="edit_form" onsubmit="return request('{{ route('server_update') }}',this,reload, (e) => {showSwal(JSON.parse(e).message,'error',3000)})"
                         target="#">
                         <label>{{ __('Sunucu Adı') }}</label>
                         <input type="text" name="name" placeholder="Sunucu Adı" class="form-control mb-3" required=""
