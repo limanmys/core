@@ -231,9 +231,6 @@
         request("{{route("set_liman_tweaks")}}",form,function (success){
             let json = JSON.parse(success);
             showSwal(json.message,"success",2000);
-            setTimeout(function () {
-                location.reload();
-            },2000);
         },function (error) {
             let json = JSON.parse(error);
             showSwal(json.message,"error",2000);
