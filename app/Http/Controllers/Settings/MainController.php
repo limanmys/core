@@ -953,12 +953,21 @@ input(type="imtcp" port="514")';
      */
     public function setDNSServers()
     {
-        // TODO: dns2 dns3 not required
         validate([
-            'dns1' => 'required|ip',
-            'dns2' => 'ip',
-            'dns3' => 'ip',
+            'dns1' => 'required|ip'
         ]);
+
+        if (strlen(request('dns2')) > 2) {
+            validate([
+                'dns2' => 'ip'
+            ]);
+        }
+
+        if (strlen(request('dns3')) > 2) {
+            validate([
+                'dns3' => 'ip'
+            ]);
+        }
 
         $system = rootSystem();
         $flag = $system->dnsUpdate(
