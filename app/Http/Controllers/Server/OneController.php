@@ -279,7 +279,8 @@ class OneController extends Controller
     {
         validate([
             'name' => 'required',
-            'control_port' => 'required|numeric|min:1|max:65537'
+            'control_port' => 'required|numeric|min:1|max:65537',
+            'ip_address' => 'required|ip',
         ]);
 
         if (! Permission::can(user()->id, 'liman', 'id', 'update_server')) {
@@ -1422,7 +1423,7 @@ class OneController extends Controller
                 ]);
 
                 return respond([
-                    'status' => __(':package_name paketi başarıyla kuruldu.', [
+                    'status' => __(':package_name işlemi tamamlandı.', [
                         'package_name' => request('package_name'),
                     ]),
                     'output' => trim($command_output),
