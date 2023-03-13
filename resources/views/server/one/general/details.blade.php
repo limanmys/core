@@ -2,8 +2,8 @@
     <div class="card card-primary">
     <div class="card-header">
         <h3 class="card-title" style="width: 100%;">
-            <div class="float-left">
-                {{$server->name}}
+            <div class="float-left" data-toggle="tooltip" data-original-title="{{ $server->name }}">
+                {{strlen($server->name) > 14 ? substr($server->name, 0, 14) . '...' : $server->name}}
             </div>
             <div class="float-right">
             @if($favorite)
