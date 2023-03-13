@@ -109,7 +109,12 @@ class MainController extends Controller
     {
         validate([
             'NAV_SERVER_COUNT' => 'required|numeric|digits_between:1,2|min:1',
-            'EXTENSION_TIMEOUT' => 'required|numeric|min:30'
+            'EXTENSION_TIMEOUT' => 'required|numeric|min:30',
+            'MARKET_URL' => 'max:120',
+            'MARKET_CLIENT_ID' => 'max:220',
+            'MARKET_CLIENT_SECRET' => 'max:220',
+            'BRAND_NAME' => 'max:60',
+            'APP_NOTIFICATION_EMAIL' => 'email|max:120'
         ]);
 
         auth()->user()->update([
@@ -948,9 +953,12 @@ input(type="imtcp" port="514")';
      */
     public function setDNSServers()
     {
-        if (trim(strlen(request("dns1"))) == 0 && trim(strlen(request("dns2"))) == 0 && trim(strlen(request("dns3"))) == 0) {
-            return respond('DNS Ayarları güncellenemedi!', 201);
-        }
+        // TODO: dns2 dns3 not required
+        validate([
+            'dns1' => 'required|ip',
+            'dns2' => 'ip',
+            'dns3' => 'ip',
+        ]);
 
         $system = rootSystem();
         $flag = $system->dnsUpdate(
