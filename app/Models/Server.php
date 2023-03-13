@@ -309,8 +309,31 @@ class Server extends Model
             return '';
         }
 
+        $services = [];
         if ($this->isLinux()) {
-            return $this->run('systemctl list-units --type=service --state=active | wc -l');
+            $raw = $this->run(
+                "systemctl list-units --all | grep service | awk '{print $1 \":\"$2\" \"$3\" \"$4\":\"$5\" \"$6\" \"$7\" \"$8\" \"$9\" \"$10}'",
+                false
+            );
+            foreach (explode("\n", $raw) as &$package) {
+                if ($package == '') {
+                    continue;
+                }
+                if (str_contains($package, '●')) {
+                    $package = explode('●:', $package)[1];
+                }
+                $row = explode(':', trim($package));
+                try {
+                    array_push($services, [
+                        'name' => strlen($row[0]) > 50 ? substr($row[0], 0, 50) . '...' : $row[0],
+                        'description' => strlen($row[2]) > 60 ? substr($row[2], 0, 60) . '...' : $row[2],
+                        'status' => $row[1],
+                    ]);
+                } catch (\Exception) {
+                }
+            }
+
+            return count($services);
         }
 
         return $this->run('(Get-Service | Measure-Object).Count');
