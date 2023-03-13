@@ -170,9 +170,15 @@ class ExternalNotificationController extends Controller
 
     public function create()
     {
+        validate([
+            'name' => 'required|max:32',
+            'ip' => 'required|max:20',
+        ]);
+
         $token = (string) Str::uuid();
         if (
-            ExternalNotification::create(
+            ExternalNotification::updateOrCreate(
+                ['name' => request('name')],
                 request()
                     ->merge(['token' => $token])
                     ->all()
