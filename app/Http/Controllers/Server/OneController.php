@@ -873,7 +873,7 @@ class OneController extends Controller
             return respond('Bu isimde bir kullanıcı zaten ekli!', 201);
         }
         $output = Command::runSudo(
-            'echo "{:name} ALL=(ALL:ALL) ALL" | tee /etc/sudoers.d/{:name} &> /dev/null && echo 1 || echo 0',
+            'echo "{:name} ALL=(ALL:ALL) ALL" | sudo -p "liman-pass-sudo" tee /etc/sudoers.d/{:name} &> /dev/null && echo 1 || echo 0',
             [
                 'name' => $name,
             ]
@@ -896,7 +896,7 @@ class OneController extends Controller
         $name = request('name');
         $name = str_replace(' ', '\\x20', (string) $name);
         $output = Command::runSudo(
-            'if [ -f "/etc/sudoers.d/{:name}" ]; then rm /etc/sudoers.d/{:name} && echo 1 || echo 0; else echo 0; fi',
+            'bash -c "if [ -f \"/etc/sudoers.d/{:name}\" ]; then rm /etc/sudoers.d/{:name} && echo 1 || echo 0; else echo 0; fi"',
             [
                 'name' => $name,
             ]
