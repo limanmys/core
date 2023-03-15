@@ -152,6 +152,11 @@ class MainController extends Controller
         if (request()->has('MAIL_PASSWORD')) {
             $flag = setEnv([
                 'MAIL_PASSWORD' => request('MAIL_PASSWORD'),
+            ]);
+        }
+
+        if (request()->has('KEYCLOAK_CLIENT_SECRET')) {
+            $flag = setEnv([
                 'KEYCLOAK_CLIENT_SECRET' => request('KEYCLOAK_CLIENT_SECRET'),
             ]);
         }
