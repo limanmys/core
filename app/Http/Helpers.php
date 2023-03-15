@@ -1390,3 +1390,28 @@ if (! function_exists('scanTranslations')) {
         return $allMatches;
     }
 }
+
+if (! function_exists('getLanguages')) {
+    function getLanguages() {
+        $languages = [];
+        $json_file = resource_path('lang') . '/languages.json';
+        if (file_exists($json_file)) {
+            $languages = json_decode(file_get_contents($json_file), true);
+            $languages = array_keys($languages);
+        }
+        
+        return $languages;
+    }
+}
+
+if (! function_exists('getLanguageNames')) {
+    function getLanguageNames() {
+        $languages = [];
+        $json_file = resource_path('lang') . '/languages.json';
+        if (file_exists($json_file)) {
+            $languages = json_decode(file_get_contents($json_file), true);
+        }
+        
+        return $languages;
+    }
+}

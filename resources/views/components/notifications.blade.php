@@ -25,7 +25,11 @@
             $notificationTitle = json_decode($notification->title);
 
             if (json_last_error() === JSON_ERROR_NONE) {
-                $notificationTitle = $notificationTitle->{app()->getLocale()};
+                if (isset($notificationTitle->{app()->getLocale()})) {
+                    $notificationTitle = $notificationTitle->{app()->getLocale()};
+                } else {
+                    $notificationTitle = $notificationTitle->en;
+                }
             } else {
                 $notificationTitle = $notification->title;
             }

@@ -80,14 +80,22 @@ switch ($notification->type) {
                     @php
                         $notificationTitle = json_decode($notification->title);
                         if (json_last_error() === JSON_ERROR_NONE) {
-                            $notificationTitle = $notificationTitle->{app()->getLocale()};
+                            if (isset($notificationTitle->{app()->getLocale()})) {
+                                $notificationTitle = $notificationTitle->{app()->getLocale()};
+                            } else {
+                                $notificationTitle = $notificationTitle->en;
+                            }
                         } else {
                             $notificationTitle = $notification->title;
                         }
 
                         $notificationContent = json_decode($notification->message);
                         if (json_last_error() === JSON_ERROR_NONE) {
-                            $notificationContent = $notificationContent->{app()->getLocale()};
+                            if (isset($notificationContent->{app()->getLocale()})) {
+                                $notificationContent = $notificationContent->{app()->getLocale()};
+                            } else {
+                                $notificationContent = $notificationContent->en;
+                            }
                         } else {
                             $notificationContent = $notification->message;
                         }

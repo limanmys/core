@@ -41,14 +41,22 @@ if (!$item) {
                     @php
                         $notificationTitle = json_decode($item->title);
                         if (json_last_error() === JSON_ERROR_NONE) {
-                            $notificationTitle = $notificationTitle->{app()->getLocale()};
+                            if (isset($notificationTitle->{app()->getLocale()})) {
+                                $notificationTitle = $notificationTitle->{app()->getLocale()};
+                            } else {
+                                $notificationTitle = $notificationTitle->en;
+                            }
                         } else {
                             $notificationTitle = $item->title;
                         }
 
                         $notificationContent = json_decode($item->message);
                         if (json_last_error() === JSON_ERROR_NONE) {
-                            $notificationContent = $notificationContent->{app()->getLocale()};
+                            if (isset($notificationContent->{app()->getLocale()})) {
+                                $notificationContent = $notificationContent->{app()->getLocale()};
+                            } else {
+                                $notificationContent = $notificationContent->en;
+                            }
                         } else {
                             $notificationContent = $item->message;
                         }

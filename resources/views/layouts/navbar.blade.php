@@ -28,12 +28,11 @@
             <i class="fa-solid fa-globe"></i>
         </a>
         <div class="dropdown-menu dropdown-menu-right p-0" style="min-width: 150px !important;">
-                <a href="{{ route('set_locale', ['locale' => 'tr']) }}" class="dropdown-item">
-                    TR Türkçe
+                @foreach (getLanguageNames() as $short => $long)
+                <a href="{{ route('set_locale', ['locale' => $short]) }}" class="dropdown-item">
+                    {{ strtoupper($short) }} {{ $long }}
                 </a>
-                <a href="{{ route('set_locale', ['locale' => 'en']) }}" class="dropdown-item">
-                    EN English
-                </a>
+                @endforeach
         </div>
     </li>
 

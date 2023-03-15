@@ -137,7 +137,7 @@ class HomeController extends Controller
     public function setLocale()
     {
         system_log(7, 'SET_LOCALE');
-        $languages = ['tr', 'en'];
+        $languages = getLanguages();
         if (
             request()->has('locale') &&
             in_array(request('locale'), $languages)
