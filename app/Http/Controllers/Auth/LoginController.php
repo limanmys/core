@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Oauth2Token;
 use App\User;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\RedirectResponse;
@@ -42,7 +44,7 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
+        $this->middleware(['guest', 'web'])->except(['logout', 'keycloak-auth', 'keycloak-callback']);
     }
 
     /**
@@ -118,7 +120,7 @@ class LoginController extends Controller
             return;
         }
 
-        return Socialite::driver('keycloak')->stateless()->redirect();
+        return Socialite::driver('keycloak')->redirect();
     }
 
     /**
@@ -133,7 +135,10 @@ class LoginController extends Controller
             return;
         }
 
-        $remote = Socialite::driver('keycloak')->stateless()->user();
+        $remote = Socialite::driver('keycloak')
+            ->setHttpClient(new Client(['verify' => false]))
+            ->stateless()
+            ->user();
 
         $user = User::find($remote->id);
 
@@ -166,7 +171,19 @@ class LoginController extends Controller
             'user' => $user,
         ]);
 
-        Auth::loginUsingId($user->id, true);
+        Oauth2Token::updateOrCreate([
+            "user_id" => $remote->getId(),
+            "token_type" => $remote->accessTokenResponseBody['token_type']
+        ], [
+            "user_id" => $remote->getId(),
+            "token_type" => $remote->accessTokenResponseBody['token_type'],
+            "access_token" => $remote->accessTokenResponseBody['access_token'],
+            "refresh_token" => $remote->accessTokenResponseBody['refresh_token'],
+            "expires_in" => (int) $remote->accessTokenResponseBody['expires_in'],
+            "refresh_expires_in" => (int) $remote->accessTokenResponseBody['refresh_expires_in'],
+        ]);
+
+        Auth::loginUsingId($remote->getId());
 
         return redirect('/');
     }

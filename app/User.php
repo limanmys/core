@@ -168,6 +168,14 @@ class User extends Authenticatable
     }
 
     /**
+     * @return HasOne
+     */
+    public function oauth2Token()
+    {
+        return $this->hasOne('\App\Models\Oauth2Token', 'user_id');
+    }
+
+    /**
      * Interact with the user's OTP secret.
      *
      * @param string $value
