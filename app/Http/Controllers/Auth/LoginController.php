@@ -140,30 +140,22 @@ class LoginController extends Controller
             ->stateless()
             ->user();
 
-        $user = User::find($remote->id);
-
-        if (! $user) {
-            $emailExists = User::where('email', $remote->email)->get();
-            if (count($emailExists) < 1) {
-                $user = User::create([
-                    'id' => $remote->id,
-                    'username' => $remote->nickname,
-                    'email' => $remote->email,
-                    'auth_type' => 'keycloak',
-                    'status' => 0,
-                    'forceChange' => false,
-                    'name' => $remote->name,
-                    'password' => Hash::make(Str::random(16))
-                ]);
-            } else {
-                return redirect('/giris')->withErrors(__('Keycloak kullanıcısının e-posta adresi sistemde mevcut.'));
-            }
-        }
-
-        $user->update([
-            'last_login_at' => Carbon::now()->toDateTimeString(),
-            'last_login_ip' => $request->ip(),
-        ]);
+        $user = User::updateOrCreate(
+            [
+                'id' => $remote->id
+            ], 
+            [
+                'id' => $remote->id,
+                'username' => $remote->nickname,
+                'email' => $remote->email,
+                'auth_type' => 'keycloak',
+                'forceChange' => false,
+                'name' => $remote->name,
+                'password' => Hash::make(Str::random(16)),
+                'last_login_at' => Carbon::now()->toDateTimeString(),
+                'last_login_ip' => $request->ip(),
+            ]
+        );
 
         system_log(7, 'LOGIN_SUCCESS');
 
