@@ -1464,6 +1464,11 @@ class OneController extends Controller
      */
     public function uploadDebFile()
     {
+        $allowed = ["deb", "rpm"];
+        if (! in_array(pathinfo(request('filePath'), PATHINFO_EXTENSION), $allowed, true)) {
+            return respond('Gönderdiğiniz dosya türü desteklenmemektedir.', 403);
+        }
+
         if (server()->isLinux()) {
             $filePath = request('filePath');
             if (! $filePath) {
