@@ -31,13 +31,6 @@ curl -s https://api.github.com/repos/limanmys/fiber-render-engine/releases/lates
 unzip liman_render*.zip
 mv liman_render package/liman/server/storage/liman_render
 
-#WebSSH
-wget "https://github.com/limanmys/webssh/archive/master.zip" -q
-unzip -qq master.zip
-mkdir -p package/liman/webssh
-mv webssh-master/* package/liman/webssh
-rm -rf master.zip webssh-master
-
 #Setup variables and version codes.
 VERSION=$(cat package/liman/server/storage/VERSION)
 echo $5 >package/liman/server/storage/VERSION_CODE
@@ -50,7 +43,7 @@ rm -rf package/liman/server/node_modules
 mv package/liman/server/storage/build_tools/DEBIAN package/
 mv package/liman/server/storage/build_tools/rhel/liman.spec liman.spec
 mv package/liman/server/storage/build_tools/rhel/liman-cron-mail.ini liman-cron-mail.ini
-mv package/liman/server/storage/build_tools/rhel/liman-system-worker.ini liman-system-worker.ini
+mv package/liman/server/storage/build_tools/rhel/liman-system-1orker.ini liman-system-worker.ini
 mv package/liman/server/storage/build_tools/rhel/liman-high-availability-syncer.ini liman-high-availability-syncer.ini
 rm -rf package/liman/server/storage/build_tools
 
@@ -81,7 +74,7 @@ Date : $DATE
 Architecture: amd64
 Priority: important
 Description: Liman MYS
-Depends: curl, gpg, zip, unzip, nginx, redis, php8.1-redis, php8.1-fpm, php8.1-gd, php8.1-curl, php8.1, php8.1-sqlite3, php8.1-snmp, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-posix, libnginx-mod-http-headers-more-filter, libssl1.1 | libssl3, supervisor, postgresql-15, php8.1-pgsql, pgloader, php8.1-bcmath, rsync, dnsutils, php8.1-ldap, php8.1-smbclient | php-smbclient, krb5-user, php8.1-ssh2 | php-ssh2, smbclient, novnc, python3.8 | python3.9 | python3.10, python3-paramiko, python3-tornado""" > DEBIAN/control
+Depends: curl, gpg, zip, unzip, nginx, redis, php8.1-redis, php8.1-fpm, php8.1-gd, php8.1-curl, php8.1, php8.1-sqlite3, php8.1-snmp, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-posix, libnginx-mod-http-headers-more-filter, libssl1.1 | libssl3, supervisor, postgresql-15, php8.1-pgsql, pgloader, php8.1-bcmath, rsync, dnsutils, php8.1-ldap, php8.1-smbclient, krb5-user, php8.1-ssh2, smbclient""" > DEBIAN/control
 cat DEBIAN/control
 cd ../
 dpkg-deb -Zgzip --build package
