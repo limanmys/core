@@ -29,3 +29,7 @@ Liman Core is sponsored by [HAVELSAN](https://havelsan.com.tr/en).
 MIT License
 
 See [LICENSE](https://github.com/limanmys/core/blob/master/LICENSE) the full text.
+
+### Development
+
+From Liman Core 1.11.1 version, we are using PNPM as package manager. Due to Laravel limitations, you should install packages with this command:  `pnpm install --shamefully-hoist`
