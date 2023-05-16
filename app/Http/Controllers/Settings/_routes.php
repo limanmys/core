@@ -37,8 +37,8 @@ Route::post('/ayar/yetki/sil', 'Settings\MainController@removeFromList')
     ->name('settings_remove_from_list')
     ->middleware('admin');
 
-Route::post('/ayar/log/kaydet', 'Settings\MainController@saveLogSystem')
-    ->name('save_log_system')
+Route::post('/ayar/log/kaydet', 'Settings\MainController@setLogForwarding')
+    ->name('set_log_forwarding')
     ->middleware('admin');
 
 Route::get('/market/yonlendir', 'Settings\MainController@redirectMarket')

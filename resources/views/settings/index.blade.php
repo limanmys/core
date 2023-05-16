@@ -47,6 +47,9 @@
                             <a class="nav-link" data-toggle="tab" href="#mailSettings" onclick="getCronMails()">{{__("Mail Ayarları")}}</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#rsyslog">{{__("Log Yönlendirme")}}</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#limanTweaks" onclick="getLimanTweaks()">{{__("İnce Ayarlar")}}</a>
                         </li>
                         {!! settingsModuleButtons() !!}
@@ -309,11 +312,12 @@
                                         <input type="number" class="form-control" name="targetPort" value="514" id="logPort">
                                     </div>
                                 </div>
-                                <div class="form-row">
-                                <div class="form-group col-md-2">
-                                        <label for="logInterval">{{__("Log Gönderme Aralığı (Dakika)")}}</label>
-                                        <input type="number" class="form-control" name="logInterval" value="10" id="logInterval">
-                                    </div>
+                                <div class="form-group">
+                                    <label for="type">{{__("Bağlantı Türü")}}</label><br>
+                                    <select id="type" class="select2" name="type">
+                                        <option value="tcp">TCP</option>
+                                        <option value="udp">UDP</option>
+                                    </select>
                                 </div>
                                 <button type="submit" class="btn btn-success">{{__("Ayarları Kaydet")}}</button>
                             </form>
@@ -337,6 +341,9 @@
 
                                 }
                             </script>
+                        </div>
+                        <div class="tab-pane fade show" id="logForward" role="tabpanel">
+                            @include("settings.log_forward")
                         </div>
                         <div class="tab-pane fade show" id="limanTweaks" role="tabpanel">
                             @include("settings.tweaks")
@@ -614,10 +621,9 @@
         function saveLogSystem(){
             showSwal('{{__("Kaydediliyor...")}}','info');
             var data = new FormData(document.querySelector('#logForm'));
-            return request("{{route("save_log_system")}}", data, function(res) {
+            return request("{{route('set_log_forwarding')}}", data, function(res) {
                 var response = JSON.parse(res);
                 showSwal(response.message,'success');
-                reload();
             }, function(response){
                 var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);

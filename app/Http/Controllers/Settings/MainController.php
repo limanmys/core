@@ -742,69 +742,57 @@ class MainController extends Controller
     }
     
     /**
-     * Save log system
+     * Set log forwarding
      *
      * This function utilizes Rsyslog integration on system
      *
      * @return JsonResponse|Response
      */
-    public function saveLogSystem()
+    public function setLogForwarding()
     {
         $flag = request()->validate([
+            'type' => 'required|in:tcp,udp',
             'targetHostname' => 'required|min:3',
-            'targetPort' => 'required|numeric|between:1,65535',
-            'logInterval' => 'required|numeric',
+            'targetPort' => 'required|numeric|between:1,65535'
         ]);
         if (! $flag) {
             return respond('Girdiğiniz veriler geçerli değil!', 201);
         }
 
-        $text =
-            '
-*.*     @@' .
+        $template = '$ModLoad imfile
+$InputFileName /liman/logs/liman.log
+$InputFileTag liman_log:
+$InputFileStateFile liman_log
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /liman/logs/liman_new.log
+$InputFileTag render_engine_log:
+$InputFileStateFile liman_render_log
+$InputFileFacility local7
+$InputRunFileMonitor
+
+local7.liman_log <SERVERADDR>
+local7.render_engine_log <SERVERADDR>';
+
+        $template = str_replace(
+            '<SERVERADDR>',
+            (request('type') == 'tcp' ? '@' : '@@') .
             request('targetHostname') .
             ':' .
-            request('targetPort') .
-            '
-\\$ModLoad imfile
-\\$InputFilePollInterval ' .
-            request('logInterval') .
-            '
-\\$PrivDropToGroup adm
-\\$InputFileName ' .
-            env('LOG_PATH') .
-            '
-\\$InputFileTag LimanApp
-\\$InputFileStateFile Stat-APP
-\\$InputFileSeverity Info
-\\$InputRunFileMonitor
-\\$InputFilePersistStateInterval 1000
-';
-        Command::runLiman('echo @{:text} > /etc/rsyslog.d/liman.conf', [
-            'text' => $text,
-        ]);
-
-        shell_exec("sudo sed -i '/module(load=\"imudp\")/d' /etc/rsyslog.conf");
-        shell_exec("sudo sed -i '/module(load=\"imtcp\")/d' /etc/rsyslog.conf");
-        shell_exec(
-            "sudo sed -i '/input(type=\"imudp\" port=\"514\")/d' /etc/rsyslog.conf"
-        );
-        shell_exec(
-            "sudo sed -i '/input(type=\"imtcp\" port=\"514\")/d' /etc/rsyslog.conf"
+            request('targetPort'),
+            $template
         );
 
-        $text = '
-module(load="imudp")
-input(type="imudp" port="514")
-module(load="imtcp")
-input(type="imtcp" port="514")';
 
-        Command::runLiman('echo @{:text} | sudo tee -a /etc/rsyslog.conf', [
-            'text' => $text,
+
+        Command::runSystem("echo ':text:' > /etc/rsyslog.d/liman.conf", [
+            'text' => $template,
         ]);
+
         shell_exec('sudo systemctl restart rsyslog');
 
-        return respond('Başarıyla Kaydedildi!');
+        return respond('Başarıyla kaydedildi!');
     }
 
     /**
