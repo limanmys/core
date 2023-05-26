@@ -33,4 +33,3 @@ See [LICENSE](https://github.com/limanmys/core/blob/master/LICENSE) the full tex
 ### Development
 
 From Liman Core 1.11.1 version, we are using PNPM as package manager. Due to Laravel limitations, you should install packages with this command:  `pnpm install --shamefully-hoist`
-
