@@ -4,6 +4,11 @@ namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
+/**
+ * Kernel
+ *
+ * @extends HttpKernel
+ */
 class Kernel extends HttpKernel
 {
     protected $middleware = [

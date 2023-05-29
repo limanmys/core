@@ -10,21 +10,22 @@ use App\Models\RoleMapping;
 use App\Models\RoleUser;
 use App\Models\Server;
 use App\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
+/**
+ * Role Controller
+ *
+ * @extends Controller
+ */
 class RoleController extends Controller
 {
+
     /**
-     * @api {get} /rol/{role} Get Role
-     * @apiName Get Role
-     * @apiGroup Role
+     * Get role view
      *
-     * @apiParam {String} role ID of the Role
-     *
-     * @apiSuccess {Array} role Role details.
-     * @apiSuccess {Array} servers Role' Servers.
-     * @apiSuccess {Array} extensions Role' Extension.
-     * @apiSuccess {Array} limanPermissions Role' Liman Permissions.
-     * @apiSuccess {Array} variables Role' Extra Variables.
+     * @param Role $role
+     * @return JsonResponse|Response
      */
     public function one(Role $role)
     {
@@ -50,13 +51,9 @@ class RoleController extends Controller
     }
 
     /**
-     * @api {post} /rol/liste All Roles List
-     * @apiName All Roles List
-     * @apiGroup Role
+     * Get role list
      *
-     * @apiParam {String} role ID of the Role
-     *
-     * @apiSuccess {Array} value Role List.
+     * @return JsonResponse|Response
      */
     public function list()
     {
@@ -78,14 +75,11 @@ class RoleController extends Controller
         ]);
     }
 
+
     /**
-     * @api {post} /rol/ekle Add New Role
-     * @apiName Add New Role
-     * @apiGroup Role
+     * Create new role
      *
-     * @apiParam {String} name Role Name
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function add()
     {
@@ -108,6 +102,11 @@ class RoleController extends Controller
         return respond('Rol grubu başarıyla eklendi.');
     }
 
+    /**
+     * Rename role
+     *
+     * @return JsonResponse|Response
+     */
     public function rename()
     {
         $count = Role::where('id', request('role_id'))->update([
@@ -122,13 +121,9 @@ class RoleController extends Controller
     }
 
     /**
-     * @api {post} /rol/sil Remove Role
-     * @apiName Remove Role
-     * @apiGroup Role
+     * Delete role
      *
-     * @apiParam {String} role_id Id of the role
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function remove()
     {
@@ -144,14 +139,9 @@ class RoleController extends Controller
     }
 
     /**
-     * @api {post} /rol/kullanici_ekle Add Users to Role
-     * @apiName Add Users to Role
-     * @apiGroup Role
+     * Assign users to role
      *
-     * @apiParam {String} role_id Id of the role
-     * @apiParam {Array} users Only ids of target users.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function addRoleUsers()
     {
@@ -165,15 +155,11 @@ class RoleController extends Controller
         return respond(__('Grup üyeleri başarıyla eklendi.'), 200);
     }
 
+
     /**
-     * @api {post} /rol/rol_ekle Add Roles to User
-     * @apiName Add Roles to User
-     * @apiGroup Role
+     * Assign roles to user
      *
-     * @apiParam {String} user_id Id of the user.
-     * @apiParam {Array} ids Only ids of target roles.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function addRolesToUser()
     {
@@ -187,19 +173,20 @@ class RoleController extends Controller
         return respond(__('Rol grupları kullanıcıya başarıyla eklendi.'), 200);
     }
 
+
     /**
-     * @api {post} /rol/rol_sil Remove Roles from User
-     * @apiName Remove Roles from User
-     * @apiGroup Role
+     * Unassign roles from user
      *
-     * @apiParam {String} user_id Id of the user.
-     * @apiParam {Array} ids Only ids of target roles.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function removeRolesToUser()
     {
-        RoleUser::whereIn('role_id', json_decode((string) request('ids')))
+        $ids = json_decode((string) request('ids'));
+        if (count($ids) == 0) {
+            return respond(__('Rol grubu silinemedi.'), 201);
+        }
+
+        RoleUser::whereIn('role_id', $ids)
             ->where([
                 'user_id' => request('user_id'),
             ])
@@ -208,15 +195,11 @@ class RoleController extends Controller
         return respond(__('Rol grupları başarıyla silindi.'), 200);
     }
 
+
     /**
-     * @api {post} /rol/kullanici_sil Remove Users from Role
-     * @apiName Remove Users from Role
-     * @apiGroup Role
+     * Unassign users from role
      *
-     * @apiParam {String} role_id Id of the role.
-     * @apiParam {Array} users Only ids of target users.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function removeRoleUsers()
     {
@@ -229,15 +212,11 @@ class RoleController extends Controller
         return respond(__('Grup üyeleri başarıyla silindi.'), 200);
     }
 
+
     /**
-     * @api {post} /rol/yetki_listesi Get Permissions List for Role
-     * @apiName Get Permissions List for Role
-     * @apiGroup Role
+     * Get role permission list
      *
-     * @apiParam {String} type server, extension, liman.
-     * @apiParam {Array} users Only ids of target users.
-     *
-     * @apiSuccess {Array} value Results Array according to type.
+     * @return JsonResponse|Response
      */
     public function getList()
     {
@@ -322,15 +301,9 @@ class RoleController extends Controller
     }
 
     /**
-     * @api {post} /rol/yetki_listesi/ekle Add Permission to Role
-     * @apiName Add Permission to Role
-     * @apiGroup Role
+     * Add permission to role
      *
-     * @apiParam {String} type server, extension, liman.
-     * @apiParam {String} role_id ID of the Role.
-     * @apiParam {Array} ids Ids of the type.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function addList()
     {
@@ -349,15 +322,9 @@ class RoleController extends Controller
     }
 
     /**
-     * @api {post} /rol/yetki_listesi/sil Remove Permission from Role
-     * @apiName Remove Permission from Role
-     * @apiGroup Role
+     * Remove permission from role
      *
-     * @apiParam {String} type server, extension, liman.
-     * @apiParam {String} role_id ID of the Role.
-     * @apiParam {Array} ids Ids of the type.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function removeFromList()
     {
@@ -369,14 +336,9 @@ class RoleController extends Controller
     }
 
     /**
-     * @api {post} /rol/yetki_listesi/fonksiyon_ekle Add Function Permissions to Role
-     * @apiName Add Function Permissions to Role
-     * @apiGroup Role
+     * Add function permissions to role
      *
-     * @apiParam {String} role_id ID of the Role.
-     * @apiParam {Array} functions Name of the functions.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function addFunctionPermissions()
     {
@@ -395,13 +357,9 @@ class RoleController extends Controller
     }
 
     /**
-     * @api {post} /rol/yetki_listesi/fonksiyon_sil Remove Function Permissions to Role
-     * @apiName Remove Function Permissions to Role
-     * @apiGroup Role
+     * Remove function permission from role
      *
-     * @apiParam {Array} functions Object ids with , delimeter.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function removeFunctionPermissions()
     {

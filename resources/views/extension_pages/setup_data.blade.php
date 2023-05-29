@@ -1,3 +1,7 @@
+@php
+    $extensionDatabase = $extension["database"];
+@endphp
+
 @if (collect($extension["database"])->isEmpty())
     <div class="card card-primary">
         <div class="card-header">
@@ -129,7 +133,8 @@
                 <div>{{ __('Bu eklentinin hiçbir ayarı yok.') }}</div>
                 @endif
         </div>
-        @if ($extension['database'])
+        
+        @if ($extensionDatabase)
             <div class="card-footer">
                 <button type="submit" class="btn btn-success">{{ __('Kaydet') }}</button>
             </div>
@@ -238,7 +243,7 @@
             <div>{{ __('Bu eklentinin hiçbir ayarı yok.') }}</div>
             @endif
     </div>
-    @if ($extension['database'])
+    @if ($extensionDatabase)
         <div class="card-footer">
             <button type="submit" class="btn btn-success">{{ __('Kaydet') }}</button>
         </div>

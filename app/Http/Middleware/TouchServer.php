@@ -4,6 +4,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 
+/**
+ * Touch Server Middleware
+ */
 class TouchServer
 {
     /**
@@ -13,8 +16,8 @@ class TouchServer
      * onu session içerisine yerleştirir. Başka bir sunucuya bakılana kadar güncelleme için
      * sorgu atılmaz.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -22,7 +25,7 @@ class TouchServer
         if ($request->server_id && auth()->check()) {
             if (
                 ($request->session()->get('last_touched')
-                && $request->server_id != $request->session()->get('last_touched'))
+                    && $request->server_id != $request->session()->get('last_touched'))
                 || ! $request->session()->get('last_touched')
             ) {
                 try {

@@ -21,10 +21,6 @@ return [
             'url' => '/ayarlar#roles',
         ],
         [
-            'name' => 'Sistem Ayarları / Sunucu Grupları',
-            'url' => '/ayarlar#serverGroups',
-        ],
-        [
             'name' => 'Sistem Ayarları / Sertifikalar',
             'url' => '/ayarlar#certificates',
         ],

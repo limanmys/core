@@ -13,6 +13,11 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * App Service Provider
+ *
+ * @extends ServiceProvider
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -21,9 +26,10 @@ class AppServiceProvider extends ServiceProvider
      * @return void
      */
     public function boot(
-        \Illuminate\Routing\Router $router,
+        \Illuminate\Routing\Router        $router,
         \Illuminate\Contracts\Http\Kernel $kernel
-    ) {
+    )
+    {
         Paginator::useBootstrap();
 
         View::composer('layouts.header', function ($view) {

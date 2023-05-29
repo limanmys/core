@@ -7,8 +7,12 @@ use App\Models\Permission;
 use App\Models\Server;
 use App\Models\UsesUuid;
 use App\Support\Database\CacheQueryBuilder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -54,26 +58,22 @@ class User extends Authenticatable
      */
     protected $hidden = ['password', 'remember_token'];
 
-    /** 
-     * Interact with the user's OTP secret.
+    /**
+     * Determines if user is admin or not
      *
-     * @param  string  $value
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     * @return bool
      */
-    protected function google2faSecret(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) =>  !is_null($value) ? decrypt($value) : '',
-            set: fn ($value) =>  !is_null($value) ? encrypt($value) : '',
-        );
-    }
-
     public function isAdmin()
     {
         // Very simply check status, this function created for more human like code write experience.
         return $this->status == 1;
     }
 
+    /**
+     * Get users servers inside of permission scope
+     *
+     * @return mixed
+     */
     public function servers()
     {
         return Server::get()->filter(function ($server) {
@@ -81,6 +81,11 @@ class User extends Authenticatable
         });
     }
 
+    /**
+     * Get users extensions inside of permission scope
+     *
+     * @return mixed
+     */
     public function extensions()
     {
         return Extension::get()->filter(function ($extension) {
@@ -93,26 +98,41 @@ class User extends Authenticatable
         });
     }
 
+    /**
+     * @return HasMany
+     */
     public function tokens()
     {
         return $this->hasMany('\App\Models\Token');
     }
 
+    /**
+     * @return HasMany
+     */
     public function settings()
     {
         return $this->hasMany('\App\Models\UserSettings');
     }
 
+    /**
+     * @return HasMany
+     */
     public function keys()
     {
         return $this->hasMany('\App\Models\ServerKey');
     }
 
+    /**
+     * @return HasMany
+     */
     public function notifications()
     {
         return $this->hasMany('\App\Models\Notification');
     }
 
+    /**
+     * @return Collection
+     */
     public function favorites()
     {
         return $this->belongsToMany('\App\Models\Server', 'user_favorites')
@@ -123,18 +143,49 @@ class User extends Authenticatable
             });
     }
 
+    /**
+     * @return MorphMany
+     */
     public function permissions()
     {
         return $this->morphMany('App\Models\Permission', 'morph');
     }
 
+    /**
+     * @return BelongsToMany
+     */
     public function roles()
     {
         return $this->belongsToMany('App\Models\Role', 'role_users');
     }
 
+    /**
+     * @return HasMany
+     */
     public function accessTokens()
     {
         return $this->hasMany('\App\Models\AccessToken');
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function oauth2Token()
+    {
+        return $this->hasOne('\App\Models\Oauth2Token', 'user_id');
+    }
+
+    /**
+     * Interact with the user's OTP secret.
+     *
+     * @param string $value
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function google2faSecret(string $value = null): Attribute
+    {
+        return new Attribute(
+            get: fn($value) => ! is_null($value) ? decrypt($value) : '',
+            set: fn($value) => ! is_null($value) ? encrypt($value) : '',
+        );
     }
 }

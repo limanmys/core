@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Tunnel Token Model
+ *
+ * @extends Model
+ */
 class TunnelToken extends Model
 {
     use UsesUuid;
@@ -17,6 +22,13 @@ class TunnelToken extends Model
         'extension_id',
     ];
 
+    /**
+     * Get a new tunnel token
+     *
+     * @param $remote_host
+     * @param $remote_port
+     * @return mixed
+     */
     public static function get($remote_host, $remote_port)
     {
         return TunnelToken::where([
@@ -27,6 +39,15 @@ class TunnelToken extends Model
         ]);
     }
 
+    /**
+     * Set new tunnel token
+     *
+     * @param $token
+     * @param $local_port
+     * @param $remote_host
+     * @param $remote_port
+     * @return mixed
+     */
     public static function set($token, $local_port, $remote_host, $remote_port)
     {
         if ($token == null) {
@@ -50,6 +71,12 @@ class TunnelToken extends Model
         ]);
     }
 
+    /**
+     * Revoke tunnel token
+     *
+     * @param $token
+     * @return mixed
+     */
     public static function remove($token)
     {
         return TunnelToken::where([

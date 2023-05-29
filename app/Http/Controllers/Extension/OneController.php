@@ -8,26 +8,38 @@ use App\Models\Token;
 use App\System\Command;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\MimeType;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use mervick\aesEverywhere\AES256;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use function request;
 
 /**
- * Class OneController
+ * Extension One Controller
+ *
+ * @extends Controller
  */
 class OneController extends Controller
 {
+    /**
+     * Get extension settings
+     *
+     * @return RedirectResponse
+     * @throws GuzzleException
+     */
     public function serverSettings(): \Illuminate\Http\RedirectResponse
     {
         $extension = json_decode(
             file_get_contents(
                 '/liman/extensions/' .
-                    strtolower((string) extension()->name) .
-                    DIRECTORY_SEPARATOR .
-                    'db.json'
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
+                'db.json'
             ),
             true
         );
@@ -155,16 +167,19 @@ class OneController extends Controller
     }
 
     /**
-     * @return Response
+     * Return extension settings page
+     *
+     * @return JsonResponse|Response
+     * @throws \Exception
      */
     public function serverSettingsPage()
     {
         $extension = json_decode(
             file_get_contents(
                 '/liman/extensions/' .
-                    strtolower((string) extension()->name) .
-                    DIRECTORY_SEPARATOR .
-                    'db.json'
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
+                'db.json'
             ),
             true
         );
@@ -219,6 +234,11 @@ class OneController extends Controller
         ]);
     }
 
+    /**
+     * Force enable extension
+     *
+     * @return JsonResponse|Response
+     */
     public function forceEnableExtension()
     {
         $flag = extension()->update([
@@ -232,6 +252,12 @@ class OneController extends Controller
         }
     }
 
+    /**
+     * Force dependency install
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function forceDepInstall()
     {
         $file = file_get_contents('/liman/extensions/' . strtolower((string) extension()->name) . '/db.json');
@@ -249,6 +275,12 @@ class OneController extends Controller
         }
     }
 
+    /**
+     * Delete extension from file system
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function remove()
     {
         $ext_name = extension()->name;
@@ -296,6 +328,11 @@ class OneController extends Controller
         return respond('Eklenti Başarıyla Silindi');
     }
 
+    /**
+     * Get files from extensions public folder
+     *
+     * @return BinaryFileResponse|void
+     */
     public function publicFolder()
     {
         $basePath =

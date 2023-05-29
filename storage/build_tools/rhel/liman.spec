@@ -2,7 +2,7 @@ Name: liman
 Version: %VERSION%
 Release: 0
 License: MIT
-Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, php-smbclient, novnc, python39, python3-paramiko, python3-tornado, python3-websockify, postgresql15, postgresql15-server
+Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, php-smbclient, postgresql15, postgresql15-server
 Prefix: /liman
 Summary: Liman MYS
 Group: Applications/System
@@ -47,15 +47,12 @@ systemctl start redis
 
 # User Creation
 if getent passwd liman > /dev/null 2>&1; then
-    #sed -i '/liman/d' /etc/sudoers
-    #echo "liman     ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
     echo "Liman User Found."
 else
     useradd liman -m
     mkdir /home/liman
     chmod -R o= /liman /home/liman
     chown -R liman:liman /liman /home/liman
-    #echo "liman     ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
     echo "Liman User Created"
 fi
 
@@ -161,8 +158,8 @@ php /liman/server/artisan config:clear
 rm -rf /liman/sandbox/{.git,vendor,views,.gitignore,composer.json,composer.lock,index.php}
 
 # Set Permissions
-chown -R liman:liman /liman/{server,database,certs,sandbox,logs,webssh,modules,packages,hashes}
-chmod 700 -R /liman/{server,database,certs,logs,webssh,modules,packages,hashes}
+chown -R liman:liman /liman/{server,database,certs,sandbox,logs,modules,packages,hashes}
+chmod 700 -R /liman/{server,database,certs,logs,modules,packages,hashes}
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
@@ -214,45 +211,14 @@ WantedBy=multi-user.target
     """ > /etc/systemd/system/liman-render.service
 fi
 
-# Create Systemd Service
+# Remove Old WebSSH Service
 if [ -f "/etc/systemd/system/liman-webssh.service" ]; then
-    echo "Liman WebSSH Service Already Added.";
-else
-    echo """
-[Unit]
-Description=Liman WebSSH Service
-After=network.target
-StartLimitIntervalSec=0
-[Service]
-Type=simple
-Restart=always
-RestartSec=1
-User=liman
-ExecStart=/usr/bin/python3 /liman/webssh/run.py
-
-[Install]
-WantedBy=multi-user.target
-    """ > /etc/systemd/system/liman-webssh.service
+    rm /etc/systemd/system/liman-webssh.service
 fi
 
-# Create Systemd Service
+# Remove Old VNC Service
 if [ -f "/etc/systemd/system/liman-vnc.service" ]; then
-    echo "Liman VNC Service Already Added.";
-else
-    echo """
-[Unit]
-Description=Liman VNC Service
-After=network.target
-StartLimitIntervalSec=0
-[Service]
-Type=simple
-Restart=always
-RestartSec=1
-User=liman
-ExecStart=/usr/bin/websockify --web=/usr/share/novnc 6080 --cert=/liman/certs/liman.crt --key=/liman/certs/liman.key --token-plugin TokenFile --token-source /liman/keys/vnc/config
-[Install]
-WantedBy=multi-user.target
-    """ > /etc/systemd/system/liman-vnc.service
+    rm /etc/systemd/system/liman-vnc.service
 fi
 
 # Create Socket Service
@@ -321,20 +287,20 @@ systemctl daemon-reload
 
 chown -R liman /var/lib/nginx/
 
-systemctl enable liman-vnc 2>/dev/null
-systemctl enable liman-webssh 2>/dev/null
 systemctl enable liman-system 2>/dev/null
 systemctl enable liman-render 2>/dev/null
 systemctl disable liman-connector 2>/dev/null
+systemctl disable liman-webssh 2>/dev/null
+systemctl disable liman-vnc 2>/dev/null
 systemctl enable liman-socket 2>/dev/null
 systemctl enable nginx 2>/dev/null
 systemctl enable php-fpm 2>/dev/null
 
 systemctl stop liman-connector
+systemctl stop liman-vnc
+systemctl stop liman-webssh
 systemctl restart liman-system
 systemctl restart liman-render
-systemctl restart liman-vnc
-systemctl restart liman-webssh
 systemctl restart liman-socket
 systemctl restart nginx
 systemctl restart php-fpm

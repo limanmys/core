@@ -186,7 +186,7 @@
                         @include('table',[
                             "value" => array_key_exists("functions",$extension) ? $extension["functions"] : [],
                             "title" => [
-                                "Fonksiyon Adı" , "Çeviri Key'i", "Yetki Sistemi", "Logu Görüntüle" ,"*hidden*"
+                                "Fonksiyon Adı" , "Çeviri Anahtarı", "Yetki Sistemi", "Logu Görüntüle" ,"*hidden*"
                             ],
                             "display" => [
                                 "name" , "description", "isActive", "displayLog", "name:old"
@@ -214,7 +214,7 @@
                             "next" => "reload",
                             "inputs" => [
                                 "Fonksiyon Adı" => "name:text",
-                                "Açıklama (Çeviri Key)" => "description:text",
+                                "Açıklama (Çeviri Anahtarı)" => "description:text",
                                 "Yetki Sistemine Dahil Et" => "isActive:checkbox",
                                 "Sunucu Loglarında Görüntüle" => "displayLog:checkbox",
                             ],
@@ -228,7 +228,7 @@
                             "next" => "reload",
                             "inputs" => [
                                 "Fonksiyon Adı" => "name:text",
-                                "Açıklama (Çeviri Key)" => "description:text",
+                                "Açıklama (Çeviri Anahtarı)" => "description:text",
                                 "Yetki Sistemine Dahil Et" => "isActive:checkbox",
                                 "Sunucu Loglarında Görüntüle" => "displayLog:checkbox",
                                 "-:-" => "old:hidden"

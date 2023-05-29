@@ -4,13 +4,24 @@ namespace App\Http\Controllers\Extension;
 
 use App\Http\Controllers\Controller;
 use App\Models\License;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use Illuminate\View\View;
 
 /**
- * Class SettingsController
+ * Extension Settings Controller
+ *
+ * @extends Controller
  */
 class SettingsController extends Controller
 {
-    public function settings_all(): \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+    /**
+     * Get all settings
+     *
+     * @return Factory|View
+     */
+    public function settings_all(): \Illuminate\Contracts\View\Factory | \Illuminate\View\View
     {
         system_log(7, 'EXTENSION_LIST');
         $updateAvailable = is_file(storage_path('extension_updates'));
@@ -28,6 +39,11 @@ class SettingsController extends Controller
         ]);
     }
 
+    /**
+     * Add license to extension
+     *
+     * @return JsonResponse|Response
+     */
     public function addLicense()
     {
         $license = License::updateOrCreate(
@@ -41,10 +57,15 @@ class SettingsController extends Controller
         }
     }
 
+    /**
+     * Get settings for extension
+     *
+     * @return JsonResponse|Response
+     */
     public function settings_one()
     {
         system_log(7, 'EXTENSION_SETTINGS_PAGE', [
-            'extension_id' => extension()->_id,
+            'extension_id' => extension()->id,
         ]);
         if (extension()->language == null) {
             extension()->update([
@@ -52,19 +73,19 @@ class SettingsController extends Controller
             ]);
             $extension = json_decode(
                 file_get_contents(
-                    '/liman/extensions/'.
-                        strtolower((string) extension()->name).
-                        DIRECTORY_SEPARATOR.
-                        'db.json'
+                    '/liman/extensions/' .
+                    strtolower((string) extension()->name) .
+                    DIRECTORY_SEPARATOR .
+                    'db.json'
                 ),
                 true
             );
             $extension['language'] = 'php';
             file_put_contents(
-                '/liman/extensions/'.
-                    strtolower((string) extension()->name).
-                    DIRECTORY_SEPARATOR.
-                    'db.json',
+                '/liman/extensions/' .
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
+                'db.json',
                 json_encode($extension, JSON_PRETTY_PRINT)
             );
         }
@@ -74,14 +95,19 @@ class SettingsController extends Controller
         ]);
     }
 
+    /**
+     * Update extension settings
+     *
+     * @return JsonResponse|Response
+     */
     public function update()
     {
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                    strtolower((string) extension()->name).
-                    DIRECTORY_SEPARATOR.
-                    'db.json'
+                '/liman/extensions/' .
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
+                'db.json'
             ),
             true
         );
@@ -137,10 +163,10 @@ class SettingsController extends Controller
             $extension['version_code'] = 1;
         }
         file_put_contents(
-            '/liman/extensions/'.
-                strtolower((string) extension()->name).
-                DIRECTORY_SEPARATOR.
-                'db.json',
+            '/liman/extensions/' .
+            strtolower((string) extension()->name) .
+            DIRECTORY_SEPARATOR .
+            'db.json',
             json_encode($extension, JSON_PRETTY_PRINT)
         );
 
@@ -152,14 +178,19 @@ class SettingsController extends Controller
         return respond('Güncellendi.', 200);
     }
 
+    /**
+     * Add extension settings
+     *
+     * @return JsonResponse|Response
+     */
     public function add()
     {
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                    strtolower((string) extension()->name).
-                    DIRECTORY_SEPARATOR.
-                    'db.json'
+                '/liman/extensions/' .
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
+                'db.json'
             ),
             true
         );
@@ -186,10 +217,10 @@ class SettingsController extends Controller
         }
 
         file_put_contents(
-            '/liman/extensions/'.
-                strtolower((string) extension()->name).
-                DIRECTORY_SEPARATOR.
-                'db.json',
+            '/liman/extensions/' .
+            strtolower((string) extension()->name) .
+            DIRECTORY_SEPARATOR .
+            'db.json',
             json_encode($extension, JSON_PRETTY_PRINT)
         );
 
@@ -201,14 +232,19 @@ class SettingsController extends Controller
         return respond('Eklendi', 200);
     }
 
+    /**
+     * Remove extension setting
+     *
+     * @return JsonResponse|Response
+     */
     public function remove()
     {
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                    strtolower((string) extension()->name).
-                    DIRECTORY_SEPARATOR.
-                    'db.json'
+                '/liman/extensions/' .
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
+                'db.json'
             ),
             true
         );
@@ -230,10 +266,10 @@ class SettingsController extends Controller
         }
 
         file_put_contents(
-            '/liman/extensions/'.
-                strtolower((string) extension()->name).
-                DIRECTORY_SEPARATOR.
-                'db.json',
+            '/liman/extensions/' .
+            strtolower((string) extension()->name) .
+            DIRECTORY_SEPARATOR .
+            'db.json',
             json_encode($extension, JSON_PRETTY_PRINT)
         );
 
@@ -245,15 +281,20 @@ class SettingsController extends Controller
         return respond('Sayfa Silindi.', 200);
     }
 
+    /**
+     * Get function parameters
+     *
+     * @return JsonResponse|Response
+     */
     public function getFunctionParameters()
     {
         $function_name = request('function_name');
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                    strtolower((string) extension()->name).
-                    DIRECTORY_SEPARATOR.
-                    'db.json'
+                '/liman/extensions/' .
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
+                'db.json'
             ),
             true
         );
@@ -277,15 +318,20 @@ class SettingsController extends Controller
         ]);
     }
 
+    /**
+     * Add function parameter
+     *
+     * @return JsonResponse|Response
+     */
     public function addFunctionParameter()
     {
         $function_name = request('function_name');
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                    strtolower((string) extension()->name).
-                    DIRECTORY_SEPARATOR.
-                    'db.json'
+                '/liman/extensions/' .
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
+                'db.json'
             ),
             true
         );
@@ -312,10 +358,10 @@ class SettingsController extends Controller
                     }
 
                     file_put_contents(
-                        '/liman/extensions/'.
-                            strtolower((string) extension()->name).
-                            DIRECTORY_SEPARATOR.
-                            'db.json',
+                        '/liman/extensions/' .
+                        strtolower((string) extension()->name) .
+                        DIRECTORY_SEPARATOR .
+                        'db.json',
                         json_encode($extension, JSON_PRETTY_PRINT)
                     );
 
@@ -328,6 +374,11 @@ class SettingsController extends Controller
         return respond('Fonksiyon bulunamadı!', 201);
     }
 
+    /**
+     * Delete function parameters
+     *
+     * @return JsonResponse|Response
+     */
     public function deleteFunctionParameters()
     {
         $function_name = request('function_name');
@@ -335,10 +386,10 @@ class SettingsController extends Controller
 
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                    strtolower((string) extension()->name).
-                    DIRECTORY_SEPARATOR.
-                    'db.json'
+                '/liman/extensions/' .
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
+                'db.json'
             ),
             true
         );
@@ -353,9 +404,7 @@ class SettingsController extends Controller
                         ) {
                             if ($parameter['variable'] == $parameter_variable) {
                                 unset(
-                                    $extension['functions'][$key]['parameters'][
-                                        $parameter_key
-                                    ]
+                                    $extension['functions'][$key]['parameters'][$parameter_key]
                                 );
                                 if (
                                     array_key_exists('version_code', $extension)
@@ -366,10 +415,10 @@ class SettingsController extends Controller
                                     $extension['version_code'] = 1;
                                 }
                                 file_put_contents(
-                                    '/liman/extensions/'.
-                                        strtolower((string) extension()->name).
-                                        DIRECTORY_SEPARATOR.
-                                        'db.json',
+                                    '/liman/extensions/' .
+                                    strtolower((string) extension()->name) .
+                                    DIRECTORY_SEPARATOR .
+                                    'db.json',
                                     json_encode($extension, JSON_PRETTY_PRINT)
                                 );
 
@@ -387,14 +436,19 @@ class SettingsController extends Controller
         return respond('Fonksiyon bulunamadı!', 201);
     }
 
+    /**
+     * Add function
+     *
+     * @return JsonResponse|Response
+     */
     public function addFunction()
     {
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                    strtolower((string) extension()->name).
-                    DIRECTORY_SEPARATOR.
-                    'db.json'
+                '/liman/extensions/' .
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
+                'db.json'
             ),
             true
         );
@@ -434,10 +488,10 @@ class SettingsController extends Controller
             $extension['version_code'] = 1;
         }
         file_put_contents(
-            '/liman/extensions/'.
-                strtolower((string) extension()->name).
-                DIRECTORY_SEPARATOR.
-                'db.json',
+            '/liman/extensions/' .
+            strtolower((string) extension()->name) .
+            DIRECTORY_SEPARATOR .
+            'db.json',
             json_encode($extension, JSON_PRETTY_PRINT)
         );
 
@@ -449,14 +503,19 @@ class SettingsController extends Controller
         return respond('Fonksiyon Eklendi.', 200);
     }
 
+    /**
+     * Update function
+     *
+     * @return JsonResponse|Response
+     */
     public function updateFunction()
     {
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                    strtolower((string) extension()->name).
-                    DIRECTORY_SEPARATOR.
-                    'db.json'
+                '/liman/extensions/' .
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
+                'db.json'
             ),
             true
         );
@@ -511,10 +570,10 @@ class SettingsController extends Controller
             $extension['version_code'] = 1;
         }
         file_put_contents(
-            '/liman/extensions/'.
-                strtolower((string) extension()->name).
-                DIRECTORY_SEPARATOR.
-                'db.json',
+            '/liman/extensions/' .
+            strtolower((string) extension()->name) .
+            DIRECTORY_SEPARATOR .
+            'db.json',
             json_encode($extension, JSON_PRETTY_PRINT)
         );
 
@@ -526,14 +585,19 @@ class SettingsController extends Controller
         return respond('Fonksiyon güncellendi.', 200);
     }
 
+    /**
+     * Remove function
+     *
+     * @return JsonResponse|Response
+     */
     public function removeFunction()
     {
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/'.
-                    strtolower((string) extension()->name).
-                    DIRECTORY_SEPARATOR.
-                    'db.json'
+                '/liman/extensions/' .
+                strtolower((string) extension()->name) .
+                DIRECTORY_SEPARATOR .
+                'db.json'
             ),
             true
         );
@@ -561,10 +625,10 @@ class SettingsController extends Controller
             $extension['version_code'] = 1;
         }
         file_put_contents(
-            '/liman/extensions/'.
-                strtolower((string) extension()->name).
-                DIRECTORY_SEPARATOR.
-                'db.json',
+            '/liman/extensions/' .
+            strtolower((string) extension()->name) .
+            DIRECTORY_SEPARATOR .
+            'db.json',
             json_encode($extension, JSON_PRETTY_PRINT)
         );
 
@@ -576,6 +640,11 @@ class SettingsController extends Controller
         return respond('Fonksiyon Silindi.', 200);
     }
 
+    /**
+     * Get extension updates
+     *
+     * @return JsonResponse|Response
+     */
     public function getExtensionUpdates()
     {
         return respond(

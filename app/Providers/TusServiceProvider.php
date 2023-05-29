@@ -6,10 +6,13 @@ use App\Http\Middleware\TusAuthenticated;
 use Illuminate\Support\ServiceProvider;
 use TusPhp\Tus\Server as TusServer;
 
+/**
+ * Tus Service Provider
+ *
+ * @extends ServiceProvider
+ */
 class TusServiceProvider extends ServiceProvider
 {
-    // ...
-
     /**
      * Register the application services.
      *

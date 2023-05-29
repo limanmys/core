@@ -2,9 +2,9 @@ function upload(option) {
   if (typeof option.file === "undefined") {
     return;
   }
-  let server_id = $("meta[name=server_id]").attr("content");
-  let extension_id = $("meta[name=extension_id]").attr("content");
-  let token = $("meta[name=csrf-token]").attr("content");
+  const server_id = $("meta[name=server_id]").attr("content");
+  const extension_id = $("meta[name=proxy_to]").attr("content") ? $("meta[name=proxy_to]").attr("content") : $("meta[name=extension_id]").attr("content");
+  const token = $("meta[name=csrf-token]").attr("content");
 
   var upload = new tus.Upload(option.file, {
     endpoint:

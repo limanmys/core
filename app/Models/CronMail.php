@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Cron Mail Model
+ *
+ * @extends Model
+ */
 class CronMail extends Model
 {
     use UsesUuid;

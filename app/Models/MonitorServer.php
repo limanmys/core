@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Server Monitor Model
+ *
+ * @extends Model
+ */
 class MonitorServer extends Model
 {
     use UsesUuid;

@@ -33,14 +33,22 @@ Echo.private('App.User.{{auth()->user()->id}}')
 
             if (isJson(notificationTitle)) {
                 let temp = JSON.parse(notificationTitle)
-                notificationTitle = temp[language];
+                if (temp[language] != undefined) {
+                    notificationTitle = temp[language];
+                } else {
+                    notificationTitle = temp["en"];
+                }
             } else {
                 notificationTitle = data["title"];
             }
 
             if (isJson(notificationMsg)) {
                 let temp = JSON.parse(notificationMsg)
-                notificationMsg = temp[language];
+                if (temp[language] != undefined) {
+                    notificationMsg = temp[language];
+                } else {
+                    notificationMsg = temp["en"];
+                }
             } else {
                 notificationMsg = data["message"];
             }

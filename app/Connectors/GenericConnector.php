@@ -2,15 +2,34 @@
 
 namespace App\Connectors;
 
+use App\Models\Server;
 use App\Models\Token;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
+/**
+ * Generic Connector
+ * This class connects server and fiber render engine together and uses returned data in Liman
+ */
 class GenericConnector
 {
+    /**
+     * Construct a new connector instance
+     *
+     * @param $server
+     * @param $user
+     */
     public function __construct(public $server = null, public $user = null)
     {
     }
 
+    /**
+     * Execute command on remote server
+     *
+     * @param $command
+     * @return string
+     * @throws GuzzleException
+     */
     public function execute($command): string
     {
         return trim(
@@ -20,49 +39,15 @@ class GenericConnector
         );
     }
 
-    public function sendFile($localPath, $remotePath, $permissions = 0644): string
-    {
-        return trim(
-            (string) self::request('putFile', [
-                'local_path' => $localPath,
-                'remote_path' => $remotePath,
-            ])
-        );
-    }
-
-    public function receiveFile($localPath, $remotePath): string
-    {
-        return trim(
-            (string) self::request('getFile', [
-                'local_path' => $localPath,
-                'remote_path' => $remotePath,
-            ])
-        );
-    }
-
-    public function verify($ip_address, $username, $password, $port, $type): string
-    {
-        return trim(
-            (string) self::request('verify', [
-                'ip_address' => $ip_address,
-                'username' => $username,
-                'password' => $password,
-                'port' => $port,
-                'key_type' => $type,
-            ])
-        );
-    }
-
-    public function create(
-        \App\Models\Server $server,
-        $username,
-        $password,
-        $user_id,
-        $key,
-        $port = null
-    ) {
-    }
-
+    /**
+     * Run extension on remote server
+     *
+     * @param $url
+     * @param $params
+     * @param $retry
+     * @return never|string
+     * @throws GuzzleException
+     */
     public function request($url, $params, $retry = 3)
     {
         $client = new Client([
@@ -83,7 +68,7 @@ class GenericConnector
         try {
             $response = $client->request(
                 'POST',
-                env('RENDER_ENGINE_ADDRESS', 'https://127.0.0.1:2806')."/$url",
+                env('RENDER_ENGINE_ADDRESS', 'https://127.0.0.1:2806') . "/$url",
                 [
                     'form_params' => $params,
                 ]
@@ -110,7 +95,7 @@ class GenericConnector
             if (env('APP_DEBUG', false)) {
                 return abort(
                     504,
-                    __('Liman render service is not working or crashed. ').$message,
+                    __('Liman render service is not working or crashed. ') . $message,
                 );
             } else {
                 return abort(
@@ -119,5 +104,86 @@ class GenericConnector
                 );
             }
         }
+    }
+
+    /**
+     * @param Server $server
+     * @param $username
+     * @param $password
+     * @param $user_id
+     * @param $key
+     * @param $port
+     * @return void
+     */
+    public function create(
+        \App\Models\Server $server,
+                           $username,
+                           $password,
+                           $user_id,
+                           $key,
+                           $port = null
+    )
+    {
+    }
+
+    /**
+     * Send file to remote server
+     *
+     * @param $localPath
+     * @param $remotePath
+     * @param $permissions
+     * @return string
+     * @throws GuzzleException
+     */
+    public function sendFile($localPath, $remotePath, $permissions = 0644): string
+    {
+        return trim(
+            (string) self::request('putFile', [
+                'local_path' => $localPath,
+                'remote_path' => $remotePath,
+            ])
+        );
+    }
+
+    /**
+     * Receive file from remote server
+     *
+     * @param $localPath
+     * @param $remotePath
+     * @return string
+     * @throws GuzzleException
+     */
+    public function receiveFile($localPath, $remotePath): string
+    {
+        return trim(
+            (string) self::request('getFile', [
+                'local_path' => $localPath,
+                'remote_path' => $remotePath,
+            ])
+        );
+    }
+
+    /**
+     * Verify if extension data is eligible to run
+     *
+     * @param $ip_address
+     * @param $username
+     * @param $password
+     * @param $port
+     * @param $type
+     * @return string
+     * @throws GuzzleException
+     */
+    public function verify($ip_address, $username, $password, $port, $type): string
+    {
+        return trim(
+            (string) self::request('verify', [
+                'ip_address' => $ip_address,
+                'username' => $username,
+                'password' => $password,
+                'port' => $port,
+                'key_type' => $type,
+            ])
+        );
     }
 }

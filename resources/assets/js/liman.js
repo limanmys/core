@@ -20,6 +20,21 @@ let english = {
 
 let turkish = {};
 
+let deutsch = {
+  "Yükleniyor...": "Laden...",
+  "Sonuç bulunamadı!": "Keine Ergebnisse gefunden!",
+  "Liman ID kopyalandı!": "Liman-ID kopiert!",
+  "Liman ID başarıyla kopyalandı.": "Liman-ID wurde erfolgreich kopiert!",
+  "Okunmamış bildiriminiz bulunmamaktadır.":
+    "Sie haben alle Benachrichtigungen gelesen.",
+  "/turkce.json": "/deutsch.json",
+  "Tümünü Seç": "Alles auswählen",
+  "Tümünü Kaldır": "Alles entfernen",
+  "CPU Kullanımı": "CPU-Auslastung",
+  "RAM Kullanımı": "RAM-Auslastung",
+  "Disk Kullanımı": "Disk-Auslastung",
+}
+
 let language = document.getElementsByTagName("html")[0].getAttribute("lang");
 let defaultLanguage = "tr";
 console.log(`🌟 Liman localization initialized: ${language}`);
@@ -31,6 +46,10 @@ let __ = (trans) => {
 
   if (language == "en") {
     language = "english";
+  }
+
+  if (language == "de") {
+    language = "deutsch";
   }
 
   if (
@@ -412,11 +431,19 @@ function renderNotifications(data, type, target, exclude) {
     let notificationMsg = notification["message"];
     if (isJson(notification["title"])) {
       let temp = JSON.parse(notification["title"]);
-      notificationTitle = temp[language];
+      if (temp[language] != undefined) {
+        notificationTitle = temp[language];
+      } else {
+        notificationTitle = temp["en"];
+      }
     }
     if (isJson(notification["message"])) {
       let temp = JSON.parse(notification["message"]);
-      notificationMsg = temp[language];
+      if (temp[language] != undefined) {
+        notificationMsg = temp[language];
+      } else {
+        notificationMsg = temp["en"];
+      }
     }
     var errors = ["error", "health_problem"];
     let color = errors.includes(notification["type"]) ? "color: #ff4444" : "";
@@ -503,6 +530,7 @@ window.$(function () {
   bsCustomFileInput.init();
   window.$(".select2").select2({
     theme: "bootstrap4",
+    language: document.getElementsByTagName("html")[0].getAttribute("lang")
   });
 
   window.$(".modal").on("show.bs.modal", function (modal) {
@@ -813,6 +841,61 @@ const ApexChartLocalization = [
       },
     },
   },
+  {
+    "name": "de",
+    "options": {
+      "months": [
+        "Januar",
+        "Februar",
+        "März",
+        "April",
+        "Mai",
+        "Juni",
+        "Juli",
+        "August",
+        "September",
+        "Oktober",
+        "November",
+        "Dezember"
+      ],
+      "shortMonths": [
+        "Jan",
+        "Feb",
+        "Mär",
+        "Apr",
+        "Mai",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Okt",
+        "Nov",
+        "Dez"
+      ],
+      "days": [
+        "Sonntag",
+        "Montag",
+        "Dienstag",
+        "Mittwoch",
+        "Donnerstag",
+        "Freitag",
+        "Samstag"
+      ],
+      "shortDays": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
+      "toolbar": {
+        "exportToSVG": "SVG speichern",
+        "exportToPNG": "PNG speichern",
+        "exportToCSV": "CSV speichern",
+        "menu": "Menü",
+        "selection": "Auswahl",
+        "selectionZoom": "Auswahl vergrößern",
+        "zoomIn": "Vergrößern",
+        "zoomOut": "Verkleinern",
+        "pan": "Verschieben",
+        "reset": "Zoom zurücksetzen"
+      }
+    }
+  }
 ];
 
 /* === INDEX CHARTS START === */

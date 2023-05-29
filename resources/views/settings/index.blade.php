@@ -22,28 +22,32 @@
                             <a class="nav-link" data-toggle="tab" href="#roles" onclick="getRoleList()" aria-selected="true">{{__("Rol Grupları")}}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#serverGroups" aria-selected="true">{{__("Sunucu Grupları")}}</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#roleList" onclick="allRoles()" aria-selected="true">{{__("İzin Listesi")}}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#certificates" >{{__("Sertifikalar")}}</a>
                         </li>
+                        @if(! env('CONTAINER_MODE', false))
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#health" onclick="checkHealth()">{{__("Sağlık Durumu")}}</a>
                         </li>
+                        @endif
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#externalNotifications" onclick="">{{__("Dış Bildirimler")}}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#limanMarket" onclick="checkMarketAccess()">{{__("Liman Market")}}</a>
                         </li>
+                        @if(! env('CONTAINER_MODE', false))
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#dnsSettings" onclick="getDNS()">{{__("DNS Ayarları")}}</a>
                         </li>
+                        @endif
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#mailSettings" onclick="getCronMails()">{{__("Mail Ayarları")}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#rsyslog">{{__("Log Yönlendirme")}}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#limanTweaks" onclick="getLimanTweaks()">{{__("İnce Ayarlar")}}</a>
@@ -65,13 +69,18 @@
                                     "value" => \App\User::all()->map(function($user) {
                                         $user->status = (bool) $user->status ? __("Yönetici") : __("Kullanıcı");
                                         $user->username = empty($user->username) ? "-" : $user->username;
+                                        $user->auth_type = ! empty($user->auth_type) ? (
+                                            $user->auth_type == "local" ? "Liman" : (
+                                                $user->auth_type == "ldap" ? "LDAP" : "Keycloak"
+                                            )
+                                        ) : "-";
                                         return $user;
                                     }),
                                     "title" => [
-                                        "İsim Soyisim", "Kullanıcı Adı", "Email", "Yetki", "*hidden*" ,
+                                        "İsim Soyisim", "Kullanıcı Adı", "Email", "Yetki", "Giriş Türü", "*hidden*" ,
                                     ],
                                     "display" => [
-                                        "name", "username", "email", "id:user_id", "status"
+                                        "name", "username", "email", "id:user_id", "status", "auth_type"
                                     ],
                                     "menu" => [
                                         "Parolayı Sıfırla" => [
@@ -303,42 +312,15 @@
                                         <input type="number" class="form-control" name="targetPort" value="514" id="logPort">
                                     </div>
                                 </div>
-                                <div class="form-row">
-                                <div class="form-group col-md-2">
-                                        <label for="logInterval">{{__("Log Gönderme Aralığı (Dakika)")}}</label>
-                                        <input type="number" class="form-control" name="logInterval" value="10" id="logInterval">
-                                    </div>
+                                <div class="form-group">
+                                    <label for="type">{{__("Bağlantı Türü")}}</label><br>
+                                    <select id="type" class="select2" name="type">
+                                        <option value="tcp">TCP</option>
+                                        <option value="udp">UDP</option>
+                                    </select>
                                 </div>
                                 <button type="submit" class="btn btn-success">{{__("Ayarları Kaydet")}}</button>
                             </form>
-                        </div>
-                        <div class="tab-pane fade show" id="serverGroups" role="tabpanel">
-                        @include('modal-button',[
-                                "class" => "btn-success",
-                                "target_id" => "addServerGroup",
-                                "text" => "Sunucu Grubu Ekle"
-                        ])<br><br>
-
-                        <p>{{__("Sunucuları bir gruba ekleyerek eklentiler arası geçişi daha akıcı yapabilirsiniz.")}}</p>
-                        @include('table',[
-                                    "value" => \App\Models\ServerGroup::all(),
-                                    "title" => [
-                                        "Adı", "*hidden*" , "*hidden*"
-                                    ],
-                                    "display" => [
-                                        "name" , "id:server_group_id" , "servers:servers"
-                                    ],
-                                    "menu" => [
-                                        "Düzenle" => [
-                                            "target" => "modifyServerGroupHandler",
-                                            "icon" => " context-menu-icon-edit"
-                                        ],
-                                        "Sil" => [
-                                            "target" => "deleteServerGroup",
-                                            "icon" => " context-menu-icon-delete"
-                                        ]
-                                    ],
-                                ])
                         </div>
                         <div class="tab-pane fade show" id="roleList" role="tabpanel">
                             <div id="roleListInner"></div>  
@@ -359,6 +341,9 @@
 
                                 }
                             </script>
+                        </div>
+                        <div class="tab-pane fade show" id="logForward" role="tabpanel">
+                            @include("settings.log_forward")
                         </div>
                         <div class="tab-pane fade show" id="limanTweaks" role="tabpanel">
                             @include("settings.tweaks")
@@ -546,81 +531,6 @@
        "submit_text" => "Parolayı Sıfırla"
    ])
 
-   @include('modal',[
-        "id"=>"deleteServerGroup",
-        "title" =>"Sunucu Grubunu Sil",
-        "url" => route('delete_server_group'),
-        "text" => "Sunucu grubunu silmek istediğinize emin misiniz? Bu işlem geri alınamayacaktır.",
-        "next" => "reload",
-        "inputs" => [
-            "-:-" => "server_group_id:hidden"
-        ],
-        "submit_text" => "Sunucu Grubunu Sil"
-    ])
-
-
-
-
-    @component('modal-component',[
-        "id" => "addServerGroup",
-        "title" => "Sunucuları Gruplama",
-        "footer" => [
-            "class" => "btn-success",
-            "onclick" => "addServerGroup()",
-            "text" => "Ekle"
-        ],
-    ])
-    <div class="form-group">
-        <label>{{__("Sunucu Grubu Adı")}}</label><br>
-        <small>{{__("Görsel olarak hiçbir yerde gösterilmeyecektir, yalnızca düzenleme kısmındak kolay erişim için eklenmiştir.")}}</small>
-        <input type="text" class="form-control" id="serverGroupName">
-    </div>
-    <label>{{__("Sunucular")}}</label><br>
-    <small>{{__("Bu gruba eklemek istediğiniz sunucuları seçin.")}}</small>
-    @include('table',[
-        "id" => "serverGroupServers",
-        "value" => servers(),
-        "title" => [
-            "Sunucu Adı" , "İp Adresi" , "*hidden*"
-        ],
-        "display" => [
-            "name" , "ip_address", "id:server_id"
-        ],
-        "noInitialize" => "true"
-    ])
-
-    @endcomponent
-
-    @component('modal-component',[
-        "id" => "modifyServerGroupModal",
-        "title" => "Sunucu Grubu Düzenleme",
-        "footer" => [
-            "class" => "btn-success",
-            "onclick" => "modifyServerGroup()",
-            "text" => "Ekle"
-        ],
-    ])
-    <div class="form-group">
-        <label>{{__("Sunucu Grubu Adı")}}</label><br>
-        <small>{{__("Görsel olarak hiçbir yerde gösterilmeyecektir, yalnızca düzenleme kısmındak kolay erişim için eklenmiştir.")}}</small>
-        <input type="text" class="form-control" id="serverGroupNameModify">
-    </div>
-    <label>{{__("Sunucular")}}</label><br>
-    <small>{{__("Bu gruba eklemek istediğiniz sunucuları seçin.")}}</small>
-    @include('table',[
-        "id" => "modifyServerGroupTable",
-        "value" => servers(),
-        "title" => [
-            "Sunucu Adı" , "İp Adresi" , "*hidden*"
-        ],
-        "display" => [
-            "name" , "ip_address", "id:server_id"
-        ],
-        "noInitialize" => "true"
-    ])
-
-    @endcomponent
-
     @include('modal',[
         "id"=>"addNewNotificationSource",
         "title" => "Yeni Bildirim İstemcisi Ekle",
@@ -711,73 +621,9 @@
         function saveLogSystem(){
             showSwal('{{__("Kaydediliyor...")}}','info');
             var data = new FormData(document.querySelector('#logForm'));
-            return request("{{route("save_log_system")}}", data, function(res) {
+            return request("{{route('set_log_forwarding')}}", data, function(res) {
                 var response = JSON.parse(res);
                 showSwal(response.message,'success');
-                reload();
-            }, function(response){
-                var error = JSON.parse(response);
-                showSwal(error.message,'error',2000);
-            });
-        }
-
-        function addServerGroup(){
-            showSwal('{{__("Ekleniyor...")}}','info');
-            var data = new FormData();
-            var tableData = [];
-            var table = $("#serverGroupServers").DataTable();
-            table.rows( { selected: true } ).data().each(function(element){
-                tableData.push(element[3]);
-            });
-            data.append('name', $('#serverGroupName').val());
-            data.append('servers', tableData.join());
-            request("{{route("add_server_group")}}", data, function(response) {
-                var res = JSON.parse(response);
-                showSwal(res.message,'success',2000);
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
-            }, function(response){
-                var error = JSON.parse(response);
-                showSwal(error.message,'error',2000);
-            });
-        }
-        function modifyServerGroupHandler(row){
-            var server_group_id = row.querySelector('#server_group_id').innerHTML;
-            var server_ids = row.querySelector('#servers').innerHTML.split(",");
-            current_server_group = server_group_id;
-            $('#serverGroupNameModify').val(row.querySelector('#name').innerHTML);
-            var table = $("#modifyServerGroupTable").DataTable();
-            table.rows().deselect();
-            table.rows().every(function(){
-                var data = this.data();
-                var current = this;
-                if(server_ids.includes(data[3])){
-                    current.select();
-                }
-                this.draw();
-            });
-            $("#modifyServerGroupModal").modal('show');
-        }
-
-        var current_server_group = null;
-        function modifyServerGroup(){
-            showSwal('{{__("Düzenleniyor...")}}','center');
-            var data = new FormData();
-            var tableData = [];
-            var table = $("#modifyServerGroupTable").DataTable();
-            table.rows( { selected: true } ).data().each(function(element){
-                tableData.push(element[3]);
-            });
-            data.append('name', $('#serverGroupNameModify').val());
-            data.append('servers', tableData.join());
-            data.append('server_group_id',current_server_group);
-            request("{{route("modify_server_group")}}", data, function(response) {
-                var res = JSON.parse(response);
-                showSwal(res.message,'success',2000);
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
             }, function(response){
                 var error = JSON.parse(response);
                 showSwal(error.message,'error',2000);
@@ -792,10 +638,6 @@
 
         $(function () {
             $("#add_user").find("input[name='username']").attr('required', false);
-
-            $("#serverGroupServers").DataTable(dataTablePresets('multiple'));
-
-            $("#modifyServerGroupTable").DataTable(dataTablePresets('multiple'));
         });
         function getUserList(){
             request('{{route('get_user_list_admin')}}', new FormData(), function (response) {

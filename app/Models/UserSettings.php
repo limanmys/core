@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * User Settings Model
+ *
+ * @extends Model
+ */
 class UserSettings extends Model
 {
     use UsesUuid;

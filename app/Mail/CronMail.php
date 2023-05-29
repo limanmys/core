@@ -9,6 +9,11 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Cron Mail
+ *
+ * @extends Mailable
+ */
 class CronMail extends Mailable
 {
     use Queueable, SerializesModels;
@@ -26,6 +31,14 @@ class CronMail extends Mailable
 
     protected $extension;
 
+    /**
+     * Construct cron mail template
+     *
+     * @param $obj
+     * @param $result
+     * @param $before
+     * @param $now
+     */
     public function __construct($obj, protected $result, protected $before, protected $now)
     {
         $this->user = User::find($obj->user_id);
@@ -41,7 +54,7 @@ class CronMail extends Mailable
      */
     public function build()
     {
-        $subject = $this->user->name.' kullanıcısının '.__($this->obj->cron_type).' Liman MYS Raporu';
+        $subject = $this->user->name . ' kullanıcısının ' . __($this->obj->cron_type) . ' Liman MYS Raporu';
 
         return $this->subject($subject)->from(env('APP_NOTIFICATION_EMAIL'))->view('email.cron_mail', [
             'user' => $this->user,

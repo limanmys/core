@@ -6,11 +6,27 @@ use App\Http\Controllers\Controller;
 use App\Models\Extension;
 use App\Models\Module;
 use App\System\Command;
-use Illuminate\Http\Request;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/**
+ * High Availability Sync Controller
+ *
+ * This class utilizes needed private functions for high availability sync between Limans
+ *
+ * @extends Controller
+ */
 class MainController extends Controller
 {
+    /**
+     * Returns extension list on system
+     *
+     * @return JsonResponse
+     * @throws GuzzleException
+     * @throws GuzzleException
+     */
     public function extensionList()
     {
         $extensions = Extension::all();
@@ -31,11 +47,16 @@ class MainController extends Controller
         return response()->json($list);
     }
 
+    /**
+     * Returns extension zip
+     *
+     * @return BinaryFileResponse
+     */
     public function downloadExtension()
     {
         // Generate Extension Folder Path
-        $path = '/liman/extensions/'.strtolower((string) request('extension_name'));
-        $tempPath = '/tmp/'.Str::random().'.zip';
+        $path = '/liman/extensions/' . strtolower((string) request('extension_name'));
+        $tempPath = '/tmp/' . Str::random() . '.zip';
 
         // Zip the current extension
         Command::runLiman('cd @{:path} && zip -r @{:tempPath} .', [
@@ -52,6 +73,11 @@ class MainController extends Controller
             ->deleteFileAfterSend();
     }
 
+    /**
+     * Module list existing on system
+     *
+     * @return JsonResponse
+     */
     public function moduleList()
     {
         $modules = Module::all();
@@ -71,11 +97,16 @@ class MainController extends Controller
         return response()->json($list);
     }
 
+    /**
+     * Returns module zip file
+     *
+     * @return BinaryFileResponse
+     */
     public function downloadModule()
     {
         // Generate Module Folder Path
-        $path = '/liman/modules/'.(string) request('module_name');
-        $tempPath = '/tmp/'.Str::random().'.zip';
+        $path = '/liman/modules/' . (string) request('module_name');
+        $tempPath = '/tmp/' . Str::random() . '.zip';
 
         // Zip the current module
         Command::runLiman('cd @{:path} && zip -r @{:tempPath} .', [

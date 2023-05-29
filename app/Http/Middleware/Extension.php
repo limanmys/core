@@ -6,12 +6,16 @@ use App\Models\AdminNotification;
 use App\Models\Certificate;
 use Closure;
 
+/**
+ * Extension
+ * Checks if extension needs certificates on server
+ */
 class Extension
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -43,7 +47,7 @@ class Extension
                     'en' => __('Yeni Sertifika Onayı', [], 'en'),
                 ]),
                 'type' => 'cert_request',
-                'message' => $server->ip_address.':'.trim($port).':'.$server->id,
+                'message' => $server->ip_address . ':' . trim($port) . ':' . $server->id,
                 'level' => 3,
             ]);
 

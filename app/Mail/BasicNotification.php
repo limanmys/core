@@ -6,6 +6,11 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Basic Notification Mail Type
+ *
+ * @extends Mailable
+ */
 class BasicNotification extends Mailable
 {
     use Queueable, SerializesModels;

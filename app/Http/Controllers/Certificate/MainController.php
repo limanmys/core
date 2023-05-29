@@ -7,20 +7,21 @@ use App\Models\AdminNotification;
 use App\Models\Certificate;
 use App\System\Command;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
+/**
+ * Certificate Main Controller
+ *
+ * @extends Controller
+ */
 class MainController extends Controller
 {
     /**
-     * @api {post} /sunucu/sertifikaOnayi Add SSL Sertificate
-     * @apiName Add SSL Sertificate
-     * @apiGroup Certificate
+     * Create certificate for determined host
      *
-     * @apiParam {String} server_hostname Server's hostname.
-     * @apiParam {String} origin Target port to retrieve certificate.
-     * @apiParam {String} notification_id Request Notification Id (OPTIONAL)
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function verifyCert()
     {
@@ -55,7 +56,7 @@ class MainController extends Controller
             'origin' => request('origin'),
         ]);
 
-        $certificate->addToSystem('/tmp/'.request('path'));
+        $certificate->addToSystem('/tmp/' . request('path'));
 
         // Update Admin Notification
         AdminNotification::where('id', request('notification_id'))->update([
@@ -66,13 +67,9 @@ class MainController extends Controller
     }
 
     /**
-     * @api {post} /sunucu/sertifikaSil Remove SSL Sertificate
-     * @apiName Remove SSL Sertificate
-     * @apiGroup Certificate
+     * Delete certificate
      *
-     * @apiParam {String} certificate_id Certificate Id.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function removeCert()
     {
@@ -91,6 +88,12 @@ class MainController extends Controller
         return respond('Sertifika Başarıyla Silindi!', 200);
     }
 
+    /**
+     * Get certificate details for determined server
+     *
+     * @param Request $request
+     * @return JsonResponse|Response
+     */
     public function getCertificateInfo(Request $request)
     {
         $certificateFile = Command::runLiman('cat /usr/local/share/ca-certificates/liman-{:ipAddress}_{:port}.crt', [
@@ -123,17 +126,17 @@ class MainController extends Controller
     }
 
     /**
-     * @api {post} /sunucu/sertifikaTalep Request SSL Sertificate
-     * @apiName Request SSL Sertificate
-     * @apiGroup Certificate
+     * Retrieve certificate from remote end
      *
-     * @apiParam {String} hostname Target Server' Hostname.
-     * @apiParam {String} port Target Server' Port.
-     *
-     * @apiSuccess {Array} array Requested certificate information..
+     * @return JsonResponse|Response
      */
     public function requestCert()
     {
+        validate([
+            'hostname' => 'required',
+            'port' => 'required|numeric|min:1|max:65537',
+        ]);
+
         [$flag, $message] = retrieveCertificate(
             request('hostname'),
             request('port')
@@ -146,13 +149,9 @@ class MainController extends Controller
     }
 
     /**
-     * @api {post} /sunucu/sertifikaGuncelle Renew SSL Sertificate
-     * @apiName Renew SSL Sertificate
-     * @apiGroup Certificate
+     * Renew certificate for server
      *
-     * @apiParam {String} certificate_id Certificate id to renew.
-     *
-     * @apiSuccess {JSON} message Message with status.
+     * @return JsonResponse|Response
      */
     public function updateCert()
     {
@@ -173,7 +172,7 @@ class MainController extends Controller
 
         $certificate->removeFromSystem();
 
-        $certificate->addToSystem('/tmp/'.$message['path']);
+        $certificate->addToSystem('/tmp/' . $message['path']);
 
         return respond('Sertifika Başarıyla Güncellendi!');
     }

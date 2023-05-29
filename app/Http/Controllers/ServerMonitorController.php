@@ -5,11 +5,29 @@ namespace App\Http\Controllers;
 use App\Models\MonitorServer;
 use App\Models\UserMonitors;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
+/**
+ * Server Monitor Controller
+ *
+ * @extends Controller
+ */
 class ServerMonitorController extends Controller
 {
+    /**
+     * Add a server to watch status
+     *
+     * @return JsonResponse|Response
+     */
     public function add()
     {
+        validate([
+            'name' => 'required',
+            'ip_address' => 'required',
+            'port' => 'required|numeric|min:-1|max:65537'
+        ]);
+
         $obj = MonitorServer::where([
             'ip_address' => request('ip_address'),
             'port' => request('port'),
@@ -34,6 +52,11 @@ class ServerMonitorController extends Controller
         return respond('Başarıyla eklendi!');
     }
 
+    /**
+     * Remove a server from watch list
+     *
+     * @return JsonResponse|Response
+     */
     public function remove()
     {
         //Find Object.
@@ -52,6 +75,18 @@ class ServerMonitorController extends Controller
         return respond('Sunucu takibi başarıyla silindi!');
     }
 
+    /**
+     * @return void
+     */
+    public function get()
+    {
+    }
+
+    /**
+     * Re-run health check
+     *
+     * @return JsonResponse|Response
+     */
     public function refresh()
     {
         $obj = UserMonitors::find(request('server_monitor_id'));
@@ -73,6 +108,11 @@ class ServerMonitorController extends Controller
         return respond('Başarıyla yenilendi!');
     }
 
+    /**
+     * Returns the list of watched servers
+     *
+     * @return JsonResponse|Response
+     */
     public function list()
     {
         $servers = UserMonitors::where('user_id', user()->id)->get()->map(function ($server) {
@@ -92,9 +132,5 @@ class ServerMonitorController extends Controller
             'monitor_servers' => $servers,
             'servers' => servers(),
         ]);
-    }
-
-    public function get()
-    {
     }
 }

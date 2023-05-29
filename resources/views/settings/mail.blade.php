@@ -48,16 +48,6 @@
     "submit_text" => "Sil"
 ])
 
-@component('modal-component',[
-    "id" => "addServerGroup",
-    "title" => "Sunucuları Gruplama",
-    "footer" => [
-        "class" => "btn-success",
-        "onclick" => "addServerGroup()",
-        "text" => "Ekle"
-    ],
-])
-@endcomponent
 
 <script>
     function editCronMail(node)

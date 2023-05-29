@@ -16,8 +16,9 @@
                         <label for="APP_LANG">{{__("Sistem Dili")}}</label><br>
                         <small>{{__("Sistemin genel dil ayarı. Dil seçimi yapmamış kullanıcıların ayarlarını da değiştirir.")}}</small>
                         <select name="APP_LANG" id="APP_LANG" class="form-control liman_env select2">
-                            <option value="tr">{{ __("Türkçe") }}</option>
-                            <option value="en">{{ __("İngilizce") }}</option>
+                            @foreach (getLanguageNames() as $short => $long)
+                            <option value="{{ $short }}">{{ $long }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="form-group">
@@ -231,9 +232,6 @@
         request("{{route("set_liman_tweaks")}}",form,function (success){
             let json = JSON.parse(success);
             showSwal(json.message,"success",2000);
-            setTimeout(function () {
-                location.reload();
-            },2000);
         },function (error) {
             let json = JSON.parse(error);
             showSwal(json.message,"error",2000);

@@ -7,11 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+/**
+ * Extension Model
+ *
+ * @extends Model
+ */
 class Extension extends Model
 {
     use UsesUuid, CacheQueryBuilder;
 
     /**
+     * Fillable fields in model
+     *
      * @var array
      */
     protected $fillable = [
@@ -51,6 +58,23 @@ class Extension extends Model
     }
 
     /**
+     * Boot model
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope('extensions', function (
+            \Illuminate\Database\Eloquent\Builder $builder
+        ) {
+            $builder->orderBy('order');
+        });
+    }
+
+    /**
+     * Get extension servers
+     *
      * @return mixed
      */
     public function servers()
@@ -65,21 +89,22 @@ class Extension extends Model
         });
     }
 
+    /**
+     * Get user's all extensions
+     *
+     * @return mixed
+     */
     public static function getAll()
     {
         return user()->extensions();
     }
 
-    protected static function boot()
-    {
-        parent::boot();
-        static::addGlobalScope('extensions', function (
-            \Illuminate\Database\Eloquent\Builder $builder
-        ) {
-            $builder->orderBy('order');
-        });
-    }
-
+    /**
+     * Get extension display name
+     *
+     * @param $value
+     * @return mixed|string
+     */
     public function getDisplayNameAttribute($value)
     {
         if (empty($this->attributes['display_name'])) {
@@ -89,11 +114,23 @@ class Extension extends Model
         return $this->attributes['display_name'];
     }
 
+    /**
+     * Get updated at attribute
+     *
+     * @param $value
+     * @return string
+     */
     public function getUpdatedAtAttribute($value)
     {
         return \Carbon\Carbon::parse($value)->isoFormat('LLLL');
     }
 
+    /**
+     * Set name attribute
+     *
+     * @param $value
+     * @return void
+     */
     public function setNameAttribute($value)
     {
         if ($this->name) {

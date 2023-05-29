@@ -7,16 +7,23 @@ use App\Models\SystemSettings;
 use App\System\Command;
 use Carbon\Carbon;
 use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use ZipArchive;
 
+/**
+ * High Availability Syncer
+ * Syncs Limans in circular type and keeps all of them up to date.
+ *
+ * @extends ShouldQueue
+ */
 class HighAvailabilitySyncer implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -35,6 +42,7 @@ class HighAvailabilitySyncer implements ShouldQueue
      * Execute the job.
      *
      * @return void
+     * @throws GuzzleException
      */
     public function handle()
     {
@@ -49,9 +57,9 @@ class HighAvailabilitySyncer implements ShouldQueue
         $limans = Liman::all()->pluck(["last_ip"])->toArray();
         $updateInformations = [];
         foreach ($limans as $ip) {
-            if ($localIp == $ip) 
+            if ($localIp == $ip)
                 continue;
-            
+
             $updateInformations[] = $this->fetchUpdateInformation($ip);
         }
 
@@ -92,15 +100,15 @@ class HighAvailabilitySyncer implements ShouldQueue
             foreach ($json as $cert) {
                 if (
                     is_file(
-                        '/usr/local/share/ca-certificates/'.
-                            $cert['targetName'].
-                            '.crt'
+                        '/usr/local/share/ca-certificates/' .
+                        $cert['targetName'] .
+                        '.crt'
                     )
                     ||
                     is_file(
-                        '/etc/pki/ca-trust/source/anchors/'.
-                            $cert['targetName'].
-                            '.crt'
+                        '/etc/pki/ca-trust/source/anchors/' .
+                        $cert['targetName'] .
+                        '.crt'
                     )
                 ) {
                     continue;
@@ -117,6 +125,10 @@ class HighAvailabilitySyncer implements ShouldQueue
 
     /**
      * Get version information from other Liman
+     *
+     * @param $ip
+     * @return array|array[]
+     * @throws GuzzleException
      */
     private function fetchUpdateInformation($ip)
     {
@@ -183,6 +195,10 @@ class HighAvailabilitySyncer implements ShouldQueue
 
     /**
      * Install not existing extension
+     *
+     * @param $extension
+     * @throws GuzzleException
+     * @return void
      */
     private function installExtension($extension)
     {
@@ -251,7 +267,36 @@ class HighAvailabilitySyncer implements ShouldQueue
     }
 
     /**
+     * Download file and return path
+     *
+     * @param $url
+     * @param $format
+     * @return string
+     */
+    private function downloadFile($url, $format = "zip")
+    {
+        $client = new Client([
+            'verify' => false
+        ]);
+
+        $path = '/tmp/' . Str::random(32) . '.' . $format;
+
+        $resource = fopen($path, 'w');
+        try {
+            $client->request('GET', $url, ['sink' => $resource]);
+        } catch (\Throwable $e) {
+            return "";
+        }
+
+        return $path;
+    }
+
+    /**
      * Update old extension
+     *
+     * @param $extension
+     * @throws GuzzleException
+     * @return void
      */
     private function updateExtension($extension)
     {
@@ -311,6 +356,10 @@ class HighAvailabilitySyncer implements ShouldQueue
 
     /**
      * Install not existing module
+     *
+     * @param $module
+     * @throws GuzzleException
+     * @return void
      */
     private function installModule($module)
     {
@@ -360,6 +409,10 @@ class HighAvailabilitySyncer implements ShouldQueue
 
     /**
      * Update old module
+     *
+     * @param $module
+     * @throws GuzzleException
+     * @return void
      */
     private function updateModule($module)
     {
@@ -405,26 +458,5 @@ class HighAvailabilitySyncer implements ShouldQueue
         Command::runSystem('rm -rf @{:file}', [
             'file' => $file
         ]);
-    }
-    
-    /**
-     * Download file and return path
-     */
-    private function downloadFile($url, $format = "zip")
-    {
-        $client = new Client([
-            'verify' => false
-        ]);
-
-        $path = '/tmp/' . Str::random(32) . '.' . $format;
-
-        $resource = fopen($path, 'w');
-        try {
-            $client->request('GET', $url, ['sink' => $resource]);
-        } catch (\Throwable $e) {
-            return "";
-        }
-
-        return $path;
     }
 }
