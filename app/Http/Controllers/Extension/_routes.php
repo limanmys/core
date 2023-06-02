@@ -148,7 +148,3 @@ Route::post(
     ->name('extension_remove_function')
     ->middleware('admin');
 
-Route::get(
-    '/eklenti/{extension_id}/public/{any}',
-    'Extension\OneController@publicFolder'
-)->where('any', '.+')->name('extension_public_folder');

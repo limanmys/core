@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 // Auth Routes
 require_once app_path('Http/Controllers/Auth/_routes.php');
 
@@ -149,19 +151,19 @@ Route::any('/upload/{any?}', function () {
     $extension_id = request('extension_id');
     $extension = \App\Models\Extension::find($extension_id);
     if ($extension) {
-        $path = '/liman/extensions/'.strtolower((string) $extension->name);
+        $path = '/liman/extensions/' . strtolower((string) $extension->name);
     } else {
         $path = storage_path();
     }
-    if (! file_exists($path.'/uploads')) {
-        mkdir($path.'/uploads');
+    if (!file_exists($path . '/uploads')) {
+        mkdir($path . '/uploads');
         if ($extension) {
             rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
         } else {
             rootSystem()->fixExtensionPermissions('liman', 'liman');
         }
     }
-    $server->setUploadDir($path.'/uploads');
+    $server->setUploadDir($path . '/uploads');
     $response = $server->serve();
 
     return $response->send();
@@ -194,3 +196,10 @@ Route::post('/upload_info', function () {
 registerModuleRoutes();
 
 Route::get('/bildirimYolla', 'Notification\ExternalNotificationController@accept');
+
+
+Route::get(
+    '/eklenti/{extension_id}/public/{any}',
+    'Extension\OneController@publicFolder'
+)->where('any', '.+')->name('extension_public_folder');
+

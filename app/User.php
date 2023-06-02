@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject as JWTSubject;
 
 /**
  * App\User
@@ -26,7 +27,7 @@ use Illuminate\Notifications\Notifiable;
  * @method static Builder|User query()
  * @method static Builder|User find($value)
  */
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use UsesUuid, Notifiable, CacheQueryBuilder;
 
@@ -56,7 +57,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'google2fa_secret', 'keycloak_token', 'keycloak_refresh_token'];
 
     /**
      * Determines if user is admin or not
@@ -188,4 +189,22 @@ class User extends Authenticatable
             set: fn($value) => ! is_null($value) ? encrypt($value) : '',
         );
     }
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier() {
+        return $this->getKey();
+    }
+    
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims() {
+        return [];
+    }    
 }

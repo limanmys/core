@@ -180,6 +180,29 @@ class Server extends Model
         return false;
     }
 
+    public function isOnline(): bool
+    {
+        if ($this->control_port == -1) {
+            return true;
+        }
+        // Simply Check Port If It's Alive
+        if (
+            is_resource(
+                @fsockopen(
+                    $this->ip_address,
+                    $this->control_port,
+                    $errno,
+                    $errstr,
+                    intval(config('liman.server_connection_timeout'))
+                )
+            )
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Get extensions on server that in scope of permission system
      *

@@ -32,7 +32,8 @@
         "phpseclib/phpseclib": "~3.0",
         "pragmarx/google2fa-laravel": "^2.0",
         "pusher/pusher-php-server": "^7.0",
-        "socialiteproviders/keycloak": "^5.2"
+        "socialiteproviders/keycloak": "^5.2",
+        "tymon/jwt-auth": "^2.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
