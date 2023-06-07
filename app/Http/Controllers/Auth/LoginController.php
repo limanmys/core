@@ -215,6 +215,8 @@ class LoginController extends Controller
     protected function sendFailedLoginResponse(Request $request)
     {
         $credientials = (object) $this->credentials($request);
+        system_log(5, "LOGIN_FAILED", ["email" => $credientials->email]);
+
         hook('login_failed', [
             'email' => $credientials->email,
             'password' => $credientials->password,

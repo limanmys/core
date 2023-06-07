@@ -342,9 +342,6 @@
                                 }
                             </script>
                         </div>
-                        <div class="tab-pane fade show" id="logForward" role="tabpanel">
-                            @include("settings.log_forward")
-                        </div>
                         <div class="tab-pane fade show" id="limanTweaks" role="tabpanel">
                             @include("settings.tweaks")
                         </div>

@@ -19,7 +19,7 @@ class CheckGoogleTwoFactor
      */
     public function handle(Request $request, Closure $next)
     {
-        if (env('OTP_ENABLED')) {
+        if (env('OTP_ENABLED', false)) {
             if (! auth()->user()->google2fa_secret) {
                 return redirect()->route('registerGoogleAuth');
             }

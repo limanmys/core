@@ -87,7 +87,7 @@ class MainController extends Controller
             'EXTENSION_DEVELOPER_MODE' => env('EXTENSION_DEVELOPER_MODE') ? 'true' : 'false',
             'APP_LANG' => env('APP_LANG', 'tr'),
             'NAV_SERVER_COUNT' => env('NAV_SERVER_COUNT', 20),
-            'OTP_ENABLED' => env('OTP_ENABLED') ? 'true' : 'false',
+            'OTP_ENABLED' => env('OTP_ENABLED', false) ? 'true' : 'false',
             'LDAP_IGNORE_CERT' => env('LDAP_IGNORE_CERT') ? 'true' : 'false',
             'EXTENSION_TIMEOUT' => env('EXTENSION_TIMEOUT', 30),
             'KEYCLOAK_ACTIVE' => env('KEYCLOAK_ACTIVE') ? 'true' : 'false',
