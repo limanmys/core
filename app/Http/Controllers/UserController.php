@@ -590,7 +590,7 @@ class UserController extends Controller
      */
     public function setGoogleSecret()
     {
-        if (! env('OTP_ENABLED')) {
+        if (! env('OTP_ENABLED', false)) {
             return redirect(route('home'));
         }
 
