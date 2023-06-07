@@ -11,6 +11,7 @@ class MenuController extends Controller
     public function servers()
     {
         $servers = Server::orderBy('updated_at', 'DESC')
+            ->limit(20)
             ->get()
             ->filter(function ($server) {
                 return Permission::can(user()->id, 'server', 'id', $server->id);
@@ -21,11 +22,9 @@ class MenuController extends Controller
 
         return response()->json([...user()->favorites()->map(function ($server) {
             $server->is_favorite = true;
-            $server->extension_count = $server->extensions()->count();
             return $server;
         }), ...$servers->map(function ($server) {
             $server->is_favorite = false;
-            $server->extension_count = $server->extensions()->count();
             return $server;
         })]);
     }
