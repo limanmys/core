@@ -116,7 +116,7 @@ Artisan::command('module:remove {module_name}', function ($module_name) {
 
 Artisan::command('register_liman', function () {
     Liman::updateOrCreate([
-        'machine_id' => getLimanId(),
+        'last_ip' => env('LIMAN_IP', trim((string) `hostname -I | cut -d' ' -f1 | xargs`)),
     ], [
         'last_ip' => env('LIMAN_IP', trim((string) `hostname -I | cut -d' ' -f1 | xargs`)),
     ]);
