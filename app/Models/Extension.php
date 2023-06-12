@@ -79,14 +79,7 @@ class Extension extends Model
      */
     public function servers()
     {
-        return Server::getAll()->filter(function ($value) {
-            return DB::table('server_extensions')
-                ->where([
-                    'server_id' => $value->id,
-                    'extension_id' => request('extension_id'),
-                ])
-                ->exists();
-        });
+        return $this->belongsToMany(Server::class, 'server_extensions');
     }
 
     /**

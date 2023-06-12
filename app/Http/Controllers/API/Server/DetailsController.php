@@ -7,6 +7,7 @@ use App\Models\Permission;
 use App\Models\Server;
 use App\System\Command;
 use Carbon\Carbon;
+use Illuminate\Http\Response;
 
 class DetailsController extends Controller
 {
@@ -33,7 +34,7 @@ class DetailsController extends Controller
         }
 
         if (!Permission::can(user()->id, 'liman', 'id', 'server_details')) {
-            return respond('Bu işlemi yapmak için yetkiniz yok!', 201);
+            return respond('Bu işlemi yapmak için yetkiniz yok!', Response::HTTP_FORBIDDEN);
         }
 
         try {
@@ -71,13 +72,13 @@ class DetailsController extends Controller
     public function stats()
     {
         if (server()->isLinux()) {
-            $cpuPercent = server()->run(
+            $cpuPercent = Command::runSudo(
                 "ps -eo %cpu --no-headers | grep -v 0.0 | awk '{s+=$1} END {print s/NR*10}'"
             );
-            $ramPercent = server()->run(
+            $ramPercent = Command::runSudo(
                 "free | grep Mem | awk '{print $3/$2 * 100.0}'"
             );
-            $ioPercent = (float) server()->run(
+            $ioPercent = (float) Command::runSudo(
                 "iostat -d | tail -n +4 | head -n -1 | awk '{s+=$2} END {print s}'"
             );
             $firstDown = $this->calculateNetworkBytes();
@@ -134,7 +135,7 @@ class DetailsController extends Controller
     public function topCpuProcesses()
     {
         $output = trim(
-            server()->run(
+            Command::runSudo(
                 "ps -eo pid,%cpu,user,cmd --sort=-%cpu --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
             )
         );
@@ -152,7 +153,7 @@ class DetailsController extends Controller
     public function topMemoryProcesses()
     {
         $output = trim(
-            server()->run(
+            Command::runSudo(
                 "ps -eo pid,%mem,user,cmd --sort=-%mem --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
             )
         );
@@ -170,7 +171,7 @@ class DetailsController extends Controller
     public function topDiskUsage()
     {
         $output = trim(
-            server()->run(
+            Command::runSudo(
                 "df --output=pcent,source,size,used -hl -x squashfs -x tmpfs -x devtmpfs | sed -n '1!p' | head -n 5 | sort -hr | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
             )
         );

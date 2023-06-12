@@ -3,11 +3,75 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Extension;
 use App\Models\Token;
 use GuzzleHttp\Client;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ExtensionController extends Controller
 {
+    public function index()
+    {
+        // If server_id exists, don't return extensions that assigned to that server
+        // For listing purposes
+        $server_id = request('server_id');
+
+        if ($server_id) {
+            $extensions = Extension::whereDoesntHave('servers', function ($query) use ($server_id) {
+                $query->where('server_id', $server_id);
+            })->orderBy("updated_at", "DESC")->get();
+        } else {
+            $extensions = Extension::orderBy("updated_at", "DESC")->get();
+        }        
+
+        return response()->json($extensions);
+    }
+
+    public function assign()
+    {
+        $extensions = request('extensions');
+        try {
+            DB::table('server_extensions')->insert(
+                array_map(function ($extension) {
+                    return [
+                        'id' => Str::uuid()->toString(),
+                        'server_id' => request('server_id'),
+                        'extension_id' => $extension,
+                    ];
+                }, $extensions)
+            );
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => "An error occured while assigning server.",
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            'message' => "Assigned successfully.",
+        ]);
+    }
+
+    public function unassign()
+    {
+        $extensions = request('extensions');
+        try {
+            DB::table('server_extensions')
+                ->where('server_id', request('server_id'))
+                ->whereIn('extension_id', $extensions)
+                ->delete();
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => "An error occured while unassigning server.",
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            'message' => "Unassigned successfully.",
+        ]);
+    }
+
     public function render()
     {
         if (extension()->status == '0') {

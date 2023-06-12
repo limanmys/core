@@ -46,36 +46,83 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
         // Server Details
         Route::get('/', [Server\DetailsController::class, 'index']);
 
-        Route::group(['prefix' => '{server_id}'], function () {
-            Route::get('/', [Server\DetailsController::class, 'server'])
-                ->middleware(['server']);
-            Route::get('/specs', [Server\DetailsController::class, 'specs'])
-                ->middleware(['server']);
+        Route::group(['prefix' => '{server_id}', 'middleware' => ['server']], function () {
+            Route::get('/', [Server\DetailsController::class, 'server']);
+            Route::get('/specs', [Server\DetailsController::class, 'specs']);
 
             // Stats
             Route::group(['prefix' => 'stats'], function () {
-                Route::get('/', [Server\DetailsController::class, 'stats'])
-                    ->middleware(['server']);
-                Route::get('/cpu', [Server\DetailsController::class, 'topCpuProcesses'])
-                    ->middleware(['server']);
-                Route::get('/ram', [Server\DetailsController::class, 'topMemoryProcesses'])
-                    ->middleware(['server']);
-                Route::get('/disk', [Server\DetailsController::class, 'topDiskUsage'])
-                    ->middleware(['server']);
+                Route::get('/', [Server\DetailsController::class, 'stats']);
+                Route::get('/cpu', [Server\DetailsController::class, 'topCpuProcesses']);
+                Route::get('/ram', [Server\DetailsController::class, 'topMemoryProcesses']);
+                Route::get('/disk', [Server\DetailsController::class, 'topDiskUsage']);
             });
 
             // Extensions
             Route::group(['prefix' => 'extensions'], function () {
                 // Extension List That Assigned To Server
-                Route::get('/', [Server\ExtensionController::class, 'index'])
-                    ->middleware(['server']);
+                Route::get('/', [Server\ExtensionController::class, 'index']);
 
                 // Extension Renderer
                 Route::match(['GET', 'POST'], '/{extension_id}', [ExtensionController::class, 'render'])
-                    ->middleware(['server', 'extension']);
+                    ->middleware(['extension']);
             });
 
-            
+            // Services
+            Route::group(['prefix' => 'services'], function () {
+                Route::get('/', [Server\ServiceController::class, 'index']);
+                Route::post('/status', [Server\ServiceController::class, 'status']);
+                Route::post('/start', [Server\ServiceController::class, 'start']);
+                Route::post('/stop', [Server\ServiceController::class, 'stop']);
+                Route::post('/restart', [Server\ServiceController::class, 'restart']);
+                Route::post('/enable', [Server\ServiceController::class, 'enable']);
+                Route::post('/disable', [Server\ServiceController::class, 'disable']);
+            });
+
+            // Packages
+            Route::group(['prefix' => 'packages'], function () {
+                Route::get('/', [Server\PackageController::class, 'index']);
+            });
+
+            // Updates
+            Route::group(['prefix' => 'updates'], function () {
+                Route::get('/', [Server\UpdateController::class, 'index']);
+            });
+
+            // Access Logs
+            Route::group(['prefix' => 'access_logs'], function () {
+                Route::get('/', [Server\AccessLogController::class, 'index']);
+                Route::get('/{log_id}', [Server\AccessLogController::class, 'details']);
+            });
+
+            // Ports
+            Route::group(['prefix' => 'ports'], function () {
+                Route::get('/', [Server\PortController::class, 'index']);
+            });
+
+            // Users
+            Route::group(['prefix' => 'users'], function () {
+                Route::get('/local', [Server\UserController::class, 'getLocalUsers']);
+                Route::post('/local', [Server\UserController::class, 'addLocalUser']);
+
+                Route::get('/groups', [Server\UserController::class, 'getLocalGroups']);
+                Route::post('/groups', [Server\UserController::class, 'addLocalGroup']);
+                Route::get('/groups/users', [Server\UserController::class, 'getLocalGroupDetails']);
+                Route::post('/groups/users', [Server\UserController::class, 'addLocalGroupUser']);
+
+                Route::get('/sudoers', [Server\UserController::class, 'getSudoers']);
+                Route::post('/sudoers', [Server\UserController::class, 'addSudoers']);
+                Route::delete('/sudoers', [Server\UserController::class, 'deleteSudoers']);
+            });
         });
-    });    
+    });
+
+    // Extension Controller
+    Route::group(['prefix' => 'extensions'], function () {
+        Route::get("/", [ExtensionController::class, 'index']);
+        Route::post("/assign", [ExtensionController::class, 'assign'])
+            ->middleware("server");
+        Route::post("/unassign", [ExtensionController::class, 'unassign'])
+            ->middleware("server");
+    });
 });

@@ -214,6 +214,7 @@ class Server extends Model
             '\App\Models\Extension',
             'server_extensions'
         )
+            ->orderBy("updated_at", "DESC")
             ->get()
             ->filter(function ($extension) {
                 return Permission::can(

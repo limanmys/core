@@ -34,7 +34,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\WizardChecker::class,
         ],
 
-        'api' => ['throttle:60,1', 'bindings'],
+        'api' => ['throttle:600,1', 'bindings'],
     ];
 
     protected $routeMiddleware = [
