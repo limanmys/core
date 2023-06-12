@@ -767,17 +767,17 @@ $InputFileFacility local7
 $InputRunFileMonitor
 
 $InputFileName /liman/logs/liman_new.log
-$InputFileTag render_engine_log:
-$InputFileStateFile liman_render_log
+$InputFileTag engine_log:
+$InputFileStateFile engine_log
 $InputFileFacility local7
 $InputRunFileMonitor
 
 local7.liman_log <SERVERADDR>
-local7.render_engine_log <SERVERADDR>';
+local7.engine_log <SERVERADDR>';
 
         $template = str_replace(
             '<SERVERADDR>',
-            (request('type') == 'tcp' ? '@' : '@@') .
+            (request('type') == 'tcp' ? '@@' : '@') .
             request('targetHostname') .
             ':' .
             request('targetPort'),
