@@ -5,6 +5,7 @@ use App\Http\Controllers\API\ExtensionController;
 use App\Http\Controllers\API\MenuController;
 use App\Http\Controllers\API\SearchController;
 use App\Http\Controllers\API\Server;
+use App\Http\Controllers\API\Settings;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/market/bagla', function () {
@@ -124,5 +125,24 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             ->middleware("server");
         Route::post("/unassign", [ExtensionController::class, 'unassign'])
             ->middleware("server");
+    });
+
+    // Settings
+    Route::group(['prefix' => 'settings'], function () {
+        // Extension
+        Route::group(['prefix' => 'extensions'], function () {
+            Route::get('/', [Settings\ExtensionController::class, 'index']);
+            Route::post('/upload', [Settings\ExtensionController::class, 'upload']);
+            Route::delete('/{extension_id}', [Settings\ExtensionController::class, 'delete']);
+            Route::post('/{extension_id}/license', [Settings\ExtensionController::class, 'license']);
+            Route::get('/{extension_id}/download', [Settings\ExtensionController::class, 'download']);
+        });
+
+        // Users
+        Route::group(['prefix' => 'users'], function () {
+            Route::get('/', [Settings\UserController::class, 'index']);
+            Route::post('/', [Settings\UserController::class, 'create']);
+            Route::delete('/{user_id}', [Settings\UserController::class, 'delete']);
+        });
     });
 });

@@ -58,6 +58,16 @@ class Extension extends Model
     }
 
     /**
+     * License object
+     *
+     * @return mixed
+     */
+    public function license()
+    {
+        return $this->hasOne('App\Models\License', 'extension_id');
+    }
+
+    /**
      * Boot model
      *
      * @return void
