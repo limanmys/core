@@ -27,6 +27,10 @@ class Server extends Model
         'type',
         'control_port',
         'os',
+        'user_id',
+        'shared_key',
+        'key_port',
+        'enabled'
     ];
 
     /**

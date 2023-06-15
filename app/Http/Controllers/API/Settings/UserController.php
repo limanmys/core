@@ -39,26 +39,14 @@ class UserController extends Controller
                 'max:255',
                 'unique:users',
             ],
+            'password' => ['string', 'min:8'],
         ]);
-
-        // Generate Password
-        do {
-            $pool = str_shuffle(
-                'abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$@%^&!$%^&'
-            );
-            $password = substr($pool, 0, 10);
-        } while (
-            ! preg_match(
-                "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\!\[\]\(\)\{\}\#\?\%\&\*\+\,\-\.\/\:\;\<\=\>\@\^\_\`\~]).{10,}$/",
-                $password
-            )
-        );
 
         $data = [
             'name' => request('name'),
             'email' => strtolower((string) request('email')),
-            'password' => Hash::make($password),
-            'status' => request('type') == 'administrator' ? '1' : '0',
+            'password' => Hash::make((string) request('password')),
+            'status' => request('status'),
             'forceChange' => true,
         ];
 
@@ -67,15 +55,11 @@ class UserController extends Controller
         }
 
         User::create($data);
-        return response()->json([
-            'status' => 'success',
-            'message' => __('Kullanıcı başarıyla oluşturuldu.'),
-            'data' => [
-                'password' => $password
-            ]
-        ]);
+        return response()->json(
+            'Kullanıcı başarıyla oluşturuldu.'
+        );
     }
-    
+
     /**
      * Delete user from system
      *

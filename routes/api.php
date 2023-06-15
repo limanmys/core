@@ -5,6 +5,7 @@ use App\Http\Controllers\API\ExtensionController;
 use App\Http\Controllers\API\MenuController;
 use App\Http\Controllers\API\SearchController;
 use App\Http\Controllers\API\Server;
+use App\Http\Controllers\API\ServerController;
 use App\Http\Controllers\API\Settings;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +47,12 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
     Route::group(['prefix' => 'servers'], function () {
         // Server Details
         Route::get('/', [Server\DetailsController::class, 'index']);
+        Route::post('/', [ServerController::class, 'create']);
+
+        // Server Creation Validations
+        Route::post('/check_access', [ServerController::class, 'checkAccess']);
+        Route::post('/check_connection', [ServerController::class, 'checkConnection']);
+        Route::post('/check_name', [ServerController::class, 'checkName']);
 
         Route::group(['prefix' => '{server_id}', 'middleware' => ['server']], function () {
             Route::get('/', [Server\DetailsController::class, 'server']);
