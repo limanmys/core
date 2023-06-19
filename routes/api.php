@@ -143,6 +143,7 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             Route::delete('/{extension_id}', [Settings\ExtensionController::class, 'delete']);
             Route::post('/{extension_id}/license', [Settings\ExtensionController::class, 'license']);
             Route::get('/{extension_id}/download', [Settings\ExtensionController::class, 'download']);
+            Route::get("/{extension_id}/functions", [Settings\RoleController::class, 'getExtensionFunctions']);
         });
 
         // Users
@@ -150,6 +151,33 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             Route::get('/', [Settings\UserController::class, 'index']);
             Route::post('/', [Settings\UserController::class, 'create']);
             Route::delete('/{user_id}', [Settings\UserController::class, 'delete']);
+        });
+
+        // Roles
+        Route::group(['prefix' => 'roles'], function () {
+            Route::get('/', [Settings\RoleController::class, 'index']);
+            Route::post('/', [Settings\RoleController::class, 'create']);
+
+            Route::group(['prefix' => '{role_id}'], function () {
+                Route::get('/', [Settings\RoleController::class, 'show']);
+                Route::delete('/', [Settings\RoleController::class, 'delete']);
+            
+                Route::get('/users', [Settings\RoleController::class, 'users']);
+                Route::post('/users', [Settings\RoleController::class, 'setUsers']);
+
+                Route::get('/servers', [Settings\RoleController::class, 'servers']);
+                Route::post('/servers', [Settings\RoleController::class, 'setServers']);
+
+                Route::get('/extensions', [Settings\RoleController::class, 'extensions']);
+                Route::post('/extensions', [Settings\RoleController::class, 'setExtensions']);
+
+                Route::get('/functions', [Settings\RoleController::class, 'functions']);
+                Route::post('/functions', [Settings\RoleController::class, 'setFunctions']);
+
+                Route::get('/liman', [Settings\RoleController::class, 'limanPermissions']);
+                Route::post('/liman', [Settings\RoleController::class, 'setLimanPermissions']);
+            });
+
         });
     });
 });
