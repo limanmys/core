@@ -1108,7 +1108,7 @@ if (! function_exists('extensionTranslate')) {
      */
     function extensionTranslate(string $text, string $extension_name)
     {
-        $lang = session('locale');
+        $lang = session('locale', 'tr');
         $file =
             '/liman/extensions/' .
             strtolower($extension_name) .

@@ -243,12 +243,13 @@ class RoleController extends Controller
      *
      * @return JsonResponse
      */
-    public function getExtensionFunctions()
+    public function getExtensionFunctions(Request $request)
     {
+        $ext = Extension::find($request->extension_id);
         $extension = json_decode(
             file_get_contents(
                 '/liman/extensions/' .
-                strtolower((string) extension()->name) .
+                strtolower((string) $ext->name) .
                 DIRECTORY_SEPARATOR .
                 'db.json'
             ),
@@ -257,10 +258,10 @@ class RoleController extends Controller
         $functions = array_key_exists('functions', $extension)
             ? $extension['functions']
             : [];
-        $lang = session('locale');
+        $lang = session('locale') ?? 'tr';
         $file =
             '/liman/extensions/' .
-            strtolower((string) extension()->name) .
+            strtolower((string) $ext->name) .
             '/lang/' .
             $lang .
             '.json';
@@ -290,5 +291,71 @@ class RoleController extends Controller
         }
 
         return response()->json($cleanFunctions);
+    }
+
+    public function setFunctions(Request $request)
+    {
+        $extension = Extension::find($request->extension_id);
+
+        foreach ($request->functions as $function) {
+            Permission::grant(
+                $request->role_id,
+                'function',
+                'name',
+                strtolower((string) $extension->name),
+                $function,
+                'roles'
+            );
+        }
+
+        return response()->json('Fonksiyonlar başarıyla güncellendi.');
+    }
+
+    public function deleteFunctions(Request $request)
+    {
+        Permission::whereIn('id', $request->permission_ids)->delete();
+
+        return response()->json('Fonksiyonlar başarıyla silindi.');
+    }
+
+    public function variables(Request $request)
+    {
+        $permissions = Permission::where([
+            'morph_id' => $request->role_id,
+            'type' => 'variable',
+        ])->get();
+
+        return response()->json($permissions);
+    }
+
+    /**
+     * Add variable
+     *
+     * @return JsonResponse|Response
+     */
+    public function setVariables(Request $request)
+    {
+        Permission::grant(
+            $request->role_id,
+            'variable',
+            $request->key,
+            $request->value,
+            null,
+            'roles'
+        );
+
+        return response()->json('Veri başarıyla eklendi!');
+    }
+
+    /**
+     * Remove variable
+     *
+     * @return JsonResponse|Response
+     */
+    public function deleteVariables(Request $request)
+    {
+        Permission::whereIn('id', $request->permission_ids)->delete();
+
+        return response()->json('Fonksiyonlar başarıyla silindi.');
     }
 }

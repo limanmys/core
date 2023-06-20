@@ -173,9 +173,14 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
 
                 Route::get('/functions', [Settings\RoleController::class, 'functions']);
                 Route::post('/functions', [Settings\RoleController::class, 'setFunctions']);
+                Route::delete('/functions', [Settings\RoleController::class, 'deleteFunctions']);
 
                 Route::get('/liman', [Settings\RoleController::class, 'limanPermissions']);
                 Route::post('/liman', [Settings\RoleController::class, 'setLimanPermissions']);
+
+                Route::get('/variables', [Settings\RoleController::class, 'variables']);
+                Route::post('/variables', [Settings\RoleController::class, 'setVariables']);
+                Route::delete('/variables', [Settings\RoleController::class, 'deleteVariables']);
             });
 
         });
