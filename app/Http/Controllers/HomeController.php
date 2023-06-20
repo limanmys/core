@@ -7,6 +7,7 @@ use App\Models\Extension;
 use App\Models\LimanRequest;
 use App\Models\Server;
 use App\Models\Token;
+use App\System\Command;
 use App\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -79,6 +80,7 @@ class HomeController extends Controller
      */
     public function getLimanStats()
     {
+        $cores = str_replace("cpu cores\t: ", "", trim(explode("\n", Command::runLiman("cat /proc/cpuinfo | grep 'cpu cores'"))[0]));
         $cpuUsage = shell_exec(
             "ps -eo %cpu --no-headers | grep -v 0.0 | awk '{s+=$1} END {print s/NR*10}'"
         );
@@ -95,10 +97,12 @@ class HomeController extends Controller
         $secondDown = $this->calculateNetworkBytes();
         $secondUp = $this->calculateNetworkBytes(false);
 
+        $totalCpu = round($cpuUsage / $cores, 2);
+
         return response([
-            'cpu' => $cpuUsage,
-            'ram' => $ramUsage,
-            'io' => round($ioPercent, 2),
+            'cpu' => $totalCpu > 100 ? 100 : $totalCpu,
+            'ram' => $ramUsage > 100 ? 100 : $ramUsage,
+            'io' => $ioPercent > 100 ? 100 : round($ioPercent, 2),
             'network' => [
                 'download' => round(($secondDown - $firstDown) / 1024 / 2, 2),
                 'upload' => round(($secondUp - $firstUp) / 1024 / 2, 2),
