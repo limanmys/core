@@ -170,7 +170,6 @@ return [
         'extension' => 'Eklenti',
         'dn' => 'DN',
         'role_id' => 'Rol Grubu',
-        'NAV_SERVER_COUNT' => 'Sol Menü Sunucu Sayısı',
         'cron_type' => 'Rapor Süresi',
         'to.*' => 'Email',
     ],

@@ -86,7 +86,6 @@ class MainController extends Controller
             'MARKET_CLIENT_SECRET' => env('MARKET_CLIENT_SECRET'),
             'EXTENSION_DEVELOPER_MODE' => env('EXTENSION_DEVELOPER_MODE') ? 'true' : 'false',
             'APP_LANG' => env('APP_LANG', 'tr'),
-            'NAV_SERVER_COUNT' => env('NAV_SERVER_COUNT', 20),
             'OTP_ENABLED' => env('OTP_ENABLED', false) ? 'true' : 'false',
             'LDAP_IGNORE_CERT' => env('LDAP_IGNORE_CERT') ? 'true' : 'false',
             'EXTENSION_TIMEOUT' => env('EXTENSION_TIMEOUT', 30),
@@ -108,7 +107,6 @@ class MainController extends Controller
     public function setLimanTweaks()
     {
         validate([
-            'NAV_SERVER_COUNT' => 'required|numeric|digits_between:1,2|min:1',
             'EXTENSION_TIMEOUT' => 'required|numeric|min:30',
             'MARKET_URL' => 'max:120',
             'MARKET_CLIENT_ID' => 'max:220',
@@ -140,7 +138,6 @@ class MainController extends Controller
             'APP_LANG' => request('APP_LANG'),
             'OTP_ENABLED' => request('OTP_ENABLED'),
             'LDAP_IGNORE_CERT' => request('LDAP_IGNORE_CERT'),
-            'NAV_SERVER_COUNT' => request('NAV_SERVER_COUNT'),
             'EXTENSION_TIMEOUT' => request('EXTENSION_TIMEOUT'),
             'KEYCLOAK_ACTIVE' => request('KEYCLOAK_ACTIVE'),
             'KEYCLOAK_CLIENT_ID' => request('KEYCLOAK_CLIENT_ID'),

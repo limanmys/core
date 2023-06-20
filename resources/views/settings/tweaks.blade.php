@@ -22,11 +22,6 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="NAV_SERVER_COUNT">{{__("Sol Menü Sunucu Sayısı")}}</label><br>
-                        <small>{{__("Sol menüde gösterilecek sunucu adeti.")}}</small>
-                        <input type="text" class="form-control liman_env" id="NAV_SERVER_COUNT" name="NAV_SERVER_COUNT">
-                    </div>
-                    <div class="form-group">
                         <label for="BRAND_NAME">{{__("Özel İsim")}}</label><br>
                         <small>{{__("Giriş ekranında gözükecek özel isim.")}}</small>
                         <input type="text" class="form-control liman_env" id="BRAND_NAME">
