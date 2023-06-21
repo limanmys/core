@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Extension;
 
 use App\Http\Controllers\Controller;
+use App\Models\GolangLicense;
 use App\Models\License;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
@@ -21,7 +22,7 @@ class SettingsController extends Controller
      *
      * @return Factory|View
      */
-    public function settings_all(): \Illuminate\Contracts\View\Factory | \Illuminate\View\View
+    public function settings_all()
     {
         system_log(7, 'EXTENSION_LIST');
         $updateAvailable = is_file(storage_path('extension_updates'));
@@ -46,15 +47,44 @@ class SettingsController extends Controller
      */
     public function addLicense()
     {
-        $license = License::updateOrCreate(
-            ['extension_id' => extension()->id],
-            ['data' => request('license')]
-        );
-        if ($license) {
+        if (extension()->license_type != 'golang_standard') {
+            License::updateOrCreate(
+                ['extension_id' => extension()->id],
+                ['data' => request('license')]
+            );
+
             return respond('Lisans Eklendi');
-        } else {
+        }
+
+        $server = extension()->servers()->first();
+
+        if (! $server) {
             return respond('Lisans Eklenemiyor!', 201);
         }
+
+        $output = callExtensionFunction(
+            extension(),
+            $server,
+            [
+                'endpoint' => 'license',
+                'type' => 'post',
+                'data' => json_encode([
+                    'license' => request('license'),
+                ]),
+            ]
+        );
+
+        $licenseType = new GolangLicense($output);
+        if ($licenseType->getValid()) {
+            License::updateOrCreate(
+                ['extension_id' => extension()->id],
+                ['data' => request('license')]
+            );
+
+            return respond('Lisans Eklendi');
+        }
+        
+        return respond('Lisans Eklenemiyor!', 201);
     }
 
     /**

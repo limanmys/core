@@ -26,10 +26,10 @@
 @include('table',[
     "value" => $extensions,
     "title" => [
-        "Eklenti Adı" , "Versiyon", "İmzalayan", "Son Güncelleme Tarihi", "*hidden*"
+        "Eklenti Adı" , "Versiyon", "Lisans Durumu", "Son Kullanım Tarihi", "Son Güncelleme Tarihi", "*hidden*"
     ],
     "display" => [
-        "name" , "version", "issuer", "updated_at", "id:extension_id"
+        "name" , "version", "valid", "expires", "updated_at", "id:extension_id"
     ],
     "menu" => [
         "Lisans Ekle" => [

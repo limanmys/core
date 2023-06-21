@@ -34,6 +34,7 @@ class Extension extends Model
         'displays',
         'require_key',
         'status',
+        'license_type'
     ];
 
     protected $casts = [
@@ -83,7 +84,7 @@ class Extension extends Model
             return DB::table('server_extensions')
                 ->where([
                     'server_id' => $value->id,
-                    'extension_id' => request('extension_id'),
+                    'extension_id' => $this->id,
                 ])
                 ->exists();
         });

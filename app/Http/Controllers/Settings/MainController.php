@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AdminNotification;
 use App\Models\Certificate;
 use App\Models\Extension;
+use App\Models\GolangLicense;
 use App\Models\Permission;
 use App\Models\PermissionData;
 use App\Models\Role;
@@ -23,6 +24,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -48,12 +50,33 @@ class MainController extends Controller
     public function index()
     {
         $updateAvailable = is_file(storage_path('extension_updates'));
-        $extensions = extensions()->map(function ($item) {
-            if (! $item['issuer']) {
-                $item['issuer'] = __('Güvenli olmayan üretici!');
+
+        $extensions = Extension::get()->map(function ($extension) {
+            if ($extension->license_type != 'golang_standard') {
+                $extension->valid = "-";
+                $extension->expires = "-";
+                return $extension;
             }
 
-            return $item;
+            $server = $extension->servers()->first();
+            if (! $server) {
+                return $extension;
+            }
+
+            $output = callExtensionFunction(
+                $extension,
+                $server,
+                [
+                    'endpoint' => 'license',
+                    'type' => 'get',    
+                ]
+            );
+
+            $license = new GolangLicense($output);
+            $extension->valid = $license->getOwner() !== '' ? ($license->getValid() ? "Geçerli" : "Geçersiz") : "Girilmemiş";
+            $extension->expires = $license->getOwner() !== '' ? $license->getFormattedTimestamp() : "-";
+
+            return $extension;
         });
 
         return view('settings.index', [
