@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 
-class GolangLicense
+class GolangLicense implements \JsonSerializable
 {
     private string $owner;
     private bool $valid;
@@ -51,5 +51,15 @@ class GolangLicense
     {
         return Carbon::createFromTimestamp($this->timestamp)
             ->isoFormat('LL');
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'owner' => $this->owner,
+            'valid' => $this->valid,
+            'client_count' => $this->client_count,
+            'timestamp' => $this->timestamp * 1000,
+        ];
     }
 }
