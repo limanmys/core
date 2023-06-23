@@ -7,11 +7,13 @@ use App\Models\Notification;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\SystemSettings;
+use App\Models\Token;
 use App\System\Command;
 use App\System\Helper;
 use App\User;
 use Beebmx\Blade\Blade;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -1412,5 +1414,42 @@ if (! function_exists('getLanguageNames')) {
         }
         
         return $languages;
+    }
+}
+
+if (! function_exists('callExtensionFunction')) {
+    function callExtensionFunction(
+        Extension $extension,
+        Server $server,
+        $params = [],
+        $target_function = "apiProxy"
+    ) {
+        if ($extension->require_key == 'true' && $server->key() == null) {
+            return null;
+        }
+
+        $client = new Client(['verify' => false]);
+        try {
+            $res = $client->request('POST', env('RENDER_ENGINE_ADDRESS', 'https://127.0.0.1:2806'), [
+                'form_params' => [
+                    'lmntargetFunction' => $target_function,
+                    'extension_id' => $extension->id,
+                    'server_id' => $server->id,
+                    'token' => Token::create(user()->id),
+                    ...$params,
+                ],
+                'timeout' => 10,
+            ]);
+            $output = $res->getBody()->__toString();
+
+            $isJson = isJson($output, true);
+            if ($isJson && isset($isJson->status) && $isJson->status == 200) {
+                return $isJson->message;
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        return null;
     }
 }

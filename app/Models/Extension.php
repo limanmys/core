@@ -34,6 +34,7 @@ class Extension extends Model
         'displays',
         'require_key',
         'status',
+        'license_type'
     ];
 
     protected $casts = [
