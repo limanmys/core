@@ -14,6 +14,10 @@ class GolangLicense
     public function __construct($license)
     {
         if (! $license) {
+            $this->owner = '';
+            $this->valid = false;
+            $this->client_count = 0;
+            $this->timestamp = 0;
             return;
         }   
 
