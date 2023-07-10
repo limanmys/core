@@ -41,33 +41,34 @@ class SubscriptionController extends Controller
 
     public function limanLicense()
     {
-        return response()->json([
-            "issuer" => "HAVELSAN A.Ş.", 
-            "issued" => "Açıklab Yazılım Geliştirme Takım Liderliği", 
-            "issued_no" => "0001", 
-            "membership_start_time" => 1435067385000, 
-            "coverage_start" => 1592920185000, 
-            "coverage_end" => 1719150585000, 
-            "package_type" => "Full Premium Paket"
-        ]);
-        
-        // TODO: License should be encrypted
-        // Decrypt license
         $license = License::find("00000000-0000-0000-0000-000000000000");
         if ($license) {
-            $license->data = AES256::decrypt($license->data, md5(env('APP_KEY')));
-
+            $license->data = json_decode(AES256::decrypt($license->data, md5(env('APP_KEY'))));
+        } else {
+            return response()->json([
+                'message' => 'Lisans anahtarı bulunamadı.'
+            ], 404);
         }
-        return response()->json($license);
+
+        return response()->json($license->data);
     }
 
     public function setLimanLicense(Request $request)
     {
-        // Decrypt before adding and if decrypting is successful go on
+        $license = $request->license;
+        $license = AES256::decrypt($license, md5(env('APP_KEY')));
+        if (!$license) {
+            return response()->json([
+                'message' => 'Lisans anahtarı geçersiz.'
+            ], 422);
+        }
+
         $license = License::updateOrCreate(
             ['id' => "00000000-0000-0000-0000-000000000000"],
             ['data' => $request->license]
         );
+
+        $license = json_decode(trim(AES256::decrypt($license->data, md5(env('APP_KEY')))));
 
         return response()->json($license);
     }
