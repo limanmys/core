@@ -75,26 +75,11 @@ Artisan::command('module:add {module_name}', function ($module_name) {
     $flag = Module::where(['name' => $module_name])->exists();
 
     if (! $flag) {
-        $module = Module::create(['name' => $module_name, 'enabled' => true]);
-
-        $notification = new AdminNotification([
-            'title' => 'Yeni Modül Eklendi',
-            'type' => 'new_module',
-            'message' => "$module_name isminde bir modül sisteme eklendi.",
-            'level' => 3,
-        ]);
+        Module::create(['name' => $module_name, 'enabled' => true]);
     } else {
         Module::where(['name' => $module_name])->first()->touch();
-
-        $notification = new AdminNotification([
-            'title' => $module_name.' modülü güncellendi.',
-            'type' => 'new_module',
-            'message' => "$module_name isminde bir modül güncellendi.",
-            'level' => 3,
-        ]);
     }
 
-    $notification->save();
     $this->info('Modül başarıyla yüklendi.');
 })->describe('New module add');
 
