@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Connectors\GenericConnector;
-use App\Connectors\SNMPConnector;
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
 use App\Models\Permission;
@@ -18,6 +17,7 @@ class ServerController extends Controller
      * This function creates server in Liman database
      *
      * @return JsonResponse|Response
+     *
      * @throws \Exception|GuzzleException
      */
     public function create()
@@ -27,22 +27,22 @@ class ServerController extends Controller
         }
 
         $server = Server::create([
-            "name" => request('name'),
-            "ip_address" => request('ip_address'),
-            "type" => request('key_type') != 'no_key' ? request('key_type') : 'none',
-            "control_port" => request('port'),
-            "os" => request('os_type') ?? 'none',
-            "user_id" => auth('api')->user()->id,
-            "shared_key" => request('shared') == 'true' ? 1 : 0,
-            "key_port" => request('port'),
-            "enabled" => 1
+            'name' => request('name'),
+            'ip_address' => request('ip_address'),
+            'type' => request('key_type') != 'no_key' ? request('key_type') : 'none',
+            'control_port' => request('port'),
+            'os' => request('os_type') ?? 'none',
+            'user_id' => auth('api')->user()->id,
+            'shared_key' => request('shared') == 'true' ? 1 : 0,
+            'key_port' => request('port'),
+            'enabled' => 1,
         ]);
 
         // Add Server to request object to use it later.
         request()->request->add(['server' => $server]);
 
-        if (request('key_type') != "no_key") {
-            $encKey = env('APP_KEY') . auth('api')->user()->id . server()->id;
+        if (request('key_type') != 'no_key') {
+            $encKey = env('APP_KEY').auth('api')->user()->id.server()->id;
             $data = [
                 'clientUsername' => AES256::encrypt(
                     request('username'),
@@ -68,6 +68,7 @@ class ServerController extends Controller
      * Grant server certificate
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      * @throws GuzzleException
      */
@@ -96,7 +97,7 @@ class ServerController extends Controller
             }
         }
 
-        return response()->json("Sunucu başarıyla eklendi.");
+        return response()->json('Sunucu başarıyla eklendi.');
     }
 
     /**
@@ -144,6 +145,7 @@ class ServerController extends Controller
      * Check if server key is valid
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      */
     public function checkConnection()

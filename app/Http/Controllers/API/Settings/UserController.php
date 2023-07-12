@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\RoleUser;
 use App\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -19,6 +18,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
+
         return response()->json($users);
     }
 
@@ -55,6 +55,7 @@ class UserController extends Controller
         }
 
         User::create($data);
+
         return response()->json(
             'Kullanıcı başarıyla oluşturuldu.'
         );

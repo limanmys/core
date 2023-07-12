@@ -21,10 +21,10 @@ class ExtensionController extends Controller
         if ($server_id) {
             $extensions = Extension::whereDoesntHave('servers', function ($query) use ($server_id) {
                 $query->where('server_id', $server_id);
-            })->orderBy("updated_at", "DESC")->get();
+            })->orderBy('updated_at', 'DESC')->get();
         } else {
-            $extensions = Extension::orderBy("updated_at", "DESC")->get();
-        }        
+            $extensions = Extension::orderBy('updated_at', 'DESC')->get();
+        }
 
         return response()->json($extensions);
     }
@@ -44,12 +44,12 @@ class ExtensionController extends Controller
             );
         } catch (\Throwable $e) {
             return response()->json([
-                'message' => "An error occured while assigning server.",
+                'message' => 'An error occured while assigning server.',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
-            'message' => "Assigned successfully.",
+            'message' => 'Assigned successfully.',
         ]);
     }
 
@@ -63,12 +63,12 @@ class ExtensionController extends Controller
                 ->delete();
         } catch (\Throwable $e) {
             return response()->json([
-                'message' => "An error occured while unassigning server.",
+                'message' => 'An error occured while unassigning server.',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
-            'message' => "Unassigned successfully.",
+            'message' => 'Unassigned successfully.',
         ]);
     }
 
@@ -121,7 +121,7 @@ class ExtensionController extends Controller
                 if (env('APP_DEBUG', false)) {
                     return abort(
                         504,
-                        __('Liman render service is not working or crashed. ') . $e->getMessage(),
+                        __('Liman render service is not working or crashed. ').$e->getMessage(),
                     );
                 } else {
                     return abort(
@@ -132,10 +132,9 @@ class ExtensionController extends Controller
             }
         }
 
-
         return response()->json(
             [
-                "html" => trim(
+                'html' => trim(
                     view($view, [
                         'auth_token' => $token,
                         'tokens' => user()
@@ -145,7 +144,7 @@ class ExtensionController extends Controller
                         'extContent' => isset($output) ? $output : null,
                         'dbJson' => $dbJson,
                     ])->render()
-                )
+                ),
             ]
         );
     }

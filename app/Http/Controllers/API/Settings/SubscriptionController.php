@@ -22,7 +22,7 @@ class SubscriptionController extends Controller
     public function show(Extension $extension)
     {
         $server = $extension->servers()->first();
-        if (!$server) {
+        if (! $server) {
             return $extension;
         }
 
@@ -41,12 +41,12 @@ class SubscriptionController extends Controller
 
     public function limanLicense()
     {
-        $license = License::find("00000000-0000-0000-0000-000000000000");
+        $license = License::find('00000000-0000-0000-0000-000000000000');
         if ($license) {
             $license->data = json_decode(AES256::decrypt($license->data, md5(env('APP_KEY'))));
         } else {
             return response()->json([
-                'message' => 'Lisans anahtarı bulunamadı.'
+                'message' => 'Lisans anahtarı bulunamadı.',
             ], 404);
         }
 
@@ -57,14 +57,14 @@ class SubscriptionController extends Controller
     {
         $license = $request->license;
         $license = AES256::decrypt($license, md5(env('APP_KEY')));
-        if (!$license) {
+        if (! $license) {
             return response()->json([
-                'message' => 'Lisans anahtarı geçersiz.'
+                'message' => 'Lisans anahtarı geçersiz.',
             ], 422);
         }
 
         $license = License::updateOrCreate(
-            ['id' => "00000000-0000-0000-0000-000000000000"],
+            ['id' => '00000000-0000-0000-0000-000000000000'],
             ['data' => $request->license]
         );
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API\Server;
 
 use App\Http\Controllers\Controller;
 use App\System\Command;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class PortController extends Controller
@@ -13,6 +12,7 @@ class PortController extends Controller
      * Get open ports on server
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      * @throws GuzzleException
      */

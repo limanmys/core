@@ -17,6 +17,7 @@ class RoleController extends Controller
     public function index()
     {
         $roles = Role::orderBy('updated_at', 'DESC')->get();
+
         return response()->json($roles);
     }
 
@@ -31,6 +32,7 @@ class RoleController extends Controller
             'functions' => $role->permissions->where('type', 'function')->count(),
             'variables' => $role->permissions->where('type', 'variable')->count(),
         ];
+
         return response()->json($role);
     }
 
@@ -46,6 +48,7 @@ class RoleController extends Controller
     public function delete(Request $request)
     {
         Role::where('id', $request->role_id)->delete();
+
         return response()->json('Rol başarıyla silindi.');
     }
 
@@ -232,6 +235,7 @@ class RoleController extends Controller
             })->first()['display_name'] ?? $item->value;
 
             $item->description = isset($function['description']) ? extensionTranslate($function['description'], $item->value) : '';
+
             return $item;
         });
 
@@ -248,9 +252,9 @@ class RoleController extends Controller
         $ext = Extension::find($request->extension_id);
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/' .
-                strtolower((string) $ext->name) .
-                DIRECTORY_SEPARATOR .
+                '/liman/extensions/'.
+                strtolower((string) $ext->name).
+                DIRECTORY_SEPARATOR.
                 'db.json'
             ),
             true
@@ -260,10 +264,10 @@ class RoleController extends Controller
             : [];
         $lang = session('locale') ?? 'tr';
         $file =
-            '/liman/extensions/' .
-            strtolower((string) $ext->name) .
-            '/lang/' .
-            $lang .
+            '/liman/extensions/'.
+            strtolower((string) $ext->name).
+            '/lang/'.
+            $lang.
             '.json';
 
         //Translate Items.

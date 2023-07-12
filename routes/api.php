@@ -193,5 +193,15 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             Route::get('/', [Settings\SubscriptionController::class, 'index']);
             Route::get('/{extension}', [Settings\SubscriptionController::class, 'show']);
         });
+
+        // Access Control
+        Route::group(['prefix' => 'access'], function () {
+            // LDAP routes
+            Route::group(['prefix' => 'ldap'], function () {
+                Route::get('/configuration', [Settings\LdapConnectionController::class, 'getConfiguration']);
+
+                Route::post('/login', [Settings\LdapConnectionController::class, 'auth']);
+            });
+        });
     });
 });

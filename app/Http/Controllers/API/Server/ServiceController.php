@@ -13,11 +13,11 @@ class ServiceController extends Controller
 {
     public function __construct()
     {
-        if (!isset(auth('api')->user()->id)) {
+        if (! isset(auth('api')->user()->id)) {
             return respond('Please log-in again.', Response::HTTP_UNAUTHORIZED);
         }
 
-        if (!Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_services')) {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_services')) {
             return respond('Bu işlemi yapmak için yetkiniz yok!', Response::HTTP_FORBIDDEN);
         }
     }
@@ -39,18 +39,18 @@ class ServiceController extends Controller
                 }
                 $row = explode(':', trim($package));
                 try {
-                    if (str_contains($row[0], "sysusers.service")) {
+                    if (str_contains($row[0], 'sysusers.service')) {
                         continue;
                     }
 
-                    $status = explode(" ", $row[1]);
+                    $status = explode(' ', $row[1]);
                     array_push($services, [
-                        'name' => strlen($row[0]) > 50 ? substr($row[0], 0, 50) . '...' : $row[0],
-                        'description' => strlen($row[2]) > 60 ? substr($row[2], 0, 60) . '...' : $row[2],
+                        'name' => strlen($row[0]) > 50 ? substr($row[0], 0, 50).'...' : $row[0],
+                        'description' => strlen($row[2]) > 60 ? substr($row[2], 0, 60).'...' : $row[2],
                         'status' => [
-                            "loaded" => $status[0] == "loaded" ? true : false,
-                            "active" => $status[1] == "active" ? true : false,
-                            "running" => $status[2]
+                            'loaded' => $status[0] == 'loaded' ? true : false,
+                            'active' => $status[1] == 'active' ? true : false,
+                            'running' => $status[2],
                         ],
                     ]);
                 } catch (Exception) {
@@ -83,151 +83,151 @@ class ServiceController extends Controller
     public function start(Request $request)
     {
         $request->validate([
-            'services' => 'required'
+            'services' => 'required',
         ]);
 
         $services = request('services');
         if (server()->isLinux()) {
             foreach ($services as $service) {
-                Command::runSudo("systemctl start @{:service}", [
-                    'service' => $service
+                Command::runSudo('systemctl start @{:service}', [
+                    'service' => $service,
                 ]);
             }
         } else {
             foreach ($services as $service) {
-                Command::run("net start @{:service}", [
-                    'service' => $service
+                Command::run('net start @{:service}', [
+                    'service' => $service,
                 ]);
             }
         }
 
         return response()->json([
-            'status' => true
+            'status' => true,
         ]);
     }
 
     public function stop(Request $request)
     {
         $request->validate([
-            'services' => 'required'
+            'services' => 'required',
         ]);
 
         $services = request('services');
         if (server()->isLinux()) {
             foreach ($services as $service) {
-                Command::runSudo("systemctl stop @{:service}", [
-                    'service' => $service
+                Command::runSudo('systemctl stop @{:service}', [
+                    'service' => $service,
                 ]);
             }
         } else {
             foreach ($services as $service) {
-                Command::run("net stop @{:service}", [
-                    'service' => $service
+                Command::run('net stop @{:service}', [
+                    'service' => $service,
                 ]);
             }
         }
 
         return response()->json([
-            'status' => true
+            'status' => true,
         ]);
     }
 
     public function restart(Request $request)
     {
         $request->validate([
-            'services' => 'required'
+            'services' => 'required',
         ]);
 
         $services = request('services');
         if (server()->isLinux()) {
             foreach ($services as $service) {
-                Command::runSudo("systemctl restart @{:service}", [
-                    'service' => $service
+                Command::runSudo('systemctl restart @{:service}', [
+                    'service' => $service,
                 ]);
             }
         } else {
             foreach ($services as $service) {
-                Command::run("net stop @{:service}", [
-                    'service' => $service
+                Command::run('net stop @{:service}', [
+                    'service' => $service,
                 ]);
-                Command::run("net start @{:service}", [
-                    'service' => $service
+                Command::run('net start @{:service}', [
+                    'service' => $service,
                 ]);
             }
         }
 
         return response()->json([
-            'status' => true
+            'status' => true,
         ]);
     }
 
     public function enable(Request $request)
     {
         $request->validate([
-            'services' => 'required'
+            'services' => 'required',
         ]);
 
         $services = request('services');
         if (server()->isLinux()) {
             foreach ($services as $service) {
-                Command::runSudo("systemctl enable @{:service}", [
-                    'service' => $service
+                Command::runSudo('systemctl enable @{:service}', [
+                    'service' => $service,
                 ]);
             }
         } else {
             foreach ($services as $service) {
-                Command::run("sc config @{:service} start=auto", [
-                    'service' => $service
+                Command::run('sc config @{:service} start=auto', [
+                    'service' => $service,
                 ]);
             }
         }
 
         return response()->json([
-            'status' => true
+            'status' => true,
         ]);
     }
 
     public function disable(Request $request)
     {
         $request->validate([
-            'services' => 'required'
+            'services' => 'required',
         ]);
 
         $services = request('services');
         if (server()->isLinux()) {
             foreach ($services as $service) {
-                Command::runSudo("systemctl disable @{:service}", [
-                    'service' => $service
+                Command::runSudo('systemctl disable @{:service}', [
+                    'service' => $service,
                 ]);
             }
         } else {
             foreach ($services as $service) {
-                Command::run("sc config @{:service} start=demand", [
-                    'service' => $service
+                Command::run('sc config @{:service} start=demand', [
+                    'service' => $service,
                 ]);
             }
         }
 
         return response()->json([
-            'status' => true
+            'status' => true,
         ]);
     }
 
     public function status(Request $request)
     {
         $request->validate([
-            'service_name' => 'required'
+            'service_name' => 'required',
         ]);
 
         $service = request('service_name');
         if (server()->isLinux()) {
-            return response()->json(Command::runSudo("systemctl status @{:service}", [
-                'service' => $service
+            return response()->json(Command::runSudo('systemctl status @{:service}', [
+                'service' => $service,
             ]));
         }
 
-        return response()->json(Command::run("sc query @{:service}", [
-            'service' => $service
+        return response()->json(Command::run('sc query @{:service}', [
+            'service' => $service,
         ]));
     }
 }

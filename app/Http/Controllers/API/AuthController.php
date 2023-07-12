@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-     /**
+    /**
      * Create a new AuthController instance.
      *
      * @return void
@@ -35,7 +35,7 @@ class AuthController extends Controller
         }
 
         $token = auth('api')->attempt($validator->validated());
-        if (!$token) {
+        if (! $token) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
@@ -50,6 +50,7 @@ class AuthController extends Controller
     public function logout()
     {
         auth('api')->logout();
+
         return response()->json(['message' => 'User successfully signed out']);
     }
 
@@ -76,8 +77,7 @@ class AuthController extends Controller
     /**
      * Get the token array structure.
      *
-     * @param  string $token
-     *
+     * @param  string  $token
      * @return \Illuminate\Http\JsonResponse
      */
     protected function createNewToken($token)
@@ -87,7 +87,7 @@ class AuthController extends Controller
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60,
             'expired_at' => (auth('api')->factory()->getTTL() * 60 + time()) * 1000,
-            'user' => auth('api')->user()
+            'user' => auth('api')->user(),
         ]);
     }
 }

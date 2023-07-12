@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API\Server;
 
 use App\Http\Controllers\Controller;
 use App\System\Command;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class UserController extends Controller
@@ -13,6 +12,7 @@ class UserController extends Controller
      * Get local users on system
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      * @throws GuzzleException
      */
@@ -62,6 +62,7 @@ class UserController extends Controller
      * Create local user on server
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      */
     public function addLocalUser()
@@ -87,6 +88,7 @@ class UserController extends Controller
      * Get local groups
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      */
     public function getLocalGroups()
@@ -136,6 +138,7 @@ class UserController extends Controller
      * Get local group details
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      */
     public function getLocalGroupDetails()
@@ -146,7 +149,7 @@ class UserController extends Controller
         ]);
 
         $users = [];
-        if (!empty($output)) {
+        if (! empty($output)) {
             $users = array_map(function ($value) {
                 return ['name' => $value];
             }, explode(',', (string) $output));
@@ -159,6 +162,7 @@ class UserController extends Controller
      * Create local group on server
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      */
     public function addLocalGroup()
@@ -178,6 +182,7 @@ class UserController extends Controller
      * Add user to group
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      */
     public function addLocalGroupUser()
@@ -199,6 +204,7 @@ class UserController extends Controller
      * Get sudoers list
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      * @throws GuzzleException
      */
@@ -209,7 +215,7 @@ class UserController extends Controller
         );
 
         $sudoers = [];
-        if (!empty($output)) {
+        if (! empty($output)) {
             $sudoers = array_map(function ($value) {
                 $fetch = explode('*-*', $value);
 
@@ -224,6 +230,7 @@ class UserController extends Controller
      * Create sudoer on server
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      */
     public function addSudoers()
@@ -253,6 +260,7 @@ class UserController extends Controller
      * Delete sudoer
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      */
     public function deleteSudoers()
@@ -273,7 +281,7 @@ class UserController extends Controller
                 return response()->json('An error occured while deleting sudoer.', Response::HTTP_UNPROCESSABLE_ENTITY);
             }
         }
-        
+
         return response()->json('Sudoer deleted successfully.');
     }
 }

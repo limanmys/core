@@ -20,6 +20,7 @@ class DetailsController extends Controller
             })
             ->map(function ($server) {
                 $server->extension_count = $server->extensions()->count();
+
                 return $server;
             });
 
@@ -29,11 +30,11 @@ class DetailsController extends Controller
     public function server()
     {
         $server = server();
-        if (!$server) {
+        if (! $server) {
             abort(504, 'Sunucu bulunamadı.');
         }
 
-        if (!Permission::can(user()->id, 'liman', 'id', 'server_details')) {
+        if (! Permission::can(user()->id, 'liman', 'id', 'server_details')) {
             return respond('Bu işlemi yapmak için yetkiniz yok!', Response::HTTP_FORBIDDEN);
         }
 
@@ -61,7 +62,7 @@ class DetailsController extends Controller
             $outputs['user'] = Command::run('whoami');
         }
 
-        $server["is_favorite"] = $server->isFavorite();
+        $server['is_favorite'] = $server->isFavorite();
 
         return response()->json([
             'server' => $server,
@@ -94,7 +95,7 @@ class DetailsController extends Controller
                 'network' => [
                     'download' => round(($secondDown - $firstDown) / 1024 / 2, 2),
                     'upload' => round(($secondUp - $firstUp) / 1024 / 2, 2),
-                ]
+                ],
             ];
         }
 
@@ -111,17 +112,17 @@ class DetailsController extends Controller
 
     public function specs()
     {
-        $cores = str_replace("cpu cores\t: ", "", trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'cpu cores'"))[0]));
-        $cpu = str_replace("model name\t: ", "", trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'model name'"))[0]));
+        $cores = str_replace("cpu cores\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'cpu cores'"))[0]));
+        $cpu = str_replace("model name\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'model name'"))[0]));
         $ram = Command::runSudo("dmidecode -t memory | grep 'Size' | awk '{print $2}' | paste -sd+ | bc");
-        $model = Command::runSudo("dmidecode -s system-product-name");
-        $manufacturer = Command::runSudo("dmidecode -s system-manufacturer");
+        $model = Command::runSudo('dmidecode -s system-product-name');
+        $manufacturer = Command::runSudo('dmidecode -s system-manufacturer');
 
         return response()->json([
-            "cpu" => $cores . "x " . $cpu,
-            "ram" => $ram,
-            "model" => $model,
-            "manufacturer" => $manufacturer,
+            'cpu' => $cores.'x '.$cpu,
+            'ram' => $ram,
+            'model' => $model,
+            'manufacturer' => $manufacturer,
         ]);
     }
 
@@ -129,6 +130,7 @@ class DetailsController extends Controller
      * Top CPU using processes
      *
      * @return Application|Factory|View
+     *
      * @throws GuzzleException
      * @throws GuzzleException
      */
@@ -147,6 +149,7 @@ class DetailsController extends Controller
      * Get top memory processes
      *
      * @return Application|Factory|View
+     *
      * @throws GuzzleException
      * @throws GuzzleException
      */
@@ -165,6 +168,7 @@ class DetailsController extends Controller
      * Top disk usage
      *
      * @return Application|Factory|View
+     *
      * @throws GuzzleException
      * @throws GuzzleException
      */
@@ -182,8 +186,8 @@ class DetailsController extends Controller
     /**
      * Calculate network flow as bytes
      *
-     * @param $download
      * @return int
+     *
      * @throws GuzzleException
      */
     private function calculateNetworkBytes($download = true)
@@ -203,7 +207,6 @@ class DetailsController extends Controller
     /**
      * Parse ps-aux output
      *
-     * @param $output
      * @return array
      */
     private function parsePsOutput($output)
@@ -227,7 +230,6 @@ class DetailsController extends Controller
     /**
      * Parse df-h output
      *
-     * @param $output
      * @return array
      */
     private function parseDfOutput($output)
@@ -238,7 +240,7 @@ class DetailsController extends Controller
             $row[1] = str_replace('\\', '/', $row[1]);
             $fetch = explode('/', $row[1]);
             $data[] = [
-                'percent' => str_replace("%", "", $row[0]),
+                'percent' => str_replace('%', '', $row[0]),
                 'source' => end($fetch),
                 'size' => $row[2],
                 'used' => $row[3],

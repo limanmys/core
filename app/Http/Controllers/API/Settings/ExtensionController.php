@@ -4,14 +4,13 @@ namespace App\Http\Controllers\API\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Models\Extension;
+use App\Models\GolangLicense;
 use App\Models\License;
 use App\Models\Permission;
 use App\System\Command;
-use App\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use ZipArchive;
 use Illuminate\Support\Str;
+use ZipArchive;
 
 class ExtensionController extends Controller
 {
@@ -23,8 +22,9 @@ class ExtensionController extends Controller
     public function index()
     {
         $extensions = Extension::orderBy('updated_at', 'DESC')->get()->map(function ($item) {
-            $item->updated = Carbon::parse($item->getRawOriginal("updated_at"))->getPreciseTimestamp(3);
+            $item->updated = Carbon::parse($item->getRawOriginal('updated_at'))->getPreciseTimestamp(3);
             $item->licensed = $item->license()->count() > 0;
+
             return $item;
         });
 
@@ -63,7 +63,7 @@ class ExtensionController extends Controller
             $decrypt = Command::runLiman(
                 "gpg --status-fd 1 -d -o '/tmp/{:originalName}' @{:extension} | grep FAILURE > /dev/null && echo 0 || echo 1",
                 [
-                    'originalName' => 'ext-' . basename((string) request()->file('extension')->path()),
+                    'originalName' => 'ext-'.basename((string) request()->file('extension')->path()),
                     'extension' => request()->file('extension')->path(),
                 ]
             );
@@ -74,7 +74,7 @@ class ExtensionController extends Controller
                 );
             }
             $zipFile =
-                '/tmp/ext-' .
+                '/tmp/ext-'.
                 basename(
                     (string) request()->file('extension')->path()
                 );
@@ -99,10 +99,11 @@ class ExtensionController extends Controller
         return response()->json('Eklenti başarıyla yüklendi.', 200);
     }
 
-     /**
+    /**
      * Delete extension from file system
      *
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      */
     public function delete()
@@ -154,16 +155,44 @@ class ExtensionController extends Controller
      */
     public function license()
     {
-        $license = License::updateOrCreate(
-            ['extension_id' => extension()->id],
-            ['data' => request('license')]
-        );
+        if (extension()->license_type != 'golang_standard') {
+            License::updateOrCreate(
+                ['extension_id' => extension()->id],
+                ['data' => request('license')]
+            );
 
-        if ($license) {
             return response()->json('Lisans eklendi.');
-        } else {
+        }
+
+        $server = extension()->servers()->first();
+
+        if (! $server) {
             return response()->json('Lisans eklenemiyor!', 500);
         }
+
+        $output = callExtensionFunction(
+            extension(),
+            $server,
+            [
+                'endpoint' => 'license',
+                'type' => 'post',
+                'data' => json_encode([
+                    'license' => request('license'),
+                ]),
+            ]
+        );
+
+        $licenseType = new GolangLicense($output);
+        if ($licenseType->getValid()) {
+            License::updateOrCreate(
+                ['extension_id' => extension()->id],
+                ['data' => request('license')]
+            );
+
+            return response()->json('Lisans eklendi.');
+        }
+
+        return response()->json('Lisans eklenemiyor!', 500);
     }
 
     /**
@@ -174,8 +203,8 @@ class ExtensionController extends Controller
     public function download()
     {
         // Generate Extension Folder Path
-        $path = '/liman/extensions/' . strtolower((string) extension()->name);
-        $tempPath = '/tmp/' . Str::random() . '.zip';
+        $path = '/liman/extensions/'.strtolower((string) extension()->name);
+        $tempPath = '/tmp/'.Str::random().'.zip';
 
         // Zip the current extension
         Command::runLiman('cd @{:path} && zip -r @{:tempPath} .', [
@@ -191,7 +220,7 @@ class ExtensionController extends Controller
         return response()
             ->download(
                 $tempPath,
-                extension()->name . '-' . extension()->version . '.lmne'
+                extension()->name.'-'.extension()->version.'.lmne'
             )
             ->deleteFileAfterSend();
     }
@@ -201,9 +230,8 @@ class ExtensionController extends Controller
      *
      * This function handles extension setup steps (setting perms etc.)
      *
-     * @param $zipFile
-     * @param $verify
      * @return array
+     *
      * @throws GuzzleException
      */
     private function setupNewExtension($zipFile, $verify = false)
@@ -219,7 +247,7 @@ class ExtensionController extends Controller
         }
 
         // Determine a random tmp folder to extract files
-        $path = '/tmp/' . Str::random();
+        $path = '/tmp/'.Str::random();
         // Extract Zip to the Temp Folder.
         try {
             $zip->extractTo($path);
@@ -228,11 +256,11 @@ class ExtensionController extends Controller
         }
 
         if (count(scandir($path)) == 3) {
-            $path = $path . '/' . scandir($path)[2];
+            $path = $path.'/'.scandir($path)[2];
         }
 
         // Now that we have everything, let's extract database.
-        $file = file_get_contents($path . '/db.json');
+        $file = file_get_contents($path.'/db.json');
 
         $json = json_decode($file, true);
 
@@ -247,7 +275,7 @@ class ExtensionController extends Controller
         ) {
             return [
                 response()->json(
-                    __("Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu") . ' ' .
+                    __("Bu eklentiyi yükleyebilmek için Liman'ı güncellemelisiniz, gerekli minimum liman sürüm kodu").' '.
                     intval($json['supportedLiman']),
                     201
                 ),
@@ -293,7 +321,7 @@ class ExtensionController extends Controller
 
         $system->userAdd($new->id);
 
-        $passPath = '/liman/keys' . DIRECTORY_SEPARATOR . $new->id;
+        $passPath = '/liman/keys'.DIRECTORY_SEPARATOR.$new->id;
 
         Command::runSystem('chmod 760 @{:path}', [
             'path' => $passPath,
@@ -301,7 +329,7 @@ class ExtensionController extends Controller
 
         file_put_contents($passPath, Str::random(32));
 
-        $extension_folder = '/liman/extensions/' . strtolower((string) $json['name']);
+        $extension_folder = '/liman/extensions/'.strtolower((string) $json['name']);
 
         Command::runLiman('mkdir -p @{:extension_folder}', [
             'extension_folder' => $extension_folder,

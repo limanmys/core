@@ -8,14 +8,13 @@ use App\Models\Permission;
 use App\System\Command;
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class AccessLogController extends Controller
 {
     public function __construct()
     {
-        if (!isset(auth('api')->user()->id)) {
+        if (! isset(auth('api')->user()->id)) {
             return response()->json('Please log-in again.', Response::HTTP_UNAUTHORIZED);
         }
 
@@ -171,7 +170,7 @@ class AccessLogController extends Controller
             if ($k_ < count($data) - 1) {
                 array_push($logs, [
                     'title' => '---------------------',
-                    'message' => 'Log seperator'
+                    'message' => 'Log seperator',
                 ]);
             }
         }

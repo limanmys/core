@@ -5,17 +5,16 @@ namespace App\Http\Controllers\API\Server;
 use App\Http\Controllers\Controller;
 use App\System\Command;
 use Exception;
-use Illuminate\Http\Request;
 
 class PackageController extends Controller
 {
     public function index()
     {
         $pkgman = Command::runSudo(
-            "which apt >/dev/null 2>&1 && echo apt || echo rpm"
+            'which apt >/dev/null 2>&1 && echo apt || echo rpm'
         );
 
-        if ($pkgman == "apt") {
+        if ($pkgman == 'apt') {
             $raw = Command::runSudo(
                 "apt list --installed 2>/dev/null | sed '1,1d'"
             );

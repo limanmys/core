@@ -16,7 +16,7 @@ class SearchController extends Controller
         // Get constant searchables
         if (user()->isAdmin()) {
             foreach (config('liman.admin_searchable') as $constant) {
-                if (!isset($searchable['Admin İşlemleri'])) {
+                if (! isset($searchable['Admin İşlemleri'])) {
                     $searchable['Admin İşlemleri'] = [];
                 }
                 $constant['name'] = __($constant['name']);
@@ -25,7 +25,7 @@ class SearchController extends Controller
         }
 
         foreach (config('liman.user_searchable') as $constant) {
-            if (!isset($searchable['Kullanıcı İşlemleri'])) {
+            if (! isset($searchable['Kullanıcı İşlemleri'])) {
                 $searchable['Kullanıcı İşlemleri'] = [];
             }
             $constant['name'] = __($constant['name']);
@@ -37,7 +37,7 @@ class SearchController extends Controller
             ->filter(function ($server) {
                 return Permission::can(user()->id, 'server', 'id', $server->id);
             });
-        
+
         $searchable['Sunucular'] = [];
         foreach ($servers as $server) {
             if (Permission::can(user()->id, 'liman', 'id', 'server_details')) {
@@ -58,6 +58,7 @@ class SearchController extends Controller
                         'name' => $extension->display_name,
                         'url' => route('extension_server', [$extension->id, $server->id]),
                     ]);
+
                     continue;
                 }
                 array_push($searchable[$server->name], [
@@ -68,7 +69,7 @@ class SearchController extends Controller
         }
 
         $results = [];
-        $searchQuery = $request->input("query");
+        $searchQuery = $request->input('query');
 
         foreach ($searchable as $category => $items) {
             foreach ($items as $item) {
