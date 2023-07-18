@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\ExtensionController;
 use App\Http\Controllers\API\MenuController;
 use App\Http\Controllers\API\SearchController;
@@ -34,6 +35,12 @@ Route::group([
 
 // Protected Routes
 Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
+    // Dashboard Routes
+    Route::group(['prefix' => 'dashboard'], function () {
+        Route::get('/latest_logged_in_users', [DashboardController::class, 'latestLoggedInUsers']);
+        Route::get('/favorite_servers', [DashboardController::class, 'favoriteServers']);
+    });
+
     // Search Controller Routes
     Route::post('/search', [SearchController::class, 'search']);
 
@@ -48,6 +55,7 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
         // Server Details
         Route::get('/', [Server\DetailsController::class, 'index']);
         Route::post('/', [ServerController::class, 'create']);
+        Route::post('/{server_id}/favorites', [Server\DetailsController::class, 'favorite']);
 
         // Server Creation Validations
         Route::post('/check_access', [ServerController::class, 'checkAccess']);
@@ -135,7 +143,7 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
     });
 
     // Settings
-    Route::group(['prefix' => 'settings'], function () {
+    Route::group(['prefix' => 'settings', 'middleware' => ['admin']], function () {
         // Extension
         Route::group(['prefix' => 'extensions'], function () {
             Route::get('/', [Settings\ExtensionController::class, 'index']);
@@ -157,11 +165,13 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
         Route::group(['prefix' => 'roles'], function () {
             Route::get('/', [Settings\RoleController::class, 'index']);
             Route::post('/', [Settings\RoleController::class, 'create']);
+            Route::get('/details', [Settings\RoleController::class, 'detailedList']);
+            Route::get('/details/csv', [Settings\RoleController::class, 'exportDetailedListAsCsv']);
 
             Route::group(['prefix' => '{role_id}'], function () {
                 Route::get('/', [Settings\RoleController::class, 'show']);
                 Route::delete('/', [Settings\RoleController::class, 'delete']);
-            
+
                 Route::get('/users', [Settings\RoleController::class, 'users']);
                 Route::post('/users', [Settings\RoleController::class, 'setUsers']);
 
@@ -182,7 +192,6 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
                 Route::post('/variables', [Settings\RoleController::class, 'setVariables']);
                 Route::delete('/variables', [Settings\RoleController::class, 'deleteVariables']);
             });
-
         });
 
         // Subscriptions
@@ -199,9 +208,33 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             // LDAP routes
             Route::group(['prefix' => 'ldap'], function () {
                 Route::get('/configuration', [Settings\LdapConnectionController::class, 'getConfiguration']);
+                Route::post('/configuration', [Settings\LdapConnectionController::class, 'saveConfiguration']);
 
                 Route::post('/login', [Settings\LdapConnectionController::class, 'auth']);
+
+                Route::group(['prefix' => 'permissions'], function () {
+                    Route::get('/users', [Settings\LdapPermissionsController::class, 'getUsers']);
+                    Route::post('/users', [Settings\LdapPermissionsController::class, 'setUsers']);
+
+                    Route::get('/groups', [Settings\LdapPermissionsController::class, 'getGroups']);
+                    Route::post('/groups', [Settings\LdapPermissionsController::class, 'setGroups']);
+                });
             });
+
+            // Keycloak Routes
+            Route::group(['prefix' => 'keycloak'], function () {
+                Route::get('/configuration', [Settings\KeycloakConnectionController::class, 'getConfiguration']);
+                Route::post('/configuration', [Settings\KeycloakConnectionController::class, 'saveConfiguration']);
+            });
+        });
+
+        // Vault
+        Route::group(['prefix' => 'vault'], function () {
+            Route::get('/', [Settings\VaultController::class, 'index']);
+            Route::post('/', [Settings\VaultController::class, 'create']);
+            Route::post('/key', [Settings\VaultController::class, 'createKey']);
+            Route::patch('/', [Settings\VaultController::class, 'update']);
+            Route::delete('/', [Settings\VaultController::class, 'delete']);
         });
     });
 });

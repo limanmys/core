@@ -8,7 +8,6 @@ use App\Models\Certificate;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\ServerKey;
-use Illuminate\Http\Request;
 use mervick\aesEverywhere\AES256;
 
 class ServerController extends Controller
