@@ -48,6 +48,7 @@ class MenuController extends Controller
 
             return $extension;
         });
+        $server->is_favorite = (bool) user()->myFavorites()->where('server_id', $server->id)->exists();
 
         return response()->json($server);
     }

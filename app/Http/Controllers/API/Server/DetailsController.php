@@ -7,7 +7,10 @@ use App\Models\Permission;
 use App\Models\Server;
 use App\System\Command;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DetailsController extends Controller
 {
@@ -181,6 +184,17 @@ class DetailsController extends Controller
         );
 
         return response()->json($this->parseDfOutput($output));
+    }
+
+    public function favorite(Request $request)
+    {
+        auth('api')->user()
+            ->myFavorites()
+            ->toggle($request->server_id);
+        
+        return response()->json([
+            'status' => 'success',
+        ]);
     }
 
     /**

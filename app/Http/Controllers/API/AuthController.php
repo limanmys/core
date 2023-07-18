@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -39,7 +41,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
-        return $this->createNewToken($token);
+        return $this->createNewToken($token, $request);
     }
 
     /**
@@ -80,8 +82,13 @@ class AuthController extends Controller
      * @param  string  $token
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function createNewToken($token)
+    protected function createNewToken($token, Request $request = null)
     {
+        User::find(auth('api')->user()->id)->update([
+            'last_login_at' => Carbon::now()->toDateTimeString(),
+            'last_login_ip' => $request->ip(),
+        ]);
+
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',

@@ -427,7 +427,6 @@ class OneController extends Controller
                 ->delete();
         } elseif (! $current) {
             DB::table('user_favorites')->insert([
-                'id' => Str::uuid(),
                 'server_id' => server()->id,
                 'user_id' => auth()->user()->id,
             ]);
