@@ -362,4 +362,98 @@ class RoleController extends Controller
 
         return response()->json('Fonksiyonlar başarıyla silindi.');
     }
+
+    /**
+     * Retrieve all roles
+     *
+     * @return JsonResponse|Response
+     */
+    public function detailedList()
+    {
+        $data = $this->generateRoleData();
+
+        return response()->json($data);
+    }
+
+    public function exportDetailedListAsCsv()
+    {
+        $data = $this->generateRoleData();
+
+        $fileName = 'detailed_roles_list_'.date('d-m-Y_H-i-s').'.csv';
+        $headers = [
+            'Content-type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename='.$fileName,
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $columns = [
+            'Kullanıcı Adı',
+            'Rol Adı',
+            'İzin Türü',
+            'İzin Değeri',
+        ];
+
+        $callback = function () use ($data, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($data as $row) {
+                fputcsv($file, [
+                    $columns[0] => $row['username'],
+                    $columns[1] => $row['role_name'],
+                    $columns[2] => $row['perm_type'],
+                    $columns[3] => $row['perm_value'],
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    private function generateRoleData()
+    {
+        $data = [];
+
+        $permissionData =
+            Permission::with('morph')
+                ->get()->each(function ($row) {
+                    $row->details = $row->getRelatedObject();
+                    if ($row->morph_type == 'roles') {
+                        $row->users = $row->morph->users()->get();
+                    }
+                });
+
+        foreach ($permissionData as $row) {
+            if ($row->details['value'] == '-' || $row->details['type'] == '-') {
+                continue;
+            }
+
+            $insert = [
+                'id' => $row->morph->id,
+                'morph_type' => $row->morph_type,
+                'perm_type' => $row->details['type'],
+                'perm_value' => $row->details['value'],
+            ];
+
+            if ($row->morph_type == 'users') {
+                $data[] = array_merge($insert, [
+                    'username' => $row->morph->name,
+                    'role_name' => __('Rol yok'),
+                ]);
+            } elseif ($row->morph_type == 'roles') {
+                foreach ($row->users as $user) {
+                    $data[] = array_merge($insert, [
+                        'username' => $user->name,
+                        'role_name' => $row->morph->name,
+                    ]);
+                }
+            }
+        }
+
+        return $data;
+    }
 }
