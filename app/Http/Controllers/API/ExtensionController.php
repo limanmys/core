@@ -5,7 +5,9 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Extension;
 use App\Models\Token;
+use App\Models\UserExtensionUsageStats;
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -72,7 +74,7 @@ class ExtensionController extends Controller
         ]);
     }
 
-    public function render()
+    public function render(Request $request)
     {
         if (extension()->status == '0') {
             return respond(
@@ -130,6 +132,18 @@ class ExtensionController extends Controller
                     );
                 }
             }
+        }
+
+        try {
+            $stat = UserExtensionUsageStats::firstOrCreate([
+                'user_id' => auth('api')->user()->id,
+                'extension_id' => $request->extension_id,
+                'server_id' => $request->server_id,
+            ]);
+
+            $stat->increment('usage');
+        } catch (\Throwable $e) {
+            // Do nothing on errors as it's not too important to care about.
         }
 
         return response()->json(

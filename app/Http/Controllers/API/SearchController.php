@@ -15,21 +15,59 @@ class SearchController extends Controller
 
         // Get constant searchables
         if (user()->isAdmin()) {
-            foreach (config('liman.admin_searchable') as $constant) {
-                if (! isset($searchable['Admin İşlemleri'])) {
-                    $searchable['Admin İşlemleri'] = [];
+            foreach (config('liman.new_search.admin') as $constant) {
+                if (isset($constant['children'])) {
+                    foreach ($constant['children'] as $child) {
+                        if (! isset($searchable[$constant['name']])) {
+                            $searchable[$constant['name']] = [];
+                        }
+                        $child['name'] = __($child['name']);
+                        array_push($searchable[$constant['name']], $child);
+                    }
+                } else {
+                    if (! isset($searchable['Yönetim'])) {
+                        $searchable['Yönetim'] = [];
+                    }
+                    $constant['name'] = __($constant['name']);
+                    array_push($searchable['Yönetim'], $constant);
                 }
-                $constant['name'] = __($constant['name']);
-                array_push($searchable['Admin İşlemleri'], $constant);
             }
         }
 
-        foreach (config('liman.user_searchable') as $constant) {
-            if (! isset($searchable['Kullanıcı İşlemleri'])) {
-                $searchable['Kullanıcı İşlemleri'] = [];
+        foreach (config('liman.new_search.user') as $constant) {
+            if (isset($constant['children'])) {
+                foreach ($constant['children'] as $child) {
+                    if (! isset($searchable[$constant['name']])) {
+                        $searchable[$constant['name']] = [];
+                    }
+                    $child['name'] = __($child['name']);
+                    array_push($searchable[$constant['name']], $child);
+                }
+            } else {
+                if (! isset($searchable['Kullanıcı'])) {
+                    $searchable['Kullanıcı'] = [];
+                }
+                $constant['name'] = __($constant['name']);
+                array_push($searchable['Kullanıcı'], $constant);
             }
-            $constant['name'] = __($constant['name']);
-            array_push($searchable['Kullanıcı İşlemleri'], $constant);
+        }
+
+        foreach (config('liman.new_search.common') as $constant) {
+            if (isset($constant['children'])) {
+                foreach ($constant['children'] as $child) {
+                    if (! isset($searchable[$constant['name']])) {
+                        $searchable[$constant['name']] = [];
+                    }
+                    $child['name'] = __($child['name']);
+                    array_push($searchable[$constant['name']], $child);
+                }
+            } else {
+                if (! isset($searchable['Genel'])) {
+                    $searchable['Genel'] = [];
+                }
+                $constant['name'] = __($constant['name']);
+                array_push($searchable['Genel'], $constant);
+            }
         }
 
         // Server searching
@@ -43,7 +81,7 @@ class SearchController extends Controller
             if (Permission::can(user()->id, 'liman', 'id', 'server_details')) {
                 array_push($searchable['Sunucular'], [
                     'name' => $server->name,
-                    'url' => route('server_one', $server->id),
+                    'url' => "/servers/$server->id",
                 ]);
             }
 
@@ -56,14 +94,14 @@ class SearchController extends Controller
                 if (! empty($extension->display_name)) {
                     array_push($searchable[$server->name], [
                         'name' => $extension->display_name,
-                        'url' => route('extension_server', [$extension->id, $server->id]),
+                        'url' => "/servers/$server->id/extensions/$extension->id",
                     ]);
 
                     continue;
                 }
                 array_push($searchable[$server->name], [
                     'name' => $extension->name,
-                    'url' => route('extension_server', [$extension->id, $server->id]),
+                    'url' => "/servers/$server->id/extensions/$extension->id",
                 ]);
             }
         }

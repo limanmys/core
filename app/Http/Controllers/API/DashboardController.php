@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use App\Models\Server;
+use App\Models\UserExtensionUsageStats;
 use App\User;
 use Illuminate\Http\Request;
 
@@ -28,11 +30,26 @@ class DashboardController extends Controller
             $temp = Server::orderBy("updated_at", "desc")
                 ->whereNotIn('id', $servers->pluck('id'))
                 ->take(6 - $servers->count())
-                ->get();
+                ->get()
+                ->filter(function ($server) {
+                    return Permission::can(user()->id, 'server', 'id', $server->id);
+                });
 
             $servers = $servers->merge($temp);
         }
 
         return response()->json($servers);
+    }
+
+    public function mostUsedExtensions()
+    {
+        $mostUsedExtensions = UserExtensionUsageStats::where('user_id', auth('api')->user()->id)
+            ->orderBy('usage', 'desc')
+            ->with('extension')
+            ->with('server')
+            ->take(6)
+            ->get();
+
+        return response()->json($mostUsedExtensions);
     }
 }

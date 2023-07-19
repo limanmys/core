@@ -39,6 +39,7 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
     Route::group(['prefix' => 'dashboard'], function () {
         Route::get('/latest_logged_in_users', [DashboardController::class, 'latestLoggedInUsers']);
         Route::get('/favorite_servers', [DashboardController::class, 'favoriteServers']);
+        Route::get('/most_used_extensions', [DashboardController::class, 'mostUsedExtensions']);
     });
 
     // Search Controller Routes
