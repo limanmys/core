@@ -9,6 +9,8 @@ use App\Models\License;
 use App\Models\Permission;
 use App\System\Command;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use ZipArchive;
 
@@ -153,7 +155,7 @@ class ExtensionController extends Controller
      *
      * @return JsonResponse|Response
      */
-    public function license()
+    public function license(Request $request)
     {
         if (extension()->license_type != 'golang_standard') {
             License::updateOrCreate(
@@ -164,15 +166,13 @@ class ExtensionController extends Controller
             return response()->json('Lisans eklendi.');
         }
 
-        $server = extension()->servers()->first();
-
-        if (! $server) {
+        if (! $request->server_id) {
             return response()->json('Lisans eklenemiyor!', 500);
         }
 
         $output = callExtensionFunction(
             extension(),
-            $server,
+            $request->server_id,
             [
                 'endpoint' => 'license',
                 'type' => 'post',
@@ -188,6 +188,8 @@ class ExtensionController extends Controller
                 ['extension_id' => extension()->id],
                 ['data' => request('license')]
             );
+
+            Cache::forget('extension_'.extension()->id.'_'.$request->server_id.'_license');
 
             return response()->json('Lisans eklendi.');
         }

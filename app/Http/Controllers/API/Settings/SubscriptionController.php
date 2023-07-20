@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Extension;
 use App\Models\GolangLicense;
 use App\Models\License;
+use App\Models\Server;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use mervick\aesEverywhere\AES256;
 
 class SubscriptionController extends Controller
@@ -19,22 +21,31 @@ class SubscriptionController extends Controller
         return response()->json($subscribable);
     }
 
-    public function show(Extension $extension)
+    public function servers(Extension $extension)
     {
-        $server = $extension->servers()->first();
-        if (! $server) {
-            return $extension;
-        }
+        $servers = $extension->servers()->get();
 
-        $output = callExtensionFunction(
-            $extension,
-            $server,
-            [
-                'endpoint' => 'license',
-                'type' => 'get',
-            ]
-        );
-        $license = new GolangLicense($output);
+        return response()->json($servers);
+    }
+
+    public function show(Extension $extension, Server $server)
+    {
+        if (! $server) {
+            return new GolangLicense([]);
+        }
+        
+        $license = Cache::rememberForever('extension_'.$extension->id.'_'.$server->id.'_license', function () use ($extension, $server) {
+            $output = callExtensionFunction(
+                $extension,
+                $server,
+                [
+                    'endpoint' => 'license',
+                    'type' => 'get',
+                ]
+            );
+            $parsed = new GolangLicense($output);
+            return $parsed->getValid() ? $parsed : null;
+        });
 
         return response()->json($license);
     }

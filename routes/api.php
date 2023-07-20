@@ -201,7 +201,8 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             Route::post('/liman', [Settings\SubscriptionController::class, 'setLimanLicense']);
 
             Route::get('/', [Settings\SubscriptionController::class, 'index']);
-            Route::get('/{extension}', [Settings\SubscriptionController::class, 'show']);
+            Route::get('/{extension}/servers', [Settings\SubscriptionController::class, 'servers']);
+            Route::get('/{extension}/{server}', [Settings\SubscriptionController::class, 'show']);
         });
 
         // Access Control
