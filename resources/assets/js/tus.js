@@ -44,4 +44,5 @@ function upload(option) {
     },
   });
   upload.start();
+  return upload;
 }
