@@ -29,10 +29,6 @@ return [
             'url' => '/ayarlar#health',
         ],
         [
-            'name' => 'Sistem Ayarları / Dış Bildirimler',
-            'url' => '/ayarlar#externalNotifications',
-        ],
-        [
             'name' => 'Sistem Ayarları / DNS',
             'url' => '/ayarlar#dnsSettings',
         ],

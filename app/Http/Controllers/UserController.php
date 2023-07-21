@@ -35,9 +35,6 @@ class UserController extends Controller
      */
     public function add()
     {
-        hook('user_add_attempt', [
-            'request' => request()->all(),
-        ]);
         request()->request->add(['email' => strtolower((string) request('email'))]);
 
         validate([
@@ -80,10 +77,6 @@ class UserController extends Controller
         // Create And Fill User Data
         $user = User::create($data);
 
-        hook('user_add_successful', [
-            'user' => $user,
-        ]);
-
         // Respond
         return respond(
             __('Kullanıcı Başarıyla Eklendi. Parola : ') . $password,
@@ -98,10 +91,6 @@ class UserController extends Controller
      */
     public function passwordReset()
     {
-        hook('user_password_reset_attempt', [
-            'user' => request('user_id'),
-        ]);
-
         $user = User::find(request('user_id'));
 
         if ($user->auth_type == 'ldap' || $user->auth_type == 'keycloak') {
@@ -124,11 +113,6 @@ class UserController extends Controller
         $user->update([
             'password' => Hash::make($password),
             'forceChange' => true,
-        ]);
-
-        hook('user_password_reset_successful', [
-            'user' => $user,
-            'password' => $password,
         ]);
 
         return respond(__('Yeni Parola: ') . $password, 200);
@@ -286,10 +270,6 @@ class UserController extends Controller
      */
     public function remove()
     {
-        hook('user_delete_attempt', [
-            'user' => request('user_id'),
-        ]);
-
         // Delete Permissions
         Permission::where('morph_id', request('user_id'))->delete();
 
@@ -298,10 +278,6 @@ class UserController extends Controller
 
         // Delete User
         User::where('id', request('user_id'))->delete();
-
-        hook('user_delete_successful', [
-            'user' => request('user_id'),
-        ]);
 
         // Respond
         return respond('Kullanıcı Başarıyla Silindi!', 200);

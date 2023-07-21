@@ -74,10 +74,6 @@ class MainController extends Controller
      */
     public function upload()
     {
-        hook('extension_upload_attempt', [
-            'request' => request()->all(),
-        ]);
-
         validate([
             'extension' => 'required|max:5000000',
         ]);

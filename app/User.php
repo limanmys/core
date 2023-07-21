@@ -123,14 +123,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany('\App\Models\ServerKey');
     }
 
-    /**
-     * @return HasMany
-     */
-    public function notifications()
-    {
-        return $this->hasMany('\App\Models\Notification');
-    }
-
     public function myFavorites()
     {
         return $this->belongsToMany('\App\Models\Server', 'user_favorites');

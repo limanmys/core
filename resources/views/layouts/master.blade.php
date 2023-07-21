@@ -16,82 +16,7 @@
     var module = { };
 </script>
 <script src="{{mix('/js/liman.js')}}"></script>
-@if(auth()->check())
-<script>
-Echo.private('App.User.{{auth()->user()->id}}')
-    .notification((notification) => {
-        var data = notification['\u0000*\u0000attributes'];
-        if(data){
-            var errors = [
-                "error" , "health_problem"
-            ];
-            
-            let language = document.getElementsByTagName('html')[0].getAttribute('lang');
 
-            let notificationTitle = decodeURIComponent(JSON.parse('"' + data["title"].replace(/\"/g, '\\"') + '"'));
-            let notificationMsg = decodeURIComponent(JSON.parse('"' + data["message"].replace(/\"/g, '\\"') + '"'));
-
-            if (isJson(notificationTitle)) {
-                let temp = JSON.parse(notificationTitle)
-                if (temp[language] != undefined) {
-                    notificationTitle = temp[language];
-                } else {
-                    notificationTitle = temp["en"];
-                }
-            } else {
-                notificationTitle = data["title"];
-            }
-
-            if (isJson(notificationMsg)) {
-                let temp = JSON.parse(notificationMsg)
-                if (temp[language] != undefined) {
-                    notificationMsg = temp[language];
-                } else {
-                    notificationMsg = temp["en"];
-                }
-            } else {
-                notificationMsg = data["message"];
-            }
-
-            let toastOptions = {
-                    title: notificationTitle,
-                    subtitle: "Liman",
-                    body: notificationMsg,
-                    delay: 5000,
-                    autohide: true,
-            };
-
-            if(errors.includes(data.type)){
-                $(document).Toasts('create', {
-                    ...toastOptions,
-                    icon: "fa-solid fa-triangle-exclamation",
-                    class: 'bg-danger'
-                });
-            }else if(data.type == "liman_update"){
-                $(document).Toasts('create', {
-                    ...toastOptions,
-                    icon: "fa-solid fa-triangle-exclamation",
-                    class: 'bg-warning'
-                });
-            }else{
-                $(document).Toasts('create', {
-                    ...toastOptions,
-                    icon: "fas fa-check",
-                    class: 'bg-success'
-                });
-            }
-            var displayedNots = [];
-
-            if(localStorage.displayedNots){
-                displayedNots = JSON.parse(localStorage.displayedNots);
-            } 
-            displayedNots.push(data.id);
-            localStorage.displayedNots = JSON.stringify(displayedNots);
-        }
-        checkNotifications(data ? data.id : null);
-    });
-</script>
-@endif
 @yield('body')
 
 </body>
@@ -109,9 +34,6 @@ Echo.private('App.User.{{auth()->user()->id}}')
         if(title != ""){
             document.title = title + " / Liman";
         }
-        @if(auth()->check())
-            checkNotifications();
-        @endif
         initialPresets();
     };
 

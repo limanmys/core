@@ -73,10 +73,6 @@ class LoginController extends Controller
 
         system_log(7, 'LOGIN_SUCCESS');
 
-        hook('login_successful', [
-            'user' => $user,
-        ]);
-
         if (env('WIZARD_STEP', 1) != config('liman.wizard_max_steps') && $user->status) {
             return redirect()->route('wizard', env('WIZARD_STEP', 1));
         }
@@ -90,7 +86,7 @@ class LoginController extends Controller
      */
     public function attemptLogin(Request $request)
     {
-        $credientials = (object) $this->credentials($request);
+        $credentials = (object) $this->credentials($request);
 
         $flag = $this->guard()->attempt(
             $this->credentials($request),
@@ -103,7 +99,7 @@ class LoginController extends Controller
         });
 
         if (! $flag) {
-            event('login_attempt', $credientials);
+            event('login_attempt', $credentials);
         }
 
         return $flag;
@@ -159,10 +155,6 @@ class LoginController extends Controller
 
         system_log(7, 'LOGIN_SUCCESS');
 
-        hook('login_successful', [
-            'user' => $user,
-        ]);
-
         Oauth2Token::updateOrCreate([
             "user_id" => $remote->getId(),
             "token_type" => $remote->accessTokenResponseBody['token_type']
@@ -214,13 +206,8 @@ class LoginController extends Controller
      */
     protected function sendFailedLoginResponse(Request $request)
     {
-        $credientials = (object) $this->credentials($request);
-        system_log(5, "LOGIN_FAILED", ["email" => $credientials->email]);
-
-        hook('login_failed', [
-            'email' => $credientials->email,
-            'password' => $credientials->password,
-        ]);
+        $credentials = (object) $this->credentials($request);
+        system_log(5, "LOGIN_FAILED", ["email" => $credentials->email]);
 
         return redirect()->route('login')->withErrors([
             "messages" => [

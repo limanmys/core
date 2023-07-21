@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Extension\Sandbox;
 use App\Http\Controllers\Controller;
 use App\Mail\ExtensionMail;
 use App\Models\Extension;
-use App\Models\Notification;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\Token;
@@ -100,21 +99,6 @@ class InternalController extends Controller
             )
         );
     }
-
-    /**
-     * Send notification from extension
-     *
-     * @return void
-     */
-    public function sendNotification()
-    {
-        Notification::new(
-            request('title') . ' (' . extension()->display_name . ')',
-            request('type'),
-            request('message')
-        );
-    }
-
 
     /**
      * Creates VNC token

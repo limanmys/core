@@ -83,20 +83,12 @@ class RoleController extends Controller
      */
     public function add()
     {
-        hook('role_group_add_attempt', [
-            'request' => request()->all(),
-        ]);
-
         validate([
             'name' => ['required', 'string', 'max:255', 'unique:roles'],
         ]);
 
         $role = Role::create([
             'name' => request('name'),
-        ]);
-
-        hook('role_group_add_successful', [
-            'role' => $role,
         ]);
 
         return respond('Rol grubu başarıyla eklendi.');

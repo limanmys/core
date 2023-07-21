@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Extension;
-use App\Models\LimanRequest;
 use App\Models\Server;
 use App\Models\Token;
 use App\System\Command;
@@ -46,31 +45,6 @@ class HomeController extends Controller
             'version' => getVersion() . ' - ' . getVersionCode(),
         ]);
     }
-
-
-    /**
-     * Returns ticket requests page
-     *
-     * @return JsonResponse|Response
-     */
-    public function all()
-    {
-        $requests = LimanRequest::where('user_id', auth()->id())->get();
-        foreach ($requests as $request) {
-            $request->status = match ($request->status) {
-                '0' => __('Talep Alındı'),
-                '1' => __('İşleniyor'),
-                '2' => __('Tamamlandı.'),
-                '3' => __('Reddedildi.'),
-                default => __('Bilinmeyen.'),
-            };
-        }
-
-        return magicView('permission.all', [
-            'requests' => $requests,
-        ]);
-    }
-
 
     /**
      * Get liman server stats

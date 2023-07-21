@@ -2,7 +2,6 @@
 
 use App\Models\Certificate;
 use App\Models\Extension;
-use App\Models\Notification;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\SystemSettings;
@@ -527,23 +526,6 @@ if (! function_exists('getVersionCode')) {
     }
 }
 
-if (! function_exists('notifications')) {
-    /**
-     * Get unread notifications of user
-     *
-     * @return mixed
-     */
-    function notifications()
-    {
-        return Notification::where([
-            'user_id' => auth()->id(),
-            'read' => false,
-        ])
-            ->orderBy('updated_at', 'desc')
-            ->get();
-    }
-}
-
 if (! function_exists('knownPorts')) {
     /**
      * Get known ports for certificate checking
@@ -789,20 +771,6 @@ if (! function_exists('sandbox')) {
     function sandbox($id): \App\Sandboxes\Sandbox
     {
         return new App\Sandboxes\PHPSandbox();
-    }
-}
-
-if (! function_exists('hook')) {
-    /**
-     * DEPRECATED
-     *
-     * @param $name
-     * @param array $data
-     * @return void
-     */
-    function hook($name, $data = [])
-    {
-        // Will be implemented
     }
 }
 

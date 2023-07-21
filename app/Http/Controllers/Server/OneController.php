@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Server;
 
 use App\Http\Controllers\Controller;
 use App\Models\Extension;
-use App\Models\Notification;
 use App\Models\Permission;
 use App\Models\Server;
 use App\System\Command;
@@ -133,10 +132,6 @@ class OneController extends Controller
      */
     public function remove()
     {
-        hook('server_delete', [
-            'server' => server(),
-        ]);
-
         // Check if authenticated user is owner or admin.
         if (
             server()->user_id != auth()->id() &&
@@ -150,21 +145,8 @@ class OneController extends Controller
         $server = server();
         // Delete the Server Object.
         server()->delete();
-        Notification::new(
-            'Bir sunucu silindi.',
-            'notify',
-            json_encode([
-                'tr' => __(':server (:ip) isimli sunucu silindi.', [
-                    'server' => $server->name,
-                    'ip' => $server->ip_address,
-                ], 'tr'),
-                'en' => __(':server (:ip) isimli sunucu silindi.', [
-                    'server' => $server->name,
-                    'ip' => $server->ip_address,
-                ], 'en'),
-            ])
+        // TODO: Add notification for delete server
 
-        );
         // Redirect user to servers home page.
         return respond(route('servers'), 300);
     }
@@ -235,11 +217,6 @@ class OneController extends Controller
      */
     public function enableExtension()
     {
-        hook('server_extension_add', [
-            'server' => server(),
-            'request' => request()->all(),
-        ]);
-
         if (
             ! auth()->user()->id == server()->user_id &&
             ! auth()
@@ -290,27 +267,6 @@ class OneController extends Controller
         if (strlen((string) request('name')) > 24) {
             return respond('Lütfen daha kısa bir sunucu adı girin.', 201);
         }
-
-        if (server()->name !== request('name')) {
-            Notification::new(
-                'Server Adı Güncellemesi',
-                'notify',
-                json_encode([
-                    'tr' => __(':old isimli sunucunun adı :new olarak değiştirildi.', [
-                        'old' => server()->name,
-                        'new' => request('name'),
-                    ], 'tr'),
-                    'en' => __(':old isimli sunucunun adı :new olarak değiştirildi.', [
-                        'old' => server()->name,
-                        'new' => request('name'),
-                    ], 'en'),
-                ])
-            );
-        }
-
-        hook('server_update', [
-            'request' => request()->all(),
-        ]);
 
         $params = [
             'name' => request('name'),
@@ -1652,11 +1608,6 @@ class OneController extends Controller
      */
     public function removeExtension()
     {
-        hook('server_extension_remove', [
-            'server' => server(),
-            'request' => request()->all(),
-        ]);
-
         if (
             server()->user_id != auth()->user()->id &&
             ! auth()

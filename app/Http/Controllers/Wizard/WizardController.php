@@ -74,9 +74,6 @@ class WizardController extends Controller
     public function finish()
     {
         system_log(7, 'LOGOUT_SUCCESS');
-        hook('logout_attempt', [
-            'user' => user(),
-        ]);
         Auth::guard()->logout();
         request()
             ->session()
@@ -87,7 +84,6 @@ class WizardController extends Controller
         request()
             ->session()
             ->flash('status', __('Liman başarıyla kuruldu! Hesabınız ile giriş yapın.'));
-        hook('logout_successful');
 
         return redirect(route('login'));
     }

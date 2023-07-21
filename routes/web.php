@@ -17,10 +17,6 @@ Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', '
 
     require_once app_path('Http/Controllers/Notification/_routes.php');
 
-    // Permission Routes
-
-    require_once app_path('Http/Controllers/Permission/_routes.php');
-
     // Server Routes
 
     require_once app_path('Http/Controllers/Server/_routes.php');
@@ -73,14 +69,6 @@ Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', '
 
     // Add Key Route
     Route::post('/kasa/ekle', 'UserController@addKey')->name('key_add');
-
-    // My Requests Route
-
-    Route::get('/taleplerim', 'HomeController@all')->name('request_permission');
-
-    // Send LimanRequest Route
-
-    Route::post('/talep', 'HomeController@request')->name('request_send');
 
     // User Add
     Route::post('/kullanici/ekle', 'UserController@add')

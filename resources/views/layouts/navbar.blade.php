@@ -31,9 +31,6 @@
         </div>
     </li>
 
-    <li id="userNotifications" class="nav-item dropdown btn-group"> 
-        @include('notifications', ['notifications' => notifications()])
-    </li>
     <li class="btn-group nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
             <i class="fa fa-user mr-1"></i>
@@ -58,22 +55,7 @@
                             class="far fa-copy fa-lg ml-1" style="cursor: pointer;" onclick="copyToClipboard('liman-id')"></i></h5>
                 </div>
                 <div class="row" style="border-top: 1px solid rgba(0, 0, 0, 0.05); margin: 0">
-                    <div class="col-md-6" style="border-right: 1px solid rgba(0, 0, 0, 0.05);">
-                        @if (auth()->user()->isAdmin())
-                        <a class="notif-action dropdown-item text-center btn-link d-block" style="background: #fff !important" href="/talepler">
-                            {{ __('Yetki Talepleri') }} 
-                            @if (\App\Models\LimanRequest::where('status', 0)->count())
-                                <span class="badge badge-info right">{{ \App\Models\LimanRequest::where('status', 0)->count() }}</span>
-                            @endif
-                            <span class="fas fa-plus" style="font-size: 14px;"></span>
-                        </a>
-                        @else
-                        <a class="notif-action dropdown-item text-center btn-link d-block" style="background: #fff !important" href="/taleplerim">
-                            {{ __('Yetki Talebi') }} <span class="fas fa-key" style="font-size: 14px;"></span>
-                        </a>
-                        @endif
-                    </div>
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <a class="notif-action dropdown-item text-center btn-link d-block" style="color: #ff4444 !important; background: #fff !important" 
                             href="{{ route('logout') }}"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

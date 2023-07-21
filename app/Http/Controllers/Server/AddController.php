@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Server;
 
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
-use App\Models\Notification;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\ServerKey;
@@ -36,10 +35,6 @@ class AddController extends Controller
         if (! Permission::can(user()->id, 'liman', 'id', 'add_server')) {
             return respond('Bu işlemi yapmak için yetkiniz yok!', 201);
         }
-
-        hook('server_add_attempt', [
-            'request' => request()->all(),
-        ]);
 
         // Check if name is already in use.
         if (
@@ -74,20 +69,7 @@ class AddController extends Controller
         $this->server->save();
 
         // Send notifications
-        Notification::new(
-            'Yeni sunucu eklendi.',
-            'notify',
-            json_encode([
-                'tr' => __(':server (:ip) isimli yeni bir sunucu eklendi.', [
-                    'server' => $this->server->name,
-                    'ip' => $this->server->ip_address,
-                ], 'tr'),
-                'en' => __(':server (:ip) isimli yeni bir sunucu eklendi.', [
-                    'server' => $this->server->name,
-                    'ip' => $this->server->ip_address,
-                ], 'en'),
-            ])
-        );
+        // TODO: Add notification for server add.
 
         // Add Server to request object to use it later.
         request()->request->add(['server' => $this->server]);
@@ -157,7 +139,6 @@ class AddController extends Controller
                 }
             }
         }
-        hook('server_add_successful', ['server' => $this->server]);
 
         return respond(route('server_one', $this->server->id), 300);
     }

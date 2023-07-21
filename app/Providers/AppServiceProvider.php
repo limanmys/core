@@ -2,9 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\Notification;
 use App\Models\Permission;
-use App\Observers\NotificationObserver;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
@@ -43,7 +41,6 @@ class AppServiceProvider extends ServiceProvider
             );
         });
         Carbon::setLocale(app()->getLocale());
-        Notification::observe(NotificationObserver::class);
         Relation::morphMap([
             'users' => 'App\User',
             'roles' => 'App\Models\Role',

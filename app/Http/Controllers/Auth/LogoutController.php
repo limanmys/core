@@ -23,9 +23,6 @@ class LogoutController extends Controller
     public function logout(): \Illuminate\Http\RedirectResponse
     {
         system_log(7, 'LOGOUT_SUCCESS');
-        hook('logout_attempt', [
-            'user' => user(),
-        ]);
 
         $user_type = auth()->user()->auth_type;
         $user_id = auth()->user()->id;
@@ -39,8 +36,6 @@ class LogoutController extends Controller
         request()
             ->session()
             ->regenerateToken();
-        
-        hook('logout_successful');
 
         if ($user_type == 'keycloak') {
             Oauth2Token::where('user_id', $user_id)->delete();

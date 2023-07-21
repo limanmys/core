@@ -284,7 +284,6 @@ class OneController extends Controller
     public function remove()
     {
         $ext_name = extension()->name;
-        hook('extension_delete_attempt', extension());
         try {
             Command::runLiman(
                 "rm -rf '/liman/extensions/{:extension}'",
@@ -300,10 +299,6 @@ class OneController extends Controller
             extension()->delete();
         } catch (\Exception) {
         }
-
-        hook('extension_delete_successful', [
-            'request' => request()->all(),
-        ]);
 
         if (is_file(storage_path('extension_updates'))) {
             $json = json_decode(file_get_contents(storage_path('extension_updates')), true);

@@ -93,32 +93,14 @@ class MainController extends Controller
      */
     public function verifyKey()
     {
-        hook('server_key_verify', [
-            'key' => [
-                'key_type' => request('key_type'),
-                'ip_address' => request('ip_address'),
-                'username' => request('username'),
-                'password' => request('password'),
-                'port' => request('port'),
-            ],
-        ]);
-
-        if (request('key_type') == 'snmp') {
-            $output = SNMPConnector::verifySnmp(
-                request('ip_address'),
-                request('username'),
-                request('password')
-            );
-        } else {
-            $connector = new GenericConnector();
-            $output = $connector->verify(
-                request('ip_address'),
-                request('username'),
-                request('password'),
-                request('port'),
-                request('key_type')
-            );
-        }
+        $connector = new GenericConnector();
+        $output = $connector->verify(
+            request('ip_address'),
+            request('username'),
+            request('password'),
+            request('port'),
+            request('key_type')
+        );
 
         if ($output == 'ok') {
             return respond('Anahtarınız doğrulandı!');
