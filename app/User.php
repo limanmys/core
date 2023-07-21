@@ -70,6 +70,16 @@ class User extends Authenticatable implements JWTSubject
         return $this->status == 1;
     }
 
+    public function scopeAdmins($query)
+    {
+        return $query->where('status', 1);
+    }
+
+    public function scopeNonAdmins($query)
+    {
+        return $query->where('status', 0);
+    }
+
     /**
      * Get users servers inside of permission scope
      *
@@ -97,6 +107,12 @@ class User extends Authenticatable implements JWTSubject
                 $extension->id
             );
         });
+    }
+
+    public function notifications()
+    {
+        return $this->belongsToMany('App\Models\Notification', 'notification_users')
+            ->withPivot('read_at');
     }
 
     /**
