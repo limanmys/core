@@ -117,7 +117,7 @@
             </div>
         </div>
         <div class="row row-eq-height" style="width: 100%; margin-left: 0; margin-bottom: 30px;">
-          <div class="col-md-6 col-sm-12">
+          <div class="col-md-12 col-sm-12">
             <div class="card shadow-sm loading online-servers" style="height: 100%; min-height: 200px;">
                 <div class="card-header">
                   <h3 class="card-title" style="font-size: 15px">{{ __("Sunucu Durumları") }}</h3>
@@ -140,75 +140,14 @@
             </div>
           </div>
           <div class="col-md-6 col-sm-12">
-            <div class="card shadow-sm loading market-widget" style="height: 100%; min-height: 200px;">
-                <div class="card-header p-0">
-                  <h3 class="card-title" style="padding: 12px; padding-left: 1.25rem; font-size: 15px">{{ __("Önerilen Eklentiler") }}</h3>
-                  <div class="float-right">
-                    <button style="margin: 5px" class="btn btn-sm btn-success" onclick="window.location.href='/market'"><i class="fas fa-shopping-cart mr-1"></i>{{ __("Eklenti Mağazası") }}</button>
-                  </div>
-                </div>
-                <div class="overlay">
-                    <div class="spinner-border" role="status">
-                        <span class="sr-only">{{ __('Yükleniyor...') }}</span>
-                    </div>
-                </div>
-                <div class="card-body" style="padding: 4px;">
-                  <div class="row row-eq-height market-col-1">
-                  </div>
-                  <div class="row row-eq-height market-col-2" style="margin-bottom: -15px;">
-                  </div>
-                </div>
-                <div class="noApp" style="height: 100%; display:flex; flex-direction: column; align-items: center; justify-content: center;">
-                    <i class="fas fa-info fa-3x mb-4"></i>
-                    <h5 class="text-bold">{{ __("Market bağlantınızı kontrol edin.") }}</h5>
-                </div>
-            </div>
+            
           </div>
         </div>
       @endif
     </div>
    <script>
         @if(user()->isAdmin())
-        function appendApp(item) {
-          const el = $(`
-          <div class="col-md-6 col-sm-12">
-            <div class="row p-2">
-              <div class="col-lg-4 col-5">
-                  <a href="{{ route('market') }}"><img class="img-fluid mb-3"></a>
-              </div>
-              <div class="col-lg-8 col-7">
-                  <a href="{{ route('market') }}" class="text-dark"><h4 style="font-weight: 600;"></h4></a>
-                  <p class="mb-0"></p>
-              </div>
-            </div>
-          </div>`);
-          $(el).find("img").attr("src", `https://market.liman.dev/${item.iconPath}`).attr("alt", item.name);
-          $(el).find("h4").text(item.name);
-          $(el).find("p").text(item.shortDescription);
-          return el;
-        }
-
-        function getHomepageApps() {
-            $(".market-widget").find(".noApp").css("display", "none");
-            request('{{ route("market_widget") }}', new FormData(), function(response) {
-                var json = JSON.parse(response);
-                let a = 0;
-                json.forEach(function(item) {
-                    if (a++ < 2) {
-                        $(".market-col-1").append(appendApp(item));
-                    } else {
-                        $(".market-col-2").append(appendApp(item));
-                    }
-                    $(".market-widget").find(".noApp").css("display", "none");
-                });
-                if (json.length < 1) {
-                    $(".market-widget").find(".noApp").css("display", "flex");
-                }
-                $(".market-widget").find(".overlay").fadeOut(500);
-            });
-        }
-        getHomepageApps();
-
+        
         function getOnlineServers() {
             $(".online-servers").find(".noServer").css("display", "none");
             let responsePromise = () => {

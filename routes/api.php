@@ -11,12 +11,6 @@ use App\Http\Controllers\API\ServerController;
 use App\Http\Controllers\API\Settings;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/market/bagla', function () {
-    return view('redirect', [
-        'url' => route('connect_market', ['code' => request('code'), 'auth' => request('auth')]),
-    ]);
-});
-
 Route::get("/", function () {
     return response()->json([
         'message' => 'Welcome to the Liman MYS API!',

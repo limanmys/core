@@ -33,10 +33,6 @@ return [
             'url' => '/ayarlar#externalNotifications',
         ],
         [
-            'name' => 'Sistem Ayarları / Liman Market',
-            'url' => '/ayarlar#limanMarket',
-        ],
-        [
             'name' => 'Sistem Ayarları / DNS',
             'url' => '/ayarlar#dnsSettings',
         ],
@@ -47,14 +43,6 @@ return [
         [
             'name' => 'Sistem Ayarları / İnce Ayarlar',
             'url' => '/ayarlar#limanTweaks',
-        ],
-        [
-            'name' => 'Eklenti Mağazası',
-            'url' => '/market',
-        ],
-        [
-            'name' => 'Market',
-            'url' => '/market',
         ],
         [
             'name' => 'Yetki Talepleri',

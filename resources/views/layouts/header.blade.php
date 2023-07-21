@@ -158,15 +158,7 @@
                         <i class="nav-icon fas fa-user"></i>
                     </a>
                 </div>
-                @if (auth()->user()->isAdmin())
-                    <div class="col">
-                        <a href="{{ route('market') }}" data-toggle="tooltip"
-                            @if (str_contains(request()->getRequestUri(), 'market')) class="active" @endif
-                            title='{{ __('Eklenti Mağazası') }}'>
-                            <i class="nav-icon fas fa-shopping-cart"></i>
-                        </a>
-                    </div>
-                @endif
+                
                 <div class="col">
                     <a href="/kasa" data-toggle="tooltip" @if (request()->getRequestUri() == '/kasa') class="active" @endif
                         title='{{ __('Kasa') }}'>

@@ -35,9 +35,6 @@
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#externalNotifications" onclick="">{{__("Dış Bildirimler")}}</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#limanMarket" onclick="checkMarketAccess()">{{__("Liman Market")}}</a>
-                        </li>
                         @if(! env('CONTAINER_MODE', false))
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#dnsSettings" onclick="getDNS()">{{__("DNS Ayarları")}}</a>
@@ -139,87 +136,6 @@
                         </div>
                         <div class="tab-pane fade show" id="extensions" role="tabpanel">
                             @include('extension_pages.manager')
-                        </div>
-                        <div class="tab-pane fade show" id="limanMarket" role="tabpanel">
-                            <div id="marketStatus" class="alert alert-secondary" role="alert">
-
-                            </div>
-                            <div id="marketLoading">
-                                <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
-                            </div>
-                            <div id="marketEnabled" style="display:none;">
-                            <div id="marketTableWrapper">
-                                @include('table',[
-                                    "id" => "marketTable",
-                                    "value" => [],
-                                    "title" => [
-                                        "Sistem Adı" , "Mevcut Versiyon", "Durumu"
-                                    ],
-                                    "display" => [
-                                        "packageName" , "currentVersion", "status"
-                                    ],
-                                ])
-                            </div>
-
-                            </div>
-                            <div id="marketDisabled" style="display:none">
-                                <p>{{__("Liman kurulumunuzu Liman Market'e bağlayarak sistemdeki tüm güncellemeleri takip edebilir, güncellemeleri indirebilirsiniz.")}}</p>
-                                <button type="button" class="btn btn-primary btn-lg" onclick="location.href = '{{route('redirect_market')}}'">{{__("Liman Market'i Bağla")}}</button>
-                            </div>
-                            <script>
-                                function checkMarketAccess(){
-                                    var status = $("#marketStatus");
-                                    $("#marketTableWrapper").fadeOut(0);
-                                    status.html("{{__('Market bağlantısı kontrol ediliyor...')}}");
-                                    status.attr("class","alert alert-secondary");
-                                    request("{{route('verify_market')}}",new FormData(),function(success){
-                                        var json = JSON.parse(success);
-                                        $("#marketLoading").fadeOut(0);
-                                        $("#marketDisabled").fadeOut(0);
-                                        $("#marketEnabled").fadeIn();
-                                        status.html(json.message);
-                                        status.attr("class","alert alert-success");
-                                        setTimeout(() => {
-                                            checkMarketUpdates();
-                                        }, 1000);
-                                    },function(error){
-                                        var json = JSON.parse(error);
-                                        $("#marketLoading").fadeOut(0);
-                                        $("#marketEnabled").fadeOut(0);
-                                        $("#marketDisabled").fadeIn();
-                                        status.html(json.message);
-                                        status.attr("class","alert alert-danger");
-                                    });
-                                }
-
-                                function checkMarketUpdates(){
-                                    var status = $("#marketStatus");
-                                    status.html("{{__('Güncellemeler kontrol ediliyor...')}}");
-                                    status.attr("class","alert alert-secondary");
-                                    $("#marketLoading").fadeIn(0);
-                                    request("{{route('check_updates_market')}}",new FormData(),function(success){
-                                        var json = JSON.parse(success);
-                                        var table = $("#marketTable").DataTable();
-                                        var counter = 1;
-                                        table.clear();
-                                        $.each(json.message,function (index,current) {
-                                            var row = table.row.add([
-                                                counter++, current["packageName"], current["currentVersion"], current["status"]
-                                            ]).draw().node();
-                                        });
-                                        table.draw();
-                                        status.html("{{__('Güncellemeler başarıyla kontrol edildi')}}");
-                                        status.attr("class","alert alert-success");
-                                        $("#marketLoading").fadeOut(0);
-                                        $("#marketTableWrapper").fadeIn(0);
-                                    },function(error){
-                                        var json = JSON.parse(error);
-                                        status.html(json.message);
-                                        status.attr("class","alert alert-danger");
-                                    });
-                                }
-                            </script>
-
                         </div>
                         <div class="tab-pane fade show" id="dnsSettings" role="tabpanel">
                             <p>{{__("Liman'ın sunucu adreslerini çözebilmesi için gerekli DNS sunucularını aşağıdan düzenleyebilirsiniz.")}}</p>

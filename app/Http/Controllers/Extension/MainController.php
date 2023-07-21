@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\Extension;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\ExtensionUpdaterJob;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\System\Command;
 use App\User;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -344,6 +342,7 @@ class MainController extends Controller
     }
 
     /**
+     * TODO: REMOVE DEPRECATED
      * Update extension order
      *
      * @return JsonResponse|Response
@@ -357,42 +356,6 @@ class MainController extends Controller
         }
 
         return respond('Sıralamalar güncellendi', 200);
-    }
-
-    /**
-     * Auto update extension
-     *
-     * @return JsonResponse|Response
-     */
-    public function autoUpdateExtension()
-    {
-        $json = json_decode(
-            file_get_contents(storage_path('extension_updates')),
-            true
-        );
-        $collection = collect($json);
-        $obj = $collection
-            ->where('extension_id', request('extension_id'))
-            ->first();
-
-        if (! $obj) {
-            return respond('Eklenti Bulunamadı', 201);
-        }
-
-        $job = (new ExtensionUpdaterJob(
-            request('extension_id'),
-            $obj['versionCode'],
-            $obj['downloadLink'],
-            $obj['hashSHA512'],
-            true
-        ))->onQueue('system_updater');
-
-        // Dispatch job right away.
-        $job_id = app(Dispatcher::class)->dispatch($job);
-
-        return respond(
-            'Talebiniz başarıyla alındı, eklenti güncellendiğinde bildirim alacaksınız.'
-        );
     }
 
     /**

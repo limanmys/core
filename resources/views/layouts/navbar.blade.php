@@ -5,11 +5,6 @@
                 data-widget="pushmenu" href="#" onclick="$('[role=tooltip]').remove(); collapseNav()"
                 id="collapseMenu"><i class="fas fa-bars"></i></a>
         </li>
-<li class="nav-item d-none d-md-block">
-    <a href="/takip" class="nav-link" data-toggle="tooltip" title="{{ __('Sunucu Takibi') }}">
-        <i class="fa-solid fa-eye"></i>
-    </a>
-</li>
 </ul>
 @if (request()->request->get('server') != null)
     <ul class="mx-auto order-0 navbar-nav text-white d-md-block d-sm-none">

@@ -33,10 +33,6 @@ Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', '
 
     require_once app_path('Http/Controllers/Settings/_routes.php');
 
-    // Market Routes
-
-    require_once app_path('Http/Controllers/Market/__routes.php');
-
     // Wizard Routes
 
     require_once app_path('Http/Controllers/Wizard/_routes.php');
@@ -74,14 +70,6 @@ Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', '
     // Vault Route
 
     Route::get('/kasa/{user_id?}', 'UserController@userKeyList')->name('keys');
-
-    Route::get('/takip', 'ServerMonitorController@list')->name('monitor_list');
-
-    Route::post('/takip/sil', 'ServerMonitorController@remove')->name('monitor_remove');
-
-    Route::post('/takip/ekle', 'ServerMonitorController@add')->name('monitor_add');
-
-    Route::post('/takip/yenile', 'ServerMonitorController@refresh')->name('monitor_refresh');
 
     // Add Key Route
     Route::post('/kasa/ekle', 'UserController@addKey')->name('key_add');

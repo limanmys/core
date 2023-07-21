@@ -17,10 +17,7 @@
 @endif
 @if($updateAvailable)
     <button class="btn btn-warning" onclick=showExtensionUpdates()>{{__("Güncellemeleri Yükle")}}</button>
-@endif
-<div class="float-sm-right">
-    <button class="btn btn-success" onclick="window.location.href='{{ route('market') }}'"><i class="fas fa-shopping-cart mr-1"></i>{{ __("Eklenti Mağazası") }}</button>
-</div><br><br>
+@endif<br><br>
 @include('errors')
 
 @include('table',[

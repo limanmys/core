@@ -103,9 +103,6 @@ class MainController extends Controller
             'MAIL_PORT' => env('MAIL_PORT'),
             'MAIL_USERNAME' => env('MAIL_USERNAME'),
             'MAIL_ENCRYPTION' => env('MAIL_ENCRYPTION'),
-            'MARKET_URL' => env('MARKET_URL'),
-            'MARKET_CLIENT_ID' => env('MARKET_CLIENT_ID'),
-            'MARKET_CLIENT_SECRET' => env('MARKET_CLIENT_SECRET'),
             'EXTENSION_DEVELOPER_MODE' => env('EXTENSION_DEVELOPER_MODE') ? 'true' : 'false',
             'APP_LANG' => env('APP_LANG', 'tr'),
             'OTP_ENABLED' => env('OTP_ENABLED', false) ? 'true' : 'false',
@@ -130,9 +127,6 @@ class MainController extends Controller
     {
         validate([
             'EXTENSION_TIMEOUT' => 'required|numeric|min:30',
-            'MARKET_URL' => 'max:120',
-            'MARKET_CLIENT_ID' => 'max:220',
-            'MARKET_CLIENT_SECRET' => 'max:220',
             'BRAND_NAME' => 'max:60',
             'APP_NOTIFICATION_EMAIL' => 'email|max:120'
         ]);
@@ -153,9 +147,6 @@ class MainController extends Controller
             'MAIL_PORT' => request('MAIL_PORT'),
             'MAIL_USERNAME' => request('MAIL_USERNAME'),
             'MAIL_ENCRYPTION' => request('MAIL_ENCRYPTION'),
-            'MARKET_URL' => request('MARKET_URL'),
-            'MARKET_CLIENT_ID' => request('MARKET_CLIENT_ID'),
-            'MARKET_CLIENT_SECRET' => request('MARKET_CLIENT_SECRET'),
             'EXTENSION_DEVELOPER_MODE' => request('EXTENSION_DEVELOPER_MODE'),
             'APP_LANG' => request('APP_LANG'),
             'OTP_ENABLED' => request('OTP_ENABLED'),
@@ -801,86 +792,6 @@ local7.engine_log <SERVERADDR>';
         shell_exec('sudo systemctl restart rsyslog');
 
         return respond('Başarıyla kaydedildi!');
-    }
-
-    /**
-     * Redirect to market
-     *
-     * @return Application|RedirectResponse|Redirector
-     */
-    public function redirectMarket()
-    {
-        $auth_code = Str::random(15);
-        session([
-            'market_auth' => $auth_code,
-        ]);
-
-        return redirect(
-            env('MARKET_URL') .
-            '/connect/authorize?response_type=code&scope=offline_access+user_api&redirect_uri=' .
-            urlencode(
-                env('APP_URL') . '/api/market/bagla?auth=' . $auth_code
-            ) .
-            '&client_id=' .
-            env('MARKET_CLIENT_ID')
-        );
-    }
-
-    /**
-     * Connect market API
-     *
-     * @return Application|RedirectResponse|Redirector
-     * @throws GuzzleException
-     */
-    public function connectMarket()
-    {
-        if (session('market_auth') != request('auth')) {
-            session([
-                'market_auth' => false,
-            ]);
-            abort(504, 'Geçersiz istek!');
-        }
-        session([
-            'market_auth' => false,
-        ]);
-        try {
-            $client = new Client(['verify' => false]);
-
-            $params = [
-                'code' => request('code'),
-                'grant_type' => 'authorization_code',
-                'redirect_uri' => env('APP_URL') .
-                    '/api/market/bagla?auth=' .
-                    request('auth'),
-                'client_id' => env('MARKET_CLIENT_ID'),
-                'client_secret' => env('MARKET_CLIENT_SECRET'),
-            ];
-            $res = $client->request(
-                'POST',
-                env('MARKET_URL') . '/connect/token',
-                ['form_params' => $params]
-            );
-        } catch (BadResponseException) {
-            abort(504, 'Market hesabınız bağlanırken bir hata oluştu!');
-        }
-
-        $json = json_decode((string) $res->getBody());
-        $requiredScopes = ['user_api', 'offline_access'];
-        $currentScopes = explode(' ', (string) $json->scope);
-
-        if ($requiredScopes != $currentScopes) {
-            abort(
-                504,
-                'Gerekli izinleri vermediğiniz için işleminizi gerçekleştiremiyoruz.'
-            );
-        }
-
-        setEnv([
-            'MARKET_ACCESS_TOKEN' => $json->access_token,
-            'MARKET_REFRESH_TOKEN' => $json->refresh_token,
-        ]);
-
-        return redirect(route('settings') . '#limanMarket');
     }
 
     /**

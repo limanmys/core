@@ -2,7 +2,6 @@
     <div class="col-5 col-sm-3">
         <div class="nav flex-column nav-tabs h-100" id="vert-tabs-tab" role="tablist" aria-orientation="vertical">
             <a class="nav-link active" data-toggle="pill" href="#general" role="tab" aria-controls="vert-tabs-home" aria-selected="true">{{__("Genel")}}</a>
-            <a class="nav-link" data-toggle="pill" href="#market" role="tab" aria-controls="vert-tabs-profile" aria-selected="false">{{__("Market Ayarları")}}</a>
             <a class="nav-link" data-toggle="pill" href="#mail" role="tab" aria-controls="vert-tabs-messages" aria-selected="false">{{__("Mail Ayarları")}}</a>
             <a class="nav-link" data-toggle="pill" href="#keycloak" role="tab" aria-controls="vert-tabs-keycloak" aria-selected="false">{{__("Keycloak Ayarları")}}</a>
             <a class="nav-link" data-toggle="pill" href="#advanced" role="tab" aria-controls="vert-tabs-settings" aria-selected="false">{{__("Gelişmiş")}}</a>
@@ -56,23 +55,6 @@
                             <button type="button" class=" btn btn-labeled btn-primary" id="icon-upload" disabled="" style="border-radius: 0px;">{{ __('Yükle') }}</button>
                         </span>
                         <input type="file" name="" id="icon-upload-file" style="display:none;">
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="market" role="tabpanel" aria-labelledby="vert-tabs-profile-tab">
-                <div>
-                    <div class="form-group">
-                        <label for="MARKET_URL">{{__("Market Adresi")}}</label><br>
-                        <small>{{__("Liman'ın güncellemeleri kontrol edeceği market adresi.")}}</small>
-                        <input type="text" class="form-control liman_env" id="MARKET_URL">
-                    </div>
-                    <div class="form-group">
-                        <label for="MARKET_CLIENT_ID">{{__("Market Client ID")}}</label><br>
-                        <input type="text" class="form-control liman_env" id="MARKET_CLIENT_ID">
-                    </div>
-                    <div class="form-group">
-                        <label for="MARKET_CLIENT_SECRET">{{__("Market Secret Key")}}</label><br>
-                        <input type="text" class="form-control liman_env" id="MARKET_CLIENT_SECRET">
                     </div>
                 </div>
             </div>

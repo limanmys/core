@@ -2,11 +2,9 @@
 
 namespace App\Console;
 
-use App\Http\Controllers\Market\MarketController;
 use App\Jobs\CronEmailJob;
 use App\Jobs\HighAvailabilitySyncer;
 use App\Models\CronMail;
-use App\Models\MonitorServer;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Bus\Dispatcher;
