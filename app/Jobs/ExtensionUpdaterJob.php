@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Http\Controllers\Extension\MainController;
-use App\Models\AdminNotification;
 use App\Models\Extension;
 use App\System\Command;
 use GuzzleHttp\Client;
@@ -72,20 +71,7 @@ class ExtensionUpdaterJob implements ShouldQueue
             [$flag, $extension] = $controller->setupNewExtension(
                 $downloadPath
             );
-            AdminNotification::create([
-                'title' => json_encode([
-                    'tr' => $this->extension->display_name . __(' eklentisi güncellendi!', [], 'tr'),
-                    'en' => $this->extension->display_name . __(' eklentisi güncellendi!', [], 'en'),
-                ]),
-                'type' => 'extension_update',
-                'message' => json_encode([
-                    'tr' => $this->extension->display_name .
-                        __(' eklentisinin yeni bir sürümü indirildi ve yüklendi.', [], 'tr'),
-                    'en' => $this->extension->display_name .
-                        __(' eklentisinin yeni bir sürümü indirildi ve yüklendi.', [], 'en'),
-                ]),
-                'level' => 3,
-            ]);
+           
             self::updateUpdatesFile();
         }
 

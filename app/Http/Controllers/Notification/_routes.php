@@ -35,14 +35,6 @@ Route::post('/bildirimler/oku', 'Notification\MainController@readAll')->name(
 
 Route::view('/bildirim/{notification_id}', 'notification.one');
 
-Route::view('/sistemBildirimi/{notification_id}', 'notification.system')
-    ->name('system_notification')
-    ->middleware('admin');
-
-Route::post('/bildirim/adminOku', 'Notification\MainController@adminRead')
-    ->name('notification_admin_read')
-    ->middleware('admin');
-
 Route::post(
     '/ayar/bildirimKanali/ekle',
     'Notification\ExternalNotificationController@create'

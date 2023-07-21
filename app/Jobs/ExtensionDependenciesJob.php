@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\AdminNotification;
 use App\System\Command;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Queueable;
@@ -62,31 +61,9 @@ class ExtensionDependenciesJob implements ShouldQueue
             ]);
             $this->extension->save();
 
-            AdminNotification::create([
-                'title' => json_encode([
-                    'tr' => $this->extension->display_name . __(' eklentisi hazır!', [], 'tr'),
-                    'en' => $this->extension->display_name . __(' eklentisi hazır!', [], 'en'),
-                ]),
-                'type' => '',
-                'message' => json_encode([
-                    'tr' => $this->extension->display_name .
-                        __(' eklentisinin bağımlılıkları başarıyla yüklendi, hemen kullanmaya başlayabilirsiniz.', [], 'tr'),
-                    'en' => $this->extension->display_name .
-                        __(' eklentisinin bağımlılıkları başarıyla yüklendi, hemen kullanmaya başlayabilirsiniz.', [], 'en'),
-                ]),
-                'level' => 3,
-            ]);
+            // TODO: Extension dependency installation success notification
         } else {
-            AdminNotification::create([
-                'title' => json_encode([
-                    'tr' => $this->extension->display_name . __(' eklentisi kurulamadı!', [], 'tr'),
-                    'en' => $this->extension->display_name . __(' eklentisi kurulamadı!', [], 'en'),
-                ]),
-                'type' => 'error',
-                'message' => $this->extension->display_name .
-                    __(' eklentisinin bağımlılıkları yüklenemedi,') . 'detayları ' . $tmp . ' dosyasından inceleyebilirsiniz.',
-                'level' => 3,
-            ]);
+            // TODO: Extension dependency installation failed notification
         }
     }
 }

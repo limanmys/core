@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\AdminNotification;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Queueable;
@@ -65,34 +64,12 @@ class LimanUpdaterJob implements ShouldQueue
         try {
             $client->request('GET', $this->downloadUrl, ['sink' => $resource]);
         } catch (\Exception $e) {
-            AdminNotification::create([
-                'title' => json_encode([
-                    'tr' => $this->extension->display_name . __(' eklentisinin güncellemesi indirilemedi!', [], 'tr'),
-                    'en' => $this->extension->display_name . __(' eklentisinin güncellemesi indirilemedi!', [], 'en'),
-                ]),
-                'type' => 'error',
-                'message' => json_encode([
-                    'tr' => __('Oluşan hata: ', [], 'tr') . $e->getMessage(),
-                    'en' => __('Oluşan hata: ', [], 'en') . $e->getMessage(),
-                ]),
-                'level' => 3,
-            ]);
+            
 
             return false;
         }
 
-        AdminNotification::create([
-            'title' => json_encode([
-                'tr' => $this->extension->display_name . __(' eklentisinin güncellemesi indirildi!', [], 'tr'),
-                'en' => $this->extension->display_name . __(' eklentisinin güncellemesi indirildi!', [], 'en'),
-            ]),
-            'type' => '',
-            'message' => json_encode([
-                'tr' => $this->extension->display_name . __(' eklentisinin güncellemesi başarıyla indirildi, eklentiler sekmesi üzerinden değişim kaydını görebilir, eklentiyi güncelleyebilirsiniz.', [], 'tr'),
-                'en' => $this->extension->display_name . __(' eklentisinin güncellemesi başarıyla indirildi, eklentiler sekmesi üzerinden değişim kaydını görebilir, eklentiyi güncelleyebilirsiniz.', [], 'en'),
-            ]),
-            'level' => 3,
-        ]);
+        
 
         if (is_file($this->downloadTo)) {
             return true;

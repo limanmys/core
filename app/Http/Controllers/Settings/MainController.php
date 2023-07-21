@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminNotification;
 use App\Models\Certificate;
 use App\Models\Extension;
 use App\Models\GolangLicense;
@@ -656,18 +655,7 @@ class MainController extends Controller
             );
             if ($flag) {
                 addCertificate(request('ldapAddress'), 636, $message['path']);
-                AdminNotification::create([
-                    'title' => json_encode([
-                        'tr' => __('Yeni Sertifika Eklendi', [], 'tr'),
-                        'en' => __('Yeni Sertifika Eklendi', [], 'en'),
-                    ]),
-                    'type' => 'new_cert',
-                    'message' => json_encode([
-                        'tr' => __('Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.', [], 'tr'),
-                        'en' => __('Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.', [], 'en'),
-                    ]),
-                    'level' => 3,
-                ]);
+                // TODO: New certificate notification
             }
         }
         if (! setBaseDn(request('ldapAddress'))) {

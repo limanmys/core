@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AdminNotification;
 use App\Models\Extension;
 use App\Models\LimanRequest;
 use App\Models\Server;
@@ -155,48 +154,6 @@ class HomeController extends Controller
         } else {
             return response('Language not found', 404);
         }
-    }
-
-
-    /**
-     * Create a new ticket
-     *
-     * @return JsonResponse|Response
-     */
-    public function request()
-    {
-        validate([
-            'note' => 'required|string',
-            'type' => 'required|in:server,extension,other',
-            'speed' => 'required|in:normal,urgent',
-        ]);
-        LimanRequest::create([
-            'user_id' => auth()->id(),
-            'email' => auth()->user()->email,
-            'note' => request('note'),
-            'type' => request('type'),
-            'speed' => request('speed'),
-            'status' => 0,
-        ]);
-
-        $users = User::where('status', 1)->get();
-        foreach ($users as $user) {
-            AdminNotification::create([
-                'user_id' => $user->id,
-                'title' => json_encode([
-                    'tr' => __('İzin isteği: ', [], 'tr') . auth()->user()->name,
-                    'en' => __('İzin isteği: ', [], 'en') . auth()->user()->name,
-                ]),
-                'type' => 'auth_request',
-                'message' => request('note'),
-                'server_id' => null,
-                'extension_id' => null,
-                'level' => 0,
-                'read' => false,
-            ]);
-        }
-
-        return respond('Talebiniz başarıyla alındı.', 200);
     }
 
     /**

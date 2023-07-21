@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Notification;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminNotification;
 use App\Models\ExternalNotification;
 use App\Models\Notification;
 use App\Models\Role;
@@ -73,99 +72,7 @@ class ExternalNotificationController extends Controller
      */
     public function accept(Request $request)
     {
-        try {
-            $channel = ExternalNotification::where('token', request('token'))->first();
-            if (!$channel) {
-                return response()->json([
-                    'Not authorized, token missing',
-                ], 403);
-            }
-            if (ip_in_range($request->ip(), $channel->ip) == false) {
-                return response()->json([
-                    'Not authorized, unacceptable ip block',
-                ], 403);
-            }
-
-            $validator = Validator::make($request->all(), [
-                'title' => 'required|max:120',
-                'message' => 'required',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'Not Acceptable, inputs invalid',
-                ], 406);
-            }
-
-            $data = json_decode((string) $request->get('message'));
-            $mail = filter_var(request('mail'), FILTER_VALIDATE_BOOLEAN);
-
-            if (isset($data->notifyUser)) {
-                $user = User::where('email', $data->notifyUser)->firstOrFail();
-                Notification::create([
-                    'user_id' => $user->id,
-                    'title' => json_encode([
-                        'tr' => __('Dış Bildirim -> ', [], 'tr') . $request->get('title'),
-                        'en' => __('Dış Bildirim -> ', [], 'en') . $request->get('title'),
-                    ]),
-                    'type' => 'external_notification',
-                    'message' => json_encode([
-                        'tr' => (isset($data->notification) ? $data->notification : $data->notification_tr) . '. ' . __('Kullanıcı', [], 'tr') . ': ' . (isset($data->user) ? $data->user : '') . ' ' . __('Makine', [], 'tr') . ': ' . (isset($data->machine) ? $data->machine : ''),
-                        'en' => (isset($data->notification) ? $data->notification : $data->notification_en) . '. ' . __('Kullanıcı', [], 'en') . ': ' . (isset($data->user) ? $data->user : '') . ' ' . __('Makine', [], 'en') . ': ' . (isset($data->machine) ? $data->machine : ''),
-                    ]),
-                    'level' => 3,
-                    'mail' => $mail,
-                ]);
-            } elseif (isset($data->notifyGroup)) {
-                $role = Role::where('name', $data->notifyGroup)->firstOrFail();
-                foreach ($role->users as $user) {
-                    Notification::create([
-                        'user_id' => $user->id,
-                        'title' => json_encode([
-                            'tr' => __('Dış Bildirim -> ', [], 'tr') . $request->get('title'),
-                            'en' => __('Dış Bildirim -> ', [], 'en') . $request->get('title'),
-                        ]),
-                        'type' => 'external_notification',
-                        'message' => json_encode([
-                            'tr' => (isset($data->notification) ? $data->notification : $data->notification_tr) . '. ' . __('Kullanıcı', [], 'tr') . ': ' . (isset($data->user) ? $data->user : '') . ' ' . __('Makine', [], 'tr') . ': ' . (isset($data->machine) ? $data->machine : ''),
-                            'en' => (isset($data->notification) ? $data->notification : $data->notification_en) . '. ' . __('Kullanıcı', [], 'en') . ': ' . (isset($data->user) ? $data->user : '') . ' ' . __('Makine', [], 'en') . ': ' . (isset($data->machine) ? $data->machine : ''),
-                        ]),
-                        'level' => 3,
-                        'mail' => $mail,
-                    ]);
-                }
-            } else {
-                $message = $request->get('message');
-                if (isJson($message) && (isset($data->notification) || isset($data->notification_tr) || isset($data->notification_en))) {
-                    $message = json_encode([
-                        'tr' => (isset($data->notification) ? $data->notification : $data->notification_tr) . '. ' . __('Kullanıcı', [], 'tr') . ': ' . (isset($data->user) ? $data->user : '') . ' ' . __('Makine', [], 'tr') . ': ' . (isset($data->machine) ? $data->machine : ''),
-                        'en' => (isset($data->notification) ? $data->notification : $data->notification_en) . '. ' . __('Kullanıcı', [], 'en') . ': ' . (isset($data->user) ? $data->user : '') . ' ' . __('Makine', [], 'en') . ': ' . (isset($data->machine) ? $data->machine : ''),
-                    ]);
-                }
-                AdminNotification::create([
-                    'title' => json_encode([
-                        'tr' => __('Dış Bildirim -> ', [], 'tr') . $request->get('title'),
-                        'en' => __('Dış Bildirim -> ', [], 'en') . $request->get('title'),
-                    ]),
-                    'type' => 'external_notification',
-                    'message' => $message,
-                    'level' => 3,
-                    'mail' => $mail,
-                ]);
-            }
-
-            $channel->update([
-                'last_used' => Carbon::now(),
-            ]);
-
-            return response()->json([
-                'OK',
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                $e->getMessage(),
-            ]);
-        }
+        // TODO: Develop new notification system
     }
 
     public function create()

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Server;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminNotification;
 use App\Models\Certificate;
 use App\Models\Notification;
 use App\Models\Permission;
@@ -144,35 +143,12 @@ class AddController extends Controller
                         request('control_port'),
                         $message['path']
                     );
-                    AdminNotification::create([
-                        'title' => json_encode([
-                            'tr' => __('Yeni Sertifika Eklendi', [], 'tr'),
-                            'en' => __('Yeni Sertifika Eklendi', [], 'en'),
-                        ]),
-                        'type' => 'new_cert',
-                        'message' => json_encode([
-                            'tr' => __('Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.', [], 'tr'),
-                            'en' => __('Sisteme yeni sunucu eklendi ve yeni bir sertifika eklendi.', [], 'en'),
-                        ]),
-                        'level' => 3,
-                    ]);
+                    // TODO: New certificate notification
                 }
                 if (! $flag || ! $flag2) {
                     $this->server->enabled = false;
                     $this->server->save();
-                    AdminNotification::create([
-                        'title' => json_encode([
-                            'tr' => __('Yeni Sertifika Onayı', [], 'tr'),
-                            'en' => __('Yeni Sertifika Onayı', [], 'en'),
-                        ]),
-                        'type' => 'cert_request',
-                        'message' => $this->server->ip_address .
-                            ':' .
-                            $this->server->control_port .
-                            ':' .
-                            $this->server->id,
-                        'level' => 3,
-                    ]);
+                    // TODO: New certificate notification
 
                     return respond(
                         __('Bu sunucu ilk defa eklendiğinden dolayı bağlantı sertifikası yönetici onayına sunulmuştur. Bu sürede sunucuya erişemezsiniz.'),

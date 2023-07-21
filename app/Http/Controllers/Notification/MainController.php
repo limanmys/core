@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Notification;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminNotification;
 use App\Models\Notification;
 use App\Notifications\NotificationSent;
 use App\User;
@@ -93,26 +92,8 @@ class MainController extends Controller
                 $item->humanDate = $humanDate;
             });
 
-        $adminNotifications = [];
-        if (
-            auth()
-                ->user()
-                ->isAdmin()
-        ) {
-            $adminNotifications = AdminNotification::where([
-                'read' => 'false',
-            ])
-                ->orderBy('updated_at', 'desc')
-                ->get()
-                ->each(function ($item, $key) {
-                    $humanDate = $item->created_at->diffForHumans();
-                    $item->humanDate = $humanDate;
-                });
-        }
-
         return respond([
             'user' => $notifications,
-            'admin' => $adminNotifications,
         ]);
     }
 
@@ -128,12 +109,6 @@ class MainController extends Controller
         $notification = Notification::where([
             'id' => request('notification_id'),
         ])->first();
-
-        if (! $notification) {
-            $notification = AdminNotification::where([
-                'id' => request('notification_id'),
-            ])->first();
-        }
 
         if (! $notification) {
             return respond('Bildirim Bulunamadi', 201);
@@ -162,47 +137,5 @@ class MainController extends Controller
             ->notify(new NotificationSent([]));
 
         return respond('Hepsi Okundu', 200);
-    }
-
-    /**
-     * Read all admin notifications
-     *
-     * @return JsonResponse|Response
-     */
-    public function adminRead()
-    {
-        AdminNotification::where([
-            'read' => 'false',
-        ])->update([
-            'read' => 'true',
-        ]);
-        $adminUsers = User::where('status', 1)->get();
-        foreach ($adminUsers as $user) {
-            $user->notify(new NotificationSent([]));
-        }
-
-        return respond('Hepsi Okundu.', 200);
-    }
-
-    /**
-     * Retrieve all system notifications
-     *
-     * @return JsonResponse|Response
-     */
-    public function allSystem()
-    {
-        $notifications = AdminNotification::orderBy('read')
-            ->orderBy('created_at', 'desc')->paginate(10);
-
-        $links = $notifications->links();
-        $notifications = $notifications->groupBy(function ($date) {
-            return \Carbon\Carbon::parse($date->created_at)->format('d.m.Y');
-        });
-
-        return magicView('notification.index', [
-            'notifications' => $notifications,
-            'links' => $links,
-            'system' => true,
-        ]);
     }
 }

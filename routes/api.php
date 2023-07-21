@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\ExtensionController;
 use App\Http\Controllers\API\MenuController;
+use App\Http\Controllers\API\ProfileController;
 use App\Http\Controllers\API\SearchController;
 use App\Http\Controllers\API\Server;
 use App\Http\Controllers\API\ServerController;
@@ -44,6 +45,9 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
 
     // Search Controller Routes
     Route::post('/search', [SearchController::class, 'search']);
+
+    // Locale
+    Route::post('/locale', [ProfileController::class, 'setLocale']);
 
     // Menu Items
     Route::group(['prefix' => 'menu'], function () {

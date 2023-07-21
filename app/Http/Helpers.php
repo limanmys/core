@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\AdminNotification;
 use App\Models\Certificate;
 use App\Models\Extension;
 use App\Models\Notification;
@@ -640,22 +639,6 @@ if (! function_exists('retrieveCertificate')) {
         file_put_contents('/tmp/' . $path, $publicKey);
 
         return [true, $certinfo];
-    }
-}
-
-if (! function_exists('adminNotifications')) {
-    /**
-     * Get unread system notifications
-     *
-     * @return mixed
-     */
-    function adminNotifications()
-    {
-        return AdminNotification::where([
-            'read' => false,
-        ])
-            ->orderBy('updated_at', 'desc')
-            ->get();
     }
 }
 

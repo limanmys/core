@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Certificate;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminNotification;
 use App\Models\Certificate;
 use App\System\Command;
 use Carbon\Carbon;
@@ -58,10 +57,7 @@ class MainController extends Controller
 
         $certificate->addToSystem('/tmp/' . request('path'));
 
-        // Update Admin Notification
-        AdminNotification::where('id', request('notification_id'))->update([
-            'read' => 'true',
-        ]);
+        // TODO: Add notification for new notification system.
 
         return respond('Sertifika Başarıyla Eklendi!', 200);
     }
