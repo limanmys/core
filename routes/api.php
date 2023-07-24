@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\ExtensionController;
 use App\Http\Controllers\API\MenuController;
+use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\ProfileController;
 use App\Http\Controllers\API\SearchController;
 use App\Http\Controllers\API\Server;
@@ -42,6 +43,14 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
 
     // Locale
     Route::post('/locale', [ProfileController::class, 'setLocale']);
+
+    // Notifications
+    Route::group(['prefix' => 'notifications'], function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread', [NotificationController::class, 'unread']);
+        Route::post('/seen', [NotificationController::class, 'seen']);
+        Route::post('/read', [NotificationController::class, 'read']);
+    });
 
     // Menu Items
     Route::group(['prefix' => 'menu'], function () {

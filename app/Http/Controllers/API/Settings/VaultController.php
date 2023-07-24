@@ -159,16 +159,17 @@ class VaultController extends Controller
      * Create a key inside of vault
      *
      * @return JsonResponse|Response
+     *
      * @throws \Exception
      */
     public function createKey(Request $request)
     {
         $user_id = auth('api')->user()->id;
-        if ($request->user_id != "" && auth('api')->user()->isAdmin()) {
+        if ($request->user_id != '' && auth('api')->user()->isAdmin()) {
             $user_id = $request->user_id;
         }
 
-        $encKey = env('APP_KEY') . $user_id . $request->server_id;
+        $encKey = env('APP_KEY').$user_id.$request->server_id;
         UserSettings::where([
             'server_id' => $request->server_id,
             'user_id' => $user_id,
@@ -197,5 +198,4 @@ class VaultController extends Controller
 
         return respond('Başarıyla eklendi.');
     }
-
 }

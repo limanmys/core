@@ -19,10 +19,10 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->uuid('user_id');
 
-            $table->foreign('extension_id')->references('id')->on('extensions');
+            $table->foreign('extension_id')->references('id')->on('extensions')->onDelete('cascade');
             $table->uuid('extension_id');
 
-            $table->foreign('server_id')->references('id')->on('servers');
+            $table->foreign('server_id')->references('id')->on('servers')->onDelete('cascade');
             $table->uuid('server_id');
 
             $table->unique(['user_id', 'extension_id', 'server_id']);

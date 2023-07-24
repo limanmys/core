@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Classes\NotificationBuilder;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
@@ -39,7 +40,7 @@ class NotificationSent extends Notification
     public function toBroadcast(mixed $notifiable)
     {
         return (new BroadcastMessage(
-            (array) $this->notification
+            (array) $this->toArray()
         ))->onConnection('sync');
     }
 
@@ -48,8 +49,11 @@ class NotificationSent extends Notification
      *
      * @return array
      */
-    public function toArray(mixed $notifiable)
+    public function toArray()
     {
-        return (array) $this->notification;
+        $builder = new NotificationBuilder($this->notification);
+        $message = $builder->convertToBroadcastable();
+
+        return $message;
     }
 }

@@ -4,11 +4,13 @@ namespace App\Models;
 
 use App\Casts\Jsonb;
 use App\User;
+use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Notification extends Model
 {
-    use UsesUuid;
+    use UsesUuid, HasEvents;
 
     public $timestamps = false;
 
@@ -17,10 +19,11 @@ class Notification extends Model
     ];
 
     protected $fillable = [
-        'type',
+        'id',
+        'level',
         'template',
         'contents',
-        'send_at'
+        'send_at',
     ];
 
     public static function boot()
@@ -32,35 +35,48 @@ class Notification extends Model
         });
     }
 
-    public function send(
-        string $type,
+    public static function send(
+        string $level,
         string $template,
         array $contents = [],
-        array|string $sendTo = "all"
+        array|string $sendTo = 'all'
     ) {
-        $object = $this->create([
-            'type' => $type,
-            'template' => $template,
-            'contents' => $contents,
-        ]);
+        try {
+            if ($sendTo === 'all') {
+                $sendTo = User::all();
+            }
 
-        if ($sendTo === "all") {
-            $sendTo = User::all();
+            if ($sendTo === 'admins') {
+                $sendTo = User::admins()->get();
+            }
+
+            if ($sendTo === 'non_admins') {
+                $sendTo = User::nonAdmins()->get();
+            }
+
+            if (is_array($sendTo) && isset($sendTo[0]) && $sendTo[0] instanceof User) {
+                $sendTo = array_pluck($sendTo, 'id');
+            }
+
+            $object = static::withoutEvents(function () use ($level, $template, $contents, $sendTo) {
+                $temp = static::create([
+                    'id' => (string) Str::uuid(),
+                    'level' => $level,
+                    'template' => $template,
+                    'contents' => $contents,
+                    'send_at' => now(),
+                ]);
+                $temp->users()->attach($sendTo);
+
+                return $temp;
+            });
+
+            $object->fireModelEvent('created', false);
+        } catch (\Throwable $e) {
+            return new Notification();
         }
 
-        if ($sendTo === "admins") {
-            $sendTo = User::admins()->get();
-        }
-
-        if ($sendTo === "non_admins") {
-            $sendTo = User::nonAdmins()->get();
-        } 
-
-        if (is_array($sendTo) && isset($sendTo[0]) && $sendTo[0] instanceof User) {
-            $sendTo = array_pluck($sendTo, 'id');
-        }
-
-        $object->users()->attach($sendTo);
+        return $object;
     }
 
     public function users()
@@ -71,8 +87,8 @@ class Notification extends Model
 
     public function scopeUnread($query)
     {
-        return $query->whereDoesntHave('users', function ($query) {
-            $query->where('user_id', auth()->id());
+        return $query->whereHas('users', function ($query) {
+            $query->whereNull('read_at');
         });
     }
 }

@@ -7,8 +7,11 @@ use Carbon\Carbon;
 class GolangLicense implements \JsonSerializable
 {
     private string $owner;
+
     private bool $valid;
+
     private int $client_count;
+
     private int $timestamp;
 
     public function __construct($license)
@@ -18,8 +21,9 @@ class GolangLicense implements \JsonSerializable
             $this->valid = false;
             $this->client_count = 0;
             $this->timestamp = 0;
+
             return;
-        }   
+        }
 
         $this->owner = $license->owner;
         $this->valid = $license->Valid;

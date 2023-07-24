@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -34,7 +33,7 @@ class Extension extends Model
         'displays',
         'require_key',
         'status',
-        'license_type'
+        'license_type',
     ];
 
     protected $casts = [
@@ -42,7 +41,6 @@ class Extension extends Model
     ];
 
     /**
-     * @param $id
      * @return mixed
      */
     public static function one($id)
@@ -106,7 +104,6 @@ class Extension extends Model
     /**
      * Get extension display name
      *
-     * @param $value
      * @return mixed|string
      */
     public function getDisplayNameAttribute($value)
@@ -121,7 +118,6 @@ class Extension extends Model
     /**
      * Get updated at attribute
      *
-     * @param $value
      * @return string
      */
     public function getUpdatedAtAttribute($value)
@@ -132,7 +128,6 @@ class Extension extends Model
     /**
      * Set name attribute
      *
-     * @param $value
      * @return void
      */
     public function setNameAttribute($value)

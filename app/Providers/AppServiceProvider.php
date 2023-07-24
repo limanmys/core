@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Notification;
 use App\Models\Permission;
+use App\Observers\NotificationObserver;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
@@ -40,11 +42,20 @@ class AppServiceProvider extends ServiceProvider
                 })
             );
         });
+
         Carbon::setLocale(app()->getLocale());
+
+        Notification::observe(NotificationObserver::class);
+
         Relation::morphMap([
             'users' => 'App\User',
             'roles' => 'App\Models\Role',
         ]);
+
+        if ($this->app->environment('local')) {
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+            $this->app->register(TelescopeServiceProvider::class);
+        }
 
         if (request()->headers->has('liman-token') == false) {
             $router->pushMiddlewareToGroup(

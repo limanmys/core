@@ -189,7 +189,7 @@ class DetailsController extends Controller
         auth('api')->user()
             ->myFavorites()
             ->toggle($request->server_id);
-        
+
         return response()->json([
             'status' => 'success',
         ]);

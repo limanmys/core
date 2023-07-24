@@ -33,7 +33,7 @@ class SubscriptionController extends Controller
         if (! $server) {
             return new GolangLicense([]);
         }
-        
+
         $license = Cache::rememberForever('extension_'.$extension->id.'_'.$server->id.'_license', function () use ($extension, $server) {
             $output = callExtensionFunction(
                 $extension,
@@ -44,6 +44,7 @@ class SubscriptionController extends Controller
                 ]
             );
             $parsed = new GolangLicense($output);
+
             return $parsed->getValid() ? $parsed : null;
         });
 

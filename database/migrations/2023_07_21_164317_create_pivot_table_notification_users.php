@@ -14,8 +14,6 @@ return new class extends Migration
     public function up()
     {
         Schema::create('notification_users', function (Blueprint $table) {
-            $table->uuid('id');
-
             $table->foreign('notification_id')
                 ->references('id')
                 ->on('notifications');
@@ -27,6 +25,7 @@ return new class extends Migration
             $table->uuid('user_id');
 
             $table->timestamp('read_at')->nullable();
+            $table->timestamp('seen_at')->nullable();
         });
     }
 
