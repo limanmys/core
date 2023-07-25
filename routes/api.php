@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\ExtensionController;
+use App\Http\Controllers\API\ExternalNotificationController;
 use App\Http\Controllers\API\MenuController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\ProfileController;
@@ -28,6 +29,8 @@ Route::group([
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user', [AuthController::class, 'userProfile']);
 });
+
+Route::post('/notifications/send', [ExternalNotificationController::class, 'accept']);
 
 // Protected Routes
 Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
@@ -244,6 +247,16 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             Route::post('/key', [Settings\VaultController::class, 'createKey']);
             Route::patch('/', [Settings\VaultController::class, 'update']);
             Route::delete('/', [Settings\VaultController::class, 'delete']);
+        });
+
+        // Notifications
+        Route::group(['prefix' => 'notifications'], function () {
+            // External Notifications
+            Route::group(['prefix' => 'external'], function () {
+                Route::get('/', [Settings\NotificationController::class, 'externalNotifications']);
+                Route::post('/', [Settings\NotificationController::class, 'createExternalNotification']);
+                Route::delete('/{id}', [Settings\NotificationController::class, 'deleteExternalNotification']);
+            });
         });
     });
 });

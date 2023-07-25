@@ -2,8 +2,10 @@
 
 namespace App\Observers;
 
+use App\Mail\BasicNotification;
 use App\Models\Notification;
 use App\Notifications\NotificationSent;
+use Illuminate\Support\Facades\Mail;
 
 class NotificationObserver
 {
@@ -21,6 +23,9 @@ class NotificationObserver
 
         foreach ($users as $user) {
             $user->notify(new NotificationSent($notification, $user));
+            if (env('MAIL_ENABLED') == true && $notification && $notification->mail) {
+                Mail::to($user)->send(new BasicNotification($notification));
+            }
         }
     }
 

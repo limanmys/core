@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Classes\NotificationBuilder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -19,14 +20,18 @@ class BasicNotification extends Mailable
 
     public $subject;
 
+    public $notification;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(public $notification)
+    public function __construct($notification)
     {
         $this->subject = __('Liman MYS Bilgilendirme');
+        $builder = new NotificationBuilder($notification);
+        $this->notification = $builder->convertToBroadcastable();
     }
 
     /**
@@ -39,6 +44,6 @@ class BasicNotification extends Mailable
         return $this->from([
             'address' => env('APP_NOTIFICATION_EMAIL'),
             'name' => __('Liman Bildiri Sistemi'),
-        ])->view('email.external_notification');
+        ])->markdown('email.external_notification');
     }
 }

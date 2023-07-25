@@ -35,8 +35,8 @@ class NotificationBuilder
 
                 break;
             default:
-                $title = __('notification.'.$this->notification->template.'_title');
-                $content = __('notification.'.$this->notification->template.'_content', $this->notification->contents);
+                $title = __('notification.' . $this->notification->template . '_title');
+                $content = __('notification.' . $this->notification->template . '_content', $this->notification->contents);
 
                 break;
         }

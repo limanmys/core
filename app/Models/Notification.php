@@ -24,6 +24,7 @@ class Notification extends Model
         'template',
         'contents',
         'send_at',
+        'mail'
     ];
 
     public static function boot()
@@ -39,9 +40,9 @@ class Notification extends Model
         string $level,
         string $template,
         array $contents = [],
-        array|string $sendTo = 'all'
+        array|string $sendTo = 'all',
+        bool $mail = false
     ) {
-        try {
             if ($sendTo === 'all') {
                 $sendTo = User::all();
             }
@@ -58,13 +59,14 @@ class Notification extends Model
                 $sendTo = array_pluck($sendTo, 'id');
             }
 
-            $object = static::withoutEvents(function () use ($level, $template, $contents, $sendTo) {
+            $object = static::withoutEvents(function () use ($level, $template, $contents, $sendTo, $mail) {
                 $temp = static::create([
                     'id' => (string) Str::uuid(),
                     'level' => $level,
                     'template' => $template,
                     'contents' => $contents,
                     'send_at' => now(),
+                    'mail' => $mail,
                 ]);
                 $temp->users()->attach($sendTo);
 
@@ -72,9 +74,6 @@ class Notification extends Model
             });
 
             $object->fireModelEvent('created', false);
-        } catch (\Throwable $e) {
-            return new Notification();
-        }
 
         return $object;
     }
