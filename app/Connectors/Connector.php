@@ -15,7 +15,7 @@ interface Connector
      * @param Server $server
      * @param $user_id
      */
-    public function __construct(\App\Models\Server $server, $user_id);
+    public function __construct(Server $server, $user_id);
 
     /**
      * Verify function
@@ -38,7 +38,7 @@ interface Connector
      * @return mixed
      */
     public static function create(
-        \App\Models\Server $server,
+        Server $server,
                            $username,
                            $password,
                            $user_id,

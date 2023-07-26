@@ -6,11 +6,16 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
 
+/**
+ * Profile Controller
+ *
+ * Manages user controls
+ */
 class ProfileController extends Controller
 {
     public function setLocale(Request $request)
     {
-        $request->validate([
+        validate([
             'locale' => 'required|string|in:tr,en,de',
         ]);
 
@@ -20,7 +25,7 @@ class ProfileController extends Controller
         ]);
 
         return response()->json([
-            'status' => true,
+            'message' => 'Dil başarıyla değiştirildi.',
             'user' => $user,
         ]);
     }

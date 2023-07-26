@@ -25,7 +25,6 @@ class MainController extends Controller
      *
      * @return JsonResponse
      * @throws GuzzleException
-     * @throws GuzzleException
      */
     public function extensionList()
     {

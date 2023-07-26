@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Server;
 
 use App\Connectors\GenericConnector;
-use App\Connectors\SNMPConnector;
 use App\Http\Controllers\Controller;
 use App\Models\Server;
 use GuzzleHttp\Exception\GuzzleException;

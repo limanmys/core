@@ -6,6 +6,7 @@ use App\Mail\BasicNotification;
 use App\Models\Notification;
 use App\Notifications\NotificationSent;
 use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Mailer\Exception\TransportException;
 
 class NotificationObserver
 {
@@ -23,8 +24,12 @@ class NotificationObserver
 
         foreach ($users as $user) {
             $user->notify(new NotificationSent($notification, $user));
-            if (env('MAIL_ENABLED') == true && $notification && $notification->mail) {
-                Mail::to($user)->send(new BasicNotification($notification));
+            if (env('MAIL_ENABLED') && $notification && $notification->mail) {
+                try {
+                    Mail::to($user)->send(new BasicNotification($notification));
+                } catch (TransportException $e) {
+                    // Don't throw anything on when mail server is not active
+                }
             }
         }
     }

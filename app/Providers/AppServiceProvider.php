@@ -6,8 +6,10 @@ use App\Models\Notification;
 use App\Models\Permission;
 use App\Observers\NotificationObserver;
 use Carbon\Carbon;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,8 +26,8 @@ class AppServiceProvider extends ServiceProvider
      * @return void
      */
     public function boot(
-        \Illuminate\Routing\Router        $router,
-        \Illuminate\Contracts\Http\Kernel $kernel
+        Router $router,
+        Kernel $kernel
     )
     {
         Paginator::useBootstrap();
@@ -57,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(TelescopeServiceProvider::class);
         }
 
-        if (request()->headers->has('liman-token') == false) {
+        if (! request()->headers->has('liman-token')) {
             $router->pushMiddlewareToGroup(
                 'web',
                 \App\Http\Middleware\VerifyCsrfToken::class

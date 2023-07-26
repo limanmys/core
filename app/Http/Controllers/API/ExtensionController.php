@@ -7,13 +7,25 @@ use App\Models\Extension;
 use App\Models\Token;
 use App\Models\UserExtensionUsageStats;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+/**
+ * Extension Controller
+ *
+ * Does jobs about extensions
+ */
 class ExtensionController extends Controller
 {
+    /**
+     * Extension list
+     *
+     * @return mixed
+     */
     public function index()
     {
         // If server_id exists, don't return extensions that assigned to that server
@@ -28,21 +40,25 @@ class ExtensionController extends Controller
             $extensions = Extension::orderBy('updated_at', 'DESC')->get();
         }
 
-        return response()->json($extensions);
+        return $extensions;
     }
 
-    public function assign()
+    /**
+     * Assign extension to server
+     *
+     * @return JsonResponse
+     */
+    public function assign(Request $request)
     {
-        $extensions = request('extensions');
         try {
             DB::table('server_extensions')->insert(
-                array_map(function ($extension) {
+                array_map(function ($extension) use ($request) {
                     return [
                         'id' => Str::uuid()->toString(),
-                        'server_id' => request('server_id'),
+                        'server_id' => $request->server_id,
                         'extension_id' => $extension,
                     ];
-                }, $extensions)
+                }, $request->extensions)
             );
         } catch (\Throwable $e) {
             return response()->json([
@@ -55,13 +71,18 @@ class ExtensionController extends Controller
         ]);
     }
 
-    public function unassign()
+    /**
+     * Unassign extensions from server
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function unassign(Request $request)
     {
-        $extensions = request('extensions');
         try {
             DB::table('server_extensions')
-                ->where('server_id', request('server_id'))
-                ->whereIn('extension_id', $extensions)
+                ->where('server_id', $request->server_id)
+                ->whereIn('extension_id', $request->extensions)
                 ->delete();
         } catch (\Throwable $e) {
             return response()->json([
@@ -74,25 +95,29 @@ class ExtensionController extends Controller
         ]);
     }
 
+    /**
+     * Render PHP from Sandbox and return it
+     *
+     * @param Request $request
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function render(Request $request)
     {
         if (extension()->status == '0') {
-            return respond(
-                __('Eklenti şu an güncelleniyor, lütfen birazdan tekrar deneyin.'),
-                201
-            );
+            return response()->json([
+                'message' => 'Eklenti şu anda güncelleniyor, biraz sonra tekrar deneyiniz.',
+            ], Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
         if (extension()->require_key == 'true' && server()->key() == null) {
-            return respond(
-                __('Bu eklentiyi kullanabilmek için bir anahtara ihtiyacınız var, lütfen kasa üzerinden bir anahtar ekleyin.'),
-                403
-            );
+            return response()->json([
+                'message' => 'Bu eklentiyi kullanabilmek için bir anahtara ihtiyacınız var, lütfen kasa üzerinden bir anahtar ekleyin.'
+            ], Response::HTTP_FORBIDDEN);
         }
 
-        $page = request('target_function')
-            ? request('target_function')
-            : 'index';
+        $page = $request->target_function
+            ?: 'index';
         $view = 'extension_pages.server_json';
 
         $token = Token::create(user()->id);
@@ -120,17 +145,9 @@ class ExtensionController extends Controller
                     );
                 }
             } catch (\Exception $e) {
-                if (env('APP_DEBUG', false)) {
-                    return abort(
-                        504,
-                        __('Liman render service is not working or crashed. ').$e->getMessage(),
-                    );
-                } else {
-                    return abort(
-                        504,
-                        __('Liman render service is not working or crashed.'),
-                    );
-                }
+                return response()->json([
+                    'message' => __('Liman render service is not working or crashed. '). !env('APP_DEBUG', false) ?: $e->getMessage()
+                ], Response::HTTP_GATEWAY_TIMEOUT);
             }
         }
 
@@ -155,7 +172,7 @@ class ExtensionController extends Controller
                             ->accessTokens()
                             ->get()
                             ->toArray(),
-                        'extContent' => isset($output) ? $output : null,
+                        'extContent' => $output ?? null,
                         'dbJson' => $dbJson,
                     ])->render()
                 ),

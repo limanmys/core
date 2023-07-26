@@ -10,17 +10,22 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
 
+/**
+ * Access Log Controller
+ */
 class AccessLogController extends Controller
 {
     public function __construct()
     {
         if (! isset(auth('api')->user()->id)) {
-            return response()->json('Please log-in again.', Response::HTTP_UNAUTHORIZED);
+            return response()->json([
+                'message' => 'Tekrar giriş yapınız.'
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'view_logs')) {
             return response()->json(
-                'Sunucu Günlük Kayıtlarını görüntülemek için yetkiniz yok',
+                ['message' => 'Sunucu günlük kayıtlarını görüntülemek için yetkiniz yok.'],
                 Response::HTTP_FORBIDDEN
             );
         }
@@ -100,7 +105,7 @@ class AccessLogController extends Controller
                 $row->view = __('Komut');
             }
 
-            array_push($clean, $row);
+            $clean[] = $row;
         }
 
         return response()->json($clean);
@@ -118,7 +123,9 @@ class AccessLogController extends Controller
             'query' => $query,
         ]);
         if ($data == '') {
-            return response()->json(__('Bu loga ait detay bulunamadı'), Response::HTTP_NOT_FOUND);
+            return response()->json([
+                'message' => 'Bu loga ait detay bulunamadı.'
+            ], Response::HTTP_NOT_FOUND);
         }
         $data = explode("\n", (string) $data);
         $logs = [];
@@ -144,34 +151,34 @@ class AccessLogController extends Controller
                             $val = base64_decode((string) $val);
                         }
 
-                        array_push($logs, [
+                        $logs[] = [
                             'title' => __($key),
                             'message' => $val,
-                        ]);
+                        ];
                     }
 
                     continue;
                 }
 
                 if ($row->lmn_level != 'high_level' && $k == 'request_details' && $k != 'token') {
-                    array_push($logs, [
+                    $logs[] = [
                         'title' => __($k),
                         'message' => json_encode($v, JSON_PRETTY_PRINT),
-                    ]);
+                    ];
 
                     continue;
                 }
 
-                array_push($logs, [
+                $logs[] = [
                     'title' => __($k),
                     'message' => $v,
-                ]);
+                ];
             }
             if ($k_ < count($data) - 1) {
-                array_push($logs, [
+                $logs[] = [
                     'title' => '---------------------',
                     'message' => 'Log seperator',
-                ]);
+                ];
             }
         }
 

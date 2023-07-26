@@ -3,6 +3,7 @@
 namespace App\Classes;
 
 use Exception;
+use ReturnTypeWillChange;
 use Throwable;
 
 /**
@@ -16,20 +17,26 @@ use Throwable;
  */
 class Ldap
 {
-    // Variables
-    private $connection;
+    private \LDAP\Connection $connection;
 
     private string $dn;
 
     private string $domain;
 
+    /**
+     * @param string $ip_address
+     * @param string $username
+     * @param string $password
+     * @param int $port
+     * @throws LDAPException
+     */
     public function __construct(
-        private string $ip_address,
-        private string $username,
-        private string $password,
+        private readonly string $ip_address,
+        private readonly string $username,
+        private readonly string $password,
 
         // default port
-        private int $port = 636,
+        private readonly int    $port = 636,
     ) {
         // First, we check if LDAP server is alive
         ! $this->isAlive() ? throw new LDAPException('LDAP server is not alive.', LDAPException::THROW_CONNECTION_ERROR) : null;
@@ -48,7 +55,7 @@ class Ldap
     /**
      * Sets LDAP pagination controls.
      */
-    public function controlPagedResult($con, int $pageSize, string $cookie)
+    public function controlPagedResult($con, int $pageSize, string $cookie): array
     {
         return [
             [
@@ -75,11 +82,11 @@ class Ldap
     /**
      * LDAP Search with pagination
      *
-     * @param  string  $filter
-     * @param  LDAPSearchOptions  $options
+     * @param string $filter
+     * @param LDAPSearchOptions $options
      * @return array
      */
-    public function search($filter, $options = new LDAPSearchOptions())
+    public function search(string $filter, LDAPSearchOptions $options = new LDAPSearchOptions()): array
     {
         $filter = html_entity_decode($filter);
 
@@ -122,7 +129,7 @@ class Ldap
             unset($entries['count']);
         } while ($cookie !== null && $cookie != '');
 
-        $entries = collect($entries)->map(function ($item) use ($options) {
+        return collect($entries)->map(function ($item) use ($options) {
             if (count($options->getAttributes()) > 1) {
                 $temp = $item;
                 $item = [];
@@ -147,14 +154,12 @@ class Ldap
                 }
             }
         })->toArray();
-
-        return $entries;
     }
 
     /**
      * Get domain
      */
-    public function getDomain()
+    public function getDomain(): array|string
     {
         $domain = str_replace('dc=', '', strtolower($this->domain));
 
@@ -164,7 +169,7 @@ class Ldap
     /**
      * Check if the LDAP server is alive
      */
-    private function isAlive()
+    private function isAlive(): bool
     {
         $alive = @fsockopen($this->ip_address, $this->port, $errno, $errstr, 0.2);
         if (! $alive) {
@@ -177,11 +182,12 @@ class Ldap
 
     /**
      * Check if LDAP can be connectable
+     * @throws LDAPException
      */
-    private function checkConnection()
+    private function checkConnection(): bool
     {
         // We check if the connection is already established
-        if ($this->connection) {
+        if (isset($this->connection)) {
             return true;
         }
 
@@ -217,7 +223,7 @@ class Ldap
         $this->domain = (array_key_exists('rootdomainnamingcontext', $entries)) ? $entries['rootdomainnamingcontext'][0] : '';
 
         // Set DN value
-        if (substr($this->username, 0, 2) == 'cn' || substr($this->username, 0, 2) == 'CN') {
+        if (str_starts_with($this->username, 'cn') || str_starts_with($this->username, 'CN')) {
             $this->dn = $this->username;
         } else {
             $this->dn = $this->username.'@'.$this->getDomain();
@@ -228,6 +234,7 @@ class Ldap
 
     /**
      * Create LDAP connection object with provided credentials
+     * @throws LDAPException
      */
     private function createConnection(): \LDAP\Connection|false
     {
@@ -248,8 +255,19 @@ class Ldap
     }
 }
 
+/**
+ * LDAP Search Options
+ *
+ * Build dynamic search options easily
+ */
 class LDAPSearchOptions
 {
+    /**
+     * @param int $page
+     * @param int $per_page
+     * @param array $attributes
+     * @param int $stop_on
+     */
     public function __construct(
         private int $page = 1,
         private int $per_page = 500,
@@ -258,27 +276,86 @@ class LDAPSearchOptions
     ) {
     }
 
+    /**
+     * @return int
+     */
     public function getPage(): int
     {
         return $this->page;
     }
 
+    /**
+     * @return int
+     */
     public function getPerPage(): int
     {
         return $this->per_page;
     }
 
+    /**
+     * @return array|string[]
+     */
     public function getAttributes(): array
     {
         return $this->attributes;
     }
 
+    /**
+     * @return int
+     */
     public function getStopOn(): int
     {
         return $this->stop_on;
     }
+
+    /**
+     * @param int $page
+     * @return $this
+     */
+    public function setPage(int $page): self
+    {
+        $this->page = $page;
+
+        return $this;
+    }
+
+    /**
+     * @param int $per_page
+     * @return $this
+     */
+    public function setPerPage(int $per_page): self
+    {
+        $this->per_page = $per_page;
+
+        return $this;
+    }
+
+    /**
+     * @param array $attributes
+     * @return $this
+     */
+    public function setAttributes(array $attributes): self
+    {
+        $this->attributes = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * @param int $stop_on
+     * @return $this
+     */
+    public function setStopOn(int $stop_on): self
+    {
+        $this->stop_on = $stop_on;
+
+        return $this;
+    }
 }
 
+/**
+ * Custom LDAP Exceptions
+ */
 class LDAPException extends Exception
 {
     const THROW_CONNECTION_ERROR = 0;
@@ -295,11 +372,23 @@ class LDAPException extends Exception
 
     const THROW_MODIFY_ERROR = 5;
 
-    public function __construct($message, $code = 0, Throwable $previous = null)
+    /**
+     * Construct the exception. Note: The message is NOT binary safe.
+     * @link https://php.net/manual/en/exception.construct.php
+     * @param string $message [optional] The Exception message to throw.
+     * @param int $code [optional] The Exception code.
+     * @param null|Throwable $previous [optional] The previous throwable used for the exception chaining.
+     */
+    public function __construct(string $message, int $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
 
+    /**
+     * String representation of the exception
+     * @link https://php.net/manual/en/exception.tostring.php
+     * @return string the string representation of the exception.
+     */
     public function __toString()
     {
         return __CLASS__.": [{$this->code}]: {$this->message}\n";

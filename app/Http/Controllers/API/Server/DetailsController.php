@@ -7,14 +7,24 @@ use App\Models\Permission;
 use App\Models\Server;
 use App\System\Command;
 use Carbon\Carbon;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+/**
+ * Server Details Controller
+ */
 class DetailsController extends Controller
 {
+    /**
+     * List servers that user can access
+     *
+     * @return JsonResponse
+     */
     public function index()
     {
-        $servers = Server::orderBy('updated_at', 'DESC')
+        return Server::orderBy('updated_at', 'DESC')
             ->get()
             ->filter(function ($server) {
                 return Permission::can(auth('api')->user()->id, 'server', 'id', $server->id);
@@ -24,15 +34,21 @@ class DetailsController extends Controller
 
                 return $server;
             });
-
-        return response()->json($servers);
     }
 
+    /**
+     * Get single server detail
+     *
+     * @return JsonResponse|Response
+     * @throws GuzzleException
+     */
     public function server()
     {
         $server = server();
         if (! $server) {
-            abort(504, 'Sunucu bulunamadı.');
+            return response()->json([
+                'message' => 'Sunucu bulunamadı.'
+            ], Response::HTTP_NOT_FOUND);
         }
 
         if (! Permission::can(user()->id, 'liman', 'id', 'server_details')) {
@@ -71,6 +87,12 @@ class DetailsController extends Controller
         ]);
     }
 
+    /**
+     * Get stats of server for graphs
+     *
+     * @return array
+     * @throws GuzzleException
+     */
     public function stats()
     {
         if (server()->isLinux()) {
@@ -111,6 +133,12 @@ class DetailsController extends Controller
         ];
     }
 
+    /**
+     * Get server specs
+     *
+     * @return JsonResponse
+     * @throws GuzzleException
+     */
     public function specs()
     {
         $cores = str_replace("cpu cores\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'cpu cores'"))[0]));
@@ -184,6 +212,12 @@ class DetailsController extends Controller
         return response()->json($this->parseDfOutput($output));
     }
 
+    /**
+     * Add server to favorites
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function favorite(Request $request)
     {
         auth('api')->user()
@@ -191,7 +225,7 @@ class DetailsController extends Controller
             ->toggle($request->server_id);
 
         return response()->json([
-            'status' => 'success',
+            'message' => 'İşlem başarılı.'
         ]);
     }
 

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Connectors\GenericConnector;
-use App\Connectors\SNMPConnector;
 use App\Support\Database\CacheQueryBuilder;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Collection;
@@ -62,7 +61,7 @@ class Server extends Model
     /**
      * Create connector instance
      *
-     * @return GenericConnector|SNMPConnector
+     * @return GenericConnector
      * @throws \Exception
      */
     private function connector()
@@ -72,9 +71,6 @@ class Server extends Model
                 504,
                 'Bu sunucuda komut çalıştırmak için bir bağlantınız yok.'
             );
-        }
-        if ($this->key()->type == 'snmp') {
-            return new SNMPConnector($this, user()->id);
         }
 
         return new GenericConnector($this, user());

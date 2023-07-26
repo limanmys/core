@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\System\Command;
 use Illuminate\Http\Response;
 
+/**
+ * Server Port Controller
+ */
 class PortController extends Controller
 {
     /**
@@ -35,13 +38,13 @@ class PortController extends Controller
         $arr = [];
         foreach (explode("\n", $output) as $line) {
             $row = explode(' ', $line);
-            array_push($arr, [
+            $arr[] = [
                 'name' => $row[0],
                 'username' => $row[1],
                 'ip_type' => $row[2],
                 'packet_type' => $row[3],
                 'port' => $row[4],
-            ]);
+            ];
         }
 
         return response()->json($arr);

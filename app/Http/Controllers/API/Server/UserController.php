@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\System\Command;
 use Illuminate\Http\Response;
 
+/**
+ * Server User Controller
+ */
 class UserController extends Controller
 {
     /**
@@ -71,17 +74,23 @@ class UserController extends Controller
         $user_password = request('password');
         $user_password_confirmation = request('password_confirmation');
         if ($user_password !== $user_password_confirmation) {
-            return response()->json('Provided passwords doesn\'t match.', Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json([
+                'password' => 'Şifreler eşleşmiyor.'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         $output = Command::runSudo('useradd --no-user-group -p $(openssl passwd -1 {:user_password}) {:user_name} -s "/bin/bash" &> /dev/null && echo 1 || echo 0', [
             'user_password' => $user_password,
             'user_name' => $user_name,
         ]);
         if ($output == '0') {
-            return response()->json('An error occured while creating user.', Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json([
+                'message' => 'Kullanıcı oluşturulurken hata oluştu.'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        return response()->json('User created successfully.');
+        return response()->json([
+            'message' => 'Kullanıcı başarıyla oluşturuldu.'
+        ]);
     }
 
     /**
@@ -107,8 +116,6 @@ class UserController extends Controller
                 }
                 $groups = array_reverse($groups);
             }
-
-            return response()->json($groups);
         }
 
         if (server()->isWindows() && server()->canRunCommand()) {
@@ -129,9 +136,9 @@ class UserController extends Controller
                     ];
                 }
             }
-
-            return response()->json($groups);
         }
+
+        return response()->json($groups);
     }
 
     /**
@@ -172,10 +179,14 @@ class UserController extends Controller
             'group_name' => $group_name,
         ]);
         if ($output == '0') {
-            return response()->json('An error occured while creating group.', Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json([
+                'message' => 'Grup oluşturulurken hata oluştu.'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        return response()->json('Created group successfully.', 200);
+        return response()->json([
+            'message' => 'Grup başarıyla oluşturuldu.'
+        ], 200);
     }
 
     /**

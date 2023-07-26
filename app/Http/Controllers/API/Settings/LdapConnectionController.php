@@ -3,12 +3,24 @@
 namespace App\Http\Controllers\API\Settings;
 
 use App\Classes\Ldap;
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
+/**
+ * LDAP Connection Controller
+ */
 class LdapConnectionController extends Controller
 {
+    /**
+     * Get existing configuration
+     *
+     * @return JsonResponse
+     */
     public function getConfiguration()
     {
         return response()->json([
@@ -19,6 +31,13 @@ class LdapConnectionController extends Controller
         ]);
     }
 
+    /**
+     * Save new LDAP configuration
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws GuzzleException
+     */
     public function saveConfiguration(Request $request)
     {
         $cert = Certificate::where([
@@ -53,6 +72,13 @@ class LdapConnectionController extends Controller
         ]);
     }
 
+    /**
+     * Try to auth on LDAP
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws JsonResponseException
+     */
     public function auth(Request $request)
     {
         validate([
@@ -67,14 +93,13 @@ class LdapConnectionController extends Controller
                 $request->password,
             );
         } catch (\Throwable $e) {
+            dd($e);
             return response()->json([
-                'status' => false,
                 'message' => 'LDAP bağlantısı başarısız.',
-            ]);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
-            'status' => true,
             'message' => 'LDAP bağlantısı başarılı.',
         ]);
     }

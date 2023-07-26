@@ -35,9 +35,10 @@ class NotificationSent extends Notification
     /**
      * Get the broadcastable representation of the notification.
      *
+     * @param mixed $notifiable
      * @return BroadcastMessage
      */
-    public function toBroadcast(mixed $notifiable)
+    public function toBroadcast(mixed $notifiable): BroadcastMessage
     {
         return (new BroadcastMessage(
             (array) $this->toArray()
@@ -49,11 +50,9 @@ class NotificationSent extends Notification
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $builder = new NotificationBuilder($this->notification);
-        $message = $builder->convertToBroadcastable();
-
-        return $message;
+        return $builder->convertToBroadcastable();
     }
 }

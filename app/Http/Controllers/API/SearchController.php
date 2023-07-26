@@ -5,10 +5,22 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Server;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Search Controller
+ *
+ * This controller utilizes ajax search on Liman
+ */
 class SearchController extends Controller
 {
+    /**
+     * Search Function
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function search(Request $request)
     {
         $searchable = [];
@@ -22,14 +34,14 @@ class SearchController extends Controller
                             $searchable[$constant['name']] = [];
                         }
                         $child['name'] = __($child['name']);
-                        array_push($searchable[$constant['name']], $child);
+                        $searchable[$constant['name']][] = $child;
                     }
                 } else {
                     if (! isset($searchable['Yönetim'])) {
                         $searchable['Yönetim'] = [];
                     }
                     $constant['name'] = __($constant['name']);
-                    array_push($searchable['Yönetim'], $constant);
+                    $searchable['Yönetim'][] = $constant;
                 }
             }
         }
@@ -41,14 +53,14 @@ class SearchController extends Controller
                         $searchable[$constant['name']] = [];
                     }
                     $child['name'] = __($child['name']);
-                    array_push($searchable[$constant['name']], $child);
+                    $searchable[$constant['name']][] = $child;
                 }
             } else {
                 if (! isset($searchable['Kullanıcı'])) {
                     $searchable['Kullanıcı'] = [];
                 }
                 $constant['name'] = __($constant['name']);
-                array_push($searchable['Kullanıcı'], $constant);
+                $searchable['Kullanıcı'][] = $constant;
             }
         }
 
@@ -59,14 +71,14 @@ class SearchController extends Controller
                         $searchable[$constant['name']] = [];
                     }
                     $child['name'] = __($child['name']);
-                    array_push($searchable[$constant['name']], $child);
+                    $searchable[$constant['name']][] = $child;
                 }
             } else {
                 if (! isset($searchable['Genel'])) {
                     $searchable['Genel'] = [];
                 }
                 $constant['name'] = __($constant['name']);
-                array_push($searchable['Genel'], $constant);
+                $searchable['Genel'][] = $constant;
             }
         }
 
@@ -79,10 +91,10 @@ class SearchController extends Controller
         $searchable['Sunucular'] = [];
         foreach ($servers as $server) {
             if (Permission::can(user()->id, 'liman', 'id', 'server_details')) {
-                array_push($searchable['Sunucular'], [
+                $searchable['Sunucular'][] = [
                     'name' => $server->name,
                     'url' => "/servers/$server->id",
-                ]);
+                ];
             }
 
             $extensions = $server->extensions();
@@ -92,17 +104,17 @@ class SearchController extends Controller
                 }
 
                 if (! empty($extension->display_name)) {
-                    array_push($searchable[$server->name], [
+                    $searchable[$server->name][] = [
                         'name' => $extension->display_name,
                         'url' => "/servers/$server->id/extensions/$extension->id",
-                    ]);
+                    ];
 
                     continue;
                 }
-                array_push($searchable[$server->name], [
+                $searchable[$server->name][] = [
                     'name' => $extension->name,
                     'url' => "/servers/$server->id/extensions/$extension->id",
-                ]);
+                ];
             }
         }
 
@@ -111,11 +123,11 @@ class SearchController extends Controller
 
         foreach ($searchable as $category => $items) {
             foreach ($items as $item) {
-                if (strpos(strtolower($item['name']), strtolower($searchQuery)) !== false) {
+                if (str_contains(strtolower($item['name']), strtolower($searchQuery))) {
                     if (! isset($results[$category])) {
                         $results[$category] = [];
                     }
-                    array_push($results[$category], $item);
+                    $results[$category][] = $item;
                 }
             }
         }

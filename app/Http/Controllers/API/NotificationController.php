@@ -4,13 +4,22 @@ namespace App\Http\Controllers\API;
 
 use App\Classes\NotificationBuilder;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Notification Controller
+ */
 class NotificationController extends Controller
 {
+    /**
+     * Return all notifications that user owns
+     *
+     * @return mixed
+     */
     public function index()
     {
-        $notifications = auth()->user()
+        return auth()->user()
             ->notifications()
             ->withPivot('read_at', 'seen_at')
             ->orderBy('send_at', 'desc')
@@ -21,13 +30,16 @@ class NotificationController extends Controller
 
                 return $builder->convertToBroadcastable();
             });
-
-        return response()->json($notifications);
     }
 
+    /**
+     * Return unread notifications
+     *
+     * @return mixed
+     */
     public function unread()
     {
-        $notifications = auth()->user()
+        return auth()->user()
             ->notifications()
             ->withPivot('read_at', 'seen_at')
             ->unread()
@@ -39,10 +51,14 @@ class NotificationController extends Controller
 
                 return $builder->convertToBroadcastable();
             });
-
-        return response()->json($notifications);
     }
 
+    /**
+     * Mark notification as seen
+     *
+     * @param Request $request
+     * @return mixed
+     */
     public function seen(Request $request)
     {
         $notification = auth()->user()
@@ -56,9 +72,14 @@ class NotificationController extends Controller
             $notification->pivot->save();
         }
 
-        return response()->json($notification);
+        return $notification;
     }
 
+    /**
+     * Mark all as read
+     *
+     * @return JsonResponse
+     */
     public function read()
     {
         auth()->user()
@@ -72,6 +93,8 @@ class NotificationController extends Controller
                 $notification->pivot->save();
             });
 
-        return response()->json(['status' => true]);
+        return response()->json([
+            'message' => 'Bildirimler okundu olarak işaretlendi.'
+        ]);
     }
 }

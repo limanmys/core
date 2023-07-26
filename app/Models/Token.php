@@ -30,7 +30,7 @@ class Token extends Model
         $user = $user_id ? $user_id : auth()->id();
         $exists = Token::where(['user_id' => $user])->first();
         if ($exists) {
-            if (Carbon::now()->diffInHours($exists->created_at) > 23) {
+            if (Carbon::now()->diffInHours($exists->created_at) > 6) {
                 $exists->delete();
 
                 return self::generate($user);

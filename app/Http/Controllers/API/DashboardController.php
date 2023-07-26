@@ -7,20 +7,34 @@ use App\Models\Permission;
 use App\Models\Server;
 use App\Models\UserExtensionUsageStats;
 use App\User;
+use Illuminate\Http\JsonResponse;
 
+/**
+ * Dashboard Controller
+ *
+ * Returns necessary values to be used on dashboard page.
+ */
 class DashboardController extends Controller
 {
+    /**
+     * Returns latest logged in users
+     *
+     * @return mixed
+     */
     public function latestLoggedInUsers()
     {
-        $users = User::orderBy('last_login_at', 'desc')
+        return User::orderBy('last_login_at', 'desc')
             ->whereNot('id', auth('api')->user()->id)
             ->whereNotNull('last_login_at')
             ->take(5)
             ->get();
-
-        return response()->json($users);
     }
 
+    /**
+     * Returns favorite servers
+     *
+     * @return mixed
+     */
     public function favoriteServers()
     {
         $servers = user()->favorites()->take(6);
@@ -37,18 +51,21 @@ class DashboardController extends Controller
             $servers = $servers->merge($temp);
         }
 
-        return response()->json($servers);
+        return $servers;
     }
 
+    /**
+     * Returns most used extensions
+     *
+     * @return mixed
+     */
     public function mostUsedExtensions()
     {
-        $mostUsedExtensions = UserExtensionUsageStats::where('user_id', auth('api')->user()->id)
+        return UserExtensionUsageStats::where('user_id', auth('api')->user()->id)
             ->orderBy('usage', 'desc')
             ->with('extension')
             ->with('server')
             ->take(6)
             ->get();
-
-        return response()->json($mostUsedExtensions);
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Casts;
  
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
- 
+
 class Jsonb implements CastsAttributes
 {
     /**

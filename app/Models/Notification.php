@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
+/**
+ * Notification Model
+ */
 class Notification extends Model
 {
     use UsesUuid, HasEvents;
@@ -27,7 +30,12 @@ class Notification extends Model
         'mail'
     ];
 
-    public static function boot()
+    /**
+     * Bootstrap the model and its traits.
+     *
+     * @return void
+     */
+    public static function boot(): void
     {
         parent::boot();
 
@@ -36,13 +44,25 @@ class Notification extends Model
         });
     }
 
+    /**
+     * Send notification with parameters
+     *
+     * @param string $level It might be information, success, warning, error
+     * @param string $template CUSTOM or selected ones.
+     * @param array $contents Contents
+     * @param array|string $sendTo It might be all, admins, non_admins or an array with user ids.
+     * @param bool $mail Send mail to recipients?
+     * @return Notification
+     */
     public static function send(
         string $level,
         string $template,
         array $contents = [],
         array|string $sendTo = 'all',
         bool $mail = false
-    ) {
+    ): Notification
+    {
+        try {
             if ($sendTo === 'all') {
                 $sendTo = User::all();
             }
@@ -74,6 +94,9 @@ class Notification extends Model
             });
 
             $object->fireModelEvent('created', false);
+        } catch (\Throwable $e) {
+            return new Notification();
+        }
 
         return $object;
     }

@@ -10,17 +10,18 @@ use App\Models\Permission;
 use App\System\Command;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use ZipArchive;
 
+/**
+ * Extension Settings Controller
+ *
+ * This functions used by extension settings page
+ */
 class ExtensionController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('admin');
-    }
-
     public function index()
     {
         $extensions = Extension::orderBy('updated_at', 'DESC')->get()->map(function ($item) {
@@ -30,7 +31,7 @@ class ExtensionController extends Controller
             return $item;
         });
 
-        return response()->json($extensions);
+        return $extensions;
     }
 
     /**
@@ -60,7 +61,9 @@ class ExtensionController extends Controller
                 ['extension' => request()->file('extension')->path()]
             );
             if (! (bool) $verify) {
-                return response()->json('Eklenti dosyanız doğrulanamadı.', 422);
+                return response()->json([
+                    'extension' => 'Eklenti dosyası doğrulanamadı'
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
             $decrypt = Command::runLiman(
                 "gpg --status-fd 1 -d -o '/tmp/{:originalName}' @{:extension} | grep FAILURE > /dev/null && echo 0 || echo 1",
@@ -71,8 +74,10 @@ class ExtensionController extends Controller
             );
             if (! (bool) $decrypt) {
                 return response()->json(
-                    'Eklenti dosyası doğrulanırken bir hata oluştu!.',
-                    500
+                    [
+                        'message' => 'Eklenti dosyası doğrulanırken bir hata oluştu!'
+                    ],
+                    Response::HTTP_INTERNAL_SERVER_ERROR
                 );
             }
             $zipFile =
@@ -83,7 +88,9 @@ class ExtensionController extends Controller
         } else {
             if (! request()->has('force')) {
                 return response()->json(
-                    'Bu eklenti imzalanmamış bir eklenti, yine de kurmak istediğinize emin misiniz?',
+                    [
+                        'message' => 'Bu eklenti imzalanmamış bir eklenti, yine de kurmak istediğinize emin misiniz?'
+                    ],
                     203
                 );
             }
@@ -98,7 +105,9 @@ class ExtensionController extends Controller
             'extension_id' => $new->id,
         ]);
 
-        return response()->json('Eklenti başarıyla yüklendi.', 200);
+        return response()->json([
+            'message' => 'Eklenti başarıyla yüklendi.'
+        ]);
     }
 
     /**
@@ -147,7 +156,9 @@ class ExtensionController extends Controller
 
         system_log(3, 'EXTENSION_REMOVE');
 
-        return response()->json('Eklenti başarıyla silindi.');
+        return response()->json([
+            'message' => 'Eklenti başarıyla silindi.'
+        ]);
     }
 
     /**
@@ -163,11 +174,13 @@ class ExtensionController extends Controller
                 ['data' => request('license')]
             );
 
-            return response()->json('Lisans eklendi.');
+            return response()->json([
+                'message' => 'Lisans eklendi.'
+            ]);
         }
 
         if (! $request->server_id) {
-            return response()->json('Lisans eklenemiyor!', 500);
+            return response()->json(['message' => 'Lisans eklenemedi.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $output = callExtensionFunction(
@@ -191,10 +204,12 @@ class ExtensionController extends Controller
 
             Cache::forget('extension_'.extension()->id.'_'.$request->server_id.'_license');
 
-            return response()->json('Lisans eklendi.');
+            return response()->json([
+                'message' => 'Lisans eklendi.'
+            ]);
         }
 
-        return response()->json('Lisans eklenemiyor!', 500);
+        return response()->json(['message' => 'Lisans eklenemedi.'], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     /**

@@ -2,20 +2,35 @@
 
 namespace App\Http\Controllers\API\Settings;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
 use App\Models\ExternalNotification;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+/**
+ * Notification Controller
+ */
 class NotificationController extends Controller
 {
+    /**
+     * Get external notification list
+     *
+     * @return JsonResponse
+     */
     public function externalNotifications()
     {
-        $externalNotifications = ExternalNotification::all();
-
-        return response()->json($externalNotifications);
+        return ExternalNotification::all();
     }
 
+    /**
+     * Create a new external notification channel
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws JsonResponseException
+     */
     public function createExternalNotification(Request $request)
     {
         validate([
@@ -31,16 +46,22 @@ class NotificationController extends Controller
         ]);
 
         return response()->json([
-            'status' => (bool) $externalNotification,
+            'message' => 'Dış bildirim ucu başarıyla oluşturuldu.',
             'token' => $token
         ], (bool) $externalNotification ? 200 : 500);
     }
 
+    /**
+     * Delete external notification channel
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function deleteExternalNotification(Request $request)
     {
         $externalNotification = ExternalNotification::find($request->id);
 
-        if (!$externalNotification) {
+        if (! $externalNotification) {
             return response()->json([
                 'status' => false
             ], 404);
@@ -48,7 +69,7 @@ class NotificationController extends Controller
 
         $status = $externalNotification->delete();
         return response()->json([
-            'status' => $status
+            'message' => 'Dış bildirim ucu silindi.'
         ], $status ? 200 : 500);
     }
 }

@@ -11,16 +11,31 @@ use App\Models\Server;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
+/**
+ * Role Controller
+ *
+ * Manages user role settings
+ */
 class RoleController extends Controller
 {
+    /**
+     * Returns user roles
+     *
+     * @return mixed
+     */
     public function index()
     {
-        $roles = Role::orderBy('updated_at', 'DESC')->get();
-
-        return response()->json($roles);
+        return Role::orderBy('updated_at', 'DESC')->get();
     }
 
+    /**
+     * Show a role
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function show(Request $request)
     {
         $role = Role::where('id', $request->role_id)->first();
@@ -33,25 +48,43 @@ class RoleController extends Controller
             'variables' => $role->permissions->where('type', 'variable')->count(),
         ];
 
-        return response()->json($role);
+        return $role;
     }
 
+    /**
+     * Create a new role
+     *
+     * @param Request $request
+     * @return mixed
+     */
     public function create(Request $request)
     {
-        $role = Role::create([
+        return Role::create([
             'name' => $request->name,
         ]);
-
-        return response()->json($role);
     }
 
+    /**
+     * Delete role
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function delete(Request $request)
     {
         Role::where('id', $request->role_id)->delete();
 
-        return response()->json('Rol başarıyla silindi.');
+        return response()->json([
+            'message' => 'Rol başarıyla silindi.'
+        ]);
     }
 
+    /**
+     * Return role users
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function users(Request $request)
     {
         $users = User::all();
@@ -63,6 +96,12 @@ class RoleController extends Controller
         ]);
     }
 
+    /**
+     * Set role users
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function setUsers(Request $request)
     {
         // Delete all users on role
@@ -76,9 +115,17 @@ class RoleController extends Controller
             ]);
         }
 
-        return response()->json('Kullanıcılar başarıyla güncellendi.');
+        return response()->json([
+            'message' => 'Kullanıcılar başarıyla güncellendi.'
+        ]);
     }
 
+    /**
+     * Return role servers
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function servers(Request $request)
     {
         $servers = Server::all();
@@ -96,6 +143,12 @@ class RoleController extends Controller
         ]);
     }
 
+    /**
+     * Set role servers
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function setServers(Request $request)
     {
         Permission::where([
@@ -115,9 +168,17 @@ class RoleController extends Controller
             );
         }
 
-        return response()->json('Sunucular başarıyla güncellendi.');
+        return response()->json([
+            'message' => 'Sunucular başarıyla güncellendi.'
+        ]);
     }
 
+    /**
+     * List role extensions
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function extensions(Request $request)
     {
         $extensions = Extension::all();
@@ -135,6 +196,12 @@ class RoleController extends Controller
         ]);
     }
 
+    /**
+     * Set role extensions
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function setExtensions(Request $request)
     {
         Permission::where([
@@ -154,9 +221,17 @@ class RoleController extends Controller
             );
         }
 
-        return response()->json('Eklentiler başarıyla güncellendi.');
+        return response()->json([
+            'message' => 'Eklentiler başarıyla güncellendi.'
+        ]);
     }
 
+    /**
+     * Get liman permissions
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function limanPermissions(Request $request)
     {
         $permissions = [
@@ -189,6 +264,12 @@ class RoleController extends Controller
         ]);
     }
 
+    /**
+     * Set Liman permissions
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function setLimanPermissions(Request $request)
     {
         Permission::where([
@@ -207,9 +288,17 @@ class RoleController extends Controller
             );
         }
 
-        return response()->json('Liman yetkileri başarıyla güncellendi.');
+        return response()->json([
+            'message' => 'Liman yetkileri başarıyla güncellendi.'
+        ]);
     }
 
+    /**
+     * Get role extension functions
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function functions(Request $request)
     {
         $display_names = Extension::all()->map(function ($item) {
@@ -287,16 +376,22 @@ class RoleController extends Controller
                 )
                     ? $json[$functions[$i]['description']]
                     : $functions[$i]['description'];
-                array_push($cleanFunctions, [
+                $cleanFunctions[] = [
                     'name' => $functions[$i]['name'],
                     'description' => $description,
-                ]);
+                ];
             }
         }
 
         return response()->json($cleanFunctions);
     }
 
+    /**
+     * Set role extension functions
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function setFunctions(Request $request)
     {
         $extension = Extension::find($request->extension_id);
@@ -312,16 +407,32 @@ class RoleController extends Controller
             );
         }
 
-        return response()->json('Fonksiyonlar başarıyla güncellendi.');
+        return response()->json([
+            'message' => 'Fonksiyonlar başarıyla güncellendi.'
+        ]);
     }
 
+    /**
+     * Delete extension role functions
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function deleteFunctions(Request $request)
     {
         Permission::whereIn('id', $request->permission_ids)->delete();
 
-        return response()->json('Fonksiyonlar başarıyla silindi.');
+        return response()->json([
+            'message' => 'Fonksiyonlar başarıyla silindi.'
+        ]);
     }
 
+    /**
+     * Get role variables
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function variables(Request $request)
     {
         $permissions = Permission::where([
@@ -375,6 +486,11 @@ class RoleController extends Controller
         return response()->json($data);
     }
 
+    /**
+     * Export detailed role list as CSV format
+     *
+     * @return StreamedResponse
+     */
     public function exportDetailedListAsCsv()
     {
         $data = $this->generateRoleData();
@@ -414,6 +530,11 @@ class RoleController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+    /**
+     * Generate role data
+     *
+     * @return array
+     */
     private function generateRoleData()
     {
         $data = [];

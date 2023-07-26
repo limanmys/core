@@ -3,15 +3,30 @@
 namespace App\Http\Controllers\API\Settings;
 
 use App\Classes\Ldap;
+use App\Classes\LDAPException;
 use App\Classes\LDAPSearchOptions;
 use App\Http\Controllers\Controller;
 use App\Models\LdapRestriction;
 use App\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * LDAP Permissions Controller
+ *
+ * Settings of authorized LDAP users.
+ */
 class LdapPermissionsController extends Controller
 {
+    /**
+     * Get users on LDAP host
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws LDAPException
+     */
     public function getUsers(Request $request)
     {
         $ldap = new Ldap(
@@ -35,6 +50,13 @@ class LdapPermissionsController extends Controller
         ]);
     }
 
+    /**
+     * Set authorized LDAP users to log in
+     *
+     * @param Request $request
+     * @return JsonResponse|Response
+     * @throws LDAPException
+     */
     public function setUsers(Request $request)
     {
         $users = $request->users;
@@ -115,11 +137,17 @@ class LdapPermissionsController extends Controller
         }
 
         return response()->json([
-            'status' => true,
             'message' => 'Kullanıcılar başarıyla güncellendi.',
         ]);
     }
 
+    /**
+     * Get existing group list
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws LDAPException
+     */
     public function getGroups(Request $request)
     {
         $ldap = new Ldap(
@@ -141,6 +169,13 @@ class LdapPermissionsController extends Controller
         ]);
     }
 
+    /**
+     * Set authorized groups to log in
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws LDAPException
+     */
     public function setGroups(Request $request)
     {
         $ldap = new Ldap(
@@ -168,7 +203,6 @@ class LdapPermissionsController extends Controller
         }
 
         return response()->json([
-            'status' => true,
             'message' => 'Gruplar başarıyla güncellendi.',
         ]);
     }

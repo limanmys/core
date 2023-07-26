@@ -6,16 +6,31 @@ use App\Http\Controllers\Controller;
 use App\Models\Server;
 use App\Models\ServerKey;
 use App\Models\UserSettings;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use mervick\aesEverywhere\AES256;
 
+/**
+ * Vault Controller
+ *
+ * Manages user keys
+ */
 class VaultController extends Controller
 {
+    /**
+     * User key list
+     *
+     * @param Request $request
+     * @return JsonResponse|Response
+     */
     public function index(Request $request)
     {
         if ($request->user_id != '') {
             if (! auth('api')->user()->isAdmin()) {
-                return respond('Bu işlemi yapmak için yönetici olmalısınız!', 403);
+                return response()->json([
+                    'message' => 'Bu işlemi yapmak için yönetici olmalısınız!'
+                ], Response::HTTP_FORBIDDEN);
             }
 
             $settings = UserSettings::where('user_id', $request->user_id)->get();

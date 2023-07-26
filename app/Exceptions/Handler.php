@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Response;
 use Throwable;
 
 /**
@@ -50,6 +51,11 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        // Use validator response hack
+        $this->renderable(function (JsonResponseException $e) {
+            return response()->json($e->getData(), $e->getCode() ? $e->getCode() : Response::HTTP_OK);
         });
     }
 }

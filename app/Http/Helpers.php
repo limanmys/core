@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\JsonResponseException;
 use App\Models\Certificate;
 use App\Models\Extension;
 use App\Models\Permission;
@@ -12,7 +13,7 @@ use App\User;
 use Beebmx\Blade\Blade;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
-use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -26,18 +27,34 @@ if (! function_exists('validate')) {
      * It validates user request datas
      *
      * @param $rules
-     * @param $messages
+     * @param array $messages
      * @return void
+     * @throws JsonResponseException
      */
-    function validate($rules, $messages = [])
+    function validate($rules, array $messages = []): void
     {
         $validator = Validator::make(request()->all(), $rules, $messages);
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            abort(400, $errors->first());
+        if (! request()->wantsJson()) {
+            // If request doesn't want JSON handle as the old way
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                abort(400, $errors->first());
+            }
+        } else {
+            // If request wants JSON handle with new way
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $customFormat = [];
+                foreach ($errors->toArray() as $key => $value) {
+                    $customFormat[$key] = $value[0];
+                }
+
+                throw new JsonResponseException($customFormat, null, Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
         }
     }
 }
+
 
 if (! function_exists('updateSystemSettings')) {
     /**
@@ -156,7 +173,7 @@ if (! function_exists('respond')) {
      *
      * @param $message
      * @param int $status
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse|Response
      */
     function respond($message, $status = 200)
     {
@@ -778,7 +795,7 @@ if (! function_exists('magicView')) {
     /**
      * Returns view or json within the scope of request
      *
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse|Response
      */
     function magicView($view, $data = [])
     {

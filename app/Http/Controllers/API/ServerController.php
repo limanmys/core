@@ -8,6 +8,7 @@ use App\Models\Certificate;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\ServerKey;
+use Illuminate\Http\Request;
 use mervick\aesEverywhere\AES256;
 
 class ServerController extends Controller
@@ -19,10 +20,12 @@ class ServerController extends Controller
      *
      * @throws \Exception|GuzzleException
      */
-    public function create()
+    public function create(Request $request)
     {
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server')) {
-            return respond('Bu işlemi yapmak için yetkiniz yok!', 201);
+            return response()->json([
+                'message' => 'Bu işlemi yapmak için izniniz yok.'
+            ], 403);
         }
 
         $server = Server::create([
@@ -40,15 +43,15 @@ class ServerController extends Controller
         // Add Server to request object to use it later.
         request()->request->add(['server' => $server]);
 
-        if (request('key_type') != 'no_key') {
+        if ($request->key_type != 'no_key') {
             $encKey = env('APP_KEY').auth('api')->user()->id.server()->id;
             $data = [
                 'clientUsername' => AES256::encrypt(
-                    request('username'),
+                    $request->username,
                     $encKey
                 ),
                 'clientPassword' => AES256::encrypt(
-                    request('password'),
+                    $request->password,
                     $encKey
                 ),
                 'key_port' => request('port'),
@@ -56,7 +59,7 @@ class ServerController extends Controller
 
             ServerKey::updateOrCreate(
                 ['server_id' => server()->id, 'user_id' => auth('api')->user()->id],
-                ['type' => request('key_type'), 'data' => json_encode($data)]
+                ['type' => $request->key_type, 'data' => json_encode($data)]
             );
         }
 
@@ -68,7 +71,6 @@ class ServerController extends Controller
      *
      * @return JsonResponse|Response
      *
-     * @throws GuzzleException
      * @throws GuzzleException
      */
     private function grantPermissions(Server $server)
@@ -96,7 +98,9 @@ class ServerController extends Controller
             }
         }
 
-        return response()->json('Sunucu başarıyla eklendi.');
+        return response()->json([
+            'message' => 'Sunucu başarıyla eklendi.'
+        ]);
     }
 
     /**
@@ -107,7 +111,9 @@ class ServerController extends Controller
     public function checkAccess()
     {
         if (request('port') == -1) {
-            return response()->json('Sunucuya başarıyla erişim sağlandı.');
+            return response()->json([
+                'message' => 'Sunucuya başarıyla erişim sağlandı.'
+            ]);
         }
         $status = @fsockopen(
             request('ip_address'),
@@ -117,7 +123,9 @@ class ServerController extends Controller
             intval(config('liman.server_connection_timeout')) / 1000
         );
         if (is_resource($status)) {
-            return response()->json('Sunucuya başarıyla erişim sağlandı.');
+            return response()->json([
+                'message' => 'Sunucuya başarıyla erişim sağlandı.'
+            ]);
         } else {
             return response()->json(['ip_address' => 'Sunucuya erişim sağlanamadı.'], 500);
         }
@@ -134,7 +142,9 @@ class ServerController extends Controller
             return response()->json(['name' => 'Lütfen daha kısa bir sunucu adı girin.'], 422);
         }
         if (! Server::where('name', request('name'))->exists()) {
-            return response()->json('İsim onaylandı.');
+            return response()->json([
+                'message' => 'İsim onaylandı.'
+            ]);
         } else {
             return response()->json(['name' => 'Bu isimde zaten bir sunucu var.'], 422);
         }
@@ -159,7 +169,9 @@ class ServerController extends Controller
         );
 
         if ($output == 'ok') {
-            return response()->json('Anahtarınız doğrulandı!');
+            return response()->json([
+                'message' => 'Anahtarınız doğrulandı.'
+            ]);
         } else {
             return response()->json([
                 'username' => 'Kullanıcı adı ya da şifreniz yanlış olabilir.',

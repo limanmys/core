@@ -5,9 +5,20 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Server;
+use Illuminate\Http\JsonResponse;
 
+/**
+ * Menu Controller
+ *
+ * Returns necessary data for left sidebar.
+ */
 class MenuController extends Controller
 {
+    /**
+     * Returns server list that is user is authorized to use
+     *
+     * @return mixed
+     */
     public function servers()
     {
         $servers = Server::orderBy('updated_at', 'DESC')
@@ -31,10 +42,18 @@ class MenuController extends Controller
         })]);
     }
 
+    /**
+     * Returns server details
+     *
+     * @param Server $server
+     * @return JsonResponse
+     */
     public function serverDetails(Server $server)
     {
         if (! Permission::can(user()->id, 'server', 'id', $server->id)) {
-            return response()->json(['error' => 'You do not have permission to access this server.'], 403);
+            return response()->json([
+                'message' => 'You do not have permission to access this server.'
+            ], 403);
         }
 
         $server->is_online = $server->isOnline();

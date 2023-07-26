@@ -2,11 +2,21 @@
 
 namespace App\Http\Controllers\API\Settings;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Keycloak Connection Settings Controller
+ */
 class KeycloakConnectionController extends Controller
 {
+    /**
+     * Get configuration of keycloak
+     *
+     * @return JsonResponse
+     */
     public function getConfiguration()
     {
         return response()->json([
@@ -18,6 +28,13 @@ class KeycloakConnectionController extends Controller
         ]);
     }
 
+    /**
+     * Save existing configuration
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws JsonResponseException
+     */
     public function saveConfiguration(Request $request)
     {
         validate([
@@ -43,7 +60,6 @@ class KeycloakConnectionController extends Controller
         }
 
         return response()->json([
-            'status' => true,
             'message' => 'Ayarlar kaydedildi.',
         ]);
     }

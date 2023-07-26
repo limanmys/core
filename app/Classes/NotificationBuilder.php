@@ -5,13 +5,26 @@ namespace App\Classes;
 use App\Models\Notification;
 use Carbon\Carbon;
 
+/**
+ * Notification Builder
+ *
+ * This class converts database object of notification to readable format.
+ */
 class NotificationBuilder
 {
-    public function __construct(private Notification $notification)
+    /**
+     * @param Notification $notification
+     */
+    public function __construct(private readonly Notification $notification)
     {
     }
 
-    public function convertToBroadcastable()
+    /**
+     * Converts notification object to readable format.
+     *
+     * @return array
+     */
+    public function convertToBroadcastable(): array
     {
         switch ($this->notification->template) {
             case 'CUSTOM':

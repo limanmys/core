@@ -5,7 +5,7 @@ use App\Models\Module;
 use Illuminate\Support\Facades\Artisan;
 
 Artisan::command('scan:translations', function () {
-    if (env('EXTENSION_DEVELOPER_MODE') != true) {
+    if (! env('EXTENSION_DEVELOPER_MODE', false)) {
         return $this->error(
             'You need to open extension developer mode for use this function.'
         );

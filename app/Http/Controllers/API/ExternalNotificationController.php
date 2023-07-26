@@ -2,14 +2,28 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
 use App\Models\ExternalNotification;
 use App\Models\Notification;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * External Notification Controller
+ *
+ * Accepts external notifications
+ */
 class ExternalNotificationController extends Controller
 {
-    public function accept(Request $request)
+    /**
+     * Accepts external notifications from outside
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws JsonResponseException
+     */
+    public function accept(Request $request): JsonResponse
     {
         $channel = ExternalNotification::where('token', $request->token)
             ->first();
@@ -17,7 +31,6 @@ class ExternalNotificationController extends Controller
         // If token not found, return 404 error
         if (! $channel) {
             return response()->json([
-                'status' => false,
                 'message' => 'token is missing'
             ], 404);
         }
@@ -25,7 +38,6 @@ class ExternalNotificationController extends Controller
         // If IP not in range, return 403 error
         if (! ip_in_range($request->ip(), $channel->ip)) {
             return response()->json([
-                'status' => false,
                 'message' => 'ip is not in range'
             ], 403);
         }
@@ -52,7 +64,6 @@ class ExternalNotificationController extends Controller
         ]);
 
         return response()->json([
-            'status' => (bool) $notification,
             'notification' => $notification
         ], (bool) $notification ? 200 : 500);
     }

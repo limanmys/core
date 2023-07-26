@@ -2,26 +2,34 @@
 
 namespace App\Http\Controllers\API\Server;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\System\Command;
 use Exception;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+/**
+ * Server Service Controller
+ */
 class ServiceController extends Controller
 {
     public function __construct()
     {
-        if (! isset(auth('api')->user()->id)) {
-            return respond('Please log-in again.', Response::HTTP_UNAUTHORIZED);
-        }
-
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_services')) {
             return respond('Bu işlemi yapmak için yetkiniz yok!', Response::HTTP_FORBIDDEN);
         }
     }
 
+    /**
+     * Service List
+     *
+     * @return JsonResponse
+     * @throws GuzzleException
+     */
     public function index()
     {
         $services = [];
@@ -44,15 +52,15 @@ class ServiceController extends Controller
                     }
 
                     $status = explode(' ', $row[1]);
-                    array_push($services, [
-                        'name' => strlen($row[0]) > 50 ? substr($row[0], 0, 50).'...' : $row[0],
-                        'description' => strlen($row[2]) > 60 ? substr($row[2], 0, 60).'...' : $row[2],
+                    $services[] = [
+                        'name' => strlen($row[0]) > 50 ? substr($row[0], 0, 50) . '...' : $row[0],
+                        'description' => strlen($row[2]) > 60 ? substr($row[2], 0, 60) . '...' : $row[2],
                         'status' => [
-                            'loaded' => $status[0] == 'loaded' ? true : false,
-                            'active' => $status[1] == 'active' ? true : false,
+                            'loaded' => $status[0] == 'loaded',
+                            'active' => $status[1] == 'active',
                             'running' => $status[2],
                         ],
-                    ]);
+                    ];
                 } catch (Exception) {
                 }
             }
@@ -67,11 +75,11 @@ class ServiceController extends Controller
                     continue;
                 }
                 try {
-                    array_push($services, [
+                    $services[] = [
                         'name' => trim(explode('=', $row[0])[1]),
                         'description' => trim(explode('=', $row[1])[1]),
                         'status' => trim(explode('=', $row[2])[1]),
-                    ]);
+                    ];
                 } catch (Exception) {
                 }
             }
@@ -80,9 +88,16 @@ class ServiceController extends Controller
         return response()->json($services);
     }
 
+    /**
+     * Start service
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws GuzzleException
+     */
     public function start(Request $request)
     {
-        $request->validate([
+        validate([
             'services' => 'required',
         ]);
 
@@ -102,13 +117,20 @@ class ServiceController extends Controller
         }
 
         return response()->json([
-            'status' => true,
+            'message' => 'Servis başlatıldı.'
         ]);
     }
 
+    /**
+     * Stop service
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws GuzzleException
+     */
     public function stop(Request $request)
     {
-        $request->validate([
+        validate([
             'services' => 'required',
         ]);
 
@@ -128,13 +150,20 @@ class ServiceController extends Controller
         }
 
         return response()->json([
-            'status' => true,
+            'message' => 'Servis durduruldu.'
         ]);
     }
 
+    /**
+     * Restart service
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws GuzzleException
+     */
     public function restart(Request $request)
     {
-        $request->validate([
+        validate([
             'services' => 'required',
         ]);
 
@@ -157,13 +186,21 @@ class ServiceController extends Controller
         }
 
         return response()->json([
-            'status' => true,
+            'message' => 'Servis yeniden başlatıldı.'
         ]);
     }
 
+    /**
+     * Enable service
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws GuzzleException
+     * @throws JsonResponseException
+     */
     public function enable(Request $request)
     {
-        $request->validate([
+        validate([
             'services' => 'required',
         ]);
 
@@ -183,13 +220,20 @@ class ServiceController extends Controller
         }
 
         return response()->json([
-            'status' => true,
+            'message' => 'Servis devreye alındı.'
         ]);
     }
 
+    /**
+     * Disable service
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws GuzzleException
+     */
     public function disable(Request $request)
     {
-        $request->validate([
+        validate([
             'services' => 'required',
         ]);
 
@@ -209,10 +253,17 @@ class ServiceController extends Controller
         }
 
         return response()->json([
-            'status' => true,
+            'message' => 'Servis devreden çıkarıldı.'
         ]);
     }
 
+    /**
+     * Service status
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws GuzzleException
+     */
     public function status(Request $request)
     {
         $request->validate([
