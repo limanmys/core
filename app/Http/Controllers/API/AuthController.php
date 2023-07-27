@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuthLog;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -38,7 +39,7 @@ class AuthController extends Controller
 
         $token = auth('api')->attempt($validator->validated());
         if (! $token) {
-            return response()->json(['message' => 'Unauthenticated.'], 401);
+            return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
         }
 
         return $this->createNewToken($token, $request);
@@ -86,7 +87,13 @@ class AuthController extends Controller
     {
         User::find(auth('api')->user()->id)->update([
             'last_login_at' => Carbon::now()->toDateTimeString(),
-            'last_login_ip' => $request->ip(),
+            'last_login_ip' => $request->header('X-Forwarded-For'),
+        ]);
+
+        AuthLog::create([
+            'user_id' => auth('api')->user()->id,
+            'ip_address' => $request->header('X-Forwarded-For'),
+            'user_agent' => $request->userAgent(),
         ]);
 
         return response()->json([

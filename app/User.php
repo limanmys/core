@@ -190,6 +190,14 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * @return HasMany
+     */
+    public function authLogs()
+    {
+        return $this->hasMany('\App\Models\AuthLog');
+    }
+
+    /**
      * Interact with the user's OTP secret.
      *
      * @param string $value

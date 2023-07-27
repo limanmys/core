@@ -46,6 +46,11 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
 
     // Locale
     Route::post('/locale', [ProfileController::class, 'setLocale']);
+    Route::group(['prefix' => 'profile'], function () {
+        Route::get('/', [ProfileController::class, 'getInformation']);
+        Route::post('/', [ProfileController::class, 'setInformation']);
+        Route::get('/auth_logs', [ProfileController::class, 'authLogs']);
+    });
 
     // Notifications
     Route::group(['prefix' => 'notifications'], function () {
