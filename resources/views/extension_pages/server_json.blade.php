@@ -15,48 +15,44 @@
 <body>
     <script>
         module = {}
+        window.addEventListener("contextmenu", e => e.preventDefault());
+        function API()
+        {
+            return "{{route('home')}}/engine/";
+        }
     </script>
 
     <script src="{{url(mix('/js/liman.js'))}}"></script>
 
     @include('errors')
     @if(!isset($dbJson["skeleton"]) || !$dbJson["skeleton"])
-    <div class="row">
-        <div class="col-12">
-            <div>
-                <div class="card-body">
-                    <div class="tab-content">
+        <div class="card-body">
+            <div class="tab-content">
+                @endif
+                <div class="tab-pane fade show active" role="tabpanel" id="mainExtensionWrapper">
+                    @if (isset($dbJson["preload"]) && $dbJson["preload"])
+                    <script>
+                        customRequestData["token"] = "{{ $auth_token }}";
+                        customRequestData["locale"] = "{{session()->get('locale')}}";
+                        @if(!isset($dbJson["vite"]) || !$dbJson["vite"])
+                        window.onload();
+                        $('.modal').on('shown.bs.modal', function() {
+                            $(this).find(".alert").fadeOut();
+                        });
                         @endif
-                        <div class="tab-pane fade show active" role="tabpanel" id="mainExtensionWrapper">
-                            @if (isset($dbJson["preload"]) && $dbJson["preload"])
-                            <script>
-                                function API(target) {
-                                    return "{{route('home')}}/engine/";
-                                }
-                                customRequestData["token"] = "{{ $auth_token }}";
-                                customRequestData["locale"] = "{{session()->get('locale')}}";
-                                @if(!isset($dbJson["vite"]) || !$dbJson["vite"])
-                                window.onload();
-                                $('.modal').on('shown.bs.modal', function() {
-                                    $(this).find(".alert").fadeOut();
-                                });
-                                @endif
-                            </script>
-                            {!! $extContent !!}
-                            @else
-                            <div class="loader-wrapper d-flex" style="min-height: 500px; align-items: center; justify-content: center;">
-                                <div class="spinner-border" role="status">
-                                    <span class="sr-only">Loading...</span>
-                                </div>
-                            </div>
-                            @endif
+                    </script>
+                    {!! $extContent !!}
+                    @else
+                    <div class="loader-wrapper d-flex" style="min-height: 100vh; align-items: center; justify-content: center;">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
                         </div>
-                        @if(!isset($dbJson["skeleton"]) || !$dbJson["skeleton"])
                     </div>
+                    @endif
                 </div>
+                @if(!isset($dbJson["skeleton"]) || !$dbJson["skeleton"])
             </div>
         </div>
-    </div>
     @endif
 
     @if(!isset($dbJson["preload"]) || !$dbJson["preload"])
@@ -71,9 +67,6 @@
             }
         })
 
-        function API() {
-            return "{{route('home')}}/engine/";
-        }
         customRequestData["token"] = "{{ $auth_token }}";
         customRequestData["locale"] = "{{session()->get('locale')}}";
         let formData = new FormData();

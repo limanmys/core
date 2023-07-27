@@ -96,7 +96,7 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
                 Route::get('/', [Server\ExtensionController::class, 'index']);
 
                 // Extension Renderer
-                Route::match(['GET', 'POST'], '/{extension_id}', [ExtensionController::class, 'render'])
+                Route::match(['GET', 'POST'], '/{extension_id}/{target_function?}', [ExtensionController::class, 'render'])
                     ->middleware(['extension']);
             });
 
