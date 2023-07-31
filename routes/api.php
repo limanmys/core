@@ -28,6 +28,7 @@ Route::group([
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user', [AuthController::class, 'userProfile']);
+    Route::post('/change_password', [AuthController::class, 'forceChangePassword']);
 });
 
 Route::post('/notifications/send', [ExternalNotificationController::class, 'accept']);
@@ -94,6 +95,12 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             Route::group(['prefix' => 'extensions'], function () {
                 // Extension List That Assigned To Server
                 Route::get('/', [Server\ExtensionController::class, 'index']);
+
+                // Extension Settings
+                Route::group(['prefix' => '{extension_id}/settings'], function () {
+                    Route::get('/', [Server\ExtensionController::class, 'serverSettings']);
+                    Route::post('/', [Server\ExtensionController::class, 'setServerSettings']);
+                });
 
                 // Extension Renderer
                 Route::match(['GET', 'POST'], '/{extension_id}/{target_function?}', [ExtensionController::class, 'render'])

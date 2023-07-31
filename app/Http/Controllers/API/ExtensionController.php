@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
 use App\Models\Extension;
+use App\Models\Permission;
+use App\Models\ServerKey;
 use App\Models\Token;
 use App\Models\UserExtensionUsageStats;
+use App\Models\UserSettings;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
@@ -104,6 +108,11 @@ class ExtensionController extends Controller
      */
     public function render(Request $request)
     {
+        $dbJson = getExtensionJson(extension()->name);
+
+        $this->checkPermissions(extension());
+        $this->checkForMissingSettings($dbJson);
+
         if (extension()->status == '0') {
             return response()->json([
                 'message' => 'Eklenti şu anda güncelleniyor, biraz sonra tekrar deneyiniz.',
@@ -122,7 +131,6 @@ class ExtensionController extends Controller
 
         $token = Token::create(user()->id);
 
-        $dbJson = getExtensionJson(extension()->name);
         if (isset($dbJson['preload']) && $dbJson['preload']) {
             $client = new Client(['verify' => false]);
             try {
@@ -178,5 +186,97 @@ class ExtensionController extends Controller
                 ),
             ]
         );
+    }
+
+    /**
+     * Check if existing settings is valid for extension
+     *
+     * @return void
+     */
+    private function checkForMissingSettings($extension)
+    {
+        $key = ServerKey::where([
+            'server_id' => server()->id,
+            'user_id' => user()->id,
+        ])->first();
+        $extra = [];
+        if ($key) {
+            $extra = ['clientUsername', 'clientPassword'];
+        }
+        foreach ($extension['database'] as $setting) {
+            if (isset($setting['required']) && $setting['required'] === false) {
+                continue;
+            }
+            $opts = [
+                'server_id' => server()->id,
+                'name' => $setting['variable'],
+            ];
+
+            if (! isset($setting['global']) || $setting['global'] === false) {
+                $opts['user_id'] = user()->id;
+            }
+
+            if (
+                ! in_array($setting['variable'], $extra) &&
+                ! UserSettings::where($opts)->exists()
+            ) {
+                throw new JsonResponseException(['redirect' => true], null, Response::HTTP_NOT_ACCEPTABLE);
+            }
+        }
+    }
+
+    /**
+     * Control if user is eligible to use this extension
+     *
+     * @return void
+     */
+    private function checkPermissions($extension)
+    {
+        if (
+            ! Permission::can(
+                auth()->id(),
+                'function',
+                'name',
+                strtolower((string) $extension->name),
+                request('target_function')
+            )
+        ) {
+            $function = request('target_function');
+            $extensionJson = json_decode(
+                file_get_contents(
+                    '/liman/extensions/' .
+                    strtolower((string) $extension->name) .
+                    DIRECTORY_SEPARATOR .
+                    'db.json'
+                ),
+                true
+            );
+
+            $functions = collect([]);
+
+            if (array_key_exists('functions', $extensionJson)) {
+                $functions = collect($extensionJson['functions']);
+            }
+
+            $isActive = 'false';
+            $functionOptions = $functions
+                ->where('name', request('target_function'))
+                ->first();
+            if ($functionOptions) {
+                $isActive = $functionOptions['isActive'];
+            }
+            if (
+                $isActive == 'true' &&
+                ! Permission::can(
+                    user()->id,
+                    'function',
+                    'name',
+                    strtolower((string) $extension->name),
+                    $function
+                )
+            ) {
+                throw new JsonResponseException(['message' => 'Bu işlem için yetkiniz bulunmamaktadır.'], null, Response::HTTP_FORBIDDEN);
+            }
+        }
     }
 }

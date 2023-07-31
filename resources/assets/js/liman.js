@@ -101,8 +101,8 @@ function request(url, data, next, error, requestType = "POST") {
 
   modalData = data;
   if (
-    url.startsWith(window.location.origin + "/engine/") ||
-    url.startsWith("/engine/")
+    url.includes("/engine/") || 
+    url.includes("/extensionRun/")
   ) {
     data.append("lmntargetFunction", url.split("/engine/")[1]);
     url = window.location.origin + "/engine/";

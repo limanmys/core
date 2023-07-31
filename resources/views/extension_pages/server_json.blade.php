@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="{{ app()->getLocale() }}">
 
 <head>
     <meta charset="UTF-8">
@@ -16,24 +16,32 @@
     <script>
         module = {}
         window.addEventListener("contextmenu", e => e.preventDefault());
-        function API()
+        function API(target)
         {
-            return "{{route('home')}}/engine/";
+            return "{{route('home')}}/engine/" + target;
         }
     </script>
-
     <script src="{{url(mix('/js/liman.js'))}}"></script>
+
+    <style>
+        html, body {
+            background: transparent !important;
+        }
+        #app {
+            margin: 0 !important;
+        }
+    </style>
 
     @include('errors')
     @if(!isset($dbJson["skeleton"]) || !$dbJson["skeleton"])
         <div class="card-body">
             <div class="tab-content">
-                @endif
+    @endif
                 <div class="tab-pane fade show active" role="tabpanel" id="mainExtensionWrapper">
                     @if (isset($dbJson["preload"]) && $dbJson["preload"])
                     <script>
                         customRequestData["token"] = "{{ $auth_token }}";
-                        customRequestData["locale"] = "{{session()->get('locale')}}";
+                        customRequestData["locale"] = "{{ app()->getLocale() }}";
                         @if(!isset($dbJson["vite"]) || !$dbJson["vite"])
                         window.onload();
                         $('.modal').on('shown.bs.modal', function() {
@@ -50,7 +58,7 @@
                     </div>
                     @endif
                 </div>
-                @if(!isset($dbJson["skeleton"]) || !$dbJson["skeleton"])
+    @if(!isset($dbJson["skeleton"]) || !$dbJson["skeleton"])
             </div>
         </div>
     @endif
@@ -71,7 +79,7 @@
         customRequestData["locale"] = "{{session()->get('locale')}}";
         let formData = new FormData();
         formData.append("lmntargetFunction", "{{request('target_function') ? request('target_function') : 'index'}}")
-        request(API(), formData, function(success) {
+        request(API("{{request('target_function') ? request('target_function') : 'index'}}"), formData, function(success) {
             $(".loader-wrapper").fadeOut(300, function() {
                 $("#mainExtensionWrapper").html(success);
             })
