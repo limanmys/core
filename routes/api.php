@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get("/", function () {
     return response()->json([
         'message' => 'Welcome to the Liman MYS API!',
-        'version' => '2.0',
+        'version' => getVersion(),
     ]);
 });
 
@@ -37,6 +37,7 @@ Route::post('/notifications/send', [ExternalNotificationController::class, 'acce
 Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
     // Dashboard Routes
     Route::group(['prefix' => 'dashboard'], function () {
+        Route::get('/information', [DashboardController::class, 'information']);
         Route::get('/latest_logged_in_users', [DashboardController::class, 'latestLoggedInUsers']);
         Route::get('/favorite_servers', [DashboardController::class, 'favoriteServers']);
         Route::get('/most_used_extensions', [DashboardController::class, 'mostUsedExtensions']);
@@ -269,6 +270,12 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
                 Route::post('/', [Settings\NotificationController::class, 'createExternalNotification']);
                 Route::delete('/{id}', [Settings\NotificationController::class, 'deleteExternalNotification']);
             });
+        });
+
+        // Mail
+        Route::group(['prefix' => 'mail'], function () {
+            Route::get('/', [Settings\MailController::class, 'getConfiguration']);
+            Route::post('/', [Settings\MailController::class, 'saveConfiguration']);
         });
     });
 });

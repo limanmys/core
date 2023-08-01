@@ -39,7 +39,6 @@ class KeycloakConnectionController extends Controller
     {
         validate([
             'client_id' => 'required|string',
-            'client_secret' => 'required|string',
             'redirect_uri' => 'required|string',
             'base_url' => 'required|string',
             'realm' => 'required|string',

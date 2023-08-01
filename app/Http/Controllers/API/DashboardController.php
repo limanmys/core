@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\UserExtensionUsageStats;
 use App\User;
-use Illuminate\Http\JsonResponse;
 
 /**
  * Dashboard Controller
@@ -16,6 +16,22 @@ use Illuminate\Http\JsonResponse;
  */
 class DashboardController extends Controller
 {
+    /**
+     * Returns dashboard information
+     *
+     * @return mixed
+     */
+    public function information()
+    {
+        return [
+            'server_count' => Server::count(),
+            'user_count' => User::count(),
+            'extension_count' => Extension::count(),
+            'version' => getVersion(),
+            'version_code' => getVersionCode()
+        ];
+    }
+
     /**
      * Returns latest logged in users
      *
