@@ -42,7 +42,6 @@ composer install --no-dev -d package/liman/sandbox/php
 rm -rf package/liman/server/node_modules
 mv package/liman/server/storage/build_tools/DEBIAN package/
 mv package/liman/server/storage/build_tools/rhel/liman.spec liman.spec
-mv package/liman/server/storage/build_tools/rhel/liman-cron-mail.ini liman-cron-mail.ini
 mv package/liman/server/storage/build_tools/rhel/liman-system-worker.ini liman-system-worker.ini
 mv package/liman/server/storage/build_tools/rhel/liman-high-availability-syncer.ini liman-high-availability-syncer.ini
 rm -rf package/liman/server/storage/build_tools
@@ -83,7 +82,6 @@ rm -rf DEBIAN
 VERSION=$(cat package/liman/server/storage/VERSION | tr - .)
 sed -i s/%VERSION%/$VERSION.$5/g liman.spec
 mkdir -p ./package/etc/supervisord.d
-cp liman-cron-mail.ini ./package/etc/supervisord.d/liman-cron-mail.ini
 cp liman-system-worker.ini ./package/etc/supervisord.d/liman-system-worker.ini
 cp liman-high-availability-syncer.ini ./package/etc/supervisord.d/liman-high-availability-syncer.ini
 rpmbuild -ba liman.spec --define "_app_dir $(pwd)/package" --define "_rpmdir /tmp" --define "_rpmfilename package.rpm"

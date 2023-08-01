@@ -41,9 +41,6 @@ Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', '
 
     require_once app_path('Http/Controllers/Roles/_routes.php');
 
-    // Cron Mail Routes
-    require_once app_path('Http/Controllers/CronMail/__routes.php');
-
     // Internal Sandbox Routes
 
     require_once app_path('Http/Controllers/Extension/Sandbox/_routes.php');

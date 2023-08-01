@@ -135,6 +135,10 @@ if [ -f "/etc/supervisord.d/liman-extension-worker.ini" ]; then
     rm /etc/supervisord.d/liman-extension-worker.ini;
 fi
 
+if [ -f "/etc/supervisord.d/liman-cron-mail.ini" ]; then
+    rm /etc/supervisord.d/liman-cron-mail.ini;
+fi
+
 supervisorctl reread
 supervisorctl update
 supervisorctl start all

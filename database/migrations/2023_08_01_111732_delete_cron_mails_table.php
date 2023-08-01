@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCronMailsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateCronMailsTable extends Migration
      */
     public function up()
     {
-        //
+        Schema::dropIfExists('cron_mails');
     }
 
     /**
@@ -23,6 +23,6 @@ class CreateCronMailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cron_mails');
+        //
     }
-}
+};

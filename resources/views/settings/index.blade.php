@@ -41,9 +41,6 @@
                         </li>
                         @endif
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#mailSettings" onclick="getCronMails()">{{__("Mail Ayarları")}}</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#rsyslog">{{__("Log Yönlendirme")}}</a>
                         </li>
                         <li class="nav-item">
@@ -240,23 +237,6 @@
                         </div>
                         <div class="tab-pane fade show" id="roleList" role="tabpanel">
                             <div id="roleListInner"></div>  
-                        </div>
-                        <div class="tab-pane fade show" id="mailSettings" role="tabpanel">
-                            <div id="mailWrapper"></div>
-                            <script>
-                                function getCronMails(){
-                                    showSwal('{{ __("Okunuyor...") }}',"info");
-                                    request("{{route('cron_mail_get')}}",new FormData(),function (success){
-                                        $("#mailWrapper").html(success);
-                                        $("#mailWrapper table").DataTable(dataTablePresets("normal"));
-                                        Swal.close();
-                                    },function(error){
-                                        let json = JSON.parse(error);
-                                        showSwal(json.message,'error',2000);
-                                    });
-
-                                }
-                            </script>
                         </div>
                         <div class="tab-pane fade show" id="limanTweaks" role="tabpanel">
                             @include("settings.tweaks")
