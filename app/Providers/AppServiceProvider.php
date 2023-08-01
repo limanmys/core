@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Models\Notification;
 use App\Models\Permission;
 use App\Observers\NotificationObserver;
+use App\Observers\UserObserver;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -48,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
         Carbon::setLocale(app()->getLocale());
 
         Notification::observe(NotificationObserver::class);
+        User::observe(UserObserver::class);
 
         Relation::morphMap([
             'users' => 'App\User',
