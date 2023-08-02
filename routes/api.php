@@ -277,5 +277,20 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             Route::get('/', [Settings\MailController::class, 'getConfiguration']);
             Route::post('/', [Settings\MailController::class, 'saveConfiguration']);
         });
+
+        // Advanced
+        Route::group(['prefix' => 'advanced'], function () {
+            // DNS Settings
+            Route::get('/dns', [Settings\DNSController::class, 'getDNSServers']);
+            Route::post('/dns', [Settings\DNSController::class, 'setDNSServers']);
+
+            // Certificates
+            Route::get('/certificates', [Settings\CertificateController::class, 'index']);
+            Route::post('/certificates', [Settings\CertificateController::class, 'create']);
+            Route::patch('/certificates/{id}', [Settings\CertificateController::class, 'update']);
+            Route::delete('/certificates/{id}', [Settings\CertificateController::class, 'delete']);
+            Route::get('/certificates/{certificate}/information', [Settings\CertificateController::class, 'information']);
+            Route::post('/certificates/retrieve', [Settings\CertificateController::class, 'retrieve']);
+        });
     });
 });
