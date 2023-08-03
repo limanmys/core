@@ -57,11 +57,6 @@ class AppServiceProvider extends ServiceProvider
             'roles' => 'App\Models\Role',
         ]);
 
-        if ($this->app->environment('local')) {
-            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
-            $this->app->register(TelescopeServiceProvider::class);
-        }
-
         if (! request()->headers->has('liman-token')) {
             $router->pushMiddlewareToGroup(
                 'web',
