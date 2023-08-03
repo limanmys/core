@@ -156,6 +156,14 @@ sed -i "s#QUEUE_DRIVER=database#QUEUE_DRIVER=redis#g" /liman/server/.env
 #Change Render Engine Port
 sed -i "s#RENDER_ENGINE_ADDRESS=https://127.0.0.1:5454#RENDER_ENGINE_ADDRESS=https://127.0.0.1:2806#g" /liman/server/.env
 
+# JWT Secret creation
+JWT_EXISTS=$(grep JWT_SECRET /liman/server/.env && echo "1" || echo "0")
+if [ $JWT_EXISTS == "0" ]; then
+    php /liman/server/artisan jwt:secret
+else
+    echo "JWT secret already set."
+fi
+
 # Run Database Migration
 php /liman/server/artisan migrate --force
 php /liman/server/artisan cache:clear
@@ -290,6 +298,7 @@ rm /etc/systemd/system/liman.service 2>/dev/null
 systemctl disable liman 2>/dev/null
 systemctl stop liman 2>/dev/null
 
+systemctl enable liman-ui 2>/dev/null
 systemctl enable liman-system 2>/dev/null
 systemctl enable liman-render 2>/dev/null
 systemctl disable liman-connector 2>/dev/null
@@ -304,6 +313,7 @@ systemctl enable php8.1-fpm 2>/dev/null
 systemctl stop liman-connector
 systemctl stop liman-vnc
 systemctl stop liman-webssh
+systemctl restart liman-ui
 systemctl restart liman-system
 systemctl restart liman-render
 systemctl restart liman-socket
