@@ -16,11 +16,13 @@ mv php-sandbox-$1/* package/liman/sandbox/php/
 rm -rf $1.zip php-sandbox-$1
 
 #UI
-wget "https://github.com/limanmys/next/archive/$1.zip" -q
-unzip -qq $1.zip 
-mkdir -p package/liman/ui
-mv next-$1/* package/liman/ui
-rm -rf $1.zip next-$1
+curl -s https://api.github.com/repos/limanmys/next/releases/latest \
+| grep "browser_download_url.*zip" \
+| cut -d : -f 2,3 \
+| tr -d \" \
+| wget -qi -
+unzip ui*.zip -d package/liman/ui
+rm ui*.zip
 
 #Extension Templates
 wget "https://github.com/limanmys/extension_templates/archive/$2.zip" -q
@@ -52,7 +54,6 @@ mv package/liman/server/storage/build_tools/rhel/liman.spec liman.spec
 mv package/liman/server/storage/build_tools/rhel/liman-system-worker.ini liman-system-worker.ini
 mv package/liman/server/storage/build_tools/rhel/liman-high-availability-syncer.ini liman-high-availability-syncer.ini
 rm -rf package/liman/server/storage/build_tools
-cd package/liman/ui && npm install && npm run build && cd ../../..
 
 #Build Package
 cd package

@@ -192,7 +192,7 @@ Restart=always
 RestartSec=1
 User=liman
 WorkingDirectory=/liman/ui
-ExecStart=/usr/bin/npm start
+ExecStart=/usr/bin/node server.js
 
 [Install]
 WantedBy=multi-user.target

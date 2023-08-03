@@ -1,4 +1,4 @@
-name: CI
+name: Liman CI
 on: [push]
 
 jobs:
@@ -19,6 +19,17 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 18
+
+      - name: Restore the Composer cache directory
+        id: composercache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+  
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-'8.1'-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-'8.1'-composer-
+
       - name: Build Liman Package
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
