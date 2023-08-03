@@ -15,6 +15,13 @@ mkdir -p package/liman/sandbox/php
 mv php-sandbox-$1/* package/liman/sandbox/php/
 rm -rf $1.zip php-sandbox-$1
 
+#UI
+wget "https://github.com/limanmys/next/archive/$1.zip" -q
+unzip -qq $1.zip 
+mkdir -p package/liman/ui
+mv next-$1/* package/liman/ui
+rm -rf $1.zip next-$1
+
 #Extension Templates
 wget "https://github.com/limanmys/extension_templates/archive/$2.zip" -q
 unzip -qq $2.zip
@@ -45,6 +52,7 @@ mv package/liman/server/storage/build_tools/rhel/liman.spec liman.spec
 mv package/liman/server/storage/build_tools/rhel/liman-system-worker.ini liman-system-worker.ini
 mv package/liman/server/storage/build_tools/rhel/liman-high-availability-syncer.ini liman-high-availability-syncer.ini
 rm -rf package/liman/server/storage/build_tools
+cd package/liman/ui && npm install && npm run build && cd ../../..
 
 #Build Package
 cd package
@@ -73,7 +81,7 @@ Date : $DATE
 Architecture: amd64
 Priority: important
 Description: Liman MYS
-Depends: curl, gpg, zip, unzip, nginx, redis, php8.1-redis, php8.1-fpm, php8.1-gd, php8.1-curl, php8.1, php8.1-sqlite3, php8.1-snmp, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-posix, libnginx-mod-http-headers-more-filter, libssl1.1 | libssl3, supervisor, postgresql-15, php8.1-pgsql, pgloader, php8.1-bcmath, rsync, dnsutils, php8.1-ldap, php8.1-smbclient, krb5-user, php8.1-ssh2, smbclient""" > DEBIAN/control
+Depends: curl, gpg, zip, unzip, nginx, redis, php8.1-redis, php8.1-fpm, php8.1-gd, php8.1-curl, php8.1, php8.1-sqlite3, php8.1-snmp, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-posix, libnginx-mod-http-headers-more-filter, libssl1.1 | libssl3, supervisor, postgresql-15, php8.1-pgsql, pgloader, php8.1-bcmath, rsync, dnsutils, php8.1-ldap, php8.1-smbclient, krb5-user, php8.1-ssh2, smbclient, nodejs""" > DEBIAN/control
 cat DEBIAN/control
 cd ../
 dpkg-deb -Zgzip --build package

@@ -2,7 +2,7 @@ Name: liman
 Version: %VERSION%
 Release: 0
 License: MIT
-Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, php-smbclient, postgresql15, postgresql15-server
+Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, php-smbclient, postgresql15, postgresql15-server, nodejs
 Prefix: /liman
 Summary: Liman MYS
 Group: Applications/System
@@ -171,6 +171,28 @@ chmod 755 /{liman,liman/extensions,liman/keys}
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman-connector.service" ]; then
     rm /etc/systemd/system/liman-connector.service
+fi
+
+# Create UI Systemd Service
+if [ -f "/etc/systemd/system/liman-ui.service" ]; then
+    echo "Liman User Interface Service Already Added.";
+else
+    echo """
+[Unit]
+Description=Liman User Interface Service
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=liman
+WorkingDirectory=/liman/ui
+ExecStart=/usr/bin/npm start
+
+[Install]
+WantedBy=multi-user.target
+    """ > /etc/systemd/system/liman-ui.service
 fi
 
 # Create Systemd Service

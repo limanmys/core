@@ -11,12 +11,14 @@ use App\Http\Controllers\API\SearchController;
 use App\Http\Controllers\API\Server;
 use App\Http\Controllers\API\ServerController;
 use App\Http\Controllers\API\Settings;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get("/", function () {
+Route::get("/", function (Request $request) {
     return response()->json([
         'message' => 'Welcome to the Liman MYS API!',
         'version' => getVersion(),
+        'ip' => $request->ip(),
     ]);
 });
 

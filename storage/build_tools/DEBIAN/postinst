@@ -177,6 +177,28 @@ if [ -f "/etc/systemd/system/liman-connector.service" ]; then
     rm /etc/systemd/system/liman-connector.service
 fi
 
+# Create UI Systemd Service
+if [ -f "/etc/systemd/system/liman-ui.service" ]; then
+    echo "Liman User Interface Service Already Added.";
+else
+    echo """
+[Unit]
+Description=Liman User Interface Service
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=liman
+WorkingDirectory=/liman/ui
+ExecStart=/usr/bin/npm start
+
+[Install]
+WantedBy=multi-user.target
+    """ > /etc/systemd/system/liman-ui.service
+fi
+
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman-system.service" ]; then
     echo "Liman System Service Already Added.";
