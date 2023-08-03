@@ -15,10 +15,6 @@ jobs:
           php-version: "8.1"
           tools: composer
           extensions: ssh2, curl, sqlite3, ldap, mbstring, xml, zip, posix, smbclient, gd
-      - name: Install node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 18
 
       - name: Restore the Composer cache directory
         id: composercache
