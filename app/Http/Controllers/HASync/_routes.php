@@ -1,7 +1,7 @@
 <?php
 
 Route::prefix("hasync")
-    ->middleware(["block_except_limans"])
+    ->middleware(["block_except_limans", "api"])
     ->group(function () {
         Route::get("/extension_list", "HASync\MainController@extensionList")->name("ha_extension_list");
         Route::get("/module_list", "HASync\MainController@moduleList")->name("ha_module_list");

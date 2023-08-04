@@ -11,6 +11,7 @@ use App\Models\Server;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -63,7 +64,7 @@ class RoleController extends Controller
             'name' => $request->name,
         ]);
 
-        return $role; 
+        return response()->json($role, Response::HTTP_OK); 
     }
 
     /**

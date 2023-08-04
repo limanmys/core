@@ -27,7 +27,7 @@ class CertificateController extends Controller
         if (
             Certificate::where([
                 'server_hostname' => strtolower((string) $request->hostname),
-                'origin' => $request->origin,
+                'origin' => $request->port,
             ])->exists()
         ) {
             return response()->json([
@@ -37,7 +37,7 @@ class CertificateController extends Controller
 
         [$flag, $message] = retrieveCertificate(
             strtolower((string) $request->hostname),
-            $request->origin
+            $request->port
         );
 
         if (! $flag) {
@@ -49,7 +49,7 @@ class CertificateController extends Controller
         // Create Certificate Object.
         $certificate = Certificate::create([
             'server_hostname' => strtolower((string) $request->hostname),
-            'origin' => $request->origin,
+            'origin' => $request->port,
         ]);
 
         $certificate->addToSystem('/tmp/' . request('path'));
@@ -100,6 +100,11 @@ class CertificateController extends Controller
         ]);
 
         $certinfo = openssl_x509_parse($certificateFile);
+        if (! $certinfo) {
+            return response()->json([
+                'message' => 'Sertifika bilgileri alınamadı.',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
         $certinfo['subjectKeyIdentifier'] = array_key_exists(
             'subjectKeyIdentifier',
             $certinfo['extensions']
@@ -120,7 +125,16 @@ class CertificateController extends Controller
         )->format('H:i d/m/Y');
         unset($certinfo['extensions']);
 
-        return response()->json($certinfo);
+        return response()->json([
+            'ip_address' => $certificate->server_hostname,
+            'port' => $certificate->origin,
+            'valid_to' => $certinfo['validTo_time_t'],
+            'valid_from' => $certinfo['validFrom_time_t'],
+            'issuer_cn' => $certinfo['issuer']['CN'] ?? '',
+            'issuer_dc' => implode(".", isset($certinfo['issuer']['DC']) ? $certinfo['issuer']['DC'] : []) ?? '',
+            'authority_key_identifier' => $certinfo['authorityKeyIdentifier'],
+            'subject_key_identifier' => $certinfo['subjectKeyIdentifier'],
+        ]);
     }
 
     /**
@@ -135,13 +149,24 @@ class CertificateController extends Controller
             'port' => 'required|numeric|min:1|max:65537',
         ]);
 
-        [$flag, $message] = retrieveCertificate(
+        [$flag, $certinfo] = retrieveCertificate(
             $request->hostname,
             $request->port
         );
+
+        if (! $flag) {
+            return response()->json([
+                'message' => 'Sertifika bilgileri alınamadı.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
         
         return response()->json([
-            'message' => $message,
+            'valid_to' => $certinfo['validTo_time_t'],
+            'valid_from' => $certinfo['validFrom_time_t'],
+            'issuer_cn' => $certinfo['issuer']['CN'] ?? '',
+            'issuer_dc' => implode(".", isset($certinfo['issuer']['DC']) ? $certinfo['issuer']['DC'] : []) ?? '',
+            'authority_key_identifier' => $certinfo['authorityKeyIdentifier'],
+            'subject_key_identifier' => $certinfo['subjectKeyIdentifier'],
         ], $flag ? Response::HTTP_OK : Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
