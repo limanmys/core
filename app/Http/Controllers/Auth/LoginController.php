@@ -72,10 +72,6 @@ class LoginController extends Controller
         ]);
 
         system_log(7, 'LOGIN_SUCCESS');
-
-        if (env('WIZARD_STEP', 1) != config('liman.wizard_max_steps') && $user->status) {
-            return redirect()->route('wizard', env('WIZARD_STEP', 1));
-        }
     }
 
     /**

@@ -140,6 +140,7 @@ class ExtensionController extends Controller
                         'extension_id' => extension()->id,
                         'server_id' => server()->id,
                         'token' => $token,
+                        'locale' => app()->getLocale(),
                     ],
                     'timeout' => 30,
                 ]);

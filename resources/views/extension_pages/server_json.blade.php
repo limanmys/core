@@ -76,7 +76,7 @@
         })
 
         customRequestData["token"] = "{{ $auth_token }}";
-        customRequestData["locale"] = "{{session()->get('locale')}}";
+        customRequestData["locale"] = "{{app()->getLocale()}}";
         let formData = new FormData();
         formData.append("lmntargetFunction", "{{request('target_function') ? request('target_function') : 'index'}}")
         request(API("{{request('target_function') ? request('target_function') : 'index'}}"), formData, function(success) {

@@ -32,7 +32,6 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\ForcePasswordChange::class,
-            \App\Http\Middleware\WizardChecker::class,
         ],
 
         'api' => [

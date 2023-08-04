@@ -29,10 +29,6 @@ Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', '
 
     require_once app_path('Http/Controllers/Settings/_routes.php');
 
-    // Wizard Routes
-
-    require_once app_path('Http/Controllers/Wizard/_routes.php');
-
     // Modules Routes
 
     require_once app_path('Http/Controllers/Module/_routes.php');
