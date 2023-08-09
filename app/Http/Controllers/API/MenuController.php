@@ -37,6 +37,7 @@ class MenuController extends Controller
             return $server;
         }), ...$servers->map(function ($server) {
             $server->is_favorite = false;
+            $server->can_run_command = $server->canRunCommand();
 
             return $server;
         })]);
@@ -68,6 +69,7 @@ class MenuController extends Controller
             return $extension;
         });
         $server->is_favorite = (bool) user()->myFavorites()->where('server_id', $server->id)->exists();
+        $server->can_run_command = $server->canRunCommand();
 
         return response()->json($server);
     }

@@ -56,14 +56,20 @@ class AuthController extends Controller
             ->first();
 
         if (! $user) {
-            // Try ldap authentication to create user from LDAP
-            if ((bool) env('LDAP_STATUS', false)) {
-                return $this->authWithLdap($request, true);
-            }
-
             // Try keycloak authentication to create user from Keycloak
             if (env('KEYCLOAK_ACTIVE', false)) {
-                return $this->authWithKeycloak($request, true);
+                $token = $this->authWithKeycloak($request, true);
+                if ($token->status() === 200) {
+                    return $token;
+                }
+            }
+
+            // Try ldap authentication to create user from LDAP
+            if ((bool) env('LDAP_STATUS', false)) {
+                $token = $this->authWithLdap($request, true);
+                if ($token->status() === 200) {
+                    return $token;
+                }
             }
         } else {
             // If User type keycloak
@@ -189,18 +195,6 @@ class AuthController extends Controller
         }
         $details = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', explode('.', $response['access_token'])[1]))));
 
-        Oauth2Token::updateOrCreate([
-            'user_id' => $details->sub,
-            'token_type' => $response['token_type'],
-        ], [
-            'user_id' => $details->sub,
-            'token_type' => $response['token_type'],
-            'access_token' => $response['access_token'],
-            'refresh_token' => $response['refresh_token'],
-            'expires_in' => (int) $response['expires_in'],
-            'refresh_expires_in' => (int) $response['refresh_expires_in'],
-        ]);
-
         if ($create) {
             $user = User::create([
                 'id' => $details->sub,
@@ -214,6 +208,18 @@ class AuthController extends Controller
         } else {
             $user = User::where('id', $details->sub)->first();
         }
+
+        Oauth2Token::updateOrCreate([
+            'user_id' => $details->sub,
+            'token_type' => $response['token_type'],
+        ], [
+            'user_id' => $details->sub,
+            'token_type' => $response['token_type'],
+            'access_token' => $response['access_token'],
+            'refresh_token' => $response['refresh_token'],
+            'expires_in' => (int) $response['expires_in'],
+            'refresh_expires_in' => (int) $response['refresh_expires_in'],
+        ]);
 
         return $this->createNewToken(
             auth('api')->login($user),
