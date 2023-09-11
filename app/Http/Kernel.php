@@ -59,7 +59,8 @@ class Kernel extends HttpKernel
         'extension' => \App\Http\Middleware\Extension::class,
         'block_except_limans' => \App\Http\Middleware\BlockExceptLimans::class,
         'google2fa' => \PragmaRX\Google2FALaravel\Middleware::class,
-        'check_google_two_factor' => \App\Http\Middleware\CheckGoogleTwoFactor::class
+        'check_google_two_factor' => \App\Http\Middleware\CheckGoogleTwoFactor::class,
+        'upload_token_check' => \App\Http\Middleware\LimanTokenUploadCheck::class,
     ];
 
     protected $middlewarePriority = [

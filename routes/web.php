@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Auth Routes
@@ -117,13 +118,14 @@ Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', '
 
 Route::any('/upload/{any?}', function () {
     $server = app('tus-server');
-    $extension_id = request('extension_id');
+    $extension_id = request()->headers->get('extension-id');
     $extension = \App\Models\Extension::find($extension_id);
     if ($extension) {
         $path = '/liman/extensions/' . strtolower((string) $extension->name);
     } else {
         $path = storage_path();
     }
+
     if (!file_exists($path . '/uploads')) {
         mkdir($path . '/uploads');
         if ($extension) {
@@ -134,11 +136,10 @@ Route::any('/upload/{any?}', function () {
     }
     $server->setUploadDir($path . '/uploads');
     $response = $server->serve();
-
     return $response->send();
 })
     ->where('any', '.*')
-    ->middleware(['auth', 'permissions']);
+    ->middleware(['upload_token_check']);
 
 Route::post('/upload_info', function () {
     request()->validate([
@@ -160,7 +161,7 @@ Route::post('/upload_info', function () {
     }
 
     return $info;
-})->middleware(['auth', 'permissions']);
+})->middleware(['upload_token_check']);
 
 registerModuleRoutes();
 
