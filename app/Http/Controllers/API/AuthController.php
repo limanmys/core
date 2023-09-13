@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AuthLog;
 use App\Models\LdapRestriction;
 use App\Models\Oauth2Token;
+use App\Models\Permission;
 use App\Models\RoleMapping;
 use App\Models\RoleMappingQueue;
 use App\Models\RoleUser;
@@ -418,7 +419,16 @@ class AuthController extends Controller
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60,
             'expired_at' => (auth('api')->factory()->getTTL() * 60 + time()) * 1000,
-            'user' => User::find(auth('api')->user()->id),
+            'user' => [
+                ...User::find(auth('api')->user()->id)->toArray(),
+                'permissions' => [
+                    'server_details' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details'),
+                    'server_services' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_services'),
+                    'add_server' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server'),
+                    'update_server' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'update_server'),
+                    'view_logs' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'view_logs'),
+                ]
+            ],
         ]);
     }
 

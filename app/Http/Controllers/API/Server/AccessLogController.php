@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\Server;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
 use App\Models\Extension;
 use App\Models\Permission;
@@ -18,13 +19,13 @@ class AccessLogController extends Controller
     public function __construct()
     {
         if (! isset(auth('api')->user()->id)) {
-            return response()->json([
+            throw new JsonResponseException([
                 'message' => 'Tekrar giriş yapınız.'
             ], Response::HTTP_UNAUTHORIZED);
         }
 
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'view_logs')) {
-            return response()->json(
+            throw new JsonResponseException(
                 ['message' => 'Sunucu günlük kayıtlarını görüntülemek için yetkiniz yok.'],
                 Response::HTTP_FORBIDDEN
             );

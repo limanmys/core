@@ -168,6 +168,15 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             ->middleware("server");
     });
 
+    // Vault
+    Route::group(['prefix' => 'settings/vault'], function () {
+        Route::get('/', [Settings\VaultController::class, 'index']);
+        Route::post('/', [Settings\VaultController::class, 'create']);
+        Route::post('/key', [Settings\VaultController::class, 'createKey']);
+        Route::patch('/', [Settings\VaultController::class, 'update']);
+        Route::delete('/', [Settings\VaultController::class, 'delete']);
+    });
+
     // Settings
     Route::group(['prefix' => 'settings', 'middleware' => ['admin']], function () {
         // Extension
@@ -185,6 +194,7 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             Route::get('/', [Settings\UserController::class, 'index']);
             Route::post('/', [Settings\UserController::class, 'create']);
             Route::delete('/{user_id}', [Settings\UserController::class, 'delete']);
+            Route::get('/auth_logs/{user_id?}', [Settings\UserController::class, 'authLogs']);
         });
 
         // Roles
@@ -255,14 +265,7 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             });
         });
 
-        // Vault
-        Route::group(['prefix' => 'vault'], function () {
-            Route::get('/', [Settings\VaultController::class, 'index']);
-            Route::post('/', [Settings\VaultController::class, 'create']);
-            Route::post('/key', [Settings\VaultController::class, 'createKey']);
-            Route::patch('/', [Settings\VaultController::class, 'update']);
-            Route::delete('/', [Settings\VaultController::class, 'delete']);
-        });
+
 
         // Notifications
         Route::group(['prefix' => 'notifications'], function () {

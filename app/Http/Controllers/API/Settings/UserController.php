@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuthLog;
 use App\Models\Permission;
 use App\Models\RoleUser;
 use App\User;
@@ -83,5 +84,26 @@ class UserController extends Controller
         return response()->json([
             'message' => 'Kullanıcı başarıyla silindi.'
         ]);
+    }
+
+    /**
+     * Authentication logs
+     * 
+     * @return JsonResponse
+     */
+    public function authLogs(Request $request)
+    {
+        if ($request->user_id) {
+            return User::find($request->user_id)
+                ->authLogs()
+                ->orderBy('created_at', 'desc')
+                ->take(500)
+                ->get();
+        }
+
+        return AuthLog::orderBy('created_at', 'desc')
+            ->with('user')
+            ->take(500)
+            ->get();
     }
 }

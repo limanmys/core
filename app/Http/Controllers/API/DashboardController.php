@@ -24,9 +24,18 @@ class DashboardController extends Controller
     public function information()
     {
         return [
-            'server_count' => Server::count(),
+            'server_count' => Server::get()->filter(function ($server) {
+                return Permission::can(user()->id, 'server', 'id', $server->id);
+            })->count(),
             'user_count' => User::count(),
-            'extension_count' => Extension::count(),
+            'extension_count' => Extension::get()->filter(function ($extension) {
+                return Permission::can(
+                    user()->id,
+                    'extension',
+                    'id',
+                    $extension->id
+                );
+            })->count(),
             'version' => getVersion(),
             'version_code' => getVersionCode()
         ];
@@ -39,6 +48,8 @@ class DashboardController extends Controller
      */
     public function latestLoggedInUsers()
     {
+        if (! auth()->user()->isAdmin()) return [];
+
         return User::orderBy('last_login_at', 'desc')
             ->whereNot('id', auth('api')->user()->id)
             ->whereNotNull('last_login_at')

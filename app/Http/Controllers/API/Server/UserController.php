@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\API\Server;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use App\System\Command;
 use Illuminate\Http\Response;
 
@@ -11,6 +13,15 @@ use Illuminate\Http\Response;
  */
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+    }
+
     /**
      * Get local users on system
      *

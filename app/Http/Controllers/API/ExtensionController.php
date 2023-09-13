@@ -39,9 +39,13 @@ class ExtensionController extends Controller
         if ($server_id) {
             $extensions = Extension::whereDoesntHave('servers', function ($query) use ($server_id) {
                 $query->where('server_id', $server_id);
-            })->orderBy('updated_at', 'DESC')->get();
+            })->orderBy('updated_at', 'DESC')->get()->filter(function ($extension) {
+                return Permission::can(auth('api')->user()->id, 'extension', 'id', $extension->id);
+            })->values();
         } else {
-            $extensions = Extension::orderBy('updated_at', 'DESC')->get();
+            $extensions = Extension::orderBy('updated_at', 'DESC')->get()->filter(function ($extension) {
+                return Permission::can(auth('api')->user()->id, 'extension', 'id', $extension->id);
+            })->values();
         }
 
         return $extensions;

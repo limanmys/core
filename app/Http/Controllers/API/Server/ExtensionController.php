@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\API\Server;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use App\Models\Token;
@@ -19,6 +21,15 @@ use mervick\aesEverywhere\AES256;
  */
 class ExtensionController extends Controller
 {
+    public function __construct()
+    {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+    }
+
     /**
      * Extension list
      *
@@ -26,11 +37,13 @@ class ExtensionController extends Controller
      */
     public function index()
     {
-        return server()->extensions()->map(function ($item) {
+        return server()->extensions()->filter(function ($extension) {
+            return Permission::can(auth('api')->user()->id, 'extension', 'id', $extension->id);
+        })->map(function ($item) {
             $item->updated = Carbon::parse($item->getRawOriginal('updated_at'))->getPreciseTimestamp(3);
 
             return $item;
-        });
+        })->values();
     }
 
     /**
