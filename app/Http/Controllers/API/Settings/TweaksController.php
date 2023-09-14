@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Http\Controllers\API\Settings;
+
+use App\Http\Controllers\Controller;
+use App\System\Command;
+use Illuminate\Http\Request;
+
+class TweaksController extends Controller
+{
+    /**
+     * Get existing configuration
+     *
+     * @return JsonResponse
+     */
+    public function getConfiguration()
+    {
+        return response()->json([
+            'APP_LANG' => env('APP_LANG'),
+            'OTP_ENABLED' => (bool) env('OTP_ENABLED', 'false'),
+            'APP_NOTIFICATION_EMAIL' => env('APP_NOTIFICATION_EMAIL'),
+            'APP_URL' => env('APP_URL'),
+            'EXTENSION_TIMEOUT' => env('EXTENSION_TIMEOUT', 30),
+            'APP_DEBUG' => (bool) env('APP_DEBUG', 'false'),
+            'EXTENSION_DEVELOPER_MODE' => (bool) env('EXTENSION_DEVELOPER_MODE', 'false'),
+            'NEW_LOG_LEVEL' => env('NEW_LOG_LEVEL'),
+            'LDAP_IGNORE_CERT' => (bool) env('LDAP_IGNORE_CERT', 'false'),
+        ]);
+    }
+
+    /**
+     * Save new mail configuration
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws GuzzleException
+     */
+    public function saveConfiguration(Request $request)
+    {
+        validate([
+            'APP_LANG' => 'required|string',
+            'APP_NOTIFICATION_EMAIL' => 'required|email',
+            'APP_URL' => 'required|url',
+            'EXTENSION_TIMEOUT' => 'required|integer|min:1|max:300',
+            'NEW_LOG_LEVEL' => 'required|string',
+        ]);
+
+        setEnv([
+            'APP_LANG' => $request->APP_LANG,
+            'OTP_ENABLED' => (bool) $request->OTP_ENABLED,
+            'APP_NOTIFICATION_EMAIL' => $request->APP_NOTIFICATION_EMAIL,
+            'APP_URL' => $request->APP_URL,
+            'EXTENSION_TIMEOUT' => $request->EXTENSION_TIMEOUT,
+            'APP_DEBUG' => (bool) $request->APP_DEBUG,
+            'EXTENSION_DEVELOPER_MODE' => (bool) $request->EXTENSION_DEVELOPER_MODE,
+            'NEW_LOG_LEVEL' => $request->NEW_LOG_LEVEL,
+            'LDAP_IGNORE_CERT' => (bool) $request->LDAP_IGNORE_CERT,
+        ]);
+
+        Command::runSystem('systemctl restart liman-render');
+
+        return response()->json([
+            'message' => 'Ayarlar kaydedildi.',
+        ]);
+    }
+}

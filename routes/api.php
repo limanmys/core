@@ -296,6 +296,12 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             Route::delete('/certificates/{id}', [Settings\CertificateController::class, 'delete']);
             Route::get('/certificates/{certificate}/information', [Settings\CertificateController::class, 'information']);
             Route::post('/certificates/retrieve', [Settings\CertificateController::class, 'retrieve']);
+
+            // Tweaks
+            Route::group(['prefix' => 'tweaks'], function () {
+                Route::get('/', [Settings\TweaksController::class, 'getConfiguration']);
+                Route::post('/', [Settings\TweaksController::class, 'saveConfiguration']);
+            });
         });
     });
 });
