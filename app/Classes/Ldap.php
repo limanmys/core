@@ -124,7 +124,7 @@ class Ldap
 
             // Update cookie and total size
             $cookie = $this->controlPagedResultResponse($this->connection, $search, $cookie);
-            $size += $entries['count'];
+            $size += $entries['count'] ?? 0;
 
             unset($entries['count']);
         } while ($cookie !== null && $cookie != '');
