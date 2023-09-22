@@ -265,7 +265,11 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             });
         });
 
-
+        // Health Check
+        Route::group(['prefix' => 'health'], function () {
+            Route::get('/', [Settings\HealthController::class, 'index']);
+            Route::post('/manual_high_availability_sync', [Settings\HealthController::class, 'manualHighAvailabilitySync']);
+        });
 
         // Notifications
         Route::group(['prefix' => 'notifications'], function () {
