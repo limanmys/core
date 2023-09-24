@@ -16,6 +16,8 @@ class UserObserver
      */
     public function created(User $user)
     {
+        if (! (bool) env('MAIL_ENABLED', false)) return;
+
         try {
             Mail::to($user->email)
                 ->send(new Information(
@@ -32,6 +34,8 @@ class UserObserver
      */
     public function updating(User $user)
     {
+        if (! (bool) env('MAIL_ENABLED', false)) return;
+
         if ($user->isDirty('password')) {
             try {
                 Mail::to($user->getOriginal('email'))

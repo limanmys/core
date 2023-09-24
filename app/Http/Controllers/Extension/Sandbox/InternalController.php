@@ -91,6 +91,8 @@ class InternalController extends Controller
      */
     public function sendMail()
     {
+        if (! (bool) env('MAIL_ENABLED', false)) return;
+
         Mail::to(request('to'))->send(
             new ExtensionMail(
                 request('subject'),
