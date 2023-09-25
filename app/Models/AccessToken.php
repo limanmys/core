@@ -21,4 +21,6 @@ class AccessToken extends Model
         'last_used_ip',
         'ip_range',
     ];
+
+    protected $hidden = ["token"];
 }

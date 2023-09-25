@@ -177,6 +177,13 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
         Route::delete('/', [Settings\VaultController::class, 'delete']);
     });
 
+    // Personal Access Tokens
+    Route::group(['prefix' => 'settings/tokens'], function () {
+        Route::get('/', [Settings\AccessTokenController::class, 'index']);
+        Route::post('/', [Settings\AccessTokenController::class, 'create']);
+        Route::delete('/{token_id}', [Settings\AccessTokenController::class, 'delete']);
+    });
+
     // Settings
     Route::group(['prefix' => 'settings', 'middleware' => ['admin']], function () {
         // Extension
