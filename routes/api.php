@@ -270,6 +270,12 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
                 Route::get('/configuration', [Settings\KeycloakConnectionController::class, 'getConfiguration']);
                 Route::post('/configuration', [Settings\KeycloakConnectionController::class, 'saveConfiguration']);
             });
+
+            // Audit Log Routes
+            Route::group(['prefix' => 'audit'], function () {
+                Route::get('/', [Settings\AuditLogController::class, 'index']);
+                Route::get('/{log_id}', [Settings\AuditLogController::class, 'details']);
+            });
         });
 
         // Health Check

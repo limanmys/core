@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Extension;
 use App\Models\Permission;
+use App\Models\Server;
 use App\Models\ServerKey;
 use App\Models\Token;
 use App\Models\UserExtensionUsageStats;
@@ -72,6 +74,22 @@ class ExtensionController extends Controller
             return response()->json([
                 'message' => 'An error occured while assigning server.',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $server = Server::find($request->server_id);
+        $extensions = Extension::whereIn('id', $request->extensions)->get();
+        foreach ($extensions as $extension) {
+            AuditLog::write(
+                'extension',
+                'assign',
+                [
+                    'extension_id' => $extension->id,
+                    'extension_name' => $extension->name,
+                    'server_id' => $request->server_id,
+                    'server_name' => $server->name,
+                ],
+                "EXTENSION_ASSIGNED_TO_SERVER"
+            );
         }
 
         return response()->json([
