@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Extension;
 use App\Models\GolangLicense;
 use App\Models\License;
@@ -105,6 +106,16 @@ class ExtensionController extends Controller
             'extension_id' => $new->id,
         ]);
 
+        AuditLog::write(
+            'extension',
+            'upload',
+            [
+                'extension_id' => $new->id,
+                'extension_name' => $new->display_name ?? $new->name,
+            ],
+            "EXTENSION_UPLOAD"
+        );
+
         return response()->json([
             'message' => 'Eklenti başarıyla yüklendi.'
         ]);
@@ -132,6 +143,17 @@ class ExtensionController extends Controller
 
         try {
             rootSystem()->userRemove(extension()->id);
+
+            AuditLog::write(
+                'extension',
+                'delete',
+                [
+                    'extension_id' => extension()->id,
+                    'extension_name' => extension()->display_name ?? extension()->name,
+                ],
+                "EXTENSION_DELETE"
+            );
+
             extension()->delete();
         } catch (\Exception) {
         }

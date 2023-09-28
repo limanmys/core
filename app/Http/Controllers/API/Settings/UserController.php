@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\AuthLog;
 use App\Models\Permission;
 use App\Models\RoleUser;
@@ -58,7 +59,17 @@ class UserController extends Controller
             $data['username'] = $request->username;
         }
 
-        User::create($data);
+        $user = User::create($data);
+
+        AuditLog::write(
+            'user',
+            'create',
+            [
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+            ],
+            "USER_CREATED"
+        );
 
         return response()->json([
             'message' => 'Kullanıcı başarıyla oluşturuldu.'
@@ -79,7 +90,17 @@ class UserController extends Controller
         RoleUser::where('user_id', $request->user_id)->delete();
 
         // Delete User
-        User::where('id', $request->user_id)->delete();
+        $user = User::where('id', $request->user_id)->delete();
+
+        AuditLog::write(
+            'user',
+            'delete',
+            [
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+            ],
+            "USER_DELETED"
+        );
 
         return response()->json([
             'message' => 'Kullanıcı başarıyla silindi.'

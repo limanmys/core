@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\System\Command;
 use Illuminate\Http\Request;
 
@@ -56,6 +57,23 @@ class TweaksController extends Controller
             'NEW_LOG_LEVEL' => $request->NEW_LOG_LEVEL,
             'LDAP_IGNORE_CERT' => (bool) $request->LDAP_IGNORE_CERT,
         ]);
+
+        AuditLog::write(
+            'tweak',
+            'edit',
+            [
+                'APP_LANG' => $request->APP_LANG,
+                'OTP_ENABLED' => (bool) $request->OTP_ENABLED,
+                'APP_NOTIFICATION_EMAIL' => $request->APP_NOTIFICATION_EMAIL,
+                'APP_URL' => $request->APP_URL,
+                'EXTENSION_TIMEOUT' => $request->EXTENSION_TIMEOUT,
+                'APP_DEBUG' => (bool) $request->APP_DEBUG,
+                'EXTENSION_DEVELOPER_MODE' => (bool) $request->EXTENSION_DEVELOPER_MODE,
+                'NEW_LOG_LEVEL' => $request->NEW_LOG_LEVEL,
+                'LDAP_IGNORE_CERT' => (bool) $request->LDAP_IGNORE_CERT,
+            ],
+            "TWEAK_EDIT"
+        );
 
         Command::runSystem('systemctl restart liman-render');
 

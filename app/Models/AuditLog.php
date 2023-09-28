@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use App\Casts\Jsonb;
+use App\Support\Database\CacheQueryBuilder;
 use App\User;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AuditLog extends Model
 {
-    use HasFactory;
     use UsesUuid;
+    use CacheQueryBuilder;
 
     public $timestamps = ["created_at"];
     const UPDATED_AT = null;

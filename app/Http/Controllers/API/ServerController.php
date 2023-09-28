@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Connectors\GenericConnector;
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Certificate;
 use App\Models\Permission;
 use App\Models\Server;
@@ -97,6 +98,16 @@ class ServerController extends Controller
                 }
             }
         }
+
+        AuditLog::write(
+            'server',
+            'create',
+            [
+                'server_id' => $server->id,
+                'server_name' => $server->name,
+            ],
+            "SERVER_CREATE"
+        );
 
         return response()->json([
             'message' => 'Sunucu başarıyla eklendi.'

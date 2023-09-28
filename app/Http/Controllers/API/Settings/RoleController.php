@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Role;
@@ -64,6 +65,16 @@ class RoleController extends Controller
             'name' => $request->name,
         ]);
 
+        AuditLog::write(
+            'role',
+            'create',
+            [
+                'role_id' => $role->id,
+                'role_name' => $role->name,
+            ],
+            "ROLE_CREATE"
+        );
+
         return response()->json($role, Response::HTTP_OK); 
     }
 
@@ -75,7 +86,18 @@ class RoleController extends Controller
      */
     public function delete(Request $request)
     {
-        Role::where('id', $request->role_id)->delete();
+        $role = Role::where('id', $request->role_id)->first();
+        $role->delete();
+
+        AuditLog::write(
+            'role',
+            'delete',
+            [
+                'role_id' => $role->id,
+                'role_name' => $role->name,
+            ],
+            "ROLE_DELETE"
+        );
 
         return response()->json([
             'message' => 'Rol başarıyla silindi.'
@@ -111,11 +133,25 @@ class RoleController extends Controller
         RoleUser::where('role_id', $request->role_id)->delete();
 
         // Add new users
+        $role = Role::find($request->role_id);
         foreach ($request->users as $user) {
             RoleUser::firstOrCreate([
                 'user_id' => $user,
                 'role_id' => $request->role_id,
             ]);
+
+            $user = User::find($user);
+            AuditLog::write(
+                'role',
+                'users',
+                [
+                    'role_id' => $role->id,
+                    'role_name' => $role->name,
+                    'user_id' => $user->id,
+                    'user_name' => $user->name
+                ],
+                "ROLE_USERS"
+            );
         }
 
         return response()->json([
@@ -171,6 +207,17 @@ class RoleController extends Controller
             );
         }
 
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => count($request->servers ?? []),
+                'type' => 'servers',
+                'array' => $request->servers
+            ],
+            "ROLE_EDIT"
+        );
+
         return response()->json([
             'message' => 'Sunucular başarıyla güncellendi.'
         ]);
@@ -223,6 +270,17 @@ class RoleController extends Controller
                 'roles'
             );
         }
+
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => count($request->extensions ?? []),
+                'type' => 'extensions',
+                'array' => $request->extensions
+            ],
+            "ROLE_EDIT"
+        );
 
         return response()->json([
             'message' => 'Eklentiler başarıyla güncellendi.'
@@ -290,6 +348,17 @@ class RoleController extends Controller
                 'roles'
             );
         }
+
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => count($request->limanPermissions ?? []),
+                'type' => 'liman_permissions',
+                'array' => $request->limanPermissions
+            ],
+            "ROLE_EDIT"
+        );
 
         return response()->json([
             'message' => 'Liman yetkileri başarıyla güncellendi.'
@@ -410,6 +479,17 @@ class RoleController extends Controller
             );
         }
 
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => count($request->functions ?? []),
+                'type' => 'functions',
+                'array' => $request->functions
+            ],
+            "ROLE_EDIT"
+        );
+
         return response()->json([
             'message' => 'Fonksiyonlar başarıyla güncellendi.'
         ]);
@@ -424,6 +504,17 @@ class RoleController extends Controller
     public function deleteFunctions(Request $request)
     {
         Permission::whereIn('id', $request->permission_ids)->delete();
+
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => count($request->permission_ids ?? []),
+                'type' => 'functions',
+                'array' => $request->permission_ids
+            ],
+            "ROLE_EDIT"
+        );
 
         return response()->json([
             'message' => 'Fonksiyonlar başarıyla silindi.'
@@ -460,6 +551,21 @@ class RoleController extends Controller
             $request->value,
             null,
             'roles'
+        );
+
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => 1,
+                'type' => 'variables',
+                'array' => [
+                    'role_id' => $request->role_id,
+                    'key' => $request->key,
+                    'value' => $request->value,
+                ]
+            ],
+            "ROLE_EDIT"
         );
 
         return response()->json('Veri başarıyla eklendi!');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\System\Command;
 use Illuminate\Http\Request;
 
@@ -65,6 +66,17 @@ class DNSController extends Controller
             $request->dns1,
             $request->dns2,
             $request->dns3
+        );
+
+        AuditLog::write(
+            'dns',
+            'edit',
+            [
+                'dns1' => $request->dns1,
+                'dns2' => $request->dns2,
+                'dns3' => $request->dns3,
+            ],
+            "DNS_EDIT"
         );
         
         return response()->json([

@@ -116,6 +116,22 @@ class ExtensionController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+        $server = Server::find($request->server_id);
+        $extensions = Extension::whereIn('id', $request->extensions)->get();
+        foreach ($extensions as $extension) {
+            AuditLog::write(
+                'extension',
+                'assign',
+                [
+                    'extension_id' => $extension->id,
+                    'extension_name' => $extension->name,
+                    'server_id' => $request->server_id,
+                    'server_name' => $server->name,
+                ],
+                "EXTENSION_UNASSIGNED_FROM_SERVER"
+            );
+        }
+
         return response()->json([
             'message' => 'Unassigned successfully.',
         ]);
