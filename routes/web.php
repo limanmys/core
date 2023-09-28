@@ -3,13 +3,18 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Auth Routes
-require_once app_path('Http/Controllers/Auth/_routes.php');
+Route::any("/", function () {
+    return redirect("/api");
+})->name('home');
 
 // HA Routes
 require_once app_path('Http/Controllers/HASync/_routes.php');
 
+// Auth Routes
+// require_once app_path('Http/Controllers/Auth/_routes.php');
+
 Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', 'permissions']], function () {
+    /*
     // Extension Routes
 
     require_once app_path('Http/Controllers/Extension/_routes.php');
@@ -37,11 +42,13 @@ Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', '
     // Role Routes
 
     require_once app_path('Http/Controllers/Roles/_routes.php');
+    */
 
     // Internal Sandbox Routes
 
     require_once app_path('Http/Controllers/Extension/Sandbox/_routes.php');
 
+    /*
     // Change the language
     Route::get('/locale', 'HomeController@setLocale')->name('set_locale');
 
@@ -114,6 +121,7 @@ Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', '
     );
 
     Route::get('/liman_arama', 'SearchController@search')->name('search');
+    */
 });
 
 Route::any('/upload/{any?}', function () {
@@ -163,7 +171,7 @@ Route::post('/upload_info', function () {
     return $info;
 })->middleware(['upload_token_check']);
 
-registerModuleRoutes();
+// registerModuleRoutes();
 
 Route::get('/bildirimYolla', 'Notification\ExternalNotificationController@accept');
 
