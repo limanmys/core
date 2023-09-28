@@ -14,7 +14,6 @@
 <body>
     <script>
         module = {}
-        window.addEventListener("contextmenu", e => e.preventDefault());
         function API(target)
         {
             return "{{route('home')}}/engine/" + target;
