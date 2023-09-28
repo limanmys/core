@@ -41,13 +41,21 @@ class Kernel extends ConsoleKernel
             ->name('hasync')
             ->everyFiveMinutes();
 
-        // Run Health Check every hour.
+        // Clean log table excess records every day
         $schedule
             ->call(function () {
-                // TODO: Health check logic here when developed
+                // This methods does keeps newest 10000 records and deletes other ones
+                \App\Models\AuthLog::orderBy('created_at', 'desc')
+                    ->skip(10000)
+                    ->get()
+                    ->each->delete();
+                \App\Models\AuditLog::orderBy('created_at', 'desc')
+                    ->skip(10000)
+                    ->get()
+                    ->each->delete();
             })
-            ->hourly()
-            ->name('Health Check');
+            ->daily()
+            ->name('Clean Log Tables');
     }
 
     /**
