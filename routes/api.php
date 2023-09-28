@@ -75,6 +75,8 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
         // Server Details
         Route::get('/', [Server\DetailsController::class, 'index']);
         Route::post('/', [ServerController::class, 'create']);
+        Route::patch('/{server_id}', [ServerController::class, 'update']);
+        Route::delete('/{server_id}', [ServerController::class, 'delete']);
         Route::post('/{server_id}/favorites', [Server\DetailsController::class, 'favorite']);
 
         // Server Creation Validations

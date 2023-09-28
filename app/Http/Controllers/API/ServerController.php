@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Connectors\GenericConnector;
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Certificate;
@@ -10,6 +11,7 @@ use App\Models\Permission;
 use App\Models\Server;
 use App\Models\ServerKey;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use mervick\aesEverywhere\AES256;
 
 class ServerController extends Controller
@@ -65,6 +67,73 @@ class ServerController extends Controller
         }
 
         return $this->grantPermissions($server);
+    }
+
+    /**
+     * Update server name and IP address
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request) {
+        $server = Server::find($request->server_id);
+        if (! $server) {
+            throw new JsonResponseException([
+                'message' => 'Sunucu bulunamadı.'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
+        $server->name = $request->name;
+        $server->ip_address = $request->ip_address;
+        $server->save();
+
+        return response()->json([
+            'message' => 'İşlem başarılı.'
+        ]);
+    }
+
+    /**
+     * Delete server from system
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(Request $request) {
+        $server = Server::find($request->server_id);
+        if (! $server) {
+            throw new JsonResponseException([
+                'message' => 'Sunucu bulunamadı.'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        if (
+            $server->user_id != auth('api')->id() &&
+            ! auth('api')
+                ->user()
+                ->isAdmin()
+        ) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
+        $server->delete();
+
+        return response()->json([
+            'message' => 'İşlem başarılı.'
+        ]);
     }
 
     /**
