@@ -89,6 +89,19 @@ class ServerController extends Controller
             ], '', Response::HTTP_FORBIDDEN);
         }
 
+        AuditLog::write(
+            'server',
+            'update',
+            [
+                'server_id' => $server->id,
+                'server_name' => $server->name,
+                'server_ip' => $server->ip_address,
+                'new_server_name' => $request->name,
+                'new_server_ip' => $request->ip_address
+            ],
+            "SERVER_UPDATE"
+        );
+
         $server->name = $request->name;
         $server->ip_address = $request->ip_address;
         $server->save();
@@ -128,6 +141,16 @@ class ServerController extends Controller
                 'message' => 'Bu işlemi yapmak için yetkiniz yok!'
             ], '', Response::HTTP_FORBIDDEN);
         }
+
+        AuditLog::write(
+            'server',
+            'delete',
+            [
+                'server_id' => $server->id,
+                'server_name' => $server->name
+            ],
+            "SERVER_DELETE"
+        );
 
         $server->delete();
 
