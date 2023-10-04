@@ -30,6 +30,19 @@
         }
     </style>
 
+    <script>
+        let hashData = window.location.hash;
+        // TODO: window.location.watch and Proxy observers not working for iframe contents
+        // Is there any better way to watch url changes?
+        setInterval(() => {
+            if (window.location.hash != hashData) {
+                hashData = window.location.hash;
+                const hashChangeEvent = new CustomEvent('limanHashChange', { detail: hashData });
+                window.dispatchEvent(hashChangeEvent, { detail: hashData });
+            }
+        }, 1500)
+    </script>
+
     @include('errors')
     @if(!isset($dbJson["skeleton"]) || !$dbJson["skeleton"])
         <div class="card-body">
