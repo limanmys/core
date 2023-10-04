@@ -290,6 +290,8 @@ fi
 sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/8.1/fpm/php.ini
 sed -i "s/post_max_size.*/post_max_size = 100M/g" /etc/php/8.1/fpm/php.ini
 
+mv -f /liman/server/storage/php8.1-fpm-www.conf /etc/php/8.1/fpm/pool.d/www.conf
+
 # Reload the systemd
 systemctl daemon-reload
 

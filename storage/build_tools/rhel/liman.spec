@@ -105,6 +105,10 @@ sed -i "s/;listen.mode/listen.mode/g" /etc/php-fpm.d/www.conf
 sed -i "s/listen.owner =.*/listen.owner = liman/g" /etc/php-fpm.d/www.conf
 sed -i "s/listen.group =.*/listen.group = liman/g" /etc/php-fpm.d/www.conf
 sed -i "s/listen.mode =.*/listen.mode = 660/g" /etc/php-fpm.d/www.conf
+sed -i "s/pm.max_children =.*/pm.max_children = 60/g" /etc/php-fpm.d/www.conf
+sed -i "s/pm.start_servers =.*/pm.start_servers = 10/g" /etc/php-fpm.d/www.conf
+sed -i "s/pm.min_spare_servers =.*/pm.min_spare_servers = 5/g" /etc/php-fpm.d/www.conf
+sed -i "s/pm.max_spare_servers =.*/pm.max_spare_servers = 20/g" /etc/php-fpm.d/www.conf
 sed -i "s/user .*;/user liman;/g" /etc/nginx/nginx.conf
 
 # Crontab Setting
