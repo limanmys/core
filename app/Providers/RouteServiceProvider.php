@@ -43,10 +43,6 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapApiRoutes();
 
         $this->mapWebRoutes();
-
-        if (env('EXTENSION_DEVELOPER_MODE', false)) {
-            $this->mapExtensionDeveloperRoutes();
-        }
     }
 
     /**

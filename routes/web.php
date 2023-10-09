@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::any("/", function () {
@@ -10,118 +9,9 @@ Route::any("/", function () {
 // HA Routes
 require_once app_path('Http/Controllers/HASync/_routes.php');
 
-// Auth Routes
-// require_once app_path('Http/Controllers/Auth/_routes.php');
-
 Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', 'permissions']], function () {
-    /*
-    // Extension Routes
-
-    require_once app_path('Http/Controllers/Extension/_routes.php');
-
-    // Notification Routes
-
-    require_once app_path('Http/Controllers/Notification/_routes.php');
-
-    // Server Routes
-
-    require_once app_path('Http/Controllers/Server/_routes.php');
-
-    // Certificate Routes
-
-    require_once app_path('Http/Controllers/Certificate/_routes.php');
-
-    // Settings Routes
-
-    require_once app_path('Http/Controllers/Settings/_routes.php');
-
-    // Modules Routes
-
-    require_once app_path('Http/Controllers/Module/_routes.php');
-
-    // Role Routes
-
-    require_once app_path('Http/Controllers/Roles/_routes.php');
-    */
-
     // Internal Sandbox Routes
-
     require_once app_path('Http/Controllers/Extension/Sandbox/_routes.php');
-
-    /*
-    // Change the language
-    Route::get('/locale', 'HomeController@setLocale')->name('set_locale');
-
-    // Home Route
-
-    Route::get('/', 'HomeController@index')->name('home');
-
-    Route::post('/', 'HomeController@getLimanStats')
-        ->name('liman_stats')
-        ->middleware('admin');
-
-    Route::post('/online_servers', 'HomeController@getServerStatus')
-        ->name('online_servers')
-        ->middleware('admin');
-
-    // Vault Route
-
-    Route::get('/kasa/{user_id?}', 'UserController@userKeyList')->name('keys');
-
-    // Add Key Route
-    Route::post('/kasa/ekle', 'UserController@addKey')->name('key_add');
-
-    // User Add
-    Route::post('/kullanici/ekle', 'UserController@add')
-        ->name('user_add')
-        ->middleware('admin');
-
-    // User Remove
-    Route::post('/kullanici/sil', 'UserController@remove')
-        ->name('user_remove')
-        ->middleware('admin');
-
-    // User Remove
-    Route::post('/kullanici/parola/sifirla', 'UserController@passwordReset')
-        ->name('user_password_reset')
-        ->middleware('admin');
-
-    Route::view('/profil', 'user.self')->name('my_profile');
-
-    Route::get('/profil/anahtarlarim', 'UserController@myAccessTokens')->name(
-        'my_access_tokens'
-    );
-
-    Route::post(
-        '/profil/anahtarlarim/ekle',
-        'UserController@createAccessToken'
-    )->name('create_access_token');
-
-    Route::post(
-        '/profil/anahtarlarim/sil',
-        'UserController@revokeAccessToken'
-    )->name('revoke_access_token');
-
-    Route::post('/profil', 'UserController@selfUpdate')->name('profile_update');
-
-    Route::post('/user/update', 'UserController@adminUpdate')
-        ->name('update_user')
-        ->middleware('admin');
-
-    Route::post('/user/setting/delete', 'UserController@removeSetting')->name(
-        'user_setting_remove'
-    );
-
-    Route::post('/user/setting/create', 'UserController@createSetting')->name(
-        'user_setting_create'
-    );
-
-    Route::post('/user/setting/update', 'UserController@updateSetting')->name(
-        'user_setting_update'
-    );
-
-    Route::get('/liman_arama', 'SearchController@search')->name('search');
-    */
 });
 
 Route::any('/upload/{any?}', function () {
@@ -171,13 +61,8 @@ Route::post('/upload_info', function () {
     return $info;
 })->middleware(['upload_token_check']);
 
-// registerModuleRoutes();
-
-Route::get('/bildirimYolla', 'Notification\ExternalNotificationController@accept');
-
-
 Route::get(
     '/eklenti/{extension_id}/public/{any}',
-    'Extension\OneController@publicFolder'
+    'API\ExtensionController@publicFolder'
 )->where('any', '.+')->name('extension_public_folder');
 

@@ -82,6 +82,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
         ],
+        
         'mongodb' => [
             'driver' => 'mongodb',
             'host' => env('DB_HOST', 'localhost'),

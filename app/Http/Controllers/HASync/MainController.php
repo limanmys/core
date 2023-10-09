@@ -4,7 +4,6 @@ namespace App\Http\Controllers\HASync;
 
 use App\Http\Controllers\Controller;
 use App\Models\Extension;
-use App\Models\Module;
 use App\System\Command;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
@@ -58,56 +57,6 @@ class MainController extends Controller
         $tempPath = '/tmp/' . Str::random() . '.zip';
 
         // Zip the current extension
-        Command::runLiman('cd @{:path} && zip -r @{:tempPath} .', [
-            'path' => $path,
-            'tempPath' => $tempPath,
-        ]);
-
-        // Return zip as download and delete it after sent.
-        return response()
-            ->download(
-                $tempPath,
-                Str::uuid() . '.zip'
-            )
-            ->deleteFileAfterSend();
-    }
-
-    /**
-     * Module list existing on system
-     *
-     * @return JsonResponse
-     */
-    public function moduleList()
-    {
-        $modules = Module::all();
-
-        $list = [];
-        foreach ($modules as $module) {
-            $list[] = [
-                "id" => $module->id,
-                "name" => $module->name,
-                "updated_at" => $module->updated_at->toDateTimeString(),
-                "download_path" => route("ha_download_module", [
-                    "module_name" => $module->name
-                ]),
-            ];
-        }
-
-        return response()->json($list);
-    }
-
-    /**
-     * Returns module zip file
-     *
-     * @return BinaryFileResponse
-     */
-    public function downloadModule()
-    {
-        // Generate Module Folder Path
-        $path = '/liman/modules/' . (string) request('module_name');
-        $tempPath = '/tmp/' . Str::random() . '.zip';
-
-        // Zip the current module
         Command::runLiman('cd @{:path} && zip -r @{:tempPath} .', [
             'path' => $path,
             'tempPath' => $tempPath,

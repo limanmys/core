@@ -22,8 +22,6 @@
         "jackiedo/dotenv-editor": "^2.0",
         "laravel/framework": "^9.19",
         "laravel/helpers": "^1.5",
-        "laravel/sanctum": "^3.0",
-        "laravel/socialite": "^5.5",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.0",
         "limanmys/php-smb": "^3.5",
@@ -32,7 +30,6 @@
         "phpseclib/phpseclib": "~3.0",
         "pragmarx/google2fa-laravel": "^2.0",
         "pusher/pusher-php-server": "^7.0",
-        "socialiteproviders/keycloak": "^5.2",
         "tymon/jwt-auth": "^2.0"
     },
     "require-dev": {

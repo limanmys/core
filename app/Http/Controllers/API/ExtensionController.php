@@ -14,6 +14,7 @@ use App\Models\UserExtensionUsageStats;
 use App\Models\UserSettings;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\MimeType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -316,6 +317,31 @@ class ExtensionController extends Controller
             ) {
                 throw new JsonResponseException(['message' => 'Bu işlem için yetkiniz bulunmamaktadır.'], null, Response::HTTP_FORBIDDEN);
             }
+        }
+    }
+
+    /**
+     * Get files from extensions public folder
+     *
+     * @return BinaryFileResponse|void
+     */
+    public function publicFolder()
+    {
+        $basePath =
+            '/liman/extensions/' . strtolower((string) extension()->name) . '/public/';
+
+        $targetPath = $basePath . explode('public/', (string) url()->current(), 2)[1];
+
+        if (realpath($targetPath) != $targetPath) {
+            abort(404);
+        }
+
+        if (is_file($targetPath)) {
+            return response()->download($targetPath, null, [
+                'Content-Type' => MimeType::fromExtension(pathinfo($targetPath, PATHINFO_EXTENSION)),
+            ]);
+        } else {
+            abort(404);
         }
     }
 }

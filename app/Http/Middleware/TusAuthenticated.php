@@ -35,18 +35,12 @@ class TusAuthenticated implements TusMiddleware
         }
 
         if (! $token) {
-            throw new UnauthorizedHttpException(response()->json([
-                'status' => 'error',
-                'message' => 'Extension-Token header is missing.',
-            ], 401));
+            throw new UnauthorizedHttpException('Extension-Token header is missing.');
         }
 
         $obj = Token::where('token', $token)->first();
         if (! $obj) {
-            throw new UnauthorizedHttpException(response()->json([
-                'status' => 'error',
-                'message' => 'Extension-Token is invalid.',
-            ], 401));
+            throw new UnauthorizedHttpException('Extension-Token is invalid.');
         }
 
         Log::info('Extension-Token is valid. User ip: ' . request()->ip);

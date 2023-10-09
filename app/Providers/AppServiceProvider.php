@@ -33,22 +33,7 @@ class AppServiceProvider extends ServiceProvider
     )
     {
         Paginator::useBootstrap();
-
-        View::composer('layouts.header', function ($view) {
-            $view->with('USER_FAVORITES', user()->favorites());
-            $view->with('SERVERS', \App\Models\Server::orderBy('updated_at', 'DESC')
-                ->limit(env('NAV_SERVER_COUNT', 20))->get()
-                ->filter(function ($server) {
-                    return Permission::can(user()->id, 'server', 'id', $server->id);
-                })
-                ->filter(function ($server) {
-                    return ! (bool) user()->favorites()->where('id', $server->id)->first();
-                })
-            );
-        });
-
         Carbon::setLocale(app()->getLocale());
-
         Notification::observe(NotificationObserver::class);
         User::observe(UserObserver::class);
 
