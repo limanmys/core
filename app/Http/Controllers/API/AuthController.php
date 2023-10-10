@@ -140,6 +140,14 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string',
+            'new_password' => [
+                'string',
+                'min:10',
+                'max:32',
+                'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\!\[\]\(\)\{\}\#\?\%\&\*\+\,\-\.\/\:\;\<\=\>\@\^\_\`\~]).{10,}$/',
+            ],
+        ], [
+            'new_password.regex' => 'Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı, özel karakter ve büyük harf içermelidir.',
         ]);
 
         if ($validator->fails()) {
@@ -149,6 +157,11 @@ class AuthController extends Controller
         $token = auth('api')->attempt($validator->validated());
         if (! $token) {
             return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
+        }
+
+        // If new_password is same as password return error
+        if (Hash::check($request->new_password, auth('api')->user()->password)) {
+            return response()->json(['message' => 'Yeni şifreniz eski şifreniz ile aynı olamaz.'], 405);
         }
 
         $user = auth('api')->user();
@@ -421,13 +434,15 @@ class AuthController extends Controller
             'expired_at' => (auth('api')->factory()->getTTL() * 60 + time()) * 1000,
             'user' => [
                 ...User::find(auth('api')->user()->id)->toArray(),
+                'last_login_at' => Carbon::now()->toDateTimeString(),
+                'last_login_ip' => $request->ip(),
                 'permissions' => [
                     'server_details' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details'),
                     'server_services' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_services'),
                     'add_server' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server'),
                     'update_server' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'update_server'),
                     'view_logs' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'view_logs'),
-                ]
+                ],
             ],
         ]);
     }

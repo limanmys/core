@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Settings;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\AuthLog;
+use App\Models\Notification;
 use App\Models\Permission;
 use App\Models\RoleUser;
 use App\User;
@@ -90,7 +91,8 @@ class UserController extends Controller
         RoleUser::where('user_id', $request->user_id)->delete();
 
         // Delete User
-        $user = User::where('id', $request->user_id)->delete();
+        $user = User::where('id', $request->user_id)->first();
+        $user->delete();
 
         AuditLog::write(
             'user',
