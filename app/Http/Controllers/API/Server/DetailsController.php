@@ -162,6 +162,11 @@ class DetailsController extends Controller
         $cores = str_replace("cpu cores\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'cpu cores'"))[0]));
         $cpu = str_replace("model name\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'model name'"))[0]));
         $ram = Command::runSudo("dmidecode -t memory | grep 'Size' | awk '{print $2}' | paste -sd+ | bc");
+        if ($ram > 1000) {
+            $ram = round($ram / 1000, 0).' GB';
+        } else {
+            $ram = $ram.' GB';
+        }
         $model = Command::runSudo('dmidecode -s system-product-name');
         $manufacturer = Command::runSudo('dmidecode -s system-manufacturer');
 
