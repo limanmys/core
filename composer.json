@@ -1,6 +1,6 @@
 {
     "name": "liman/liman",
-    "description": "Liman System Manager.",
+    "description": "Liman System Manager",
     "keywords": ["liman", "linux", "havelsan"],
     "license": "MIT",
     "type": "project",

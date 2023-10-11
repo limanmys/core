@@ -60,6 +60,14 @@
 </h4>
     <ul class="phpdocumentor-list">
                     <li>
+                <a href="namespaces/app-casts.html" class="">Casts</a>
+                
+            </li>
+                    <li>
+                <a href="namespaces/app-classes.html" class="">Classes</a>
+                
+            </li>
+                    <li>
                 <a href="namespaces/app-connectors.html" class="">Connectors</a>
                 
             </li>
@@ -101,10 +109,6 @@
             </li>
                     <li>
                 <a href="namespaces/app-providers.html" class="">Providers</a>
-                
-            </li>
-                    <li>
-                <a href="namespaces/app-sandboxes.html" class="">Sandboxes</a>
                 
             </li>
                     <li>
@@ -266,7 +270,7 @@
     <span class="phpdocumentor-signature__visibility">protected</span>
         <span class="phpdocumentor-signature__type">mixed</span>
     <span class="phpdocumentor-signature__name">$middleware</span>
-     = <span class="phpdocumentor-signature__default-value">[\App\Http\Middleware\XssSanitization::class, \App\Http\Middleware\CheckForMaintenanceMode::class, \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class, \App\Http\Middleware\TrimStrings::class, \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class]</span></code>
+     = <span class="phpdocumentor-signature__default-value">[\App\Http\Middleware\XssSanitization::class, \App\Http\Middleware\CheckForMaintenanceMode::class, \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class, \App\Http\Middleware\TrimStrings::class, \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class, \App\Http\Middleware\TrustProxies::class]</span></code>
 
         <section class="phpdocumentor-description"></section>
 
@@ -291,7 +295,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/Http/Kernel.php"><a href="files/app-http-kernel.html"><abbr title="app/Http/Kernel.php">Kernel.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">22</span>
+    <span class="phpdocumentor-element-found-in__line">23</span>
 
     </aside>
 
@@ -300,7 +304,7 @@
     <span class="phpdocumentor-signature__visibility">protected</span>
         <span class="phpdocumentor-signature__type">mixed</span>
     <span class="phpdocumentor-signature__name">$middlewareGroups</span>
-     = <span class="phpdocumentor-signature__default-value">[&#039;web&#039; =&gt; [\App\Http\Middleware\EncryptCookies::class, \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class, \Illuminate\Session\Middleware\StartSession::class, \App\Http\Middleware\TouchServer::class, \App\Http\Middleware\APILogin::class, \Illuminate\Session\Middleware\AuthenticateSession::class, \App\Http\Middleware\Language::class, \Illuminate\View\Middleware\ShareErrorsFromSession::class, \Illuminate\Routing\Middleware\SubstituteBindings::class, \App\Http\Middleware\ForcePasswordChange::class, \App\Http\Middleware\WizardChecker::class], &#039;api&#039; =&gt; [&#039;throttle:60,1&#039;, &#039;bindings&#039;]]</span></code>
+     = <span class="phpdocumentor-signature__default-value">[&#039;web&#039; =&gt; [\App\Http\Middleware\EncryptCookies::class, \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class, \Illuminate\Session\Middleware\StartSession::class, \App\Http\Middleware\APILogin::class, \Illuminate\Session\Middleware\AuthenticateSession::class, \Illuminate\View\Middleware\ShareErrorsFromSession::class, \Illuminate\Routing\Middleware\SubstituteBindings::class, \App\Http\Middleware\ForcePasswordChange::class], &#039;api&#039; =&gt; [&#039;throttle:600,1&#039;, &#039;bindings&#039;, \App\Http\Middleware\APILocalization::class]]</span></code>
 
         <section class="phpdocumentor-description"></section>
 
@@ -325,7 +329,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/Http/Kernel.php"><a href="files/app-http-kernel.html"><abbr title="app/Http/Kernel.php">Kernel.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">61</span>
+    <span class="phpdocumentor-element-found-in__line">62</span>
 
     </aside>
 
@@ -359,7 +363,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/Http/Kernel.php"><a href="files/app-http-kernel.html"><abbr title="app/Http/Kernel.php">Kernel.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">40</span>
+    <span class="phpdocumentor-element-found-in__line">42</span>
 
     </aside>
 
@@ -368,7 +372,7 @@
     <span class="phpdocumentor-signature__visibility">protected</span>
         <span class="phpdocumentor-signature__type">mixed</span>
     <span class="phpdocumentor-signature__name">$routeMiddleware</span>
-     = <span class="phpdocumentor-signature__default-value">[&#039;auth&#039; =&gt; \App\Http\Middleware\Authenticate::class, &#039;auth.basic&#039; =&gt; \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class, &#039;bindings&#039; =&gt; \Illuminate\Routing\Middleware\SubstituteBindings::class, &#039;cache.headers&#039; =&gt; \Illuminate\Http\Middleware\SetCacheHeaders::class, &#039;can&#039; =&gt; \Illuminate\Auth\Middleware\Authorize::class, &#039;parameters&#039; =&gt; \App\Http\Middleware\Parameters::class, &#039;server&#039; =&gt; \App\Http\Middleware\Server::class, &#039;server_api&#039; =&gt; \App\Http\Middleware\ServerApi::class, &#039;permissions&#039; =&gt; \App\Http\Middleware\PermissionManager::class, &#039;admin&#039; =&gt; \App\Http\Middleware\Admin::class, &#039;guest&#039; =&gt; \App\Http\Middleware\RedirectIfAuthenticated::class, &#039;signed&#039; =&gt; \Illuminate\Routing\Middleware\ValidateSignature::class, &#039;throttle&#039; =&gt; \Illuminate\Routing\Middleware\ThrottleRequests::class, &#039;verified&#039; =&gt; \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class, &#039;extension&#039; =&gt; \App\Http\Middleware\Extension::class, &#039;block_except_limans&#039; =&gt; \App\Http\Middleware\BlockExceptLimans::class, &#039;google2fa&#039; =&gt; \PragmaRX\Google2FALaravel\Middleware::class, &#039;check_google_two_factor&#039; =&gt; \App\Http\Middleware\CheckGoogleTwoFactor::class]</span></code>
+     = <span class="phpdocumentor-signature__default-value">[&#039;auth&#039; =&gt; \App\Http\Middleware\Authenticate::class, &#039;auth.basic&#039; =&gt; \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class, &#039;bindings&#039; =&gt; \Illuminate\Routing\Middleware\SubstituteBindings::class, &#039;cache.headers&#039; =&gt; \Illuminate\Http\Middleware\SetCacheHeaders::class, &#039;can&#039; =&gt; \Illuminate\Auth\Middleware\Authorize::class, &#039;server&#039; =&gt; \App\Http\Middleware\Server::class, &#039;permissions&#039; =&gt; \App\Http\Middleware\PermissionManager::class, &#039;admin&#039; =&gt; \App\Http\Middleware\Admin::class, &#039;guest&#039; =&gt; \App\Http\Middleware\RedirectIfAuthenticated::class, &#039;signed&#039; =&gt; \Illuminate\Routing\Middleware\ValidateSignature::class, &#039;throttle&#039; =&gt; \Illuminate\Routing\Middleware\ThrottleRequests::class, &#039;verified&#039; =&gt; \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class, &#039;extension&#039; =&gt; \App\Http\Middleware\Extension::class, &#039;block_except_limans&#039; =&gt; \App\Http\Middleware\BlockExceptLimans::class, &#039;google2fa&#039; =&gt; \PragmaRX\Google2FALaravel\Middleware::class, &#039;check_google_two_factor&#039; =&gt; \App\Http\Middleware\CheckGoogleTwoFactor::class, &#039;upload_token_check&#039; =&gt; \App\Http\Middleware\LimanTokenUploadCheck::class]</span></code>
 
         <section class="phpdocumentor-description"></section>
 
