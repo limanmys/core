@@ -32,6 +32,7 @@ class UserController extends Controller
      */
     public function getLocalUsers()
     {
+        $users = [];
         if (server()->isLinux()) {
             $output = Command::runSudo(
                 "cut -d: -f1,3 /etc/passwd | egrep ':[0-9]{4}$' | cut -d: -f1"
@@ -50,7 +51,7 @@ class UserController extends Controller
         }
 
         if (server()->isWindows() && server()->canRunCommand()) {
-            $output = Command::runSudo(
+            $output = Command::run(
                 'Get-LocalUser | Where { $_.Enabled -eq $True} | Select-Object Name'
             );
             $output = trim($output);
@@ -113,6 +114,7 @@ class UserController extends Controller
      */
     public function getLocalGroups()
     {
+        $groups = [];
         if (server()->isLinux()) {
             $output = Command::runSudo("getent group | cut -d ':' -f1");
             $output = trim($output);
@@ -130,7 +132,7 @@ class UserController extends Controller
         }
 
         if (server()->isWindows() && server()->canRunCommand()) {
-            $output = Command::runSudo(
+            $output = Command::run(
                 'Get-LocalGroup | Select-Object Name'
             );
             $output = trim($output);

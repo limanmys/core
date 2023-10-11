@@ -184,7 +184,6 @@ class DetailsController extends Controller
      * @return Application|Factory|View
      *
      * @throws GuzzleException
-     * @throws GuzzleException
      */
     public function topCpuProcesses()
     {
@@ -209,7 +208,6 @@ class DetailsController extends Controller
      * @return Application|Factory|View
      *
      * @throws GuzzleException
-     * @throws GuzzleException
      */
     public function topMemoryProcesses()
     {
@@ -233,7 +231,6 @@ class DetailsController extends Controller
      *
      * @return Application|Factory|View
      *
-     * @throws GuzzleException
      * @throws GuzzleException
      */
     public function topDiskUsage()
