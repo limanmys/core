@@ -321,6 +321,11 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
                 Route::get('/', [Settings\TweaksController::class, 'getConfiguration']);
                 Route::post('/', [Settings\TweaksController::class, 'saveConfiguration']);
             });
+
+            // Log Rotation
+            Route::group(['prefix' => 'log_rotation'], function () {
+                Route::post('/', [Settings\LogRotationController::class, 'saveConfiguration']);
+            });
         });
     });
 });

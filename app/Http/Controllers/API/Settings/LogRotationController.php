@@ -36,15 +36,12 @@ $InputFileStateFile engine_log
 $InputFileFacility local7
 $InputRunFileMonitor
 
-local7.liman_log <SERVERADDR>
-local7.engine_log <SERVERADDR>';
+local7.liman_log <RSYSLOGACTION>
+local7.engine_log <RSYSLOGACTION>';
 
         $template = str_replace(
-            '<SERVERADDR>',
-            (request('type') == 'tcp' ? '@@' : '@') .
-            request('ip_address') .
-            ':' .
-            request('port'),
+            '<RSYSLOGACTION>',
+            "action(type=\"omfwd\" target=\"{$request->ip_address}\" port=\"{$request->port}\", protocol=\"{$request->type}\")",
             $template
         );
 
