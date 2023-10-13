@@ -49,7 +49,8 @@ class User extends Authenticatable implements JWTSubject
         'last_login_at',
         'last_login_ip',
         'locale',
-        'google2fa_secret'
+        'google2fa_secret',
+        'otp_enabled'
     ];
 
     /**

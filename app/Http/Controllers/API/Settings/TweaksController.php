@@ -18,7 +18,6 @@ class TweaksController extends Controller
     {
         return response()->json([
             'APP_LANG' => env('APP_LANG'),
-            'OTP_ENABLED' => (bool) env('OTP_ENABLED', 'false'),
             'APP_NOTIFICATION_EMAIL' => env('APP_NOTIFICATION_EMAIL'),
             'APP_URL' => env('APP_URL'),
             'EXTENSION_TIMEOUT' => env('EXTENSION_TIMEOUT', 30),
@@ -48,7 +47,6 @@ class TweaksController extends Controller
 
         setEnv([
             'APP_LANG' => $request->APP_LANG,
-            'OTP_ENABLED' => (bool) $request->OTP_ENABLED,
             'APP_NOTIFICATION_EMAIL' => $request->APP_NOTIFICATION_EMAIL,
             'APP_URL' => $request->APP_URL,
             'EXTENSION_TIMEOUT' => $request->EXTENSION_TIMEOUT,
@@ -63,7 +61,6 @@ class TweaksController extends Controller
             'edit',
             [
                 'APP_LANG' => $request->APP_LANG,
-                'OTP_ENABLED' => (bool) $request->OTP_ENABLED,
                 'APP_NOTIFICATION_EMAIL' => $request->APP_NOTIFICATION_EMAIL,
                 'APP_URL' => $request->APP_URL,
                 'EXTENSION_TIMEOUT' => $request->EXTENSION_TIMEOUT,

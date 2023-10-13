@@ -17,12 +17,14 @@ use App\Models\UserSettings;
 use App\User;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use mervick\aesEverywhere\AES256;
+use RobThree\Auth\TwoFactorAuth;
 
 class AuthController extends Controller
 {
@@ -33,7 +35,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'forceChangePassword']]);
+        $this->middleware('auth:api', ['except' => ['login', 'forceChangePassword', 'setupTwoFactorAuthentication']]);
     }
 
     /**
@@ -91,11 +93,70 @@ class AuthController extends Controller
             return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
         }
 
+        if (auth('api')->user()->otp_enabled) {
+            $tfa = new TwoFactorAuth(
+                "Liman", 6, 30, \RobThree\Auth\Algorithm::Sha1
+            );
+
+            if (auth('api')->user()->google2fa_secret == null) {
+                $secret = $tfa->createSecret();
+                return response()->json([
+                    'message' => 'İki faktörlü doğrulama için Google Authenticator uygulaması ile QR kodunu okutunuz.',
+                    'secret' => $secret,
+                    'image' => $secret,
+                ], 402);
+            }
+
+            if (! $request->token) {
+                return response()->json(['message' => 'İki faktörlü doğrulama gerekmektedir.'], 406);
+            } else {
+                if (! $tfa->verifyCode(
+                    auth('api')->user()->google2fa_secret,
+                    $request->token
+                )) {
+                    return response()->json(['message' => 'İki faktörlü doğrulama başarısız.'], 406);
+                }
+            }
+        }
+
         if (auth('api')->user()->forceChange) {
             return response()->json(['message' => 'Şifrenizi değiştirmeniz gerekmektedir.'], 405);
         }
 
         return $this->createNewToken($token, $request);
+    }
+
+    /**
+     * Setup Two Factor Authentication
+     * 
+     * @return JsonResponse
+     */
+    public function setupTwoFactorAuthentication(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string',
+            'password' => 'required|string',
+            'secret' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $token = auth('api')->attempt([
+            'email' => $validator->validated()["email"],
+            'password' => $validator->validated()["password"],
+        ]);
+        if (! $token) {
+            return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
+        }
+
+        User::find(auth('api')->user()->id)->update([
+            'otp_enabled' => true,
+            'google2fa_secret' => $request->secret
+        ]);
+
+        return response()->json(['message' => '2FA kurulumu başarıyla yapıldı.']);
     }
 
     /**
