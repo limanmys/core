@@ -25,7 +25,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::all();
+        return User::orderBy('last_login_at', 'desc')
+            ->get();
     }
 
     /**

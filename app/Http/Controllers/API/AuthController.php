@@ -94,23 +94,27 @@ class AuthController extends Controller
         }
 
         if (auth('api')->user()->otp_enabled) {
-            $tfa = new TwoFactorAuth(
-                "Liman", 6, 30, \RobThree\Auth\Algorithm::Sha1
-            );
+            $tfa = app('pragmarx.google2fa');
+
 
             if (auth('api')->user()->google2fa_secret == null) {
-                $secret = $tfa->createSecret();
+                $secret = $tfa->generateSecretKey();
                 return response()->json([
                     'message' => 'İki faktörlü doğrulama için Google Authenticator uygulaması ile QR kodunu okutunuz.',
                     'secret' => $secret,
-                    'image' => $secret,
+                    'image' => $tfa->getQRCodeInline(
+                        "Liman",
+                        auth('api')->user()->email,
+                        $secret,
+                        400
+                    ),
                 ], 402);
             }
 
             if (! $request->token) {
                 return response()->json(['message' => 'İki faktörlü doğrulama gerekmektedir.'], 406);
             } else {
-                if (! $tfa->verifyCode(
+                if (! $tfa->verifyGoogle2FA(
                     auth('api')->user()->google2fa_secret,
                     $request->token
                 )) {
