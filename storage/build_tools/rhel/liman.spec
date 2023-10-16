@@ -188,10 +188,6 @@ fi
 # Create UI Systemd Service
 if [ -f "/etc/systemd/system/liman-ui.service" ]; then
     echo "Liman User Interface Service Already Added.";
-    ENVIRONMENT_SET=$(cat /etc/systemd/system/liman-ui.service | grep Environment >/dev/null && echo 1 || echo 0)
-    if [ $ENVIRONMENT_SET == "0" ]; then
-        sed -i '/\[Service\]/a Environment="HOSTNAME=127.0.0.1"' /etc/systemd/system/liman-ui.service
-    fi
 else
     echo """
 [Unit]
