@@ -348,6 +348,10 @@ class Server extends Model
                 }
                 $row = explode(':', trim($package));
                 try {
+                    if (str_contains($row[0], 'sysusers.service')) {
+                        continue;
+                    }
+
                     array_push($services, [
                         'name' => strlen($row[0]) > 50 ? substr($row[0], 0, 50) . '...' : $row[0],
                         'description' => strlen($row[2]) > 60 ? substr($row[2], 0, 60) . '...' : $row[2],
