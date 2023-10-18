@@ -76,6 +76,12 @@ class ServerController extends Controller
      * @return JsonResponse
      */
     public function update(Request $request) {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'update_server')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
         $server = Server::find($request->server_id);
         if (! $server) {
             throw new JsonResponseException([

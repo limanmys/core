@@ -21,15 +21,6 @@ use mervick\aesEverywhere\AES256;
  */
 class ExtensionController extends Controller
 {
-    public function __construct()
-    {
-        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
-            throw new JsonResponseException([
-                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
-            ], '', Response::HTTP_FORBIDDEN);
-        }
-    }
-
     /**
      * Extension list
      *
@@ -37,6 +28,12 @@ class ExtensionController extends Controller
      */
     public function index()
     {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
         return server()->extensions()->filter(function ($extension) {
             return Permission::can(auth('api')->user()->id, 'extension', 'id', $extension->id);
         })->map(function ($item) {
