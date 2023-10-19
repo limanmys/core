@@ -203,7 +203,9 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
         Route::group(['prefix' => 'users'], function () {
             Route::get('/', [Settings\UserController::class, 'index']);
             Route::post('/', [Settings\UserController::class, 'create']);
+            Route::patch('/{user_id}', [Settings\UserController::class, 'update']);
             Route::delete('/{user_id}', [Settings\UserController::class, 'delete']);
+            Route::get('/{user_id}/roles', [Settings\UserController::class, 'roles']);
             Route::get('/auth_logs/{user_id?}', [Settings\UserController::class, 'authLogs']);
         });
 

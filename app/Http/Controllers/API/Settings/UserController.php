@@ -5,13 +5,15 @@ namespace App\Http\Controllers\API\Settings;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\AuthLog;
-use App\Models\Notification;
 use App\Models\Permission;
+use App\Models\Role;
 use App\Models\RoleUser;
 use App\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 /**
  * User Controller
@@ -75,6 +77,95 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'Kullanıcı başarıyla oluşturuldu.'
+        ]);
+    }
+
+    /**
+     * Get all roles list with selected ones
+     * 
+     * @return JsonResponse
+     */
+    public function roles(Request $request)
+    {
+        $user = User::findOrFail($request->user_id);
+
+        $roles = $user->roles->pluck('id')->toArray();
+
+        return response()->json(Role::all()->map(function ($role) use ($roles) {
+            return [
+                'id' => $role->id,
+                'name' => $role->name,
+                'selected' => in_array($role->id, $roles),
+            ];
+        }));
+    }
+
+    /**
+     * Update user information
+     *
+     * @return JsonResponse|Response
+     */
+    public function update(Request $request)
+    {
+        $user = User::findOrFail($request->user_id);
+
+        validate([
+            'name' => ['required', 'string', 'max:255'],
+            'username' => ['nullable', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'password' => ['nullable', 'string', 'min:8'],
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'status' => $request->status,
+        ];
+
+        if ($user->auth_type !== 'ldap') {
+            $data['email'] = strtolower((string) $request->email);     
+            
+            if ($request->username) {
+                $data['username'] = $request->username;
+            }
+    
+            if ($request->password) {
+                $data['password'] = Hash::make((string) $request->password);
+                if (auth('api')->user()->id !== $user->id) {
+                    $data['forceChange'] = true;
+                }
+            }
+        }
+
+        $user->update($data);
+
+        $rolesToSync = [];
+        foreach ($request->roles as $role) {
+            $rolesToSync[$role] = [
+                'id' => Str::uuid(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        $user->roles()->sync($rolesToSync);
+
+        AuditLog::write(
+            'user',
+            'update',
+            [
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+            ],
+            "USER_UPDATED"
+        );
+
+        return response()->json([
+            'message' => 'Kullanıcı başarıyla güncellendi.'
         ]);
     }
 
