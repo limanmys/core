@@ -24,7 +24,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use mervick\aesEverywhere\AES256;
-use RobThree\Auth\TwoFactorAuth;
 
 class AuthController extends Controller
 {
@@ -363,9 +362,6 @@ class AuthController extends Controller
         $userGroups = $ldapUser['memberof'] ?? [];
 
         $user = User::where('objectguid', $objectguid)->first();
-        if ($user) {
-            RoleUser::where('user_id', $user->id)->delete();
-        }
 
         if (! (((bool) $restrictedGroups) == false && ((bool) $restrictedUsers) == false)) {
             $groupCheck = (bool) $restrictedGroups;

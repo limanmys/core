@@ -79,6 +79,7 @@ class LdapPermissionsController extends Controller
         $domain = env('LDAP_DOMAIN');
 
         foreach ($users as $user) {
+            $username = $user;
             $ldapUser = $ldap->search('(&(objectClass=user)(sAMAccountName='.$user.'))', new LDAPSearchOptions(
                 1,
                 1,
@@ -127,7 +128,7 @@ class LdapPermissionsController extends Controller
                 }
                 $user = User::create([
                     'name' => $name,
-                    'username' => strtolower($user),
+                    'username' => strtolower($username),
                     'email' => $mail,
                     'password' => Hash::make(str_random('16')),
                     'objectguid' => $objecthex,
@@ -178,12 +179,6 @@ class LdapPermissionsController extends Controller
      */
     public function setGroups(Request $request)
     {
-        $ldap = new Ldap(
-            env('LDAP_HOST'),
-            $request->username,
-            $request->password
-        );
-
         $groups = $request->groups;
         $ldapRestrictions = LdapRestriction::where('type', 'group')->get();
 
