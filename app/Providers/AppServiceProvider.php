@@ -3,16 +3,15 @@
 namespace App\Providers;
 
 use App\Models\Notification;
-use App\Models\Permission;
 use App\Observers\NotificationObserver;
 use App\Observers\UserObserver;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -48,6 +47,10 @@ class AppServiceProvider extends ServiceProvider
                 \App\Http\Middleware\VerifyCsrfToken::class
             );
         }
+
+        ResetPassword::createUrlUsing(function ($user, string $token) {
+            return request()->getSchemeAndHttpHost() . '/auth/reset_password?token=' . $token . '&email=' . $user->getEmailForPasswordReset();
+        });
     }
 
     /**

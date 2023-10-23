@@ -32,6 +32,8 @@ Route::group([
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user', [AuthController::class, 'userProfile']);
     Route::post('/change_password', [AuthController::class, 'forceChangePassword']);
+    Route::post('/forgot_password', [AuthController::class, 'sendPasswordResetLink']);
+    Route::post('/reset_password', [AuthController::class, 'resetPassword']);
 });
 
 Route::post('/notifications/send', [ExternalNotificationController::class, 'accept']);

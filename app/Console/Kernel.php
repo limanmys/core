@@ -56,6 +56,12 @@ class Kernel extends ConsoleKernel
             })
             ->daily()
             ->name('Clean Log Tables');
+
+        // Clear expired password reset tokens every 60 minutes
+        $schedule
+            ->command('auth:clear-resets')
+            ->hourly()
+            ->name('Clear Expired Password Reset Tokens');
     }
 
     /**
