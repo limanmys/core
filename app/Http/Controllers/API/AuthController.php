@@ -36,7 +36,18 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'forceChangePassword', 'setupTwoFactorAuthentication']]);
+        $this->middleware(
+            'auth:api',
+            ['except' => 
+                [
+                    'login', 
+                    'forceChangePassword', 
+                    'setupTwoFactorAuthentication', 
+                    'sendPasswordResetLink', 
+                    'resetPassword'
+                ]
+            ]
+        );
     }
 
     /**
@@ -261,7 +272,14 @@ class AuthController extends Controller
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:10',
+                'max:32',
+                'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\!\[\]\(\)\{\}\#\?\%\&\*\+\,\-\.\/\:\;\<\=\>\@\^\_\`\~]).{10,}$/',
+                'confirmed'
+            ]
         ]);
      
         $status = Password::reset(
