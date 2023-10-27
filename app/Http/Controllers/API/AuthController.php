@@ -6,6 +6,7 @@ use App\Classes\Ldap;
 use App\Classes\LDAPSearchOptions;
 use App\Http\Controllers\Controller;
 use App\Models\AuthLog;
+use App\Models\Extension;
 use App\Models\LdapRestriction;
 use App\Models\Oauth2Token;
 use App\Models\Permission;
@@ -505,12 +506,24 @@ class AuthController extends Controller
             ]);
         }
 
-        foreach (Server::where('ip_address', trim(env('LDAP_HOST')))->get() as $server) {
-            $encKey = env('APP_KEY').$user->id.$server->id;
+        $extensionWithLdap = Extension::where('ldap_support', true)->get();
+        $serverList = [];
+        foreach ($extensionWithLdap as $extension) {
+            $serverList = array_merge($serverList, $extension->servers()->get()->toArray());
+        }
+        $serverList = [
+            ...$serverList,
+            ...Server::where('ip_address', trim(env('LDAP_HOST')))->get(),
+        ];
+        // Check if server list is unique by id
+        $serverList = collect($serverList)->unique('id')->values();
+
+        foreach ($serverList as $server) {
+            $encKey = env('APP_KEY').$user->id.$server['id'];
             $encrypted = AES256::encrypt($request->email, $encKey);
             UserSettings::firstOrCreate([
                 'user_id' => $user->id,
-                'server_id' => $server->id,
+                'server_id' => $server['id'],
                 'name' => 'clientUsername',
             ], [
                 'value' => $encrypted,
@@ -520,7 +533,7 @@ class AuthController extends Controller
 
             UserSettings::firstOrCreate([
                 'user_id' => $user->id,
-                'server_id' => $server->id,
+                'server_id' => $server['id'],
                 'name' => 'clientPassword',
             ], [
                 'value' => $encrypted,

@@ -34,6 +34,7 @@ class Extension extends Model
         'require_key',
         'status',
         'license_type',
+        'ldap_support',
     ];
 
     protected $casts = [
