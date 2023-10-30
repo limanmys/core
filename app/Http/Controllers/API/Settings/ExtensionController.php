@@ -8,6 +8,7 @@ use App\Models\Extension;
 use App\Models\GolangLicense;
 use App\Models\License;
 use App\Models\Permission;
+use App\Models\Server;
 use App\System\Command;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -207,7 +208,7 @@ class ExtensionController extends Controller
 
         $output = callExtensionFunction(
             extension(),
-            $request->server_id,
+            Server::find($request->server_id),
             [
                 'endpoint' => 'license',
                 'type' => 'post',
