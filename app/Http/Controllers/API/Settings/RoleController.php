@@ -653,12 +653,14 @@ class RoleController extends Controller
                 ->get()->each(function ($row) {
                     $row->details = $row->getRelatedObject();
                     if ($row->morph_type == 'roles') {
-                        $row->users = $row->morph->users()->get();
+                        if (null !== $row->morph) {
+                            $row->users = $row->morph->users()->get();
+                        }
                     }
                 });
 
         foreach ($permissionData as $row) {
-            if ($row->details['value'] == '-' || $row->details['type'] == '-') {
+            if (null === $row->morph || $row->details['value'] == '-' || $row->details['type'] == '-') {
                 continue;
             }
 
