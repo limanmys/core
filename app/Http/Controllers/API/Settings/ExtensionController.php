@@ -44,7 +44,7 @@ class ExtensionController extends Controller
     public function upload()
     {
         validate([
-            'extension' => 'required|max:5000000',
+            'extension' => 'required|max:5000000|mimes:zip,lmne,signed',
         ]);
 
         $verify = false;
