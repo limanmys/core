@@ -35,6 +35,7 @@ mix
             'resources/assets/js/bootstrap-datepicker.js',
             'resources/assets/js/bootstrap-timepicker.js',
             'resources/assets/js/jquery.dataTables.js',
+            'resources/assets/js/adminlte.js',
             'resources/assets/js/select2.full.js',
             'resources/assets/js/sweetalert2.min.js',
             'resources/assets/js/Chart.js',
