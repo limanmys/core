@@ -29,6 +29,10 @@ class AccessTokenController extends Controller
      */
     public function create(Request $request)
     {
+        validate([
+            'name' => 'required|unique:access_tokens,name',
+        ]);
+
         $token = Str::uuid();
         AccessToken::create([
             'user_id' => auth('api')->user()->id,
