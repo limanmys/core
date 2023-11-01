@@ -68,7 +68,7 @@ return [
                     ],
                     [
                         'name' => 'Kişisel Erişim Anahtarları',
-                        'url' => '/settings/access_tokens'
+                        'url' => '/settings/tokens'
                     ]
                 ]
             ]
