@@ -106,11 +106,4 @@ class Notification extends Model
         return $this->belongsToMany(User::class, 'notification_users')
             ->withPivot('read_at');
     }
-
-    public function scopeUnread($query)
-    {
-        return $query->whereHas('users', function ($query) {
-            $query->whereNull('read_at');
-        });
-    }
 }

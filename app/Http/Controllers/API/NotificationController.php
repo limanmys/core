@@ -42,7 +42,7 @@ class NotificationController extends Controller
         return auth()->user()
             ->notifications()
             ->withPivot('read_at', 'seen_at')
-            ->unread()
+            ->where('read_at', null)
             ->orderBy('send_at', 'desc')
             ->take(8)
             ->get()
@@ -84,7 +84,7 @@ class NotificationController extends Controller
     {
         auth()->user()
             ->notifications()
-            ->unread()
+            ->where('read_at', null)
             ->withPivot('read_at', 'seen_at')
             ->get()
             ->map(function ($notification) {
