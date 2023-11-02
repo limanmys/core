@@ -234,16 +234,20 @@ class UserController extends Controller
      */
     public function getSudoers()
     {
-        $output = Command::runSudo(
-            "cat /etc/sudoers /etc/sudoers.d/* | grep -v '^#\|^Defaults' | sed '/^$/d' | awk '{ print $1 \"*-*\" $2 \" \" $3 }'"
-        );
+        $command = <<<'EOT'
+        sh -c "cat /etc/sudoers /etc/sudoers.d/* | grep -v '^#\|^Defaults' | sed '/^$/d'"
+        EOT;
+
+        $output = Command::runSudo($command);
 
         $sudoers = [];
-        if (! empty($output)) {
+        if (! empty($output)) {    
             $sudoers = array_map(function ($value) {
-                $fetch = explode('*-*', $value);
-
-                return ['name' => $fetch[0], 'access' => $fetch[1]];
+                $val = strtr($value, "\t\n\r ", ' ');
+                $fetch = explode(' ', $val);
+                $name = array_shift($fetch);
+                
+                return ['name' => $name, 'access' => implode(' ', $fetch)];
             }, explode("\n", $output));
         }
 
@@ -265,7 +269,7 @@ class UserController extends Controller
             'name' => $name,
         ]);
         if ($checkFile == '1') {
-            return response()->json('Another user exists with this name.', Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json(['name' => 'Another user exists with this name.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         $output = Command::runSudo(
             'echo "{:name} ALL=(ALL:ALL) ALL" | sudo -p "liman-pass-sudo" tee /etc/sudoers.d/{:name} &> /dev/null && echo 1 || echo 0',
@@ -274,7 +278,7 @@ class UserController extends Controller
             ]
         );
         if ($output == '0') {
-            return response()->json('An error occured while creating sudoer', Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json(['name' => 'An error occured while creating sudoer'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return response()->json('Sudoer created successfully.');
@@ -302,7 +306,7 @@ class UserController extends Controller
                 ]
             );
             if ($output == '0') {
-                return response()->json('An error occured while deleting sudoer.', Response::HTTP_UNPROCESSABLE_ENTITY);
+                return response()->json('An error occured while deleting sudoer.', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
 
