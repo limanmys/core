@@ -27,6 +27,10 @@ class LimanTokenUploadCheck
         }
 
         if (! $token) {
+            if (auth('api')->check()) {
+                return $next($request);
+            }
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Extension-Token header is missing.',

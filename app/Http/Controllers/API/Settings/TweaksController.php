@@ -43,6 +43,8 @@ class TweaksController extends Controller
             'APP_URL' => 'required|url',
             'EXTENSION_TIMEOUT' => 'required|integer|min:1|max:300',
             'NEW_LOG_LEVEL' => 'required|string',
+        ], [], [
+            "EXTENSION_TIMEOUT" => "Eklenti zaman aşımı"
         ]);
 
         setEnv([

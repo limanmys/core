@@ -129,6 +129,12 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             // Packages
             Route::group(['prefix' => 'packages'], function () {
                 Route::get('/', [Server\PackageController::class, 'index']);
+
+                // Queue
+                Route::group(['prefix' => 'queue'], function () {
+                    Route::get('/', [Server\QueueController::class, 'index']);
+                    Route::post('/', [Server\QueueController::class, 'create']);
+                });
             });
 
             // Updates
@@ -161,6 +167,8 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
                 Route::post('/sudoers', [Server\UserController::class, 'addSudoers']);
                 Route::delete('/sudoers', [Server\UserController::class, 'deleteSudoers']);
             });
+
+            
         });
     });
 

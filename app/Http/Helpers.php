@@ -28,12 +28,14 @@ if (! function_exists('validate')) {
      *
      * @param $rules
      * @param array $messages
+     * @param array $fieldNames
      * @return void
      * @throws JsonResponseException
      */
-    function validate($rules, array $messages = []): void
+    function validate($rules, array $messages = [], array $fieldNames = []): void
     {
         $validator = Validator::make(request()->all(), $rules, $messages);
+        $validator->setAttributeNames($fieldNames);
         if (! request()->wantsJson()) {
             // If request doesn't want JSON handle as the old way
             if ($validator->fails()) {

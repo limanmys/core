@@ -35,6 +35,10 @@ class TusAuthenticated implements TusMiddleware
         }
 
         if (! $token) {
+            if (auth('api')->check()) {
+                return true;
+            }
+
             throw new UnauthorizedHttpException('Extension-Token header is missing.');
         }
 
