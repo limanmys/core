@@ -9,7 +9,7 @@ Route::any("/", function () {
 // HA Routes
 require_once app_path('Http/Controllers/HASync/_routes.php');
 
-Route::group(['middleware' => ['auth', 'check_google_two_factor', 'google2fa', 'permissions']], function () {
+Route::group(['middleware' => ['auth', 'permissions']], function () {
     // Internal Sandbox Routes
     require_once app_path('Http/Controllers/Extension/Sandbox/_routes.php');
 });
