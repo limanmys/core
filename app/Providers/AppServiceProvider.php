@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Notification;
+use App\Models\Server;
 use App\Observers\NotificationObserver;
+use App\Observers\ServerObserver;
 use App\Observers\UserObserver;
 use App\User;
 use Carbon\Carbon;
@@ -35,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         Carbon::setLocale(app()->getLocale());
         Notification::observe(NotificationObserver::class);
         User::observe(UserObserver::class);
+        Server::observe(ServerObserver::class);
 
         Relation::morphMap([
             'users' => 'App\User',
@@ -49,7 +52,12 @@ class AppServiceProvider extends ServiceProvider
         }
 
         ResetPassword::createUrlUsing(function ($user, string $token) {
-            return request()->getSchemeAndHttpHost() . '/auth/reset_password?token=' . $token . '&email=' . $user->getEmailForPasswordReset();
+            return sprintf(
+                '%s/auth/reset_password?token=%s&email=%s', 
+                request()->getSchemeAndHttpHost(), 
+                $token, 
+                $user->getEmailForPasswordReset()
+            );
         });
     }
 
