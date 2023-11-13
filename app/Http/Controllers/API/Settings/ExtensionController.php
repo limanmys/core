@@ -87,16 +87,7 @@ class ExtensionController extends Controller
                 basename(
                     (string) request()->file('extension')->path()
                 );
-        } else {
-            if (! request()->has('force')) {
-                return response()->json(
-                    [
-                        'message' => 'Bu eklenti imzalanmamış bir eklenti, yine de kurmak istediğinize emin misiniz?'
-                    ],
-                    203
-                );
-            }
-        }
+        } 
         [$error, $new] = $this->setupNewExtension($zipFile, $verify);
 
         if ($error) {
