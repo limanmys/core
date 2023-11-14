@@ -36,7 +36,7 @@ class TemplatedExtensionMail extends Mailable
             'name' => __('Liman Bildiri Sistemi'),
         ])
             ->subject($this->subject)
-            ->view('email.extension_mail');
+            ->markdown('email.information');
         foreach ($this->attachs as $attachment) {
             $mail->attach($attachment);
         }
