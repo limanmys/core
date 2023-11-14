@@ -95,10 +95,11 @@ class InternalController extends Controller
         if (! (bool) env('MAIL_ENABLED', false)) return;
 
         $sendTo = [];
-        if (! is_array(request('to'))) {
-            $sendTo[] = request('to');
+        $to = json_decode(request('to'));
+        if (! is_array($to)) {
+            $sendTo[] = $to;
         } else {
-            $sendTo = request('to');
+            $sendTo = $to;
         }
 
         $template = ExtensionMail::class;
