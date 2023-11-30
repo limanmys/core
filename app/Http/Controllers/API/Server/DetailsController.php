@@ -161,9 +161,9 @@ class DetailsController extends Controller
 
         $cores = str_replace("cpu cores\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'cpu cores'"))[0]));
         $cpu = str_replace("model name\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'model name'"))[0]));
-        $ram = Command::runSudo("dmidecode -t memory | grep 'Size' | awk '{print $2}' | paste -sd+ | bc");
+        $ram = Command::runSudo('free -m | grep ^Mem | tr -s " " | cut -f2 -d" "');
         if ($ram > 1000) {
-            $ram = round($ram / 1000, 0).' GB';
+            $ram = round($ram / 1000, 1).' GB';
         } else {
             $ram = $ram.' GB';
         }
