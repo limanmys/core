@@ -1199,6 +1199,8 @@ if (! function_exists('callExtensionFunction')) {
             $isJson = isJson($output, true);
             if ($isJson && isset($isJson->status) && $isJson->status == 200) {
                 return $isJson->message;
+            } else {
+                return $output;
             }
         } catch (\Exception $e) {
             return null;

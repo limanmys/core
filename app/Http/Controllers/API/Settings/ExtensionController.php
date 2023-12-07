@@ -45,8 +45,18 @@ class ExtensionController extends Controller
     public function upload()
     {
         validate([
-            'extension' => 'required|max:5000000|mimes:zip,lmne,signed',
+            'extension' => 'required|max:5000000',
         ]);
+
+        $extension = request()
+            ->file('extension')
+            ->getClientOriginalExtension();
+
+        if ($extension !== 'zip' && $extension !== 'signed' && $extension !== 'lmne') {
+            return response()->json([
+                'extension' => 'Eklenti dosyası uzantısı zip, signed, lmne olmalıdır.'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
         $verify = false;
         $zipFile = request()->file('extension');
@@ -187,6 +197,8 @@ class ExtensionController extends Controller
                 ['extension_id' => extension()->id],
                 ['data' => request('license')]
             );
+            
+            Cache::forget('extension_'.extension()->id.'_'.$request->server_id.'_license');
 
             return response()->json([
                 'message' => 'Lisans eklendi.'
