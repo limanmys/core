@@ -65,12 +65,16 @@ if [ -f "/liman/database/liman.sqlite" ]; then
     sed -i '/DB_CONNECTION/d' /liman/server/.env
     printf "\nDB_CONNECTION=pgsql\n" | tee -a /liman/server/.env
 elif [ $DB_EXISTS == "0" ]; then
-    sudo -u postgres createuser liman
-    sudo -u postgres createdb liman -O liman
-    RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
-    sudo -u postgres psql -U postgres -d postgres -c "alter user \"liman\" with password '$RANDOM_PASSWORD';"
-    sed -i '/DB_PASSWORD/d' /liman/server/.env
-    printf "\nDB_PASSWORD=$RANDOM_PASSWORD\n" | tee -a /liman/server/.env
+    # .env dosyasında DB_PASSWORD kontrolü
+    if ! grep -q "DB_PASSWORD=" /liman/server/.env || [ -z "$(grep "DB_PASSWORD=" /liman/server/.env | sed 's/DB_PASSWORD=//')" ]; then
+        # DB_PASSWORD boşsa veya yoksa yeni bir şifre oluştur
+        sudo -u postgres createuser liman
+        sudo -u postgres createdb liman -O liman
+        RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
+        sudo -u postgres psql -U postgres -d postgres -c "alter user \"liman\" with password '$RANDOM_PASSWORD';"
+        sed -i '/DB_PASSWORD/d' /liman/server/.env
+        printf "\nDB_PASSWORD=$RANDOM_PASSWORD\n" | tee -a /liman/server/.env
+    fi
 else
     echo "Postgresql already set up."
 fi

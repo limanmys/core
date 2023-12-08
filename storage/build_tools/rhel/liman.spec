@@ -85,12 +85,14 @@ DB_EXISTS=$(sudo -u liman psql -lqt | cut -d \| -f 1 | grep "liman" >/dev/null 2
 
 # Database Creation
 if [ $DB_EXISTS == "0" ]; then
-    sudo -u postgres createuser liman
-    sudo -u postgres createdb liman -O liman
-    RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
-    sudo -u postgres psql -U postgres -d postgres -c "alter user \"liman\" with password '$RANDOM_PASSWORD';"
-    sed -i '/DB_PASSWORD/d' /liman/server/.env
-    printf "\nDB_PASSWORD=$RANDOM_PASSWORD\n" | tee -a /liman/server/.env
+    if ! grep -q "DB_PASSWORD=" /liman/server/.env || [ -z "$(grep "DB_PASSWORD=" /liman/server/.env | sed 's/DB_PASSWORD=//')" ]; then
+        sudo -u postgres createuser liman
+        sudo -u postgres createdb liman -O liman
+        RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
+        sudo -u postgres psql -U postgres -d postgres -c "alter user \"liman\" with password '$RANDOM_PASSWORD';"
+        sed -i '/DB_PASSWORD/d' /liman/server/.env
+        printf "\nDB_PASSWORD=$RANDOM_PASSWORD\n" | tee -a /liman/server/.env
+    fi
 else
     echo "Postgresql already set up."
 fi
