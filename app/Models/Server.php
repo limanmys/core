@@ -361,6 +361,22 @@ class Server extends Model
                 }
             }
 
+            $raw = $this->run(
+                "systemctl list-unit-files --state=disabled | grep service | awk '{print $1 \":\"$2}'",
+                false
+            );
+
+            foreach (explode("\n", $raw) as &$package) {
+                if ($package == '') {
+                    continue;
+                }
+                $row = explode(':', trim($package));
+                $services[] = [
+                    'name' => strlen($row[0]) > 50 ? substr($row[0], 0, 50) . '...' : $row[0],
+                    'status' => $row[1] == 'disabled',
+                ];
+            }
+
             return count($services);
         }
 

@@ -66,6 +66,22 @@ class ServiceController extends Controller
                 } catch (Exception) {
                 }
             }
+
+            $raw = Command::runSudo(
+                "systemctl list-unit-files --state=disabled | grep service | awk '{print $1 \":\"$2}'",
+                false
+            );
+
+            foreach (explode("\n", $raw) as &$package) {
+                if ($package == '') {
+                    continue;
+                }
+                $row = explode(':', trim($package));
+                $services[] = [
+                    'name' => strlen($row[0]) > 50 ? substr($row[0], 0, 50) . '...' : $row[0],
+                    'status' => $row[1] == 'disabled',
+                ];
+            }
         } else {
             $rawServices = Command::run(
                 "(Get-WmiObject win32_service | select Name, DisplayName, State, StartMode) -replace '\s\s+',':'"
