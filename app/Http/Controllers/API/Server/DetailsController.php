@@ -108,6 +108,8 @@ class DetailsController extends Controller
         }
 
         if (server()->isLinux()) {
+            $cores = str_replace("cpu cores\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'cpu cores'"))[0]));
+
             $cpuPercent = Command::runSudo(
                 "ps -eo %cpu --no-headers | grep -v 0.0 | awk '{s+=$1} END {print s/NR*10}'"
             );
@@ -124,7 +126,7 @@ class DetailsController extends Controller
             $secondUp = $this->calculateNetworkBytes(false);
 
             return [
-                'cpu' => round((float) $cpuPercent, 2),
+                'cpu' => round((float) $cpuPercent / $cores, 2),
                 'ram' => round((float) $ramPercent, 2),
                 'io' => round((float) $ioPercent, 2),
                 'network' => [
@@ -295,6 +297,8 @@ class DetailsController extends Controller
      */
     private function parsePsOutput($output)
     {
+        $cores = str_replace("cpu cores\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'cpu cores'"))[0]));
+
         $data = [];
         foreach (explode("\n", (string) $output) as $row) {
             $row = explode('*-*', $row);
@@ -302,7 +306,7 @@ class DetailsController extends Controller
             $fetch = explode('/', $row[3]);
             $data[] = [
                 'pid' => $row[0],
-                'percent' => $row[1],
+                'percent' => round($row[1] / $cores, 1),
                 'user' => $row[2],
                 'cmd' => end($fetch),
             ];
