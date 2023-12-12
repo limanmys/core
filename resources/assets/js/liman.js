@@ -250,7 +250,7 @@ function message(data) {
   }
   const modal_id = modal.getAttribute("id");
   const selector = window.$("#" + modal_id + "_alert");
-  const color = "alert-info";
+  let color = "alert-info";
   switch (json["status"]) {
     case 200:
       color = "alert-success";

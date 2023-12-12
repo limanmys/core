@@ -286,7 +286,9 @@ class ExtensionController extends Controller
         if (! $zip->open($zipFile)) {
             system_log(7, 'EXTENSION_UPLOAD_FAILED_CORRUPTED');
 
-            return [response()->json('Eklenti dosyası açılamıyor.', 500), null];
+            return [response()->json([
+                'message' => 'Eklenti dosyası açılamıyor.'
+            ], 500), null];
         }
 
         // Determine a random tmp folder to extract files
@@ -295,7 +297,9 @@ class ExtensionController extends Controller
         try {
             $zip->extractTo($path);
         } catch (\Exception) {
-            return [response()->json('Eklenti dosyası açılamıyor.', 500), null];
+            return [response()->json([
+                'message' => 'Eklenti dosyası açılamıyor.'
+            ], 500), null];
         }
 
         if (count(scandir($path)) == 3) {
@@ -309,7 +313,9 @@ class ExtensionController extends Controller
 
         preg_match('/[A-Za-z-]+/', (string) $json['name'], $output);
         if (empty($output) || $output[0] != $json['name']) {
-            return [response()->json('Eklenti isminde yalnızca harflere izin verilmektedir.', 422), null];
+            return [response()->json([
+                'message' => 'Eklenti adı geçerli değil.'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY), null];
         }
 
         if (
@@ -339,7 +345,9 @@ class ExtensionController extends Controller
             if ($extension->version == $json['version']) {
                 system_log(7, 'EXTENSION_UPLOAD_FAILED_ALREADY_INSTALLED');
 
-                return [response()->json('Eklentinin bu sürümü zaten yüklü.', 422), null];
+                return [response()->json([
+                    'message' => 'Bu eklenti zaten yüklü.'
+                ], Response::HTTP_UNPROCESSABLE_ENTITY), null];
             }
         }
 
