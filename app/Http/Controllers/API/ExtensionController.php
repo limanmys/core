@@ -245,8 +245,7 @@ class ExtensionController extends Controller
         }
         foreach ($extension['database'] as $setting) {
             if (
-                ($setting['variable'] == 'clientUsername') ||
-                ($setting['variable'] == 'clientPassword')
+                in_array($setting['variable'], $extra)
             ) {
                 continue;            
             }
