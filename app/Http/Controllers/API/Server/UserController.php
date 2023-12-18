@@ -272,7 +272,7 @@ class UserController extends Controller
             return response()->json(['name' => 'Another user exists with this name.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         $output = Command::runSudo(
-            'echo "{:name} ALL=(ALL:ALL) ALL" | sudo -p "liman-pass-sudo" tee /etc/sudoers.d/{:name} &> /dev/null && echo 1 || echo 0',
+            'echo "{:name} ALL=(ALL:ALL) ALL" | ' . sudo() . ' tee /etc/sudoers.d/{:name} &> /dev/null && echo 1 || echo 0',
             [
                 'name' => $name,
             ]
