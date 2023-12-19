@@ -113,6 +113,11 @@ class Extension extends Model
             return Str::title(str_replace('-', ' ', (string) $this->name));
         }
 
+        $displayName = json_decode($this->attributes['display_name'], true);
+        if (is_array($displayName)) {
+            return $displayName[auth('api')->user()->language] ?? $displayName[app()->getLocale()] ?? $this->attributes['display_name'];
+        }
+
         return $this->attributes['display_name'];
     }
 
