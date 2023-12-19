@@ -23,25 +23,27 @@ class LogRotationController extends Controller
             'port' => 'required|numeric|between:1,65535'
         ]);
 
-        $template = '$ModLoad imfile
-$InputFileName /liman/logs/liman.log
-$InputFileTag liman_log:
-$InputFileStateFile liman_log
-$InputFileFacility local7
-$InputRunFileMonitor
-
-$InputFileName /liman/logs/liman_new.log
-$InputFileTag engine_log:
-$InputFileStateFile engine_log
-$InputFileFacility local7
-$InputRunFileMonitor
-
-local7.liman_log <RSYSLOGACTION>
-local7.engine_log <RSYSLOGACTION>';
+        $template = 'module(load="imfile")
+input(type="imfile" File="/liman/logs/liman_new.log" Tag="engine" ruleset="remote")
+ruleset(name="remote"){action(type="omfwd" target="<TARGET>" port="<PORT>" protocol="<PROTOCOL>")}
+input(type="imfile" File="/liman/logs/liman.log" Tag="liman" ruleset="remote")
+ruleset(name="remote"){action(type="omfwd" target="<TARGET>" port="<PORT>" protocol="<PROTOCOL>")}';
 
         $template = str_replace(
-            '<RSYSLOGACTION>',
-            "action(type=\"omfwd\" target=\"{$request->ip_address}\" port=\"{$request->port}\", protocol=\"{$request->type}\")",
+            '<TARGET>',
+            $request->ip_address,
+            $template
+        );
+
+        $template = str_replace(
+            '<PORT>',
+            $request->port,
+            $template
+        );
+
+        $template = str_replace(
+            '<PROTOCOL>',
+            $request->type,
             $template
         );
 

@@ -179,10 +179,12 @@ rm -rf /liman/sandbox/{.git,vendor,views,.gitignore,composer.json,composer.lock,
 
 # Set Permissions
 chown -R liman:liman /liman/{server,database,certs,sandbox,logs,modules,packages,hashes}
-chmod 700 -R /liman/{server,database,certs,logs,modules,packages,hashes}
+chmod 700 -R /liman/{server,database,certs,modules,packages,hashes}
+chmod 750 -R /liman/logs
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
+usermod -aG liman syslog
 
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman-connector.service" ]; then
