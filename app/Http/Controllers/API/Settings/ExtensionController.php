@@ -360,6 +360,7 @@ class ExtensionController extends Controller
         unset($json['issuer']);
         unset($json['status']);
         unset($json['order']);
+        $json['display_name'] = json_encode($json['display_name']);
         $new->fill($json);
         $new->status = '1';
         $new->save();
