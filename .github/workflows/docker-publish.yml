@@ -26,7 +26,7 @@ jobs:
         run: |
           VERSION=`cat storage/VERSION`
           echo "RELEASE_VER=$(echo $VERSION)" >> $GITHUB_ENV
-          echo "RELEASE_RUNNUMBER=$(echo ($GITHUB_RUN_NUMBER+874))" >> $GITHUB_ENV
+          echo "RELEASE_RUNNUMBER=$(($GITHUB_RUN_NUMBER+874))" >> $GITHUB_ENV
 
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
