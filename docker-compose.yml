@@ -1,0 +1,84 @@
+version: '3.8'
+services:
+  limancore:
+    image: aciklab/liman:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+    environment:
+      # Redis settings
+      - REDIS_HOST=liman-redis
+      - REDIS_PASS=${DB_PASS}
+      - REDIS_PORT=6379
+      # DB settings
+      # For using Patroni or another Postgresql Cluster
+      - DB_HOST=liman-db
+      - DB_DATABASE=liman
+      - DB_USERNAME=liman
+      - DB_PORT=5432
+      - DB_PASS=${DB_PASS}
+      # Nginx settings
+      - NGINX_PORT=443
+    container_name: liman-core
+    tty: true
+    ports:
+      - '443:443'
+      - '3000:3000'
+    volumes: 
+      - core:/liman
+      - certs:/usr/local/share/ca-certificates
+    networks:
+      - liman-net
+    dns:
+      - 127.0.0.1
+      # Add active directory DNS(s) for using Domain extension and LDAP on Liman
+  db:
+    image: postgres:15
+    container_name: liman-db
+    restart: always
+    environment:
+      - POSTGRES_USER=liman
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=liman
+    volumes: 
+      - db:/var/lib/postgresql/data
+    healthcheck :
+      test: [ "CMD", "pg_isready", "-q", "-d", "liman", "-U", "liman" ]
+      interval : 5s
+      timeout : 5s
+      retries : 5
+    networks:
+      - liman-net
+  redis:
+    image: redis
+    container_name: liman-redis
+    environment:
+      - REDIS_PASSWORD=${DB_PASS}
+      - REDIS_DISABLE_COMMANDS=CONFIG
+    command: > 
+      --requirepass ${DB_PASS} --protected-mode yes
+    networks:
+      - liman-net
+  webssh:
+    image: limanmys/webssh:latest
+    restart: always
+    container_name: liman-webssh
+    networks:
+      - liman-net
+
+volumes:
+  # Persistent Postgresql Database
+  db:
+    driver: local
+  # Persist Core Files
+  core:
+    driver: local
+  # Persist Linux System Certificates
+  certs:
+    driver: local
+
+networks:
+  liman-net:
+    name: liman-net
+    driver: bridge

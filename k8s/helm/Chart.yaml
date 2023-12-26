@@ -1,0 +1,10 @@
+name: Liman
+description: Liman Merkezi Yönetim Sistemi
+version: 2.0.863
+apiVersion: v2
+keywords:
+  - liman
+  - system-management
+  - linux
+sources:
+home:

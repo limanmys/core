@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    service: redis
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: redis
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        network/liman-net: "true"
+        service: redis
+    spec:
+      containers:
+        - args:
+            - --requirepass
+            - $(REDIS_PASSWORD)
+            - --protected-mode
+            - "yes"
+          env:
+            - name: REDIS_DISABLE_COMMANDS
+              value: CONFIG
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{ .Release.Name }}-auth
+          image: redis
+          name: liman-redis
+          resources: {}
+      restartPolicy: Always
+status: {}
