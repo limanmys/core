@@ -24,7 +24,7 @@ jobs:
 
       - name: Get version details
         run: |
-          VERSION=`cat package/liman/server/storage/VERSION`
+          VERSION=`cat package/storage/VERSION`
           echo "RELEASE_VER=$(echo $VERSION)" >> $GITHUB_ENV
           echo "RELEASE_RUNNUMBER=$(echo $GITHUB_RUN_NUMBER)" >> $GITHUB_ENV
 
