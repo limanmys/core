@@ -118,7 +118,7 @@ class Extension extends Model
             return $displayName[auth('api')->user()->language] ?? $displayName[app()->getLocale()] ?? $this->attributes['display_name'];
         }
 
-        return $this->attributes['display_name'];
+        return str_replace('"', '', $this->attributes['display_name']);
     }
 
     /**
