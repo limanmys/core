@@ -26,7 +26,7 @@ class NotificationObserver
             $user->notify(new NotificationSent($notification, $user));
             if (env('MAIL_ENABLED') && $notification && $notification->mail) {
                 try {
-                    Mail::to($user)->send(new BasicNotification($notification));
+                    Mail::to($user)->send(new BasicNotification($notification, $user));
                 } catch (TransportException $e) {
                     // Don't throw anything on when mail server is not active
                 }
