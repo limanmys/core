@@ -61,7 +61,7 @@ class MenuController extends Controller
         $server->extensions = $server->extensions()->map(function ($extension) use ($server) {
             $db = getExtensionJson($extension->name);
             if (isset($db['menus']) && $db['menus']) {
-                $extension->menus = $db['menus'];
+                $extension->menus = $this->checkMenu($db['menus'], $db['name']);
             } else {
                 $extension->menus = [];
             }
@@ -72,5 +72,37 @@ class MenuController extends Controller
         $server->can_run_command = $server->canRunCommand();
 
         return response()->json($server);
+    }
+
+    /**
+     * Check if menu is eligible to be shown
+     * 
+     * @param mixed $menu
+     * @param string $extension_name
+     * 
+     * @return $menu
+     */
+    private function checkMenu($menus, $extension_name)
+    {
+        if (auth('api')->user()->isAdmin()) {
+            return $menus;
+        }
+
+        foreach ($menus as $key => &$menu) {
+            if (isset($menu['permission'])) {
+                if (!Permission::can(auth('api')->user()->id, 'function', 'name', $extension_name, $menu['permission'])) {
+                    unset($menus[$key]);
+                    continue;
+                }
+            }
+    
+            if (isset($menu['children'])) {
+                $menu['children'] = collect($menu['children'])->filter(function ($child) use ($extension_name) {
+                    return $this->checkMenu($child, $extension_name);
+                })->toArray();
+            }
+        }
+        
+        return $menus;
     }
 }
