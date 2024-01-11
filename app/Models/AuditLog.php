@@ -36,7 +36,8 @@ class AuditLog extends Model
         string $type,
         string $action,
         array $details,
-        string $message = ""
+        string $message = "",
+        array $extra = []
     ) {
         $request = request()->all();
         unset($request['password']);
@@ -53,6 +54,8 @@ class AuditLog extends Model
                 unset($request[$k]);
             }
         }
+
+        $request = array_merge($request, $extra);
 
         return self::create([
             'user_id' => auth('api')->user()->id,

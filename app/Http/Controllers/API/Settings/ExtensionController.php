@@ -98,7 +98,7 @@ class ExtensionController extends Controller
                     (string) request()->file('extension')->path()
                 );
         } 
-        [$error, $new] = $this->setupNewExtension($zipFile, $verify);
+        [$error, $new, $old] = $this->setupNewExtension($zipFile, $verify);
 
         if ($error) {
             return $error;
@@ -115,7 +115,11 @@ class ExtensionController extends Controller
                 'extension_id' => $new->id,
                 'extension_name' => $new->display_name ?? $new->name,
             ],
-            "EXTENSION_UPLOAD"
+            'EXTENSION_UPLOAD',
+            [
+                'old' => $old,
+                'new' => $new,
+            ]
         );
 
         return response()->json([
@@ -340,6 +344,7 @@ class ExtensionController extends Controller
 
         // Check If Extension Already Exists.
         $extension = Extension::where('name', $json['name'])->first();
+        $old = $extension->toArray();
 
         if ($extension) {
             if ($extension->version == $json['version']) {
@@ -393,6 +398,6 @@ class ExtensionController extends Controller
         ]);
         $system->fixExtensionPermissions($new->id, $new->name);
 
-        return [null, $new];
+        return [null, $new, $old];
     }
 }
