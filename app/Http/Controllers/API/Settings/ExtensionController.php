@@ -344,7 +344,10 @@ class ExtensionController extends Controller
 
         // Check If Extension Already Exists.
         $extension = Extension::where('name', $json['name'])->first();
-        $old = $extension->toArray();
+        if ($extension)
+            $old = $extension->toArray();
+        else
+            $old = [];
 
         if ($extension) {
             if ($extension->version == $json['version']) {
