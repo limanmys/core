@@ -213,6 +213,8 @@ class ExtensionController extends Controller
 
         return response()->json(
             [
+                'extension_name' => extension()->display_name,
+                'server_name' => server()->name,
                 'html' => trim(
                     view($view, [
                         'auth_token' => $token,
