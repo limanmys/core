@@ -102,14 +102,17 @@ class ServerController extends Controller
                 'server_id' => $server->id,
                 'server_name' => $server->name,
                 'server_ip' => $server->ip_address,
+                'shared_status' => $server->shared_key ? 'true' : 'false',
                 'new_server_name' => $request->name,
-                'new_server_ip' => $request->ip_address
+                'new_server_ip' => $request->ip_address,
+                'new_shared_status' => $request->shared_key ? 'true' : 'false',
             ],
             "SERVER_UPDATE"
         );
 
         $server->name = $request->name;
         $server->ip_address = $request->ip_address;
+        $server->shared_key = (bool) $request->shared_key;
         $server->save();
 
         return response()->json([
