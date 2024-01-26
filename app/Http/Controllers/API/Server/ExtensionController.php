@@ -51,15 +51,7 @@ class ExtensionController extends Controller
      */
     public function serverSettings()
     {
-        $extension = json_decode(
-            file_get_contents(
-                '/liman/extensions/' .
-                strtolower((string) extension()->name) .
-                DIRECTORY_SEPARATOR .
-                'db.json'
-            ),
-            true
-        );
+        $extension = getExtensionJson(extension()->name);
         
         $similar = [];
         $globalVars = [];
@@ -70,6 +62,17 @@ class ExtensionController extends Controller
                 ($flag != null && $item['variable'] == 'clientPassword')
             ) {
                 unset($extension['database'][$key]);
+            }
+
+            if (
+                auth('api')->user()->auth_type == 'ldap' &&
+                isset($extension['ldap_support_fields'])
+            ) {
+                if (
+                    in_array($item['variable'], array_values($extension['ldap_support_fields']))
+                ) {
+                    unset($extension['database'][$key]);
+                }
             }
 
             $opts = [
@@ -94,10 +97,12 @@ class ExtensionController extends Controller
                     }
                 }
 
-                $similar[$item['variable']] = AES256::decrypt(
-                    $obj->value,
-                    $key
-                );
+                if ($item['type'] != 'password') {
+                    $similar[$item['variable']] = AES256::decrypt(
+                        $obj->value,
+                        $key
+                    );
+                }
             }
         }
 
@@ -124,6 +129,10 @@ class ExtensionController extends Controller
             'has_global_variables' => ! auth('api')->user()->isAdmin() ? count($globalVars) > 0 : false,
             'values' => collect($similar)->filter(function ($item, $key) use ($globalVars, $database) {
                 $key = $database->where('variable', $key)->first();
+                if (! $key) {
+                    return false;
+                }
+
                 if ($key['type'] == 'password') {
                     return false;
                 }

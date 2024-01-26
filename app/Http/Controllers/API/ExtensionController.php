@@ -245,6 +245,12 @@ class ExtensionController extends Controller
         if ($key) {
             $extra = ['clientUsername', 'clientPassword'];
         }
+        if (auth()->user()->auth_type == 'ldap') {
+            $extensionJson = getExtensionJson($extension['name']);
+
+            if (isset($extensionJson['ldap_support_fields']))
+                $extra = array_merge($extra, array_values($extensionJson['ldap_support_fields']));
+        }
         foreach ($extension['database'] as $setting) {
             if (
                 in_array($setting['variable'], $extra)

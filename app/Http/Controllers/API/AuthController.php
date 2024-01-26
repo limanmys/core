@@ -508,8 +508,21 @@ class AuthController extends Controller
 
         $extensionWithLdap = Extension::where('ldap_support', true)->get();
         $serverList = [];
+        $keys = [];
         foreach ($extensionWithLdap as $extension) {
-            $serverList = array_merge($serverList, $extension->servers()->get()->toArray());
+            $extensionJson = getExtensionJson($extension->name);
+            $extensionServers = $extension->servers()->get()->toArray();
+            foreach ($extensionServers as $server) {
+                if (! isset($extensionJson['ldap_support_fields'])) {
+                    $keys[$server['id']] = [
+                        'username' => 'clientUsername',
+                        'password' => 'clientPassword',
+                    ];
+                } else {
+                    $keys[$server['id']] = $extensionJson['ldap_support_fields'];
+                }
+            }
+            $serverList = array_merge($serverList, $extensionServers);
         }
         $serverList = [
             ...$serverList,
@@ -520,23 +533,20 @@ class AuthController extends Controller
 
         foreach ($serverList as $server) {
             $encKey = env('APP_KEY').$user->id.$server['id'];
-            $encrypted = AES256::encrypt($request->email, $encKey);
-            UserSettings::firstOrCreate([
+            UserSettings::updateOrCreate([
                 'user_id' => $user->id,
                 'server_id' => $server['id'],
-                'name' => 'clientUsername',
+                'name' => $keys[$server['id']]['username'] ?? 'clientUsername',
             ], [
-                'value' => $encrypted,
+                'value' => AES256::encrypt($request->email, $encKey),
             ]);
 
-            $encrypted = AES256::encrypt($request->password, $encKey);
-
-            UserSettings::firstOrCreate([
+            UserSettings::updateOrCreate([
                 'user_id' => $user->id,
                 'server_id' => $server['id'],
-                'name' => 'clientPassword',
+                'name' => $keys[$server['id']]['password'] ?? 'clientPassword',
             ], [
-                'value' => $encrypted,
+                'value' => AES256::encrypt($request->password, $encKey),
             ]);
         }
 
