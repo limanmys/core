@@ -97,7 +97,7 @@ class UserController extends Controller
         if ($output == '0') {
             return response()->json([
                 'message' => 'Kullanıcı oluşturulurken hata oluştu.'
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
@@ -194,7 +194,7 @@ class UserController extends Controller
         if ($output == '0') {
             return response()->json([
                 'message' => 'Grup oluşturulurken hata oluştu.'
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
@@ -269,7 +269,7 @@ class UserController extends Controller
             'name' => $name,
         ]);
         if ($checkFile == '1') {
-            return response()->json(['name' => 'Another user exists with this name.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json(['name' => 'Bu isimde başka bir kullanıcı mevcut.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         $output = Command::runSudo(
             'echo "{:name} ALL=(ALL:ALL) ALL" | ' . sudo() . ' tee /etc/sudoers.d/{:name} &> /dev/null && echo 1 || echo 0',
@@ -278,7 +278,7 @@ class UserController extends Controller
             ]
         );
         if ($output == '0') {
-            return response()->json(['name' => 'An error occured while creating sudoer'], Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json(['message' => 'An error occured while creating sudoer'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json('Sudoer created successfully.');
