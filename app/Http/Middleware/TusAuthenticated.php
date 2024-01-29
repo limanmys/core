@@ -23,7 +23,7 @@ class TusAuthenticated implements TusMiddleware
      */
     public function handle(Request $request, Response $response)
     {
-        if (auth()->check()) {
+        if (auth('api')->check()) {
             return;
         }
 
@@ -39,12 +39,12 @@ class TusAuthenticated implements TusMiddleware
                 return true;
             }
 
-            throw new UnauthorizedHttpException('Extension-Token header is missing.');
+            throw new UnauthorizedHttpException('', 'Extension-Token header is missing.');
         }
 
         $obj = Token::where('token', $token)->first();
         if (! $obj) {
-            throw new UnauthorizedHttpException('Extension-Token is invalid.');
+            throw new UnauthorizedHttpException('', 'Extension-Token is invalid.');
         }
 
         Log::info('Extension-Token is valid. User ip: ' . request()->ip);

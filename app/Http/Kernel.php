@@ -18,11 +18,12 @@ class Kernel extends HttpKernel
         Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         Middleware\TrustProxies::class,
+        Middleware\EncryptCookies::class,
+        Middleware\CookieJWTAuthenticator::class,
     ];
 
     protected $middlewareGroups = [
         'web' => [
-            Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \App\Http\Middleware\APILogin::class,
@@ -55,7 +56,6 @@ class Kernel extends HttpKernel
         'extension' => \App\Http\Middleware\Extension::class,
         'block_except_limans' => \App\Http\Middleware\BlockExceptLimans::class,
         'google2fa' => \PragmaRX\Google2FALaravel\MiddlewareStateless::class,
-        'upload_token_check' => \App\Http\Middleware\LimanTokenUploadCheck::class,
     ];
 
     protected $middlewarePriority = [

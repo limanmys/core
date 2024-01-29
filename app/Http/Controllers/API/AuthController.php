@@ -21,6 +21,7 @@ use GuzzleHttp\Client;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
@@ -181,11 +182,15 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function logout()
+    public function logout(Request $request)
     {
+        $deleteToken = Cookie::forget('token', '/', $request->getHost());
+        $deleteCurrentUser = Cookie::forget('currentUser', '/', $request->getHost());
         auth('api')->logout();
 
-        return response()->json(['message' => 'User successfully signed out']);
+        return response()->json(['message' => 'User successfully signed out'])
+            ->withCookie($deleteToken)
+            ->withCookie($deleteCurrentUser);
     }
 
     /**
@@ -575,13 +580,17 @@ class AuthController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60,
+        $return = [
             'expired_at' => (auth('api')->factory()->getTTL() * 60 + time()) * 1000,
             'user' => [
-                ...User::find(auth('api')->user()->id)->toArray(),
+                ...User::find(auth('api')->user()->id, [
+                    'id',
+                    'name',
+                    'email',
+                    'locale',
+                    'status',
+                    'username'
+                ])->toArray(),
                 'last_login_at' => Carbon::now()->toDateTimeString(),
                 'last_login_ip' => $request->ip(),
                 'permissions' => [
@@ -592,7 +601,27 @@ class AuthController extends Controller
                     'view_logs' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'view_logs'),
                 ],
             ],
-        ]);
+        ];
+
+        return response()->json($return)->withCookie(cookie(
+            'token',
+            $token,
+            auth('api')->factory()->getTTL() * 60,
+            null,
+            $request->getHost(),
+            true,
+            true,
+            false
+        ))->withCookie(cookie(
+            'currentUser',
+            json_encode($return),
+            auth('api')->factory()->getTTL() * 60,
+            null,
+            $request->getHost(),
+            true,
+            false,
+            false
+        ));
     }
 
     /**

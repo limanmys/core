@@ -36,8 +36,7 @@ Route::any('/upload/{any?}', function () {
     $response = $server->serve();
     return $response->send();
 })
-    ->where('any', '.*')
-    ->middleware(['upload_token_check']);
+    ->where('any', '.*');
 
 Route::post('/upload_info', function () {
     request()->validate([
@@ -59,7 +58,7 @@ Route::post('/upload_info', function () {
     }
 
     return $info;
-})->middleware(['upload_token_check']);
+});
 
 Route::get(
     '/eklenti/{extension_id}/public/{any}',
