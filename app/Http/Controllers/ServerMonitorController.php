@@ -7,119 +7,161 @@ use App\Models\UserMonitors;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 
-/**
- * Server Monitor Controller
- *
- * @extends Controller
- */
 class ServerMonitorController extends Controller
 {
     /**
-     * Add a server to watch status
+     * Add a server to watch status.
      *
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
     public function add()
     {
-        validate([
-            'name' => 'required',
-            'ip_address' => 'required',
-            'port' => 'required|numeric|min:-1|max:65537'
-        ]);
+        try {
+            $this->validateRequest();
 
-        $obj = MonitorServer::where([
-            'ip_address' => request('ip_address'),
-            'port' => request('port'),
-        ])->first();
-        if (! $obj) {
-            $status = checkPort(request('ip_address'), request('port'));
-            $obj = new MonitorServer([
+            $server = MonitorServer::firstOrNew([
                 'ip_address' => request('ip_address'),
                 'port' => request('port'),
-                'online' => $status,
-                'last_checked' => Carbon::now(),
             ]);
-            $obj->save();
+
+            if (!$server->exists) {
+                $status = checkPort(request('ip_address'), request('port'));
+                $server->fill([
+                    'online' => $status,
+                    'last_checked' => Carbon::now(),
+                ])->save();
+            }
+
+            UserMonitors::create([
+                'name' => request('name'),
+                'server_monitor_id' => $server->id,
+                'user_id' => user()->id,
+            ]);
+
+            return respond('Başarıyla eklendi!');
+        } catch (ValidationException $e) {
+            return respond($e->validator->errors()->first(), 422);
+        } catch (\Exception $e) {
+            return respond('Bir hata oluştu!', 500);
         }
-
-        UserMonitors::create([
-            'name' => request('name'),
-            'server_monitor_id' => $obj->id,
-            'user_id' => user()->id,
-        ]);
-
-        return respond('Başarıyla eklendi!');
     }
 
     /**
-     * Remove a server from watch list
+     * Remove a server from the watch list.
      *
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
     public function remove()
     {
-        //Find Object.
-        $obj = UserMonitors::find(request('server_monitor_id'));
-        if (! $obj) {
-            return respond('Bu sunucu takibi bulunamadı!', 201);
-        }
+        try {
+            $obj = UserMonitors::find(request('server_monitor_id'));
+            if (!$obj) {
+                return respond('Bu sunucu takibi bulunamadı!', 404);
+            }
 
-        //Let's search if this is the only occurence of tracking.
-        $monitors = UserMonitors::where('server_monitor_id', $obj->server_monitor_id)->get();
-        if ($monitors->count() == 1) {
-            MonitorServer::find($obj->server_monitor_id)->delete();
-        }
-        $obj->delete();
+            $this->deleteServerIfNoOtherMonitors($obj);
 
-        return respond('Sunucu takibi başarıyla silindi!');
+            $obj->delete();
+
+            return respond('Sunucu takibi başarıyla silindi!');
+        } catch (\Exception $e) {
+            return respond('Bir hata oluştu!', 500);
+        }
     }
 
     /**
-     * @return void
-     */
-    public function get()
-    {
-    }
-
-    /**
-     * Re-run health check
+     * Re-run health check.
      *
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
     public function refresh()
     {
-        $obj = UserMonitors::find(request('server_monitor_id'));
-        if (! $obj) {
-            return respond('Bu sunucu takibi bulunamadı!', 201);
+        try {
+            $obj = UserMonitors::find(request('server_monitor_id'));
+            if (!$obj) {
+                return respond('Bu sunucu takibi bulunamadı!', 404);
+            }
+
+            $server = MonitorServer::find($obj->server_monitor_id);
+            if (!$server) {
+                return respond('Bu sunucu takibi bulunamadı!', 404);
+            }
+
+            $status = checkPort($server->ip_address, $server->port);
+            $server->update([
+                'online' => $status,
+                'last_checked' => Carbon::now(),
+            ]);
+
+            return respond('Başarıyla yenilendi!');
+        } catch (\Exception $e) {
+            return respond('Bir hata oluştu!', 500);
         }
-
-        $server = MonitorServer::find($obj->server_monitor_id);
-        if (! $server) {
-            return respond('Bu sunucu takibi bulunamadı!', 201);
-        }
-
-        $status = checkPort($server->ip_address, $server->port);
-        $server->update([
-            'online' => $status,
-            'last_checked' => Carbon::now(),
-        ]);
-
-        return respond('Başarıyla yenilendi!');
     }
 
     /**
-     * Returns the list of watched servers
+     * Returns the list of watched servers.
      *
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
     public function list()
     {
-        $servers = UserMonitors::where('user_id', user()->id)->get()->map(function ($server) {
+        try {
+            $servers = $this->getUserMonitorsWithServerDetails();
+
+            return magicView('monitor.index', [
+                'monitor_servers' => $servers,
+                'servers' => servers(),
+            ]);
+        } catch (\Exception $e) {
+            return respond('Bir hata oluştu!', 500);
+        }
+    }
+
+    /**
+     * Validate the incoming request.
+     *
+     * @return void
+     * @throws ValidationException
+     */
+    private function validateRequest()
+    {
+        $this->validate(request(), [
+            'name' => 'required',
+            'ip_address' => 'required',
+            'port' => 'required|numeric|min:-1|max:65537',
+        ]);
+    }
+
+    /**
+     * Delete the server if no other monitors are tracking it.
+     *
+     * @param \App\Models\UserMonitors $monitor
+     * @return void
+     */
+    private function deleteServerIfNoOtherMonitors(UserMonitors $monitor)
+    {
+        $monitors = UserMonitors::where('server_monitor_id', $monitor->server_monitor_id)->get();
+        if ($monitors->count() == 1) {
+            MonitorServer::find($monitor->server_monitor_id)->delete();
+        }
+    }
+
+    /**
+     * Get user monitors with server details.
+     *
+     * @return mixed
+     */
+    private function getUserMonitorsWithServerDetails()
+    {
+        return UserMonitors::where('user_id', user()->id)->get()->map(function ($server) {
             $obj = MonitorServer::find($server->server_monitor_id);
-            if (! $obj) {
+            if (!$obj) {
                 return $server;
             }
+
             $server->online = $obj->online;
             $server->last_checked = $obj->last_checked;
             $server->ip_address = $obj->ip_address;
@@ -127,10 +169,5 @@ class ServerMonitorController extends Controller
 
             return $server;
         });
-
-        return magicView('monitor.index', [
-            'monitor_servers' => $servers,
-            'servers' => servers(),
-        ]);
     }
 }
