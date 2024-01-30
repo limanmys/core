@@ -24,6 +24,7 @@
         "laravel/helpers": "^1.5",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.0",
+        "league/csv": "^9.0",
         "limanmys/php-smb": "^3.5",
         "mervick/aes-everywhere": "^1.1",
         "mews/captcha": "^3.2",

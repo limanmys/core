@@ -13,6 +13,7 @@ use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use League\Csv\Writer;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -608,6 +609,7 @@ class RoleController extends Controller
         $headers = [
             'Content-type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename='.$fileName,
+            'Content-Transfer-Encoding' => 'utf-8',
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
@@ -620,20 +622,26 @@ class RoleController extends Controller
             'İzin Değeri',
         ];
 
-        $callback = function () use ($data, $columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
+        $writer = Writer::createFromPath("php://temp", "r+");
+        $writer->insertOne($columns);
 
-            foreach ($data as $row) {
-                fputcsv($file, [
-                    $columns[0] => $row['username'],
-                    $columns[1] => $row['role_name'],
-                    $columns[2] => $row['perm_type'],
-                    $columns[3] => $row['perm_value'],
-                ]);
+        foreach ($data as $row) {
+            $writer->insertOne([
+                $row['username'],
+                $row['role_name'],
+                $row['perm_type'],
+                $row['perm_value'],
+            ]);
+        }
+
+        $flushThreshold = 1000;
+        $callback = function () use ($writer, $flushThreshold) {
+            foreach ($writer->chunk(1024) as $offset => $chunk) {
+                echo $chunk;
+                if ($offset % $flushThreshold === 0) {
+                    flush();
+                }
             }
-
-            fclose($file);
         };
 
         return response()->stream($callback, 200, $headers);
