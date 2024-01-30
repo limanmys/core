@@ -20,14 +20,14 @@ class LimanUpdaterJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $downloadTo;
+    protected string $downloadTo;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($version, protected $downloadUrl)
+    public function __construct(protected string $version, protected string $downloadUrl)
     {
         $this->downloadTo = "/liman/packages/liman-$version.deb";
     }
@@ -40,7 +40,7 @@ class LimanUpdaterJob implements ShouldQueue
      */
     public function handle()
     {
-        self::downloadFile();
+        $this->downloadFile();
     }
 
     /**
@@ -57,47 +57,79 @@ class LimanUpdaterJob implements ShouldQueue
 
         $client = new Client([
             'headers' => [
-                'Authorization' => 'Bearer ' . env('MARKET_ACCESS_TOKEN'),
+                'Authorization' => 'Bearer ' . config('services.market.access_token'),
             ],
             'verify' => false,
         ]);
-        $resource = fopen($this->downloadTo, 'w');
-        try {
-            $client->request('GET', $this->downloadUrl, ['sink' => $resource]);
-        } catch (\Exception $e) {
-            AdminNotification::create([
-                'title' => json_encode([
-                    'tr' => $this->extension->display_name . __(' eklentisinin güncellemesi indirilemedi!', [], 'tr'),
-                    'en' => $this->extension->display_name . __(' eklentisinin güncellemesi indirilemedi!', [], 'en'),
-                ]),
-                'type' => 'error',
-                'message' => json_encode([
-                    'tr' => __('Oluşan hata: ', [], 'tr') . $e->getMessage(),
-                    'en' => __('Oluşan hata: ', [], 'en') . $e->getMessage(),
-                ]),
-                'level' => 3,
-            ]);
 
+        try {
+            $response = $client->request('GET', $this->downloadUrl);
+
+            if ($response->getStatusCode() == 200) {
+                file_put_contents($this->downloadTo, $response->getBody());
+                $this->notifySuccess();
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->notifyError($e->getMessage());
             return false;
         }
 
+        return false;
+    }
+
+    /**
+     * Notify success message
+     *
+     * @return void
+     */
+    private function notifySuccess()
+    {
         AdminNotification::create([
             'title' => json_encode([
-                'tr' => $this->extension->display_name . __(' eklentisinin güncellemesi indirildi!', [], 'tr'),
-                'en' => $this->extension->display_name . __(' eklentisinin güncellemesi indirildi!', [], 'en'),
+                'tr' => $this->getNotificationMessage('Güncelleme Başarılı', 'tr'),
+                'en' => $this->getNotificationMessage('Update Successful', 'en'),
             ]),
-            'type' => '',
+            'type' => 'success',
             'message' => json_encode([
-                'tr' => $this->extension->display_name . __(' eklentisinin güncellemesi başarıyla indirildi, eklentiler sekmesi üzerinden değişim kaydını görebilir, eklentiyi güncelleyebilirsiniz.', [], 'tr'),
-                'en' => $this->extension->display_name . __(' eklentisinin güncellemesi başarıyla indirildi, eklentiler sekmesi üzerinden değişim kaydını görebilir, eklentiyi güncelleyebilirsiniz.', [], 'en'),
+                'tr' => $this->getNotificationMessage('Güncelleme başarıyla tamamlandı.', 'tr'),
+                'en' => $this->getNotificationMessage('Update completed successfully.', 'en'),
             ]),
             'level' => 3,
         ]);
+    }
 
-        if (is_file($this->downloadTo)) {
-            return true;
-        } else {
-            return false;
-        }
+    /**
+     * Notify error message
+     *
+     * @param string $errorMessage
+     * @return void
+     */
+    private function notifyError(string $errorMessage)
+    {
+        AdminNotification::create([
+            'title' => json_encode([
+                'tr' => $this->getNotificationMessage('Güncelleme Hatası', 'tr'),
+                'en' => $this->getNotificationMessage('Update Error', 'en'),
+            ]),
+            'type' => 'error',
+            'message' => json_encode([
+                'tr' => $this->getNotificationMessage('Oluşan hata: ', 'tr') . $errorMessage,
+                'en' => $this->getNotificationMessage('Error occurred: ', 'en') . $errorMessage,
+            ]),
+            'level' => 3,
+        ]);
+    }
+
+    /**
+     * Get notification message
+     *
+     * @param string $message
+     * @param string $locale
+     * @return string
+     */
+    private function getNotificationMessage(string $message, string $locale): string
+    {
+        return $this->extension->display_name . __(' eklentisinin güncellemesi ', [], $locale) . $message;
     }
 }
