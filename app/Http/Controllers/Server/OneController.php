@@ -35,68 +35,98 @@ class OneController extends Controller
      * @return Application|Factory|View|JsonResponse|Response
      * @throws GuzzleException
      */
-    public function one()
-    {
-        $server = server();
-        if (! $server) {
-            abort(504, 'Sunucu Bulunamadı.');
-        }
-
-        if (! Permission::can(user()->id, 'liman', 'id', 'server_details')) {
-            return respond('Bu işlemi yapmak için yetkiniz yok!', 201);
-        }
-
-        try {
-            if ($server->isWindows()) {
-                preg_match('/\d+/', (string) $server->getUptime(), $output);
-                $uptime = $output[0];
-            } else {
-                $uptime = $server->getUptime();
-            }
-            $uptime = Carbon::parse($uptime)->diffForHumans();
-        } catch (\Throwable) {
-            $uptime = __('Uptime parse edemiyorum.');
-        }
-
-        $outputs = [
-            'hostname' => $server->getHostname(),
-            'version' => $server->getVersion(),
-            'nofservices' => $server->getNoOfServices(),
-            'nofprocesses' => $server->getNoOfProcesses(),
-            'uptime' => $uptime,
-        ];
-
-        if ($server->canRunCommand()) {
-            $outputs['user'] = Command::run('whoami');
-        }
-
-        $input_extensions = [];
-        $available_extensions = $this->availableExtensions();
-
-        foreach ($available_extensions as $extension) {
-            $arr = [];
-            if (isset($extension->install)) {
-                foreach ($extension->install as $key => $parameter) {
-                    $arr[$parameter['name']] = $key . ':' . $parameter['type'];
-                }
-            }
-            $arr[$extension->display_name . ':' . $extension->id] =
-                'extension_id:hidden';
-            $input_extensions[] = [
-                'name' => $extension->display_name,
-                'id' => $extension->id,
-            ];
-        }
-
-        return view('server.one.main', [
-            'server' => $server,
-            'favorite' => $server->isFavorite(),
-            'outputs' => $outputs,
-            'installed_extensions' => $this->installedExtensions(),
-            'available_extensions' => $available_extensions,
-            'input_extensions' => $input_extensions,
-        ]);
+  public function one()
+{
+    $server = $this->getServer();
+    
+    if (!$server) {
+        abort(504, 'Sunucu Bulunamadı.');
     }
+
+    $this->checkPermission();
+
+    try {
+        $uptime = $this->getFormattedUptime($server);
+    } catch (\Throwable $e) {
+        $uptime = __('Uptime parse edemiyorum.');
+    }
+
+    $outputs = $this->getServerOutputs($server, $uptime);
+
+    if ($server->canRunCommand()) {
+        $outputs['user'] = Command::run('whoami');
+    }
+
+    $inputExtensions = $this->getInputExtensions();
+
+    return view('server.one.main', [
+        'server' => $server,
+        'favorite' => $server->isFavorite(),
+        'outputs' => $outputs,
+        'installedExtensions' => $this->installedExtensions(),
+        'availableExtensions' => $this->availableExtensions(),
+        'inputExtensions' => $inputExtensions,
+    ]);
+}
+
+private function getServer()
+{
+    return server();
+}
+
+private function checkPermission()
+{
+    if (!Permission::can(user()->id, 'liman', 'id', 'server_details')) {
+        return respond('Bu işlemi yapmak için yetkiniz yok!', 201);
+    }
+}
+
+private function getFormattedUptime($server)
+{
+    $uptimeValue = $server->isWindows()
+        ? (int) preg_replace('/\D/', '', $server->getUptime())
+        : $server->getUptime();
+
+    return Carbon::parse($uptimeValue)->diffForHumans();
+}
+
+private function getServerOutputs($server, $uptime)
+{
+    return [
+        'hostname' => $server->getHostname(),
+        'version' => $server->getVersion(),
+        'nofservices' => $server->getNoOfServices(),
+        'nofprocesses' => $server->getNoOfProcesses(),
+        'uptime' => $uptime,
+    ];
+}
+
+private function getInputExtensions()
+{
+    $inputExtensions = [];
+    $availableExtensions = $this->availableExtensions();
+
+    foreach ($availableExtensions as $extension) {
+        $parameters = $this->getInstallParameters($extension);
+        $inputExtensions[] = array_merge(['extension_id' => 'hidden'], $parameters);
+    }
+
+    return $inputExtensions;
+}
+
+private function getInstallParameters($extension)
+{
+    $parameters = [];
+
+    if (isset($extension->install)) {
+        foreach ($extension->install as $key => $parameter) {
+            $parameters[$parameter['name']] = "$key:{$parameter['type']}";
+        }
+    }
+
+    return $parameters;
+}
+
 
     /**
      * Get available extensions
