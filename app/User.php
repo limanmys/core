@@ -208,7 +208,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return new Attribute(
             get: fn($value) => ! is_null($value) ? decrypt($value) : '',
-            set: fn($value) => ! is_null($value) ? encrypt($value) : '',
+            set: fn($value) => ! is_null($value) ? encrypt($value) : null,
         );
     }
 
