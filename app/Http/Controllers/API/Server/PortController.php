@@ -5,43 +5,42 @@ namespace App\Http\Controllers\API\Server;
 use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
-use App\System\Command;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Illuminate\Support\Facades\Process;
+#use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
-/**
- * Server Port Controller
- */
 class PortController extends Controller
 {
-    public function __construct()
+     
+    public function index(Request $request): JsonResponse
     {
-        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
-            throw new JsonResponseException([
-                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
-            ], '', Response::HTTP_FORBIDDEN);
-        }
-    }
+        $request->validate([
+            'os' => 'required|string|in:linux,macos,window',
+        ]);
 
-    /**
-     * Get open ports on server
-     *
-     * @return JsonResponse|Response
-     *
-     * @throws GuzzleException
-     * @throws GuzzleException
-     */
-    public function index()
-    {
-        if (server()->os != 'linux') {
-            return respond('Bu sunucuda portları kontrol edemezsiniz!', Response::HTTP_FORBIDDEN);
+        $this->authorize('viewOpenPorts', 'App\Models\Server');
+
+        if ($request->os !== 'linux') {
+            throw new JsonResponseException(
+                ['message' => 'Sadece Linux sunucularda portları kontrol edebilirsiniz!'],
+                '',
+                Response::HTTP_FORBIDDEN
+            );
         }
 
-        $output = trim(
-            Command::runSudo(
-                "lsof -i -P -n | grep -v '\-'| awk -F' ' '{print $1,$3,$5,$8,$9}' | sed 1,1d"
-            )
-        );
+        
+        $command = 'lsof -i -P -n | grep -v "\-"| awk -F" " "{print $1,$3,$5,$8,$9}" | sed 1,1d';
+
+        $process = Process::fromShellCommandline($command);
+        $process->run();
+
+        if (! $process->isSuccessful()) {
+            throw new \RuntimeException($process->getErrorOutput());
+        }
+
+        $output = trim($process->getOutput());
 
         if (empty($output)) {
             return response()->json([]);
