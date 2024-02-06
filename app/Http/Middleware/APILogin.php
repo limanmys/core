@@ -3,42 +3,58 @@
 namespace App\Http\Middleware;
 
 use App\Models\AccessToken;
-use Carbon\Carbon;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
-/**
- * API Token Checker Middleware
- */
 class APILogin
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return mixed
-     */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        if (request()->headers->has('liman-token')) {
-            $obj = AccessToken::where([
-                'token' => request()->headers->get('liman-token'),
-            ])->first();
-            if (! $obj) {
-                abort(403, 'Token Geçersiz!');
-            }
-
-            if ($obj->ip_range != '-1' && ! ip_in_range($request->ip(), $obj->ip_range)) {
-                abort(403, "Bu token'i bu ip adresinden kullanamazsınız!");
-            }
-
-            $obj->update([
-                'last_used_at' => Carbon::now()->toDateTimeString(),
-                'last_used_ip' => $request->ip(),
-            ]);
-            Auth::loginUsingId($obj->user_id);
+        $token = $request->header('liman-token');
+        
+        if (! $token) {
+            return $this->abortWithMessage('Token eksik!', Response::HTTP_FORBIDDEN);
         }
 
+        $accessToken = AccessToken::where('token', $token)->first();
+
+        if (! $accessToken) {
+            return $this->abortWithMessage('Geçersiz token!', Response::HTTP_FORBIDDEN);
+        }
+
+        if (! $this->isIPInRange($request->ip(), $accessToken->ip_range)) {
+            return $this->abortWithMessage('Bu IP adresinden token kullanılamaz!', Response::HTTP_FORBIDDEN);
+        }
+
+        $this->updateAccessToken($accessToken, $request->ip());
+
+        $this->loginUser($accessToken->user_id);
+
         return $next($request);
+    }
+
+    private function abortWithMessage(string $message, int $statusCode): Response
+    {
+        abort($statusCode, $message);
+    }
+
+    private function isIPInRange(string $ip, string $range): bool
+    {
+        return $range === '-1' || ip_in_range($ip, $range);
+    }
+
+    private function updateAccessToken(AccessToken $accessToken, string $ip): void
+    {
+        $accessToken->update([
+            'last_used_at' => now(),
+            'last_used_ip' => $ip,
+        ]);
+    }
+
+    private function loginUser(int $userId): void
+    {
+        Auth::loginUsingId($userId);
     }
 }
