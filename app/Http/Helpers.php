@@ -28,12 +28,14 @@ if (! function_exists('validate')) {
      *
      * @param $rules
      * @param array $messages
+     * @param array $fieldNames
      * @return void
      * @throws JsonResponseException
      */
-    function validate($rules, array $messages = []): void
+    function validate($rules, array $messages = [], array $fieldNames = []): void
     {
         $validator = Validator::make(request()->all(), $rules, $messages);
+        $validator->setAttributeNames($fieldNames);
         if (! request()->wantsJson()) {
             // If request doesn't want JSON handle as the old way
             if ($validator->fails()) {
@@ -274,64 +276,6 @@ if (! function_exists('users')) {
     }
 }
 
-if (! function_exists('registerModuleRoutes')) {
-    /**
-     * Register module routes
-     *
-     * @return void
-     */
-    function registerModuleRoutes()
-    {
-        $files = searchModuleFiles('routes.php');
-        foreach ($files as $file) {
-            require_once $file . '/routes.php';
-        }
-    }
-}
-
-if (! function_exists('registerModuleListeners')) {
-    /**
-     * Register module listeners
-     *
-     * @return void
-     */
-    function registerModuleListeners()
-    {
-        $files = searchModuleFiles('listeners.php');
-        foreach ($files as $file) {
-            require_once $file . '/listeners.php';
-        }
-    }
-}
-
-if (! function_exists('searchModuleFiles')) {
-    /**
-     * Search module files
-     *
-     * @param $type
-     * @return array
-     */
-    function searchModuleFiles($type)
-    {
-        $command = 'find /liman/modules/ -name @{:type}';
-
-        $output = Command::runLiman($command, [
-            'type' => $type,
-        ]);
-        if ($output == '') {
-            return [];
-        }
-
-        $data = explode("\n", (string) $output);
-        $arr = [];
-        foreach ($data as $file) {
-            array_push($arr, dirname($file));
-        }
-
-        return $arr;
-    }
-}
-
 if (! function_exists('getLimanPermissions')) {
     /**
      * Get liman permission list
@@ -363,105 +307,6 @@ if (! function_exists('getLimanPermissions')) {
     }
 }
 
-if (! function_exists('settingsModuleViews')) {
-    /**
-     * Return setting module views and render it in settings page
-     *
-     * @return string
-     */
-    function settingsModuleViews()
-    {
-        $str = '';
-        foreach (searchModuleFiles('settings.blade.php') as $file) {
-            $blade = new Blade(
-                [realpath(base_path('resources/views/components')), $file],
-                '/tmp'
-            );
-            $str .= $blade->render('settings');
-        }
-
-        return $str;
-    }
-}
-
-if (! function_exists('renderModuleView')) {
-    /**
-     * Return render module view layout
-     *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
-     */
-    function renderModuleView($module, $page, $params = [])
-    {
-        $blade = new Blade('/liman/modules/' . $module . '/views/', '/tmp');
-        $str = $blade->render($page, $params);
-
-        return view('modules.layout', [
-            'name' => $module,
-            'html' => $str,
-        ]);
-    }
-}
-
-$sidebarModuleLinks = null;
-if (! function_exists('sidebarModuleLinks')) {
-    /**
-     * Returns module links
-     *
-     * @return array
-     */
-    function sidebarModuleLinks()
-    {
-        global $sidebarModuleLinks;
-        if ($sidebarModuleLinks != null) {
-            return $sidebarModuleLinks;
-        }
-        $array = [];
-        foreach (searchModuleFiles('sidebar.json') as $file) {
-            $filePath = $file . '/sidebar.json';
-            $data = file_get_contents($filePath);
-            $json = json_decode($data, true);
-            if (json_last_error() != JSON_ERROR_NONE) {
-                continue;
-            }
-            foreach ($json as $a) {
-                array_push($array, $a);
-            }
-        }
-        $sidebarModuleLinks = $array;
-
-        return $array;
-    }
-}
-
-if (! function_exists('settingsModuleButtons')) {
-    /**
-     * Returns html view of modules
-     *
-     * @return string
-     */
-    function settingsModuleButtons()
-    {
-        $str = '';
-        foreach (searchModuleFiles('settings.blade.php') as $file) {
-            $foo = substr((string) $file, 15);
-            $name = substr($foo, 0, strpos($foo, '/'));
-            $hrefName = $name;
-            if (is_numeric($name[0])) {
-                $hrefName = 'l-' . $name;
-            }
-
-            $str .=
-                '<li class="nav-item">
-               <a id="' .
-                $name .
-                "tab\" class=\"nav-link\" data-toggle=\"tab\" href=\"#$hrefName\">$name</a>
-            </li>";
-        }
-
-        return $str;
-    }
-}
-
 if (! function_exists('getLimanHostname')) {
     /**
      * Get liman server hostname
@@ -471,51 +316,6 @@ if (! function_exists('getLimanHostname')) {
     function getLimanHostname(): string
     {
         return trim((string) `hostname`);
-    }
-}
-
-if (! function_exists('serverModuleViews')) {
-    /**
-     * Get server modules
-     *
-     * @return string
-     */
-    function serverModuleViews()
-    {
-        $str = '';
-        foreach (searchModuleFiles('server.blade.php') as $file) {
-            $blade = new Blade(
-                [realpath(base_path('resources/views/components')), $file],
-                '/tmp'
-            );
-            $str .= $blade->render('server');
-        }
-
-        return $str;
-    }
-}
-
-if (! function_exists('serverModuleButtons')) {
-    /**
-     * Get server module html views
-     *
-     * @return string
-     */
-    function serverModuleButtons()
-    {
-        $str = '';
-        foreach (searchModuleFiles('server.blade.php') as $file) {
-            $foo = substr((string) $file, 15);
-            $name = substr($foo, 0, strpos($foo, '/'));
-            $str .=
-                '<li class="nav-item">
-               <a id="' .
-                $name .
-                "tab\"class=\"nav-link\" data-toggle=\"tab\" href=\"#$name\">$name</a>
-            </li>";
-        }
-
-        return $str;
     }
 }
 
@@ -775,19 +575,6 @@ if (! function_exists('user')) {
     function user()
     {
         return auth()->user();
-    }
-}
-
-if (! function_exists('sandbox')) {
-    /**
-     * Get sandbox instance
-     *
-     * @param  $id
-     * @return App\Sandboxes\Sandbox
-     */
-    function sandbox($id): \App\Sandboxes\Sandbox
-    {
-        return new App\Sandboxes\PHPSandbox();
     }
 }
 
@@ -1143,7 +930,6 @@ if (! function_exists('checkHealth')) {
             'logs' => '0700',
             'sandbox' => '0755',
             'server' => '0700',
-            'modules' => '0700',
             'packages' => '0700',
             'hashes' => '0700',
         ];
@@ -1413,6 +1199,8 @@ if (! function_exists('callExtensionFunction')) {
             $isJson = isJson($output, true);
             if ($isJson && isset($isJson->status) && $isJson->status == 200) {
                 return $isJson->message;
+            } else {
+                return $output;
             }
         } catch (\Exception $e) {
             return null;

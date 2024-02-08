@@ -34,6 +34,7 @@ class Extension extends Model
         'require_key',
         'status',
         'license_type',
+        'ldap_support',
     ];
 
     protected $casts = [
@@ -112,7 +113,12 @@ class Extension extends Model
             return Str::title(str_replace('-', ' ', (string) $this->name));
         }
 
-        return $this->attributes['display_name'];
+        $displayName = json_decode($this->attributes['display_name'], true);
+        if (is_array($displayName)) {
+            return $displayName[auth('api')->user()->language] ?? $displayName[app()->getLocale()] ?? $this->attributes['display_name'];
+        }
+
+        return str_replace('"', '', json_decode($this->attributes['display_name']) ?? $this->attributes['display_name']);
     }
 
     /**

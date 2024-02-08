@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\Server;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
 use App\Models\Extension;
 use App\Models\Permission;
@@ -18,13 +19,13 @@ class AccessLogController extends Controller
     public function __construct()
     {
         if (! isset(auth('api')->user()->id)) {
-            return response()->json([
+            throw new JsonResponseException([
                 'message' => 'Tekrar giriş yapınız.'
             ], Response::HTTP_UNAUTHORIZED);
         }
 
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'view_logs')) {
-            return response()->json(
+            throw new JsonResponseException(
                 ['message' => 'Sunucu günlük kayıtlarını görüntülemek için yetkiniz yok.'],
                 Response::HTTP_FORBIDDEN
             );
@@ -65,47 +66,51 @@ class AccessLogController extends Controller
         foreach (explode("\n", (string) $data) as $row) {
             $row = json_decode($row);
 
-            if (isset($row->request_details->extension_id)) {
-                if (! isset($knownExtensions[$row->request_details->extension_id])) {
-
-                    $extension = Extension::find($row->request_details->extension_id);
-                    if ($extension) {
-                        $knownExtensions[$row->request_details->extension_id] =
-                            $extension->display_name;
-                    } else {
-                        $knownExtensions[$row->request_details->extension_id] =
-                            $row->request_details->extension_id;
+            try {
+                if (isset($row->request_details->extension_id)) {
+                    if (! isset($knownExtensions[$row->request_details->extension_id])) {
+    
+                        $extension = Extension::find($row->request_details->extension_id);
+                        if ($extension) {
+                            $knownExtensions[$row->request_details->extension_id] =
+                                $extension->display_name;
+                        } else {
+                            $knownExtensions[$row->request_details->extension_id] =
+                                $row->request_details->extension_id;
+                        }
                     }
-                }
-                $row->extension_id = $knownExtensions[$row->request_details->extension_id];
-            } else {
-                $row->extension_id = __('Komut');
-            }
-
-            if (! isset($knownUsers[$row->user_id])) {
-                $user = User::find($row->user_id);
-                if ($user) {
-                    $knownUsers[$row->user_id] = $user->name;
+                    $row->extension_id = $knownExtensions[$row->request_details->extension_id];
                 } else {
-                    $knownUsers[$row->user_id] = $row->user_id;
+                    $row->extension_id = __('Komut');
                 }
-            }
-
-            $row->user_id = $knownUsers[$row->user_id];
-
-            if (isset($row->request_details->lmntargetFunction)) {
-                $row->view = $row->request_details->lmntargetFunction;
-
-                if (isset($row->request_details->lmntargetFunction) && $row->request_details->lmntargetFunction == '') {
-                    if ($row->lmn_level == 'high_level' && isset($row->request_details->title)) {
-                        $row->view = base64_decode($row->request_details->title);
+    
+                if (! isset($knownUsers[$row->user_id])) {
+                    $user = User::find($row->user_id);
+                    if ($user) {
+                        $knownUsers[$row->user_id] = $user->name;
+                    } else {
+                        $knownUsers[$row->user_id] = $row->user_id;
                     }
                 }
-            } else {
-                $row->view = __('Komut');
+    
+                $row->user_id = $knownUsers[$row->user_id];
+    
+                if (isset($row->request_details->lmntargetFunction)) {
+                    $row->view = $row->request_details->lmntargetFunction;
+    
+                    if (isset($row->request_details->lmntargetFunction) && $row->request_details->lmntargetFunction == '') {
+                        if ($row->lmn_level == 'high_level' && isset($row->request_details->title)) {
+                            $row->view = base64_decode($row->request_details->title);
+                        }
+                    }
+                } else {
+                    $row->view = __('Komut');
+                }
+    
+                $clean[] = $row;
+            } catch (\Throwable $e) {
+                continue;
             }
-
-            $clean[] = $row;
         }
 
         return response()->json($clean);

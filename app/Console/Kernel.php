@@ -41,13 +41,27 @@ class Kernel extends ConsoleKernel
             ->name('hasync')
             ->everyFiveMinutes();
 
-        // Run Health Check every hour.
+        // Clean log table excess records every day
         $schedule
             ->call(function () {
-                // TODO: Health check logic here when developed
+                // This methods does keeps newest 10000 records and deletes other ones
+                \App\Models\AuthLog::orderBy('created_at', 'desc')
+                    ->skip(10000)
+                    ->get()
+                    ->each->delete();
+                \App\Models\AuditLog::orderBy('created_at', 'desc')
+                    ->skip(10000)
+                    ->get()
+                    ->each->delete();
             })
+            ->daily()
+            ->name('Clean Log Tables');
+
+        // Clear expired password reset tokens every 60 minutes
+        $schedule
+            ->command('auth:clear-resets')
             ->hourly()
-            ->name('Health Check');
+            ->name('Clear Expired Password Reset Tokens');
     }
 
     /**

@@ -29,6 +29,8 @@ class ProfileController extends Controller
             ], 403);
         }
 
+        $user = User::find(auth('api')->user()->id);
+
         if ($request->password) {
             if (
                 ! auth()->attempt([
@@ -51,11 +53,17 @@ class ProfileController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . auth('api')->user()->id,
         ]);
 
-        $user = User::find(auth('api')->user()->id);
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
+            'otp_enabled' => (bool) $request->otp_enabled,
         ]);
+
+        if (! (bool) $request->otp_enabled) {
+            $user->update([
+                'google2fa_secret' => null
+            ]);
+        }
 
         return response()->json([
             'message' => 'Bilgiler başarıyla güncellendi.',

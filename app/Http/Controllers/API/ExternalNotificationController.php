@@ -56,7 +56,7 @@ class ExternalNotificationController extends Controller
                 "content" => $request->content,
             ],
             $request->send_to,
-            $request->mail
+            (bool) $request->mail
         );
 
         $channel->update([

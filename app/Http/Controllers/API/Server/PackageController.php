@@ -2,17 +2,29 @@
 
 namespace App\Http\Controllers\API\Server;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use App\System\Command;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 /**
  * Package Controller
  */
 class PackageController extends Controller
 {
+    public function __construct()
+    {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+    }
+
     /**
      * List packages that is installed on system
      *

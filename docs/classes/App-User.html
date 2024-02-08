@@ -60,6 +60,14 @@
 </h4>
     <ul class="phpdocumentor-list">
                     <li>
+                <a href="namespaces/app-casts.html" class="">Casts</a>
+                
+            </li>
+                    <li>
+                <a href="namespaces/app-classes.html" class="">Classes</a>
+                
+            </li>
+                    <li>
                 <a href="namespaces/app-connectors.html" class="">Connectors</a>
                 
             </li>
@@ -101,10 +109,6 @@
             </li>
                     <li>
                 <a href="namespaces/app-providers.html" class="">Providers</a>
-                
-            </li>
-                    <li>
-                <a href="namespaces/app-sandboxes.html" class="">Sandboxes</a>
                 
             </li>
                     <li>
@@ -159,6 +163,9 @@
                             </ul>
         </div>
     
+            <span class="phpdocumentor-element__implements">
+            implements
+                            <abbr title="\Tymon\JWTAuth\Contracts\JWTSubject">JWTSubject</abbr>                    </span>
     
             <span class="phpdocumentor-element__extends">
             Uses
@@ -168,7 +175,7 @@
         <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">29</span>
+    <span class="phpdocumentor-element-found-in__line">30</span>
 
     </aside>
 
@@ -180,6 +187,18 @@
 
 
 
+<h3 id="interfaces_class_traits">
+    Interfaces, Classes, Traits and Enums
+    <a href="#interfaces_class_traits" class="headerlink"><i class="fas fa-link"></i></a>
+</h3>
+
+<dl class="phpdocumentor-table-of-contents">
+            <dt class="phpdocumentor-table-of-contents__entry -interface"><abbr title="\Tymon\JWTAuth\Contracts\JWTSubject">JWTSubject</abbr></dt>
+        <dd></dd>
+    
+    
+    
+    </dl>
 
 
 <h3 id="toc">
@@ -217,6 +236,13 @@
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/App-User.html#method_authLogs">authLogs()</a>
+    <span>
+                                &nbsp;: <abbr title="\Illuminate\Database\Eloquent\Relations\HasMany">HasMany</abbr>    </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/App-User.html#method_extensions">extensions()</a>
     <span>
                                 &nbsp;: mixed    </span>
@@ -245,6 +271,20 @@
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/App-User.html#method_getJWTCustomClaims">getJWTCustomClaims()</a>
+    <span>
+                                &nbsp;: array&lt;string|int, mixed&gt;    </span>
+</dt>
+<dd>Return a key value array, containing any custom claims to be added to the JWT.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/App-User.html#method_getJWTIdentifier">getJWTIdentifier()</a>
+    <span>
+                                &nbsp;: mixed    </span>
+</dt>
+<dd>Get the identifier that will be stored in the subject claim of the JWT.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/App-Models-UsesUuid.html#method_getKeyType">getKeyType()</a>
     <span>
                                 &nbsp;: string    </span>
@@ -266,6 +306,13 @@
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/App-User.html#method_myFavorites">myFavorites()</a>
+    <span>
+                                &nbsp;: mixed    </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/App-User.html#method_newModelQuery">newModelQuery()</a>
     <span>
                                 &nbsp;: <abbr title="\Illuminate\Database\Eloquent\Builder">Builder</abbr>|<a href="classes/App-User.html"><abbr title="\App\User">User</abbr></a>    </span>
@@ -282,7 +329,14 @@
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/App-User.html#method_notifications">notifications()</a>
     <span>
-                                &nbsp;: <abbr title="\Illuminate\Database\Eloquent\Relations\HasMany">HasMany</abbr>    </span>
+                                &nbsp;: mixed    </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/App-User.html#method_oauth2Token">oauth2Token()</a>
+    <span>
+                                &nbsp;: <abbr title="\App\HasOne">HasOne</abbr>    </span>
 </dt>
 <dd></dd>
 
@@ -304,6 +358,20 @@
     <a href="classes/App-User.html#method_roles">roles()</a>
     <span>
                                 &nbsp;: <abbr title="\Illuminate\Database\Eloquent\Relations\BelongsToMany">BelongsToMany</abbr>    </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/App-User.html#method_scopeAdmins">scopeAdmins()</a>
+    <span>
+                                &nbsp;: mixed    </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/App-User.html#method_scopeNonAdmins">scopeNonAdmins()</a>
+    <span>
+                                &nbsp;: mixed    </span>
 </dt>
 <dd></dd>
 
@@ -410,7 +478,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">38</span>
+    <span class="phpdocumentor-element-found-in__line">39</span>
 
     </aside>
 
@@ -443,7 +511,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">59</span>
+    <span class="phpdocumentor-element-found-in__line">60</span>
 
     </aside>
 
@@ -453,7 +521,7 @@
     <span class="phpdocumentor-signature__visibility">protected</span>
         <span class="phpdocumentor-signature__type">array&lt;string|int, mixed&gt;</span>
     <span class="phpdocumentor-signature__name">$hidden</span>
-     = <span class="phpdocumentor-signature__default-value">[&#039;password&#039;, &#039;remember_token&#039;]</span></code>
+     = <span class="phpdocumentor-signature__default-value">[&#039;password&#039;, &#039;remember_token&#039;, &#039;google2fa_secret&#039;, &#039;keycloak_token&#039;, &#039;keycloak_refresh_token&#039;]</span></code>
 
     
     
@@ -480,7 +548,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">165</span>
+    <span class="phpdocumentor-element-found-in__line">179</span>
 
     </aside>
 
@@ -505,6 +573,38 @@
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_authLogs">
+        authLogs()
+        <a href="classes/App-User.html#method_authLogs" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">195</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">authLogs</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><abbr title="\Illuminate\Database\Eloquent\Relations\HasMany">HasMany</abbr></span></code>
+
+    
+    
+    
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type"><abbr title="\Illuminate\Database\Eloquent\Relations\HasMany">HasMany</abbr></span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_extensions">
         extensions()
         <a href="classes/App-User.html#method_extensions" class="headerlink"><i class="fas fa-link"></i></a>
@@ -512,7 +612,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">89</span>
+    <span class="phpdocumentor-element-found-in__line">100</span>
 
     </aside>
 
@@ -545,7 +645,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">136</span>
+    <span class="phpdocumentor-element-found-in__line">150</span>
 
     </aside>
 
@@ -620,7 +720,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/Models/UsesUuid.php"><a href="files/app-models-usesuuid.html"><abbr title="app/Models/UsesUuid.php">UsesUuid.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">32</span>
+    <span class="phpdocumentor-element-found-in__line">29</span>
 
     </aside>
 
@@ -629,12 +729,79 @@
     <span class="phpdocumentor-signature__visibility">public</span>
                     <span class="phpdocumentor-signature__name">getIncrementing</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">bool</span></code>
 
-    
+        <section class="phpdocumentor-description"></section>
+
     
     
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
     <span class="phpdocumentor-signature__response_type">bool</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_getJWTCustomClaims">
+        getJWTCustomClaims()
+        <a href="classes/App-User.html#method_getJWTCustomClaims" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">228</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Return a key value array, containing any custom claims to be added to the JWT.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">getJWTCustomClaims</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;</span></code>
+
+    
+    
+    
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_getJWTIdentifier">
+        getJWTIdentifier()
+        <a href="classes/App-User.html#method_getJWTIdentifier" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">219</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Get the identifier that will be stored in the subject claim of the JWT.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">getJWTIdentifier</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+
+    
+    
+    
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">mixed</span>
             &mdash;
         
     
@@ -652,7 +819,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/Models/UsesUuid.php"><a href="files/app-models-usesuuid.html"><abbr title="app/Models/UsesUuid.php">UsesUuid.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">40</span>
+    <span class="phpdocumentor-element-found-in__line">34</span>
 
     </aside>
 
@@ -661,7 +828,8 @@
     <span class="phpdocumentor-signature__visibility">public</span>
                     <span class="phpdocumentor-signature__name">getKeyType</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
 
-    
+        <section class="phpdocumentor-description"></section>
+
     
     
 
@@ -684,7 +852,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">66</span>
+    <span class="phpdocumentor-element-found-in__line">67</span>
 
     </aside>
 
@@ -717,7 +885,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">120</span>
+    <span class="phpdocumentor-element-found-in__line">137</span>
 
     </aside>
 
@@ -732,6 +900,39 @@
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
     <span class="phpdocumentor-signature__response_type"><abbr title="\Illuminate\Database\Eloquent\Relations\HasMany">HasMany</abbr></span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_myFavorites">
+        myFavorites()
+        <a href="classes/App-User.html#method_myFavorites" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">142</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">myFavorites</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">mixed</span>
             &mdash;
         
     
@@ -813,21 +1014,54 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">128</span>
+    <span class="phpdocumentor-element-found-in__line">112</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">notifications</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><abbr title="\Illuminate\Database\Eloquent\Relations\HasMany">HasMany</abbr></span></code>
+                    <span class="phpdocumentor-signature__name">notifications</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">mixed</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_oauth2Token">
+        oauth2Token()
+        <a href="classes/App-User.html#method_oauth2Token" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">187</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">oauth2Token</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><abbr title="\App\HasOne">HasOne</abbr></span></code>
 
     
     
     
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type"><abbr title="\Illuminate\Database\Eloquent\Relations\HasMany">HasMany</abbr></span>
+    <span class="phpdocumentor-signature__response_type"><abbr title="\App\HasOne">HasOne</abbr></span>
             &mdash;
         
     
@@ -845,7 +1079,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">149</span>
+    <span class="phpdocumentor-element-found-in__line">163</span>
 
     </aside>
 
@@ -909,7 +1143,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">157</span>
+    <span class="phpdocumentor-element-found-in__line">171</span>
 
     </aside>
 
@@ -934,6 +1168,94 @@
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_scopeAdmins">
+        scopeAdmins()
+        <a href="classes/App-User.html#method_scopeAdmins" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">73</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">scopeAdmins</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$query</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$query</span>
+                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">mixed</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_scopeNonAdmins">
+        scopeNonAdmins()
+        <a href="classes/App-User.html#method_scopeNonAdmins" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">78</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">scopeNonAdmins</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$query</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$query</span>
+                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">mixed</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_servers">
         servers()
         <a href="classes/App-User.html#method_servers" class="headerlink"><i class="fas fa-link"></i></a>
@@ -941,7 +1263,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">77</span>
+    <span class="phpdocumentor-element-found-in__line">88</span>
 
     </aside>
 
@@ -974,7 +1296,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">112</span>
+    <span class="phpdocumentor-element-found-in__line">129</span>
 
     </aside>
 
@@ -1006,7 +1328,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">104</span>
+    <span class="phpdocumentor-element-found-in__line">121</span>
 
     </aside>
 
@@ -1070,7 +1392,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/User.php"><a href="files/app-user.html"><abbr title="app/User.php">User.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">176</span>
+    <span class="phpdocumentor-element-found-in__line">206</span>
 
     </aside>
 
@@ -1078,7 +1400,7 @@
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">protected</span>
-                    <span class="phpdocumentor-signature__name">google2faSecret</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$value</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><abbr title="\Illuminate\Database\Eloquent\Casts\Attribute">Attribute</abbr></span></code>
+                    <span class="phpdocumentor-signature__name">google2faSecret</span><span>(</span><span class="phpdocumentor-signature__argument"><span>[</span><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$value</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><abbr title="\Illuminate\Database\Eloquent\Casts\Attribute">Attribute</abbr></span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
@@ -1086,7 +1408,7 @@
                     <dt class="phpdocumentor-argument-list__entry">
                 <span class="phpdocumentor-signature__argument__name">$value</span>
                 : <span class="phpdocumentor-signature__argument__return-type">string</span>
-                            </dt>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
             <dd class="phpdocumentor-argument-list__definition">
                 
             </dd>

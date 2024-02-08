@@ -5,7 +5,7 @@ return [
     /*
      * Enable / disable Google2FA.
      */
-    'enabled' => env('OTP_ENABLED', false),
+    'enabled' => env('OTP_ENABLED', true),
 
     /*
      * Lifetime in minutes.
@@ -27,7 +27,7 @@ return [
     /*
      * Guard.
      */
-    'guard' => '',
+    'guard' => 'api',
 
     /*
      * 2FA verified session var.
@@ -37,7 +37,7 @@ return [
     /*
      * One Time Password request input name.
      */
-    'otp_input' => 'one_time_password',
+    'otp_input' => 'token',
 
     /*
      * One Time Password Window.

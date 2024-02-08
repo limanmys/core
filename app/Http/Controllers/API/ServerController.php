@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\API;
 
 use App\Connectors\GenericConnector;
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Certificate;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\ServerKey;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use mervick\aesEverywhere\AES256;
 
 class ServerController extends Controller
@@ -67,6 +70,105 @@ class ServerController extends Controller
     }
 
     /**
+     * Update server name and IP address
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request) {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'update_server')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
+        $server = Server::find($request->server_id);
+        if (! $server) {
+            throw new JsonResponseException([
+                'message' => 'Sunucu bulunamadı.'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
+        AuditLog::write(
+            'server',
+            'update',
+            [
+                'server_id' => $server->id,
+                'server_name' => $server->name,
+                'server_ip' => $server->ip_address,
+                'shared_status' => $server->shared_key ? 'true' : 'false',
+                'new_server_name' => $request->name,
+                'new_server_ip' => $request->ip_address,
+                'new_shared_status' => $request->shared_key ? 'true' : 'false',
+            ],
+            "SERVER_UPDATE"
+        );
+
+        $server->name = $request->name;
+        $server->ip_address = $request->ip_address;
+        $server->shared_key = (bool) $request->shared_key;
+        $server->save();
+
+        return response()->json([
+            'message' => 'İşlem başarılı.'
+        ]);
+    }
+
+    /**
+     * Delete server from system
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(Request $request) {
+        $server = Server::find($request->server_id);
+        if (! $server) {
+            throw new JsonResponseException([
+                'message' => 'Sunucu bulunamadı.'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        if (
+            $server->user_id != auth('api')->id() &&
+            ! auth('api')
+                ->user()
+                ->isAdmin()
+        ) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
+        AuditLog::write(
+            'server',
+            'delete',
+            [
+                'server_id' => $server->id,
+                'server_name' => $server->name
+            ],
+            "SERVER_DELETE"
+        );
+
+        $server->delete();
+
+        return response()->json([
+            'message' => 'İşlem başarılı.'
+        ]);
+    }
+
+    /**
      * Grant server certificate
      *
      * @return JsonResponse|Response
@@ -97,6 +199,16 @@ class ServerController extends Controller
                 }
             }
         }
+
+        AuditLog::write(
+            'server',
+            'create',
+            [
+                'server_id' => $server->id,
+                'server_name' => $server->name,
+            ],
+            "SERVER_CREATE"
+        );
 
         return response()->json([
             'message' => 'Sunucu başarıyla eklendi.'

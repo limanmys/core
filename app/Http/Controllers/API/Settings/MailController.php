@@ -35,7 +35,6 @@ class MailController extends Controller
     public function saveConfiguration(Request $request)
     {
         validate([
-            'active' => 'required|boolean',
             'host' => 'required|string',
             'port' => 'required|integer',
             'username' => 'required|string',

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\API\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Extension;
 use App\Models\GolangLicense;
 use App\Models\License;
 use App\Models\Permission;
+use App\Models\Server;
 use App\System\Command;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -45,6 +47,16 @@ class ExtensionController extends Controller
         validate([
             'extension' => 'required|max:5000000',
         ]);
+
+        $extension = request()
+            ->file('extension')
+            ->getClientOriginalExtension();
+
+        if ($extension !== 'zip' && $extension !== 'signed' && $extension !== 'lmne') {
+            return response()->json([
+                'extension' => 'Eklenti dosyası uzantısı zip, signed, lmne olmalıdır.'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
         $verify = false;
         $zipFile = request()->file('extension');
@@ -85,17 +97,8 @@ class ExtensionController extends Controller
                 basename(
                     (string) request()->file('extension')->path()
                 );
-        } else {
-            if (! request()->has('force')) {
-                return response()->json(
-                    [
-                        'message' => 'Bu eklenti imzalanmamış bir eklenti, yine de kurmak istediğinize emin misiniz?'
-                    ],
-                    203
-                );
-            }
-        }
-        [$error, $new] = $this->setupNewExtension($zipFile, $verify);
+        } 
+        [$error, $new, $old] = $this->setupNewExtension($zipFile, $verify);
 
         if ($error) {
             return $error;
@@ -104,6 +107,20 @@ class ExtensionController extends Controller
         system_log(3, 'EXTENSION_UPLOAD_SUCCESS', [
             'extension_id' => $new->id,
         ]);
+
+        AuditLog::write(
+            'extension',
+            'upload',
+            [
+                'extension_id' => $new->id,
+                'extension_name' => $new->display_name ?? $new->name,
+            ],
+            'EXTENSION_UPLOAD',
+            [
+                'old' => $old,
+                'new' => $new,
+            ]
+        );
 
         return response()->json([
             'message' => 'Eklenti başarıyla yüklendi.'
@@ -132,6 +149,17 @@ class ExtensionController extends Controller
 
         try {
             rootSystem()->userRemove(extension()->id);
+
+            AuditLog::write(
+                'extension',
+                'delete',
+                [
+                    'extension_id' => extension()->id,
+                    'extension_name' => extension()->display_name ?? extension()->name,
+                ],
+                "EXTENSION_DELETE"
+            );
+
             extension()->delete();
         } catch (\Exception) {
         }
@@ -173,6 +201,8 @@ class ExtensionController extends Controller
                 ['extension_id' => extension()->id],
                 ['data' => request('license')]
             );
+            
+            Cache::forget('extension_'.extension()->id.'_'.$request->server_id.'_license');
 
             return response()->json([
                 'message' => 'Lisans eklendi.'
@@ -185,7 +215,7 @@ class ExtensionController extends Controller
 
         $output = callExtensionFunction(
             extension(),
-            $request->server_id,
+            Server::find($request->server_id),
             [
                 'endpoint' => 'license',
                 'type' => 'post',
@@ -260,7 +290,9 @@ class ExtensionController extends Controller
         if (! $zip->open($zipFile)) {
             system_log(7, 'EXTENSION_UPLOAD_FAILED_CORRUPTED');
 
-            return [response()->json('Eklenti dosyası açılamıyor.', 500), null];
+            return [response()->json([
+                'message' => 'Eklenti dosyası açılamıyor.'
+            ], 500), null];
         }
 
         // Determine a random tmp folder to extract files
@@ -269,7 +301,9 @@ class ExtensionController extends Controller
         try {
             $zip->extractTo($path);
         } catch (\Exception) {
-            return [response()->json('Eklenti dosyası açılamıyor.', 500), null];
+            return [response()->json([
+                'message' => 'Eklenti dosyası açılamıyor.'
+            ], 500), null];
         }
 
         if (count(scandir($path)) == 3) {
@@ -283,7 +317,9 @@ class ExtensionController extends Controller
 
         preg_match('/[A-Za-z-]+/', (string) $json['name'], $output);
         if (empty($output) || $output[0] != $json['name']) {
-            return [response()->json('Eklenti isminde yalnızca harflere izin verilmektedir.', 422), null];
+            return [response()->json([
+                'message' => 'Eklenti adı geçerli değil.'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY), null];
         }
 
         if (
@@ -308,12 +344,18 @@ class ExtensionController extends Controller
 
         // Check If Extension Already Exists.
         $extension = Extension::where('name', $json['name'])->first();
+        if ($extension)
+            $old = $extension->toArray();
+        else
+            $old = [];
 
         if ($extension) {
             if ($extension->version == $json['version']) {
                 system_log(7, 'EXTENSION_UPLOAD_FAILED_ALREADY_INSTALLED');
 
-                return [response()->json('Eklentinin bu sürümü zaten yüklü.', 422), null];
+                return [response()->json([
+                    'message' => 'Bu eklenti zaten yüklü.'
+                ], Response::HTTP_UNPROCESSABLE_ENTITY), null];
             }
         }
 
@@ -326,6 +368,7 @@ class ExtensionController extends Controller
         unset($json['issuer']);
         unset($json['status']);
         unset($json['order']);
+        $json['display_name'] = json_encode($json['display_name']);
         $new->fill($json);
         $new->status = '1';
         $new->save();
@@ -358,6 +401,6 @@ class ExtensionController extends Controller
         ]);
         $system->fixExtensionPermissions($new->id, $new->name);
 
-        return [null, $new];
+        return [null, $new, $old];
     }
 }

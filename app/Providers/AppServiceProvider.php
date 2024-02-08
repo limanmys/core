@@ -3,16 +3,17 @@
 namespace App\Providers;
 
 use App\Models\Notification;
-use App\Models\Permission;
+use App\Models\Server;
 use App\Observers\NotificationObserver;
+use App\Observers\ServerObserver;
 use App\Observers\UserObserver;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -33,24 +34,10 @@ class AppServiceProvider extends ServiceProvider
     )
     {
         Paginator::useBootstrap();
-
-        View::composer('layouts.header', function ($view) {
-            $view->with('USER_FAVORITES', user()->favorites());
-            $view->with('SERVERS', \App\Models\Server::orderBy('updated_at', 'DESC')
-                ->limit(env('NAV_SERVER_COUNT', 20))->get()
-                ->filter(function ($server) {
-                    return Permission::can(user()->id, 'server', 'id', $server->id);
-                })
-                ->filter(function ($server) {
-                    return ! (bool) user()->favorites()->where('id', $server->id)->first();
-                })
-            );
-        });
-
         Carbon::setLocale(app()->getLocale());
-
         Notification::observe(NotificationObserver::class);
         User::observe(UserObserver::class);
+        Server::observe(ServerObserver::class);
 
         Relation::morphMap([
             'users' => 'App\User',
@@ -63,6 +50,15 @@ class AppServiceProvider extends ServiceProvider
                 \App\Http\Middleware\VerifyCsrfToken::class
             );
         }
+
+        ResetPassword::createUrlUsing(function ($user, string $token) {
+            return sprintf(
+                '%s/auth/reset_password?token=%s&email=%s', 
+                request()->getSchemeAndHttpHost(), 
+                $token, 
+                $user->getEmailForPasswordReset()
+            );
+        });
     }
 
     /**

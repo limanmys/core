@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liman MYS</title>
     <link rel="stylesheet" href="{{url(mix('/css/liman.css'))}}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="server_id" content="{{request('server_id') ? request('server_id') : ''}}">
@@ -15,7 +14,6 @@
 <body>
     <script>
         module = {}
-        window.addEventListener("contextmenu", e => e.preventDefault());
         function API(target)
         {
             return "{{route('home')}}/engine/" + target;
@@ -31,6 +29,19 @@
             margin: 0 !important;
         }
     </style>
+
+    <script>
+        let hashData = window.location.hash;
+        // TODO: window.location.watch and Proxy observers not working for iframe contents
+        // Is there any better way to watch url changes?
+        setInterval(() => {
+            if (window.location.hash != hashData) {
+                hashData = window.location.hash;
+                const hashChangeEvent = new CustomEvent('limanHashChange', { detail: hashData });
+                window.dispatchEvent(hashChangeEvent, { detail: hashData });
+            }
+        }, 1500)
+    </script>
 
     @include('errors')
     @if(!isset($dbJson["skeleton"]) || !$dbJson["skeleton"])
@@ -65,16 +76,6 @@
 
     @if(!isset($dbJson["preload"]) || !$dbJson["preload"])
     <script>
-        $(function() {
-            var list = [];
-            $("#quickNavBar li>a").each(function() {
-                list.push($(this).text());
-            });
-            if ((new Set(list)).size !== list.length) {
-
-            }
-        })
-
         customRequestData["token"] = "{{ $auth_token }}";
         customRequestData["locale"] = "{{app()->getLocale()}}";
         let formData = new FormData();
@@ -104,10 +105,6 @@
             $(".nav.nav-tabs a").on('click', function() {
                 window.location.hash = $(this).attr("href");
             });
-            var title = $(".breadcrumb-item.active").text();
-            if (title != "") {
-                document.title = title + " / Liman";
-            }
             initialPresets();
         };
 

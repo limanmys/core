@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\Server;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Server;
@@ -30,10 +31,13 @@ class DetailsController extends Controller
                 return Permission::can(auth('api')->user()->id, 'server', 'id', $server->id);
             })
             ->map(function ($server) {
-                $server->extension_count = $server->extensions()->count();
+                $server->extension_count = $server->extensions()->filter(function ($extension) {
+                    return Permission::can(auth('api')->user()->id, 'extension', 'id', $extension->id);
+                })->count();
 
                 return $server;
-            });
+            })
+            ->values();
     }
 
     /**
@@ -46,13 +50,15 @@ class DetailsController extends Controller
     {
         $server = server();
         if (! $server) {
-            return response()->json([
+            throw new JsonResponseException([
                 'message' => 'Sunucu bulunamadı.'
             ], Response::HTTP_NOT_FOUND);
         }
 
-        if (! Permission::can(user()->id, 'liman', 'id', 'server_details')) {
-            return respond('Bu işlemi yapmak için yetkiniz yok!', Response::HTTP_FORBIDDEN);
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
         }
 
         try {
@@ -95,7 +101,15 @@ class DetailsController extends Controller
      */
     public function stats()
     {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
         if (server()->isLinux()) {
+            $cores = str_replace("cpu cores\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'cpu cores'"))[0]));
+
             $cpuPercent = Command::runSudo(
                 "ps -eo %cpu --no-headers | grep -v 0.0 | awk '{s+=$1} END {print s/NR*10}'"
             );
@@ -112,7 +126,7 @@ class DetailsController extends Controller
             $secondUp = $this->calculateNetworkBytes(false);
 
             return [
-                'cpu' => round((float) $cpuPercent, 2),
+                'cpu' => round((float) $cpuPercent / $cores, 2),
                 'ram' => round((float) $ramPercent, 2),
                 'io' => round((float) $ioPercent, 2),
                 'network' => [
@@ -141,9 +155,20 @@ class DetailsController extends Controller
      */
     public function specs()
     {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
         $cores = str_replace("cpu cores\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'cpu cores'"))[0]));
         $cpu = str_replace("model name\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'model name'"))[0]));
-        $ram = Command::runSudo("dmidecode -t memory | grep 'Size' | awk '{print $2}' | paste -sd+ | bc");
+        $ram = Command::runSudo('free -m | grep ^Mem | tr -s " " | cut -f2 -d" "');
+        if ($ram > 1000) {
+            $ram = round($ram / 1000, 1).' GB';
+        } else {
+            $ram = $ram.' GB';
+        }
         $model = Command::runSudo('dmidecode -s system-product-name');
         $manufacturer = Command::runSudo('dmidecode -s system-manufacturer');
 
@@ -161,10 +186,15 @@ class DetailsController extends Controller
      * @return Application|Factory|View
      *
      * @throws GuzzleException
-     * @throws GuzzleException
      */
     public function topCpuProcesses()
     {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
         $output = trim(
             Command::runSudo(
                 "ps -eo pid,%cpu,user,cmd --sort=-%cpu --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
@@ -180,10 +210,15 @@ class DetailsController extends Controller
      * @return Application|Factory|View
      *
      * @throws GuzzleException
-     * @throws GuzzleException
      */
     public function topMemoryProcesses()
     {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
         $output = trim(
             Command::runSudo(
                 "ps -eo pid,%mem,user,cmd --sort=-%mem --no-headers | head -n 5 | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
@@ -199,10 +234,15 @@ class DetailsController extends Controller
      * @return Application|Factory|View
      *
      * @throws GuzzleException
-     * @throws GuzzleException
      */
     public function topDiskUsage()
     {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
         $output = trim(
             Command::runSudo(
                 "df --output=pcent,source,size,used -hl -x squashfs -x tmpfs -x devtmpfs | sed -n '1!p' | head -n 5 | sort -hr | awk '{print $1\"*-*\"$2\"*-*\"$3\"*-*\"$4}'"
@@ -257,6 +297,8 @@ class DetailsController extends Controller
      */
     private function parsePsOutput($output)
     {
+        $cores = str_replace("cpu cores\t: ", '', trim(explode("\n", Command::runSudo("cat /proc/cpuinfo | grep 'cpu cores'"))[0]));
+
         $data = [];
         foreach (explode("\n", (string) $output) as $row) {
             $row = explode('*-*', $row);
@@ -264,7 +306,7 @@ class DetailsController extends Controller
             $fetch = explode('/', $row[3]);
             $data[] = [
                 'pid' => $row[0],
-                'percent' => $row[1],
+                'percent' => round($row[1] / $cores, 1),
                 'user' => $row[2],
                 'cmd' => end($fetch),
             ];

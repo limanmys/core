@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Extension\Sandbox;
 
 use App\Http\Controllers\Controller;
 use App\Mail\ExtensionMail;
+use App\Mail\TemplatedExtensionMail;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
@@ -91,13 +92,30 @@ class InternalController extends Controller
      */
     public function sendMail()
     {
-        Mail::to(request('to'))->send(
-            new ExtensionMail(
-                request('subject'),
-                base64_decode((string) request('content')),
-                json_decode((string) request('attachments'), true),
-            )
-        );
+        if (! (bool) env('MAIL_ENABLED', false)) return;
+
+        $sendTo = [];
+        $to = json_decode(request('to'));
+        if (! is_array($to)) {
+            $sendTo[] = $to;
+        } else {
+            $sendTo = $to;
+        }
+
+        $template = ExtensionMail::class;
+        if ((bool) request('templated')) {
+            $template = TemplatedExtensionMail::class;
+        }
+
+        foreach ($sendTo as $recipient) {
+            Mail::to($recipient)->send(
+                new $template(
+                    request('subject'),
+                    base64_decode((string) request('content')),
+                    json_decode((string) request('attachments'), true),
+                )
+            );
+        }
     }
 
     /**

@@ -19,14 +19,14 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        return auth()->user()
+        return auth('api')->user()
             ->notifications()
             ->withPivot('read_at', 'seen_at')
             ->orderBy('send_at', 'desc')
             ->take(100)
             ->get()
             ->map(function ($notification) {
-                $builder = new NotificationBuilder($notification);
+                $builder = new NotificationBuilder($notification, auth('api')->user()->locale);
 
                 return $builder->convertToBroadcastable();
             });
@@ -39,15 +39,15 @@ class NotificationController extends Controller
      */
     public function unread()
     {
-        return auth()->user()
+        return auth('api')->user()
             ->notifications()
             ->withPivot('read_at', 'seen_at')
-            ->unread()
+            ->where('read_at', null)
             ->orderBy('send_at', 'desc')
             ->take(8)
             ->get()
             ->map(function ($notification) {
-                $builder = new NotificationBuilder($notification);
+                $builder = new NotificationBuilder($notification, auth('api')->user()->locale);
 
                 return $builder->convertToBroadcastable();
             });
@@ -84,7 +84,7 @@ class NotificationController extends Controller
     {
         auth()->user()
             ->notifications()
-            ->unread()
+            ->where('read_at', null)
             ->withPivot('read_at', 'seen_at')
             ->get()
             ->map(function ($notification) {

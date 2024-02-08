@@ -5,8 +5,6 @@ namespace App\Providers;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use SocialiteProviders\Keycloak\KeycloakExtendSocialite;
-use SocialiteProviders\Manager\SocialiteWasCalled;
 
 /**
  * Event Service Provider
@@ -23,10 +21,7 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class
-        ],
-        SocialiteWasCalled::class => [
-            KeycloakExtendSocialite::class . '@handle',
-        ],
+        ]
     ];
 
     /**
@@ -37,7 +32,6 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         parent::boot();
-        registerModuleListeners();
     }
 
     /**
@@ -57,6 +51,6 @@ class EventServiceProvider extends ServiceProvider
      */
     protected function discoverEventsWithin()
     {
-        return ['/liman/modules/'];
+        return [];
     }
 }

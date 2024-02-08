@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Role;
@@ -12,6 +13,7 @@ use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use League\Csv\Writer;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -64,6 +66,16 @@ class RoleController extends Controller
             'name' => $request->name,
         ]);
 
+        AuditLog::write(
+            'role',
+            'create',
+            [
+                'role_id' => $role->id,
+                'role_name' => $role->name,
+            ],
+            "ROLE_CREATE"
+        );
+
         return response()->json($role, Response::HTTP_OK); 
     }
 
@@ -75,7 +87,18 @@ class RoleController extends Controller
      */
     public function delete(Request $request)
     {
-        Role::where('id', $request->role_id)->delete();
+        $role = Role::where('id', $request->role_id)->first();
+        $role->delete();
+
+        AuditLog::write(
+            'role',
+            'delete',
+            [
+                'role_id' => $role->id,
+                'role_name' => $role->name,
+            ],
+            "ROLE_DELETE"
+        );
 
         return response()->json([
             'message' => 'Rol başarıyla silindi.'
@@ -111,11 +134,25 @@ class RoleController extends Controller
         RoleUser::where('role_id', $request->role_id)->delete();
 
         // Add new users
+        $role = Role::find($request->role_id);
         foreach ($request->users as $user) {
             RoleUser::firstOrCreate([
                 'user_id' => $user,
                 'role_id' => $request->role_id,
             ]);
+
+            $user = User::find($user);
+            AuditLog::write(
+                'role',
+                'users',
+                [
+                    'role_id' => $role->id,
+                    'role_name' => $role->name,
+                    'user_id' => $user->id,
+                    'user_name' => $user->name
+                ],
+                "ROLE_USERS"
+            );
         }
 
         return response()->json([
@@ -171,6 +208,17 @@ class RoleController extends Controller
             );
         }
 
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => count($request->servers ?? []),
+                'type' => 'servers',
+                'array' => $request->servers
+            ],
+            "ROLE_EDIT"
+        );
+
         return response()->json([
             'message' => 'Sunucular başarıyla güncellendi.'
         ]);
@@ -223,6 +271,17 @@ class RoleController extends Controller
                 'roles'
             );
         }
+
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => count($request->extensions ?? []),
+                'type' => 'extensions',
+                'array' => $request->extensions
+            ],
+            "ROLE_EDIT"
+        );
 
         return response()->json([
             'message' => 'Eklentiler başarıyla güncellendi.'
@@ -290,6 +349,17 @@ class RoleController extends Controller
                 'roles'
             );
         }
+
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => count($request->limanPermissions ?? []),
+                'type' => 'liman_permissions',
+                'array' => $request->limanPermissions
+            ],
+            "ROLE_EDIT"
+        );
 
         return response()->json([
             'message' => 'Liman yetkileri başarıyla güncellendi.'
@@ -410,6 +480,17 @@ class RoleController extends Controller
             );
         }
 
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => count($request->functions ?? []),
+                'type' => 'functions',
+                'array' => $request->functions
+            ],
+            "ROLE_EDIT"
+        );
+
         return response()->json([
             'message' => 'Fonksiyonlar başarıyla güncellendi.'
         ]);
@@ -424,6 +505,17 @@ class RoleController extends Controller
     public function deleteFunctions(Request $request)
     {
         Permission::whereIn('id', $request->permission_ids)->delete();
+
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => count($request->permission_ids ?? []),
+                'type' => 'functions',
+                'array' => $request->permission_ids
+            ],
+            "ROLE_EDIT"
+        );
 
         return response()->json([
             'message' => 'Fonksiyonlar başarıyla silindi.'
@@ -460,6 +552,21 @@ class RoleController extends Controller
             $request->value,
             null,
             'roles'
+        );
+
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => 1,
+                'type' => 'variables',
+                'array' => [
+                    'role_id' => $request->role_id,
+                    'key' => $request->key,
+                    'value' => $request->value,
+                ]
+            ],
+            "ROLE_EDIT"
         );
 
         return response()->json('Veri başarıyla eklendi!');
@@ -502,6 +609,7 @@ class RoleController extends Controller
         $headers = [
             'Content-type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename='.$fileName,
+            'Content-Transfer-Encoding' => 'utf-8',
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
@@ -514,20 +622,26 @@ class RoleController extends Controller
             'İzin Değeri',
         ];
 
-        $callback = function () use ($data, $columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
+        $writer = Writer::createFromPath("php://temp", "r+");
+        $writer->insertOne($columns);
 
-            foreach ($data as $row) {
-                fputcsv($file, [
-                    $columns[0] => $row['username'],
-                    $columns[1] => $row['role_name'],
-                    $columns[2] => $row['perm_type'],
-                    $columns[3] => $row['perm_value'],
-                ]);
+        foreach ($data as $row) {
+            $writer->insertOne([
+                $row['username'],
+                $row['role_name'],
+                $row['perm_type'],
+                $row['perm_value'],
+            ]);
+        }
+
+        $flushThreshold = 1000;
+        $callback = function () use ($writer, $flushThreshold) {
+            foreach ($writer->chunk(1024) as $offset => $chunk) {
+                echo $chunk;
+                if ($offset % $flushThreshold === 0) {
+                    flush();
+                }
             }
-
-            fclose($file);
         };
 
         return response()->stream($callback, 200, $headers);
@@ -547,12 +661,14 @@ class RoleController extends Controller
                 ->get()->each(function ($row) {
                     $row->details = $row->getRelatedObject();
                     if ($row->morph_type == 'roles') {
-                        $row->users = $row->morph->users()->get();
+                        if (null !== $row->morph) {
+                            $row->users = $row->morph->users()->get();
+                        }
                     }
                 });
 
         foreach ($permissionData as $row) {
-            if ($row->details['value'] == '-' || $row->details['type'] == '-') {
+            if (null === $row->morph || $row->details['value'] == '-' || $row->details['type'] == '-') {
                 continue;
             }
 

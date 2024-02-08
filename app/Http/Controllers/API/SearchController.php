@@ -27,7 +27,7 @@ class SearchController extends Controller
 
         // Get constant searchables
         if (user()->isAdmin()) {
-            foreach (config('liman.new_search.admin') as $constant) {
+            foreach (config('liman.search.admin') as $constant) {
                 if (isset($constant['children'])) {
                     foreach ($constant['children'] as $child) {
                         if (! isset($searchable[$constant['name']])) {
@@ -46,7 +46,7 @@ class SearchController extends Controller
             }
         }
 
-        foreach (config('liman.new_search.user') as $constant) {
+        foreach (config('liman.search.user') as $constant) {
             if (isset($constant['children'])) {
                 foreach ($constant['children'] as $child) {
                     if (! isset($searchable[$constant['name']])) {
@@ -64,7 +64,7 @@ class SearchController extends Controller
             }
         }
 
-        foreach (config('liman.new_search.common') as $constant) {
+        foreach (config('liman.search.common') as $constant) {
             if (isset($constant['children'])) {
                 foreach ($constant['children'] as $child) {
                     if (! isset($searchable[$constant['name']])) {

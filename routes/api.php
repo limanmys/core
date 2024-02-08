@@ -26,11 +26,14 @@ Route::group([
     'prefix' => 'auth'
 ], function () {
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/setup_mfa', [AuthController::class, 'setupTwoFactorAuthentication']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user', [AuthController::class, 'userProfile']);
     Route::post('/change_password', [AuthController::class, 'forceChangePassword']);
+    Route::post('/forgot_password', [AuthController::class, 'sendPasswordResetLink']);
+    Route::post('/reset_password', [AuthController::class, 'resetPassword']);
 });
 
 Route::post('/notifications/send', [ExternalNotificationController::class, 'accept']);
@@ -75,6 +78,8 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
         // Server Details
         Route::get('/', [Server\DetailsController::class, 'index']);
         Route::post('/', [ServerController::class, 'create']);
+        Route::patch('/{server_id}', [ServerController::class, 'update']);
+        Route::delete('/{server_id}', [ServerController::class, 'delete']);
         Route::post('/{server_id}/favorites', [Server\DetailsController::class, 'favorite']);
 
         // Server Creation Validations
@@ -124,6 +129,12 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             // Packages
             Route::group(['prefix' => 'packages'], function () {
                 Route::get('/', [Server\PackageController::class, 'index']);
+
+                // Queue
+                Route::group(['prefix' => 'queue'], function () {
+                    Route::get('/', [Server\QueueController::class, 'index']);
+                    Route::post('/', [Server\QueueController::class, 'create']);
+                });
             });
 
             // Updates
@@ -156,6 +167,8 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
                 Route::post('/sudoers', [Server\UserController::class, 'addSudoers']);
                 Route::delete('/sudoers', [Server\UserController::class, 'deleteSudoers']);
             });
+
+            
         });
     });
 
@@ -166,6 +179,22 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             ->middleware("server");
         Route::post("/unassign", [ExtensionController::class, 'unassign'])
             ->middleware("server");
+    });
+
+    // Vault
+    Route::group(['prefix' => 'settings/vault'], function () {
+        Route::get('/', [Settings\VaultController::class, 'index']);
+        Route::post('/', [Settings\VaultController::class, 'create']);
+        Route::post('/key', [Settings\VaultController::class, 'createKey']);
+        Route::patch('/', [Settings\VaultController::class, 'update']);
+        Route::delete('/', [Settings\VaultController::class, 'delete']);
+    });
+
+    // Personal Access Tokens
+    Route::group(['prefix' => 'settings/tokens'], function () {
+        Route::get('/', [Settings\AccessTokenController::class, 'index']);
+        Route::post('/', [Settings\AccessTokenController::class, 'create']);
+        Route::delete('/{token_id}', [Settings\AccessTokenController::class, 'delete']);
     });
 
     // Settings
@@ -184,7 +213,10 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
         Route::group(['prefix' => 'users'], function () {
             Route::get('/', [Settings\UserController::class, 'index']);
             Route::post('/', [Settings\UserController::class, 'create']);
+            Route::patch('/{user_id}', [Settings\UserController::class, 'update']);
             Route::delete('/{user_id}', [Settings\UserController::class, 'delete']);
+            Route::get('/{user_id}/roles', [Settings\UserController::class, 'roles']);
+            Route::get('/auth_logs/{user_id?}', [Settings\UserController::class, 'authLogs']);
         });
 
         // Roles
@@ -253,15 +285,18 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
                 Route::get('/configuration', [Settings\KeycloakConnectionController::class, 'getConfiguration']);
                 Route::post('/configuration', [Settings\KeycloakConnectionController::class, 'saveConfiguration']);
             });
+
+            // Audit Log Routes
+            Route::group(['prefix' => 'audit'], function () {
+                Route::get('/', [Settings\AuditLogController::class, 'index']);
+                Route::get('/{log_id}', [Settings\AuditLogController::class, 'details']);
+            });
         });
 
-        // Vault
-        Route::group(['prefix' => 'vault'], function () {
-            Route::get('/', [Settings\VaultController::class, 'index']);
-            Route::post('/', [Settings\VaultController::class, 'create']);
-            Route::post('/key', [Settings\VaultController::class, 'createKey']);
-            Route::patch('/', [Settings\VaultController::class, 'update']);
-            Route::delete('/', [Settings\VaultController::class, 'delete']);
+        // Health Check
+        Route::group(['prefix' => 'health'], function () {
+            Route::get('/', [Settings\HealthController::class, 'index']);
+            Route::post('/manual_high_availability_sync', [Settings\HealthController::class, 'manualHighAvailabilitySync']);
         });
 
         // Notifications
@@ -293,6 +328,17 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             Route::delete('/certificates/{id}', [Settings\CertificateController::class, 'delete']);
             Route::get('/certificates/{certificate}/information', [Settings\CertificateController::class, 'information']);
             Route::post('/certificates/retrieve', [Settings\CertificateController::class, 'retrieve']);
+
+            // Tweaks
+            Route::group(['prefix' => 'tweaks'], function () {
+                Route::get('/', [Settings\TweaksController::class, 'getConfiguration']);
+                Route::post('/', [Settings\TweaksController::class, 'saveConfiguration']);
+            });
+
+            // Log Rotation
+            Route::group(['prefix' => 'log_rotation'], function () {
+                Route::post('/', [Settings\LogRotationController::class, 'saveConfiguration']);
+            });
         });
     });
 });

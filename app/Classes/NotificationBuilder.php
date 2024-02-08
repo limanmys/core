@@ -15,7 +15,7 @@ class NotificationBuilder
     /**
      * @param Notification $notification
      */
-    public function __construct(private readonly Notification $notification)
+    public function __construct(private $notification, private $locale)
     {
     }
 
@@ -31,7 +31,7 @@ class NotificationBuilder
                 $contents = $this->notification->contents;
                 $title = $contents['title'];
                 $content = $contents['content'];
-                $locale = app()->getLocale();
+                $locale = $this->locale;
                 $fallback = env('APP_LOCALE', 'tr');
 
                 if (isset($title[$locale])) {

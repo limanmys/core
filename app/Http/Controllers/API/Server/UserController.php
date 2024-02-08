@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\API\Server;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use App\System\Command;
 use Illuminate\Http\Response;
 
@@ -11,6 +13,15 @@ use Illuminate\Http\Response;
  */
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+    }
+
     /**
      * Get local users on system
      *
@@ -21,6 +32,7 @@ class UserController extends Controller
      */
     public function getLocalUsers()
     {
+        $users = [];
         if (server()->isLinux()) {
             $output = Command::runSudo(
                 "cut -d: -f1,3 /etc/passwd | egrep ':[0-9]{4}$' | cut -d: -f1"
@@ -39,7 +51,7 @@ class UserController extends Controller
         }
 
         if (server()->isWindows() && server()->canRunCommand()) {
-            $output = Command::runSudo(
+            $output = Command::run(
                 'Get-LocalUser | Where { $_.Enabled -eq $True} | Select-Object Name'
             );
             $output = trim($output);
@@ -85,7 +97,7 @@ class UserController extends Controller
         if ($output == '0') {
             return response()->json([
                 'message' => 'Kullanıcı oluşturulurken hata oluştu.'
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
@@ -102,6 +114,7 @@ class UserController extends Controller
      */
     public function getLocalGroups()
     {
+        $groups = [];
         if (server()->isLinux()) {
             $output = Command::runSudo("getent group | cut -d ':' -f1");
             $output = trim($output);
@@ -119,7 +132,7 @@ class UserController extends Controller
         }
 
         if (server()->isWindows() && server()->canRunCommand()) {
-            $output = Command::runSudo(
+            $output = Command::run(
                 'Get-LocalGroup | Select-Object Name'
             );
             $output = trim($output);
@@ -181,7 +194,7 @@ class UserController extends Controller
         if ($output == '0') {
             return response()->json([
                 'message' => 'Grup oluşturulurken hata oluştu.'
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
@@ -221,16 +234,20 @@ class UserController extends Controller
      */
     public function getSudoers()
     {
-        $output = Command::runSudo(
-            "cat /etc/sudoers /etc/sudoers.d/* | grep -v '^#\|^Defaults' | sed '/^$/d' | awk '{ print $1 \"*-*\" $2 \" \" $3 }'"
-        );
+        $command = <<<'EOT'
+        sh -c "cat /etc/sudoers /etc/sudoers.d/* | grep -v '^#\|^Defaults' | sed '/^$/d'"
+        EOT;
+
+        $output = Command::runSudo($command);
 
         $sudoers = [];
-        if (! empty($output)) {
+        if (! empty($output)) {    
             $sudoers = array_map(function ($value) {
-                $fetch = explode('*-*', $value);
-
-                return ['name' => $fetch[0], 'access' => $fetch[1]];
+                $val = strtr($value, "\t\n\r ", ' ');
+                $fetch = explode(' ', $val);
+                $name = array_shift($fetch);
+                
+                return ['name' => $name, 'access' => implode(' ', $fetch)];
             }, explode("\n", $output));
         }
 
@@ -252,16 +269,16 @@ class UserController extends Controller
             'name' => $name,
         ]);
         if ($checkFile == '1') {
-            return response()->json('Another user exists with this name.', Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json(['name' => 'Bu isimde başka bir kullanıcı mevcut.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         $output = Command::runSudo(
-            'echo "{:name} ALL=(ALL:ALL) ALL" | sudo -p "liman-pass-sudo" tee /etc/sudoers.d/{:name} &> /dev/null && echo 1 || echo 0',
+            'echo "{:name} ALL=(ALL:ALL) ALL" | ' . sudo() . ' tee /etc/sudoers.d/{:name} &> /dev/null && echo 1 || echo 0',
             [
                 'name' => $name,
             ]
         );
         if ($output == '0') {
-            return response()->json('An error occured while creating sudoer', Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json(['message' => 'An error occured while creating sudoer'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json('Sudoer created successfully.');
@@ -289,7 +306,7 @@ class UserController extends Controller
                 ]
             );
             if ($output == '0') {
-                return response()->json('An error occured while deleting sudoer.', Response::HTTP_UNPROCESSABLE_ENTITY);
+                return response()->json('An error occured while deleting sudoer.', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
 

@@ -52,7 +52,7 @@ class CertificateController extends Controller
             'origin' => $request->port,
         ]);
 
-        $certificate->addToSystem('/tmp/' . request('path'));
+        $certificate->addToSystem('/tmp/' . $message['path']);
 
         return response()->json([
             'message' => 'Sertifika başarıyla eklendi.',

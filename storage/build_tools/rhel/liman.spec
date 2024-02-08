@@ -85,12 +85,14 @@ DB_EXISTS=$(sudo -u liman psql -lqt | cut -d \| -f 1 | grep "liman" >/dev/null 2
 
 # Database Creation
 if [ $DB_EXISTS == "0" ]; then
-    sudo -u postgres createuser liman
-    sudo -u postgres createdb liman -O liman
-    RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
-    sudo -u postgres psql -U postgres -d postgres -c "alter user \"liman\" with password '$RANDOM_PASSWORD';"
-    sed -i '/DB_PASSWORD/d' /liman/server/.env
-    printf "\nDB_PASSWORD=$RANDOM_PASSWORD\n" | tee -a /liman/server/.env
+    if ! grep -q "DB_PASSWORD=" /liman/server/.env || [ -z "$(grep "DB_PASSWORD=" /liman/server/.env | sed 's/DB_PASSWORD=//')" ]; then
+        sudo -u postgres createuser liman
+        sudo -u postgres createdb liman -O liman
+        RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
+        sudo -u postgres psql -U postgres -d postgres -c "alter user \"liman\" with password '$RANDOM_PASSWORD';"
+        sed -i '/DB_PASSWORD/d' /liman/server/.env
+        printf "\nDB_PASSWORD=$RANDOM_PASSWORD\n" | tee -a /liman/server/.env
+    fi
 else
     echo "Postgresql already set up."
 fi
@@ -105,6 +107,10 @@ sed -i "s/;listen.mode/listen.mode/g" /etc/php-fpm.d/www.conf
 sed -i "s/listen.owner =.*/listen.owner = liman/g" /etc/php-fpm.d/www.conf
 sed -i "s/listen.group =.*/listen.group = liman/g" /etc/php-fpm.d/www.conf
 sed -i "s/listen.mode =.*/listen.mode = 660/g" /etc/php-fpm.d/www.conf
+sed -i "s/pm.max_children =.*/pm.max_children = 60/g" /etc/php-fpm.d/www.conf
+sed -i "s/pm.start_servers =.*/pm.start_servers = 10/g" /etc/php-fpm.d/www.conf
+sed -i "s/pm.min_spare_servers =.*/pm.min_spare_servers = 5/g" /etc/php-fpm.d/www.conf
+sed -i "s/pm.max_spare_servers =.*/pm.max_spare_servers = 20/g" /etc/php-fpm.d/www.conf
 sed -i "s/user .*;/user liman;/g" /etc/nginx/nginx.conf
 
 # Crontab Setting
@@ -171,10 +177,12 @@ rm -rf /liman/sandbox/{.git,vendor,views,.gitignore,composer.json,composer.lock,
 
 # Set Permissions
 chown -R liman:liman /liman/{server,database,certs,sandbox,logs,modules,packages,hashes}
-chmod 700 -R /liman/{server,database,certs,logs,modules,packages,hashes}
+chmod 700 -R /liman/{server,database,certs,modules,packages,hashes}
+chmod 750 -R /liman/logs
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
+usermod -aG liman syslog
 
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman-connector.service" ]; then

@@ -18,7 +18,7 @@ class NotificationSent extends Notification
      *
      * @return void
      */
-    public function __construct(private $notification)
+    public function __construct(private $notification, private $user)
     {
     }
 
@@ -52,7 +52,7 @@ class NotificationSent extends Notification
      */
     public function toArray(): array
     {
-        $builder = new NotificationBuilder($this->notification);
+        $builder = new NotificationBuilder($this->notification, $this->user->locale);
         return $builder->convertToBroadcastable();
     }
 }

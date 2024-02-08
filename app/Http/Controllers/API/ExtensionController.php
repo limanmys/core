@@ -4,14 +4,17 @@ namespace App\Http\Controllers\API;
 
 use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Extension;
 use App\Models\Permission;
+use App\Models\Server;
 use App\Models\ServerKey;
 use App\Models\Token;
 use App\Models\UserExtensionUsageStats;
 use App\Models\UserSettings;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\MimeType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -39,9 +42,13 @@ class ExtensionController extends Controller
         if ($server_id) {
             $extensions = Extension::whereDoesntHave('servers', function ($query) use ($server_id) {
                 $query->where('server_id', $server_id);
-            })->orderBy('updated_at', 'DESC')->get();
+            })->orderBy('updated_at', 'DESC')->get()->filter(function ($extension) {
+                return Permission::can(auth('api')->user()->id, 'extension', 'id', $extension->id);
+            })->values();
         } else {
-            $extensions = Extension::orderBy('updated_at', 'DESC')->get();
+            $extensions = Extension::orderBy('updated_at', 'DESC')->get()->filter(function ($extension) {
+                return Permission::can(auth('api')->user()->id, 'extension', 'id', $extension->id);
+            })->values();
         }
 
         return $extensions;
@@ -70,6 +77,22 @@ class ExtensionController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+        $server = Server::find($request->server_id);
+        $extensions = Extension::whereIn('id', $request->extensions)->get();
+        foreach ($extensions as $extension) {
+            AuditLog::write(
+                'extension',
+                'assign',
+                [
+                    'extension_id' => $extension->id,
+                    'extension_name' => $extension->name,
+                    'server_id' => $request->server_id,
+                    'server_name' => $server->name,
+                ],
+                "EXTENSION_ASSIGNED_TO_SERVER"
+            );
+        }
+
         return response()->json([
             'message' => 'Assigned successfully.',
         ]);
@@ -92,6 +115,22 @@ class ExtensionController extends Controller
             return response()->json([
                 'message' => 'An error occured while unassigning server.',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $server = Server::find($request->server_id);
+        $extensions = Extension::whereIn('id', $request->extensions)->get();
+        foreach ($extensions as $extension) {
+            AuditLog::write(
+                'extension',
+                'assign',
+                [
+                    'extension_id' => $extension->id,
+                    'extension_name' => $extension->name,
+                    'server_id' => $request->server_id,
+                    'server_name' => $server->name,
+                ],
+                "EXTENSION_UNASSIGNED_FROM_SERVER"
+            );
         }
 
         return response()->json([
@@ -174,6 +213,8 @@ class ExtensionController extends Controller
 
         return response()->json(
             [
+                'extension_name' => extension()->display_name,
+                'server_name' => server()->name,
                 'html' => trim(
                     view($view, [
                         'auth_token' => $token,
@@ -204,7 +245,19 @@ class ExtensionController extends Controller
         if ($key) {
             $extra = ['clientUsername', 'clientPassword'];
         }
+        if (auth()->user()->auth_type == 'ldap') {
+            $extensionJson = getExtensionJson($extension['name']);
+
+            if (isset($extensionJson['ldap_support_fields']))
+                $extra = array_merge($extra, array_values($extensionJson['ldap_support_fields']));
+        }
         foreach ($extension['database'] as $setting) {
+            if (
+                in_array($setting['variable'], $extra)
+            ) {
+                continue;            
+            }
+
             if (isset($setting['required']) && $setting['required'] === false) {
                 continue;
             }
@@ -278,6 +331,31 @@ class ExtensionController extends Controller
             ) {
                 throw new JsonResponseException(['message' => 'Bu işlem için yetkiniz bulunmamaktadır.'], null, Response::HTTP_FORBIDDEN);
             }
+        }
+    }
+
+    /**
+     * Get files from extensions public folder
+     *
+     * @return BinaryFileResponse|void
+     */
+    public function publicFolder()
+    {
+        $basePath =
+            '/liman/extensions/' . strtolower((string) extension()->name) . '/public/';
+
+        $targetPath = $basePath . explode('public/', (string) url()->current(), 2)[1];
+
+        if (realpath($targetPath) != $targetPath) {
+            abort(404);
+        }
+
+        if (is_file($targetPath)) {
+            return response()->download($targetPath, null, [
+                'Content-Type' => MimeType::fromExtension(pathinfo($targetPath, PATHINFO_EXTENSION)),
+            ]);
+        } else {
+            abort(404);
         }
     }
 }

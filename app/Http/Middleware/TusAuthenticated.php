@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Token;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use TusPhp\Middleware\TusMiddleware;
 use TusPhp\Request;
@@ -21,8 +23,31 @@ class TusAuthenticated implements TusMiddleware
      */
     public function handle(Request $request, Response $response)
     {
-        if (! auth()->check()) {
-            throw new UnauthorizedHttpException('Kullanıcı giriş yapmadı!');
+        if (auth('api')->check()) {
+            return;
         }
+
+        $token = "";
+        if (request()->token) {
+            $token = request()->token;
+        } else if (request()->headers->get('Extension-Token')) {
+            $token = request()->headers->get('Extension-Token');
+        }
+
+        if (! $token) {
+            if (auth('api')->check()) {
+                return true;
+            }
+
+            throw new UnauthorizedHttpException('', 'Extension-Token header is missing.');
+        }
+
+        $obj = Token::where('token', $token)->first();
+        if (! $obj) {
+            throw new UnauthorizedHttpException('', 'Extension-Token is invalid.');
+        }
+
+        Log::info('Extension-Token is valid. User ip: ' . request()->ip);
+        return true;
     }
 }

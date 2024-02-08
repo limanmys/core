@@ -20,7 +20,9 @@ class ServiceController extends Controller
     public function __construct()
     {
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_services')) {
-            return respond('Bu işlemi yapmak için yetkiniz yok!', Response::HTTP_FORBIDDEN);
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
         }
     }
 
@@ -63,6 +65,22 @@ class ServiceController extends Controller
                     ];
                 } catch (Exception) {
                 }
+            }
+
+            $raw = Command::runSudo(
+                "systemctl list-unit-files --state=disabled | grep service | awk '{print $1 \":\"$2}'",
+                false
+            );
+
+            foreach (explode("\n", $raw) as &$package) {
+                if ($package == '') {
+                    continue;
+                }
+                $row = explode(':', trim($package));
+                $services[] = [
+                    'name' => strlen($row[0]) > 50 ? substr($row[0], 0, 50) . '...' : $row[0],
+                    'status' => $row[1] == 'disabled',
+                ];
             }
         } else {
             $rawServices = Command::run(

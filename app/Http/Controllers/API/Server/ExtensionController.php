@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\API\Server;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use App\Models\Token;
@@ -26,11 +28,19 @@ class ExtensionController extends Controller
      */
     public function index()
     {
-        return server()->extensions()->map(function ($item) {
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
+        return server()->extensions()->filter(function ($extension) {
+            return Permission::can(auth('api')->user()->id, 'extension', 'id', $extension->id);
+        })->map(function ($item) {
             $item->updated = Carbon::parse($item->getRawOriginal('updated_at'))->getPreciseTimestamp(3);
 
             return $item;
-        });
+        })->values();
     }
 
     /**
@@ -41,15 +51,7 @@ class ExtensionController extends Controller
      */
     public function serverSettings()
     {
-        $extension = json_decode(
-            file_get_contents(
-                '/liman/extensions/' .
-                strtolower((string) extension()->name) .
-                DIRECTORY_SEPARATOR .
-                'db.json'
-            ),
-            true
-        );
+        $extension = getExtensionJson(extension()->name);
         
         $similar = [];
         $globalVars = [];
@@ -60,6 +62,17 @@ class ExtensionController extends Controller
                 ($flag != null && $item['variable'] == 'clientPassword')
             ) {
                 unset($extension['database'][$key]);
+            }
+
+            if (
+                auth('api')->user()->auth_type == 'ldap' &&
+                isset($extension['ldap_support_fields'])
+            ) {
+                if (
+                    in_array($item['variable'], array_values($extension['ldap_support_fields']))
+                ) {
+                    unset($extension['database'][$key]);
+                }
             }
 
             $opts = [
@@ -84,10 +97,12 @@ class ExtensionController extends Controller
                     }
                 }
 
-                $similar[$item['variable']] = AES256::decrypt(
-                    $obj->value,
-                    $key
-                );
+                if ($item['type'] != 'password') {
+                    $similar[$item['variable']] = AES256::decrypt(
+                        $obj->value,
+                        $key
+                    );
+                }
             }
         }
 
@@ -114,6 +129,10 @@ class ExtensionController extends Controller
             'has_global_variables' => ! auth('api')->user()->isAdmin() ? count($globalVars) > 0 : false,
             'values' => collect($similar)->filter(function ($item, $key) use ($globalVars, $database) {
                 $key = $database->where('variable', $key)->first();
+                if (! $key) {
+                    return false;
+                }
+
                 if ($key['type'] == 'password') {
                     return false;
                 }

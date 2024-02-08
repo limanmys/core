@@ -6,8 +6,10 @@ use App\Classes\Ldap;
 use App\Classes\LDAPSearchOptions;
 use App\Http\Controllers\Controller;
 use App\Models\AuthLog;
+use App\Models\Extension;
 use App\Models\LdapRestriction;
 use App\Models\Oauth2Token;
+use App\Models\Permission;
 use App\Models\RoleMapping;
 use App\Models\RoleMappingQueue;
 use App\Models\RoleUser;
@@ -16,9 +18,13 @@ use App\Models\UserSettings;
 use App\User;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use mervick\aesEverywhere\AES256;
@@ -32,7 +38,18 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'forceChangePassword']]);
+        $this->middleware(
+            'auth:api',
+            ['except' => 
+                [
+                    'login', 
+                    'forceChangePassword', 
+                    'setupTwoFactorAuthentication', 
+                    'sendPasswordResetLink', 
+                    'resetPassword'
+                ]
+            ]
+        );
     }
 
     /**
@@ -56,14 +73,20 @@ class AuthController extends Controller
             ->first();
 
         if (! $user) {
-            // Try ldap authentication to create user from LDAP
-            if ((bool) env('LDAP_STATUS', false)) {
-                return $this->authWithLdap($request, true);
-            }
-
             // Try keycloak authentication to create user from Keycloak
             if (env('KEYCLOAK_ACTIVE', false)) {
-                return $this->authWithKeycloak($request, true);
+                $token = $this->authWithKeycloak($request, true);
+                if ($token->status() === 200) {
+                    return $token;
+                }
+            }
+
+            // Try ldap authentication to create user from LDAP
+            if ((bool) env('LDAP_STATUS', false)) {
+                $token = $this->authWithLdap($request, true);
+                if ($token->status() === 200) {
+                    return $token;
+                }
             }
         } else {
             // If User type keycloak
@@ -84,6 +107,36 @@ class AuthController extends Controller
             return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
         }
 
+        if (auth('api')->user()->otp_enabled) {
+            $tfa = app('pragmarx.google2fa');
+
+
+            if (auth('api')->user()->google2fa_secret == null) {
+                $secret = $tfa->generateSecretKey();
+                return response()->json([
+                    'message' => 'İki faktörlü doğrulama için Google Authenticator uygulaması ile QR kodunu okutunuz.',
+                    'secret' => $secret,
+                    'image' => $tfa->getQRCodeInline(
+                        "Liman",
+                        auth('api')->user()->email,
+                        $secret,
+                        400
+                    ),
+                ], 402);
+            }
+
+            if (! $request->token) {
+                return response()->json(['message' => 'İki faktörlü doğrulama gerekmektedir.'], 406);
+            } else {
+                if (! $tfa->verifyGoogle2FA(
+                    auth('api')->user()->google2fa_secret,
+                    $request->token
+                )) {
+                    return response()->json(['message' => 'İki faktörlü doğrulama başarısız.'], 406);
+                }
+            }
+        }
+
         if (auth('api')->user()->forceChange) {
             return response()->json(['message' => 'Şifrenizi değiştirmeniz gerekmektedir.'], 405);
         }
@@ -92,15 +145,52 @@ class AuthController extends Controller
     }
 
     /**
+     * Setup Two Factor Authentication
+     * 
+     * @return JsonResponse
+     */
+    public function setupTwoFactorAuthentication(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string',
+            'password' => 'required|string',
+            'secret' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $token = auth('api')->attempt([
+            'email' => $validator->validated()["email"],
+            'password' => $validator->validated()["password"],
+        ]);
+        if (! $token) {
+            return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
+        }
+
+        User::find(auth('api')->user()->id)->update([
+            'otp_enabled' => true,
+            'google2fa_secret' => $request->secret
+        ]);
+
+        return response()->json(['message' => '2FA kurulumu başarıyla yapıldı.']);
+    }
+
+    /**
      * Log the user out (Invalidate the token).
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function logout()
+    public function logout(Request $request)
     {
+        $deleteToken = Cookie::forget('token', '/', $request->getHost());
+        $deleteCurrentUser = Cookie::forget('currentUser', '/', $request->getHost());
         auth('api')->logout();
 
-        return response()->json(['message' => 'User successfully signed out']);
+        return response()->json(['message' => 'User successfully signed out'])
+            ->withCookie($deleteToken)
+            ->withCookie($deleteCurrentUser);
     }
 
     /**
@@ -133,6 +223,14 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string',
+            'new_password' => [
+                'string',
+                'min:10',
+                'max:32',
+                'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\!\[\]\(\)\{\}\#\?\%\&\*\+\,\-\.\/\:\;\<\=\>\@\^\_\`\~]).{10,}$/',
+            ],
+        ], [
+            'new_password.regex' => 'Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı, özel karakter ve büyük harf içermelidir.',
         ]);
 
         if ($validator->fails()) {
@@ -144,12 +242,68 @@ class AuthController extends Controller
             return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
         }
 
+        // If new_password is same as password return error
+        if (Hash::check($request->new_password, auth('api')->user()->password)) {
+            return response()->json(['message' => 'Yeni şifreniz eski şifreniz ile aynı olamaz.'], 405);
+        }
+
         $user = auth('api')->user();
         $user->forceChange = false;
         $user->password = bcrypt($request->new_password);
         $user->save();
 
         return response()->json(['message' => 'Şifreniz başarıyla değiştirildi.']);
+    }
+
+    /**
+     * Send password reset link
+     */
+    public function sendPasswordResetLink(Request $request)
+    {  
+        // Check email exists on database laravel validator
+        validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        Password::sendResetLink($request->only('email'));
+
+        return response()->json(['message' => 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.']);
+    }
+    
+    /**
+     * Reset password with token
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => [
+                'required',
+                'string',
+                'min:10',
+                'max:32',
+                'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\!\[\]\(\)\{\}\#\?\%\&\*\+\,\-\.\/\:\;\<\=\>\@\^\_\`\~]).{10,}$/',
+                'confirmed'
+            ]
+        ]);
+     
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+     
+                $user->save();
+     
+                event(new PasswordReset($user));
+            }
+        );
+     
+        return $status === Password::PASSWORD_RESET
+                    ? response()->json(['message' => 'Şifreniz başarıyla değiştirildi.'])
+                    : response()->json(['message' => 'Şifre sıfırlama bağlantısı geçersiz.'], 401);
     }
 
     /**
@@ -189,18 +343,6 @@ class AuthController extends Controller
         }
         $details = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', explode('.', $response['access_token'])[1]))));
 
-        Oauth2Token::updateOrCreate([
-            'user_id' => $details->sub,
-            'token_type' => $response['token_type'],
-        ], [
-            'user_id' => $details->sub,
-            'token_type' => $response['token_type'],
-            'access_token' => $response['access_token'],
-            'refresh_token' => $response['refresh_token'],
-            'expires_in' => (int) $response['expires_in'],
-            'refresh_expires_in' => (int) $response['refresh_expires_in'],
-        ]);
-
         if ($create) {
             $user = User::create([
                 'id' => $details->sub,
@@ -214,6 +356,18 @@ class AuthController extends Controller
         } else {
             $user = User::where('id', $details->sub)->first();
         }
+
+        Oauth2Token::updateOrCreate([
+            'user_id' => $details->sub,
+            'token_type' => $response['token_type'],
+        ], [
+            'user_id' => $details->sub,
+            'token_type' => $response['token_type'],
+            'access_token' => $response['access_token'],
+            'refresh_token' => $response['refresh_token'],
+            'expires_in' => (int) $response['expires_in'],
+            'refresh_expires_in' => (int) $response['refresh_expires_in'],
+        ]);
 
         return $this->createNewToken(
             auth('api')->login($user),
@@ -278,9 +432,6 @@ class AuthController extends Controller
         $userGroups = $ldapUser['memberof'] ?? [];
 
         $user = User::where('objectguid', $objectguid)->first();
-        if ($user) {
-            RoleUser::where('user_id', $user->id)->delete();
-        }
 
         if (! (((bool) $restrictedGroups) == false && ((bool) $restrictedUsers) == false)) {
             $groupCheck = (bool) $restrictedGroups;
@@ -360,25 +511,47 @@ class AuthController extends Controller
             ]);
         }
 
-        foreach (Server::where('ip_address', trim(env('LDAP_HOST')))->get() as $server) {
-            $encKey = env('APP_KEY').$user->id.$server->id;
-            $encrypted = AES256::encrypt($request->email, $encKey);
-            UserSettings::firstOrCreate([
+        $extensionWithLdap = Extension::where('ldap_support', true)->get();
+        $serverList = [];
+        $keys = [];
+        foreach ($extensionWithLdap as $extension) {
+            $extensionJson = getExtensionJson($extension->name);
+            $extensionServers = $extension->servers()->get()->toArray();
+            foreach ($extensionServers as $server) {
+                if (! isset($extensionJson['ldap_support_fields'])) {
+                    $keys[$server['id']] = [
+                        'username' => 'clientUsername',
+                        'password' => 'clientPassword',
+                    ];
+                } else {
+                    $keys[$server['id']] = $extensionJson['ldap_support_fields'];
+                }
+            }
+            $serverList = array_merge($serverList, $extensionServers);
+        }
+        $serverList = [
+            ...$serverList,
+            ...Server::where('ip_address', trim(env('LDAP_HOST')))->get(),
+        ];
+        // Check if server list is unique by id
+        $serverList = collect($serverList)->unique('id')->values();
+
+        foreach ($serverList as $server) {
+            $encKey = env('APP_KEY').$user->id.$server['id'];
+            UserSettings::updateOrCreate([
                 'user_id' => $user->id,
-                'server_id' => $server->id,
-                'name' => 'clientUsername',
+                'server_id' => $server['id'],
+                'name' => $keys[$server['id']]['username'] ?? 'clientUsername',
             ], [
-                'value' => $encrypted,
+                'value' => AES256::encrypt($request->email, $encKey),
             ]);
 
-            $encrypted = AES256::encrypt($request->password, $encKey);
-
-            UserSettings::firstOrCreate([
+            UserSettings::updateOrCreate([
                 'user_id' => $user->id,
-                'server_id' => $server->id,
-                'name' => 'clientPassword',
+                'server_id' => $server['id'],
+                'name' => $keys[$server['id']]['password'] ?? 'clientPassword',
             ], [
-                'value' => $encrypted,
+                'value' => AES256::encrypt($request->password, $encKey),
             ]);
         }
 
@@ -407,13 +580,48 @@ class AuthController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60,
+        $return = [
             'expired_at' => (auth('api')->factory()->getTTL() * 60 + time()) * 1000,
-            'user' => User::find(auth('api')->user()->id),
-        ]);
+            'user' => [
+                ...User::find(auth('api')->user()->id, [
+                    'id',
+                    'name',
+                    'email',
+                    'locale',
+                    'status',
+                    'username'
+                ])->toArray(),
+                'last_login_at' => Carbon::now()->toDateTimeString(),
+                'last_login_ip' => $request->ip(),
+                'permissions' => [
+                    'server_details' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details'),
+                    'server_services' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_services'),
+                    'add_server' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server'),
+                    'update_server' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'update_server'),
+                    'view_logs' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'view_logs'),
+                ],
+            ],
+        ];
+
+        return response()->json($return)->withCookie(cookie(
+            'token',
+            $token,
+            auth('api')->factory()->getTTL() * 60,
+            null,
+            $request->getHost(),
+            true,
+            true,
+            false
+        ))->withCookie(cookie(
+            'currentUser',
+            json_encode($return),
+            auth('api')->factory()->getTTL() * 60,
+            null,
+            $request->getHost(),
+            true,
+            false,
+            false
+        ));
     }
 
     /**

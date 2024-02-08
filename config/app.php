@@ -171,7 +171,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\TusServiceProvider::class,
-        \SocialiteProviders\Manager\ServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         App\Providers\BroadcastServiceProvider::class,
     ],
