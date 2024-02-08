@@ -15,7 +15,7 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+        if (!Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
             throw new JsonResponseException([
                 'message' => 'Bu işlemi yapmak için yetkiniz yok!'
             ], '', Response::HTTP_FORBIDDEN);
@@ -105,13 +105,7 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Get local groups
-     *
-     * @return JsonResponse|Response
-     *
-     * @throws GuzzleException
-     */
+
     public function getLocalGroups()
     {
         $groups = [];
@@ -154,6 +148,30 @@ class UserController extends Controller
         return response()->json($groups);
     }
 
+    public function deleteGroup($groupName)
+    {
+        if (server()->isLinux()) {
+            $output = Command::runSudo("groupdel $groupName");
+            if ($output) {
+                return true;
+            } else {
+                return false;
+            }
+        } elseif (server()->isWindows() && server()->canRunCommand()) {
+            $output = Command::run("Remove-LocalGroup -Name $groupName");
+            if ($output) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+
+
+
     /**
      * Get local group details
      *
@@ -169,7 +187,7 @@ class UserController extends Controller
         ]);
 
         $users = [];
-        if (! empty($output)) {
+        if (!empty($output)) {
             $users = array_map(function ($value) {
                 return ['name' => $value];
             }, explode(',', (string) $output));
@@ -241,12 +259,12 @@ class UserController extends Controller
         $output = Command::runSudo($command);
 
         $sudoers = [];
-        if (! empty($output)) {    
+        if (!empty($output)) {
             $sudoers = array_map(function ($value) {
                 $val = strtr($value, "\t\n\r ", ' ');
                 $fetch = explode(' ', $val);
                 $name = array_shift($fetch);
-                
+
                 return ['name' => $name, 'access' => implode(' ', $fetch)];
             }, explode("\n", $output));
         }

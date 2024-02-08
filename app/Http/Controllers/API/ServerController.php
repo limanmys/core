@@ -25,7 +25,7 @@ class ServerController extends Controller
      */
     public function create(Request $request)
     {
-        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server')) {
+        if (!Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server')) {
             return response()->json([
                 'message' => 'Bu işlemi yapmak için izniniz yok.'
             ], 403);
@@ -47,7 +47,7 @@ class ServerController extends Controller
         request()->request->add(['server' => $server]);
 
         if ($request->key_type != 'no_key') {
-            $encKey = env('APP_KEY').auth('api')->user()->id.server()->id;
+            $encKey = env('APP_KEY') . auth('api')->user()->id . server()->id;
             $data = [
                 'clientUsername' => AES256::encrypt(
                     $request->username,
@@ -75,21 +75,22 @@ class ServerController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function update(Request $request) {
-        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'update_server')) {
+    public function update(Request $request)
+    {
+        if (!Permission::can(auth('api')->user()->id, 'liman', 'id', 'update_server')) {
             throw new JsonResponseException([
                 'message' => 'Bu işlemi yapmak için yetkiniz yok!'
             ], '', Response::HTTP_FORBIDDEN);
         }
 
         $server = Server::find($request->server_id);
-        if (! $server) {
+        if (!$server) {
             throw new JsonResponseException([
                 'message' => 'Sunucu bulunamadı.'
             ], Response::HTTP_NOT_FOUND);
         }
 
-        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+        if (!Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
             throw new JsonResponseException([
                 'message' => 'Bu işlemi yapmak için yetkiniz yok!'
             ], '', Response::HTTP_FORBIDDEN);
@@ -126,9 +127,10 @@ class ServerController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function delete(Request $request) {
+    public function delete(Request $request)
+    {
         $server = Server::find($request->server_id);
-        if (! $server) {
+        if (!$server) {
             throw new JsonResponseException([
                 'message' => 'Sunucu bulunamadı.'
             ], Response::HTTP_NOT_FOUND);
@@ -136,7 +138,7 @@ class ServerController extends Controller
 
         if (
             $server->user_id != auth('api')->id() &&
-            ! auth('api')
+            !auth('api')
                 ->user()
                 ->isAdmin()
         ) {
@@ -145,7 +147,7 @@ class ServerController extends Controller
             ], '', Response::HTTP_FORBIDDEN);
         }
 
-        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
+        if (!Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
             throw new JsonResponseException([
                 'message' => 'Bu işlemi yapmak için yetkiniz yok!'
             ], '', Response::HTTP_FORBIDDEN);
@@ -185,7 +187,7 @@ class ServerController extends Controller
                 'server_hostname' => $server->ip_address,
                 'origin' => $server->control_port,
             ])->first();
-            if (! $cert) {
+            if (!$cert) {
                 [$flag, $message] = retrieveCertificate(
                     $server->ip_address,
                     $server->control_port,
@@ -253,7 +255,7 @@ class ServerController extends Controller
         if (strlen((string) request('name')) > 24) {
             return response()->json(['name' => 'Lütfen daha kısa bir sunucu adı girin.'], 422);
         }
-        if (! Server::where('name', request('name'))->exists()) {
+        if (!Server::where('name', request('name'))->exists()) {
             return response()->json([
                 'message' => 'İsim onaylandı.'
             ]);
@@ -289,6 +291,29 @@ class ServerController extends Controller
                 'username' => 'Kullanıcı adı ya da şifreniz yanlış olabilir.',
                 'password' => 'Kullanıcı adı ya da şifreniz yanlış olabilir.',
             ], 422);
+        }
+    }
+    public function checkConnectionSecure()
+    {
+        $ipAddress = request('ip_address');
+        $username = request('username');
+        $password = request('password');
+        $port = request('port');
+        $keyType = request('key_type');
+
+        // Parametre validasyonu
+        if (!filter_var($ipAddress, FILTER_VALIDATE_IP) || !is_numeric($port)) {
+            return response()->json(['error' => 'Geçersiz IP adresi veya bağlantı noktası.'], 422);
+        }
+
+        // Güvenli bağlantı doğrulaması
+        $connector = new GenericConnector();
+        $output = $connector->verify($ipAddress, $username, $password, $port, $keyType);
+
+        if ($output == 'ok') {
+            return response()->json(['message' => 'Anahtarınız doğrulandı.']);
+        } else {
+            return response()->json(['error' => 'Kullanıcı adı veya şifre hatalı.'], 422);
         }
     }
 }
