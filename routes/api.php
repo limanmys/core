@@ -342,3 +342,9 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
         });
     });
 });
+
+Route::fallback(function(){
+    return response()->json([
+        'message' => 'Sayfa bulunamadı.'
+    ], 404);
+});

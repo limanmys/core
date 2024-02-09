@@ -2,8 +2,13 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 /**
@@ -56,6 +61,41 @@ class Handler extends ExceptionHandler
         // Use validator response hack
         $this->renderable(function (JsonResponseException $e) {
             return response()->json($e->getData(), $e->getCode() ? $e->getCode() : Response::HTTP_OK);
+        });
+
+        $this->renderable(function (NotFoundHttpException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Kayıt bulunamadı.'
+                ], 404);
+            }
+        });
+
+        $this->renderable(function (ModelNotFoundException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Kayıt bulunamadı.'
+                ], 404);
+            }
+        });
+
+        $this->renderable(function (QueryException $e) {
+            return response()->json([
+                'message' => 'Veritabanı hatası mevcut. Sistem veritabanı bağlantısını kontrol ediniz.',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        });
+
+        $this->renderable(function (HttpException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        });
+
+        $this->renderable(function (Throwable $e) {
+            return response()->json([
+                'type' => get_class($e),
+                'message' => 'Beklenmeyen bir hata oluştu. Sistem yöneticinize başvurunuz.',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         });
     }
 }
