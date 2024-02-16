@@ -24,6 +24,24 @@ class QueueController extends Controller
         $tus = app('tus-server');
         $file = $tus->getCache()->get($request->file);
 
+        if ($file['size'] > 1024 * 1024 * 1024 * 2) {
+            // Delete file from filesystem
+            unlink($file['file_path']);            
+
+            return response()->json([
+                'file' => "Dosya boyutu 2GB'dan büyük olamaz."
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        if (!in_array(pathinfo($file['file_path'], PATHINFO_EXTENSION), ['deb', 'rpm'])) {
+            // Delete file from filesystem
+            unlink($file['file_path']);    
+
+            return response()->json([
+                'file' => "Sadece .deb ve .rpm uzantılı dosyalar yüklenebilir."
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
         $token = Token::create(auth('api')->user()->id);
         $client = new Client([
             'verify' => false,
@@ -42,6 +60,7 @@ class QueueController extends Controller
                 ],
                 'timeout' => 30,
             ]);
+            unlink($file['file_path']);
             $output = (string) $res->getBody();
 
             $isJson = isJson($output, true);
