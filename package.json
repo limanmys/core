@@ -14,7 +14,7 @@
         "webpack-cli": "^4.10.0"
     },
     "dependencies": {
-        "laravel-echo": "^1.15.1",
+        "laravel-echo": "^1.15.3",
         "pusher-js": "^7.6.0"
     }
 }
