@@ -262,7 +262,7 @@ class AuthController extends Controller
     {  
         // Check email exists on database laravel validator
         validate([
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email',
         ]);
 
         Password::sendResetLink($request->only('email'));

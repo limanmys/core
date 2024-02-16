@@ -25,14 +25,14 @@ Route::get("/", function (Request $request) {
 Route::group([
     'prefix' => 'auth'
 ], function () {
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:5,2');
     Route::post('/setup_mfa', [AuthController::class, 'setupTwoFactorAuthentication']);
-    Route::post('/register', [AuthController::class, 'register']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user', [AuthController::class, 'userProfile']);
     Route::post('/change_password', [AuthController::class, 'forceChangePassword']);
-    Route::post('/forgot_password', [AuthController::class, 'sendPasswordResetLink']);
+    Route::post('/forgot_password', [AuthController::class, 'sendPasswordResetLink'])
+        ->middleware('throttle:5,15');
     Route::post('/reset_password', [AuthController::class, 'resetPassword']);
 });
 

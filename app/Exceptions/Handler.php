@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -83,6 +84,12 @@ class Handler extends ExceptionHandler
             return response()->json([
                 'message' => 'Veritabanı hatası mevcut. Sistem veritabanı bağlantısını kontrol ediniz.',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        });
+
+        $this->renderable(function (ThrottleRequestsException $e) {
+            return response()->json([
+                'message' => 'Çok fazla istek gönderdiniz. Lütfen biraz bekleyin.',
+            ], Response::HTTP_TOO_MANY_REQUESTS);
         });
 
         $this->renderable(function (HttpException $e) {
