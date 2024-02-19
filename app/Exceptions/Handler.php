@@ -98,6 +98,17 @@ class Handler extends ExceptionHandler
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         });
 
+        if (config('app.debug')) {
+            $this->renderable(function (Throwable $e) {
+                return response()->json([
+                    'type' => get_class($e),
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTrace(),
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            });
+        }
         $this->renderable(function (Throwable $e) {
             return response()->json([
                 'type' => get_class($e),

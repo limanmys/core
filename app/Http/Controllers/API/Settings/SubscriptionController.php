@@ -96,6 +96,7 @@ class SubscriptionController extends Controller
                 [
                     'endpoint' => 'license',
                     'type' => 'get',
+                    'service' => 'admin'
                 ]
             );
             $parsed = new GolangLicense($output);
