@@ -26,13 +26,13 @@ Route::group([
     'prefix' => 'auth'
 ], function () {
     Route::post('/login', [AuthController::class, 'login'])
-        ->middleware('throttle:5,2');
+        ->middleware('throttle:login');
     Route::post('/setup_mfa', [AuthController::class, 'setupTwoFactorAuthentication']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'userProfile']);
     Route::post('/change_password', [AuthController::class, 'forceChangePassword']);
     Route::post('/forgot_password', [AuthController::class, 'sendPasswordResetLink'])
-        ->middleware('throttle:5,15');
+        ->middleware('throttle:forgot-password');
     Route::post('/reset_password', [AuthController::class, 'resetPassword']);
 });
 
