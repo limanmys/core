@@ -222,6 +222,7 @@ class ExtensionController extends Controller
                 'data' => json_encode([
                     'license' => request('license'),
                 ]),
+                'service' => 'admin',
             ]
         );
 
