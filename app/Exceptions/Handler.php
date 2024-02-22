@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -98,6 +99,14 @@ class Handler extends ExceptionHandler
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         });
 
+        $this->renderable(function (AuthenticationException $e) {
+            return response()->json([
+                'message' => 'Giriş yapmanız gereklidir.'
+            ], Response::HTTP_UNAUTHORIZED)
+                ->withoutCookie('token')
+                ->withoutCookie('currentUser');
+        });
+
         if (config('app.debug')) {
             $this->renderable(function (Throwable $e) {
                 return response()->json([
@@ -109,6 +118,7 @@ class Handler extends ExceptionHandler
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
             });
         }
+        
         $this->renderable(function (Throwable $e) {
             return response()->json([
                 'type' => get_class($e),
