@@ -98,7 +98,11 @@ class ExtensionController extends Controller
                     (string) request()->file('extension')->path()
                 );
         } 
-        [$error, $new, $old] = $this->setupNewExtension($zipFile, $verify);
+        $list = $this->setupNewExtension($zipFile, $verify);
+        $error = $list[0];
+        $new = $list[1];
+        if (isset($list[2])) $old = $list[2];
+        else $old = [];
 
         if ($error) {
             return $error;
