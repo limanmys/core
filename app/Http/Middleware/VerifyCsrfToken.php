@@ -25,7 +25,10 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         '/lmn/private/reverseProxyRequest',
-        '/lmn/private/sendNotification',
         '/lmn/private/sendMail',
+        '/upload',
+        '/upload_info',
+        '/upload*',
+        '/upload_info*'
     ];
 }

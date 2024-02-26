@@ -17,24 +17,27 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        Middleware\TrustProxies::class,
+        Middleware\EncryptCookies::class,
+        Middleware\CookieJWTAuthenticator::class,
     ];
 
     protected $middlewareGroups = [
         'web' => [
-            Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
-            \App\Http\Middleware\TouchServer::class,
             \App\Http\Middleware\APILogin::class,
             \Illuminate\Session\Middleware\AuthenticateSession::class,
-            \App\Http\Middleware\Language::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\ForcePasswordChange::class,
-            \App\Http\Middleware\WizardChecker::class,
         ],
 
-        'api' => ['throttle:60,1', 'bindings'],
+        'api' => [
+            'throttle:600,1',
+            'bindings', 
+            \App\Http\Middleware\APILocalization::class
+        ],
     ];
 
     protected $routeMiddleware = [
@@ -43,9 +46,7 @@ class Kernel extends HttpKernel
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        'parameters' => \App\Http\Middleware\Parameters::class,
         'server' => \App\Http\Middleware\Server::class,
-        'server_api' => \App\Http\Middleware\ServerApi::class,
         'permissions' => \App\Http\Middleware\PermissionManager::class,
         'admin' => \App\Http\Middleware\Admin::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
@@ -54,8 +55,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'extension' => \App\Http\Middleware\Extension::class,
         'block_except_limans' => \App\Http\Middleware\BlockExceptLimans::class,
-        'google2fa' => \PragmaRX\Google2FALaravel\Middleware::class,
-        'check_google_two_factor' => \App\Http\Middleware\CheckGoogleTwoFactor::class
+        'google2fa' => \PragmaRX\Google2FALaravel\MiddlewareStateless::class,
     ];
 
     protected $middlewarePriority = [

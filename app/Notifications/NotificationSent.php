@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Classes\NotificationBuilder;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
@@ -17,7 +18,7 @@ class NotificationSent extends Notification
      *
      * @return void
      */
-    public function __construct(private $notification)
+    public function __construct(private $notification, private $user)
     {
     }
 
@@ -34,12 +35,13 @@ class NotificationSent extends Notification
     /**
      * Get the broadcastable representation of the notification.
      *
+     * @param mixed $notifiable
      * @return BroadcastMessage
      */
-    public function toBroadcast(mixed $notifiable)
+    public function toBroadcast(mixed $notifiable): BroadcastMessage
     {
         return (new BroadcastMessage(
-            (array) $this->notification
+            (array) $this->toArray()
         ))->onConnection('sync');
     }
 
@@ -48,8 +50,9 @@ class NotificationSent extends Notification
      *
      * @return array
      */
-    public function toArray(mixed $notifiable)
+    public function toArray(): array
     {
-        return (array) $this->notification;
+        $builder = new NotificationBuilder($this->notification, $this->user->locale);
+        return $builder->convertToBroadcastable();
     }
 }

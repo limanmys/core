@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject as JWTSubject;
 
 /**
  * App\User
@@ -26,7 +27,7 @@ use Illuminate\Notifications\Notifiable;
  * @method static Builder|User query()
  * @method static Builder|User find($value)
  */
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use UsesUuid, Notifiable, CacheQueryBuilder;
 
@@ -48,7 +49,8 @@ class User extends Authenticatable
         'last_login_at',
         'last_login_ip',
         'locale',
-        'google2fa_secret'
+        'google2fa_secret',
+        'otp_enabled'
     ];
 
     /**
@@ -56,7 +58,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'google2fa_secret', 'keycloak_token', 'keycloak_refresh_token'];
 
     /**
      * Determines if user is admin or not
@@ -67,6 +69,16 @@ class User extends Authenticatable
     {
         // Very simply check status, this function created for more human like code write experience.
         return $this->status == 1;
+    }
+
+    public function scopeAdmins($query)
+    {
+        return $query->where('status', 1);
+    }
+
+    public function scopeNonAdmins($query)
+    {
+        return $query->where('status', 0);
     }
 
     /**
@@ -98,6 +110,12 @@ class User extends Authenticatable
         });
     }
 
+    public function notifications()
+    {
+        return $this->belongsToMany('App\Models\Notification', 'notification_users')
+            ->withPivot('read_at');
+    }
+
     /**
      * @return HasMany
      */
@@ -122,12 +140,9 @@ class User extends Authenticatable
         return $this->hasMany('\App\Models\ServerKey');
     }
 
-    /**
-     * @return HasMany
-     */
-    public function notifications()
+    public function myFavorites()
     {
-        return $this->hasMany('\App\Models\Notification');
+        return $this->belongsToMany('\App\Models\Server', 'user_favorites');
     }
 
     /**
@@ -176,6 +191,14 @@ class User extends Authenticatable
     }
 
     /**
+     * @return HasMany
+     */
+    public function authLogs()
+    {
+        return $this->hasMany('\App\Models\AuthLog');
+    }
+
+    /**
      * Interact with the user's OTP secret.
      *
      * @param string $value
@@ -185,7 +208,25 @@ class User extends Authenticatable
     {
         return new Attribute(
             get: fn($value) => ! is_null($value) ? decrypt($value) : '',
-            set: fn($value) => ! is_null($value) ? encrypt($value) : '',
+            set: fn($value) => ! is_null($value) ? encrypt($value) : null,
         );
     }
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier() {
+        return $this->getKey();
+    }
+    
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims() {
+        return [];
+    }    
 }

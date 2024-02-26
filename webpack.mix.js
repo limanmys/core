@@ -43,8 +43,6 @@ mix
             'resources/assets/js/jstree.js',
             'resources/assets/js/buttons.html5.min.js',
             'resources/assets/js/jquery.inputmask.min.js',
-            'resources/assets/js/echo.common.js',
-            'resources/assets/js/pusher.min.js',
             'resources/assets/js/jquery.overlayScrollbars.js',
             'resources/assets/js/liman.js',
             'resources/assets/js/tus.js'

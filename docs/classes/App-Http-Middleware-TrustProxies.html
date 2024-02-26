@@ -60,6 +60,14 @@
 </h4>
     <ul class="phpdocumentor-list">
                     <li>
+                <a href="namespaces/app-casts.html" class="">Casts</a>
+                
+            </li>
+                    <li>
+                <a href="namespaces/app-classes.html" class="">Classes</a>
+                
+            </li>
+                    <li>
                 <a href="namespaces/app-connectors.html" class="">Connectors</a>
                 
             </li>
@@ -101,10 +109,6 @@
             </li>
                     <li>
                 <a href="namespaces/app-providers.html" class="">Providers</a>
-                
-            </li>
-                    <li>
-                <a href="namespaces/app-sandboxes.html" class="">Sandboxes</a>
                 
             </li>
                     <li>
@@ -151,7 +155,7 @@
     TrustProxies
 
         <span class="phpdocumentor-element__extends">
-        extends <abbr title="\Fideloper\Proxy\TrustProxies">TrustProxies</abbr>
+        extends <abbr title="\Illuminate\Http\Middleware\TrustProxies">TrustProxies</abbr>
     </span>
     
             <div class="phpdocumentor-element__package">
@@ -167,29 +171,14 @@
         <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/Http/Middleware/TrustProxies.php"><a href="files/app-http-middleware-trustproxies.html"><abbr title="app/Http/Middleware/TrustProxies.php">TrustProxies.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">13</span>
+    <span class="phpdocumentor-element-found-in__line">8</span>
 
     </aside>
 
-            <p class="phpdocumentor-summary">Trust Proxies</p>
+        
+    <section class="phpdocumentor-description"></section>
 
 
-
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                    <dt class="phpdocumentor-tag-list__entry">
-                    <span class="phpdocumentor-tag__name">extends</span>
-                </dt>
-                <dd class="phpdocumentor-tag-list__definition">
-                                                                                
-                                                 <section class="phpdocumentor-description"><p>Middleware</p>
-</section>
-
-                                    </dd>
-                        </dl>
 
 
 
@@ -212,7 +201,7 @@
             <dt class="phpdocumentor-table-of-contents__entry -property -protected">
     <a href="classes/App-Http-Middleware-TrustProxies.html#property_proxies">$proxies</a>
     <span>
-                        &nbsp;: array&lt;string|int, mixed&gt;            </span>
+                        &nbsp;: array&lt;int, string&gt;|string|null            </span>
 </dt>
 <dd>The trusted proxies for this application.</dd>
 
@@ -244,7 +233,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/Http/Middleware/TrustProxies.php"><a href="files/app-http-middleware-trustproxies.html"><abbr title="app/Http/Middleware/TrustProxies.php">TrustProxies.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">27</span>
+    <span class="phpdocumentor-element-found-in__line">24</span>
 
     </aside>
 
@@ -254,7 +243,7 @@
     <span class="phpdocumentor-signature__visibility">protected</span>
         <span class="phpdocumentor-signature__type">int</span>
     <span class="phpdocumentor-signature__name">$headers</span>
-     = <span class="phpdocumentor-signature__default-value">\Illuminate\Http\Request::HEADER_X_FORWARDED_ALL</span></code>
+     = <span class="phpdocumentor-signature__default-value">\Illuminate\Http\Request::HEADER_X_FORWARDED_FOR | \Illuminate\Http\Request::HEADER_X_FORWARDED_HOST | \Illuminate\Http\Request::HEADER_X_FORWARDED_PORT | \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO | \Illuminate\Http\Request::HEADER_X_FORWARDED_AWS_ELB | \Illuminate\Http\Request::HEADER_X_FORWARDED_PREFIX</span></code>
 
     
     
@@ -277,7 +266,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="app/Http/Middleware/TrustProxies.php"><a href="files/app-http-middleware-trustproxies.html"><abbr title="app/Http/Middleware/TrustProxies.php">TrustProxies.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">20</span>
+    <span class="phpdocumentor-element-found-in__line">15</span>
 
     </aside>
 
@@ -285,9 +274,9 @@
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">protected</span>
-        <span class="phpdocumentor-signature__type">array&lt;string|int, mixed&gt;</span>
+        <span class="phpdocumentor-signature__type">array&lt;int, string&gt;|string|null</span>
     <span class="phpdocumentor-signature__name">$proxies</span>
-    </code>
+     = <span class="phpdocumentor-signature__default-value">[&quot;127.0.0.1&quot;]</span></code>
 
     
     

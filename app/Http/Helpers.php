@@ -1,18 +1,19 @@
 <?php
 
-use App\Models\AdminNotification;
+use App\Exceptions\JsonResponseException;
 use App\Models\Certificate;
 use App\Models\Extension;
-use App\Models\Notification;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\SystemSettings;
+use App\Models\Token;
 use App\System\Command;
 use App\System\Helper;
 use App\User;
 use Beebmx\Blade\Blade;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
+use GuzzleHttp\Client;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -26,18 +27,36 @@ if (! function_exists('validate')) {
      * It validates user request datas
      *
      * @param $rules
-     * @param $messages
+     * @param array $messages
+     * @param array $fieldNames
      * @return void
+     * @throws JsonResponseException
      */
-    function validate($rules, $messages = [])
+    function validate($rules, array $messages = [], array $fieldNames = []): void
     {
         $validator = Validator::make(request()->all(), $rules, $messages);
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            abort(400, $errors->first());
+        $validator->setAttributeNames($fieldNames);
+        if (! request()->wantsJson()) {
+            // If request doesn't want JSON handle as the old way
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                abort(400, $errors->first());
+            }
+        } else {
+            // If request wants JSON handle with new way
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $customFormat = [];
+                foreach ($errors->toArray() as $key => $value) {
+                    $customFormat[$key] = $value[0];
+                }
+
+                throw new JsonResponseException($customFormat, null, Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
         }
     }
 }
+
 
 if (! function_exists('updateSystemSettings')) {
     /**
@@ -156,7 +175,7 @@ if (! function_exists('respond')) {
      *
      * @param $message
      * @param int $status
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse|Response
      */
     function respond($message, $status = 200)
     {
@@ -257,64 +276,6 @@ if (! function_exists('users')) {
     }
 }
 
-if (! function_exists('registerModuleRoutes')) {
-    /**
-     * Register module routes
-     *
-     * @return void
-     */
-    function registerModuleRoutes()
-    {
-        $files = searchModuleFiles('routes.php');
-        foreach ($files as $file) {
-            require_once $file . '/routes.php';
-        }
-    }
-}
-
-if (! function_exists('registerModuleListeners')) {
-    /**
-     * Register module listeners
-     *
-     * @return void
-     */
-    function registerModuleListeners()
-    {
-        $files = searchModuleFiles('listeners.php');
-        foreach ($files as $file) {
-            require_once $file . '/listeners.php';
-        }
-    }
-}
-
-if (! function_exists('searchModuleFiles')) {
-    /**
-     * Search module files
-     *
-     * @param $type
-     * @return array
-     */
-    function searchModuleFiles($type)
-    {
-        $command = 'find /liman/modules/ -name @{:type}';
-
-        $output = Command::runLiman($command, [
-            'type' => $type,
-        ]);
-        if ($output == '') {
-            return [];
-        }
-
-        $data = explode("\n", (string) $output);
-        $arr = [];
-        foreach ($data as $file) {
-            array_push($arr, dirname($file));
-        }
-
-        return $arr;
-    }
-}
-
 if (! function_exists('getLimanPermissions')) {
     /**
      * Get liman permission list
@@ -346,105 +307,6 @@ if (! function_exists('getLimanPermissions')) {
     }
 }
 
-if (! function_exists('settingsModuleViews')) {
-    /**
-     * Return setting module views and render it in settings page
-     *
-     * @return string
-     */
-    function settingsModuleViews()
-    {
-        $str = '';
-        foreach (searchModuleFiles('settings.blade.php') as $file) {
-            $blade = new Blade(
-                [realpath(base_path('resources/views/components')), $file],
-                '/tmp'
-            );
-            $str .= $blade->render('settings');
-        }
-
-        return $str;
-    }
-}
-
-if (! function_exists('renderModuleView')) {
-    /**
-     * Return render module view layout
-     *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
-     */
-    function renderModuleView($module, $page, $params = [])
-    {
-        $blade = new Blade('/liman/modules/' . $module . '/views/', '/tmp');
-        $str = $blade->render($page, $params);
-
-        return view('modules.layout', [
-            'name' => $module,
-            'html' => $str,
-        ]);
-    }
-}
-
-$sidebarModuleLinks = null;
-if (! function_exists('sidebarModuleLinks')) {
-    /**
-     * Returns module links
-     *
-     * @return array
-     */
-    function sidebarModuleLinks()
-    {
-        global $sidebarModuleLinks;
-        if ($sidebarModuleLinks != null) {
-            return $sidebarModuleLinks;
-        }
-        $array = [];
-        foreach (searchModuleFiles('sidebar.json') as $file) {
-            $filePath = $file . '/sidebar.json';
-            $data = file_get_contents($filePath);
-            $json = json_decode($data, true);
-            if (json_last_error() != JSON_ERROR_NONE) {
-                continue;
-            }
-            foreach ($json as $a) {
-                array_push($array, $a);
-            }
-        }
-        $sidebarModuleLinks = $array;
-
-        return $array;
-    }
-}
-
-if (! function_exists('settingsModuleButtons')) {
-    /**
-     * Returns html view of modules
-     *
-     * @return string
-     */
-    function settingsModuleButtons()
-    {
-        $str = '';
-        foreach (searchModuleFiles('settings.blade.php') as $file) {
-            $foo = substr((string) $file, 15);
-            $name = substr($foo, 0, strpos($foo, '/'));
-            $hrefName = $name;
-            if (is_numeric($name[0])) {
-                $hrefName = 'l-' . $name;
-            }
-
-            $str .=
-                '<li class="nav-item">
-               <a id="' .
-                $name .
-                "tab\" class=\"nav-link\" data-toggle=\"tab\" href=\"#$hrefName\">$name</a>
-            </li>";
-        }
-
-        return $str;
-    }
-}
-
 if (! function_exists('getLimanHostname')) {
     /**
      * Get liman server hostname
@@ -454,51 +316,6 @@ if (! function_exists('getLimanHostname')) {
     function getLimanHostname(): string
     {
         return trim((string) `hostname`);
-    }
-}
-
-if (! function_exists('serverModuleViews')) {
-    /**
-     * Get server modules
-     *
-     * @return string
-     */
-    function serverModuleViews()
-    {
-        $str = '';
-        foreach (searchModuleFiles('server.blade.php') as $file) {
-            $blade = new Blade(
-                [realpath(base_path('resources/views/components')), $file],
-                '/tmp'
-            );
-            $str .= $blade->render('server');
-        }
-
-        return $str;
-    }
-}
-
-if (! function_exists('serverModuleButtons')) {
-    /**
-     * Get server module html views
-     *
-     * @return string
-     */
-    function serverModuleButtons()
-    {
-        $str = '';
-        foreach (searchModuleFiles('server.blade.php') as $file) {
-            $foo = substr((string) $file, 15);
-            $name = substr($foo, 0, strpos($foo, '/'));
-            $str .=
-                '<li class="nav-item">
-               <a id="' .
-                $name .
-                "tab\"class=\"nav-link\" data-toggle=\"tab\" href=\"#$name\">$name</a>
-            </li>";
-        }
-
-        return $str;
     }
 }
 
@@ -523,23 +340,6 @@ if (! function_exists('getVersionCode')) {
     function getVersionCode(): int
     {
         return intval(file_get_contents(storage_path('VERSION_CODE')));
-    }
-}
-
-if (! function_exists('notifications')) {
-    /**
-     * Get unread notifications of user
-     *
-     * @return mixed
-     */
-    function notifications()
-    {
-        return Notification::where([
-            'user_id' => auth()->id(),
-            'read' => false,
-        ])
-            ->orderBy('updated_at', 'desc')
-            ->get();
     }
 }
 
@@ -638,22 +438,6 @@ if (! function_exists('retrieveCertificate')) {
         file_put_contents('/tmp/' . $path, $publicKey);
 
         return [true, $certinfo];
-    }
-}
-
-if (! function_exists('adminNotifications')) {
-    /**
-     * Get unread system notifications
-     *
-     * @return mixed
-     */
-    function adminNotifications()
-    {
-        return AdminNotification::where([
-            'read' => false,
-        ])
-            ->orderBy('updated_at', 'desc')
-            ->get();
     }
 }
 
@@ -794,38 +578,11 @@ if (! function_exists('user')) {
     }
 }
 
-if (! function_exists('sandbox')) {
-    /**
-     * Get sandbox instance
-     *
-     * @param  $id
-     * @return App\Sandboxes\Sandbox
-     */
-    function sandbox($id): \App\Sandboxes\Sandbox
-    {
-        return new App\Sandboxes\PHPSandbox();
-    }
-}
-
-if (! function_exists('hook')) {
-    /**
-     * DEPRECATED
-     *
-     * @param $name
-     * @param array $data
-     * @return void
-     */
-    function hook($name, $data = [])
-    {
-        // Will be implemented
-    }
-}
-
 if (! function_exists('magicView')) {
     /**
      * Returns view or json within the scope of request
      *
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse|Response
      */
     function magicView($view, $data = [])
     {
@@ -1108,7 +865,7 @@ if (! function_exists('extensionTranslate')) {
      */
     function extensionTranslate(string $text, string $extension_name)
     {
-        $lang = session('locale');
+        $lang = session('locale', 'tr');
         $file =
             '/liman/extensions/' .
             strtolower($extension_name) .
@@ -1173,7 +930,6 @@ if (! function_exists('checkHealth')) {
             'logs' => '0700',
             'sandbox' => '0755',
             'server' => '0700',
-            'modules' => '0700',
             'packages' => '0700',
             'hashes' => '0700',
         ];
@@ -1412,5 +1168,44 @@ if (! function_exists('getLanguageNames')) {
         }
         
         return $languages;
+    }
+}
+
+if (! function_exists('callExtensionFunction')) {
+    function callExtensionFunction(
+        Extension $extension,
+        Server $server,
+        $params = [],
+        $target_function = "apiProxy"
+    ) {
+        if ($extension->require_key == 'true' && $server->key() == null) {
+            return null;
+        }
+
+        $client = new Client(['verify' => false]);
+        try {
+            $res = $client->request('POST', env('RENDER_ENGINE_ADDRESS', 'https://127.0.0.1:2806'), [
+                'form_params' => [
+                    'lmntargetFunction' => $target_function,
+                    'extension_id' => $extension->id,
+                    'server_id' => $server->id,
+                    'token' => Token::create(user()->id),
+                    ...$params,
+                ],
+                'timeout' => 10,
+            ]);
+            $output = $res->getBody()->__toString();
+
+            $isJson = isJson($output, true);
+            if ($isJson && isset($isJson->status) && $isJson->status == 200) {
+                return $isJson->message;
+            } else {
+                return $output;
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        return null;
     }
 }

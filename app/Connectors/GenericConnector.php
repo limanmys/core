@@ -74,6 +74,15 @@ class GenericConnector
                 ]
             );
 
+            if ($response->getStatusCode() === 201) {
+                $json = json_decode($response->getBody()->getContents());
+                if (isset($json->status) && $json->message === "cannot connect to server") {
+                    abort(
+                        504,
+                        __('Cannot connect to server. Please check your connection or credentials.'),
+                    );
+                }
+            }
             return $response->getBody()->getContents();
         } catch (\Exception $exception) {
             $code = 504;

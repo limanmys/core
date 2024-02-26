@@ -5,7 +5,6 @@ namespace App\Jobs;
 use App\Models\Liman;
 use App\Models\SystemSettings;
 use App\System\Command;
-use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -14,7 +13,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use ZipArchive;
 
@@ -70,14 +68,6 @@ class HighAvailabilitySyncer implements ShouldQueue
 
             foreach ($information['update_extensions'] as $extension) {
                 $this->updateExtension($extension);
-            }
-
-            foreach ($information['missing_modules'] as $module) {
-                $this->installModule($module);
-            }
-
-            foreach ($information['update_modules'] as $module) {
-                $this->updateModule($module);
             }
         }
 
@@ -137,13 +127,10 @@ class HighAvailabilitySyncer implements ShouldQueue
         ]);
 
         $extensionListResponse = $client->request('GET', 'https://' . $ip . '/hasync/extension_list');
-        $moduleListResponse = $client->request('GET', 'https://' . $ip . '/hasync/module_list');
-
         $extensionList = json_decode($extensionListResponse->getBody()->getContents());
-        $moduleList = json_decode($moduleListResponse->getBody()->getContents());
-
         $missingExtensionList = [];
         $needsToBeUpdated = [];
+        
         foreach ($extensionList as $extension) {
             $path = '/liman/extensions/' . $extension->name;
 
@@ -166,30 +153,9 @@ class HighAvailabilitySyncer implements ShouldQueue
             }
         }
 
-        $missingModuleList = [];
-        $moduleNeedsToBeUpdated = [];
-        foreach ($moduleList as $module) {
-            $path = '/liman/modules/' . $module->name;
-
-            // Determine if module does exist
-            if (!is_dir($path)) {
-                $missingModuleList[] = $module;
-                continue;
-            }
-
-            // If module is up to date
-            $updatedAt = Carbon::parse($module->updated_at)->getTimestamp();
-            if ($updatedAt > filemtime($path)) {
-                $moduleNeedsToBeUpdated[] = $module;
-                continue;
-            }
-        }
-
         return [
             "missing_extensions" => $missingExtensionList,
-            "update_extensions" => $needsToBeUpdated,
-            "missing_modules" => $missingModuleList,
-            "update_modules" => $moduleNeedsToBeUpdated
+            "update_extensions" => $needsToBeUpdated
         ];
     }
 
@@ -352,111 +318,5 @@ class HighAvailabilitySyncer implements ShouldQueue
         ) {
             $system->installPackages($json['dependencies']);
         }
-    }
-
-    /**
-     * Install not existing module
-     *
-     * @param $module
-     * @throws GuzzleException
-     * @return void
-     */
-    private function installModule($module)
-    {
-        $module = (array) $module;
-
-        // Download module and put to the folder
-        $file = $this->downloadFile($module['download_path']);
-
-        if (!$file || !is_file($file)) {
-            throw new Exception("file could not be downloaded");
-        }
-
-        $zip = new ZipArchive();
-
-        if (!$zip->open($file)) {
-            throw new Exception("downloaded zip file cannot be opened");
-        }
-
-        $path = '/tmp/' . Str::random();
-        try {
-            $zip->extractTo($path);
-        } catch (\Exception) {
-            throw new Exception("error when extracting zip file");
-        }
-
-        $module_folder = '/liman/modules/' . (string) $module['name'];
-
-        Command::runLiman('mkdir -p @{:module_folder}', [
-            'module_folder' => $module_folder,
-        ]);
-
-        Command::runLiman('cp -r {:path}/* {:module_folder}/.', [
-            'module_folder' => $module_folder,
-            'path' => $path,
-        ]);
-
-        Command::runSystem('rm -rf @{:file}', [
-            'file' => $path
-        ]);
-
-        Artisan::call("module:add " . $module['name']);
-
-        Command::runSystem('rm -rf @{:file}', [
-            'file' => $file
-        ]);
-    }
-
-    /**
-     * Update old module
-     *
-     * @param $module
-     * @throws GuzzleException
-     * @return void
-     */
-    private function updateModule($module)
-    {
-        $module = (array) $module;
-
-        // Download module and put to the folder
-        $file = $this->downloadFile($module['download_path']);
-
-        if (!$file || !is_file($file)) {
-            throw new Exception("file could not be downloaded");
-        }
-
-        $zip = new ZipArchive();
-
-        if (!$zip->open($file)) {
-            throw new Exception("downloaded zip file cannot be opened");
-        }
-
-        $path = '/tmp/' . Str::random();
-        try {
-            $zip->extractTo($path);
-        } catch (\Exception) {
-            throw new Exception("error when extracting zip file");
-        }
-
-        $module_folder = '/liman/modules/' . (string) $module['name'];
-
-        Command::runLiman('mkdir -p @{:module_folder}', [
-            'module_folder' => $module_folder,
-        ]);
-
-        Command::runLiman('cp -r {:path}/* {:module_folder}/.', [
-            'module_folder' => $module_folder,
-            'path' => $path,
-        ]);
-
-        Command::runSystem('rm -rf @{:file}', [
-            'file' => $path
-        ]);
-
-        Artisan::call("module:add " . $module['name']);
-
-        Command::runSystem('rm -rf @{:file}', [
-            'file' => $file
-        ]);
     }
 }

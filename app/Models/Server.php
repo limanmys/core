@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Connectors\GenericConnector;
-use App\Connectors\SNMPConnector;
 use App\Support\Database\CacheQueryBuilder;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Collection;
@@ -27,6 +26,10 @@ class Server extends Model
         'type',
         'control_port',
         'os',
+        'user_id',
+        'shared_key',
+        'key_port',
+        'enabled'
     ];
 
     /**
@@ -58,7 +61,7 @@ class Server extends Model
     /**
      * Create connector instance
      *
-     * @return GenericConnector|SNMPConnector
+     * @return GenericConnector
      * @throws \Exception
      */
     private function connector()
@@ -68,9 +71,6 @@ class Server extends Model
                 504,
                 'Bu sunucuda komut çalıştırmak için bir bağlantınız yok.'
             );
-        }
-        if ($this->key()->type == 'snmp') {
-            return new SNMPConnector($this, user()->id);
         }
 
         return new GenericConnector($this, user());
@@ -180,6 +180,29 @@ class Server extends Model
         return false;
     }
 
+    public function isOnline(): bool
+    {
+        if ($this->control_port == -1) {
+            return true;
+        }
+        // Simply Check Port If It's Alive
+        if (
+            is_resource(
+                @fsockopen(
+                    $this->ip_address,
+                    $this->control_port,
+                    $errno,
+                    $errstr,
+                    intval(config('liman.server_connection_timeout'))
+                )
+            )
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Get extensions on server that in scope of permission system
      *
@@ -191,6 +214,7 @@ class Server extends Model
             '\App\Models\Extension',
             'server_extensions'
         )
+            ->orderBy("updated_at", "DESC")
             ->get()
             ->filter(function ($extension) {
                 return Permission::can(
@@ -324,6 +348,10 @@ class Server extends Model
                 }
                 $row = explode(':', trim($package));
                 try {
+                    if (str_contains($row[0], 'sysusers.service')) {
+                        continue;
+                    }
+
                     array_push($services, [
                         'name' => strlen($row[0]) > 50 ? substr($row[0], 0, 50) . '...' : $row[0],
                         'description' => strlen($row[2]) > 60 ? substr($row[2], 0, 60) . '...' : $row[2],
@@ -331,6 +359,22 @@ class Server extends Model
                     ]);
                 } catch (\Exception) {
                 }
+            }
+
+            $raw = $this->run(
+                "systemctl list-unit-files --state=disabled | grep service | awk '{print $1 \":\"$2}'",
+                false
+            );
+
+            foreach (explode("\n", $raw) as &$package) {
+                if ($package == '') {
+                    continue;
+                }
+                $row = explode(':', trim($package));
+                $services[] = [
+                    'name' => strlen($row[0]) > 50 ? substr($row[0], 0, 50) . '...' : $row[0],
+                    'status' => $row[1] == 'disabled',
+                ];
             }
 
             return count($services);

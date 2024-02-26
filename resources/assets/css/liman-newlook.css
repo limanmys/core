@@ -216,6 +216,14 @@ nav[aria-label="breadcrumb"] {
   font-weight: 600;
 }
 
+.modal.fade.show {
+  backdrop-filter: blur(4px);
+  background-color: transparent !important;
+}
+.modal-backdrop {
+  background-color: transparent !important;
+}
+
 .dt-buttons {
   width: 100%;
   margin-bottom: 12px;

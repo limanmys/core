@@ -26,7 +26,9 @@ class BlockExceptLimans
         $ips = Liman::all()->pluck(["last_ip"])->toArray();
 
         if (!in_array($request->ip(), $ips)) {
-            abort(403, "You are restricted to access the site.");
+            return response()->json([
+                "message" => "You are restricted to access the site."
+            ], 403);
         }
 
         return $next($request);

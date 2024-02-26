@@ -25,11 +25,15 @@ class APILogin
                 'token' => request()->headers->get('liman-token'),
             ])->first();
             if (! $obj) {
-                abort(403, 'Token Geçersiz!');
+                return response()->json([
+                    'message' => 'Invalid token.',
+                ], 403);
             }
 
             if ($obj->ip_range != '-1' && ! ip_in_range($request->ip(), $obj->ip_range)) {
-                abort(403, "Bu token'i bu ip adresinden kullanamazsınız!");
+                return response()->json([
+                    'message' => 'You are restricted to access the site.',
+                ], 403);
             }
 
             $obj->update([

@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Extension\Sandbox;
 
 use App\Http\Controllers\Controller;
 use App\Mail\ExtensionMail;
+use App\Mail\TemplatedExtensionMail;
 use App\Models\Extension;
-use App\Models\Notification;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\Token;
@@ -92,29 +92,31 @@ class InternalController extends Controller
      */
     public function sendMail()
     {
-        Mail::to(request('to'))->send(
-            new ExtensionMail(
-                request('subject'),
-                base64_decode((string) request('content')),
-                json_decode((string) request('attachments'), true),
-            )
-        );
-    }
+        if (! (bool) env('MAIL_ENABLED', false)) return;
 
-    /**
-     * Send notification from extension
-     *
-     * @return void
-     */
-    public function sendNotification()
-    {
-        Notification::new(
-            request('title') . ' (' . extension()->display_name . ')',
-            request('type'),
-            request('message')
-        );
-    }
+        $sendTo = [];
+        $to = json_decode(request('to'));
+        if (! is_array($to)) {
+            $sendTo[] = $to;
+        } else {
+            $sendTo = $to;
+        }
 
+        $template = ExtensionMail::class;
+        if ((bool) request('templated')) {
+            $template = TemplatedExtensionMail::class;
+        }
+
+        foreach ($sendTo as $recipient) {
+            Mail::to($recipient)->send(
+                new $template(
+                    request('subject'),
+                    base64_decode((string) request('content')),
+                    json_decode((string) request('attachments'), true),
+                )
+            );
+        }
+    }
 
     /**
      * Creates VNC token

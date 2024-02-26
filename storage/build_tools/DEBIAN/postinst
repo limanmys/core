@@ -65,12 +65,16 @@ if [ -f "/liman/database/liman.sqlite" ]; then
     sed -i '/DB_CONNECTION/d' /liman/server/.env
     printf "\nDB_CONNECTION=pgsql\n" | tee -a /liman/server/.env
 elif [ $DB_EXISTS == "0" ]; then
-    sudo -u postgres createuser liman
-    sudo -u postgres createdb liman -O liman
-    RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
-    sudo -u postgres psql -U postgres -d postgres -c "alter user \"liman\" with password '$RANDOM_PASSWORD';"
-    sed -i '/DB_PASSWORD/d' /liman/server/.env
-    printf "\nDB_PASSWORD=$RANDOM_PASSWORD\n" | tee -a /liman/server/.env
+    # .env dosyasında DB_PASSWORD kontrolü
+    if ! grep -q "DB_PASSWORD=" /liman/server/.env || [ -z "$(grep "DB_PASSWORD=" /liman/server/.env | sed 's/DB_PASSWORD=//')" ]; then
+        # DB_PASSWORD boşsa veya yoksa yeni bir şifre oluştur
+        sudo -u postgres createuser liman
+        sudo -u postgres createdb liman -O liman
+        RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
+        sudo -u postgres psql -U postgres -d postgres -c "alter user \"liman\" with password '$RANDOM_PASSWORD';"
+        sed -i '/DB_PASSWORD/d' /liman/server/.env
+        printf "\nDB_PASSWORD=$RANDOM_PASSWORD\n" | tee -a /liman/server/.env
+    fi
 else
     echo "Postgresql already set up."
 fi
@@ -139,18 +143,10 @@ redirect_stderr=true
 stdout_logfile=/liman/logs/system_update.log
     """ > /etc/supervisor/conf.d/liman-system-worker.conf
 
-echo """
-#LIMAN_OPTIMIZATIONS
-[program:liman-cron_mail-worker]
-process_name=%(program_name)s_%(process_num)02d
-command=php /liman/server/artisan queue:work --sleep=1 --tries=3 --queue=cron_mail --timeout=0
-autostart=true
-autorestart=true
-user=liman
-numprocs=8
-redirect_stderr=true
-stdout_logfile=/liman/logs/mail.log
-    """ > /etc/supervisor/conf.d/liman-cron-mail.conf
+if [ -f "/etc/supervisor/conf.d/liman-cron-mail.conf" ]; then
+    rm /etc/supervisor/conf.d/liman-cron-mail.conf
+fi
+
 supervisorctl reread
 supervisorctl update
 supervisorctl start all
@@ -164,6 +160,14 @@ sed -i "s#QUEUE_DRIVER=database#QUEUE_DRIVER=redis#g" /liman/server/.env
 #Change Render Engine Port
 sed -i "s#RENDER_ENGINE_ADDRESS=https://127.0.0.1:5454#RENDER_ENGINE_ADDRESS=https://127.0.0.1:2806#g" /liman/server/.env
 
+# JWT Secret creation
+JWT_EXISTS=$(grep JWT_SECRET /liman/server/.env && echo "1" || echo "0")
+if [ $JWT_EXISTS == "0" ]; then
+    php /liman/server/artisan jwt:secret
+else
+    echo "JWT secret already set."
+fi
+
 # Run Database Migration
 php /liman/server/artisan migrate --force
 php /liman/server/artisan cache:clear
@@ -175,14 +179,42 @@ rm -rf /liman/sandbox/{.git,vendor,views,.gitignore,composer.json,composer.lock,
 
 # Set Permissions
 chown -R liman:liman /liman/{server,database,certs,sandbox,logs,modules,packages,hashes}
-chmod 700 -R /liman/{server,database,certs,logs,modules,packages,hashes}
+chmod 700 -R /liman/{server,database,certs,modules,packages,hashes}
+chmod 750 -R /liman/logs
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
+usermod -aG liman syslog
 
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman-connector.service" ]; then
     rm /etc/systemd/system/liman-connector.service
+fi
+
+# Create UI Systemd Service
+if [ -f "/etc/systemd/system/liman-ui.service" ]; then
+    echo "Liman User Interface Service Already Added.";
+    ENVIRONMENT_SET=$(cat /etc/systemd/system/liman-ui.service | grep Environment >/dev/null && echo 1 || echo 0)
+    if [ $ENVIRONMENT_SET == "1" ]; then
+        sed -i '/Environment="HOSTNAME=127.0.0.1"/d' /etc/systemd/system/liman-ui.service
+    fi
+else
+    echo """
+[Unit]
+Description=Liman User Interface Service
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=liman
+WorkingDirectory=/liman/ui
+ExecStart=/usr/bin/node server.js
+
+[Install]
+WantedBy=multi-user.target
+    """ > /etc/systemd/system/liman-ui.service
 fi
 
 # Create Systemd Service
@@ -268,6 +300,8 @@ fi
 sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/8.1/fpm/php.ini
 sed -i "s/post_max_size.*/post_max_size = 100M/g" /etc/php/8.1/fpm/php.ini
 
+mv -f /liman/server/storage/php8.1-fpm-www.conf /etc/php/8.1/fpm/pool.d/www.conf
+
 # Reload the systemd
 systemctl daemon-reload
 
@@ -276,6 +310,7 @@ rm /etc/systemd/system/liman.service 2>/dev/null
 systemctl disable liman 2>/dev/null
 systemctl stop liman 2>/dev/null
 
+systemctl enable liman-ui 2>/dev/null
 systemctl enable liman-system 2>/dev/null
 systemctl enable liman-render 2>/dev/null
 systemctl disable liman-connector 2>/dev/null
@@ -290,6 +325,7 @@ systemctl enable php8.1-fpm 2>/dev/null
 systemctl stop liman-connector
 systemctl stop liman-vnc
 systemctl stop liman-webssh
+systemctl restart liman-ui
 systemctl restart liman-system
 systemctl restart liman-render
 systemctl restart liman-socket

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -34,6 +33,8 @@ class Extension extends Model
         'displays',
         'require_key',
         'status',
+        'license_type',
+        'ldap_support',
     ];
 
     protected $casts = [
@@ -41,7 +42,6 @@ class Extension extends Model
     ];
 
     /**
-     * @param $id
      * @return mixed
      */
     public static function one($id)
@@ -55,6 +55,16 @@ class Extension extends Model
         }
 
         return $extension;
+    }
+
+    /**
+     * License object
+     *
+     * @return mixed
+     */
+    public function license()
+    {
+        return $this->hasOne('App\Models\License', 'extension_id');
     }
 
     /**
@@ -79,14 +89,7 @@ class Extension extends Model
      */
     public function servers()
     {
-        return Server::getAll()->filter(function ($value) {
-            return DB::table('server_extensions')
-                ->where([
-                    'server_id' => $value->id,
-                    'extension_id' => request('extension_id'),
-                ])
-                ->exists();
-        });
+        return $this->belongsToMany(Server::class, 'server_extensions');
     }
 
     /**
@@ -102,7 +105,6 @@ class Extension extends Model
     /**
      * Get extension display name
      *
-     * @param $value
      * @return mixed|string
      */
     public function getDisplayNameAttribute($value)
@@ -111,13 +113,17 @@ class Extension extends Model
             return Str::title(str_replace('-', ' ', (string) $this->name));
         }
 
-        return $this->attributes['display_name'];
+        $displayName = json_decode($this->attributes['display_name'], true);
+        if (is_array($displayName)) {
+            return $displayName[auth('api')->user()->language] ?? $displayName[app()->getLocale()] ?? $this->attributes['display_name'];
+        }
+
+        return str_replace('"', '', json_decode($this->attributes['display_name']) ?? $this->attributes['display_name']);
     }
 
     /**
      * Get updated at attribute
      *
-     * @param $value
      * @return string
      */
     public function getUpdatedAtAttribute($value)
@@ -128,7 +134,6 @@ class Extension extends Model
     /**
      * Set name attribute
      *
-     * @param $value
      * @return void
      */
     public function setNameAttribute($value)

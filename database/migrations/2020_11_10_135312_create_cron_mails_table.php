@@ -13,18 +13,7 @@ class CreateCronMailsTable extends Migration
      */
     public function up()
     {
-        Schema::create('cron_mails', function (Blueprint $table) {
-            $table->uuid('id');
-            $table->string('server_id')->nullable();
-            $table->string('extension_id')->nullable();
-            $table->string('user_id');
-            $table->string('type')->default('extension');
-            $table->string('cron_type')->default('weekly');
-            $table->string('target');
-            $table->string('to');
-            $table->timestamp('last');
-            $table->timestamps();
-        });
+        //
     }
 
     /**

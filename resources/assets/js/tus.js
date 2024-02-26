@@ -4,16 +4,14 @@ function upload(option) {
   }
   const server_id = $("meta[name=server_id]").attr("content");
   const extension_id = $("meta[name=proxy_to]").attr("content") ? $("meta[name=proxy_to]").attr("content") : $("meta[name=extension_id]").attr("content");
-  const token = $("meta[name=csrf-token]").attr("content");
+  const liman_token = customRequestData['token'];
 
   var upload = new tus.Upload(option.file, {
     endpoint:
       "/upload?extension_id=" +
       extension_id +
       "&server_id=" +
-      server_id +
-      "&x-csrf-token=" +
-      token,
+      server_id,
     retryDelays: [0, 1000, 3000, 5000, 10000],
     overridePatchMethod: true,
     chunkSize: 1000 * 1000,
@@ -38,10 +36,11 @@ function upload(option) {
       });
     },
     headers: {
-      server_id: server_id,
-      extension_id: extension_id,
-      "x-csrf-token": token,
+      "Server-Id": server_id,
+      "Extension-Id": extension_id,
+      "Extension-Token": liman_token,
     },
   });
   upload.start();
+  return upload;
 }

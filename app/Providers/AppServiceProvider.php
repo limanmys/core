@@ -2,15 +2,18 @@
 
 namespace App\Providers;
 
-use App\Models\AdminNotification;
 use App\Models\Notification;
-use App\Models\Permission;
-use App\Observers\AdminNotificationObserver;
+use App\Models\Server;
 use App\Observers\NotificationObserver;
+use App\Observers\ServerObserver;
+use App\Observers\UserObserver;
+use App\User;
 use Carbon\Carbon;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\View;
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -26,38 +29,36 @@ class AppServiceProvider extends ServiceProvider
      * @return void
      */
     public function boot(
-        \Illuminate\Routing\Router        $router,
-        \Illuminate\Contracts\Http\Kernel $kernel
+        Router $router,
+        Kernel $kernel
     )
     {
         Paginator::useBootstrap();
-
-        View::composer('layouts.header', function ($view) {
-            $view->with('USER_FAVORITES', user()->favorites());
-            $view->with('SERVERS', \App\Models\Server::orderBy('updated_at', 'DESC')
-                ->limit(env('NAV_SERVER_COUNT', 20))->get()
-                ->filter(function ($server) {
-                    return Permission::can(user()->id, 'server', 'id', $server->id);
-                })
-                ->filter(function ($server) {
-                    return ! (bool) user()->favorites()->where('id', $server->id)->first();
-                })
-            );
-        });
         Carbon::setLocale(app()->getLocale());
         Notification::observe(NotificationObserver::class);
-        AdminNotification::observe(AdminNotificationObserver::class);
+        User::observe(UserObserver::class);
+        Server::observe(ServerObserver::class);
+
         Relation::morphMap([
             'users' => 'App\User',
             'roles' => 'App\Models\Role',
         ]);
 
-        if (request()->headers->has('liman-token') == false) {
+        if (! request()->headers->has('liman-token')) {
             $router->pushMiddlewareToGroup(
                 'web',
                 \App\Http\Middleware\VerifyCsrfToken::class
             );
         }
+
+        ResetPassword::createUrlUsing(function ($user, string $token) {
+            return sprintf(
+                '%s/auth/reset_password?token=%s&email=%s', 
+                request()->getSchemeAndHttpHost(), 
+                $token, 
+                $user->getEmailForPasswordReset()
+            );
+        });
     }
 
     /**

@@ -2,98 +2,108 @@
 
 namespace App\Models;
 
+use App\Casts\Jsonb;
+use App\User;
+use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
  * Notification Model
- *
- * @extends Model
  */
 class Notification extends Model
 {
-    use UsesUuid;
+    use UsesUuid, HasEvents;
+
+    public $timestamps = false;
+
+    protected $casts = [
+        'contents' => Jsonb::class,
+    ];
 
     protected $fillable = [
-        'user_id',
-        'title',
-        'type',
-        'message',
-        'server_id',
-        'extension_id',
+        'id',
         'level',
-        'read',
+        'template',
+        'contents',
+        'send_at',
         'mail'
     ];
 
     /**
-     * Creates new notification
+     * Bootstrap the model and its traits.
      *
-     * @param $title
-     * @param $type "notify | certificate | health"
-     * @param $message
-     * @param $server_id
-     * @param $extension_id
-     * @param $level "0 | 2"
-     * @return mixed
+     * @return void
      */
-    public static function new(
-        $title,
-        $type,
-        $message,
-        $server_id = null,
-        $extension_id = null,
-        $level = 0
-    )
+    public static function boot(): void
     {
-        // Create a notification object and fill values.
-        // Before we return the notification, check if it's urgent. If so, send an email.
-        return Notification::create([
-            'user_id' => auth()->id(),
-            'title' => json_encode([
-                'tr' => __($title, [], 'tr'),
-                'en' => __($title, [], 'en'),
-            ]),
-            'type' => $type,
-            'message' => $message,
-            'server_id' => $server_id,
-            'extension_id' => $extension_id,
-            'level' => $level,
-            'read' => false,
-        ]);
+        parent::boot();
+
+        static::creating(function ($notification) {
+            $notification->send_at = now();
+        });
     }
 
     /**
-     * Sends new notification
+     * Send notification with parameters
      *
-     * @param $title
-     * @param $type "notify | certificate | health"
-     * @param $message
-     * @param $user_id
-     * @param $server_id
-     * @param $extension_id
-     * @param $level "0 | 2"
-     * @return mixed
+     * @param string $level It might be information, success, warning, error
+     * @param string $template CUSTOM or selected ones.
+     * @param array $contents Contents
+     * @param array|string $sendTo It might be all, admins, non_admins or an array with user ids.
+     * @param bool $mail Send mail to recipients?
+     * @return Notification
      */
     public static function send(
-        $title,
-        $type,
-        $message,
-        $user_id,
-        $server_id = null,
-        $extension_id = null,
-        $level = 0
-    )
+        string $level,
+        string $template,
+        array $contents = [],
+        array|string $sendTo = 'all',
+        bool $mail = false
+    ): Notification
     {
-        // Create a notification object and fill values.
-        return Notification::create([
-            'user_id' => $user_id,
-            'title' => $title,
-            'type' => $type,
-            'message' => $message,
-            'server_id' => $server_id,
-            'extension_id' => $extension_id,
-            'level' => $level,
-            'read' => false,
-        ]);
+        try {
+            if ($sendTo === 'all') {
+                $sendTo = User::all();
+            }
+
+            if ($sendTo === 'admins') {
+                $sendTo = User::admins()->get();
+            }
+
+            if ($sendTo === 'non_admins') {
+                $sendTo = User::nonAdmins()->get();
+            }
+
+            if (is_array($sendTo) && isset($sendTo[0]) && $sendTo[0] instanceof User) {
+                $sendTo = array_pluck($sendTo, 'id');
+            }
+
+            $object = static::withoutEvents(function () use ($level, $template, $contents, $sendTo, $mail) {
+                $temp = static::create([
+                    'id' => (string) Str::uuid(),
+                    'level' => $level,
+                    'template' => $template,
+                    'contents' => $contents,
+                    'send_at' => now(),
+                    'mail' => $mail,
+                ]);
+                $temp->users()->attach($sendTo);
+
+                return $temp;
+            });
+
+            $object->fireModelEvent('created', false);
+        } catch (\Throwable $e) {
+            return new Notification();
+        }
+
+        return $object;
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'notification_users')
+            ->withPivot('read_at');
     }
 }

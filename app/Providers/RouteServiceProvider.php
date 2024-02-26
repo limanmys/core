@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -28,7 +30,13 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        RateLimiter::for('login', function ($request) {
+            return Limit::perMinute(3)->by($request->email.$request->ip());
+        });
+
+        RateLimiter::for('forgot-password', function ($request) {
+            return Limit::perMinutes(5, 2)->by($request->email.$request->ip());
+        });
 
         parent::boot();
     }
@@ -43,10 +51,6 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapApiRoutes();
 
         $this->mapWebRoutes();
-
-        if (env('EXTENSION_DEVELOPER_MODE') == true) {
-            $this->mapExtensionDeveloperRoutes();
-        }
     }
 
     /**
@@ -76,19 +80,5 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('web')
             ->namespace($this->namespace)
             ->group(base_path('routes/web.php'));
-    }
-
-    /**
-     * Map extension developer routes
-     *
-     * This function registers extra routes that is coming from extension developer mode
-     *
-     * @return void
-     */
-    protected function mapExtensionDeveloperRoutes()
-    {
-        Route::namespace($this->namespace)
-            ->middleware('web')
-            ->group(base_path('routes/extension_developer.php'));
     }
 }

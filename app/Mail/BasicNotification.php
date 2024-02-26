@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Classes\NotificationBuilder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -15,8 +16,6 @@ class BasicNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user;
-
     public $subject;
 
     /**
@@ -24,9 +23,11 @@ class BasicNotification extends Mailable
      *
      * @return void
      */
-    public function __construct(public $notification)
+    public function __construct(public $notification, public $user)
     {
         $this->subject = __('Liman MYS Bilgilendirme');
+        $builder = new NotificationBuilder($this->notification, $this->user->locale ?? env('APP_LOCALE', 'tr'));
+        $this->notification = $builder->convertToBroadcastable();
     }
 
     /**
@@ -36,9 +37,12 @@ class BasicNotification extends Mailable
      */
     public function build()
     {
+        // Set session locale
+        app()->setLocale($this->user->locale ?? env('APP_LOCALE', 'tr'));
+
         return $this->from([
             'address' => env('APP_NOTIFICATION_EMAIL'),
             'name' => __('Liman Bildiri Sistemi'),
-        ])->view('email.external_notification');
+        ])->markdown('email.external_notification');
     }
 }

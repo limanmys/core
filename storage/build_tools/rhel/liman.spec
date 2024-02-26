@@ -2,7 +2,7 @@ Name: liman
 Version: %VERSION%
 Release: 0
 License: MIT
-Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, php-smbclient, postgresql15, postgresql15-server
+Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, php-smbclient, postgresql15, postgresql15-server, nodejs
 Prefix: /liman
 Summary: Liman MYS
 Group: Applications/System
@@ -85,12 +85,14 @@ DB_EXISTS=$(sudo -u liman psql -lqt | cut -d \| -f 1 | grep "liman" >/dev/null 2
 
 # Database Creation
 if [ $DB_EXISTS == "0" ]; then
-    sudo -u postgres createuser liman
-    sudo -u postgres createdb liman -O liman
-    RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
-    sudo -u postgres psql -U postgres -d postgres -c "alter user \"liman\" with password '$RANDOM_PASSWORD';"
-    sed -i '/DB_PASSWORD/d' /liman/server/.env
-    printf "\nDB_PASSWORD=$RANDOM_PASSWORD\n" | tee -a /liman/server/.env
+    if ! grep -q "DB_PASSWORD=" /liman/server/.env || [ -z "$(grep "DB_PASSWORD=" /liman/server/.env | sed 's/DB_PASSWORD=//')" ]; then
+        sudo -u postgres createuser liman
+        sudo -u postgres createdb liman -O liman
+        RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
+        sudo -u postgres psql -U postgres -d postgres -c "alter user \"liman\" with password '$RANDOM_PASSWORD';"
+        sed -i '/DB_PASSWORD/d' /liman/server/.env
+        printf "\nDB_PASSWORD=$RANDOM_PASSWORD\n" | tee -a /liman/server/.env
+    fi
 else
     echo "Postgresql already set up."
 fi
@@ -105,6 +107,10 @@ sed -i "s/;listen.mode/listen.mode/g" /etc/php-fpm.d/www.conf
 sed -i "s/listen.owner =.*/listen.owner = liman/g" /etc/php-fpm.d/www.conf
 sed -i "s/listen.group =.*/listen.group = liman/g" /etc/php-fpm.d/www.conf
 sed -i "s/listen.mode =.*/listen.mode = 660/g" /etc/php-fpm.d/www.conf
+sed -i "s/pm.max_children =.*/pm.max_children = 60/g" /etc/php-fpm.d/www.conf
+sed -i "s/pm.start_servers =.*/pm.start_servers = 10/g" /etc/php-fpm.d/www.conf
+sed -i "s/pm.min_spare_servers =.*/pm.min_spare_servers = 5/g" /etc/php-fpm.d/www.conf
+sed -i "s/pm.max_spare_servers =.*/pm.max_spare_servers = 20/g" /etc/php-fpm.d/www.conf
 sed -i "s/user .*;/user liman;/g" /etc/nginx/nginx.conf
 
 # Crontab Setting
@@ -135,6 +141,10 @@ if [ -f "/etc/supervisord.d/liman-extension-worker.ini" ]; then
     rm /etc/supervisord.d/liman-extension-worker.ini;
 fi
 
+if [ -f "/etc/supervisord.d/liman-cron-mail.ini" ]; then
+    rm /etc/supervisord.d/liman-cron-mail.ini;
+fi
+
 supervisorctl reread
 supervisorctl update
 supervisorctl start all
@@ -148,6 +158,14 @@ sed -i "s#QUEUE_DRIVER=database#QUEUE_DRIVER=redis#g" /liman/server/.env
 #Change Render Engine Port
 sed -i "s#RENDER_ENGINE_ADDRESS=https://127.0.0.1:5454#RENDER_ENGINE_ADDRESS=https://127.0.0.1:2806#g" /liman/server/.env
 
+# JWT Secret creation
+JWT_EXISTS=$(grep JWT_SECRET /liman/server/.env && echo "1" || echo "0")
+if [ $JWT_EXISTS == "0" ]; then
+    php /liman/server/artisan jwt:secret
+else
+    echo "JWT secret already set."
+fi
+
 # Run Database Migration
 php /liman/server/artisan migrate --force
 php /liman/server/artisan cache:clear
@@ -159,14 +177,38 @@ rm -rf /liman/sandbox/{.git,vendor,views,.gitignore,composer.json,composer.lock,
 
 # Set Permissions
 chown -R liman:liman /liman/{server,database,certs,sandbox,logs,modules,packages,hashes}
-chmod 700 -R /liman/{server,database,certs,logs,modules,packages,hashes}
+chmod 700 -R /liman/{server,database,certs,modules,packages,hashes}
+chmod 750 -R /liman/logs
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
+usermod -aG liman syslog
 
 # Create Systemd Service
 if [ -f "/etc/systemd/system/liman-connector.service" ]; then
     rm /etc/systemd/system/liman-connector.service
+fi
+
+# Create UI Systemd Service
+if [ -f "/etc/systemd/system/liman-ui.service" ]; then
+    echo "Liman User Interface Service Already Added.";
+else
+    echo """
+[Unit]
+Description=Liman User Interface Service
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=liman
+WorkingDirectory=/liman/ui
+ExecStart=/usr/bin/node server.js
+
+[Install]
+WantedBy=multi-user.target
+    """ > /etc/systemd/system/liman-ui.service
 fi
 
 # Create Systemd Service
@@ -287,6 +329,7 @@ systemctl daemon-reload
 
 chown -R liman /var/lib/nginx/
 
+systemctl enable liman-ui 2>/dev/null
 systemctl enable liman-system 2>/dev/null
 systemctl enable liman-render 2>/dev/null
 systemctl disable liman-connector 2>/dev/null
@@ -299,6 +342,7 @@ systemctl enable php-fpm 2>/dev/null
 systemctl stop liman-connector
 systemctl stop liman-vnc
 systemctl stop liman-webssh
+systemctl restart liman-ui
 systemctl restart liman-system
 systemctl restart liman-render
 systemctl restart liman-socket
