@@ -24,13 +24,6 @@ curl -s https://api.github.com/repos/limanmys/next/releases/latest \
 unzip ui*.zip -d package/liman/ui
 rm ui*.zip
 
-#Extension Templates
-wget "https://github.com/limanmys/extension_templates/archive/$2.zip" -q
-unzip -qq $2.zip
-mkdir -p package/liman/server/storage/extension_templates
-mv extension_templates-$2/* package/liman/server/storage/extension_templates/
-rm -rf $2.zip extension_templates-$2
-
 #Render Engine
 curl -s https://api.github.com/repos/limanmys/fiber-render-engine/releases/latest \
 | grep "browser_download_url.*zip" \
@@ -49,6 +42,7 @@ DATE=$(date)
 composer install --no-dev -d package/liman/server
 composer install --no-dev -d package/liman/sandbox/php
 rm -rf package/liman/server/node_modules
+rm -rf package/liman/server/docs
 mv package/liman/server/storage/build_tools/DEBIAN package/
 mv package/liman/server/storage/build_tools/rhel/liman.spec liman.spec
 mv package/liman/server/storage/build_tools/rhel/liman-system-worker.ini liman-system-worker.ini
