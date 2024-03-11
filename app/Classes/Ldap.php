@@ -38,13 +38,21 @@ class Ldap
         private readonly int    $port = 636,
     ) {
         // First, we check if LDAP server is alive
-        ! $this->isAlive() ? throw new LDAPException('LDAP server is not alive.', LDAPException::THROW_CONNECTION_ERROR) : null;
+        $isAlive = retry(3, function () {
+            return $this->isAlive();
+        }, 1000);
+        ! $isAlive ? throw new LDAPException('LDAP server is not alive.', LDAPException::THROW_CONNECTION_ERROR) : null;
 
         // Then, we check if the connection is established
-        ! $this->checkConnection() ? throw new LDAPException('LDAP server connection failed.') : null;
+        $connectionStatus = retry(3, function () {
+            return $this->checkConnection();
+        }, 1000);
+        ! $connectionStatus ? throw new LDAPException('LDAP server connection failed.') : null;
 
         // We finally connect to the LDAP server with our authentication
-        $connection = $this->createConnection();
+        $connection = retry(5, function () {
+            return $this->createConnection();
+        }, 1000);
         if (! $connection) {
             throw new LDAPException('LDAP server bind failed, might be caused by wrong username or password.', LDAPException::THROW_BIND_ERROR);
         }
@@ -237,7 +245,7 @@ class Ldap
      */
     private function createConnection(): \LDAP\Connection|false
     {
-        $connection = ldap_connect('ldaps://'.$this->ip_address.':'.$this->port);
+        $connection = ldap_connect('ldaps://'.$this->ip_address);
 
         // Connection options
         ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3);
