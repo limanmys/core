@@ -430,6 +430,13 @@ class AuthController extends Controller
         $objectguid = bin2hex($ldapUser[$guidColumn]);
 
         $userGroups = $ldapUser['memberof'] ?? [];
+        if (is_string($userGroups)) {
+            $userGroups = [$userGroups];
+        }
+        $userGroups = array_map(function ($item) {
+            // Convert CN=a,OU=b,DC=A,DC=B format to a
+            return explode(',', explode('=', $item)[1])[0];
+        }, $userGroups);
 
         $user = User::where('objectguid', $objectguid)->first();
 
@@ -490,8 +497,8 @@ class AuthController extends Controller
         }
 
         RoleUser::where('user_id', $user->id)->where('type', 'ldap')->delete();
-        if (isset($ldapUser['memberof'])) {
-            foreach ($ldapUser['memberof'] as $row) {
+        if (isset($userGroups) && is_array($userGroups) && count($userGroups) > 0) {
+            foreach ($userGroups as $row) {
                 RoleMapping::where('group_id', md5($row))->get()->map(function ($item) use ($user) {
                     RoleUser::firstOrCreate([
                         'user_id' => $user->id,
@@ -516,7 +523,9 @@ class AuthController extends Controller
         $keys = [];
         foreach ($extensionWithLdap as $extension) {
             $extensionJson = getExtensionJson($extension->name);
-            $extensionServers = $extension->servers()->get()->toArray();
+            $extensionServers = $extension->servers()->get()->filter(function ($server) use ($user) {
+                return Permission::can($user->id, 'server', 'id', $server->id);
+            })->toArray();
             foreach ($extensionServers as $server) {
                 if (! isset($extensionJson['ldap_support_fields'])) {
                     $keys[$server['id']] = [
@@ -534,7 +543,9 @@ class AuthController extends Controller
             ...Server::where('ip_address', trim(env('LDAP_HOST')))->get(),
         ];
         // Check if server list is unique by id
-        $serverList = collect($serverList)->unique('id')->values();
+        $serverList = collect($serverList)->filter(function ($server) use ($user) {
+            return Permission::can($user->id, 'server', 'id', $server['id']);
+        })->unique('id')->values();
 
         foreach ($serverList as $server) {
             $encKey = env('APP_KEY').$user->id.$server['id'];
