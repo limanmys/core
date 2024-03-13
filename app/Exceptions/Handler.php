@@ -109,6 +109,14 @@ class Handler extends ExceptionHandler
 
         if (config('app.debug')) {
             $this->renderable(function (Throwable $e) {
+                if ($e->getMessage() === 'Unauthenticated.') {
+                    return response()->json([
+                        'message' => 'Giriş yapmanız gereklidir.'
+                    ], Response::HTTP_UNAUTHORIZED)
+                        ->withoutCookie('token')
+                        ->withoutCookie('currentUser');
+                }
+
                 return response()->json([
                     'type' => get_class($e),
                     'message' => $e->getMessage(),
@@ -120,6 +128,14 @@ class Handler extends ExceptionHandler
         }
         
         $this->renderable(function (Throwable $e) {
+            if ($e->getMessage() === 'Unauthenticated.') {
+                return response()->json([
+                    'message' => 'Giriş yapmanız gereklidir.'
+                ], Response::HTTP_UNAUTHORIZED)
+                    ->withoutCookie('token')
+                    ->withoutCookie('currentUser');
+            }
+
             return response()->json([
                 'type' => get_class($e),
                 'message' => 'Beklenmeyen bir hata oluştu. Sistem yöneticinize başvurunuz.',
