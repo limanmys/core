@@ -33,8 +33,8 @@ RUN mv ui /liman_files/
 # CORE
 RUN wget "https://github.com/limanmys/core/archive/refs/heads/master.zip" -O "core.zip"
 RUN unzip -qq core.zip
-RUN mv core-feature-new-ui/* /liman_files/server
-RUN mv core-feature-new-ui/.env.example /liman_files/server
+RUN mv core-master/* /liman_files/server
+RUN mv core-master/.env.example /liman_files/server
 RUN rm -rf core.zip
 
 # PHP SANDBOX
