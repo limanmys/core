@@ -31,7 +31,7 @@ RUN unzip ui*.zip -d ui
 RUN mv ui /liman_files/
 
 # CORE
-RUN wget "https://github.com/limanmys/core/archive/refs/heads/feature-new-ui.zip" -O "core.zip"
+RUN wget "https://github.com/limanmys/core/archive/refs/heads/master.zip" -O "core.zip"
 RUN unzip -qq core.zip
 RUN mv core-feature-new-ui/* /liman_files/server
 RUN mv core-feature-new-ui/.env.example /liman_files/server
