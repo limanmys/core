@@ -60,6 +60,7 @@ class MenuController extends Controller
         $server->is_online = $server->isOnline();
         $server->extensions = $server->extensions()->map(function ($extension) use ($server) {
             $db = getExtensionJson($extension->name);
+            $db['name'] = strtolower($extension->name);
             if (isset($db['menus']) && $db['menus']) {
                 $extension->menus = $this->checkMenu($db['menus'], $db['name']);
             } else {
