@@ -60,9 +60,8 @@ class MenuController extends Controller
         $server->is_online = $server->isOnline();
         $server->extensions = $server->extensions()->map(function ($extension) use ($server) {
             $db = getExtensionJson($extension->name);
-            $db['name'] = strtolower($extension->name);
             if (isset($db['menus']) && $db['menus']) {
-                $extension->menus = $this->checkMenu($db['menus'], $db['name']);
+                $extension->menus = $this->checkMenu($db['menus'], $extension->name);
             } else {
                 $extension->menus = [];
             }
@@ -89,6 +88,8 @@ class MenuController extends Controller
             return $menus;
         }
 
+        $extension_name = strtolower($extension_name);
+
         foreach ($menus as $key => &$menu) {
             if (isset($menu['permission'])) {
                 if (!Permission::can(auth('api')->user()->id, 'function', 'name', $extension_name, $menu['permission'])) {
@@ -98,12 +99,12 @@ class MenuController extends Controller
             }
     
             if (isset($menu['children'])) {
-                $menu['children'] = collect($menu['children'])->filter(function ($child) use ($extension_name) {
+                $menu['children'] = array_values(collect($menu['children'])->filter(function ($child) use ($extension_name) {
                     return $this->checkMenu($child, $extension_name);
-                })->toArray();
+                })->toArray());
             }
         }
         
-        return $menus;
+        return array_values($menus);
     }
 }
