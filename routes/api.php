@@ -277,6 +277,9 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
 
                     Route::get('/groups', [Settings\LdapPermissionsController::class, 'getGroups']);
                     Route::post('/groups', [Settings\LdapPermissionsController::class, 'setGroups']);
+
+                    Route::get('/role_mappings', [Settings\LdapPermissionsController::class, 'getRoleMappings']);
+                    Route::post('/role_mappings', [Settings\LdapPermissionsController::class, 'setRoleMappings']);
                 });
             });
 

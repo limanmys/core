@@ -7,6 +7,7 @@ use App\Classes\LDAPException;
 use App\Classes\LDAPSearchOptions;
 use App\Http\Controllers\Controller;
 use App\Models\LdapRestriction;
+use App\Models\RoleMapping;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -193,6 +194,66 @@ class LdapPermissionsController extends Controller
                 LdapRestriction::create([
                     'name' => $group,
                     'type' => 'group',
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Gruplar başarıyla güncellendi.',
+        ]);
+    }
+
+    /**
+     * Get role mapping for LDAP groups
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getRoleMappings(Request $request)
+    {
+        $ldap = new Ldap(
+            env('LDAP_HOST'),
+            $request->username,
+            $request->password
+        );
+
+        $query = $request->search_query;
+        $groups = $ldap->search("(&(sAMAccountName=$query*)(objectCategory=group))", new LDAPSearchOptions(
+            1,
+            100,
+            ['samaccountname']
+        ));
+
+        return response()->json([
+            'items' => $groups,
+            'selected' => RoleMapping::where('role_id', $request->role_id)
+                ->get()->pluck('group_id'),
+        ]);
+    }
+
+    /**
+     * Set role mapping for LDAP groups
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     * @throws LDAPException
+     */
+    public function setRoleMappings(Request $request) {
+        $role_id = $request->role_id;
+        $groups = $request->groups;
+        $roleMapping = RoleMapping::where('role_id', $role_id)->get();
+
+        foreach ($roleMapping as $mapping) {
+            if (! in_array($mapping->group_id, $groups)) {
+                $mapping->delete();
+            }
+        }
+
+        foreach ($groups as $group) {
+            if (! $roleMapping->contains('group_id', $group)) {
+                RoleMapping::create([
+                    'role_id' => $role_id,
+                    'group_id' => $group,
                 ]);
             }
         }
