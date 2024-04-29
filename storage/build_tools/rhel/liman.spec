@@ -36,8 +36,9 @@ fi
 
 postgresql-setup --initdb
 systemctl enable postgresql.service
-systemctl start postgresql.service
+
 sed -i '1s/^/host    all             all             127.0.0.1\/32            md5\n/' /var/lib/pgsql/data/pg_hba.conf
+systemctl start postgresql.service
 
 systemctl enable crond
 systemctl start crond
