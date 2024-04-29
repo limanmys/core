@@ -25,6 +25,7 @@ Route::get("/", function (Request $request) {
 Route::group([
     'prefix' => 'auth'
 ], function () {
+    Route::get('/types', [AuthController::class, 'activeAuthTypes']);
     Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:login');
     Route::post('/setup_mfa', [AuthController::class, 'setupTwoFactorAuthentication']);

@@ -30,6 +30,7 @@ class AuthController extends Controller
             ['except' => 
                 [
                     'login', 
+                    'activeAuthTypes',
                     'forceChangePassword', 
                     'setupTwoFactorAuthentication', 
                     'sendPasswordResetLink', 
@@ -37,6 +38,24 @@ class AuthController extends Controller
                 ]
             ]
         );
+    }
+
+    /**
+     * Active authentication types
+     */
+    public function activeAuthTypes()
+    {
+        $types = ['liman'];
+
+        if (env('KEYCLOAK_ACTIVE') == 'true') {
+            $types[] = 'keycloak';
+        }
+
+        if ((bool) env('LDAP_STATUS')) {
+            $types[] = 'ldap';
+        }
+
+        return $types;
     }
 
     /**
