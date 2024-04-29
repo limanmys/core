@@ -34,10 +34,10 @@ else
     echo "Installing liman."
 fi
 
-/usr/pgsql-15/bin/postgresql-15-setup initdb
-systemctl enable postgresql-15
-sed -i '1s/^/host    all             all             127.0.0.1\/32            md5\n/' /var/lib/pgsql/15/data/pg_hba.conf
-systemctl start postgresql-15
+postgresql-setup --initdb
+systemctl enable postgresql.service
+systemctl start postgresql.service
+sed -i '1s/^/host    all             all             127.0.0.1\/32            md5\n/' /var/lib/pgsql/data/pg_hba.conf
 
 systemctl enable crond
 systemctl start crond
