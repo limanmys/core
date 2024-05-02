@@ -47,7 +47,7 @@ class AuthController extends Controller
     {
         $types = ['liman'];
 
-        if (env('KEYCLOAK_ACTIVE') == 'true') {
+        if ((bool) env('KEYCLOAK_ACTIVE')) {
             $types[] = 'keycloak';
         }
 
