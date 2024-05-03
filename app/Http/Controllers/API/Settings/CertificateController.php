@@ -13,7 +13,30 @@ class CertificateController extends Controller
 {
     public function index()
     {
-        return Certificate::orderBy('updated_at', 'desc')->get();
+        $certificates = Certificate::orderBy('updated_at', 'desc')->get();
+
+        $certificates->map(function ($certificate) {
+            $certificateFile = Command::runLiman('cat /usr/local/share/ca-certificates/liman-{:ipAddress}_{:port}.crt', [
+                'ipAddress' => $certificate->server_hostname,
+                'port' => $certificate->origin,
+            ]);
+
+            $certinfo = openssl_x509_parse($certificateFile);
+
+            if (! $certinfo) {
+                // Certificate is not valid
+                // Remove certificate from system
+                $certificate->removeFromSystem();
+            }
+
+            $certificate->valid_to =
+                $certinfo['validTo_time_t'] * 1000;
+
+            $certificate->valid_from =
+                $certinfo['validFrom_time_t'];
+        });
+
+        return $certificates;
     }
 
     /**
@@ -25,14 +48,12 @@ class CertificateController extends Controller
     {
         // Check If Certificate Already Added or not.
         if (
-            Certificate::where([
+            $certificate = Certificate::where([
                 'server_hostname' => strtolower((string) $request->hostname),
                 'origin' => $request->port,
-            ])->exists()
+            ])->first()
         ) {
-            return response()->json([
-                'message' => 'Bu sunucu ve port için sertifika zaten eklenmiş.',
-            ], Response::HTTP_CONFLICT);
+            $certificate->removeFromSystem();
         }
 
         [$flag, $message] = retrieveCertificate(
@@ -52,7 +73,7 @@ class CertificateController extends Controller
             'origin' => $request->port,
         ]);
 
-        $certificate->addToSystem('/tmp/' . $message['path']);
+        $certificate->addToSystem('/tmp/'.$message['path']);
 
         return response()->json([
             'message' => 'Sertifika başarıyla eklendi.',
@@ -89,7 +110,7 @@ class CertificateController extends Controller
     /**
      * Get certificate details for determined server
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse|Response
      */
     public function information(Certificate $certificate)
@@ -131,7 +152,7 @@ class CertificateController extends Controller
             'valid_to' => $certinfo['validTo_time_t'],
             'valid_from' => $certinfo['validFrom_time_t'],
             'issuer_cn' => $certinfo['issuer']['CN'] ?? '',
-            'issuer_dc' => implode(".", isset($certinfo['issuer']['DC']) ? $certinfo['issuer']['DC'] : []) ?? '',
+            'issuer_dc' => implode('.', isset($certinfo['issuer']['DC']) ? $certinfo['issuer']['DC'] : []) ?? '',
             'authority_key_identifier' => $certinfo['authorityKeyIdentifier'],
             'subject_key_identifier' => $certinfo['subjectKeyIdentifier'],
         ]);
@@ -156,15 +177,15 @@ class CertificateController extends Controller
 
         if (! $flag) {
             return response()->json([
-                'message' => 'Sertifika bilgileri alınamadı.'
+                'message' => 'Sertifika bilgileri alınamadı.',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
+
         return response()->json([
             'valid_to' => $certinfo['validTo_time_t'],
             'valid_from' => $certinfo['validFrom_time_t'],
             'issuer_cn' => $certinfo['issuer']['CN'] ?? '',
-            'issuer_dc' => implode(".", isset($certinfo['issuer']['DC']) ? $certinfo['issuer']['DC'] : []) ?? '',
+            'issuer_dc' => implode('.', isset($certinfo['issuer']['DC']) ? $certinfo['issuer']['DC'] : []) ?? '',
             'authority_key_identifier' => $certinfo['authorityKeyIdentifier'],
             'subject_key_identifier' => $certinfo['subjectKeyIdentifier'],
         ], $flag ? Response::HTTP_OK : Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -198,7 +219,7 @@ class CertificateController extends Controller
 
         $certificate->removeFromSystem();
 
-        $certificate->addToSystem('/tmp/' . $message['path']);
+        $certificate->addToSystem('/tmp/'.$message['path']);
 
         return response()->json([
             'message' => 'Sertifika başarıyla güncellendi.',
