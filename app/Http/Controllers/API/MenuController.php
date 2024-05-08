@@ -97,14 +97,16 @@ class MenuController extends Controller
                     continue;
                 }
             }
-    
+
             if (isset($menu['children'])) {
-                $menu['children'] = array_values(collect($menu['children'])->filter(function ($child) use ($extension_name) {
-                    return $this->checkMenu($child, $extension_name);
-                })->toArray());
+                $menu['children'] = $this->checkMenu($menu['children'], $extension_name);
+                if (empty($menu['children'])) {
+                    unset($menus[$key]);
+                    continue;
+                }
             }
         }
-        
+
         return array_values($menus);
     }
 }
