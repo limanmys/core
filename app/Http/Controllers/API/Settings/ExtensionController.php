@@ -140,6 +140,7 @@ class ExtensionController extends Controller
     public function delete()
     {
         $ext_name = extension()->name;
+        $extension_id = extension()->id;
         try {
             Command::runLiman(
                 "rm -rf '/liman/extensions/{:extension}'",
@@ -167,17 +168,11 @@ class ExtensionController extends Controller
         } catch (\Exception) {
         }
 
-        if (is_file(storage_path('extension_updates'))) {
-            $json = json_decode(file_get_contents(storage_path('extension_updates')), true);
-            for ($i = 0; $i < count($json); $i++) {
-                if ($json[$i]['name'] == $ext_name) {
-                    unset($json[$i]);
-                }
-            }
-            file_put_contents(storage_path('extension_updates'), json_encode($json));
-        }
-
         try {
+            Permission::where('value', $extension_id)
+                ->where('type', 'extension')
+                ->delete();
+
             Permission::where('value', $ext_name)
                 ->where('type', 'function')
                 ->where('key', 'name')

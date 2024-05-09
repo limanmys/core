@@ -132,6 +132,16 @@ class Extension extends Model
     }
 
     /**
+     * Get name attribute
+     * 
+     * @return string
+     */
+    public function getNameAttribute($value)
+    {
+        return strtolower($value);
+    }
+
+    /**
      * Set name attribute
      *
      * @return void
