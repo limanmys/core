@@ -6,6 +6,7 @@ use App\Classes\Authentication\KeycloakAuthenticator;
 use App\Classes\Authentication\LDAPAuthenticator;
 use App\Classes\Authentication\LimanAuthenticator;
 use App\Http\Controllers\Controller;
+use App\Models\SystemSettings;
 use App\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
@@ -34,7 +35,8 @@ class AuthController extends Controller
                     'forceChangePassword', 
                     'setupTwoFactorAuthentication', 
                     'sendPasswordResetLink', 
-                    'resetPassword'
+                    'resetPassword',
+                    'loginBranding'
                 ]
             ]
         );
@@ -56,6 +58,16 @@ class AuthController extends Controller
         }
 
         return $types;
+    }
+
+    /**
+     * Return login screen branding
+     */
+    public function loginBranding()
+    {
+        return response()->json([
+            'image' => SystemSettings::where('key', 'LOGIN_IMAGE')->first()?->data ?? '',
+        ]);
     }
 
     /**

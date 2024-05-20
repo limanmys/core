@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\SystemSettings;
 use App\System\Command;
 use Illuminate\Http\Request;
 
@@ -25,6 +26,7 @@ class TweaksController extends Controller
             'EXTENSION_DEVELOPER_MODE' => (bool) env('EXTENSION_DEVELOPER_MODE', 'false'),
             'NEW_LOG_LEVEL' => env('NEW_LOG_LEVEL'),
             'LDAP_IGNORE_CERT' => (bool) env('LDAP_IGNORE_CERT', 'false'),
+            'LOGIN_IMAGE' => SystemSettings::where('key', 'LOGIN_IMAGE')->first()?->data ?? '',
         ]);
     }
 
@@ -57,6 +59,18 @@ class TweaksController extends Controller
             'NEW_LOG_LEVEL' => $request->NEW_LOG_LEVEL,
             'LDAP_IGNORE_CERT' => (bool) $request->LDAP_IGNORE_CERT,
         ]);
+
+        if ($request->has('LOGIN_IMAGE') && $request->LOGIN_IMAGE != '')
+            // Control if LOGIN_IMAGE is bigger than 1mb
+            if (strlen($request->LOGIN_IMAGE) > 1048576) {
+                return response()->json([
+                    'LOGIN_IMAGE' => 'Giriş arka planı resmi 1MB\'dan büyük olamaz.',
+                ], 422);
+            }
+            SystemSettings::updateOrCreate(
+                ['key' => 'LOGIN_IMAGE'],
+                ['data' => $request->get('LOGIN_IMAGE')]
+            );
 
         AuditLog::write(
             'tweak',

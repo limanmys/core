@@ -27,13 +27,13 @@ class CertificateController extends Controller
                 // Certificate is not valid
                 // Remove certificate from system
                 $certificate->removeFromSystem();
+            } else {
+                $certificate->valid_to =
+                    $certinfo['validTo_time_t'] * 1000;
+
+                $certificate->valid_from =
+                    $certinfo['validFrom_time_t'];
             }
-
-            $certificate->valid_to =
-                $certinfo['validTo_time_t'] * 1000;
-
-            $certificate->valid_from =
-                $certinfo['validFrom_time_t'];
         });
 
         return $certificates;
