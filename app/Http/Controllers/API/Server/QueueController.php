@@ -60,7 +60,6 @@ class QueueController extends Controller
                 ],
                 'timeout' => 30,
             ]);
-            unlink($file['file_path']);
             $output = (string) $res->getBody();
 
             $isJson = isJson($output, true);
