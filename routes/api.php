@@ -27,6 +27,7 @@ Route::group([
 ], function () {
     Route::get('/types', [AuthController::class, 'activeAuthTypes']);
     Route::get('/branding', [AuthController::class, 'loginBranding']);
+    Route::get('/gate', [AuthController::class, 'authGate']);
     Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:login');
     Route::post('/setup_mfa', [AuthController::class, 'setupTwoFactorAuthentication']);

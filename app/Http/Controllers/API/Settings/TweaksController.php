@@ -27,6 +27,7 @@ class TweaksController extends Controller
             'NEW_LOG_LEVEL' => env('NEW_LOG_LEVEL'),
             'LDAP_IGNORE_CERT' => (bool) env('LDAP_IGNORE_CERT', 'false'),
             'LOGIN_IMAGE' => SystemSettings::where('key', 'LOGIN_IMAGE')->first()?->data ?? '',
+            'DEFAULT_AUTH_GATE' => env('DEFAULT_AUTH_GATE', 'liman'),
         ]);
     }
 
@@ -45,6 +46,7 @@ class TweaksController extends Controller
             'APP_URL' => 'required|url',
             'EXTENSION_TIMEOUT' => 'required|integer|min:1|max:300',
             'NEW_LOG_LEVEL' => 'required|string',
+            'DEFAULT_AUTH_GATE' => 'required|string|in:liman,keycloak,ldap',
         ], [], [
             "EXTENSION_TIMEOUT" => "Eklenti zaman aşımı"
         ]);
@@ -58,9 +60,10 @@ class TweaksController extends Controller
             'EXTENSION_DEVELOPER_MODE' => (bool) $request->EXTENSION_DEVELOPER_MODE,
             'NEW_LOG_LEVEL' => $request->NEW_LOG_LEVEL,
             'LDAP_IGNORE_CERT' => (bool) $request->LDAP_IGNORE_CERT,
+            'DEFAULT_AUTH_GATE' => $request->DEFAULT_AUTH_GATE,
         ]);
 
-        if ($request->has('LOGIN_IMAGE') && $request->LOGIN_IMAGE != '')
+        if ($request->has('LOGIN_IMAGE') && $request->LOGIN_IMAGE != '') {
             // Control if LOGIN_IMAGE is bigger than 1mb
             if (strlen($request->LOGIN_IMAGE) > 1048576) {
                 return response()->json([
@@ -71,6 +74,7 @@ class TweaksController extends Controller
                 ['key' => 'LOGIN_IMAGE'],
                 ['data' => $request->get('LOGIN_IMAGE')]
             );
+        }
 
         AuditLog::write(
             'tweak',
@@ -84,6 +88,7 @@ class TweaksController extends Controller
                 'EXTENSION_DEVELOPER_MODE' => (bool) $request->EXTENSION_DEVELOPER_MODE,
                 'NEW_LOG_LEVEL' => $request->NEW_LOG_LEVEL,
                 'LDAP_IGNORE_CERT' => (bool) $request->LDAP_IGNORE_CERT,
+                'DEFAULT_AUTH_GATE' => $request->DEFAULT_AUTH_GATE,
             ],
             "TWEAK_EDIT"
         );

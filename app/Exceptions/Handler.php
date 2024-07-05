@@ -60,6 +60,14 @@ class Handler extends ExceptionHandler
             //
         });
 
+        $this->renderable(function (AuthenticationException $e) {
+            return response()->json([
+                'message' => 'Giriş yapmanız gereklidir.'
+            ], Response::HTTP_UNAUTHORIZED)
+                ->withoutCookie('token')
+                ->withoutCookie('currentUser');
+        });
+
         // Use validator response hack
         $this->renderable(function (JsonResponseException $e) {
             return response()->json($e->getData(), $e->getCode() ? $e->getCode() : Response::HTTP_OK);
@@ -81,31 +89,12 @@ class Handler extends ExceptionHandler
             }
         });
 
-        $this->renderable(function (QueryException $e) {
-            return response()->json([
-                'message' => 'Veritabanı hatası mevcut. Sistem veritabanı bağlantısını kontrol ediniz.',
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        });
-
         $this->renderable(function (ThrottleRequestsException $e) {
             return response()->json([
                 'message' => 'Çok fazla istek gönderdiniz. Lütfen biraz bekleyin.',
             ], Response::HTTP_TOO_MANY_REQUESTS);
         });
 
-        $this->renderable(function (HttpException $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        });
-
-        $this->renderable(function (AuthenticationException $e) {
-            return response()->json([
-                'message' => 'Giriş yapmanız gereklidir.'
-            ], Response::HTTP_UNAUTHORIZED)
-                ->withoutCookie('token')
-                ->withoutCookie('currentUser');
-        });
 
         if (config('app.debug')) {
             $this->renderable(function (Throwable $e) {
@@ -126,6 +115,18 @@ class Handler extends ExceptionHandler
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
             });
         }
+
+        $this->renderable(function (QueryException $e) {
+            return response()->json([
+                'message' => 'Veritabanı hatası mevcut. Sistem veritabanı bağlantısını kontrol ediniz.',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        });
+        
+        $this->renderable(function (HttpException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        });
         
         $this->renderable(function (Throwable $e) {
             if ($e->getMessage() === 'Unauthenticated.') {

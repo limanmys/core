@@ -36,7 +36,8 @@ class AuthController extends Controller
                     'setupTwoFactorAuthentication', 
                     'sendPasswordResetLink', 
                     'resetPassword',
-                    'loginBranding'
+                    'loginBranding',
+                    'authGate',
                 ]
             ]
         );
@@ -68,6 +69,14 @@ class AuthController extends Controller
         return response()->json([
             'image' => SystemSettings::where('key', 'LOGIN_IMAGE')->first()?->data ?? '',
         ]);
+    }
+
+    /**
+     * Get default auth gate
+     */
+    public function authGate()
+    {
+        return response()->json(env('DEFAULT_AUTH_GATE', 'liman'));
     }
 
     /**
