@@ -38,6 +38,7 @@ class AuthController extends Controller
                     'resetPassword',
                     'loginBranding',
                     'authGate',
+                    'logout',
                 ]
             ]
         );
@@ -190,11 +191,15 @@ class AuthController extends Controller
     {
         $deleteToken = Cookie::forget('token', '/', $request->getHost());
         $deleteCurrentUser = Cookie::forget('currentUser', '/', $request->getHost());
-        auth('api')->logout();
+        try {
+            auth('api')->logout();
+        } catch (\Throwable $e) {}
 
         return response()->json(['message' => 'User successfully signed out'])
             ->withCookie($deleteToken)
-            ->withCookie($deleteCurrentUser);
+            ->withCookie($deleteCurrentUser)
+            ->withoutCookie('token')
+            ->withoutCookie('currentUser');
     }
 
     /**

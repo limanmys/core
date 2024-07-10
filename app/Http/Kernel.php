@@ -20,6 +20,7 @@ class Kernel extends HttpKernel
         Middleware\TrustProxies::class,
         Middleware\EncryptCookies::class,
         Middleware\CookieJWTAuthenticator::class,
+        Middleware\ClearTokenOnUnauthorized::class,
     ];
 
     protected $middlewareGroups = [
