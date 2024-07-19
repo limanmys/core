@@ -3,7 +3,6 @@
 namespace App\Connectors;
 
 use App\Models\Server;
-use App\Models\Token;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -60,9 +59,9 @@ class GenericConnector
         }
 
         if ($this->user == null) {
-            $params['token'] = Token::create(user()->id);
+            $params['token'] = auth('api')->setTTL(1000)->tokenById(user()->id);
         } else {
-            $params['token'] = Token::create($this->user->id);
+            $params['token'] = auth('api')->setTTL(1000)->tokenById($this->user->id);
         }
 
         try {

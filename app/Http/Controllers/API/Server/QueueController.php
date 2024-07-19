@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API\Server;
 
 use App\Http\Controllers\Controller;
 use App\Models\Queue;
-use App\Models\Token;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -42,12 +41,10 @@ class QueueController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $token = Token::create(auth('api')->user()->id);
         $client = new Client([
             'verify' => false,
-            'headers' => [
-                'Authorization' => $token
-            ]
+            // Add all cookies from original request
+            'cookies' => convertToCookieJar($request)
         ]);
         try {
             $res = $client->request('POST', env('RENDER_ENGINE_ADDRESS', 'https://127.0.0.1:2806') . "/queue", [

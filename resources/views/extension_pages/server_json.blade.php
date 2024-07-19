@@ -51,7 +51,6 @@
                 <div class="tab-pane fade show active" role="tabpanel" id="mainExtensionWrapper">
                     @if (isset($dbJson["preload"]) && $dbJson["preload"])
                     <script>
-                        customRequestData["token"] = "{{ $auth_token }}";
                         customRequestData["locale"] = "{{ app()->getLocale() }}";
                         @if(!isset($dbJson["vite"]) || !$dbJson["vite"])
                         window.onload();
@@ -76,7 +75,6 @@
 
     @if(!isset($dbJson["preload"]) || !$dbJson["preload"])
     <script>
-        customRequestData["token"] = "{{ $auth_token }}";
         customRequestData["locale"] = "{{app()->getLocale()}}";
         let formData = new FormData();
         formData.append("lmntargetFunction", "{{request('target_function') ? request('target_function') : 'index'}}")

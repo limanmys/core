@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use App\Models\Token;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
@@ -218,7 +217,6 @@ class ExtensionController extends Controller
                         'lmntargetFunction' => $extension['verification'],
                         'extension_id' => extension()->id,
                         'server_id' => server()->id,
-                        'token' => Token::create(user()->id),
                     ],
                     'timeout' => 5,
                 ]);

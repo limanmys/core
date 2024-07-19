@@ -9,7 +9,6 @@ use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\ServerKey;
-use App\Models\Token;
 use App\Models\UserExtensionUsageStats;
 use App\Models\UserSettings;
 use GuzzleHttp\Client;
@@ -168,19 +167,17 @@ class ExtensionController extends Controller
             ?: 'index';
         $view = 'extension_pages.server_json';
 
-        $token = Token::create(user()->id);
-
         if (isset($dbJson['preload']) && $dbJson['preload']) {
-            $client = new Client(['verify' => false]);
+            $client = new Client(['verify' => false, 'cookies' => true]);
             try {
                 $res = $client->request('POST', env('RENDER_ENGINE_ADDRESS', 'https://127.0.0.1:2806'), [
                     'form_params' => [
                         'lmntargetFunction' => $page,
                         'extension_id' => extension()->id,
                         'server_id' => server()->id,
-                        'token' => $token,
                         'locale' => app()->getLocale(),
                     ],
+                    'cookies' => convertToCookieJar($request, "127.0.0.1"),
                     'timeout' => 30,
                 ]);
                 $output = (string) $res->getBody();
@@ -217,7 +214,6 @@ class ExtensionController extends Controller
                 'server_name' => server()->name,
                 'html' => trim(
                     view($view, [
-                        'auth_token' => $token,
                         'tokens' => user()
                             ->accessTokens()
                             ->get()

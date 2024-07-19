@@ -8,7 +8,6 @@ use App\Mail\TemplatedExtensionMail;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
-use App\Models\Token;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -49,14 +48,31 @@ class InternalController extends Controller
             ]);
             abort(403, 'Not Allowed');
         }
-        ($token = Token::where('token', request('token'))->first()) or
-        abort(403, 'Token gecersiz');
-        auth()->loginUsingId($token->user_id);
+
+        $user_id = "";
+        // Check JWT is valid from request('token')
+        if (! request('token')) {
+            system_log(5, 'EXTENSION_NO_TOKEN', [
+                'extension_id' => extension()->id,
+            ]);
+            abort(403, 'Token gecersiz');
+        } else {
+            if (! auth('api')->setToken(request('token'))->check()) {
+                system_log(5, 'EXTENSION_INVALID_TOKEN', [
+                    'extension_id' => extension()->id,
+                ]);
+                abort(403, 'Token gecersiz');
+            } else {
+                // Login User
+                $user_id = auth('api')->setToken(request('token'))->getPayload()['sub'];
+                auth('api')->loginUsingId($user_id);
+            }
+        }
 
         ($server = Server::find(request('server_id'))) or
         abort(404, 'Sunucu Bulunamadi');
         if (
-            ! Permission::can($token->user_id, 'server', 'id', $server->id)
+            ! Permission::can($user_id, 'server', 'id', $server->id)
         ) {
             system_log(7, 'EXTENSION_NO_PERMISSION_SERVER', [
                 'extension_id' => extension()->id,
@@ -68,7 +84,7 @@ class InternalController extends Controller
         abort(404, 'Eklenti Bulunamadi');
         if (
             ! Permission::can(
-                $token->user_id,
+                $user_id,
                 'extension',
                 'id',
                 $extension->id

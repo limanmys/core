@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Token;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use TusPhp\Middleware\TusMiddleware;
@@ -40,11 +39,6 @@ class TusAuthenticated implements TusMiddleware
             }
 
             throw new UnauthorizedHttpException('', 'Extension-Token header is missing.');
-        }
-
-        $obj = Token::where('token', $token)->first();
-        if (! $obj) {
-            throw new UnauthorizedHttpException('', 'Extension-Token is invalid.');
         }
 
         Log::info('Extension-Token is valid. User ip: ' . request()->ip);

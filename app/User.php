@@ -119,14 +119,6 @@ class User extends Authenticatable implements JWTSubject
     /**
      * @return HasMany
      */
-    public function tokens()
-    {
-        return $this->hasMany('\App\Models\Token');
-    }
-
-    /**
-     * @return HasMany
-     */
     public function settings()
     {
         return $this->hasMany('\App\Models\UserSettings');

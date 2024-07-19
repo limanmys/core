@@ -6,13 +6,12 @@ use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\SystemSettings;
-use App\Models\Token;
 use App\System\Command;
 use App\System\Helper;
 use App\User;
-use Beebmx\Blade\Blade;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -575,26 +574,6 @@ if (! function_exists('user')) {
     function user()
     {
         return auth()->user();
-    }
-}
-
-if (! function_exists('magicView')) {
-    /**
-     * Returns view or json within the scope of request
-     *
-     * @return \Illuminate\Http\JsonResponse|Response
-     */
-    function magicView($view, $data = [])
-    {
-        if (
-            request()->wantsJson() &&
-            ! request()->has('partialRequest') &&
-            ! request()->has('limanJSRequest')
-        ) {
-            return response()->json($data);
-        } else {
-            return response()->view($view, $data);
-        }
     }
 }
 
@@ -1189,10 +1168,10 @@ if (! function_exists('callExtensionFunction')) {
                     'lmntargetFunction' => $target_function,
                     'extension_id' => $extension->id,
                     'server_id' => $server->id,
-                    'token' => Token::create(user()->id),
                     ...$params,
                 ],
                 'timeout' => 10,
+                'cookies' => convertToCookieJar(request()),
             ]);
             $output = $res->getBody()->__toString();
 
@@ -1207,5 +1186,15 @@ if (! function_exists('callExtensionFunction')) {
         }
 
         return null;
+    }
+}
+
+if (! function_exists('convertToCookieJar')) {
+    function convertToCookieJar($request, $host = null) {
+        // Add all cookies from original request
+        if ($host == null) {
+            $host = $request->host();
+        }
+        return CookieJar::fromArray($request->cookies->all(), $host);
     }
 }
