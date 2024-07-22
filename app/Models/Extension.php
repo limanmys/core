@@ -68,21 +68,6 @@ class Extension extends Model
     }
 
     /**
-     * Boot model
-     *
-     * @return void
-     */
-    protected static function boot()
-    {
-        parent::boot();
-        static::addGlobalScope('extensions', function (
-            \Illuminate\Database\Eloquent\Builder $builder
-        ) {
-            $builder->orderBy('order');
-        });
-    }
-
-    /**
      * Get extension servers
      *
      * @return mixed

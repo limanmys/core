@@ -255,11 +255,16 @@ class RoleController extends Controller
      */
     public function setExtensions(Request $request)
     {
-        Permission::where([
+        $extensions = Permission::where([
             'morph_id' => $request->role_id,
             'type' => 'extension',
             'key' => 'id',
-        ])->delete();
+        ]);
+
+        $role = Role::find($request->role_id);
+        $oldExtensions = $role->permissions->where('type', 'extension')->pluck('value')->toArray();
+
+        $extensions->delete();
 
         foreach ($request->extensions as $extension) {
             Permission::grant(
@@ -270,6 +275,17 @@ class RoleController extends Controller
                 null,
                 'roles'
             );
+        }
+
+        // Detect removed extensions and remove their functions
+        $newExtensions = $request->extensions;
+        $removedExtensions = array_diff($oldExtensions, $newExtensions);
+        foreach ($removedExtensions as $extension) {
+            Permission::where([
+                'morph_id' => $request->role_id,
+                'type' => 'function',
+                'value' => Extension::find($extension)->name,
+            ])->delete();
         }
 
         AuditLog::write(
