@@ -2,38 +2,37 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::any("/", function () {
-    return redirect("/api");
+Route::any('/', function () {
+    return redirect('/api');
 })->name('home');
 
 // HA Routes
 require_once app_path('Http/Controllers/HASync/_routes.php');
 
-Route::group(['middleware' => ['auth', 'permissions']], function () {
-    // Internal Sandbox Routes
-    require_once app_path('Http/Controllers/Extension/Sandbox/_routes.php');
-});
+// Internal Sandbox Routes
+require_once app_path('Http/Controllers/Extension/Sandbox/_routes.php');
 
 Route::any('/upload/{any?}', function () {
     $server = app('tus-server');
     $extension_id = request()->headers->get('extension-id');
     $extension = \App\Models\Extension::find($extension_id);
     if ($extension) {
-        $path = '/liman/extensions/' . strtolower((string) $extension->name);
+        $path = '/liman/extensions/'.strtolower((string) $extension->name);
     } else {
         $path = storage_path();
     }
 
-    if (!file_exists($path . '/uploads')) {
-        mkdir($path . '/uploads');
+    if (! file_exists($path.'/uploads')) {
+        mkdir($path.'/uploads');
         if ($extension) {
             rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
         } else {
             rootSystem()->fixExtensionPermissions('liman', 'liman');
         }
     }
-    $server->setUploadDir($path . '/uploads');
+    $server->setUploadDir($path.'/uploads');
     $response = $server->serve();
+
     return $response->send();
 })
     ->where('any', '.*');
@@ -64,4 +63,3 @@ Route::get(
     '/eklenti/{extension_id}/public/{any}',
     'API\ExtensionController@publicFolder'
 )->where('any', '.+')->name('extension_public_folder');
-

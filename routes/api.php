@@ -14,7 +14,7 @@ use App\Http\Controllers\API\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get("/", function (Request $request) {
+Route::get('/', function (Request $request) {
     return response()->json([
         'message' => 'Welcome to the Liman MYS API!',
         'version' => getVersion(),
@@ -23,7 +23,7 @@ Route::get("/", function (Request $request) {
 });
 
 Route::group([
-    'prefix' => 'auth'
+    'prefix' => 'auth',
 ], function () {
     Route::get('/types', [AuthController::class, 'activeAuthTypes']);
     Route::get('/branding', [AuthController::class, 'loginBranding']);
@@ -42,7 +42,7 @@ Route::group([
 Route::post('/notifications/send', [ExternalNotificationController::class, 'accept']);
 
 // Protected Routes
-Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
+Route::group(['middleware' => ['auth:api', 'permissions']], function () {
     // Dashboard Routes
     Route::group(['prefix' => 'dashboard'], function () {
         Route::get('/information', [DashboardController::class, 'information']);
@@ -171,17 +171,16 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
                 Route::delete('/sudoers', [Server\UserController::class, 'deleteSudoers']);
             });
 
-            
         });
     });
 
     // Extension Controller
     Route::group(['prefix' => 'extensions'], function () {
-        Route::get("/", [ExtensionController::class, 'index']);
-        Route::post("/assign", [ExtensionController::class, 'assign'])
-            ->middleware("server");
-        Route::post("/unassign", [ExtensionController::class, 'unassign'])
-            ->middleware("server");
+        Route::get('/', [ExtensionController::class, 'index']);
+        Route::post('/assign', [ExtensionController::class, 'assign'])
+            ->middleware('server');
+        Route::post('/unassign', [ExtensionController::class, 'unassign'])
+            ->middleware('server');
     });
 
     // Vault
@@ -209,7 +208,7 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
             Route::delete('/{extension_id}', [Settings\ExtensionController::class, 'delete']);
             Route::post('/{extension_id}/license', [Settings\ExtensionController::class, 'license']);
             Route::get('/{extension_id}/download', [Settings\ExtensionController::class, 'download']);
-            Route::get("/{extension_id}/functions", [Settings\RoleController::class, 'getExtensionFunctions']);
+            Route::get('/{extension_id}/functions', [Settings\RoleController::class, 'getExtensionFunctions']);
         });
 
         // Users
@@ -349,8 +348,8 @@ Route::group(['middleware' =>  ['auth:api', 'permissions']], function () {
     });
 });
 
-Route::fallback(function(){
+Route::fallback(function () {
     return response()->json([
-        'message' => 'Sayfa bulunamadı.'
+        'message' => 'Sayfa bulunamadı.',
     ], 404);
 });

@@ -32,7 +32,6 @@ class SubscriptionController extends Controller
     /**
      * Servers list that extension uses
      *
-     * @param Extension $extension
      * @return mixed
      */
     public function servers(Extension $extension)
@@ -43,8 +42,6 @@ class SubscriptionController extends Controller
     /**
      * Show extension license status
      *
-     * @param Extension $extension
-     * @param Server $server
      * @return GolangLicense|JsonResponse
      */
     public function show(Extension $extension, Server $server)
@@ -61,12 +58,12 @@ class SubscriptionController extends Controller
                     [],
                     'index'
                 );
-                
+
                 try {
                     $document = new \DOMDocument();
                     $contentType = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
-                    @$document->loadHTML($contentType . $output);
-            
+                    @$document->loadHTML($contentType.$output);
+
                     // License data
                     $license = $document->getElementsByTagName('td');
                     $owner = $license->item(0)->nodeValue;
@@ -96,7 +93,7 @@ class SubscriptionController extends Controller
                 [
                     'endpoint' => 'license',
                     'type' => 'get',
-                    'service' => 'admin'
+                    'service' => 'admin',
                 ]
             );
             $parsed = new GolangLicense($output);
@@ -111,6 +108,7 @@ class SubscriptionController extends Controller
      * Liman license status
      *
      * @return JsonResponse
+     *
      * @throws \Exception
      */
     public function limanLicense()
@@ -131,8 +129,8 @@ class SubscriptionController extends Controller
     /**
      * Set Liman License
      *
-     * @param Request $request
      * @return JsonResponse
+     *
      * @throws \Exception
      */
     public function setLimanLicense(Request $request)

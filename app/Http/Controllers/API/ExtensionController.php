@@ -88,7 +88,7 @@ class ExtensionController extends Controller
                     'server_id' => $request->server_id,
                     'server_name' => $server->name,
                 ],
-                "EXTENSION_ASSIGNED_TO_SERVER"
+                'EXTENSION_ASSIGNED_TO_SERVER'
             );
         }
 
@@ -100,7 +100,6 @@ class ExtensionController extends Controller
     /**
      * Unassign extensions from server
      *
-     * @param Request $request
      * @return JsonResponse
      */
     public function unassign(Request $request)
@@ -128,7 +127,7 @@ class ExtensionController extends Controller
                     'server_id' => $request->server_id,
                     'server_name' => $server->name,
                 ],
-                "EXTENSION_UNASSIGNED_FROM_SERVER"
+                'EXTENSION_UNASSIGNED_FROM_SERVER'
             );
         }
 
@@ -140,8 +139,8 @@ class ExtensionController extends Controller
     /**
      * Render PHP from Sandbox and return it
      *
-     * @param Request $request
      * @return JsonResponse|Response
+     *
      * @throws GuzzleException
      */
     public function render(Request $request)
@@ -159,7 +158,7 @@ class ExtensionController extends Controller
 
         if (extension()->require_key == 'true' && server()->key() == null) {
             return response()->json([
-                'message' => 'Bu eklentiyi kullanabilmek için bir anahtara ihtiyacınız var, lütfen kasa üzerinden bir anahtar ekleyin.'
+                'message' => 'Bu eklentiyi kullanabilmek için bir anahtara ihtiyacınız var, lütfen kasa üzerinden bir anahtar ekleyin.',
             ], Response::HTTP_FORBIDDEN);
         }
 
@@ -177,7 +176,7 @@ class ExtensionController extends Controller
                         'server_id' => server()->id,
                         'locale' => app()->getLocale(),
                     ],
-                    'cookies' => convertToCookieJar($request, "127.0.0.1"),
+                    'cookies' => convertToCookieJar($request, '127.0.0.1'),
                     'timeout' => 30,
                 ]);
                 $output = (string) $res->getBody();
@@ -191,7 +190,7 @@ class ExtensionController extends Controller
                 }
             } catch (\Exception $e) {
                 return response()->json([
-                    'message' => __('Liman render service is not working or crashed. '). !env('APP_DEBUG', false) ?: $e->getMessage()
+                    'message' => __('Liman render service is not working or crashed. ').! env('APP_DEBUG', false) ?: $e->getMessage(),
                 ], Response::HTTP_GATEWAY_TIMEOUT);
             }
         }
@@ -244,14 +243,15 @@ class ExtensionController extends Controller
         if (auth()->user()->auth_type == 'ldap') {
             $extensionJson = getExtensionJson($extension['name']);
 
-            if (isset($extensionJson['ldap_support_fields']))
+            if (isset($extensionJson['ldap_support_fields'])) {
                 $extra = array_merge($extra, array_values($extensionJson['ldap_support_fields']));
+            }
         }
         foreach ($extension['database'] as $setting) {
             if (
                 in_array($setting['variable'], $extra)
             ) {
-                continue;            
+                continue;
             }
 
             if (isset($setting['required']) && $setting['required'] === false) {
@@ -294,9 +294,9 @@ class ExtensionController extends Controller
             $function = request('target_function');
             $extensionJson = json_decode(
                 file_get_contents(
-                    '/liman/extensions/' .
-                    strtolower((string) $extension->name) .
-                    DIRECTORY_SEPARATOR .
+                    '/liman/extensions/'.
+                    strtolower((string) $extension->name).
+                    DIRECTORY_SEPARATOR.
                     'db.json'
                 ),
                 true
@@ -338,9 +338,9 @@ class ExtensionController extends Controller
     public function publicFolder()
     {
         $basePath =
-            '/liman/extensions/' . strtolower((string) extension()->name) . '/public/';
+            '/liman/extensions/'.strtolower((string) extension()->name).'/public/';
 
-        $targetPath = $basePath . explode('public/', (string) url()->current(), 2)[1];
+        $targetPath = $basePath.explode('public/', (string) url()->current(), 2)[1];
 
         if (realpath($targetPath) != $targetPath) {
             abort(404);

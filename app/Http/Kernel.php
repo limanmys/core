@@ -34,7 +34,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             'throttle:600,1',
-            'bindings', 
+            'bindings',
             Middleware\CookieJWTAuthenticator::class,
             Middleware\ClearTokenOnUnauthorized::class,
             Middleware\APILocalization::class,

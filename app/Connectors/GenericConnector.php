@@ -14,9 +14,6 @@ class GenericConnector
 {
     /**
      * Construct a new connector instance
-     *
-     * @param $server
-     * @param $user
      */
     public function __construct(public $server = null, public $user = null)
     {
@@ -25,8 +22,6 @@ class GenericConnector
     /**
      * Execute command on remote server
      *
-     * @param $command
-     * @return string
      * @throws GuzzleException
      */
     public function execute($command): string
@@ -41,10 +36,8 @@ class GenericConnector
     /**
      * Run extension on remote server
      *
-     * @param $url
-     * @param $params
-     * @param $retry
      * @return never|string
+     *
      * @throws GuzzleException
      */
     public function request($url, $params, $retry = 3)
@@ -67,21 +60,23 @@ class GenericConnector
         try {
             $response = $client->request(
                 'POST',
-                env('RENDER_ENGINE_ADDRESS', 'https://127.0.0.1:2806') . "/$url",
+                env('RENDER_ENGINE_ADDRESS', 'https://127.0.0.1:2806')."/$url",
                 [
                     'form_params' => $params,
+                    'cookies' => convertToCookieJar(request(), '127.0.0.1'),
                 ]
             );
 
             if ($response->getStatusCode() === 201) {
                 $json = json_decode($response->getBody()->getContents());
-                if (isset($json->status) && $json->message === "cannot connect to server") {
+                if (isset($json->status) && $json->message === 'cannot connect to server') {
                     abort(
                         504,
                         __('Cannot connect to server. Please check your connection or credentials.'),
                     );
                 }
             }
+
             return $response->getBody()->getContents();
         } catch (\Exception $exception) {
             $code = 504;
@@ -103,7 +98,7 @@ class GenericConnector
             if (env('APP_DEBUG', false)) {
                 return abort(
                     504,
-                    __('Liman render service is not working or crashed. ') . $message,
+                    __('Liman render service is not working or crashed. ').$message,
                 );
             } else {
                 return abort(
@@ -115,32 +110,21 @@ class GenericConnector
     }
 
     /**
-     * @param Server $server
-     * @param $username
-     * @param $password
-     * @param $user_id
-     * @param $key
-     * @param $port
      * @return void
      */
     public function create(
         \App\Models\Server $server,
-                           $username,
-                           $password,
-                           $user_id,
-                           $key,
-                           $port = null
-    )
-    {
+        $username,
+        $password,
+        $user_id,
+        $key,
+        $port = null
+    ) {
     }
 
     /**
      * Send file to remote server
      *
-     * @param $localPath
-     * @param $remotePath
-     * @param $permissions
-     * @return string
      * @throws GuzzleException
      */
     public function sendFile($localPath, $remotePath, $permissions = 0644): string
@@ -156,9 +140,6 @@ class GenericConnector
     /**
      * Receive file from remote server
      *
-     * @param $localPath
-     * @param $remotePath
-     * @return string
      * @throws GuzzleException
      */
     public function receiveFile($localPath, $remotePath): string
@@ -174,12 +155,6 @@ class GenericConnector
     /**
      * Verify if extension data is eligible to run
      *
-     * @param $ip_address
-     * @param $username
-     * @param $password
-     * @param $port
-     * @param $type
-     * @return string
      * @throws GuzzleException
      */
     public function verify($ip_address, $username, $password, $port, $type): string

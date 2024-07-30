@@ -1171,7 +1171,7 @@ if (! function_exists('callExtensionFunction')) {
                     ...$params,
                 ],
                 'timeout' => 10,
-                'cookies' => convertToCookieJar(request()),
+                'cookies' => convertToCookieJar(request(), '127.0.0.1'),
             ]);
             $output = $res->getBody()->__toString();
 
