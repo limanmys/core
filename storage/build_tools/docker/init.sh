@@ -101,6 +101,10 @@ update-ca-certificates
 # Set container mode to true
 grep -E "^CONTAINER_MODE" /liman/server/.env >/dev/null && sed -i '/^CONTAINER_MODE/d' /liman/server/.env && echo "CONTAINER_MODE=true" >> /liman/server/.env || echo "CONTAINER_MODE=true" >> /liman/server/.env
 
+# Update executable perms
+chmod +x /usr/bin/limanctl
+chmod +x /liman/server/storage/limanctl
+
 # Start Liman services
 sleep 3;
 /usr/bin/supervisord -c /etc/supervisor/supervisor.conf 

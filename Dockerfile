@@ -31,11 +31,7 @@ RUN unzip ui*.zip -d ui
 RUN mv ui /liman_files/
 
 # CORE
-RUN wget "https://github.com/limanmys/core/archive/refs/heads/master.zip" -O "core.zip"
-RUN unzip -qq core.zip
-RUN mv core-master/* /liman_files/server
-RUN mv core-master/.env.example /liman_files/server
-RUN rm -rf core.zip
+COPY . /liman_files/server
 
 # PHP SANDBOX
 RUN wget "https://github.com/limanmys/php-sandbox/archive/refs/heads/master.zip" -O "sandbox.zip"
