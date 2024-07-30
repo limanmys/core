@@ -19,15 +19,13 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         Middleware\TrustProxies::class,
         Middleware\EncryptCookies::class,
-        Middleware\CookieJWTAuthenticator::class,
-        Middleware\ClearTokenOnUnauthorized::class,
+        Middleware\APILogin::class,
     ];
 
     protected $middlewareGroups = [
         'web' => [
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
-            \App\Http\Middleware\APILogin::class,
             \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
@@ -37,7 +35,9 @@ class Kernel extends HttpKernel
         'api' => [
             'throttle:600,1',
             'bindings', 
-            \App\Http\Middleware\APILocalization::class
+            Middleware\CookieJWTAuthenticator::class,
+            Middleware\ClearTokenOnUnauthorized::class,
+            Middleware\APILocalization::class,
         ],
     ];
 
