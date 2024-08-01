@@ -28,7 +28,11 @@ class ExtensionController extends Controller
     {
         $extensions = Extension::orderBy('updated_at', 'DESC')->get()->map(function ($item) {
             $item->updated = Carbon::parse($item->getRawOriginal('updated_at'))->getPreciseTimestamp(3);
-            $item->licensed = $item->license()->count() > 0;
+            if ($item->license_type) {
+                $item->licensed = $item->license()->count() > 0 ? "licensed" : "not_licensed";
+            } else {
+                $item->licensed = "non_commercial";
+            }
 
             return $item;
         });
