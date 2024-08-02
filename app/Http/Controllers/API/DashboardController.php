@@ -23,19 +23,22 @@ class DashboardController extends Controller
      */
     public function information()
     {
+        $userId = user()->id;
+    
+        $serverCount = Server::get()
+            ->filter(fn($server) => Permission::can($userId, 'server', 'id', $server->id))
+            ->count();
+    
+        $userCount = User::count();
+    
+        $extensionCount = Extension::get()
+            ->filter(fn($extension) => Permission::can($userId, 'extension', 'id', $extension->id))
+            ->count();
+    
         return [
-            'server_count' => Server::get()->filter(function ($server) {
-                return Permission::can(user()->id, 'server', 'id', $server->id);
-            })->count(),
-            'user_count' => User::count(),
-            'extension_count' => Extension::get()->filter(function ($extension) {
-                return Permission::can(
-                    user()->id,
-                    'extension',
-                    'id',
-                    $extension->id
-                );
-            })->count(),
+            'server_count' => $serverCount,
+            'user_count' => $userCount,
+            'extension_count' => $extensionCount,
             'version' => getVersion(),
             'version_code' => getVersionCode()
         ];
