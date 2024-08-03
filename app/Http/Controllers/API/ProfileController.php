@@ -33,7 +33,7 @@ class ProfileController extends Controller
 
         if ($request->password) {
             if (
-                ! auth()->attempt([
+                !auth()->attempt([
                     'email' => $user->email,
                     'password' => $request->old_password,
                 ])
@@ -42,7 +42,7 @@ class ProfileController extends Controller
                     'password' => 'Eski şifreniz yanlış.',
                 ]);
             }
-    
+
             $user->update([
                 'password' => Hash::make($request->password),
             ]);
@@ -59,7 +59,7 @@ class ProfileController extends Controller
             'otp_enabled' => (bool) $request->otp_enabled,
         ]);
 
-        if (! (bool) $request->otp_enabled) {
+        if (!(bool) $request->otp_enabled) {
             $user->update([
                 'google2fa_secret' => null
             ]);
