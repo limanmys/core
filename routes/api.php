@@ -342,6 +342,7 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
 
             // Log Rotation
             Route::group(['prefix' => 'log_rotation'], function () {
+                Route::get('/', [Settings\LogRotationController::class, 'getConfiguration']);
                 Route::post('/', [Settings\LogRotationController::class, 'saveConfiguration']);
             });
         });
