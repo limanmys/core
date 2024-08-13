@@ -6,9 +6,7 @@ use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\SystemSettings;
-use App\System\Command;
 use App\System\Helper;
-use App\User;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -55,7 +53,6 @@ if (! function_exists('validate')) {
         }
     }
 }
-
 
 if (! function_exists('updateSystemSettings')) {
     /**
@@ -178,24 +175,13 @@ if (! function_exists('respond')) {
      */
     function respond($message, $status = 200)
     {
-        if (request()->wantsJson()) {
-            return response()->json(
-                [
-                    'message' => is_array($message) ? $message : __($message),
-                    'status' => $status,
-                ],
-                $status
-            );
-        } else {
-            return response()->view(
-                'general.error',
-                [
-                    'message' => __($message),
-                    'status' => $status,
-                ],
-                $status
-            );
-        }
+        return response()->json(
+            [
+                'message' => is_array($message) ? $message : __($message),
+                'status' => $status,
+            ],
+            $status
+        );
     }
 }
 
@@ -224,33 +210,6 @@ if (! function_exists('ip_in_range')) {
     }
 }
 
-if (! function_exists('strposX')) {
-    /**
-     * Finds string position
-     *
-     * @param $haystack
-     * @param $needle
-     * @param $number
-     * @return bool|int
-     */
-    function strposX($haystack, $needle, $number)
-    {
-        if ($number == '1') {
-            return strpos((string) $haystack, (string) $needle);
-        } elseif ($number > '1') {
-            return strpos(
-                (string) $haystack,
-                (string) $needle,
-                strposX($haystack, $needle, $number - 1) + strlen((string) $needle)
-            );
-        } else {
-            return error_log(
-                'Error: Value for parameter $number is out of range'
-            );
-        }
-    }
-}
-
 if (! function_exists('rootSystem')) {
     /**
      * Get new system helper instance
@@ -260,18 +219,6 @@ if (! function_exists('rootSystem')) {
     function rootSystem()
     {
         return new Helper();
-    }
-}
-
-if (! function_exists('users')) {
-    /**
-     * Get all users
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    function users()
-    {
-        return User::all();
     }
 }
 
@@ -303,18 +250,6 @@ if (! function_exists('getLimanPermissions')) {
         });
 
         return $permissions;
-    }
-}
-
-if (! function_exists('getLimanHostname')) {
-    /**
-     * Get liman server hostname
-     *
-     * @return string
-     */
-    function getLimanHostname(): string
-    {
-        return trim((string) `hostname`);
     }
 }
 
@@ -463,20 +398,6 @@ if (! function_exists('addCertificate')) {
     }
 }
 
-if (! function_exists('getLimanId')) {
-    /**
-     * Get liman id
-     *
-     * @return string
-     */
-    function getLimanId()
-    {
-        return md5(
-                'l1m@ns3cur1ty' . trim(shell_exec('ls /dev/disk/by-uuid -1'))
-            ) . PHP_EOL;
-    }
-}
-
 if (! function_exists('system_log')) {
     /**
      * Create a system log
@@ -518,33 +439,6 @@ if (! function_exists('server')) {
         $server = Server::find($serverObj->id);
 
         return $server;
-    }
-}
-
-if (! function_exists('servers')) {
-    /**
-     * Get user's all servers
-     *
-     * @return mixed
-     */
-    function servers()
-    {
-        return auth()
-            ->user()
-            ->servers();
-    }
-}
-
-if (! function_exists('extensions')) {
-    /**
-     * Get all extensions
-     *
-     * @param array $filter
-     * @return array
-     */
-    function extensions($filter = [])
-    {
-        return Extension::getAll($filter);
     }
 }
 
@@ -609,27 +503,6 @@ if (! function_exists('getExtensionJson')) {
     }
 }
 
-if (! function_exists('redirect_now')) {
-    /**
-     * Redirect to URL
-     *
-     * @param $url
-     * @param $code
-     * @return void
-     */
-    function redirect_now($url, $code = 302)
-    {
-        try {
-            \App::abort($code, '', ['Location' => $url]);
-        } catch (\Exception $exception) {
-            $previousErrorHandler = set_exception_handler(function () {
-            });
-            restore_error_handler();
-            call_user_func($previousErrorHandler, $exception);
-            exit();
-        }
-    }
-}
 if (! function_exists('extensionDb')) {
     /**
      * Get a variable from extension database
@@ -716,60 +589,6 @@ if (! function_exists('getObject')) {
     }
 }
 
-if (! function_exists('objectToArray')) {
-    /**
-     * Convert object to array
-     *
-     * @param $array
-     * @param $key
-     * @param $value
-     * @return array
-     */
-    function objectToArray($array, $key, $value)
-    {
-        $combined_array = [];
-        foreach ($array as $item) {
-            if (is_array($item)) {
-                $combined_array[$item[$key]] = $item[$value];
-            } else {
-                $combined_array[$item->__get($key)] = $item->__get($value);
-            }
-        }
-
-        return $combined_array;
-    }
-}
-
-if (! function_exists('cleanArray')) {
-    /**
-     * Clear array
-     *
-     * @param $array
-     * @return array
-     */
-    function cleanArray($array)
-    {
-        $newArray = [];
-        foreach ($array as $row) {
-            $newArray[] = $row;
-        }
-
-        return $newArray;
-    }
-}
-
-if (! function_exists('cleanDash')) {
-    /**
-     * Clear dash symbol from a string
-     *
-     * @param $text
-     * @return string
-     */
-    function cleanDash($text): string
-    {
-        return str_replace('-', '', (string) $text);
-    }
-}
 if (! function_exists('isJson')) {
     /**
      * Check if data is JSON
@@ -882,115 +701,6 @@ if (! function_exists('setEnv')) {
         return true;
     }
 }
-if (! function_exists('checkHealth')) {
-    /**
-     * Check health of liman server
-     *
-     * @return array
-     */
-    function checkHealth()
-    {
-        $messages = [];
-
-        if (! env('CONTAINER_MODE', true)) {
-            array_push($messages, [
-                'type' => 'success',
-                'message' => __('Her şey Yolunda, sıkıntı yok!'),
-            ]);
-
-            return $messages;
-        }
-
-        $allowed = [
-            'certs' => '0700',
-            'database' => '0700',
-            'extensions' => '0755',
-            'keys' => '0755',
-            'logs' => '0700',
-            'sandbox' => '0755',
-            'server' => '0700',
-            'packages' => '0700',
-            'hashes' => '0700',
-        ];
-
-        $services = [
-            "liman-render",
-            "liman-socket",
-            "liman-system"
-        ];
-
-        // Check Permissions and Owners
-        foreach ($allowed as $name => $permission) {
-            // Permission Check
-            $file = '/liman/' . $name;
-            if (! file_exists($file)) {
-                array_push($messages, [
-                    'type' => 'danger',
-                    'message' => "'/liman/$name' isimli sistem dosyası bulunamadı",
-                ]);
-
-                continue;
-            }
-
-            if (getPermissions('/liman/' . $name) != $permission) {
-                array_push($messages, [
-                    'type' => 'danger',
-                    'message' => "'/liman/$name' izni hatalı (" .
-                        getPermissions('/liman/' . $name) .
-                        ').',
-                ]);
-            }
-
-            // Owners Check
-            $owner = posix_getpwuid(fileowner($file))['name'];
-            $group = posix_getgrgid(filegroup($file))['name'];
-            if ($owner != 'liman' || $group != 'liman') {
-                array_push($messages, [
-                    'type' => 'danger',
-                    'message' => "'/liman/$name' dosyasının sahibi hatalı ($owner : $group).",
-                ]);
-            }
-        }
-
-        foreach ($services as $service) {
-            $status = Command::runLiman("systemctl is-active --quiet @{:service} && echo 1 || echo 0", [
-                "service" => $service
-            ]);
-
-            if ($status == "0") {
-                array_push($messages, [
-                    'type' => 'danger',
-                    'message' => "$service kritik servis kapalı durumdadır. Lütfen kontrol ediniz.",
-                ]);
-            }
-        }
-
-        if (empty($messages)) {
-            array_push($messages, [
-                'type' => 'success',
-                'message' => __('Her şey Yolunda, sıkıntı yok!'),
-            ]);
-        }
-
-        return $messages;
-    }
-}
-
-if (! function_exists('lDecrypt')) {
-    /**
-     * Decrypt data within the scope of server
-     *
-     * @param $data
-     * @return float|int|string|null
-     * @throws Exception
-     */
-    function lDecrypt($data)
-    {
-        $key = env('APP_KEY') . user()->id . server()->id;
-
-        return AES256::decrypt($data, $key);
-    }
-}
 
 if (! function_exists('setBaseDn')) {
     /**
@@ -1046,107 +756,6 @@ if (! function_exists('checkPort')) {
 
             return true;
         }
-    }
-}
-if (! function_exists('endsWith')) {
-    /**
-     * Check if string ends with other string
-     *
-     * @param $string
-     * @param $endString
-     * @return bool
-     */
-    function endsWith($string, $endString)
-    {
-        $len = strlen((string) $endString);
-        if ($len == 0) {
-            return true;
-        }
-
-        return substr((string) $string, -$len) === $endString;
-    }
-}
-
-if (! function_exists('fetchExtensionTemplates')) {
-    /**
-     * Fetch extension templates
-     *
-     * @return mixed
-     */
-    function fetchExtensionTemplates()
-    {
-        $path = storage_path('extension_templates/templates.json');
-
-        return json_decode(file_get_contents($path));
-    }
-}
-
-if (! function_exists('scanTranslations')) {
-    /**
-     * Scan translations
-     *
-     * @param $directory
-     * @return array
-     */
-    function scanTranslations($directory)
-    {
-        $pattern =
-            '[^\w]' .
-            '(?<!->)' .
-            '(' .
-            implode('|', ['__']) .
-            ')' .
-            "\(" .
-            "[\'\"]" .
-            '(' .
-            '.+' .
-            ')' .
-            "[\'\"]" .
-            "[\),]";
-        $allMatches = [];
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($directory)
-        );
-        foreach ($iterator as $file) {
-            if ($file->isDir()) {
-                continue;
-            }
-            if (endsWith($file->getPathname(), '.php')) {
-                $content = file_get_contents($file->getPathname());
-                if (preg_match_all("/$pattern/siU", $content, $matches)) {
-                    foreach ($matches[2] as $row) {
-                        $allMatches[$row] = $row;
-                    }
-                }
-            }
-        }
-
-        return $allMatches;
-    }
-}
-
-if (! function_exists('getLanguages')) {
-    function getLanguages() {
-        $languages = [];
-        $json_file = resource_path('lang') . '/languages.json';
-        if (file_exists($json_file)) {
-            $languages = json_decode(file_get_contents($json_file), true);
-            $languages = array_keys($languages);
-        }
-        
-        return $languages;
-    }
-}
-
-if (! function_exists('getLanguageNames')) {
-    function getLanguageNames() {
-        $languages = [];
-        $json_file = resource_path('lang') . '/languages.json';
-        if (file_exists($json_file)) {
-            $languages = json_decode(file_get_contents($json_file), true);
-        }
-        
-        return $languages;
     }
 }
 

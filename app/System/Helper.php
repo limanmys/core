@@ -41,7 +41,7 @@ class Helper
         try {
             $this->client->get('/userAdd', [
                 'query' => [
-                    'extension_id' => cleanDash($extension_id),
+                    'extension_id' => str_replace('-', '', (string) $extension_id),
                     'liman_token' => $this->authKey,
                 ],
             ]);
@@ -64,7 +64,7 @@ class Helper
         try {
             $this->client->get('/userRemove', [
                 'query' => [
-                    'extension_id' => cleanDash($extension_id),
+                    'extension_id' => str_replace('-', '', (string) $extension_id),
                     'liman_token' => $this->authKey,
                 ],
             ]);

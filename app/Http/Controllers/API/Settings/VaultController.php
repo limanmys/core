@@ -39,7 +39,7 @@ class VaultController extends Controller
         }
 
         // Retrieve User servers that has permission.
-        $servers = servers();
+        $servers = auth('api')->user()->servers();
 
         foreach ($settings as $setting) {
             $server = $servers->find($setting->server_id);

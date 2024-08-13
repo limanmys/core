@@ -59,6 +59,12 @@ class LogRotationController extends Controller
             'port' => 'required|numeric|between:1,65535'
         ]);
 
+        if ((bool) env('CONTAINER_MODE', false)) {
+            return response()->json([
+                'ip_address' => ['Bu özellik konteyner modunda kullanılamaz.'],
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
         // Check if the port is open
         // Disable fsockopen error reporting
         error_reporting(0);

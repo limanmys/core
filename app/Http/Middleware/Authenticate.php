@@ -6,7 +6,6 @@ use Illuminate\Auth\Middleware\Authenticate as Middleware;
 
 /**
  * Auth Middleware
- * This function is empty because of Laravel
  *
  * @extends Middleware
  */
