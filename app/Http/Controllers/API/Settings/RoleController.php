@@ -9,7 +9,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RoleUser;
 use App\Models\Server;
-use App\User;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

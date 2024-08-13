@@ -8,7 +8,7 @@ use App\Classes\LDAPSearchOptions;
 use App\Http\Controllers\Controller;
 use App\Models\LdapRestriction;
 use App\Models\RoleMapping;
-use App\User;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

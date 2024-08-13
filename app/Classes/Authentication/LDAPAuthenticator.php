@@ -12,7 +12,7 @@ use App\Models\RoleMappingQueue;
 use App\Models\RoleUser;
 use App\Models\Server;
 use App\Models\UserSettings;
-use App\User;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;

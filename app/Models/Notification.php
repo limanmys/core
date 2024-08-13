@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Casts\Jsonb;
-use App\User;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;

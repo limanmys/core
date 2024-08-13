@@ -7,7 +7,7 @@ use App\Models\Server;
 use App\Observers\NotificationObserver;
 use App\Observers\ServerObserver;
 use App\Observers\UserObserver;
-use App\User;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Contracts\Http\Kernel;
@@ -40,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
         Server::observe(ServerObserver::class);
 
         Relation::morphMap([
-            'users' => 'App\User',
+            'users' => 'App\Models\User',
             'roles' => 'App\Models\Role',
         ]);
 

@@ -3,7 +3,7 @@
 namespace App\Classes\Authentication;
 
 use App\Models\Oauth2Token;
-use App\User;
+use App\Models\User;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use App\Models\Extension;
 use App\Models\Permission;
@@ -18,7 +18,7 @@ use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject as JWTSubject;
 
 /**
- * App\User
+ * App\Models\User
  *
  * @property-read mixed $id
  *

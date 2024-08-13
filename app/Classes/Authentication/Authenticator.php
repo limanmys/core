@@ -4,7 +4,7 @@ namespace App\Classes\Authentication;
 
 use App\Models\AuthLog;
 use App\Models\Permission;
-use App\User;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
