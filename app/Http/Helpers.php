@@ -680,6 +680,25 @@ if (! function_exists('extensionTranslate')) {
     }
 }
 
+if (! function_exists('endsWith')) {
+    /**
+     * Check if string ends with other string
+     *
+     * @param $string
+     * @param $endString
+     * @return bool
+     */
+    function endsWith($string, $endString)
+    {
+        $len = strlen((string) $endString);
+        if ($len == 0) {
+            return true;
+        }
+
+        return substr((string) $string, -$len) === $endString;
+    }
+}
+
 if (! function_exists('setEnv')) {
     /**
      * Set environment file
