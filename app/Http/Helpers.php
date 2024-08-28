@@ -311,6 +311,15 @@ if (! function_exists('retrieveCertificate')) {
             ],
         ]);
         $flag = false;
+
+        // Check if hostname is an IP address or not
+        if (filter_var($hostname, FILTER_VALIDATE_IP)) {
+            $hostname = gethostbyaddr($hostname);
+            if (! $hostname) {
+                return [false, __('Sertifika alınamıyor!')];
+            }
+        }
+
         try {
             $read = stream_socket_client(
                 'ssl://' . $hostname . ':' . $port,
