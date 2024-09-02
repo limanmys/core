@@ -32,6 +32,13 @@ class Server extends Model
         'enabled'
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'control_port' => 'integer',
+        ];
+    }
+
     /**
      * Get all servers
      *

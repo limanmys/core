@@ -20,7 +20,7 @@
         "doctrine/dbal": "^3.4",
         "guzzlehttp/guzzle": "^7.5",
         "jackiedo/dotenv-editor": "^2.0",
-        "laravel/framework": "^9.19",
+        "laravel/framework": "^10.0",
         "laravel/helpers": "^1.5",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.0",
@@ -40,7 +40,7 @@
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.1",
         "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0",
+        "spatie/laravel-ignition": "^2.0",
         "spatie/laravel-web-tinker": "^1.8"
     },
     "autoload": {
