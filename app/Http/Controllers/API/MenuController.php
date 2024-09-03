@@ -70,6 +70,7 @@ class MenuController extends Controller
         });
         $server->is_favorite = (bool) user()->myFavorites()->where('server_id', $server->id)->exists();
         $server->can_run_command = $server->canRunCommand();
+        $server = $server->toArray();
 
         return response()->json($server);
     }
