@@ -21,12 +21,21 @@ class CertificateController extends Controller
                 'port' => $certificate->origin,
             ]);
 
+            // Check if RHEL
+            if ($certificateFile == '') {
+                $certificateFile = Command::runLiman('cat /etc/pki/ca-trust/source/anchors/liman-{:ipAddress}_{:port}.crt', [
+                    'ipAddress' => $certificate->server_hostname,
+                    'port' => $certificate->origin,
+                ]);
+            }
+
             $certinfo = openssl_x509_parse($certificateFile);
 
             if (! $certinfo) {
                 // Certificate is not valid
                 // Remove certificate from system
                 $certificate->removeFromSystem();
+                $certificate->delete();
             } else {
                 $certificate->valid_to =
                     $certinfo['validTo_time_t'] * 1000;

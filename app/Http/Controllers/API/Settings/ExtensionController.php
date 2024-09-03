@@ -72,17 +72,17 @@ class ExtensionController extends Controller
                 '.signed'
             )
         ) {
-            $verify = Command::runLiman(
-                'gpg --verify --status-fd 1 @{:extension} | grep GOODSIG || echo 0',
+            $verify = Command::runSystem(
+                'runuser liman -c "$(which gpg) --verify --status-fd 1 @{:extension}" | grep GOODSIG || echo 0',
                 ['extension' => request()->file('extension')->path()]
             );
-            if (! (bool) $verify) {
+	        if (! (bool) $verify) {
                 return response()->json([
                     'extension' => 'Eklenti dosyası doğrulanamadı',
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
-            $decrypt = Command::runLiman(
-                "gpg --status-fd 1 -d -o '/tmp/{:originalName}' @{:extension} | grep FAILURE > /dev/null && echo 0 || echo 1",
+            $decrypt = Command::runSystem(
+                'runuser liman -c "gpg --status-fd 1 -d -o \'/tmp/{:originalName}\' @{:extension} | grep FAILURE > /dev/null && echo 0 || echo 1"',
                 [
                     'originalName' => 'ext-'.basename((string) request()->file('extension')->path()),
                     'extension' => request()->file('extension')->path(),
