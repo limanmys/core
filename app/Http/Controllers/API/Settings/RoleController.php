@@ -601,6 +601,59 @@ class RoleController extends Controller
     }
 
     /**
+     * Role based system layout view settings
+     */
+    public function views(Request $request)
+    {
+        $permissions = Permission::where([
+            'morph_id' => $request->role_id,
+            'type' => 'view',
+        ])->get();
+
+        return response()->json($permissions);
+    }
+
+    /**
+     * Set role views
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function setViews(Request $request)
+    {
+        Permission::where([
+            'morph_id' => $request->role_id,
+            'type' => 'view',
+        ])->delete();
+
+        foreach ($request->views as $view) {
+            Permission::grant(
+                $request->role_id,
+                'view',
+                'name',
+                $view,
+                null,
+                'roles'
+            );
+        }
+
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => count($request->views ?? []),
+                'type' => 'views',
+                'array' => $request->views
+            ],
+            "ROLE_EDIT"
+        );
+
+        return response()->json([
+            'message' => 'Görünüm ayarları güncellendi.'
+        ]);
+    }
+
+    /**
      * Retrieve all roles
      *
      * @return JsonResponse|Response
