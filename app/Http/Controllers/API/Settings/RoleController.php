@@ -49,6 +49,7 @@ class RoleController extends Controller
             'liman' => $role->permissions->where('type', 'liman')->count(),
             'functions' => $role->permissions->where('type', 'function')->count(),
             'variables' => $role->permissions->where('type', 'variable')->count(),
+            'views' => $role->permissions->where('type', 'view')->count(),
         ];
 
         return $role;
@@ -605,12 +606,34 @@ class RoleController extends Controller
      */
     public function views(Request $request)
     {
+        // View permission roles guide
+        // Options:
+        // - Sidebar: Shows server list / shows extension list that user has access
+        // - Sidebar [string]: servers, extensions
+        // - Sidebar [default_value]: servers
+        // - Dashboard [string[]]: Server count, extension count, user count, version, most used extensions, most used servers
+        // - Dashboard [string[]]: servers, extensions, users, version, most_used_extensions, most_used_servers 
+        // - Dashboard [default_value]: servers, extensions, users, version, most_used_extensions, most_used_servers
+        // If sidebar has extensions, dashboard must have extensions
+        // If sidebar has servers, dashboard must have servers and extensions both
+
+        $defaultViews = config('liman.default_views');
+
         $permissions = Permission::where([
             'morph_id' => $request->role_id,
             'type' => 'view',
         ])->get();
 
-        return response()->json($permissions);
+        $viewSettings = [
+            ...$defaultViews,
+            ...$permissions->map(function ($item) {
+                return [
+                    $item->key => json_decode($item->value),
+                ];
+            })->toArray(),
+        ];
+
+        return response()->json($viewSettings);
     }
 
     /**
@@ -626,12 +649,12 @@ class RoleController extends Controller
             'type' => 'view',
         ])->delete();
 
-        foreach ($request->views as $view) {
+        foreach ($request->views as $setting => $value) {
             Permission::grant(
                 $request->role_id,
                 'view',
-                'name',
-                $view,
+                $setting,
+                json_encode($value),
                 null,
                 'roles'
             );

@@ -2,7 +2,17 @@
 
 return [
     'server_connection_timeout' => 5000, //ms
-    'wizard_max_steps' => 4,
+    'default_views' => [
+        'sidebar' => 'servers',
+        'dashboard' => [
+            'servers',
+            'extensions',
+            'users',
+            'version',
+            'most_used_extensions',
+            'most_used_servers',
+        ],
+    ],
     'search' => [
         'admin' => [
             [

@@ -76,7 +76,7 @@ class Permission extends Model
         $key,
         $value,
         $extra = null,
-        $morph_type = 'users'
+        $morph_type = 'roles'
     )
     {
         try {

@@ -20,13 +20,15 @@ class Authenticator
      */
     public static function createNewToken($token, ?Request $request = null)
     {
-        User::find(auth('api')->user()->id)->update([
+        $id = auth('api')->user()->id;
+
+        User::find($id)->update([
             'last_login_at' => Carbon::now()->toDateTimeString(),
             'last_login_ip' => $request->ip(),
         ]);
 
         AuthLog::create([
-            'user_id' => auth('api')->user()->id,
+            'user_id' => $id,
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
@@ -34,7 +36,7 @@ class Authenticator
         $return = [
             'expired_at' => (auth('api')->factory()->getTTL() * 60 + time()) * 1000,
             'user' => [
-                ...User::find(auth('api')->user()->id, [
+                ...User::find($id, [
                     'id',
                     'name',
                     'email',
@@ -45,11 +47,43 @@ class Authenticator
                 'last_login_at' => Carbon::now()->toDateTimeString(),
                 'last_login_ip' => $request->ip(),
                 'permissions' => [
-                    'server_details' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details'),
-                    'server_services' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_services'),
-                    'add_server' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server'),
-                    'update_server' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'update_server'),
-                    'view_logs' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'view_logs'),
+                    'server_details' => Permission::can($id, 'liman', 'id', 'server_details'),
+                    'server_services' => Permission::can($id, 'liman', 'id', 'server_services'),
+                    'add_server' => Permission::can($id, 'liman', 'id', 'add_server'),
+                    'update_server' => Permission::can($id, 'liman', 'id', 'update_server'),
+                    'view_logs' => Permission::can($id, 'liman', 'id', 'view_logs'),
+                    'view' => (function () {
+                        $defaultPermissions = config('liman.default_views');
+
+                        if (auth('api')->user()->isAdmin()) {
+                            return $defaultPermissions;
+                        }
+
+                        // TODO: Check priorities of permission values
+                        // If something is different than default, it should be returned
+                        $permissions = Permission::whereIn(
+                            'morph_id', 
+                            auth('api')->user()->roles->pluck('id')->toArray()
+                        )
+                            ->where('morph_type', 'roles')
+                            ->where('type', 'view')
+                            ->get();
+
+                        $customPermissions = $permissions->map(function ($item) {
+                            return [
+                                $item->key => json_decode($item->value),
+                            ];
+                        })->toArray();
+                        
+                        $filteredPermissions = array_filter($customPermissions, function ($permission) use ($defaultPermissions) {
+                            return !in_array($permission, $defaultPermissions);
+                        });
+                        
+                        return [
+                            ...$defaultPermissions,
+                            ...$filteredPermissions,
+                        ];
+                    })(),
                 ],
             ],
         ];

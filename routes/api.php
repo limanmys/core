@@ -251,6 +251,9 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
                 Route::get('/variables', [Settings\RoleController::class, 'variables']);
                 Route::post('/variables', [Settings\RoleController::class, 'setVariables']);
                 Route::delete('/variables', [Settings\RoleController::class, 'deleteVariables']);
+
+                Route::get('/views', [Settings\RoleController::class, 'views']);
+                Route::post('/views', [Settings\RoleController::class, 'setViews']);
             });
         });
 
