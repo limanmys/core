@@ -6,7 +6,6 @@ return [
         'sidebar' => 'servers',
         'dashboard' => [
             'servers',
-            'extensions',
             'users',
             'version',
             'most_used_extensions',

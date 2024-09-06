@@ -56,11 +56,11 @@ class Authenticator
                         $defaultPermissions = config('liman.default_views');
 
                         if (auth('api')->user()->isAdmin()) {
+                            $defaultPermissions["dashboard"][] = "auth_logs";
+                            $defaultPermissions["dashboard"][] = "extensions";
                             return $defaultPermissions;
                         }
 
-                        // TODO: Check priorities of permission values
-                        // If something is different than default, it should be returned
                         $permissions = Permission::whereIn(
                             'morph_id', 
                             auth('api')->user()->roles->pluck('id')->toArray()
@@ -69,20 +69,33 @@ class Authenticator
                             ->where('type', 'view')
                             ->get();
 
-                        $customPermissions = $permissions->map(function ($item) {
-                            return [
-                                $item->key => json_decode($item->value),
-                            ];
-                        })->toArray();
-                        
-                        $filteredPermissions = array_filter($customPermissions, function ($permission) use ($defaultPermissions) {
-                            return !in_array($permission, $defaultPermissions);
-                        });
-                        
-                        return [
+                        $viewPermissions = [
                             ...$defaultPermissions,
-                            ...$filteredPermissions,
                         ];
+
+                        $dashboardPermissions = [];
+                        $permissions->map(function ($permission) use (&$dashboardPermissions, &$viewPermissions) {
+                            if ($permission->key === "sidebar") {
+                                // if sidebar is set to extensions, you cannot override it.
+                                if (isset($viewPermissions["sidebar"]) && $viewPermissions["sidebar"] === "extensions") {
+                                    return;
+                                }
+                                $viewPermissions["sidebar"] = json_decode($permission->value);
+                            }
+
+                            if ($permission->key === "dashboard") {
+                                // merge all dashboard permissions that comes from roles
+                                $dashboardPermissions = array_unique([
+                                    ...$dashboardPermissions,
+                                    ...json_decode($permission->value),
+                                ]);
+                            }
+                        });
+
+                        // if there is no dashboard permission, set it to default
+                        $viewPermissions["dashboard"] = count($dashboardPermissions) > 0 ? $dashboardPermissions : $defaultPermissions["dashboard"];
+                        
+                        return $viewPermissions;
                     })(),
                 ],
             ],

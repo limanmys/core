@@ -617,21 +617,18 @@ class RoleController extends Controller
         // If sidebar has extensions, dashboard must have extensions
         // If sidebar has servers, dashboard must have servers and extensions both
 
-        $defaultViews = config('liman.default_views');
-
         $permissions = Permission::where([
             'morph_id' => $request->role_id,
             'type' => 'view',
         ])->get();
 
         $viewSettings = [
-            ...$defaultViews,
-            ...$permissions->map(function ($item) {
-                return [
-                    $item->key => json_decode($item->value),
-                ];
-            })->toArray(),
+            ...config('liman.default_views'),
         ];
+
+        $permissions->map(function ($item) use (&$viewSettings) {
+            $viewSettings[$item->key] = json_decode($item->value);
+        });
 
         return response()->json($viewSettings);
     }
