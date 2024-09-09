@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
 use Illuminate\Http\JsonResponse;
@@ -44,6 +45,43 @@ class MenuController extends Controller
     }
 
     /**
+     * Returns extensions menu view
+     * 
+     * @return JsonResponse
+     */
+    public function extensions()
+    {
+        $extensions = Extension::getAll()->filter(function ($extension) {
+            return Permission::can(user()->id, 'extension', 'id', $extension->id);
+        })->map(function ($extension) {
+            $db = getExtensionJson($extension->name);
+            if (isset($db['menus']) && $db['menus']) {
+                $extension->menus = $this->checkMenu($db['menus'], $extension->name);
+            } else {
+                $extension->menus = [];
+            }
+
+            // Find a server that associated with this extension that user has permission to access
+            $serverInformation = $extension->servers()->get();
+            $serverInformation = $serverInformation->filter(function ($server) {
+                return Permission::can(user()->id, 'server', 'id', $server->id);
+            })->first();
+            if ($serverInformation) {
+                $extension->server_id = $serverInformation->id;
+                $extension->server_name = $serverInformation->name;
+            } else {
+                return null;
+            }
+
+            return $extension;
+        })->filter(function ($extension) {
+            return $extension !== null;
+        })->values();
+
+        return $extensions;
+    }
+
+    /**
      * Returns server details
      *
      * @param Server $server
@@ -67,7 +105,7 @@ class MenuController extends Controller
             }
 
             return $extension;
-        });
+        })->values();
         $server->is_favorite = (bool) user()->myFavorites()->where('server_id', $server->id)->exists();
         $server->can_run_command = $server->canRunCommand();
         $server = $server->toArray();

@@ -74,6 +74,7 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
     Route::group(['prefix' => 'menu'], function () {
         Route::get('/servers', [MenuController::class, 'servers']);
         Route::get('/servers/{server}', [MenuController::class, 'serverDetails']);
+        Route::get('/extensions', [MenuController::class, 'extensions']);
     });
 
     // Server Controller
