@@ -20,6 +20,11 @@ class Oauth2Token extends Model
         'token_type',
         'expires_in',
         'refresh_expires_in',
+        'permissions',
+    ];
+
+    protected $casts = [
+        'permissions' => 'array',
     ];
 
     /**

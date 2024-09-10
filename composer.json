@@ -12,6 +12,7 @@
         "ext-snmp": "*",
         "ext-xml": "*",
         "ext-zip": "*",
+        "acsystems/keycloak-php-sdk": "^4.4",
         "ankitpokhrel/tus-php": "^2.3",
         "bacon/bacon-qr-code": "^2.0",
         "beebmx/blade": "^1.5",
@@ -31,6 +32,7 @@
         "phpseclib/phpseclib": "~3.0",
         "pragmarx/google2fa-laravel": "^2.0",
         "pusher/pusher-php-server": "^7.0",
+        "stevenmaguire/oauth2-keycloak": "^5.1",
         "tymon/jwt-auth": "^2.0"
     },
     "require-dev": {
