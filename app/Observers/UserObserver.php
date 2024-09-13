@@ -4,7 +4,7 @@ namespace App\Observers;
 
 use App\Mail\Information;
 use App\Models\Notification;
-use App\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 
 class UserObserver
@@ -12,7 +12,7 @@ class UserObserver
     /**
      * Listen to the User created event.
      *
-     * @param  \App\User  $user
+     * @param  \App\Models\User  $user
      * @return void
      */
     public function created(User $user)
@@ -40,7 +40,7 @@ class UserObserver
     /**
      * Listen to the User updating event.
      *
-     * @param  \App\User  $user
+     * @param  \App\Models\User  $user
      * @return void
      */
     public function updating(User $user)

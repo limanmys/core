@@ -27,7 +27,7 @@ class ServerController extends Controller
     {
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server')) {
             return response()->json([
-                'message' => 'Bu işlemi yapmak için izniniz yok.'
+                'message' => 'Bu işlemi yapmak için izniniz yok.',
             ], 403);
         }
 
@@ -71,27 +71,27 @@ class ServerController extends Controller
 
     /**
      * Update server name and IP address
-     * 
-     * @param Request $request
+     *
      * @return JsonResponse
      */
-    public function update(Request $request) {
+    public function update(Request $request)
+    {
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'update_server')) {
             throw new JsonResponseException([
-                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!',
             ], '', Response::HTTP_FORBIDDEN);
         }
 
         $server = Server::find($request->server_id);
         if (! $server) {
             throw new JsonResponseException([
-                'message' => 'Sunucu bulunamadı.'
+                'message' => 'Sunucu bulunamadı.',
             ], Response::HTTP_NOT_FOUND);
         }
 
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
             throw new JsonResponseException([
-                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!',
             ], '', Response::HTTP_FORBIDDEN);
         }
 
@@ -107,7 +107,7 @@ class ServerController extends Controller
                 'new_server_ip' => $request->ip_address,
                 'new_shared_status' => $request->shared_key ? 'true' : 'false',
             ],
-            "SERVER_UPDATE"
+            'SERVER_UPDATE'
         );
 
         $server->name = $request->name;
@@ -116,21 +116,21 @@ class ServerController extends Controller
         $server->save();
 
         return response()->json([
-            'message' => 'İşlem başarılı.'
+            'message' => 'İşlem başarılı.',
         ]);
     }
 
     /**
      * Delete server from system
-     * 
-     * @param Request $request
+     *
      * @return JsonResponse
      */
-    public function delete(Request $request) {
+    public function delete(Request $request)
+    {
         $server = Server::find($request->server_id);
         if (! $server) {
             throw new JsonResponseException([
-                'message' => 'Sunucu bulunamadı.'
+                'message' => 'Sunucu bulunamadı.',
             ], Response::HTTP_NOT_FOUND);
         }
 
@@ -141,13 +141,13 @@ class ServerController extends Controller
                 ->isAdmin()
         ) {
             throw new JsonResponseException([
-                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!',
             ], '', Response::HTTP_FORBIDDEN);
         }
 
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
             throw new JsonResponseException([
-                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!',
             ], '', Response::HTTP_FORBIDDEN);
         }
 
@@ -156,15 +156,15 @@ class ServerController extends Controller
             'delete',
             [
                 'server_id' => $server->id,
-                'server_name' => $server->name
+                'server_name' => $server->name,
             ],
-            "SERVER_DELETE"
+            'SERVER_DELETE'
         );
 
         $server->delete();
 
         return response()->json([
-            'message' => 'İşlem başarılı.'
+            'message' => 'İşlem başarılı.',
         ]);
     }
 
@@ -207,11 +207,11 @@ class ServerController extends Controller
                 'server_id' => $server->id,
                 'server_name' => $server->name,
             ],
-            "SERVER_CREATE"
+            'SERVER_CREATE'
         );
 
         return response()->json([
-            'message' => 'Sunucu başarıyla eklendi.'
+            'message' => 'Sunucu başarıyla eklendi.',
         ]);
     }
 
@@ -224,7 +224,7 @@ class ServerController extends Controller
     {
         if (request('port') == -1) {
             return response()->json([
-                'message' => 'Sunucuya başarıyla erişim sağlandı.'
+                'message' => 'Sunucuya başarıyla erişim sağlandı.',
             ]);
         }
         $status = @fsockopen(
@@ -236,7 +236,7 @@ class ServerController extends Controller
         );
         if (is_resource($status)) {
             return response()->json([
-                'message' => 'Sunucuya başarıyla erişim sağlandı.'
+                'message' => 'Sunucuya başarıyla erişim sağlandı.',
             ]);
         } else {
             return response()->json(['ip_address' => 'Sunucuya erişim sağlanamadı.'], 500);
@@ -255,7 +255,7 @@ class ServerController extends Controller
         }
         if (! Server::where('name', request('name'))->exists()) {
             return response()->json([
-                'message' => 'İsim onaylandı.'
+                'message' => 'İsim onaylandı.',
             ]);
         } else {
             return response()->json(['name' => 'Bu isimde zaten bir sunucu var.'], 422);
@@ -282,7 +282,7 @@ class ServerController extends Controller
 
         if ($output == 'ok') {
             return response()->json([
-                'message' => 'Anahtarınız doğrulandı.'
+                'message' => 'Anahtarınız doğrulandı.',
             ]);
         } else {
             return response()->json([

@@ -4,14 +4,14 @@ namespace App\Http\Controllers\API\Server;
 
 use App\Http\Controllers\Controller;
 use App\Models\Queue;
-use App\Models\Token;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class QueueController extends Controller
 {
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         $queues = Queue::where('type', 'install')
             ->whereJsonContains('data->server_id', $request->server_id)
             ->orderBy('updated_at', 'desc')
@@ -20,45 +20,43 @@ class QueueController extends Controller
         return $queues;
     }
 
-    public function create(Request $request) {
+    public function create(Request $request)
+    {
         $tus = app('tus-server');
         $file = $tus->getCache()->get($request->file);
 
         if ($file['size'] > 1024 * 1024 * 1024 * 2) {
             // Delete file from filesystem
-            unlink($file['file_path']);            
+            unlink($file['file_path']);
 
             return response()->json([
-                'file' => "Dosya boyutu 2GB'dan büyük olamaz."
+                'file' => "Dosya boyutu 2GB'dan büyük olamaz.",
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        if (!in_array(pathinfo($file['file_path'], PATHINFO_EXTENSION), ['deb', 'rpm'])) {
+        if (! in_array(pathinfo($file['file_path'], PATHINFO_EXTENSION), ['deb', 'rpm'])) {
             // Delete file from filesystem
-            unlink($file['file_path']);    
+            unlink($file['file_path']);
 
             return response()->json([
-                'file' => "Sadece .deb ve .rpm uzantılı dosyalar yüklenebilir."
+                'file' => 'Sadece .deb ve .rpm uzantılı dosyalar yüklenebilir.',
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $token = Token::create(auth('api')->user()->id);
         $client = new Client([
             'verify' => false,
-            'headers' => [
-                'Authorization' => $token
-            ]
         ]);
         try {
-            $res = $client->request('POST', env('RENDER_ENGINE_ADDRESS', 'https://127.0.0.1:2806') . "/queue", [
+            $res = $client->request('POST', env('RENDER_ENGINE_ADDRESS', 'https://127.0.0.1:2806').'/queue', [
                 'json' => [
                     'type' => 'install',
                     'data' => [
                         'server_id' => $request->server_id,
-                        'path' => $file['file_path']
-                    ]
+                        'path' => $file['file_path'],
+                    ],
                 ],
                 'timeout' => 30,
+                'cookies' => convertToCookieJar(request(), '127.0.0.1'),
             ]);
             $output = (string) $res->getBody();
 
@@ -72,7 +70,7 @@ class QueueController extends Controller
             }
         } catch (\Exception $e) {
             return response()->json([
-                'message' => __('Liman render service is not working or crashed. '). !env('APP_DEBUG', false) ?: $e->getMessage()
+                'message' => __('Liman render service is not working or crashed. ').! env('APP_DEBUG', false) ?: $e->getMessage(),
             ], Response::HTTP_GATEWAY_TIMEOUT);
         }
     }

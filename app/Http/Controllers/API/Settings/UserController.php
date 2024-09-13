@@ -8,7 +8,7 @@ use App\Models\AuthLog;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RoleUser;
-use App\User;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;

@@ -7,7 +7,7 @@ use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\UserExtensionUsageStats;
-use App\User;
+use App\Models\User;
 
 /**
  * Dashboard Controller

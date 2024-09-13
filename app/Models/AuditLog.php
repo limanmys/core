@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Casts\Jsonb;
 use App\Support\Database\CacheQueryBuilder;
-use App\User;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class AuditLog extends Model

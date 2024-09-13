@@ -6,12 +6,11 @@ use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
-use App\Models\Token;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use mervick\aesEverywhere\AES256;
@@ -30,7 +29,7 @@ class ExtensionController extends Controller
     {
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
             throw new JsonResponseException([
-                'message' => 'Bu işlemi yapmak için yetkiniz yok!'
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!',
             ], '', Response::HTTP_FORBIDDEN);
         }
 
@@ -47,12 +46,13 @@ class ExtensionController extends Controller
      * Get extension settings list
      *
      * @return JsonResponse|Response
+     *
      * @throws \Exception
      */
     public function serverSettings()
     {
         $extension = getExtensionJson(extension()->name);
-        
+
         $similar = [];
         $globalVars = [];
         $flag = server()->key();
@@ -80,7 +80,7 @@ class ExtensionController extends Controller
                 'name' => $item['variable'],
             ];
 
-            if (!isset($item['global']) || $item['global'] === false) {
+            if (! isset($item['global']) || $item['global'] === false) {
                 $opts['user_id'] = user()->id;
             }
 
@@ -89,9 +89,9 @@ class ExtensionController extends Controller
                 ->first();
             if ($obj) {
                 if (array_key_exists('user_id', $opts)) {
-                    $key = env('APP_KEY') . user()->id . server()->id;
+                    $key = env('APP_KEY').user()->id.server()->id;
                 } else {
-                    $key = env('APP_KEY') . $obj->user_id . server()->id;
+                    $key = env('APP_KEY').$obj->user_id.server()->id;
                     if ($obj->user_id != user()->id) {
                         array_push($globalVars, $item['variable']);
                     }
@@ -106,7 +106,7 @@ class ExtensionController extends Controller
             }
         }
 
-        $database = collect($extension["database"])->map(function ($item) use ($similar) {
+        $database = collect($extension['database'])->map(function ($item) use ($similar) {
             if (array_key_exists($item['variable'], $similar)) {
                 $item['value'] = $similar[$item['variable']];
             } else {
@@ -118,7 +118,7 @@ class ExtensionController extends Controller
 
         if (! auth('api')->user()->isAdmin()) {
             $database = $database->whereNotIn('variable', $globalVars);
-        }           
+        }
 
         $requiredSettings = $database->where('required', true);
         $advancedSettings = $database->where('required', false);
@@ -136,13 +136,13 @@ class ExtensionController extends Controller
                 if ($key['type'] == 'password') {
                     return false;
                 }
-                
+
                 if (! auth('api')->user()->isAdmin()) {
                     return ! in_array($key, $globalVars);
                 }
 
                 return true;
-            })->toArray()
+            })->toArray(),
         ]);
     }
 
@@ -155,9 +155,9 @@ class ExtensionController extends Controller
     {
         $extension = json_decode(
             file_get_contents(
-                '/liman/extensions/' .
-                strtolower((string) extension()->name) .
-                DIRECTORY_SEPARATOR .
+                '/liman/extensions/'.
+                strtolower((string) extension()->name).
+                DIRECTORY_SEPARATOR.
                 'db.json'
             ),
             true
@@ -169,7 +169,7 @@ class ExtensionController extends Controller
                 'name' => $key['variable'],
             ];
 
-            if (!isset($key['global']) || $key['global'] === false) {
+            if (! isset($key['global']) || $key['global'] === false) {
                 $opts['user_id'] = user()->id;
             }
 
@@ -177,8 +177,8 @@ class ExtensionController extends Controller
             $variable = request($key['variable']);
             if ($variable) {
                 if ($row->exists()) {
-                    $encKey = env('APP_KEY') . user()->id . server()->id;
-                    if ($row->first()->user_id != user()->id && !user()->isAdmin()) {
+                    $encKey = env('APP_KEY').user()->id.server()->id;
+                    if ($row->first()->user_id != user()->id && ! user()->isAdmin()) {
                         return response()->json([
                             'message' => __('Bu ayar sadece eklentiyi kuran kişi tarafından değiştirilebilir.'),
                         ], 403);
@@ -190,7 +190,7 @@ class ExtensionController extends Controller
                         'updated_at' => Carbon::now(),
                     ]);
                 } else {
-                    $encKey = env('APP_KEY') . user()->id . server()->id;
+                    $encKey = env('APP_KEY').user()->id.server()->id;
                     DB::table('user_settings')->insert([
                         'id' => Str::uuid(),
                         'server_id' => server()->id,
@@ -218,9 +218,9 @@ class ExtensionController extends Controller
                         'lmntargetFunction' => $extension['verification'],
                         'extension_id' => extension()->id,
                         'server_id' => server()->id,
-                        'token' => Token::create(user()->id),
                     ],
                     'timeout' => 5,
+                    'cookies' => convertToCookieJar(request(), '127.0.0.1'),
                 ]);
                 $output = (string) $res->getBody();
                 if (isJson($output)) {

@@ -12,6 +12,7 @@
         "ext-snmp": "*",
         "ext-xml": "*",
         "ext-zip": "*",
+        "acsystems/keycloak-php-sdk": "^4.4",
         "ankitpokhrel/tus-php": "^2.3",
         "bacon/bacon-qr-code": "^2.0",
         "beebmx/blade": "^1.5",
@@ -20,7 +21,7 @@
         "doctrine/dbal": "^3.4",
         "guzzlehttp/guzzle": "^7.5",
         "jackiedo/dotenv-editor": "^2.0",
-        "laravel/framework": "^9.19",
+        "laravel/framework": "^10.0",
         "laravel/helpers": "^1.5",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.0",
@@ -31,6 +32,7 @@
         "phpseclib/phpseclib": "~3.0",
         "pragmarx/google2fa-laravel": "^2.0",
         "pusher/pusher-php-server": "^7.0",
+        "stevenmaguire/oauth2-keycloak": "^5.1",
         "tymon/jwt-auth": "^2.0"
     },
     "require-dev": {
@@ -40,7 +42,7 @@
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.1",
         "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0",
+        "spatie/laravel-ignition": "^2.0",
         "spatie/laravel-web-tinker": "^1.8"
     },
     "autoload": {

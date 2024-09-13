@@ -34,14 +34,14 @@ class Kernel extends HttpKernel
 
         'api' => [
             'throttle:600,1',
-            'bindings', 
+            'bindings',
             Middleware\CookieJWTAuthenticator::class,
             Middleware\ClearTokenOnUnauthorized::class,
             Middleware\APILocalization::class,
         ],
     ];
 
-    protected $routeMiddleware = [
+    protected $middlewareAliases = [
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
@@ -50,7 +50,6 @@ class Kernel extends HttpKernel
         'server' => \App\Http\Middleware\Server::class,
         'permissions' => \App\Http\Middleware\PermissionManager::class,
         'admin' => \App\Http\Middleware\Admin::class,
-        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,

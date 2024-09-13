@@ -61,11 +61,9 @@ spec:
             - name: REDIS_PORT
               value: "6379"
           image: aciklab/liman:latest
-          imagePullPolicy: Never
           name: liman-core
           ports:
             - containerPort: 443
-              hostPort: 443
               protocol: TCP
           resources: {}
           tty: true

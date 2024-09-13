@@ -4,7 +4,7 @@ namespace App\Classes\Authentication;
 
 use App\Models\AuthLog;
 use App\Models\Permission;
-use App\User;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,13 +20,15 @@ class Authenticator
      */
     public static function createNewToken($token, ?Request $request = null)
     {
-        User::find(auth('api')->user()->id)->update([
+        $id = auth('api')->user()->id;
+
+        User::find($id)->update([
             'last_login_at' => Carbon::now()->toDateTimeString(),
             'last_login_ip' => $request->ip(),
         ]);
 
         AuthLog::create([
-            'user_id' => auth('api')->user()->id,
+            'user_id' => $id,
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
@@ -34,7 +36,7 @@ class Authenticator
         $return = [
             'expired_at' => (auth('api')->factory()->getTTL() * 60 + time()) * 1000,
             'user' => [
-                ...User::find(auth('api')->user()->id, [
+                ...User::find($id, [
                     'id',
                     'name',
                     'email',
@@ -45,11 +47,56 @@ class Authenticator
                 'last_login_at' => Carbon::now()->toDateTimeString(),
                 'last_login_ip' => $request->ip(),
                 'permissions' => [
-                    'server_details' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details'),
-                    'server_services' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_services'),
-                    'add_server' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server'),
-                    'update_server' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'update_server'),
-                    'view_logs' => Permission::can(auth('api')->user()->id, 'liman', 'id', 'view_logs'),
+                    'server_details' => Permission::can($id, 'liman', 'id', 'server_details'),
+                    'server_services' => Permission::can($id, 'liman', 'id', 'server_services'),
+                    'add_server' => Permission::can($id, 'liman', 'id', 'add_server'),
+                    'update_server' => Permission::can($id, 'liman', 'id', 'update_server'),
+                    'view_logs' => Permission::can($id, 'liman', 'id', 'view_logs'),
+                    'view' => (function () {
+                        $defaultPermissions = config('liman.default_views');
+
+                        if (auth('api')->user()->isAdmin()) {
+                            $defaultPermissions["dashboard"][] = "auth_logs";
+                            $defaultPermissions["dashboard"][] = "extensions";
+                            return $defaultPermissions;
+                        }
+
+                        $permissions = Permission::whereIn(
+                            'morph_id', 
+                            auth('api')->user()->roles->pluck('id')->toArray()
+                        )
+                            ->where('morph_type', 'roles')
+                            ->where('type', 'view')
+                            ->get();
+
+                        $viewPermissions = [
+                            ...$defaultPermissions,
+                        ];
+
+                        $dashboardPermissions = [];
+                        $permissions->map(function ($permission) use (&$dashboardPermissions, &$viewPermissions) {
+                            if ($permission->key === "sidebar") {
+                                // if sidebar is set to extensions, you cannot override it.
+                                if (isset($viewPermissions["sidebar"]) && $viewPermissions["sidebar"] === "extensions") {
+                                    return;
+                                }
+                                $viewPermissions["sidebar"] = json_decode($permission->value);
+                            }
+
+                            if ($permission->key === "dashboard") {
+                                // merge all dashboard permissions that comes from roles
+                                $dashboardPermissions = array_unique([
+                                    ...$dashboardPermissions,
+                                    ...json_decode($permission->value),
+                                ]);
+                            }
+                        });
+
+                        // if there is no dashboard permission, set it to default
+                        $viewPermissions["dashboard"] = count($dashboardPermissions) > 0 ? $dashboardPermissions : $defaultPermissions["dashboard"];
+                        
+                        return $viewPermissions;
+                    })(),
                 ],
             ],
         ];

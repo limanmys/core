@@ -28,7 +28,11 @@ class ExtensionController extends Controller
     {
         $extensions = Extension::orderBy('updated_at', 'DESC')->get()->map(function ($item) {
             $item->updated = Carbon::parse($item->getRawOriginal('updated_at'))->getPreciseTimestamp(3);
-            $item->licensed = $item->license()->count() > 0;
+            if ($item->license_type) {
+                $item->licensed = $item->license()->count() > 0 ? "licensed" : "not_licensed";
+            } else {
+                $item->licensed = "non_commercial";
+            }
 
             return $item;
         });
@@ -54,7 +58,7 @@ class ExtensionController extends Controller
 
         if ($extension !== 'zip' && $extension !== 'signed' && $extension !== 'lmne') {
             return response()->json([
-                'extension' => 'Eklenti dosyası uzantısı zip, signed, lmne olmalıdır.'
+                'extension' => 'Eklenti dosyası uzantısı zip, signed, lmne olmalıdır.',
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -68,17 +72,17 @@ class ExtensionController extends Controller
                 '.signed'
             )
         ) {
-            $verify = Command::runLiman(
-                'gpg --verify --status-fd 1 @{:extension} | grep GOODSIG || echo 0',
+            $verify = Command::runSystem(
+                'runuser liman -c "$(which gpg) --verify --status-fd 1 @{:extension}" | grep GOODSIG || echo 0',
                 ['extension' => request()->file('extension')->path()]
             );
-            if (! (bool) $verify) {
+	        if (! (bool) $verify) {
                 return response()->json([
-                    'extension' => 'Eklenti dosyası doğrulanamadı'
+                    'extension' => 'Eklenti dosyası doğrulanamadı',
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
-            $decrypt = Command::runLiman(
-                "gpg --status-fd 1 -d -o '/tmp/{:originalName}' @{:extension} | grep FAILURE > /dev/null && echo 0 || echo 1",
+            $decrypt = Command::runSystem(
+                'runuser liman -c "gpg --status-fd 1 -d -o \'/tmp/{:originalName}\' @{:extension} | grep FAILURE > /dev/null && echo 0 || echo 1"',
                 [
                     'originalName' => 'ext-'.basename((string) request()->file('extension')->path()),
                     'extension' => request()->file('extension')->path(),
@@ -87,7 +91,7 @@ class ExtensionController extends Controller
             if (! (bool) $decrypt) {
                 return response()->json(
                     [
-                        'message' => 'Eklenti dosyası doğrulanırken bir hata oluştu!'
+                        'message' => 'Eklenti dosyası doğrulanırken bir hata oluştu!',
                     ],
                     Response::HTTP_INTERNAL_SERVER_ERROR
                 );
@@ -97,7 +101,7 @@ class ExtensionController extends Controller
                 basename(
                     (string) request()->file('extension')->path()
                 );
-        } 
+        }
         $list = $this->setupNewExtension($zipFile, $verify);
         $error = $list[0];
         $new = $list[1];
@@ -126,7 +130,7 @@ class ExtensionController extends Controller
         );
 
         return response()->json([
-            'message' => 'Eklenti başarıyla yüklendi.'
+            'message' => 'Eklenti başarıyla yüklendi.',
         ]);
     }
 
@@ -161,7 +165,7 @@ class ExtensionController extends Controller
                     'extension_id' => extension()->id,
                     'extension_name' => extension()->display_name ?? extension()->name,
                 ],
-                "EXTENSION_DELETE"
+                'EXTENSION_DELETE'
             );
 
             extension()->delete();
@@ -183,7 +187,7 @@ class ExtensionController extends Controller
         system_log(3, 'EXTENSION_REMOVE');
 
         return response()->json([
-            'message' => 'Eklenti başarıyla silindi.'
+            'message' => 'Eklenti başarıyla silindi.',
         ]);
     }
 
@@ -199,11 +203,11 @@ class ExtensionController extends Controller
                 ['extension_id' => extension()->id],
                 ['data' => request('license')]
             );
-            
+
             Cache::forget('extension_'.extension()->id.'_'.$request->server_id.'_license');
 
             return response()->json([
-                'message' => 'Lisans eklendi.'
+                'message' => 'Lisans eklendi.',
             ]);
         }
 
@@ -234,7 +238,7 @@ class ExtensionController extends Controller
             Cache::forget('extension_'.extension()->id.'_'.$request->server_id.'_license');
 
             return response()->json([
-                'message' => 'Lisans eklendi.'
+                'message' => 'Lisans eklendi.',
             ]);
         }
 
@@ -290,7 +294,7 @@ class ExtensionController extends Controller
             system_log(7, 'EXTENSION_UPLOAD_FAILED_CORRUPTED');
 
             return [response()->json([
-                'message' => 'Eklenti dosyası açılamıyor.'
+                'message' => 'Eklenti dosyası açılamıyor.',
             ], 500), null];
         }
 
@@ -301,7 +305,7 @@ class ExtensionController extends Controller
             $zip->extractTo($path);
         } catch (\Exception) {
             return [response()->json([
-                'message' => 'Eklenti dosyası açılamıyor.'
+                'message' => 'Eklenti dosyası açılamıyor.',
             ], 500), null];
         }
 
@@ -317,7 +321,7 @@ class ExtensionController extends Controller
         preg_match('/[A-Za-z-]+/', (string) $json['name'], $output);
         if (empty($output) || $output[0] != $json['name']) {
             return [response()->json([
-                'message' => 'Eklenti adı geçerli değil.'
+                'message' => 'Eklenti adı geçerli değil.',
             ], Response::HTTP_UNPROCESSABLE_ENTITY), null];
         }
 
@@ -343,17 +347,18 @@ class ExtensionController extends Controller
 
         // Check If Extension Already Exists.
         $extension = Extension::where('name', $json['name'])->first();
-        if ($extension)
+        if ($extension) {
             $old = $extension->toArray();
-        else
+        } else {
             $old = [];
+        }
 
         if ($extension) {
             if ($extension->version == $json['version']) {
                 system_log(7, 'EXTENSION_UPLOAD_FAILED_ALREADY_INSTALLED');
 
                 return [response()->json([
-                    'message' => 'Bu eklenti zaten yüklü.'
+                    'message' => 'Bu eklenti zaten yüklü.',
                 ], Response::HTTP_UNPROCESSABLE_ENTITY), null];
             }
         }

@@ -23,7 +23,7 @@ RUN apt -yqq update
 RUN DEBIAN_FRONTEND=noninteractive apt -yqq install sudo nodejs gpg zip unzip nginx sysstat php8.1-redis php8.1-fpm php8.1-gd php8.1-curl php8.1 php8.1-sqlite3 php8.1-snmp php8.1-mbstring php8.1-xml php8.1-zip php8.1-posix libnginx-mod-http-headers-more-filter libssl3 supervisor php8.1-pgsql pgloader php8.1-bcmath rsync dnsutils php8.1-ldap php8.1-smbclient krb5-user php8.1-ssh2 smbclient novnc
 
 # FILES
-RUN bash -c 'mkdir -p /liman_files/{server,certs,logs,database,sandbox,keys,extensions,modules,packages,ui}'
+RUN bash -c 'mkdir -p /liman_files/{server,certs,logs,database,sandbox,keys,extensions,packages,ui}'
 
 # UI
 RUN curl -s https://api.github.com/repos/limanmys/next/releases/latest | grep "browser_download_url.*zip" | cut -d : -f 2,3 | tr -d \" | wget -qi -
@@ -31,11 +31,7 @@ RUN unzip ui*.zip -d ui
 RUN mv ui /liman_files/
 
 # CORE
-RUN wget "https://github.com/limanmys/core/archive/refs/heads/master.zip" -O "core.zip"
-RUN unzip -qq core.zip
-RUN mv core-master/* /liman_files/server
-RUN mv core-master/.env.example /liman_files/server
-RUN rm -rf core.zip
+COPY . /liman_files/server
 
 # PHP SANDBOX
 RUN wget "https://github.com/limanmys/php-sandbox/archive/refs/heads/master.zip" -O "sandbox.zip"
@@ -43,13 +39,6 @@ RUN unzip -qq sandbox.zip
 RUN mkdir -p /liman_files/sandbox/php
 RUN mv php-sandbox-master/* /liman_files/sandbox/php/
 RUN rm -rf sandbox.zip php-sandbox-master
-
-# EXT TEMPLATES
-RUN wget "https://github.com/limanmys/extension_templates/archive/master.zip" -O "extension_templates.zip"
-RUN unzip -qq extension_templates.zip
-RUN mkdir -p /liman_files/server/storage/extension_templates
-RUN mv extension_templates-master/* /liman_files/server/storage/extension_templates
-RUN rm -rf extension_templates.zip extension_templates-master
 
 # RENDER ENGINE
 RUN curl -s https://api.github.com/repos/limanmys/fiber-render-engine/releases/latest | grep "browser_download_url.*zip" | cut -d : -f 2,3 | tr -d \" | wget -qi -

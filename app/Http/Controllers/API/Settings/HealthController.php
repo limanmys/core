@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API\Settings;
 use App\Http\Controllers\Controller;
 use App\Jobs\HighAvailabilitySyncer;
 use App\System\Command;
-use App\User;
+use App\Models\User;
 use Illuminate\Contracts\Bus\Dispatcher;
 
 class HealthController extends Controller

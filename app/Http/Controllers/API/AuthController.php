@@ -7,7 +7,7 @@ use App\Classes\Authentication\LDAPAuthenticator;
 use App\Classes\Authentication\LimanAuthenticator;
 use App\Http\Controllers\Controller;
 use App\Models\SystemSettings;
-use App\User;
+use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

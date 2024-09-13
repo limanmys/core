@@ -9,7 +9,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RoleUser;
 use App\Models\Server;
-use App\User;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -49,6 +49,7 @@ class RoleController extends Controller
             'liman' => $role->permissions->where('type', 'liman')->count(),
             'functions' => $role->permissions->where('type', 'function')->count(),
             'variables' => $role->permissions->where('type', 'variable')->count(),
+            'views' => $role->permissions->where('type', 'view')->count(),
         ];
 
         return $role;
@@ -255,11 +256,16 @@ class RoleController extends Controller
      */
     public function setExtensions(Request $request)
     {
-        Permission::where([
+        $extensions = Permission::where([
             'morph_id' => $request->role_id,
             'type' => 'extension',
             'key' => 'id',
-        ])->delete();
+        ]);
+
+        $role = Role::find($request->role_id);
+        $oldExtensions = $role->permissions->where('type', 'extension')->pluck('value')->toArray();
+
+        $extensions->delete();
 
         foreach ($request->extensions as $extension) {
             Permission::grant(
@@ -270,6 +276,17 @@ class RoleController extends Controller
                 null,
                 'roles'
             );
+        }
+
+        // Detect removed extensions and remove their functions
+        $newExtensions = $request->extensions;
+        $removedExtensions = array_diff($oldExtensions, $newExtensions);
+        foreach ($removedExtensions as $extension) {
+            Permission::where([
+                'morph_id' => $request->role_id,
+                'type' => 'function',
+                'value' => Extension::find($extension)->name,
+            ])->delete();
         }
 
         AuditLog::write(
@@ -582,6 +599,78 @@ class RoleController extends Controller
         Permission::whereIn('id', $request->permission_ids)->delete();
 
         return response()->json('Fonksiyonlar başarıyla silindi.');
+    }
+
+    /**
+     * Role based system layout view settings
+     */
+    public function views(Request $request)
+    {
+        // View permission roles guide
+        // Options:
+        // - Sidebar: Shows server list / shows extension list that user has access
+        // - Sidebar [string]: servers, extensions
+        // - Sidebar [default_value]: servers
+        // - Dashboard [string[]]: Server count, extension count, user count, version, most used extensions, most used servers
+        // - Dashboard [string[]]: servers, extensions, users, version, most_used_extensions, most_used_servers 
+        // - Dashboard [default_value]: servers, extensions, users, version, most_used_extensions, most_used_servers
+        // If sidebar has extensions, dashboard must have extensions
+        // If sidebar has servers, dashboard must have servers and extensions both
+
+        $permissions = Permission::where([
+            'morph_id' => $request->role_id,
+            'type' => 'view',
+        ])->get();
+
+        $viewSettings = [
+            ...config('liman.default_views'),
+        ];
+
+        $permissions->map(function ($item) use (&$viewSettings) {
+            $viewSettings[$item->key] = json_decode($item->value);
+        });
+
+        return response()->json($viewSettings);
+    }
+
+    /**
+     * Set role views
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function setViews(Request $request)
+    {
+        Permission::where([
+            'morph_id' => $request->role_id,
+            'type' => 'view',
+        ])->delete();
+
+        foreach ($request->views as $setting => $value) {
+            Permission::grant(
+                $request->role_id,
+                'view',
+                $setting,
+                json_encode($value),
+                null,
+                'roles'
+            );
+        }
+
+        AuditLog::write(
+            'role',
+            'edit',
+            [
+                'changed_count' => count($request->views ?? []),
+                'type' => 'views',
+                'array' => $request->views
+            ],
+            "ROLE_EDIT"
+        );
+
+        return response()->json([
+            'message' => 'Görünüm ayarları güncellendi.'
+        ]);
     }
 
     /**

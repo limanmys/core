@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\System\Command;
-use App\User;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
 

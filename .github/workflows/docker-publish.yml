@@ -1,5 +1,8 @@
 name: Docker
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 env:
   # Use docker.io for Docker Hub if empty

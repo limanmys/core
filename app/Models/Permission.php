@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Support\Database\CacheQueryBuilder;
-use App\User;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
@@ -76,7 +76,7 @@ class Permission extends Model
         $key,
         $value,
         $extra = null,
-        $morph_type = 'users'
+        $morph_type = 'roles'
     )
     {
         try {

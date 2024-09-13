@@ -8,7 +8,6 @@ use App\Mail\TemplatedExtensionMail;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
-use App\Models\Token;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -19,70 +18,88 @@ use Illuminate\Support\Str;
 class InternalController extends Controller
 {
     /**
-     * Creates a internal controller instance
+     * Creates an internal controller instance
      */
     public function __construct()
     {
-        if (array_key_exists('SERVER_ADDR', $_SERVER)) {
+        if (isset($_SERVER['SERVER_ADDR'])) {
             $this->checkPermissions();
         }
     }
 
     /**
-     * Check permissions of extension
+     * Check permissions of the extension
      *
      * @return void
      */
     private function checkPermissions()
     {
-        if (
-            request('system_token') ==
-            file_get_contents('/liman/keys/service.key') &&
-            $_SERVER['REMOTE_ADDR'] == '127.0.0.1'
-        ) {
+        $systemToken = request('system_token');
+        $serviceKey = file_get_contents('/liman/keys/service.key');
+        $remoteAddr = $_SERVER['REMOTE_ADDR'];
+        $serverAddr = $_SERVER['SERVER_ADDR'];
+
+        if ($systemToken === $serviceKey && $remoteAddr === '127.0.0.1') {
             return;
         }
 
-        if ($_SERVER['SERVER_ADDR'] != $_SERVER['REMOTE_ADDR']) {
-            system_log(5, 'EXTENSION_INTERNAL_NO_PERMISSION', [
-                'extension_id' => extension()->id,
-            ]);
-            abort(403, 'Not Allowed');
-        }
-        ($token = Token::where('token', request('token'))->first()) or
-        abort(403, 'Token gecersiz');
-        auth()->loginUsingId($token->user_id);
-
-        ($server = Server::find(request('server_id'))) or
-        abort(404, 'Sunucu Bulunamadi');
-        if (
-            ! Permission::can($token->user_id, 'server', 'id', $server->id)
-        ) {
-            system_log(7, 'EXTENSION_NO_PERMISSION_SERVER', [
-                'extension_id' => extension()->id,
-                'server_id' => request('server_id'),
-            ]);
-            abort(504, 'Sunucu icin yetkiniz yok.');
-        }
-        ($extension = Extension::find(request('extension_id'))) or
-        abort(404, 'Eklenti Bulunamadi');
-        if (
-            ! Permission::can(
-                $token->user_id,
-                'extension',
-                'id',
-                $extension->id
-            )
-        ) {
-            system_log(7, 'EXTENSION_NO_PERMISSION_SERVER', [
-                'extension_id' => extension()->id,
-                'server_id' => request('server_id'),
-            ]);
-            abort(504, 'Eklenti için yetkiniz yok.');
+        if ($serverAddr !== $remoteAddr) {
+            $this->logAndAbort('EXTENSION_INTERNAL_NO_PERMISSION', 'Not Allowed', 403);
         }
 
-        request()->request->add(['server' => $server]);
-        request()->request->add(['extension' => $extension]);
+        $userId = auth('api')->id();
+        $token = request('token');
+
+        if (! $token) {
+            $this->logAndAbort('EXTENSION_NO_TOKEN', 'Token gecersiz', 403);
+        } elseif (! auth('api')->check()) {
+            $this->logAndAbort('EXTENSION_INVALID_TOKEN', 'Token gecersiz', 403);
+        }
+
+        $serverId = request('server_id');
+        $server = Server::find($serverId);
+        if (! $server) {
+            abort(404, 'Sunucu Bulunamadi');
+        }
+
+        if (! Permission::can($userId, 'server', 'id', $server->id)) {
+            $this->logAndAbort('EXTENSION_NO_PERMISSION_SERVER', 'Sunucu icin yetkiniz yok.', 504, $serverId);
+        }
+
+        $extensionId = request('extension_id');
+        $extension = Extension::find($extensionId);
+        if (! $extension) {
+            abort(404, 'Eklenti Bulunamadi');
+        }
+
+        if (! Permission::can($userId, 'extension', 'id', $extension->id)) {
+            $this->logAndAbort('EXTENSION_NO_PERMISSION_SERVER', 'Eklenti için yetkiniz yok.', 504, $serverId);
+        }
+
+        request()->request->add(['server' => $server, 'extension' => $extension]);
+    }
+
+    /**
+     * Log the error and abort the request with a response
+     *
+     * @param  string  $logCode
+     * @param  string  $message
+     * @param  int  $statusCode
+     * @param  mixed  $additionalData
+     * @return void
+     */
+    private function logAndAbort($logCode, $message, $statusCode = 403, $additionalData = null)
+    {
+        $logData = [
+            'extension_id' => extension()->id,
+        ];
+
+        if ($additionalData) {
+            $logData = array_merge($logData, ['server_id' => $additionalData]);
+        }
+
+        system_log(5, $logCode, $logData);
+        abort($statusCode, $message);
     }
 
     /**
@@ -92,48 +109,45 @@ class InternalController extends Controller
      */
     public function sendMail()
     {
-        if (! (bool) env('MAIL_ENABLED', false)) return;
+        if (! (bool) env('MAIL_ENABLED', false)) {
+            return;
+        }
 
-        $sendTo = [];
         $to = json_decode(request('to'));
-        if (! is_array($to)) {
-            $sendTo[] = $to;
-        } else {
-            $sendTo = $to;
-        }
+        $recipients = is_array($to) ? $to : [$to];
 
-        $template = ExtensionMail::class;
-        if ((bool) request('templated')) {
-            $template = TemplatedExtensionMail::class;
-        }
+        $templateClass = (bool) request('templated') ? TemplatedExtensionMail::class : ExtensionMail::class;
+        $subject = request('subject');
+        $content = base64_decode(request('content'));
+        $attachments = json_decode(request('attachments'), true);
 
-        foreach ($sendTo as $recipient) {
-            Mail::to($recipient)->send(
-                new $template(
-                    request('subject'),
-                    base64_decode((string) request('content')),
-                    json_decode((string) request('attachments'), true),
-                )
-            );
+        foreach ($recipients as $recipient) {
+            Mail::to($recipient)->send(new $templateClass($subject, $content, $attachments));
         }
     }
 
     /**
      * Creates VNC token
      *
-     * @return array|string|string[]
+     * @return string
      */
     public function addProxyConfig()
     {
-        if (! is_dir('/liman/keys/' . 'vnc')) {
-            mkdir('/liman/keys/' . 'vnc', 0700);
+        $vncDir = '/liman/keys/vnc';
+
+        if (! is_dir($vncDir)) {
+            mkdir($vncDir, 0700, true);
         }
-        $writer = fopen('/liman/keys/' . 'vnc/config', 'a+');
+
+        $configFilePath = $vncDir.'/config';
+        $writer = fopen($configFilePath, 'a+');
+
         $hostname = request('hostname');
         $port = request('port');
-        $token = Str::uuid();
-        $token = str_replace('-', '', (string) $token);
-        fwrite($writer, $token . ": $hostname:$port" . "\n");
+        $token = str_replace('-', '', (string) Str::uuid());
+
+        fwrite($writer, "$token: $hostname:$port\n");
+        fclose($writer);
 
         return $token;
     }

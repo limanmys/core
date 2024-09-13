@@ -113,7 +113,6 @@ function request(url, data, next, error, requestType = "POST") {
     data.append(key, value);
   }
   data.append("lmnbaseurl", window.location.origin);
-  data.append("limanJSRequest", true);
   const urlParams = new URLSearchParams(window.location.search);
   urlParams.forEach(function (value, key) {
     data.append(key, value);

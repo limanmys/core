@@ -3,48 +3,66 @@
 namespace App\Classes\Authentication;
 
 use App\Models\Oauth2Token;
-use App\User;
-use GuzzleHttp\Client;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Keycloak\KeycloakClient;
+use Keycloak\User\UserApi;
+use Stevenmaguire\OAuth2\Client\Provider\Keycloak as KeycloakProvider;
 
 class KeycloakAuthenticator implements AuthenticatorInterface
 {
+    private $kcClient;
+
+    private $oauthProvider;
+
+    private $kcUserApi;
+
+    public function __construct()
+    {
+        $this->kcClient = new KeycloakClient(
+            env('KEYCLOAK_CLIENT_ID'),
+            env('KEYCLOAK_CLIENT_SECRET'),
+            env('KEYCLOAK_REALM'),
+            env('KEYCLOAK_BASE_URL'),
+            null,
+            ''
+        );
+
+        $this->kcUserApi = new UserApi($this->kcClient);
+
+        $this->oauthProvider = new KeycloakProvider([
+            'authServerUrl'     => env('KEYCLOAK_BASE_URL'),
+            'realm'             => env('KEYCLOAK_REALM'),
+            'clientId'          => env('KEYCLOAK_CLIENT_ID'),
+            'clientSecret'      => env('KEYCLOAK_CLIENT_SECRET'),
+            'redirectUri'       => env('KEYCLOAK_REDIRECT_URI'),
+            'version'           => '24.0.0',
+        ]);
+    }
+
     public function authenticate($credentials, $request): JsonResponse
     {
-        $client = new Client([
-            'verify' => false,
-        ]);
-
         try {
-            $r = $client->post(
-                env('KEYCLOAK_BASE_URL').'/realms/'.env('KEYCLOAK_REALM').'/protocol/openid-connect/token',
-                [
-                    'form_params' => [
-                        'client_id' => env('KEYCLOAK_CLIENT_ID'),
-                        'client_secret' => env('KEYCLOAK_CLIENT_SECRET'),
-                        'username' => $request->email,
-                        'password' => $request->password,
-                        'grant_type' => 'password',
-                        'scope' => 'openid',
-                    ],
-                ]
-            );
+            $accessTokenObject = $this->oauthProvider->getAccessToken('password', [
+                'username' => $request->email,
+                'password' => $request->password,
+                'scope'    => 'openid',
+            ]);
+
+            $resourceOwner = $this->oauthProvider->getResourceOwner($accessTokenObject);
+
+            $roles = collect($this->kcUserApi->getRoles($resourceOwner->getId()))
+                    ->map(function ($role) {
+                        return $role->name;
+                    })->toArray();
         } catch (\Exception $e) {
             Log::error('Keycloak authentication failed. '.$e->getMessage());
 
             return Authenticator::returnLoginError($request->email);
         }
-
-        $response = json_decode($r->getBody()->getContents(), true);
-        if (! isset($response['access_token'])) {
-            Log::error('Keycloak authentication failed. Access token is missing.');
-
-            return Authenticator::returnLoginError($request->email);
-        }
-        $details = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', explode('.', $response['access_token'])[1]))));
 
         $create = User::where('email', strtolower($request->email))
             ->orWhere('username', strtolower($request->email))
@@ -52,28 +70,29 @@ class KeycloakAuthenticator implements AuthenticatorInterface
 
         if (! $create) {
             $user = User::create([
-                'id' => $details->sub,
-                'name' => $details->name,
-                'email' => $details->email,
-                'username' => $details->preferred_username,
+                'id' => $resourceOwner->getId(),
+                'name' => $resourceOwner->getName(),
+                'email' => $resourceOwner->getEmail(),
+                'username' => $resourceOwner->getUsername(),
                 'auth_type' => 'keycloak',
-                'password' => Hash::make(Str::random(16)),
+                'password' => Hash::make(Str::uuid()),
                 'forceChange' => false,
             ]);
         } else {
-            $user = User::where('id', $details->sub)->first();
+            $user = User::where('id', $resourceOwner->getId())->first();
         }
 
         Oauth2Token::updateOrCreate([
-            'user_id' => $details->sub,
-            'token_type' => $response['token_type'],
+            'user_id' => $resourceOwner->getId(),
+            'token_type' => $accessTokenObject->getValues()['token_type'],
         ], [
-            'user_id' => $details->sub,
-            'token_type' => $response['token_type'],
-            'access_token' => $response['access_token'],
-            'refresh_token' => $response['refresh_token'],
-            'expires_in' => (int) $response['expires_in'],
-            'refresh_expires_in' => (int) $response['refresh_expires_in'],
+            'user_id' => $resourceOwner->getId(),
+            'token_type' => $accessTokenObject->getValues()['token_type'],
+            'access_token' => $accessTokenObject->getToken(),
+            'refresh_token' => $accessTokenObject->getRefreshToken(),
+            'expires_in' => $accessTokenObject->getExpires(),
+            'refresh_expires_in' => $accessTokenObject->getValues()['refresh_expires_in'],
+            'permissions' => $roles,
         ]);
 
         return Authenticator::createNewToken(

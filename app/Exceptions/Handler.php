@@ -62,7 +62,7 @@ class Handler extends ExceptionHandler
 
         $this->renderable(function (AuthenticationException $e) {
             return response()->json([
-                'message' => 'Giriş yapmanız gereklidir.'
+                'message' => 'Giriş yapmanız gereklidir.',
             ], Response::HTTP_UNAUTHORIZED)
                 ->withoutCookie('token')
                 ->withoutCookie('currentUser');
@@ -76,7 +76,7 @@ class Handler extends ExceptionHandler
         $this->renderable(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'message' => 'Kayıt bulunamadı.'
+                    'message' => 'Kayıt bulunamadı.',
                 ], 404);
             }
         });
@@ -84,7 +84,7 @@ class Handler extends ExceptionHandler
         $this->renderable(function (ModelNotFoundException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'message' => 'Kayıt bulunamadı.'
+                    'message' => 'Kayıt bulunamadı.',
                 ], 404);
             }
         });
@@ -95,12 +95,11 @@ class Handler extends ExceptionHandler
             ], Response::HTTP_TOO_MANY_REQUESTS);
         });
 
-
         if (config('app.debug')) {
             $this->renderable(function (Throwable $e) {
                 if ($e->getMessage() === 'Unauthenticated.') {
                     return response()->json([
-                        'message' => 'Giriş yapmanız gereklidir.'
+                        'message' => 'Giriş yapmanız gereklidir.',
                     ], Response::HTTP_UNAUTHORIZED)
                         ->withoutCookie('token')
                         ->withoutCookie('currentUser');
@@ -121,17 +120,17 @@ class Handler extends ExceptionHandler
                 'message' => 'Veritabanı hatası mevcut. Sistem veritabanı bağlantısını kontrol ediniz.',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         });
-        
+
         $this->renderable(function (HttpException $e) {
             return response()->json([
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         });
-        
+
         $this->renderable(function (Throwable $e) {
             if ($e->getMessage() === 'Unauthenticated.') {
                 return response()->json([
-                    'message' => 'Giriş yapmanız gereklidir.'
+                    'message' => 'Giriş yapmanız gereklidir.',
                 ], Response::HTTP_UNAUTHORIZED)
                     ->withoutCookie('token')
                     ->withoutCookie('currentUser');
