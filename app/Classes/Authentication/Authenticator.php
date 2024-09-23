@@ -74,26 +74,40 @@ class Authenticator
                         ];
 
                         $dashboardPermissions = [];
-                        $permissions->map(function ($permission) use (&$dashboardPermissions, &$viewPermissions) {
+                        $hasDashboardPermission = false;
+                        $permissions->map(function ($permission) use (&$dashboardPermissions, &$viewPermissions, &$hasDashboardPermission) {
                             if ($permission->key === "sidebar") {
                                 // if sidebar is set to extensions, you cannot override it.
                                 if (isset($viewPermissions["sidebar"]) && $viewPermissions["sidebar"] === "extensions") {
                                     return;
                                 }
-                                $viewPermissions["sidebar"] = json_decode($permission->value);
+                                try {
+                                    $viewPermissions["sidebar"] = json_decode($permission->value, false, 512, JSON_THROW_ON_ERROR);
+                                } catch (\Exception $e) {
+                                    $viewPermissions["sidebar"] = $permission->value;
+                                }
                             }
 
                             if ($permission->key === "dashboard") {
+                                $hasDashboardPermission = true;
                                 // merge all dashboard permissions that comes from roles
                                 $dashboardPermissions = array_unique([
                                     ...$dashboardPermissions,
                                     ...json_decode($permission->value),
                                 ]);
                             }
+
+                            if ($permission->key === "redirect") {
+                                if (! auth()->user()->isAdmin()) {
+                                    $viewPermissions["redirect"] = $permission->value;
+                                }
+                            }
                         });
 
                         // if there is no dashboard permission, set it to default
-                        $viewPermissions["dashboard"] = count($dashboardPermissions) > 0 ? $dashboardPermissions : $defaultPermissions["dashboard"];
+                        $viewPermissions["dashboard"] = $hasDashboardPermission
+                            ? $dashboardPermissions 
+                            : $defaultPermissions["dashboard"];
                         
                         return $viewPermissions;
                     })(),

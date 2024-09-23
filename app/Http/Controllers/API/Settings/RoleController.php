@@ -627,7 +627,11 @@ class RoleController extends Controller
         ];
 
         $permissions->map(function ($item) use (&$viewSettings) {
-            $viewSettings[$item->key] = json_decode($item->value);
+            try {
+                $viewSettings[$item->key] = json_decode($item->value, false, 512, JSON_THROW_ON_ERROR);
+            } catch (\Throwable) {
+                $viewSettings[$item->key] = $item->value;
+            }
         });
 
         return response()->json($viewSettings);
@@ -647,11 +651,19 @@ class RoleController extends Controller
         ])->delete();
 
         foreach ($request->views as $setting => $value) {
+            if ($value === '') {
+                continue;
+            }
+
+            if (is_array($value) || is_object($value)) {
+                $value = json_encode($value);
+            }
+
             Permission::grant(
                 $request->role_id,
                 'view',
                 $setting,
-                json_encode($value),
+                $value,
                 null,
                 'roles'
             );

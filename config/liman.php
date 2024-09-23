@@ -11,6 +11,7 @@ return [
             'most_used_extensions',
             'most_used_servers',
         ],
+        'redirect' => null
     ],
     'search' => [
         'admin' => [
