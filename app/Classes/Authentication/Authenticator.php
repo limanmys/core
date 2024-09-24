@@ -98,7 +98,7 @@ class Authenticator
                             }
 
                             if ($permission->key === "redirect") {
-                                if (! auth()->user()->isAdmin()) {
+                                if (! auth('api')->user()->isAdmin()) {
                                     $viewPermissions["redirect"] = $permission->value;
                                 }
                             }
