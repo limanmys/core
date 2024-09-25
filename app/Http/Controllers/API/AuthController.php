@@ -166,8 +166,18 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        $user = User::where(function ($query) use ($validator) {
+                $query->where('email', $validator->validated()["email"])
+                    ->orWhere('username', $validator->validated()["email"]);
+            })->where('auth_type', 'local')
+              ->first();
+
+        if (! $user) {
+            return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
+        }
+
         $token = auth('api')->attempt([
-            'email' => $validator->validated()["email"],
+            'email' => $user->email,
             'password' => $validator->validated()["password"],
         ]);
         if (! $token) {
@@ -230,7 +240,7 @@ class AuthController extends Controller
     public function forceChangePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
+            'email' => 'required|string',
             'password' => 'required|string',
             'new_password' => [
                 'string',
@@ -246,7 +256,20 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $token = auth('api')->attempt($validator->validated());
+        $user = User::where(function ($query) use ($request) {
+                    $query->where('email', $request->email)
+                        ->orWhere('username', $request->email);
+                })->where('auth_type', 'local')
+                  ->first();
+
+        if (! $user) {
+            return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
+        }
+
+        $token = auth('api')->attempt([
+            'email' => $user->email,
+            'password' => $request->password,
+        ]);
         if (! $token) {
             return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
         }

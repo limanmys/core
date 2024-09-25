@@ -9,9 +9,11 @@ class LimanAuthenticator implements AuthenticatorInterface
 {
     public function authenticate($credentials, $request): JsonResponse
     {
-        $user = User::where("email", $credentials["email"])
-            ->orWhere("username", $credentials["email"])
-            ->first();
+        $user = User::where(function ($query) use ($credentials) {
+                    $query->where('email', $credentials['email'])
+                        ->orWhere('username', $credentials['email']);
+                })->where('auth_type', 'local')
+                  ->first();
 
         if (! $user) {
             return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
