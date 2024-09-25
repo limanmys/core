@@ -169,8 +169,7 @@ class AuthController extends Controller
         $user = User::where(function ($query) use ($validator) {
                 $query->where('email', $validator->validated()["email"])
                     ->orWhere('username', $validator->validated()["email"]);
-            })->where('auth_type', 'local')
-              ->first();
+            })->first();
 
         if (! $user) {
             return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
