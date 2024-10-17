@@ -34,7 +34,7 @@ class MainController extends Controller
             $list[] = [
                 "id" => $extension->id,
                 "name" => strtolower($extension->name),
-                "version_code" => (int) str_replace('.', '', $extension->version),
+                "version_code" => intval($extension->version_code),
                 "download_path" => route("ha_download_ext", [
                     "extension_name" => $extension->name
                 ]),

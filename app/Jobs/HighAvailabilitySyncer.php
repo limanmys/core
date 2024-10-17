@@ -144,9 +144,9 @@ class HighAvailabilitySyncer implements ShouldQueue
             if (is_file($path . '/db.json')) {
                 $json = (array) json_decode(file_get_contents($path . '/db.json'));
 
-                $version = (int) str_replace('.', '', $json['version']);
+                $version = $json['version_code'];
 
-                if ($version < $extension->version_code) {
+                if (intval($version) < intval($extension->version_code)) {
                     $needsToBeUpdated[] = $extension;
                     continue;
                 }

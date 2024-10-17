@@ -794,7 +794,7 @@ if (! function_exists('callExtensionFunction')) {
         $params = [],
         $target_function = "apiProxy"
     ) {
-        if ($extension->require_key == 'true' && $server->key() == null) {
+        if ($extension->require_key == true && $server->key() == null) {
             return null;
         }
 
