@@ -567,7 +567,7 @@ class RoleController extends Controller
             'variable',
             $request->key,
             $request->value,
-            null,
+            $request->type ?? null,
             'roles'
         );
 
@@ -581,6 +581,7 @@ class RoleController extends Controller
                     'role_id' => $request->role_id,
                     'key' => $request->key,
                     'value' => $request->value,
+                    'type' => $request->type ?? null,
                 ]
             ],
             "ROLE_EDIT"
@@ -598,7 +599,7 @@ class RoleController extends Controller
     {
         Permission::whereIn('id', $request->permission_ids)->delete();
 
-        return response()->json('Fonksiyonlar başarıyla silindi.');
+        return response()->json('Veri başarıyla silindi.');
     }
 
     /**
