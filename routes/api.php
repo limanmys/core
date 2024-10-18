@@ -210,6 +210,7 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
             Route::post('/{extension_id}/license', [Settings\ExtensionController::class, 'license']);
             Route::get('/{extension_id}/download', [Settings\ExtensionController::class, 'download']);
             Route::get('/{extension_id}/functions', [Settings\RoleController::class, 'getExtensionFunctions']);
+            Route::get('/{extension_id}/variables', [Settings\RoleController::class, 'getExtensionVariables']);
         });
 
         // Users
