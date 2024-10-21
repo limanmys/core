@@ -250,7 +250,7 @@ class ServerController extends Controller
      */
     public function checkName()
     {
-        if (strlen((string) request('name')) > 24) {
+        if (strlen((string) request('name')) > 40) {
             return response()->json(['name' => 'Lütfen daha kısa bir sunucu adı girin.'], 422);
         }
         if (! Server::where('name', request('name'))->exists()) {
