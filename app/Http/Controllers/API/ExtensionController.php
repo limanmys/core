@@ -150,13 +150,7 @@ class ExtensionController extends Controller
         $this->checkPermissions(extension());
         $this->checkForMissingSettings($dbJson);
 
-        if (extension()->status == '0') {
-            return response()->json([
-                'message' => 'Eklenti şu anda güncelleniyor, biraz sonra tekrar deneyiniz.',
-            ], Response::HTTP_SERVICE_UNAVAILABLE);
-        }
-
-        if (extension()->require_key == 'true' && server()->key() == null) {
+        if (extension()->require_key == true && server()->key() == null) {
             return response()->json([
                 'message' => 'Bu eklentiyi kullanabilmek için bir anahtara ihtiyacınız var, lütfen kasa üzerinden bir anahtar ekleyin.',
             ], Response::HTTP_FORBIDDEN);

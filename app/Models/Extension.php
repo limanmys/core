@@ -24,21 +24,16 @@ class Extension extends Model
         'display_name',
         'name',
         'version',
+        'version_code',
         'icon',
-        'service',
         'sslPorts',
-        'issuer',
-        'language',
-        'support',
-        'displays',
         'require_key',
-        'status',
         'license_type',
         'ldap_support',
     ];
 
     protected $casts = [
-        'displays' => 'array',
+        'require_key' => 'boolean',
     ];
 
     /**

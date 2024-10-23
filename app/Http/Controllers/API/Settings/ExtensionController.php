@@ -102,10 +102,9 @@ class ExtensionController extends Controller
                     (string) request()->file('extension')->path()
                 );
         }
-        $list = $this->setupNewExtension($zipFile, $verify);
-        $error = $list[0];
-        $new = $list[1];
-        $old = $list[2] ?? [];
+        
+        list($error, $new, $old) = $this->setupNewExtension($zipFile);
+        $old = $old ?? [];
 
         if ($error) {
             return $error;
@@ -284,7 +283,7 @@ class ExtensionController extends Controller
      *
      * @throws GuzzleException
      */
-    private function setupNewExtension($zipFile, $verify = false)
+    private function setupNewExtension($zipFile)
     {
         // Initialize Zip Archive Object to use it later.
         $zip = new ZipArchive();
@@ -339,12 +338,6 @@ class ExtensionController extends Controller
             ];
         }
 
-        if ($verify) {
-            $json['issuer'] = explode(' ', (string) $verify, 4)[3];
-        } else {
-            $json['issuer'] = '';
-        }
-
         // Check If Extension Already Exists.
         $extension = Extension::where('name', $json['name'])->first();
         if ($extension) {
@@ -369,12 +362,8 @@ class ExtensionController extends Controller
         } else {
             $new = new Extension();
         }
-        unset($json['issuer']);
-        unset($json['status']);
-        unset($json['order']);
         $json['display_name'] = json_encode($json['display_name']);
         $new->fill($json);
-        $new->status = '1';
         $new->save();
 
         if (array_key_exists('dependencies', $json) && $json['dependencies'] != '') {

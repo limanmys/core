@@ -234,13 +234,24 @@ class RoleController extends Controller
     public function extensions(Request $request)
     {
         $extensions = Extension::all();
-        $selected = Extension::find(
-            Role::find($request->role_id)
-                ->permissions
-                ->where('type', 'extension')
-                ->pluck('value')
-                ->toArray()
-        );
+        $roles = Role::find($request->role_id)
+            ->permissions
+            ->where('type', 'extension')
+            ->pluck('value')
+            ->toArray();
+        $selected = $extensions->filter(function ($extension) use ($roles) {
+            return in_array($extension->id, $roles);
+        })->values();
+
+        if ($request->variable_selector) {
+            $selected = [
+                ...$selected,
+                [
+                    'id' => 'default',
+                    'name' => 'Default KV',
+                ],
+            ];
+        }
 
         return response()->json([
             'extensions' => $extensions,
@@ -556,18 +567,38 @@ class RoleController extends Controller
     }
 
     /**
+     * Get extension variables from db.json
+     */
+    public function getExtensionVariables(Request $request)
+    {
+        $extension = Extension::find($request->extension_id);
+        $extJson = getExtensionJson($extension->name);
+
+        return response()->json($extJson['variables'] ?? []);
+    }
+
+    /**
      * Add variable
      *
      * @return JsonResponse|Response
      */
     public function setVariables(Request $request)
     {
+        switch ($request->type) {
+            case 'multiselect':
+                $value = json_encode($request->value);
+                break;
+            default:
+                $value = $request->value;
+                break;
+        }
+
         Permission::grant(
             $request->role_id,
             'variable',
             $request->key,
-            $request->value,
-            null,
+            $value,
+            $request->type ?? 'string',
             'roles'
         );
 
@@ -581,6 +612,7 @@ class RoleController extends Controller
                     'role_id' => $request->role_id,
                     'key' => $request->key,
                     'value' => $request->value,
+                    'type' => $request->type ?? null,
                 ]
             ],
             "ROLE_EDIT"
@@ -598,7 +630,7 @@ class RoleController extends Controller
     {
         Permission::whereIn('id', $request->permission_ids)->delete();
 
-        return response()->json('Fonksiyonlar başarıyla silindi.');
+        return response()->json('Veri başarıyla silindi.');
     }
 
     /**
