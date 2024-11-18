@@ -54,6 +54,8 @@ class NotificationBuilder
                 break;
         }
 
+        Carbon::setLocale($this->locale ?: env('APP_LOCALE', 'tr'));
+
         $object = [
             'notification_id' => $this->notification->id,
             'title' => $title,
