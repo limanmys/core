@@ -176,6 +176,15 @@ class UserController extends Controller
      */
     public function delete(Request $request)
     {
+        $user = User::where('id', $request->user_id)->first();
+
+        // If user type is not local, return error
+        if ($user->auth_type !== 'local') {
+            return response()->json([
+                'message' => 'LDAP kullanıcıları silinemez.'
+            ], 400);
+        }
+
         // Delete Permissions
         Permission::where('morph_id', $request->user_id)->delete();
 
@@ -183,7 +192,6 @@ class UserController extends Controller
         RoleUser::where('user_id', $request->user_id)->delete();
 
         // Delete User
-        $user = User::where('id', $request->user_id)->first();
         $user->delete();
 
         AuditLog::write(

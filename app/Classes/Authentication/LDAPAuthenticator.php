@@ -36,7 +36,12 @@ class LDAPAuthenticator implements AuthenticatorInterface
             ->first();
 
         try {
-            $email = explode("@", strtolower($request->email))[0];
+            // Check if email contains @ symbol if not, just write the email
+            if (! strpos($request->email, '@')) {
+                $email = strtolower($request->email);
+            } else {
+                $email = explode("@", strtolower($request->email))[0];
+            }
             $ldap = new Ldap(
                 env('LDAP_HOST'),
                 $email,
@@ -125,16 +130,27 @@ class LDAPAuthenticator implements AuthenticatorInterface
         }
 
         if (! $create) {
-            $user = User::create([
-                'objectguid' => $objectguid,
-                'name' => $name,
-                'email' => $mail,
-                'username' => strtolower($ldapUser['samaccountname']),
-                'auth_type' => 'ldap',
-                'password' => Hash::make(Str::random(16)),
-                'forceChange' => false,
-            ]);
+            try {
+                $user = User::create([
+                    'objectguid' => $objectguid,
+                    'name' => $name,
+                    'email' => $mail,
+                    'username' => strtolower($ldapUser['samaccountname']),
+                    'auth_type' => 'ldap',
+                    'password' => Hash::make(Str::random(16)),
+                    'forceChange' => false,
+                ]);
+            } catch (\Throwable $e) {
+                Log::error('LDAP authentication failed. '.$e->getMessage());
+
+                return Authenticator::returnLoginError($request->email);
+            }
         } else {
+            if (! $user) {
+                // Return error if user already exists
+                Log::error('LDAP authentication failed. User already exists on system.');
+                return Authenticator::returnLoginError($request->email);
+            }
             if ($user->email != $mail) {
                 $temp = User::where('email', $mail)->first();
                 if (! $temp) {
