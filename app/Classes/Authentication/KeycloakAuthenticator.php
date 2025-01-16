@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Keycloak\KeycloakClient;
-use Keycloak\User\UserApi;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak as KeycloakProvider;
 
 class KeycloakAuthenticator implements AuthenticatorInterface
@@ -17,8 +16,6 @@ class KeycloakAuthenticator implements AuthenticatorInterface
     private $kcClient;
 
     private $oauthProvider;
-
-    private $kcUserApi;
 
     public function __construct()
     {
@@ -30,8 +27,6 @@ class KeycloakAuthenticator implements AuthenticatorInterface
             null,
             ''
         );
-
-        $this->kcUserApi = new UserApi($this->kcClient);
 
         $this->oauthProvider = new KeycloakProvider([
             'authServerUrl'     => env('KEYCLOAK_BASE_URL'),
@@ -54,10 +49,7 @@ class KeycloakAuthenticator implements AuthenticatorInterface
 
             $resourceOwner = $this->oauthProvider->getResourceOwner($accessTokenObject);
 
-            $roles = collect($this->kcUserApi->getRoles($resourceOwner->getId()))
-                    ->map(function ($role) {
-                        return $role->name;
-                    })->toArray();
+            $roles = $resourceOwner->toArray()['realm_access']['roles'];
         } catch (\Exception $e) {
             Log::error('Keycloak authentication failed. '.$e->getMessage());
 
@@ -95,9 +87,38 @@ class KeycloakAuthenticator implements AuthenticatorInterface
             'permissions' => $roles,
         ]);
 
+        try {
+            $allRealmRoles = $this->getAllRealmRoles();
+
+            foreach ($allRealmRoles as $role) {
+                if (in_array($role->name, $roles)) {
+                    // If user role is matched with realm role, check attributes and assign user to liman role
+                    if (isset($role->attributes->liman_role) && count($role->attributes->liman_role) > 0) {
+                       // Assign all items in liman_role attribute to user
+                        foreach ($role->attributes->liman_role as $limanRole) {
+                            $user->assignRole($limanRole);
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to fetch realm roles from Keycloak. '.$e->getMessage());
+        }
+
         return Authenticator::createNewToken(
             auth('api')->login($user),
             $request
         );
+    }
+
+    private function getAllRealmRoles()
+    {
+        $response = $this->kcClient->sendRequest('GET', "roles?briefRepresentation=false");
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to fetch composite roles');
+        }
+
+        return json_decode($response->getBody()->getContents());
     }
 }

@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject as JWTSubject;
+use Illuminate\Support\Str;
 
 /**
  * App\Models\User
@@ -188,6 +189,27 @@ class User extends Authenticatable implements JWTSubject
     public function authLogs()
     {
         return $this->hasMany('\App\Models\AuthLog');
+    }
+
+    /**
+     * Assign role to user
+     * 
+     * @param string $id
+     * @return void
+     */
+    public function assignRole($id)
+    {
+        // Check if id is valid for a role
+        if (Role::find($id) == null) {
+            return;
+        }
+
+        // Check if role is already assigned
+        if ($this->roles()->where('role_id', $id)->exists()) {
+            return;
+        }
+
+        $this->roles()->attach($id, ['id' => Str::uuid()]);
     }
 
     /**
