@@ -31,6 +31,9 @@ chmod +x /liman/server/storage/liman_render
 chmod +x /liman/server/storage/liman_system
 chmod +x /liman/server/storage/limanctl
 
+runuser liman -c '$(which gpg) --batch --yes --delete-keys aciklab@havelsan.com.tr'
+runuser liman -c '$(which gpg) --import /liman/server/storage/aciklab.public'
+
 # Generate environment variables if does not exist
 if [ -f "/liman/server/.env" ]; then
     echo "/liman/server/.env exists."
