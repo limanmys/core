@@ -105,6 +105,9 @@ class KeycloakAuthenticator implements AuthenticatorInterface
             Log::warning('Failed to fetch realm roles from Keycloak. '.$e->getMessage());
         }
 
+        // Set user preference of session time
+        auth('api')->factory()->setTTL($user->session_time);
+
         return Authenticator::createNewToken(
             auth('api')->login($user),
             $request

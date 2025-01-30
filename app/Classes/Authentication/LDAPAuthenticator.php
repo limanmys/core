@@ -235,6 +235,9 @@ class LDAPAuthenticator implements AuthenticatorInterface
             ]);
         }
 
+        // Set user preference of session time
+        auth('api')->factory()->setTTL($user->session_time);
+
         return Authenticator::createNewToken(
             auth('api')->login($user),
             $request

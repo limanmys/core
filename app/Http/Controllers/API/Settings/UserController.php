@@ -120,11 +120,13 @@ class UserController extends Controller
                 Rule::unique('users')->ignore($user->id),
             ],
             'password' => ['nullable', 'string', 'min:8'],
+            'session_time' => ['required', 'integer', 'min:15', 'max:999999'],
         ]);
 
         $data = [
             'name' => $request->name,
             'status' => $request->status,
+            'session_time' => $request->session_time,
         ];
 
         if ($user->auth_type !== 'ldap') {

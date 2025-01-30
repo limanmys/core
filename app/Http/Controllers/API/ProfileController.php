@@ -57,6 +57,7 @@ class ProfileController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'otp_enabled' => (bool) $request->otp_enabled,
+            'session_time' => $request->session_time,
         ]);
 
         if (! (bool) $request->otp_enabled) {

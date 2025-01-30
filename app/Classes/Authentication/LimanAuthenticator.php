@@ -18,6 +18,9 @@ class LimanAuthenticator implements AuthenticatorInterface
         if (! $user) {
             return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
         }
+
+        // Set user preference of session time
+        auth('api')->factory()->setTTL($user->session_time);
         
         $credentials["email"] = $user->email;
 
