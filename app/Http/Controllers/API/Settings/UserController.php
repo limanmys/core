@@ -123,10 +123,15 @@ class UserController extends Controller
             'session_time' => ['required', 'integer', 'min:15', 'max:999999'],
         ]);
 
+        $session_time = env('JWT_TTL', 120);
+        if ($request->session_time == $session_time) {
+            $session_time = -1;
+        }
+
         $data = [
             'name' => $request->name,
             'status' => $request->status,
-            'session_time' => $request->session_time,
+            'session_time' => $session_time,
         ];
 
         if ($user->auth_type !== 'ldap') {

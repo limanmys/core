@@ -28,6 +28,7 @@ class TweaksController extends Controller
             'LDAP_IGNORE_CERT' => (bool) env('LDAP_IGNORE_CERT', 'false'),
             'LOGIN_IMAGE' => SystemSettings::where('key', 'LOGIN_IMAGE')->first()?->data ?? '',
             'DEFAULT_AUTH_GATE' => env('DEFAULT_AUTH_GATE', 'liman'),
+            'JWT_TTL' => env('JWT_TTL', 120),
         ]);
     }
 
@@ -47,6 +48,7 @@ class TweaksController extends Controller
             'EXTENSION_TIMEOUT' => 'required|integer|min:1|max:300',
             'NEW_LOG_LEVEL' => 'required|string',
             'DEFAULT_AUTH_GATE' => 'required|string|in:liman,keycloak,ldap',
+            'JWT_TTL' => 'required|integer|min:15|max:999999',
         ], [], [
             "EXTENSION_TIMEOUT" => "Eklenti zaman aşımı"
         ]);
@@ -61,6 +63,7 @@ class TweaksController extends Controller
             'NEW_LOG_LEVEL' => $request->NEW_LOG_LEVEL,
             'LDAP_IGNORE_CERT' => (bool) $request->LDAP_IGNORE_CERT,
             'DEFAULT_AUTH_GATE' => $request->DEFAULT_AUTH_GATE,
+            'JWT_TTL' => $request->JWT_TTL,
         ]);
 
         if ($request->has('LOGIN_IMAGE') && $request->LOGIN_IMAGE != '') {
@@ -89,6 +92,7 @@ class TweaksController extends Controller
                 'NEW_LOG_LEVEL' => $request->NEW_LOG_LEVEL,
                 'LDAP_IGNORE_CERT' => (bool) $request->LDAP_IGNORE_CERT,
                 'DEFAULT_AUTH_GATE' => $request->DEFAULT_AUTH_GATE,
+                'JWT_TTL' => $request->JWT_TTL,
             ],
             "TWEAK_EDIT"
         );

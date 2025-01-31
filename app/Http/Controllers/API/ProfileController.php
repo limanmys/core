@@ -53,11 +53,16 @@ class ProfileController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . auth('api')->user()->id,
         ]);
 
+        $session_time = env('JWT_TTL', 120);
+        if ($request->session_time == $session_time) {
+            $session_time = -1;
+        }
+
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
             'otp_enabled' => (bool) $request->otp_enabled,
-            'session_time' => $request->session_time,
+            'session_time' => $session_time,
         ]);
 
         if (! (bool) $request->otp_enabled) {

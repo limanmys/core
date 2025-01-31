@@ -228,6 +228,17 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Manipulate model's session time field
+     */
+    public function getSessionTimeAttribute($value) {
+        if ($value == -1) {
+            return env('JWT_TTL', 120);
+        }
+
+        return $value;
+    }
+
+    /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
      * @return mixed
