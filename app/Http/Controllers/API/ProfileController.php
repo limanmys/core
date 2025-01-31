@@ -56,6 +56,8 @@ class ProfileController extends Controller
         $session_time = env('JWT_TTL', 120);
         if ($request->session_time == $session_time) {
             $session_time = -1;
+        } else {
+            $session_time = $request->session_time;
         }
 
         $user->update([
