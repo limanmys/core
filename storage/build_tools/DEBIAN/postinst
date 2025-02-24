@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Create Required Folders for Liman
-mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions,modules,packages}
+mkdir -p /liman/{server,certs,logs,sandbox,keys,extension}
 
 # environment creation
 if [ -f "/liman/server/.env" ]; then
@@ -48,23 +48,7 @@ fi
 DB_EXISTS=$(sudo -u liman psql -lqt | cut -d \| -f 1 | grep "liman" >/dev/null 2>/dev/null && echo "1" || echo "0")
 
 # Database Creation
-if [ -f "/liman/database/liman.sqlite" ]; then
-    sed -i '/DB_CONNECTION/d' /liman/server/.env
-    printf "\nDB_CONNECTION=sqlite\n" | tee -a /liman/server/.env
-    php /liman/server/artisan migrate --path=database/migrations/2020_11_17_134057_update_admin_notifications_table.php --force
-    php /liman/server/artisan migrate --path=database/migrations/2020_11_17_134154_update_notifications_table.php --force
-
-    sudo -u postgres createuser liman
-    sudo -u postgres createdb liman -O liman
-    RANDOM_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 25 ; echo)
-    sudo -u postgres psql -U postgres -d postgres -c "alter user \"liman\" with password '$RANDOM_PASSWORD';"
-    sed -i '/DB_PASSWORD/d' /liman/server/.env
-    printf "\nDB_PASSWORD=$RANDOM_PASSWORD\n" | tee -a /liman/server/.env
-    sudo -u liman /usr/bin/pgloader /liman/server/storage/migration.load
-    mv /liman/database/liman.sqlite /liman/database/liman.sqlite.bak
-    sed -i '/DB_CONNECTION/d' /liman/server/.env
-    printf "\nDB_CONNECTION=pgsql\n" | tee -a /liman/server/.env
-elif [ $DB_EXISTS == "0" ]; then
+if [ $DB_EXISTS == "0" ]; then
     # .env dosyasında DB_PASSWORD kontrolü
     if ! grep -q "DB_PASSWORD=" /liman/server/.env || [ -z "$(grep "DB_PASSWORD=" /liman/server/.env | sed 's/DB_PASSWORD=//')" ]; then
         # DB_PASSWORD boşsa veya yoksa yeni bir şifre oluştur
@@ -80,7 +64,7 @@ else
 fi
 
 # Update Php and Fpm to run as liman user.
-sed -i "s/www-data/liman/g" /etc/php/8.1/fpm/pool.d/www.conf
+sed -i "s/www-data/liman/g" /etc/php/8.4/fpm/pool.d/www.conf
 sed -i "s/www-data/liman/g" /etc/nginx/nginx.conf
 
 # Crontab Setting
@@ -113,10 +97,6 @@ server {
 fi
 
 #Supervisor Configuration
-if [ -f "/etc/supervisor/conf.d/liman-extension-worker.conf" ]; then
-    rm /etc/supervisor/conf.d/liman-extension-worker.conf;
-fi
-
 echo """
 #LIMAN_OPTIMIZATIONS
 [program:liman-high_availability_syncer]
@@ -143,16 +123,12 @@ redirect_stderr=true
 stdout_logfile=/liman/logs/system_update.log
     """ > /etc/supervisor/conf.d/liman-system-worker.conf
 
-if [ -f "/etc/supervisor/conf.d/liman-cron-mail.conf" ]; then
-    rm /etc/supervisor/conf.d/liman-cron-mail.conf
-fi
-
 supervisorctl reread
 supervisorctl update
 supervisorctl start all
 
 #Increase Php-Fpm Memory
-sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php/8.1/fpm/php.ini
+sed -i "s/memory_limit = 128M/memory_limit = 1024M/g" /etc/php/8.4/fpm/php.ini
 
 #Change Queue Driver from Db to Redis
 sed -i "s#QUEUE_DRIVER=database#QUEUE_DRIVER=redis#g" /liman/server/.env
@@ -178,18 +154,13 @@ php /liman/server/artisan config:clear
 rm -rf /liman/sandbox/{.git,vendor,views,.gitignore,composer.json,composer.lock,index.php}
 
 # Set Permissions
-chown -R liman:liman /liman/{server,database,certs,sandbox,logs,modules,packages,hashes}
-chmod 700 -R /liman/{server,database,certs,modules,packages,hashes}
+chown -R liman:liman /liman/{server,certs,sandbox,logs,hashes}
+chmod 700 -R /liman/{server,certs,hashes}
 chmod 750 -R /liman/logs
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
 chmod 755 /{liman,liman/extensions,liman/keys}
 usermod -aG liman syslog
-
-# Create Systemd Service
-if [ -f "/etc/systemd/system/liman-connector.service" ]; then
-    rm /etc/systemd/system/liman-connector.service
-fi
 
 # Create UI Systemd Service
 if [ -f "/etc/systemd/system/liman-ui.service" ]; then
@@ -259,16 +230,6 @@ WantedBy=multi-user.target
     """ > /etc/systemd/system/liman-render.service
 fi
 
-# Remove Old WebSSH Service
-if [ -f "/etc/systemd/system/liman-webssh.service" ]; then
-    rm /etc/systemd/system/liman-webssh.service
-fi
-
-# Remove Old VNC Service
-if [ -f "/etc/systemd/system/liman-vnc.service" ]; then
-    rm /etc/systemd/system/liman-vnc.service
-fi
-
 # Create Socket Service
 if [ -f "/etc/systemd/system/liman-socket.service" ]; then
     echo "Liman Socket Service Already Added.";
@@ -290,17 +251,10 @@ WantedBy=multi-user.target
     """ > /etc/systemd/system/liman-socket.service
 fi
 
-if (systemctl -q is-active systemd-resolved.service); then
-    systemctl disable systemd-resolved
-    systemctl stop systemd-resolved
-    rm /etc/resolv.conf
-    /usr/bin/python3 /liman/server/storage/smb-dhcp-client 2> /dev/null | grep "Domain Name Server(s)" | cut -d : -f 2 |  xargs  | sed 's/ /\n/g' |sed 's/.*\..*\..*\..*/nameserver &/g' > /etc/resolv.conf
-fi
+sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/8.4/fpm/php.ini
+sed -i "s/post_max_size.*/post_max_size = 100M/g" /etc/php/8.4/fpm/php.ini
 
-sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/8.1/fpm/php.ini
-sed -i "s/post_max_size.*/post_max_size = 100M/g" /etc/php/8.1/fpm/php.ini
-
-mv -f /liman/server/storage/php8.1-fpm-www.conf /etc/php/8.1/fpm/pool.d/www.conf
+mv -f /liman/server/storage/php8.4-fpm-www.conf /etc/php/8.4/fpm/pool.d/www.conf
 
 # Reload the systemd
 systemctl daemon-reload
@@ -318,9 +272,9 @@ systemctl disable liman-webssh 2>/dev/null
 systemctl disable liman-vnc 2>/dev/null
 systemctl enable liman-socket 2>/dev/null
 systemctl enable nginx 2>/dev/null
-systemctl stop php7.3-fpm 2>/dev/null
-systemctl disable php7.3-fpm 2>/dev/null
-systemctl enable php8.1-fpm 2>/dev/null
+systemctl stop php8.1-fpm 2>/dev/null
+systemctl disable php8.1-fpm 2>/dev/null
+systemctl enable php8.4-fpm 2>/dev/null
 
 systemctl stop liman-connector
 systemctl stop liman-vnc
@@ -330,7 +284,7 @@ systemctl restart liman-system
 systemctl restart liman-render
 systemctl restart liman-socket
 systemctl restart nginx
-systemctl restart php8.1-fpm
+systemctl restart php8.4-fpm
 
 # Optimize Liman
 php /liman/server/artisan optimize:clear

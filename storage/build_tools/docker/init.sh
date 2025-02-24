@@ -8,8 +8,6 @@ rm -rf /liman_files
 chown liman:liman /liman
 chmod -R 700 /liman/certs
 chown -R liman:liman /liman/certs
-chmod -R 700 /liman/database
-chown -R liman:liman /liman/database
 chmod -R 755 /liman/extensions
 chown liman:liman /liman/extensions
 chmod -R 755 /liman/keys
@@ -22,8 +20,6 @@ chmod -R 700 /liman/server
 chown -R liman:liman /liman/server
 chmod -R 700 /liman/modules
 chown -R liman:liman /liman/modules
-chmod -R 700 /liman/packages
-chown -R liman:liman /liman/packages
 chmod -R 700 /liman/ui
 chown -R liman:liman /liman/ui
 
