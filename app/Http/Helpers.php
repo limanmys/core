@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Jackiedo\DotenvEditor\Facades\DotenvEditor;
 use mervick\aesEverywhere\AES256;
+use sixlive\DotenvEditor\DotenvEditor;
 
 if (! function_exists('validate')) {
     /**
@@ -717,8 +717,12 @@ if (! function_exists('setEnv')) {
      */
     function setEnv(array $values): bool
     {
-        $editor = DotenvEditor::load(base_path('.env'));
-        $editor->setKeys($values);
+        $editor = new DotenvEditor;
+
+        $editor = $editor->load(base_path('.env'));
+        foreach ($values as $key => $value) {
+            $editor->set($key, $value);
+        }
         try {
             $editor->save();
         } catch (\Exception) {
