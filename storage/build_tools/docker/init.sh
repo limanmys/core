@@ -18,8 +18,6 @@ chmod -R 755 /liman/sandbox
 chown -R liman:liman /liman/sandbox
 chmod -R 700 /liman/server
 chown -R liman:liman /liman/server
-chmod -R 700 /liman/modules
-chown -R liman:liman /liman/modules
 chmod -R 700 /liman/ui
 chown -R liman:liman /liman/ui
 
@@ -49,7 +47,6 @@ else
     echo "JWT secret already set."
 fi
 
-
 # Set container mode to true
 grep -E "^CONTAINER_MODE" /liman/server/.env >/dev/null && sed -i '/^CONTAINER_MODE/d' /liman/server/.env && echo "CONTAINER_MODE=true" >> /liman/server/.env || echo "CONTAINER_MODE=true" >> /liman/server/.env
 
@@ -72,9 +69,9 @@ chown -R liman:liman /liman/logs
 
 # Set needed values
 sed -i "s#QUEUE_DRIVER=database#QUEUE_DRIVER=redis#g" /liman/server/.env
-sed -i "s/memory_limit.*/memory_limit = 1024M/g" /etc/php/8.1/fpm/php.ini
-sed -i "s/post_max_size.*/post_max_size = 128M/g" /etc/php/8.1/fpm/php.ini
-sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/8.1/fpm/php.ini
+sed -i "s/memory_limit.*/memory_limit = 1024M/g" /etc/php/8.4/fpm/php.ini
+sed -i "s/post_max_size.*/post_max_size = 128M/g" /etc/php/8.4/fpm/php.ini
+sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/8.4/fpm/php.ini
 
 # Dynamic nginx port
 sed -i "s/listen 443 ssl http2.*/listen ${NGINX_PORT} ssl http2;/g" /etc/nginx/sites-available/liman.conf

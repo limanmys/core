@@ -232,7 +232,12 @@ fi
 
 # Create Socket Service
 if [ -f "/etc/systemd/system/liman-socket.service" ]; then
-    echo "Liman Socket Service Already Added.";
+    if grep -q "websockets:" "/etc/systemd/system/liman-socket.service"; then
+        sed -i 's|ExecStart=/usr/bin/php /liman/server/artisan websockets:[a-z]*|ExecStart=/usr/bin/php /liman/server/artisan reverb:start --port=6001|g' /etc/systemd/system/liman-socket.service
+        echo "Liman Socket Service güncellendi."
+    else
+        echo "Liman Socket Service zaten güncel."
+    fi
 else
         echo """
 [Unit]
@@ -244,12 +249,36 @@ Type=simple
 Restart=always
 RestartSec=1
 User=liman
-ExecStart=/usr/bin/php /liman/server/artisan websockets:serve --host=127.0.0.1
+ExecStart=/usr/bin/php /liman/server/artisan reverb:start --port=6001
 
 [Install]
 WantedBy=multi-user.target
     """ > /etc/systemd/system/liman-socket.service
 fi
+
+# Reverb websocket installation
+declare -A reverb_vars=(
+    ["REVERB_APP_ID"]="app"
+    ["REVERB_APP_KEY"]="liman-key"
+    ["REVERB_APP_SECRET"]="liman-secret"
+    ["REVERB_HOST"]="127.0.0.1"
+    ["REVERB_PORT"]="6001"
+    ["REVERB_SCHEME"]="http"
+)
+
+# Her değişken için kontrol et ve yoksa ekle
+for key in "${!reverb_vars[@]}"; do
+    value="${reverb_vars[$key]}"
+    
+    # Değişken dosyada var mı kontrol et
+    if ! grep -q "^$key=" "/liman/server/.env"; then
+        # Değişken yoksa, dosyanın sonuna ekle
+        echo "$key=$value" >> "/liman/server/.env"
+        echo "$key değişkeni eklendi."
+    else
+        echo "$key değişkeni zaten mevcut."
+    fi
+done
 
 sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/8.4/fpm/php.ini
 sed -i "s/post_max_size.*/post_max_size = 100M/g" /etc/php/8.4/fpm/php.ini
