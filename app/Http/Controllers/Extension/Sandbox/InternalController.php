@@ -8,6 +8,7 @@ use App\Mail\TemplatedExtensionMail;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
+use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -150,5 +151,10 @@ class InternalController extends Controller
         fclose($writer);
 
         return $token;
+    }
+
+    public function getLimanUsers()
+    {
+        return json_encode(User::select('id', 'name', 'username', 'email', 'status')->get());
     }
 }

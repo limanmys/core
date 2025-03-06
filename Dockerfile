@@ -34,7 +34,7 @@ RUN mv ui /liman_files/
 COPY . /liman_files/server
 
 # PHP SANDBOX
-RUN wget "https://github.com/limanmys/php-sandbox/archive/refs/heads/master.zip" -O "sandbox.zip"
+RUN wget "https://github.com/limanmys/php-sandbox/archive/2.2-dev.zip" -O "sandbox.zip"
 RUN unzip -qq sandbox.zip
 RUN mkdir -p /liman_files/sandbox/php
 RUN mv php-sandbox-master/* /liman_files/sandbox/php/

@@ -12,4 +12,9 @@ Route::prefix('/lmn/private')
             '/reverseProxyRequest',
             'Extension\Sandbox\InternalController@addProxyConfig'
         )->name('SandboxAddVncProxyConfig');
+
+        Route::get(
+            '/getLimanUsers',
+            'Extension\Sandbox\InternalController@getLimanUsers'
+        )->name('SandboxGetLimanUsers');
     });
