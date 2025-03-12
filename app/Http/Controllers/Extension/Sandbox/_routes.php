@@ -13,7 +13,7 @@ Route::prefix('/lmn/private')
             'Extension\Sandbox\InternalController@addProxyConfig'
         )->name('SandboxAddVncProxyConfig');
 
-        Route::get(
+        Route::post(
             '/getLimanUsers',
             'Extension\Sandbox\InternalController@getLimanUsers'
         )->name('SandboxGetLimanUsers');
