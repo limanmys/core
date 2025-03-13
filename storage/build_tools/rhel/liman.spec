@@ -290,6 +290,13 @@ WantedBy=multi-user.target
     """ > /etc/systemd/system/liman-socket.service
 fi
 
+if (systemctl -q is-active systemd-resolved.service); then
+    systemctl disable systemd-resolved
+    systemctl stop systemd-resolved
+    rm /etc/resolv.conf
+    /usr/bin/python3 /liman/server/storage/smb-dhcp-client 2> /dev/null | grep "Domain Name Server(s)" | cut -d : -f 2 |  xargs  | sed 's/ /\n/g' |sed 's/.*\..*\..*\..*/nameserver &/g' > /etc/resolv.conf
+fi
+
 # Reverb websocket installation
 declare -A reverb_vars=(
     ["REVERB_APP_ID"]="app"
