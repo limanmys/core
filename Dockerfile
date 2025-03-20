@@ -26,7 +26,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt -yqq install sudo nodejs gpg zip unzip ng
 RUN bash -c 'mkdir -p /liman_files/{server,certs,logs,database,sandbox,keys,extensions,packages,ui}'
 
 # UI
-RUN wget -qi https://github.com/limanmys/next/releases/download/release.master.150/ui-master-150.zip
+RUN wget https://github.com/limanmys/next/releases/download/release.master.150/ui-master-150.zip
 RUN unzip ui*.zip -d ui
 RUN mv ui /liman_files/
 

@@ -21,7 +21,7 @@ rm -rf $1.zip php-sandbox-$1
 #| cut -d : -f 2,3 \
 #| tr -d \" \
 #| wget -qi -
-wget -qi https://github.com/limanmys/next/releases/download/release.master.150/ui-master-150.zip
+wget https://github.com/limanmys/next/releases/download/release.master.150/ui-master-150.zip
 unzip ui-master-150.zip -d package/liman/ui
 rm ui-master-150.zip
 
