@@ -5,6 +5,7 @@ namespace App\Classes\Authentication;
 use App\Models\Oauth2Token;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -50,6 +51,19 @@ class KeycloakAuthenticator implements AuthenticatorInterface
             $resourceOwner = $this->oauthProvider->getResourceOwner($accessTokenObject);
 
             $roles = $resourceOwner->toArray()['realm_access']['roles'];
+
+            // Put roles in Redis
+            $encoded_roles = json_encode($roles);
+
+            $isCached = Cache::put(
+                sprintf("kc_roles:%s", $resourceOwner->getId()),
+                $encoded_roles,
+                60 * 24 * 60 * 7
+            );
+
+            if (! $isCached) {
+                Log::warning('Failed to cache roles for user '.$resourceOwner->getId());
+            }
         } catch (\Exception $e) {
             Log::error('Keycloak authentication failed. '.$e->getMessage());
 
