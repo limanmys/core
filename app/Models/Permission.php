@@ -6,6 +6,7 @@ use App\Support\Database\CacheQueryBuilder;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Permission Model
@@ -44,6 +45,20 @@ class Permission extends Model
         // Verify if user is admin.
         if ($user->isAdmin()) {
             return true;
+        }
+
+        if ($user->auth_type === 'keycloak') {
+            $cachedRoles = Cache::get(
+                sprintf("kc_roles:%s", $user->id)
+            );
+
+            if ($cachedRoles) {
+                $roles = json_decode($cachedRoles);
+
+                if (in_array($extra, $roles)) {
+                    return true;
+                }
+            }
         }
 
         $ids = $user->roles->pluck('id')->toArray();
