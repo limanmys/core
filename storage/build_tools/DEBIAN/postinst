@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Create Required Folders for Liman
-mkdir -p /liman/{server,certs,logs,sandbox,keys,extension}
+mkdir -p /liman/{server,certs,logs,sandbox,keys,extensions}
+
+# Remove obsolete folder
+rm -r /liman/extension
 
 # environment creation
 if [ -f "/liman/server/.env" ]; then
@@ -333,6 +336,9 @@ php /liman/server/artisan up
 
 # Flush Redis Cache
 redis-cli flushall
+
+# Patch Broken Sandbox Package
+sed -i 's/public function lseek($file, int $offset, int $whence = SEEK_SET, string $path = null) {/public function lseek($file, int $offset, int $whence = SEEK_SET, ?string $path = null) {/' /liman/sandbox/php/vendor/icewind/smb/src/Native/NativeState.php
 
 # Create Limanctl Symlink
 chmod +x /liman/server/storage/limanctl

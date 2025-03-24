@@ -101,6 +101,9 @@ grep -E "^CONTAINER_MODE" /liman/server/.env >/dev/null && sed -i '/^CONTAINER_M
 chmod +x /usr/bin/limanctl
 chmod +x /liman/server/storage/limanctl
 
+# Patch broken sandbox package
+sed -i 's/public function lseek($file, int $offset, int $whence = SEEK_SET, string $path = null) {/public function lseek($file, int $offset, int $whence = SEEK_SET, ?string $path = null) {/' /liman/sandbox/php/vendor/icewind/smb/src/Native/NativeState.php
+
 # Start Liman services
 sleep 3;
 /usr/bin/supervisord -c /etc/supervisor/supervisor.conf 

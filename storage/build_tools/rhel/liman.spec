@@ -2,7 +2,7 @@ Name: liman
 Version: %VERSION%
 Release: 0
 License: MIT
-Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, php-smbclient, postgresql, postgresql-server, nodejs
+Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, postgresql, postgresql-server, nodejs
 Prefix: /liman
 Summary: Liman MYS
 Group: Applications/System
@@ -23,7 +23,10 @@ cp -rfa %{_app_dir} %{buildroot}
 %post -p /bin/bash
 
 # Create Required Folders for Liman
-mkdir -p /liman/{server,certs,logs,sandbox,keys,extension}
+mkdir -p /liman/{server,certs,logs,sandbox,keys,extensions}
+
+# Remove obsolete folder
+rm -r /liman/extension
 
 # environment creation
 if [ -f "/liman/server/.env" ]; then
@@ -390,6 +393,9 @@ php /liman/server/artisan up
 
 # Flush Redis Cache
 redis-cli flushall
+
+# Patch Broken Sandbox Package
+sed -i 's/public function lseek($file, int $offset, int $whence = SEEK_SET, string $path = null) {/public function lseek($file, int $offset, int $whence = SEEK_SET, ?string $path = null) {/' /liman/sandbox/php/vendor/icewind/smb/src/Native/NativeState.php
 
 # Create Limanctl Symlink
 chmod +x /liman/server/storage/limanctl

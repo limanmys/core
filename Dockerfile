@@ -20,7 +20,7 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesourc
 RUN apt -yqq update
 
 # LIMAN DEPS
-RUN DEBIAN_FRONTEND=noninteractive apt -yqq install sudo nodejs gpg zip unzip nginx sysstat php8.4-redis php8.4-fpm php8.4-gd php8.4-curl php8.4 php8.4-snmp php8.4-mbstring php8.4-xml php8.4-zip php8.4-posix libnginx-mod-http-headers-more-filter libssl3 supervisor php8.4-pgsql php8.4-bcmath dnsutils php8.4-ldap php8.4-smbclient krb5-user php8.4-ssh2 smbclient novnc
+RUN DEBIAN_FRONTEND=noninteractive apt -yqq install sudo nodejs gpg zip unzip nginx sysstat php8.4-redis php8.4-fpm php8.4-gd php8.4-curl php8.4 php8.4-snmp php8.4-mbstring php8.4-xml php8.4-zip php8.4-posix libnginx-mod-http-headers-more-filter libssl3 supervisor php8.4-pgsql php8.4-bcmath dnsutils php8.4-ldap krb5-user php8.4-ssh2 novnc
 
 # FILES
 RUN bash -c 'mkdir -p /liman_files/{server,certs,logs,database,sandbox,keys,extensions,packages,ui}'
