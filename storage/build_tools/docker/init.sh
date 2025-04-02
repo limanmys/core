@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # Remove old liman files if exists
 rm -rf /liman/server/{app,bootstrap,vendor,public} >/dev/null
@@ -45,7 +45,7 @@ fi
 
 # JWT Secret creation
 JWT_EXISTS=$(grep JWT_SECRET /liman/server/.env && echo "1" || echo "0")
-if [ $JWT_EXISTS == "0" ]; then
+if [ $JWT_EXISTS = "0" ]; then
     php /liman/server/artisan jwt:secret
 else
     echo "JWT secret already set."
@@ -132,4 +132,4 @@ sed -i 's/public function lseek($file, int $offset, int $whence = SEEK_SET, stri
 
 # Start Liman services
 sleep 3;
-/usr/bin/supervisord -c /etc/supervisor/supervisor.conf 
+/usr/bin/supervisord -c /etc/supervisor/supervisor.conf
