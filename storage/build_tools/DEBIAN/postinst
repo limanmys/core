@@ -344,6 +344,6 @@ sed -i 's/public function lseek($file, int $offset, int $whence = SEEK_SET, stri
 chmod +x /liman/server/storage/limanctl
 cp -f /liman/server/storage/limanctl /usr/bin/limanctl
 
-#Finalize Installation
+# Finalize Installation
 printf "\nKurulum Başarıyla Tamamlandı!\n\nYönetici Hesabı oluşturmak yada şifrenizi yenilemek için aşağıdaki komutu çalıştırabilisiniz\n\n\n"
 printf "sudo limanctl administrator\n\n\nDestek için liman.havelsan.com.tr adresini ziyaret edebilirsiniz.\n"

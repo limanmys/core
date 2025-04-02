@@ -1,5 +1,9 @@
 #!/usr/bin/env sh
 
+# Remove old liman files if exists
+rm -rf /liman/server/{app,bootstrap,vendor,public} >/dev/null
+rm -rf /liman/sandbox/php/{vendor,views} >/dev/null
+
 # Update files on the persistent storage
 cp -r /liman_files/* /liman
 rm -rf /liman_files
@@ -61,6 +65,28 @@ sed -i "s/^DB_PORT=.*/DB_PORT=${DB_PORT}/g" /liman/server/.env
 sed -i "s/^DB_DATABASE=.*/DB_DATABASE=${DB_DATABASE}/g" /liman/server/.env 
 sed -i "s/^DB_USERNAME=.*/DB_USERNAME=${DB_USERNAME}/g" /liman/server/.env 
 sed -i "s/^DB_PASSWORD=.*/DB_PASSWORD=${DB_PASS}/g" /liman/server/.env 
+
+# Reverb websocket installation
+declare -A reverb_vars=(
+    ["REVERB_APP_ID"]="app"
+    ["REVERB_APP_KEY"]="liman-key"
+    ["REVERB_APP_SECRET"]="liman-secret"
+    ["REVERB_HOST"]="127.0.0.1"
+    ["REVERB_PORT"]="6001"
+    ["REVERB_SCHEME"]="http"
+)
+
+# Reverb websocket .env settings
+for key in "${!reverb_vars[@]}"; do
+    value="${reverb_vars[$key]}"
+    
+    # Değişken dosyada var mı kontrol et
+    if ! grep -q "^$key=" "/liman/server/.env"; then
+        # Değişken yoksa, dosyanın sonuna ekle
+        echo "$key=$value" >> "/liman/server/.env"
+        echo "$key added to .env"
+    fi
+done
 
 # Permission fix
 touch /liman/logs/liman.log
