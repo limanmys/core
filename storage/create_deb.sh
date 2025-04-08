@@ -21,6 +21,8 @@ curl -s https://api.github.com/repos/limanmys/next/releases/latest \
 | cut -d : -f 2,3 \
 | tr -d \" \
 | wget -qi -
+unzip ui*.zip -d package/liman/ui
+rm ui*.zip
 
 #Render Engine
 curl -s https://api.github.com/repos/limanmys/fiber-render-engine/releases/latest \
