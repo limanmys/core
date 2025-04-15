@@ -1,4 +1,8 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+
+# Remove old liman files if exists
+rm -rf /liman/server/{app,bootstrap,vendor,public} >/dev/null
+rm -rf /liman/sandbox/php/{vendor,views} >/dev/null
 
 # Update files on the persistent storage
 cp -r /liman_files/* /liman
@@ -8,8 +12,6 @@ rm -rf /liman_files
 chown liman:liman /liman
 chmod -R 700 /liman/certs
 chown -R liman:liman /liman/certs
-chmod -R 700 /liman/database
-chown -R liman:liman /liman/database
 chmod -R 755 /liman/extensions
 chown liman:liman /liman/extensions
 chmod -R 755 /liman/keys
@@ -20,10 +22,6 @@ chmod -R 755 /liman/sandbox
 chown -R liman:liman /liman/sandbox
 chmod -R 700 /liman/server
 chown -R liman:liman /liman/server
-chmod -R 700 /liman/modules
-chown -R liman:liman /liman/modules
-chmod -R 700 /liman/packages
-chown -R liman:liman /liman/packages
 chmod -R 700 /liman/ui
 chown -R liman:liman /liman/ui
 
@@ -47,12 +45,11 @@ fi
 
 # JWT Secret creation
 JWT_EXISTS=$(grep JWT_SECRET /liman/server/.env && echo "1" || echo "0")
-if [ $JWT_EXISTS == "0" ]; then
+if [ $JWT_EXISTS = "0" ]; then
     php /liman/server/artisan jwt:secret
 else
     echo "JWT secret already set."
 fi
-
 
 # Set container mode to true
 grep -E "^CONTAINER_MODE" /liman/server/.env >/dev/null && sed -i '/^CONTAINER_MODE/d' /liman/server/.env && echo "CONTAINER_MODE=true" >> /liman/server/.env || echo "CONTAINER_MODE=true" >> /liman/server/.env
@@ -69,6 +66,28 @@ sed -i "s/^DB_DATABASE=.*/DB_DATABASE=${DB_DATABASE}/g" /liman/server/.env
 sed -i "s/^DB_USERNAME=.*/DB_USERNAME=${DB_USERNAME}/g" /liman/server/.env 
 sed -i "s/^DB_PASSWORD=.*/DB_PASSWORD=${DB_PASS}/g" /liman/server/.env 
 
+# Reverb websocket installation
+declare -A reverb_vars=(
+    ["REVERB_APP_ID"]="app"
+    ["REVERB_APP_KEY"]="liman-key"
+    ["REVERB_APP_SECRET"]="liman-secret"
+    ["REVERB_HOST"]="127.0.0.1"
+    ["REVERB_PORT"]="6001"
+    ["REVERB_SCHEME"]="http"
+)
+
+# Reverb websocket .env settings
+for key in "${!reverb_vars[@]}"; do
+    value="${reverb_vars[$key]}"
+    
+    # Değişken dosyada var mı kontrol et
+    if ! grep -q "^$key=" "/liman/server/.env"; then
+        # Değişken yoksa, dosyanın sonuna ekle
+        echo "$key=$value" >> "/liman/server/.env"
+        echo "$key added to .env"
+    fi
+done
+
 # Permission fix
 touch /liman/logs/liman.log
 touch /liman/logs/liman_new.log
@@ -76,9 +95,9 @@ chown -R liman:liman /liman/logs
 
 # Set needed values
 sed -i "s#QUEUE_DRIVER=database#QUEUE_DRIVER=redis#g" /liman/server/.env
-sed -i "s/memory_limit.*/memory_limit = 1024M/g" /etc/php/8.1/fpm/php.ini
-sed -i "s/post_max_size.*/post_max_size = 128M/g" /etc/php/8.1/fpm/php.ini
-sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/8.1/fpm/php.ini
+sed -i "s/memory_limit.*/memory_limit = 1024M/g" /etc/php/8.4/fpm/php.ini
+sed -i "s/post_max_size.*/post_max_size = 128M/g" /etc/php/8.4/fpm/php.ini
+sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php/8.4/fpm/php.ini
 
 # Dynamic nginx port
 sed -i "s/listen 443 ssl http2.*/listen ${NGINX_PORT} ssl http2;/g" /etc/nginx/sites-available/liman.conf
@@ -108,6 +127,9 @@ grep -E "^CONTAINER_MODE" /liman/server/.env >/dev/null && sed -i '/^CONTAINER_M
 chmod +x /usr/bin/limanctl
 chmod +x /liman/server/storage/limanctl
 
+# Patch broken sandbox package
+sed -i 's/public function lseek($file, int $offset, int $whence = SEEK_SET, string $path = null) {/public function lseek($file, int $offset, int $whence = SEEK_SET, ?string $path = null) {/' /liman/sandbox/php/vendor/icewind/smb/src/Native/NativeState.php
+
 # Start Liman services
 sleep 3;
-/usr/bin/supervisord -c /etc/supervisor/supervisor.conf 
+/usr/bin/supervisord -c /etc/supervisor/supervisor.conf

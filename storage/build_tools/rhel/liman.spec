@@ -2,7 +2,7 @@ Name: liman
 Version: %VERSION%
 Release: 0
 License: MIT
-Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, libsmbclient, samba-client, php-smbclient, postgresql, postgresql-server, nodejs
+Requires: curl, gpgme, zip, unzip, nginx, crontabs, redis, php, php-fpm, php-pecl-redis5, php-pecl-zip, php-gd, php-snmp, php-mbstring, php-xml, php-pdo, openssl, supervisor, php-pgsql, php-bcmath, rsync, bind-utils, php-ldap, postgresql, postgresql-server, nodejs
 Prefix: /liman
 Summary: Liman MYS
 Group: Applications/System
@@ -23,7 +23,10 @@ cp -rfa %{_app_dir} %{buildroot}
 %post -p /bin/bash
 
 # Create Required Folders for Liman
-mkdir -p /liman/{server,certs,logs,database,sandbox,keys,extensions,modules,packages}
+mkdir -p /liman/{server,certs,logs,sandbox,keys,extensions}
+
+# Remove obsolete folder
+rm -r /liman/extension
 
 # environment creation
 if [ -f "/liman/server/.env" ]; then
@@ -124,7 +127,7 @@ else
 fi
 
 sed -i "s/more_set_headers/#more_set_headers/g" /liman/server/storage/nginx.conf
-sed -i "s/php\/php8.1-fpm.sock/php-fpm\/www.sock/g" /liman/server/storage/nginx.conf
+sed -i "s/php\/php8.4-fpm.sock/php-fpm\/www.sock/g" /liman/server/storage/nginx.conf
 mv /liman/server/storage/nginx.conf /etc/nginx/conf.d/liman.conf
 
 # Nginx Auto Redirection
@@ -177,8 +180,8 @@ php /liman/server/artisan config:clear
 rm -rf /liman/sandbox/{.git,vendor,views,.gitignore,composer.json,composer.lock,index.php}
 
 # Set Permissions
-chown -R liman:liman /liman/{server,database,certs,sandbox,logs,modules,packages,hashes}
-chmod 700 -R /liman/{server,database,certs,modules,packages,hashes}
+chown -R liman:liman /liman/{server,certs,sandbox,logs,hashes}
+chmod 700 -R /liman/{server,certs,hashes}
 chmod 750 -R /liman/logs
 chmod 755 -R /liman/sandbox
 chown liman:liman /{liman,liman/extensions,liman/keys}
@@ -266,7 +269,12 @@ fi
 
 # Create Socket Service
 if [ -f "/etc/systemd/system/liman-socket.service" ]; then
-    echo "Liman Socket Service Already Added.";
+    if grep -q "websockets:" "/etc/systemd/system/liman-socket.service"; then
+        sed -i 's|ExecStart=/usr/bin/php /liman/server/artisan websockets:[a-z]*|ExecStart=/usr/bin/php /liman/server/artisan reverb:start --port=6001|g' /etc/systemd/system/liman-socket.service
+        echo "Liman Socket Service güncellendi."
+    else
+        echo "Liman Socket Service zaten güncel."
+    fi
 else
         echo """
 [Unit]
@@ -278,7 +286,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User=liman
-ExecStart=/usr/bin/php /liman/server/artisan websockets:serve --host=127.0.0.1
+ExecStart=/usr/bin/php /liman/server/artisan reverb:start --port=6001
 
 [Install]
 WantedBy=multi-user.target
@@ -291,6 +299,30 @@ if (systemctl -q is-active systemd-resolved.service); then
     rm /etc/resolv.conf
     /usr/bin/python3 /liman/server/storage/smb-dhcp-client 2> /dev/null | grep "Domain Name Server(s)" | cut -d : -f 2 |  xargs  | sed 's/ /\n/g' |sed 's/.*\..*\..*\..*/nameserver &/g' > /etc/resolv.conf
 fi
+
+# Reverb websocket installation
+declare -A reverb_vars=(
+    ["REVERB_APP_ID"]="app"
+    ["REVERB_APP_KEY"]="liman-key"
+    ["REVERB_APP_SECRET"]="liman-secret"
+    ["REVERB_HOST"]="127.0.0.1"
+    ["REVERB_PORT"]="6001"
+    ["REVERB_SCHEME"]="http"
+)
+
+# Her değişken için kontrol et ve yoksa ekle
+for key in "${!reverb_vars[@]}"; do
+    value="${reverb_vars[$key]}"
+    
+    # Değişken dosyada var mı kontrol et
+    if ! grep -q "^$key=" "/liman/server/.env"; then
+        # Değişken yoksa, dosyanın sonuna ekle
+        echo "$key=$value" >> "/liman/server/.env"
+        echo "$key değişkeni eklendi."
+    else
+        echo "$key değişkeni zaten mevcut."
+    fi
+done
 
 sed -i "s/upload_max_filesize.*/upload_max_filesize = 100M/g" /etc/php.ini
 sed -i "s/post_max_size.*/post_max_size = 100M/g" /etc/php.ini
@@ -361,6 +393,9 @@ php /liman/server/artisan up
 
 # Flush Redis Cache
 redis-cli flushall
+
+# Patch Broken Sandbox Package
+sed -i 's/public function lseek($file, int $offset, int $whence = SEEK_SET, string $path = null) {/public function lseek($file, int $offset, int $whence = SEEK_SET, ?string $path = null) {/' /liman/sandbox/php/vendor/icewind/smb/src/Native/NativeState.php
 
 # Create Limanctl Symlink
 chmod +x /liman/server/storage/limanctl

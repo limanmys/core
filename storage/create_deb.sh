@@ -77,7 +77,7 @@ Date : $DATE
 Architecture: amd64
 Priority: important
 Description: Liman MYS
-Depends: curl, gpg, zip, unzip, nginx, redis, php8.1-redis, php8.1-fpm, php8.1-gd, php8.1-curl, php8.1, php8.1-sqlite3, php8.1-snmp, php8.1-mbstring, php8.1-xml, php8.1-zip, php8.1-posix, libnginx-mod-http-headers-more-filter, libssl1.1 | libssl3, supervisor, postgresql-15, php8.1-pgsql, pgloader, php8.1-bcmath, rsync, dnsutils, php8.1-ldap, php8.1-smbclient, krb5-user, php8.1-ssh2, smbclient, nodejs""" > DEBIAN/control
+Depends: curl, gpg, zip, unzip, nginx, redis, php8.4-redis, php8.4-fpm, php8.4-gd, php8.4-curl, php8.4, php8.4-snmp, php8.4-mbstring, php8.4-xml, php8.4-zip, php8.4-posix, libnginx-mod-http-headers-more-filter, libssl1.1 | libssl3, supervisor, postgresql-15, php8.4-pgsql, php8.4-bcmath, dnsutils, php8.4-ldap, krb5-user, php8.4-ssh2, nodejs""" > DEBIAN/control
 cat DEBIAN/control
 cd ../
 dpkg-deb -Zgzip --build package

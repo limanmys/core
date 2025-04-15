@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject as JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject as JWTSubject;
 use Illuminate\Support\Str;
 
 /**
