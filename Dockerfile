@@ -34,11 +34,11 @@ RUN mv ui /liman_files/
 COPY . /liman_files/server
 
 # PHP SANDBOX
-RUN wget "https://github.com/limanmys/php-sandbox/archive/2.2-dev.zip" -O "sandbox.zip"
+RUN wget "https://github.com/limanmys/php-sandbox/archive/refs/heads/master.zip" -O "sandbox.zip"
 RUN unzip -qq sandbox.zip
 RUN mkdir -p /liman_files/sandbox/php
-RUN mv php-sandbox-2.2-dev/* /liman_files/sandbox/php/
-RUN rm -rf sandbox.zip php-sandbox-2.2-dev
+RUN mv php-sandbox-master/* /liman_files/sandbox/php/
+RUN rm -rf sandbox.zip php-sandbox-master
 
 # RENDER ENGINE
 RUN curl -s https://api.github.com/repos/limanmys/fiber-render-engine/releases/latest | grep "browser_download_url.*zip" | cut -d : -f 2,3 | tr -d \" | wget -qi -
