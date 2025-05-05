@@ -42,10 +42,33 @@ class ExternalNotificationController extends Controller
             ], 403);
         }
 
+        if ($request->has('level')) {
+            // If level is information and success, change request data to trivial
+            if ($request->level === 'information' || $request->level === 'success') {
+                $request->merge([
+                    'level' => 'trivial'
+                ]);
+            }
+
+            // If level is warning, change request data to medium
+            if ($request->level === 'warning') {
+                $request->merge([
+                    'level' => 'medium'
+                ]);
+            }
+
+            // If level is error, change request data to high
+            if ($request->level === 'error') {
+                $request->merge([
+                    'level' => 'critical'
+                ]);
+            }
+        }
+
         validate([
             'title' => 'required',
             'content' => 'required',
-            'level' => 'required',
+            'level' => 'required|in:critical,high,medium,low,trivial',
         ]);
 
         $notification = Notification::send(

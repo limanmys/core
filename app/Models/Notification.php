@@ -47,7 +47,7 @@ class Notification extends Model
     /**
      * Send notification with parameters
      *
-     * @param string $level It might be information, success, warning, error
+     * @param string $level It might be critical, high, medium, low, trivial
      * @param string $template CUSTOM or selected ones.
      * @param array $contents Contents
      * @param array|string $sendTo It might be all, admins, non_admins or an array with user ids.

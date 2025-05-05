@@ -16,7 +16,7 @@ class ServerObserver
     public function created(Server $server)
     {
         Notification::send(
-            'information',
+            'trivial',
             'SERVER_CREATED',
             [
                 'name' => $server->name,
@@ -35,7 +35,7 @@ class ServerObserver
     public function deleted(Server $server)
     {
         Notification::send(
-            'information',
+            'trivial',
             'SERVER_DELETED',
             [
                 'name' => $server->name,

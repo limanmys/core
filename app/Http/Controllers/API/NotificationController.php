@@ -17,13 +17,35 @@ class NotificationController extends Controller
      *
      * @return mixed
      */
-    public function index()
+    public function index(Request $request)
     {
-        return auth('api')->user()
+        $query = auth('api')->user()
             ->notifications()
             ->withPivot('read_at', 'seen_at')
             ->orderBy('send_at', 'desc')
-            ->take(100)
+            ->take(100);
+
+        if ($request->has('type')) {
+            validate([
+                'type' => 'required|in:critical,high,medium,low,trivial'
+            ]);
+
+            $query->where('level', $request->type);
+        }
+
+        if ($request->has('start_date') && $request->has('end_date')) {
+            validate([
+                'start_date' => 'required|date',
+                'end_date' => 'required|date'
+            ]);
+
+            $query->whereBetween('send_at', [
+                $request->start_date,
+                $request->end_date
+            ]);
+        }
+
+        return $query
             ->get()
             ->map(function ($notification) {
                 $builder = new NotificationBuilder($notification, auth('api')->user()->locale);

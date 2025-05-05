@@ -26,7 +26,7 @@ class UserObserver
             }
             
             Notification::send(
-                'information',
+                'trivial',
                 'USER_CREATED',
                 [
                     'name' => $user->name,
@@ -55,7 +55,7 @@ class UserObserver
                 }
 
                 Notification::send(
-                    'warning',
+                    'medium',
                     'USER_PASSWORD_RESET',
                     [
                         'name' => $user->name,
