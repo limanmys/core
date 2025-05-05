@@ -18,7 +18,7 @@ Liman MYS
 %build
 
 %install
-cp -rfa %{_app_dir} %{buildroot}
+cp -rfa %{_app_dir}/* %{buildroot}
 
 %post -p /bin/bash
 
