@@ -88,5 +88,5 @@ sed -i s/%VERSION%/$VERSION.$5/g liman.spec
 mkdir -p ./package/etc/supervisord.d
 cp liman-system-worker.ini ./package/etc/supervisord.d/liman-system-worker.ini
 cp liman-high-availability-syncer.ini ./package/etc/supervisord.d/liman-high-availability-syncer.ini
-rpmbuild -ba liman.spec --define "_app_dir $(pwd)/package" --define "_rpmdir /tmp" --define "_rpmfilename package.rpm"
+rpmbuild -ba liman.spec --define "_app_dir $PWD/package" --define "_rpmdir /tmp" --define "_rpmfilename package.rpm"
 rm -rf package
