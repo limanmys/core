@@ -16,14 +16,13 @@ mv php-sandbox-$1/* package/liman/sandbox/php/
 rm -rf $1.zip php-sandbox-$1
 
 #UI
-#curl -s https://api.github.com/repos/limanmys/next/releases/latest \
-#| grep "browser_download_url.*zip" \
-#| cut -d : -f 2,3 \
-#| tr -d \" \
-#| wget -qi -
-wget https://github.com/limanmys/next/releases/download/release.master.150/ui-master-150.zip
-unzip ui-master-150.zip -d package/liman/ui
-rm ui-master-150.zip
+curl -s https://api.github.com/repos/limanmys/next/releases/latest \
+| grep "browser_download_url.*zip" \
+| cut -d : -f 2,3 \
+| tr -d \" \
+| wget -qi -
+unzip ui*.zip -d package/liman/ui
+rm ui*.zip
 
 #Render Engine
 curl -s https://api.github.com/repos/limanmys/fiber-render-engine/releases/latest \
