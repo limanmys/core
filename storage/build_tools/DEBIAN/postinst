@@ -85,12 +85,12 @@ ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
 # Nginx Auto Redirection
 if grep --quiet LIMAN_SECURITY_OPTIMIZATIONS /etc/nginx/sites-available/default; then
     echo "Nginx https redirection already set up."; 
+    sed -i '/listen \[::\]:80 default_server;/d' /etc/nginx/sites-available/default
 else
     echo """
 #LIMAN_SECURITY_OPTIMIZATIONS
 server {
     listen 80 default_server;
-    listen [::]:80 default_server;
     server_name _;
     server_tokens off;
     more_set_headers 'Server: LIMAN MYS';
