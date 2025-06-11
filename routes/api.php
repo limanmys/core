@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\ExtensionController;
 use App\Http\Controllers\API\ExternalNotificationController;
+use App\Http\Controllers\API\KubernetesController;
 use App\Http\Controllers\API\MenuController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\ProfileController;
@@ -75,6 +76,14 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
         Route::get('/servers', [MenuController::class, 'servers']);
         Route::get('/servers/{server}', [MenuController::class, 'serverDetails']);
         Route::get('/extensions', [MenuController::class, 'extensions']);
+    });
+
+    // Kubernetes Endpoints
+    Route::group(['prefix' => 'kubernetes'], function () {
+        Route::post('/namespaces', [KubernetesController::class, 'getNamespaces']);
+        Route::post('/deployments', [KubernetesController::class, 'getDeployments']);
+        Route::post('/deployment_details', [KubernetesController::class, 'getDeploymentDetails']);
+        Route::post('/get_reachable_ip', [KubernetesController::class, 'getReachableIpFromDeploymentDetails']);
     });
 
     // Server Controller
