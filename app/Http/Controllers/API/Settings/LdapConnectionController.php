@@ -93,7 +93,6 @@ class LdapConnectionController extends Controller
                 $request->password,
             );
         } catch (\Throwable $e) {
-            dd($e);
             return response()->json([
                 'message' => 'LDAP bağlantısı başarısız.',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);

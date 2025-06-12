@@ -94,7 +94,7 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
         Route::patch('/{server_id}', [ServerController::class, 'update']);
         Route::delete('/{server_id}', [ServerController::class, 'delete']);
         Route::post('/{server_id}/favorites', [Server\DetailsController::class, 'favorite']);
-
+        
         // Server Creation Validations
         Route::post('/check_access', [ServerController::class, 'checkAccess']);
         Route::post('/check_connection', [ServerController::class, 'checkConnection']);
@@ -103,6 +103,9 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
         Route::group(['prefix' => '{server_id}', 'middleware' => ['server']], function () {
             Route::get('/', [Server\DetailsController::class, 'server']);
             Route::get('/specs', [Server\DetailsController::class, 'specs']);
+
+            // Kubernetes
+            Route::get('/kubernetes_deployment_details', [KubernetesController::class, 'getDeploymentDetailsFromServer']);
 
             // Stats
             Route::group(['prefix' => 'stats'], function () {

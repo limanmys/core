@@ -28,6 +28,24 @@ class KubernetesController extends Controller
         ]);
     }
 
+    public function getDeploymentDetailsFromServer(Request $request)
+    {
+        if (server()->os !== 'kubernetes') {
+            return response()->json(['error' => 'Server is not a Kubernetes server'], 400);
+        }
+
+        $information = server()->kubernetesInformation()->first();
+
+        if (!$information) {
+            return response()->json(['error' => 'Kubernetes information not found for this server'], 404);
+        }
+
+        return $this->makeRenderEngineRequest($request, 'deploymentDetails', [
+            'kubeconfig' => $information->kubeconfig,
+            ...$information->toArray(),
+        ]);
+    }
+
     public function getReachableIpFromDeploymentDetails(Request $request)
     {
         $response = $this->makeRenderEngineRequest($request, 'deploymentDetails', [

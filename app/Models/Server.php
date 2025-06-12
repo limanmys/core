@@ -28,8 +28,7 @@ class Server extends Model
         'os',
         'user_id',
         'shared_key',
-        'key_port',
-        'enabled'
+        'key_port'
     ];
 
     protected function casts(): array
@@ -37,6 +36,11 @@ class Server extends Model
         return [
             'control_port' => 'integer',
         ];
+    }
+
+    public function kubernetesInformation()
+    {
+        return $this->hasOne(KubernetesInformation::class, 'server_id');
     }
 
     /**
