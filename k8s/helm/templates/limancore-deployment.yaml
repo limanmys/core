@@ -65,7 +65,13 @@ spec:
           ports:
             - containerPort: 443
               protocol: TCP
-          resources: {}
+          resources: 
+            limits:
+              cpu: "4000m"      # İhtiyacınıza göre ayarlayın
+              memory: "6Gi"     # İhtiyacınıza göre ayarlayın
+            requests:
+              cpu: "2000m"       # Minimum CPU
+              memory: "3Gi"     # Minimum RAM
           tty: true
           volumeMounts:
             - mountPath: /liman
