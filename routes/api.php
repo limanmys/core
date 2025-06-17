@@ -38,6 +38,8 @@ Route::group([
     Route::post('/forgot_password', [AuthController::class, 'sendPasswordResetLink'])
         ->middleware('throttle:forgot-password');
     Route::post('/reset_password', [AuthController::class, 'resetPassword']);
+    Route::get('/oidc/callback', [AuthController::class, 'oidcCallback'])
+        ->name('oidcCallback');
 });
 
 Route::post('/notifications/send', [ExternalNotificationController::class, 'accept']);

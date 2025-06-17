@@ -14,6 +14,7 @@ use App\Models\Server;
 use App\Models\UserSettings;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -131,15 +132,26 @@ class LDAPAuthenticator implements AuthenticatorInterface
 
         if (! $create) {
             try {
-                $user = User::create([
-                    'objectguid' => $objectguid,
-                    'name' => $name,
-                    'email' => $mail,
-                    'username' => strtolower($ldapUser['samaccountname']),
-                    'auth_type' => 'ldap',
-                    'password' => Hash::make(Str::random(16)),
-                    'forceChange' => false,
-                ]);
+                // Database transaction içinde yeni user oluştur
+                $user = DB::transaction(function () use ($objectguid, $name, $mail, $ldapUser) {
+                    $newUser = User::create([
+                        'objectguid' => $objectguid,
+                        'name' => $name,
+                        'email' => $mail,
+                        'username' => strtolower($ldapUser['samaccountname']),
+                        'auth_type' => 'ldap',
+                        'password' => Hash::make(Str::random(16)),
+                        'forceChange' => false,
+                    ]);
+                    
+                    // User'ın gerçekten kaydedildiğini ve ID'sinin olduğunu kontrol et
+                    $newUser->refresh();
+                    if (!$newUser->getJWTIdentifier()) {
+                        throw new \Exception('LDAP user creation failed - JWT identifier is null');
+                    }
+                    
+                    return $newUser;
+                });
             } catch (\Throwable $e) {
                 Log::error('LDAP authentication failed. '.$e->getMessage());
 

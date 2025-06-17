@@ -6,6 +6,7 @@ use App\Models\Oauth2Token;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -75,15 +76,26 @@ class KeycloakAuthenticator implements AuthenticatorInterface
             ->first();
 
         if (! $create) {
-            $user = User::create([
-                'id' => $resourceOwner->getId(),
-                'name' => $resourceOwner->getName(),
-                'email' => $resourceOwner->getEmail(),
-                'username' => $resourceOwner->getUsername(),
-                'auth_type' => 'keycloak',
-                'password' => Hash::make(Str::uuid()),
-                'forceChange' => false,
-            ]);
+            // Database transaction içinde yeni user oluştur
+            $user = DB::transaction(function () use ($resourceOwner) {
+                $newUser = User::create([
+                    'id' => $resourceOwner->getId(),
+                    'name' => $resourceOwner->getName(),
+                    'email' => $resourceOwner->getEmail(),
+                    'username' => $resourceOwner->getUsername(),
+                    'auth_type' => 'keycloak',
+                    'password' => Hash::make(Str::uuid()),
+                    'forceChange' => false,
+                ]);
+                
+                // User'ın gerçekten kaydedildiğini ve ID'sinin olduğunu kontrol et
+                $newUser->refresh();
+                if (!$newUser->getJWTIdentifier()) {
+                    throw new \Exception('Keycloak user creation failed - JWT identifier is null');
+                }
+                
+                return $newUser;
+            });
         } else {
             $user = User::where('id', $resourceOwner->getId())->first();
         }

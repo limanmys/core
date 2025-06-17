@@ -16,13 +16,14 @@ class Authenticator
      * Get the token array structure.
      *
      * @param  string  $token
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public static function createNewToken($token, ?Request $request = null)
     {
         $id = auth('api')->user()->id;
+        $user = User::find($id);
 
-        User::find($id)->update([
+        $user->update([
             'last_login_at' => Carbon::now()->toDateTimeString(),
             'last_login_ip' => $request->ip(),
         ]);
@@ -120,6 +121,41 @@ class Authenticator
             $tokenTimeout = 0;
         } else {
             $tokenTimeout = auth('api')->factory()->getTTL() * 60;
+        }
+
+        // OIDC kullanıcıları için callback URL'den ana sayfaya redirect
+        if ($user->auth_type === 'oidc' && $request && $request->has('callback_url')) {
+            $callbackUrl = $request->input('callback_url');
+            
+            // Callback URL'yi parse et ve ana sayfaya redirect URL'i oluştur
+            $parsedUrl = parse_url($callbackUrl);
+            $baseUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . 
+                      (isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '');
+            
+            $redirectResponse = redirect($baseUrl . '/');
+            
+            // Cookie'leri redirect response'a ekle
+            return $redirectResponse
+                ->withCookie(cookie(
+                    'token',
+                    $token,
+                    $tokenTimeout,
+                    null,
+                    $request->getHost(),
+                    true,
+                    true,
+                    false
+                ))
+                ->withCookie(cookie(
+                    'currentUser',
+                    json_encode($return),
+                    $tokenTimeout,
+                    null,
+                    $request->getHost(),
+                    true,
+                    false,
+                    false
+                ));
         }
 
         return response()->json($return)->withCookie(cookie(

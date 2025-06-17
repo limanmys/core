@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Classes\Authentication\KeycloakAuthenticator;
 use App\Classes\Authentication\LDAPAuthenticator;
 use App\Classes\Authentication\LimanAuthenticator;
+use App\Classes\Authentication\OIDCAuthenticator;
 use App\Http\Controllers\Controller;
 use App\Models\SystemSettings;
 use App\Models\User;
@@ -39,6 +40,7 @@ class AuthController extends Controller
                     'loginBranding',
                     'authGate',
                     'logout',
+                    'oidcCallback',
                 ]
             ]
         );
@@ -57,6 +59,10 @@ class AuthController extends Controller
 
         if ((bool) env('LDAP_STATUS')) {
             $types[] = 'ldap';
+        }
+
+        if ((bool) env('OIDC_ACTIVE')) {
+            $types[] = 'oidc';
         }
 
         return $types;
@@ -88,10 +94,16 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         // Validate request
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string',
-            'password' => 'required|string',
-        ]);
+        if ($request->type === 'oidc') {
+            $validator = Validator::make($request->all(), [
+                'type' => 'required|string',
+            ]);
+        } else {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|string',
+                'password' => 'required|string',
+            ]);
+        }
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
@@ -106,12 +118,19 @@ class AuthController extends Controller
             case 'ldap':
                 $authenticator = new LDAPAuthenticator();
                 break;
+            case 'oidc':
+                $authenticator = new OIDCAuthenticator();
+                break;
             default:
                 $authenticator = new LimanAuthenticator();
                 break;
         }
 
         $token = $authenticator->authenticate($validator->validated(), $request);
+
+        if ($request->type === 'oidc' && isset($token->original['redirect_required'])) {
+            return $token;
+        }
 
         if (! auth('api')->user()) {
             return $token;
@@ -147,6 +166,11 @@ class AuthController extends Controller
         }
 
         return $token;
+    }
+
+    public function oidcCallback(Request $request)
+    {
+        return OIDCAuthenticator::handleCallback($request);
     }
 
     /**
