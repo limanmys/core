@@ -239,11 +239,16 @@ class OIDCAuthenticator implements AuthenticatorInterface
                 return null;
             }
             
-            // Issuer kontrolü
-            if ($payload['iss'] !== env('OIDC_ISSUER_URL') . '/') {
+            // Issuer kontrolü (trailing slash normalize edilerek)
+            $expectedIssuer = rtrim(env('OIDC_ISSUER_URL'), '/');
+            $actualIssuer = rtrim($payload['iss'], '/');
+            
+            if ($actualIssuer !== $expectedIssuer) {
                 Log::error('OIDC ID token issuer mismatch', [
-                    'expected' => env('OIDC_ISSUER_URL') . '/',
-                    'actual' => $payload['iss']
+                    'expected' => $expectedIssuer,
+                    'actual' => $actualIssuer,
+                    'original_expected' => env('OIDC_ISSUER_URL'),
+                    'original_actual' => $payload['iss']
                 ]);
                 return null;
             }

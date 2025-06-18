@@ -310,6 +310,12 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
                 Route::post('/configuration', [Settings\KeycloakConnectionController::class, 'saveConfiguration']);
             });
 
+            // OIDC Routes
+            Route::group(['prefix' => 'oidc'], function () {
+                Route::get('/configuration', [Settings\OIDCConnectionController::class, 'getConfiguration']);
+                Route::post('/configuration', [Settings\OIDCConnectionController::class, 'saveConfiguration']);
+            });
+
             // Audit Log Routes
             Route::group(['prefix' => 'audit'], function () {
                 Route::get('/', [Settings\AuditLogController::class, 'index']);
