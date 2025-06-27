@@ -262,44 +262,50 @@ class KubernetesController extends Controller
     private function extractInternalEndpoints(array $deploymentData, string $deploymentName, string $namespace): array
     {
         $endpoints = [];
-        
-        // Try deployment name as service name (common convention)
-        $serviceName = $deploymentName;
-        $clusterDomain = 'cluster.local'; // Default Kubernetes cluster domain
-        
-        // Look for ClusterIP services
-        if (isset($deploymentData['services'])) {
-            foreach ($deploymentData['services'] as $service) {
-                $serviceType = $service['spec']['type'] ?? 'ClusterIP';
-                $serviceName = $service['metadata']['name'] ?? $deploymentName;
-                
-                if ($serviceType === 'ClusterIP') {
-                    $clusterIP = $service['spec']['clusterIP'] ?? null;
-                    $ports = $service['spec']['ports'] ?? [];
-                    
-                    foreach ($ports as $portInfo) {
-                        $port = $portInfo['port'] ?? null;
+        $clusterDomain = 'cluster.local';
+    
+        $dnsNames = [
+            "{$deploymentName}", // Sadece servis/deploy adı
+            "{$deploymentName}.{$namespace}",
+            "{$deploymentName}.{$namespace}.svc",
+            "{$deploymentName}.{$namespace}.svc.{$clusterDomain}",
+        ];
+    
+        $containerPorts = [];
+        if (
+            isset($deploymentData['spec']['template']['spec']['containers']) &&
+            is_array($deploymentData['spec']['template']['spec']['containers'])
+        ) {
+            foreach ($deploymentData['spec']['template']['spec']['containers'] as $container) {
+                if (isset($container['ports']) && is_array($container['ports'])) {
+                    foreach ($container['ports'] as $portInfo) {
+                        $port = $portInfo['containerPort'] ?? null;
                         $protocol = strtolower($portInfo['protocol'] ?? 'tcp');
-                        
-                        // Internal service DNS name
-                        $internalHostname = "{$serviceName}.{$namespace}.svc.{$clusterDomain}";
-                        
-                        if ($clusterIP && $clusterIP !== 'None') {
-                            $endpoints[] = [
-                                'type' => 'internal',
-                                'address' => $clusterIP,
-                                'hostname' => $internalHostname,
+                        if ($port) {
+                            $containerPorts[] = [
                                 'port' => $port,
                                 'protocol' => $protocol,
-                                'priority' => 4,
-                                'url' => $this->buildUrl($internalHostname, $port, $protocol)
                             ];
                         }
                     }
                 }
             }
         }
-        
+    
+        foreach ($dnsNames as $internalHostname) {
+            foreach ($containerPorts as $portInfo) {
+                $endpoints[] = [
+                    'type' => 'internal',
+                    'address' => $internalHostname,
+                    'hostname' => $internalHostname,
+                    'port' => $portInfo['port'],
+                    'protocol' => $portInfo['protocol'],
+                    'priority' => 4,
+                    'url' => $this->buildUrl($internalHostname, $portInfo['port'], $portInfo['protocol'])
+                ];
+            }
+        }
+    
         return $endpoints;
     }
 
