@@ -7,6 +7,7 @@ use App\Models\Notification;
 use App\Notifications\NotificationSent;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\Mailer\Exception\TransportException;
+use Illuminate\Support\Facades\Log;
 
 class NotificationObserver
 {
@@ -24,6 +25,11 @@ class NotificationObserver
 
         foreach ($users as $user) {
             $user->notify(new NotificationSent($notification, $user));
+            Log::info('Notification sent.', [
+                'user_id' => $user->id,
+                'notification_id' => $notification->id,
+                'send_at' => $notification->send_at
+            ]);
             if (env('MAIL_ENABLED') && $notification && $notification->mail) {
                 try {
                     Mail::to($user)->send(new BasicNotification($notification, $user));

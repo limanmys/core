@@ -52,7 +52,8 @@ class User extends Authenticatable implements JWTSubject
         'locale',
         'google2fa_secret',
         'otp_enabled',
-        'session_time'
+        'session_time',
+        'oidc_sub',
     ];
 
     /**

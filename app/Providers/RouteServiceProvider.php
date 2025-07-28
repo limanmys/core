@@ -39,6 +39,9 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         parent::boot();
+
+        Route::middleware([])
+            ->group(base_path('routes/health.php'));
     }
 
     /**

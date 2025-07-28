@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\ExtensionController;
 use App\Http\Controllers\API\ExternalNotificationController;
+use App\Http\Controllers\API\KubernetesController;
 use App\Http\Controllers\API\MenuController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\ProfileController;
@@ -37,6 +38,8 @@ Route::group([
     Route::post('/forgot_password', [AuthController::class, 'sendPasswordResetLink'])
         ->middleware('throttle:forgot-password');
     Route::post('/reset_password', [AuthController::class, 'resetPassword']);
+    Route::get('/oidc/callback', [AuthController::class, 'oidcCallback'])
+        ->name('oidcCallback');
 });
 
 Route::post('/notifications/send', [ExternalNotificationController::class, 'accept']);
@@ -77,6 +80,14 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
         Route::get('/extensions', [MenuController::class, 'extensions']);
     });
 
+    // Kubernetes Endpoints
+    Route::group(['prefix' => 'kubernetes'], function () {
+        Route::post('/namespaces', [KubernetesController::class, 'getNamespaces']);
+        Route::post('/deployments', [KubernetesController::class, 'getDeployments']);
+        Route::post('/deployment_details', [KubernetesController::class, 'getDeploymentDetails']);
+        Route::post('/get_reachable_ip', [KubernetesController::class, 'getReachableIpFromDeploymentDetails']);
+    });
+
     // Server Controller
     Route::group(['prefix' => 'servers'], function () {
         // Server Details
@@ -85,7 +96,7 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
         Route::patch('/{server_id}', [ServerController::class, 'update']);
         Route::delete('/{server_id}', [ServerController::class, 'delete']);
         Route::post('/{server_id}/favorites', [Server\DetailsController::class, 'favorite']);
-
+        
         // Server Creation Validations
         Route::post('/check_access', [ServerController::class, 'checkAccess']);
         Route::post('/check_connection', [ServerController::class, 'checkConnection']);
@@ -94,6 +105,9 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
         Route::group(['prefix' => '{server_id}', 'middleware' => ['server']], function () {
             Route::get('/', [Server\DetailsController::class, 'server']);
             Route::get('/specs', [Server\DetailsController::class, 'specs']);
+
+            // Kubernetes
+            Route::get('/kubernetes_deployment_details', [KubernetesController::class, 'getDeploymentDetailsFromServer']);
 
             // Stats
             Route::group(['prefix' => 'stats'], function () {
@@ -294,6 +308,12 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
             Route::group(['prefix' => 'keycloak'], function () {
                 Route::get('/configuration', [Settings\KeycloakConnectionController::class, 'getConfiguration']);
                 Route::post('/configuration', [Settings\KeycloakConnectionController::class, 'saveConfiguration']);
+            });
+
+            // OIDC Routes
+            Route::group(['prefix' => 'oidc'], function () {
+                Route::get('/configuration', [Settings\OIDCConnectionController::class, 'getConfiguration']);
+                Route::post('/configuration', [Settings\OIDCConnectionController::class, 'saveConfiguration']);
             });
 
             // Audit Log Routes

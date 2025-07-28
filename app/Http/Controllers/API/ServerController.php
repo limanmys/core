@@ -40,11 +40,18 @@ class ServerController extends Controller
             'user_id' => auth('api')->user()->id,
             'shared_key' => request('shared') == 'true' ? 1 : 0,
             'key_port' => request('port'),
-            'enabled' => 1,
         ]);
 
         // Add Server to request object to use it later.
         request()->request->add(['server' => $server]);
+
+        if ($request->os_type === 'kubernetes' && $request->has('kubeconfig')) {
+            $server->kubernetesInformation()->create([
+                'kubeconfig' => $request->kubeconfig,
+                'namespace' => $request->namespace,
+                'deployment' => $request->deployment,
+            ]);
+        }
 
         if ($request->key_type != 'no_key') {
             $encKey = env('APP_KEY').auth('api')->user()->id.server()->id;
