@@ -14,11 +14,6 @@ type Claim struct {
 	ID       uint
 }
 
-type WorkerClaim struct {
-	DeviceID  string
-	IPAddress string
-}
-
 func CreateToken(username string, id uint) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
