@@ -2,61 +2,101 @@
 
 ## Proje Genel Bakış
 
-Liman, sunucuları, istemcileri ve ağ cihazlarını merkezi olarak yönetmek için açık kaynaklı bir platform. HAVELSAN tarafından geliştirilen bu sistem, genişletilebilir eklenti mimarisi ile güvenli sunucu yönetimi sağlar.
+Liman, sunucuları, istemcileri ve ağ cihazlarını merkezi olarak yönetmek için açık kaynaklı bir platform. HAVELSAN tarafından geliştirilen bu sistem, genişletilebilir eklenti mimarisi ile güvenli sunucu yönetimi sağlar. Bu proje, PHP Laravel'den Golang'e migrate edilmiştir.
 
 ## Teknoloji Stack
 
 ### Backend
-- **Framework**: Laravel 12 (PHP 8.4)
-- **Veritabanı**: PostgreSQL
-- **Auth**: JWT (php-open-source-saver/jwt-auth)
-- **Cache**: Redis
-- **Queue**: Laravel Queue
-- **WebSocket**: Laravel Reverb
+- **Framework**: Fiber v2 (Golang 1.21+)
+- **ORM**: GORM v2
+- **Veritabanı**: PostgreSQL 15+
+- **Auth**: JWT-go (golang-jwt/jwt/v5)
+- **Cache**: Redis 7+
+- **Queue**: Asynq (Hibiken)
+- **WebSocket**: Gorilla WebSocket
+- **Migration**: Custom GORM-based migration system
 
 ### Frontend
 - External bir NextJS uygulaması kullanılıyor. Bu sistem sadece API olarak hizmet vermekte.
 
 ### Deployment
-- **Container**: Docker (Ubuntu Jammy)
-- **Web Server**: Nginx
-- **PHP**: PHP-FPM 8.4
-- **Process Manager**: Supervisor
+- **Container**: Docker (Alpine Linux)
+- **Web Server**: Nginx (reverse proxy)
+- **Binary**: Single binary executable
+- **Process Manager**: Systemd/Docker Compose
 
 ## Proje Yapısı
 
 ```
-/liman/server/
-├── app/
-│   ├── Classes/              # Özel sınıflar
-│   │   ├── Authentication/   # Auth adaptörleri (Liman, Keycloak, LDAP, OIDC)
-│   │   ├── Ldap.php         # LDAP bağlantı sınıfı
-│   │   └── NotificationBuilder.php
-│   ├── Connectors/          # Sunucu bağlantı adaptörleri
-│   │   ├── Connector.php
-│   │   └── GenericConnector.php
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── API/         # REST API endpoints
-│   │   │   ├── Extension/   # Eklenti sandbox
-│   │   │   └── HASync/      # Yüksek erişilebilirlik sistemi yardımcı endpointleri
-│   │   ├── Middleware/      # Auth, permission, server middlewares
-│   │   └── Helpers.php      # Global helper fonksiyonlar
-│   ├── Models/              # Eloquent modeller
-│   ├── System/              # Sistem seviye sınıflar
-│   └── ...
-├── config/                  # Laravel config dosyaları
-├── database/
-│   ├── migrations/          # Veritabanı migrasyonları
-│   └── seeds/               # Seed dosyaları
-├── routes/
-│   ├── api.php             # API rotaları
-│   ├── web.php             # Web rotaları
-│   └── ...
+github.com/limanmys/core/
+├── cmd/
+│   ├── server/              # Ana uygulama entry point
+│   │   └── main.go
+│   ├── migrate/             # Migration tool
+│   │   └── main.go
+│   └── tools/               # CLI tools
+├── internal/
+│   ├── config/              # Konfigürasyon yönetimi
+│   │   ├── config.go
+│   │   └── database.go
+│   ├── models/              # GORM modelleri
+│   │   ├── user.go
+│   │   ├── server.go
+│   │   ├── extension.go
+│   │   └── ...
+│   ├── handlers/            # HTTP handler'ları
+│   │   ├── auth/
+│   │   ├── server/
+│   │   ├── extension/
+│   │   └── settings/
+│   ├── middleware/          # Fiber middleware'leri
+│   │   ├── auth.go
+│   │   ├── permission.go
+│   │   └── cors.go
+│   ├── services/            # Business logic katmanı
+│   │   ├── auth/
+│   │   │   ├── authenticator.go
+│   │   │   ├── keycloak.go
+│   │   │   ├── ldap.go
+│   │   │   └── oidc.go
+│   │   ├── connectors/      # Sunucu bağlantı adaptörleri
+│   │   │   ├── connector.go
+│   │   │   └── generic.go
+│   │   ├── extension/       # Eklenti sistemi
+│   │   └── notification/    # Bildirim sistemi
+│   ├── repositories/        # Data access layer
+│   │   ├── user.go
+│   │   ├── server.go
+│   │   └── ...
+│   ├── utils/               # Utility fonksiyonlar
+│   │   ├── helpers.go
+│   │   ├── validation.go
+│   │   └── security.go
+│   └── migrations/          # Veritabanı migration dosyaları
+│       ├── 001_create_users_table.go
+│       ├── 002_create_servers_table.go
+│       └── ...
+├── pkg/                     # Public packages
+│   ├── logger/              # Logging utilities
+│   ├── cache/               # Redis cache wrapper
+│   ├── queue/               # Queue system
+│   └── websocket/           # WebSocket utilities
+├── api/                     # API documentation
+│   └── openapi.yaml
+├── deployments/             # Deployment configurations
+│   ├── docker/
+│   │   ├── Dockerfile
+│   │   └── docker-compose.yml
+│   └── k8s/
+├── scripts/                 # Build ve deployment scriptleri
 ├── storage/                 # Dosya depolama
-└── resources/
-    ├── views/              # Blade templates
-    └── assets/             # Frontend assets
+├── configs/                 # Konfigürasyon dosyaları
+│   ├── config.yaml
+│   └── config.example.yaml
+├── go.mod
+├── go.sum
+├── Makefile
+└── README.md
 ```
 
 ## Önemli Özellikler
@@ -138,16 +178,16 @@ Liman, sunucuları, istemcileri ve ağ cihazlarını merkezi olarak yönetmek i�
 
 ## Önemli Sınıflar ve Fonksiyonlar
 
-### Helper Functions (`app/Http/Helpers.php`)
-```php
-validate($rules, $messages = [], $fieldNames = []): void
-user(): User                    // Authenticated user
-server(): Server               // Current server context
-extension(): Extension         // Current extension context
-sudo(): string                 // Sudo command prefix
+### Helper Functions (`internal/utils/helpers.go`)
+```go
+func ValidateRequest(ctx *fiber.Ctx, rules map[string]string) error
+func GetAuthenticatedUser(ctx *fiber.Ctx) (*models.User, error)
+func GetCurrentServer(ctx *fiber.Ctx) (*models.Server, error)
+func GetCurrentExtension(ctx *fiber.Ctx) (*models.Extension, error)
+func GetSudoCommand() string
 ```
 
-### Authentication Classes
+### Authentication Services
 - `Authenticator`: Token management
 - `KeycloakAuthenticator`: Keycloak entegrasyonu
 - `LDAPAuthenticator`: LDAP entegrasyonu
@@ -156,58 +196,83 @@ sudo(): string                 // Sudo command prefix
 
 ### Server Connection
 - `GenericConnector`: SSH/WinRM bağlantı yönetimi
-- `Command`: Güvenli komut çalıştırma wrapper
+- `CommandRunner`: Güvenli komut çalıştırma wrapper
 
 ## Güvenlik Considerations
 
 ### 1. Command Injection Prevention
-- Tüm shell komutları `Command::clean()` ile sanitize edilir
+- Tüm shell komutları `CommandRunner.Sanitize()` ile sanitize edilir
 - Parameterized queries kullanılır: `@{:param}` (quoted), `{:param}` (raw)
 
 ### 2. Permission System
-- Granular permission kontrolü: `Permission::can($userId, $object, $field, $value)`
-- Middleware: `permissions`, `admin`, `server`
+- Granular permission kontrolü: `permission.Can(userID, object, field, value)`
+- Middleware: `auth.Required`, `permission.Check`, `server.Context`
 
 ### 3. Input Validation
-- `validate()` helper ile request validation
-- Laravel validation rules
+- `ValidateRequest()` helper ile request validation
+- Struct tag validation ile giriş kontrolü
 
 ### 4. Audit Logging
-- Tüm kritik işlemler `AuditLog` ile kaydedilir
+- Tüm kritik işlemler `AuditLog` modeli ile kaydedilir
 - User actions tracking
 
 ## Development Workflow
 
 ### Environment Setup
-1. PHP 8.4+ kurulumu
-2. Composer dependencies: `composer install`
-3. Node.js + pnpm: `pnpm install`
-4. Environment: `.env` dosyası konfigürasyonu
-5. Database migration: `php artisan migrate`
+1. Go 1.21+ kurulumu
+2. Dependencies: `go mod tidy`
+3. Environment: `.env` dosyası konfigürasyonu
+4. Database migration: `go run cmd/migrate/main.go`
+5. Redis connection setup
 
 ### Build Process
-- Frontend: `pnpm run dev` (development), `pnpm run prod` (production)
-- Backend: `composer dump-autoload`
+- Development: `go run cmd/server/main.go`
+- Production: `go build -o bin/liman-server cmd/server/main.go`
+- Cross-compilation: `GOOS=linux GOARCH=amd64 go build`
+
+### Migration System
+- Migration files: `internal/migrations/`
+- Run migrations: `go run cmd/migrate/main.go`
+- Create migration: `go run cmd/tools/main.go create-migration <name>`
 
 ### Testing
-- No testing system included in this project
+- Unit tests: `go test ./...`
+- Integration tests: `go test -tags=integration ./...`
 
 ## Extension Development
 
 ### Extension Sandbox
 - Eklentiler sandbox ortamında çalışır
-- `app/Http/Controllers/Extension/Sandbox/` altında internal API
+- `internal/handlers/extension/sandbox/` altında internal API
 - Güvenlik kısıtlamaları: file system access, network restrictions
 
 ## Deployment
 
 ### Docker
 ```dockerfile
-FROM ubuntu:jammy
-# PHP 8.4, Nginx, Supervisor
-# Laravel optimizasyonları
+FROM alpine:latest
+# Go binary
+# Nginx reverse proxy
 # Extension environment
 ```
+
+### Production Considerations
+- `APP_ENV=production`
+- Redis cache optimization
+- Nginx reverse proxy
+- SSL certificate management
+- Log rotation
+
+## Error Handling
+
+### Custom Exceptions
+- `JsonResponseException`: API error responses
+- `ValidationException`: Input validation errors
+
+### Logging
+- Laravel Log facade
+- Different log levels: emergency, alert, critical, error, warning, notice, info, debug
+- Structured logging for audit trails
 
 ### Production Considerations
 - `APP_ENV=production`
@@ -231,8 +296,8 @@ FROM ubuntu:jammy
 
 ### Database
 - Query optimization with indexes
-- Eloquent relationship eager loading
-- Database connection pooling
+- GORM relationship preloading
+- Connection pooling
 
 ### Caching
 - Redis cache for frequently accessed data
@@ -259,41 +324,39 @@ FROM ubuntu:jammy
 
 ## Common Development Patterns
 
-### Controller Pattern
-```php
-class ExampleController extends Controller
-{
-    public function index()
-    {
-        // Permission check
-        if (!Permission::can(user()->id, 'resource', 'action')) {
-            throw new JsonResponseException(['message' => 'Unauthorized'], '', 403);
-        }
-        
-        // Business logic
-        return response()->json($data);
+### Handler Pattern
+```go
+func (h *ExampleHandler) Index(ctx *fiber.Ctx) error {
+    // Permission check
+    user, err := utils.GetAuthenticatedUser(ctx)
+    if err != nil {
+        return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
     }
+    
+    if !permission.Can(user.ID, "resource", "action") {
+        return fiber.NewError(fiber.StatusForbidden, "Forbidden")
+    }
+    
+    // Business logic
+    return ctx.JSON(data)
 }
 ```
 
 ### Model Relationships
-```php
-class Server extends Model
-{
-    use UsesUuid;
-    
-    public function extensions()
-    {
-        return $this->belongsToMany(Extension::class, 'server_extensions');
-    }
+```go
+type Server struct {
+    gorm.Model
+    ID         uuid.UUID   `gorm:"type:uuid;primary_key"`
+    Name       string      `gorm:"not null"`
+    Extensions []Extension `gorm:"many2many:server_extensions;"`
 }
 ```
 
 ### Middleware Usage
-```php
-Route::group(['middleware' => ['auth:api', 'permissions']], function () {
-    // Protected routes
-});
+```go
+api := app.Group("/api")
+api.Use(middleware.Auth())
+api.Use(middleware.Permission())
 ```
 
 ## Troubleshooting
