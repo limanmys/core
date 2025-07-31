@@ -7,13 +7,14 @@ Liman, sunucuları, istemcileri ve ağ cihazlarını merkezi olarak yönetmek i�
 ## Teknoloji Stack
 
 ### Backend
-- **Framework**: Fiber v2 (Golang 1.21+)
+- **Framework**: Fiber v3 (Golang 1.24+)
 - **ORM**: GORM v2
 - **Veritabanı**: PostgreSQL 15+
 - **Auth**: JWT-go (golang-jwt/jwt/v5)
 - **Cache**: Redis 7+
 - **Queue**: Asynq (Hibiken)
-- **WebSocket**: Gorilla WebSocket
+- **WebSocket**: Fiber Websocket
+- **Validation**: Go Validator (go-playground/validator/v10)
 - **Migration**: Custom GORM-based migration system
 
 ### Frontend
@@ -25,84 +26,10 @@ Liman, sunucuları, istemcileri ve ağ cihazlarını merkezi olarak yönetmek i�
 - **Binary**: Single binary executable
 - **Process Manager**: Systemd/Docker Compose
 
-## Proje Yapısı
-
-```
-github.com/limanmys/core/
-├── cmd/
-│   ├── server/              # Ana uygulama entry point
-│   │   └── main.go
-│   ├── migrate/             # Migration tool
-│   │   └── main.go
-│   └── tools/               # CLI tools
-├── internal/
-│   ├── config/              # Konfigürasyon yönetimi
-│   │   ├── config.go
-│   │   └── database.go
-│   ├── models/              # GORM modelleri
-│   │   ├── user.go
-│   │   ├── server.go
-│   │   ├── extension.go
-│   │   └── ...
-│   ├── handlers/            # HTTP handler'ları
-│   │   ├── auth/
-│   │   ├── server/
-│   │   ├── extension/
-│   │   └── settings/
-│   ├── middleware/          # Fiber middleware'leri
-│   │   ├── auth.go
-│   │   ├── permission.go
-│   │   └── cors.go
-│   ├── services/            # Business logic katmanı
-│   │   ├── auth/
-│   │   │   ├── authenticator.go
-│   │   │   ├── keycloak.go
-│   │   │   ├── ldap.go
-│   │   │   └── oidc.go
-│   │   ├── connectors/      # Sunucu bağlantı adaptörleri
-│   │   │   ├── connector.go
-│   │   │   └── generic.go
-│   │   ├── extension/       # Eklenti sistemi
-│   │   └── notification/    # Bildirim sistemi
-│   ├── repositories/        # Data access layer
-│   │   ├── user.go
-│   │   ├── server.go
-│   │   └── ...
-│   ├── utils/               # Utility fonksiyonlar
-│   │   ├── helpers.go
-│   │   ├── validation.go
-│   │   └── security.go
-│   └── migrations/          # Veritabanı migration dosyaları
-│       ├── 001_create_users_table.go
-│       ├── 002_create_servers_table.go
-│       └── ...
-├── pkg/                     # Public packages
-│   ├── logger/              # Logging utilities
-│   ├── cache/               # Redis cache wrapper
-│   ├── queue/               # Queue system
-│   └── websocket/           # WebSocket utilities
-├── api/                     # API documentation
-│   └── openapi.yaml
-├── deployments/             # Deployment configurations
-│   ├── docker/
-│   │   ├── Dockerfile
-│   │   └── docker-compose.yml
-│   └── k8s/
-├── scripts/                 # Build ve deployment scriptleri
-├── storage/                 # Dosya depolama
-├── configs/                 # Konfigürasyon dosyaları
-│   ├── config.yaml
-│   └── config.example.yaml
-├── go.mod
-├── go.sum
-├── Makefile
-└── README.md
-```
-
 ## Önemli Özellikler
 
 ### 1. Multi-Authentication System
-- **Liman Auth**: Yerli kullanıcı sistemi
+- **Liman Auth**: Yerel kullanıcı sistemi
 - **Keycloak**: OAuth2/OIDC entegrasyonu
 - **LDAP**: Active Directory/OpenLDAP desteği
 - **OIDC**: Generic OIDC provider desteği
@@ -219,7 +146,7 @@ func GetSudoCommand() string
 ## Development Workflow
 
 ### Environment Setup
-1. Go 1.21+ kurulumu
+1. Go 1.24+ kurulumu
 2. Dependencies: `go mod tidy`
 3. Environment: `.env` dosyası konfigürasyonu
 4. Database migration: `go run cmd/migrate/main.go`
