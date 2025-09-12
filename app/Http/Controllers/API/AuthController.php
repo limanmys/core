@@ -228,6 +228,17 @@ class AuthController extends Controller
             auth('api')->logout();
         } catch (\Throwable $e) {}
 
+        if (env('LOGOUT_REDIRECT_URL') != '') {
+            return response()->json([
+                'message' => 'User successfully signed out',
+                'redirect' => env('LOGOUT_REDIRECT_URL')
+            ])
+            ->withCookie($deleteToken)
+            ->withCookie($deleteCurrentUser)
+            ->withoutCookie('token')
+            ->withoutCookie('currentUser');
+        }
+
         return response()->json(['message' => 'User successfully signed out'])
             ->withCookie($deleteToken)
             ->withCookie($deleteCurrentUser)
