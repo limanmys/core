@@ -2,6 +2,7 @@
 
 namespace App\Classes\Authentication;
 
+use App\Models\Oauth2Token;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -138,7 +139,7 @@ class OIDCAuthenticator implements AuthenticatorInterface
             }
             
             $tokenData = $tokenResponse->json();
-            
+
             // ID token'ı decode et ve verify et
             $userInfo = self::decodeAndVerifyIdToken($tokenData['id_token']);
             
@@ -173,7 +174,6 @@ class OIDCAuthenticator implements AuthenticatorInterface
                 ], 500);
             }
             
-            
             // User'ın session time'ını set et
             auth('api')->factory()->setTTL($user->session_time);
             
@@ -183,6 +183,34 @@ class OIDCAuthenticator implements AuthenticatorInterface
                 'user_agent' => $stateData['user_agent'],
                 'callback_url' => $request->fullUrl() // Callback URL'yi ekle
             ]);
+
+            if (isset($userInfo['external_token'])) {
+                Oauth2Token::updateOrCreate([
+                    'user_id' => $user->id,
+                    'token_type' => "EXTERNAL_TOKEN",
+                ], [
+                    'user_id' => $user->id,
+                    'token_type' => "EXTERNAL_TOKEN",
+                    'access_token' => $userInfo['external_token'],
+                    'refresh_token' => "",
+                    'expires_in' => 0,
+                    'refresh_expires_in' => 0,
+                    'permissions' => [],
+                ]);
+            } else {
+                Oauth2Token::updateOrCreate([
+                    'user_id' => $user->id,
+                    'token_type' => $tokenData['token_type'],
+                ], [
+                    'user_id' => $user->id,
+                    'token_type' => $tokenData['token_type'],
+                    'access_token' => $tokenData['access_token'],
+                    'refresh_token' => $tokenData['refresh_token'],
+                    'expires_in' => $tokenData['expires_in'],
+                    'refresh_expires_in' => $tokenData['refresh_expires_in'],
+                    'permissions' => [],
+                ]);
+            }
             
             Log::info("OIDC authentication successful", [
                 'user_id' => $user->id,
