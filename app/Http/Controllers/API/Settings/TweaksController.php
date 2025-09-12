@@ -29,6 +29,7 @@ class TweaksController extends Controller
             'LOGIN_IMAGE' => SystemSettings::where('key', 'LOGIN_IMAGE')->first()?->data ?? '',
             'DEFAULT_AUTH_GATE' => env('DEFAULT_AUTH_GATE', 'liman'),
             'JWT_TTL' => env('JWT_TTL', 120),
+            'CORS_TRUSTED_ORIGINS' => env('CORS_TRUSTED_ORIGINS', ''),
         ]);
     }
 
@@ -49,6 +50,7 @@ class TweaksController extends Controller
             'NEW_LOG_LEVEL' => 'required|string',
             'DEFAULT_AUTH_GATE' => 'required|string|in:liman,keycloak,ldap',
             'JWT_TTL' => 'required|integer|min:15|max:999999',
+            'CORS_TRUSTED_ORIGINS' => 'nullable|string',
         ], [], [
             "EXTENSION_TIMEOUT" => "Eklenti zaman aşımı"
         ]);
@@ -64,6 +66,7 @@ class TweaksController extends Controller
             'LDAP_IGNORE_CERT' => (bool) $request->LDAP_IGNORE_CERT,
             'DEFAULT_AUTH_GATE' => $request->DEFAULT_AUTH_GATE,
             'JWT_TTL' => $request->JWT_TTL,
+            'CORS_TRUSTED_ORIGINS' => $request->CORS_TRUSTED_ORIGINS,
         ]);
 
         if ($request->has('LOGIN_IMAGE') && $request->LOGIN_IMAGE != '') {
@@ -93,6 +96,7 @@ class TweaksController extends Controller
                 'LDAP_IGNORE_CERT' => (bool) $request->LDAP_IGNORE_CERT,
                 'DEFAULT_AUTH_GATE' => $request->DEFAULT_AUTH_GATE,
                 'JWT_TTL' => $request->JWT_TTL,
+                'CORS_TRUSTED_ORIGINS' => $request->CORS_TRUSTED_ORIGINS,
             ],
             "TWEAK_EDIT"
         );
