@@ -316,6 +316,10 @@ class OIDCAuthenticator implements AuthenticatorInterface
             $user = User::where('oidc_sub', $userInfo['sub'])->first();
             
             if (!$user) {
+                if (trim($userInfo['email']) === '') {
+                    throw new \Exception('User creation failed, email value is required')
+                }
+
                 // Email ile user'ı ara
                 $user = User::where('email', strtolower($userInfo['email']))->first();
                 
