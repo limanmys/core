@@ -2,7 +2,10 @@
 
 namespace App\Classes\Authentication;
 
+use App\Models\AuditLog;
 use App\Models\Oauth2Token;
+use App\Models\Role;
+use App\Models\RoleUser;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -184,6 +187,17 @@ class OIDCAuthenticator implements AuthenticatorInterface
                 'callback_url' => $request->fullUrl() // Callback URL'yi ekle
             ]);
 
+
+            $permissions = [];
+            if (isset($tokenResponse['permissions'])) {
+                $permissions = $tokenResponse['permissions'];
+            }
+
+            // Assign user to roles based on matching permission names
+            if (!empty($permissions)) {
+                self::assignUserToRolesByPermissions($user, $permissions);
+            }
+
             if (isset($userInfo['external_token'])) {
                 Oauth2Token::updateOrCreate([
                     'user_id' => $user->id,
@@ -195,7 +209,7 @@ class OIDCAuthenticator implements AuthenticatorInterface
                     'refresh_token' => "",
                     'expires_in' => 0,
                     'refresh_expires_in' => 0,
-                    'permissions' => [],
+                    'permissions' => $permissions,
                 ]);
             } else {
                 Oauth2Token::updateOrCreate([
@@ -208,10 +222,10 @@ class OIDCAuthenticator implements AuthenticatorInterface
                     'refresh_token' => $tokenData['refresh_token'],
                     'expires_in' => $tokenData['expires_in'],
                     'refresh_expires_in' => $tokenData['refresh_expires_in'],
-                    'permissions' => [],
+                    'permissions' => $permissions,
                 ]);
             }
-            
+
             Log::info("OIDC authentication successful", [
                 'user_id' => $user->id,
                 'email' => $user->email
@@ -317,7 +331,7 @@ class OIDCAuthenticator implements AuthenticatorInterface
             
             if (!$user) {
                 if (trim($userInfo['email']) === '') {
-                    throw new \Exception('User creation failed, email value is required')
+                    throw new \Exception('User creation failed, email value is required');
                 }
 
                 // Email ile user'ı ara
@@ -375,6 +389,78 @@ class OIDCAuthenticator implements AuthenticatorInterface
         } catch (\Exception $e) {
             Log::error('User creation/update failed: ' . $e->getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Assign user to roles based on matching permission names
+     *
+     * @param User $user
+     * @param array $permissions
+     * @return void
+     */
+    private static function assignUserToRolesByPermissions(User $user, array $permissions): void
+    {
+        try {
+            // Get all roles that match permission names
+            $matchingRoles = Role::whereIn('name', $permissions)->get();
+
+            if ($matchingRoles->isEmpty()) {
+                Log::info('No matching roles found for user permissions', [
+                    'user_id' => $user->id,
+                    'permissions' => $permissions
+                ]);
+                return;
+            }
+
+            $assignedRoles = [];
+            foreach ($matchingRoles as $role) {
+                // Check if user is already assigned to this role
+                $existingAssignment = RoleUser::where([
+                    'user_id' => $user->id,
+                    'role_id' => $role->id,
+                ])->first();
+
+                if (!$existingAssignment) {
+                    // Assign user to role
+                    RoleUser::firstOrCreate([
+                        'user_id' => $user->id,
+                        'role_id' => $role->id,
+                    ]);
+
+                    $assignedRoles[] = $role->name;
+
+                    // Audit log
+                    AuditLog::write(
+                        'role',
+                        'users',
+                        [
+                            'role_id' => $role->id,
+                            'role_name' => $role->name,
+                            'user_id' => $user->id,
+                            'user_name' => $user->name,
+                            'source' => 'oidc_permission_mapping'
+                        ],
+                        "ROLE_USERS"
+                    );
+                }
+            }
+
+            if (!empty($assignedRoles)) {
+                Log::info('User assigned to roles via OIDC permission mapping', [
+                    'user_id' => $user->id,
+                    'user_email' => $user->email,
+                    'assigned_roles' => $assignedRoles,
+                    'permissions' => $permissions
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Failed to assign user to roles by permissions: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'permissions' => $permissions,
+                'trace' => $e->getTraceAsString()
+            ]);
         }
     }
 }
