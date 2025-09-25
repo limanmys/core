@@ -57,6 +57,18 @@ return [
             'level' => 'info',
         ],
 
+        'auth' => [
+            'driver' => 'single',
+            'path' => env('LOG_AUTH_PATH', '/liman/logs/auth.log'),
+            'level' => 'info',
+        ],
+
+        'audit' => [
+            'driver' => 'single',
+            'path' => env('LOG_AUDIT_PATH', '/liman/logs/audit.log'),
+            'level' => 'info',
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

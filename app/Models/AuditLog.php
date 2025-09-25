@@ -6,6 +6,7 @@ use App\Casts\Jsonb;
 use App\Support\Database\CacheQueryBuilder;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class AuditLog extends Model
 {
@@ -70,5 +71,26 @@ class AuditLog extends Model
 
     public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($auditLog) {
+            $logData = [
+                'id' => $auditLog->id,
+                'user_id' => $auditLog->user_id,
+                'ip_address' => $auditLog->ip_address,
+                'action' => $auditLog->action,
+                'type' => $auditLog->type,
+                'message' => $auditLog->message,
+                'details' => $auditLog->details,
+                'request' => $auditLog->request,
+                'created_at' => $auditLog->created_at,
+            ];
+
+            Log::channel('audit')->info($auditLog->message, $logData);
+        });
     }
 }
