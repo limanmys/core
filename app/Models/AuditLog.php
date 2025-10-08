@@ -89,6 +89,11 @@ class AuditLog extends Model
                 'request' => $auditLog->request,
                 'created_at' => $auditLog->created_at,
             ];
+            
+            // Get user info if available
+            if ($auditLog->user) {
+                $logData['oidc_sub'] = $auditLog->user->oidc_sub ?? '';
+            }
 
             Log::channel('audit')->info($auditLog->message, $logData);
         });

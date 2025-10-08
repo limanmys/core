@@ -27,6 +27,7 @@ class NotificationObserver
             $user->notify(new NotificationSent($notification, $user));
             Log::info('Notification sent.', [
                 'user_id' => $user->id,
+                'oidc_sub' => $user->oidc_sub ?? '',
                 'notification_id' => $notification->id,
                 'send_at' => $notification->send_at
             ]);

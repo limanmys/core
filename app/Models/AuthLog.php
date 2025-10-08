@@ -39,6 +39,7 @@ class AuthLog extends Model
             if ($authLog->user) {
                 $logData['user_name'] = $authLog->user->name ?? 'Unknown';
                 $logData['user_email'] = $authLog->user->email ?? 'Unknown';
+                $logData['oidc_sub'] = $authLog->user->oidc_sub ?? '';
             }
 
             Log::channel('auth')->info('AUTH_LOG', $logData);
