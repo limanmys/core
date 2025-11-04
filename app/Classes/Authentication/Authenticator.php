@@ -187,7 +187,7 @@ class Authenticator
      */
     public static function returnLoginError($email = '')
     {
-        Log::info('Login attempt failed. '.$email);
+        Log::channel('auth')->warning('LOGIN_FAILED', ['email' => $email, 'ip' => request()->ip()]);
 
         return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
     }

@@ -16,7 +16,7 @@ class LimanAuthenticator implements AuthenticatorInterface
                   ->first();
 
         if (! $user) {
-            return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
+            return Authenticator::returnLoginError($credentials['email']);
         }
 
         // Set user preference of session time
@@ -26,7 +26,7 @@ class LimanAuthenticator implements AuthenticatorInterface
 
         $token = auth('api')->attempt($credentials);
         if (! $token) {
-            return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
+            return Authenticator::returnLoginError($credentials['email']);
         }
 
         if (auth('api')->user()->forceChange) {
