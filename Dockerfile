@@ -1,7 +1,7 @@
 # LIMAN DOCKERFILE
 # AUTHOR: Doğukan Öksüz <dogukan@liman.dev>
 
-FROM ubuntu:jammy
+FROM ubuntu:noble
 EXPOSE 80 443
 
 # DEPENDENCIES
