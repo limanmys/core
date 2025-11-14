@@ -79,6 +79,15 @@ class TweaksController extends Controller
                     'LOGIN_IMAGE' => 'Giriş arka planı resmi 1MB\'dan büyük olamaz.',
                 ], 422);
             }
+
+            // Validate image format and prevent SVG/script injection
+            $imageValidation = $this->validateBase64Image($request->LOGIN_IMAGE);
+            if (!$imageValidation['valid']) {
+                return response()->json([
+                    'LOGIN_IMAGE' => $imageValidation['error'],
+                ], 422);
+            }
+
             SystemSettings::updateOrCreate(
                 ['key' => 'LOGIN_IMAGE'],
                 ['data' => $request->get('LOGIN_IMAGE')]
@@ -110,5 +119,87 @@ class TweaksController extends Controller
         return response()->json([
             'message' => 'Ayarlar kaydedildi.',
         ]);
+    }
+
+    /**
+     * Validate base64 encoded image data
+     * Prevents SVG injection and validates image format
+     *
+     * @param string $base64Data
+     * @return array
+     */
+    private function validateBase64Image($base64Data)
+    {
+        // Allowed MIME types (excluding SVG for security)
+        $allowedMimeTypes = [
+            'image/jpeg',
+            'image/jpg',
+            'image/png',
+            'image/gif',
+            'image/webp',
+        ];
+
+        // Extract MIME type from base64 data URL
+        if (preg_match('/^data:(image\/[a-zA-Z0-9\+\-\.]+);base64,/', $base64Data, $matches)) {
+            $mimeType = $matches[1];
+            
+            // Check if MIME type is allowed
+            if (!in_array($mimeType, $allowedMimeTypes)) {
+                return [
+                    'valid' => false,
+                    'error' => 'Sadece JPG, PNG, GIF ve WebP formatları desteklenmektedir. SVG dosyaları güvenlik nedeniyle kabul edilmemektedir.',
+                ];
+            }
+
+            // Extract base64 data
+            $base64String = preg_replace('/^data:image\/[a-zA-Z0-9\+\-\.]+;base64,/', '', $base64Data);
+            $imageData = base64_decode($base64String, true);
+
+            // Validate base64 decoding
+            if ($imageData === false) {
+                return [
+                    'valid' => false,
+                    'error' => 'Geçersiz base64 resim verisi.',
+                ];
+            }
+
+            // Verify actual image data using getimagesizefromstring
+            $imageInfo = @getimagesizefromstring($imageData);
+            if ($imageInfo === false) {
+                return [
+                    'valid' => false,
+                    'error' => 'Resim verisi doğrulanamadı. Lütfen geçerli bir resim dosyası yükleyin.',
+                ];
+            }
+
+            // Verify MIME type matches actual image type
+            $actualMimeType = $imageInfo['mime'];
+            if ($actualMimeType !== $mimeType) {
+                return [
+                    'valid' => false,
+                    'error' => 'Resim formatı eşleşmiyor. Dosya içeriği ile MIME tipi tutarsız.',
+                ];
+            }
+
+            // Additional check: ensure it's not an SVG disguised as another format
+            if (strpos($imageData, '<svg') !== false || strpos($imageData, '<?xml') !== false) {
+                return [
+                    'valid' => false,
+                    'error' => 'SVG içeriği tespit edildi. Güvenlik nedeniyle SVG dosyaları kabul edilmemektedir.',
+                ];
+            }
+
+            return [
+                'valid' => true,
+                'mimeType' => $mimeType,
+                'width' => $imageInfo[0],
+                'height' => $imageInfo[1],
+            ];
+        }
+
+        return [
+            'valid' => false,
+            'error' => 'Geçersiz resim formatı. Base64 kodlanmış resim bekleniyor.',
+        ];
     }
 }
