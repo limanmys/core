@@ -77,7 +77,6 @@ COPY storage/build_tools/docker/config/nginx.conf /etc/nginx/sites-available/lim
 RUN ln -s /etc/nginx/sites-available/liman.conf /etc/nginx/sites-enabled/liman.conf
 
 # SERVICES
-RUN mkdir /run/php
 COPY storage/build_tools/docker/config/supervisor.conf /etc/supervisor/supervisor.conf
 COPY storage/build_tools/docker/config/supervisor /etc/supervisor/conf.d
 
