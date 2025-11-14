@@ -331,7 +331,11 @@ class AuthController extends Controller
             'email' => 'required|email',
         ]);
 
-        Password::sendResetLink($request->only('email'));
+        try {
+            Password::sendResetLink($request->only('email'));
+        } catch (\Throwable $e) {
+            // Do nothing
+        }
 
         return response()->json(['message' => 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.']);
     }
