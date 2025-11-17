@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Settings;
 use App\Http\Controllers\Controller;
 use App\Mail\TestMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Mail;
 
 class MailController extends Controller
@@ -54,6 +55,15 @@ class MailController extends Controller
             setEnv([
                 'MAIL_PASSWORD' => $request->password,
             ]);
+        }
+
+        // Force update the config at runtime to ensure the mailer uses the new values
+        Config::set('mail.host', $request->host);
+        Config::set('mail.port', $request->port);
+        Config::set('mail.username', $request->username);
+        Config::set('mail.encryption', $request->encryption);
+        if ($request->password) {
+            Config::set('mail.password', $request->password);
         }
 
         try {
