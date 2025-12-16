@@ -14,7 +14,7 @@ class RoleUser extends Model
 {
     use UsesUuid;
 
-    protected $fillable = ['role_id', 'user_id', 'type'];
+    protected $fillable = ['role_id', 'user_id', 'type', 'auto'];
 
     /**
      * @return BelongsTo

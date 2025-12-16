@@ -394,6 +394,10 @@ class OIDCAuthenticator implements AuthenticatorInterface
 
     /**
      * Assign user to roles based on matching permission names
+     * 
+     * This method first removes all auto-assigned roles (auto=true) from the user,
+     * then assigns new roles from OIDC with auto=true flag.
+     * This ensures that when a role is removed from OIDC, it gets removed from the user.
      *
      * @param User $user
      * @param array $permissions
@@ -402,6 +406,31 @@ class OIDCAuthenticator implements AuthenticatorInterface
     private static function assignUserToRolesByPermissions(User $user, array $permissions): void
     {
         try {
+            // First, remove all auto-assigned roles for this user
+            $removedAutoRoles = RoleUser::where('user_id', $user->id)
+                ->where('auto', true)
+                ->get();
+
+            if ($removedAutoRoles->isNotEmpty()) {
+                $removedRoleNames = [];
+                foreach ($removedAutoRoles as $roleUser) {
+                    $role = Role::find($roleUser->role_id);
+                    if ($role) {
+                        $removedRoleNames[] = $role->name;
+                    }
+                }
+
+                RoleUser::where('user_id', $user->id)
+                    ->where('auto', true)
+                    ->delete();
+
+                Log::info('Removed auto-assigned roles from user', [
+                    'user_id' => $user->id,
+                    'user_email' => $user->email,
+                    'removed_roles' => $removedRoleNames
+                ]);
+            }
+
             // Get all roles that match permission names
             $matchingRoles = Role::whereIn('name', $permissions)->get();
 
@@ -415,35 +444,46 @@ class OIDCAuthenticator implements AuthenticatorInterface
 
             $assignedRoles = [];
             foreach ($matchingRoles as $role) {
-                // Check if user is already assigned to this role
-                $existingAssignment = RoleUser::where([
+                // Check if user is already manually assigned to this role (auto=false)
+                $existingManualAssignment = RoleUser::where([
                     'user_id' => $user->id,
                     'role_id' => $role->id,
+                    'auto' => false,
                 ])->first();
 
-                if (!$existingAssignment) {
-                    // Assign user to role
-                    RoleUser::firstOrCreate([
+                if ($existingManualAssignment) {
+                    // User already has manual assignment, skip auto-assignment
+                    Log::info('User already has manual role assignment, skipping auto-assignment', [
                         'user_id' => $user->id,
                         'role_id' => $role->id,
+                        'role_name' => $role->name
                     ]);
-
-                    $assignedRoles[] = $role->name;
-
-                    // Audit log
-                    AuditLog::write(
-                        'role',
-                        'users',
-                        [
-                            'role_id' => $role->id,
-                            'role_name' => $role->name,
-                            'user_id' => $user->id,
-                            'user_name' => $user->name,
-                            'source' => 'oidc_permission_mapping'
-                        ],
-                        "ROLE_USERS"
-                    );
+                    continue;
                 }
+
+                // Assign user to role with auto=true
+                RoleUser::create([
+                    'user_id' => $user->id,
+                    'role_id' => $role->id,
+                    'auto' => true,
+                ]);
+
+                $assignedRoles[] = $role->name;
+
+                // Audit log
+                AuditLog::write(
+                    'role',
+                    'users',
+                    [
+                        'role_id' => $role->id,
+                        'role_name' => $role->name,
+                        'user_id' => $user->id,
+                        'user_name' => $user->name,
+                        'source' => 'oidc_permission_mapping',
+                        'auto' => true
+                    ],
+                    "ROLE_USERS"
+                );
             }
 
             if (!empty($assignedRoles)) {
@@ -451,7 +491,8 @@ class OIDCAuthenticator implements AuthenticatorInterface
                     'user_id' => $user->id,
                     'user_email' => $user->email,
                     'assigned_roles' => $assignedRoles,
-                    'permissions' => $permissions
+                    'permissions' => $permissions,
+                    'auto' => true
                 ]);
             }
 
