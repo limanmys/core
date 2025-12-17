@@ -58,7 +58,12 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'schema' => 'public',
-            'sslmode' => 'prefer',
+            'sslmode' => env('DB_SSLMODE', 'prefer'),
+            ...(env('DB_SSL_ENABLED', false) ? [
+                'sslrootcert' => env('DB_SSL_CA'),
+                'sslcert' => env('DB_SSL_CERT'),
+                'sslkey' => env('DB_SSL_KEY'),
+            ] : []),
             'options' => [
                 PDO::ATTR_PERSISTENT => true,
             ],
@@ -115,20 +120,36 @@ return [
     */
 
     'redis' => [
-        'client' => 'phpredis',
+        'client' => 'predis',
 
-        'default' => [
+        'default' => array_filter([
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => env('REDIS_DB', 0),
-        ],
+            'scheme' => env('REDIS_SCHEME', 'tcp'),
+            'ssl' => env('REDIS_SSL_ENABLED', false) ? [
+                'cafile' => env('REDIS_SSL_CA'),
+                'local_cert' => env('REDIS_SSL_CERT'),
+                'local_pk' => env('REDIS_SSL_KEY'),
+                'verify_peer' => env('REDIS_SSL_VERIFY_PEER', true),
+                'verify_peer_name' => env('REDIS_SSL_VERIFY_PEER_NAME', false),
+            ] : null,
+        ]),
 
-        'cache' => [
+        'cache' => array_filter([
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => env('REDIS_CACHE_DB', 1),
-        ],
+            'scheme' => env('REDIS_SCHEME', 'tcp'),
+            'ssl' => env('REDIS_SSL_ENABLED', false) ? [
+                'cafile' => env('REDIS_SSL_CA'),
+                'local_cert' => env('REDIS_SSL_CERT'),
+                'local_pk' => env('REDIS_SSL_KEY'),
+                'verify_peer' => env('REDIS_SSL_VERIFY_PEER', true),
+                'verify_peer_name' => env('REDIS_SSL_VERIFY_PEER_NAME', false),
+            ] : null,
+        ]),
     ],
 ];
