@@ -482,7 +482,9 @@ class OIDCAuthenticator implements AuthenticatorInterface
                         'source' => 'oidc_permission_mapping',
                         'auto' => true
                     ],
-                    "ROLE_USERS"
+                    "ROLE_USERS",
+                    [],
+                    $user->id
                 );
             }
 
