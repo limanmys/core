@@ -38,7 +38,8 @@ class AuditLog extends Model
         string $action,
         array $details,
         string $message = "",
-        array $extra = []
+        array $extra = [],
+        string $user_id = "",
     ) {
         $request = request()->all();
         unset($request['password']);
@@ -59,7 +60,7 @@ class AuditLog extends Model
         $request = array_merge($request, $extra);
 
         return self::create([
-            'user_id' => auth('api')->user()->id,
+            'user_id' => auth('api')->user()?->id ?? $user_id ?? '',
             'ip_address' => request()->ip(),
             'request' => $request,
             'action' => $action,
