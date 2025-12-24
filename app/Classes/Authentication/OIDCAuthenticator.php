@@ -483,6 +483,7 @@ class OIDCAuthenticator implements AuthenticatorInterface
                         'auto' => true
                     ],
                     "ROLE_USERS",
+                    [],
                     $user->id,
                 );
             }
