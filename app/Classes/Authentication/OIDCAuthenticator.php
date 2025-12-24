@@ -31,11 +31,18 @@ class OIDCAuthenticator implements AuthenticatorInterface
         $state = Str::random(40);
         $nonce = Str::random(32);
         
+        // Validate and sanitize redirect_path to prevent open redirects
+        $redirectPath = null;
+        if ($request->has('redirect_path')) {
+            $redirectPath = self::validateRedirectPath($request->input('redirect_path'));
+        }
+        
         // State ve nonce'u cache'te sakla (30 dakika TTL)
         Cache::put("oidc_state:{$state}", [
             'nonce' => $nonce,
             'ip' => $request->ip(),
             'user_agent' => $request->userAgent(),
+            'redirect_path' => $redirectPath,
             'created_at' => now()->toDateTimeString()
         ], 30 * 60); // 30 dakika
         
@@ -235,10 +242,17 @@ class OIDCAuthenticator implements AuthenticatorInterface
             Cache::forget("oidc_state:{$request->state}");
 
             // JWT token oluştur ve cookie'ye set et
-            return Authenticator::createNewToken(
+            $tokenResponse = Authenticator::createNewToken(
                 auth('api')->login($user),
                 $request
             );
+            
+            // Get the redirect path or default to homepage
+            $redirectPath = $stateData['redirect_path'] ?? '/';
+            
+            // Redirect the user with cookies attached
+            return redirect($redirectPath)
+                ->withCookies($tokenResponse->headers->getCookies());
         } catch (\Exception $e) {
             Log::error('OIDC authentication exception: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
@@ -392,6 +406,59 @@ class OIDCAuthenticator implements AuthenticatorInterface
         }
     }
 
+    /**
+     * Validate redirect path to prevent open redirect vulnerabilities
+     * Only allows relative paths within the application
+     * 
+     * @param string $path
+     * @return string|null Sanitized path or null if invalid
+     */
+    private static function validateRedirectPath(?string $path): ?string
+    {
+        if (!$path || trim($path) === '') {
+            return null;
+        }
+        
+        $path = trim($path);
+        
+        // Reject if it contains protocol (http://, https://, ftp://, //)
+        if (preg_match('#^\w+:|^//#', $path)) {
+            Log::warning('Rejected redirect_path with protocol', ['path' => $path]);
+            return null;
+        }
+        
+        // Reject if it contains @ (username in URL)
+        if (strpos($path, '@') !== false) {
+            Log::warning('Rejected redirect_path with @ symbol', ['path' => $path]);
+            return null;
+        }
+        
+        // Reject if it contains backslashes (Windows path or obfuscation attempt)
+        if (strpos($path, '\\') !== false) {
+            Log::warning('Rejected redirect_path with backslashes', ['path' => $path]);
+            return null;
+        }
+        
+        // Only allow paths starting with /
+        if (!str_starts_with($path, '/')) {
+            Log::warning('Rejected redirect_path not starting with /', ['path' => $path]);
+            return null;
+        }
+        
+        // Additional security: reject if path tries to escape with multiple slashes
+        $normalized = preg_replace('#/+#', '/', $path);
+        
+        // Reject any suspicious patterns
+        if (preg_match('#\.\.|javascript:|data:|vbscript:#i', $normalized)) {
+            Log::warning('Rejected redirect_path with suspicious pattern', ['path' => $path]);
+            return null;
+        }
+        
+        Log::info('Validated redirect_path', ['original' => $path, 'normalized' => $normalized]);
+        
+        return $normalized;
+    }
+    
     /**
      * Assign user to roles based on matching permission names
      * 

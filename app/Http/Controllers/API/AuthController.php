@@ -97,6 +97,7 @@ class AuthController extends Controller
         if ($request->type === 'oidc') {
             $validator = Validator::make($request->all(), [
                 'type' => 'required|string',
+                'redirect_path' => 'nullable|string',
             ]);
         } else {
             $validator = Validator::make($request->all(), [
