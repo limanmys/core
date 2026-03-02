@@ -64,30 +64,34 @@ class FeatureFlagController extends Controller
     public function saveConfiguration(Request $request)
     {
         validate([
-            'lang_tr' => 'required|boolean',
-            'lang_en' => 'required|boolean',
-            'lang_de' => 'required|boolean',
-            'settings_vault' => 'required|boolean',
-            'settings_tokens' => 'required|boolean',
-            'settings_extensions' => 'required|boolean',
-            'settings_users' => 'required|boolean',
-            'settings_roles' => 'required|boolean',
-            'settings_email' => 'required|boolean',
-            'settings_external_notifications' => 'required|boolean',
-            'settings_subscriptions' => 'required|boolean',
-            'settings_health' => 'required|boolean',
-            'server_services' => 'required|boolean',
-            'server_packages' => 'required|boolean',
-            'server_updates' => 'required|boolean',
-            'server_user_management' => 'required|boolean',
-            'server_open_ports' => 'required|boolean',
-            'server_access_logs' => 'required|boolean',
-            'dashboard_most_used_extensions' => 'required|boolean',
-            'dashboard_favorite_servers' => 'required|boolean',
-            'dashboard_auth_logs' => 'required|boolean',
+            'lang_tr' => 'present|boolean',
+            'lang_en' => 'present|boolean',
+            'lang_de' => 'present|boolean',
+            'settings_vault' => 'present|boolean',
+            'settings_tokens' => 'present|boolean',
+            'settings_extensions' => 'present|boolean',
+            'settings_users' => 'present|boolean',
+            'settings_roles' => 'present|boolean',
+            'settings_email' => 'present|boolean',
+            'settings_external_notifications' => 'present|boolean',
+            'settings_subscriptions' => 'present|boolean',
+            'settings_health' => 'present|boolean',
+            'server_services' => 'present|boolean',
+            'server_packages' => 'present|boolean',
+            'server_updates' => 'present|boolean',
+            'server_user_management' => 'present|boolean',
+            'server_open_ports' => 'present|boolean',
+            'server_access_logs' => 'present|boolean',
+            'dashboard_most_used_extensions' => 'present|boolean',
+            'dashboard_favorite_servers' => 'present|boolean',
+            'dashboard_auth_logs' => 'present|boolean',
         ]);
 
-        $flags = $request->only(array_keys(self::DEFAULT_FLAGS));
+        // Cast all values to proper booleans before saving
+        $flags = array_map(
+            fn ($key) => $request->boolean($key),
+            array_combine(array_keys(self::DEFAULT_FLAGS), array_keys(self::DEFAULT_FLAGS))
+        );
 
         // Ensure at least one language is enabled
         $enabledLangs = array_filter([
