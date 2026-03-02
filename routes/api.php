@@ -78,6 +78,9 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
         Route::get('/extensions', [MenuController::class, 'extensions']);
     });
 
+    // Feature Flags (readable by all authenticated users)
+    Route::get('/settings/advanced/feature_flags', [Settings\FeatureFlagController::class, 'getConfiguration']);
+
     // Kubernetes Endpoints
     Route::group(['prefix' => 'kubernetes'], function () {
         Route::post('/namespaces', [KubernetesController::class, 'getNamespaces']);
@@ -361,6 +364,11 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
             Route::group(['prefix' => 'tweaks'], function () {
                 Route::get('/', [Settings\TweaksController::class, 'getConfiguration']);
                 Route::post('/', [Settings\TweaksController::class, 'saveConfiguration']);
+            });
+
+            // Feature Flags
+            Route::group(['prefix' => 'feature_flags'], function () {
+                Route::post('/', [Settings\FeatureFlagController::class, 'saveConfiguration']);
             });
 
             // Log Rotation
