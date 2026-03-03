@@ -63,6 +63,13 @@ class FeatureFlagController extends Controller
      */
     public function saveConfiguration(Request $request)
     {
+        // Normalize all flag values to proper PHP booleans before validation,
+        // since boolean strings like "false" are not accepted by Laravel's boolean rule.
+        $request->merge(array_map(
+            fn ($key) => $request->boolean($key),
+            array_combine(array_keys(self::DEFAULT_FLAGS), array_keys(self::DEFAULT_FLAGS))
+        ));
+
         validate([
             'lang_tr' => 'present|boolean',
             'lang_en' => 'present|boolean',
@@ -87,11 +94,7 @@ class FeatureFlagController extends Controller
             'dashboard_auth_logs' => 'present|boolean',
         ]);
 
-        // Cast all values to proper booleans before saving
-        $flags = array_map(
-            fn ($key) => $request->boolean($key),
-            array_combine(array_keys(self::DEFAULT_FLAGS), array_keys(self::DEFAULT_FLAGS))
-        );
+        $flags = $request->only(array_keys(self::DEFAULT_FLAGS));
 
         // Ensure at least one language is enabled
         $enabledLangs = array_filter([
