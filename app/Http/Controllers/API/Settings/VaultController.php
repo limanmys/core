@@ -151,6 +151,12 @@ class VaultController extends Controller
         if (! $first) {
             return response()->json(['status' => false], 404);
         }
+
+        // Ownership check: only admins or the owner can delete
+        if (! auth('api')->user()->isAdmin() && auth('api')->user()->id != $first->user_id) {
+            return response()->json(['status' => false, 'message' => 'Bu kayıt üzerinde yetkiniz bulunmamaktadır.'], 403);
+        }
+
         if (
             $first->name == 'clientUsername' ||
             $first->name == 'clientPassword'

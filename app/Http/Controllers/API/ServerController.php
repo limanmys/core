@@ -229,19 +229,55 @@ class ServerController extends Controller
      */
     public function checkAccess()
     {
-        if (request('port') == -1) {
+        validate([
+            'ip_address' => 'required|string|max:255',
+            'port' => 'required|integer|min:-1|max:65535',
+        ]);
+
+        $ip = request('ip_address');
+        $port = (int) request('port');
+
+        // Port -1 means no port check needed (portless server)
+        if ($port === -1) {
             return response()->json([
                 'message' => 'Sunucuya başarıyla erişim sağlandı.',
             ]);
         }
+
+        // Validate port range for actual connections
+        if ($port < 1) {
+            return response()->json(['port' => 'Geçersiz port numarası.'], 422);
+        }
+
+        // Resolve hostname to IP for validation
+        $resolvedIp = $ip;
+        if (! filter_var($ip, FILTER_VALIDATE_IP)) {
+            $resolvedIp = gethostbyname($ip);
+            if ($resolvedIp === $ip) {
+                return response()->json(['ip_address' => 'Sunucu adresi çözümlenemedi.'], 422);
+            }
+        }
+
+        // Block metadata endpoints and cloud-internal addresses (169.254.x.x link-local)
+        if (filter_var($resolvedIp, FILTER_VALIDATE_IP) && str_starts_with($resolvedIp, '169.254.')) {
+            return response()->json(['ip_address' => 'Link-local adresleri kullanılamaz.'], 422);
+        }
+
+        // Restrict to safe port range — block well-known internal service ports
+        $blockedPorts = [6379, 11211, 27017, 9200, 9300, 2379, 5432, 3306];
+        if (in_array($port, $blockedPorts)) {
+            return response()->json(['port' => 'Bu port numarası güvenlik nedeniyle engellenmiştir.'], 422);
+        }
+
         $status = @fsockopen(
-            request('ip_address'),
-            request('port'),
+            $ip,
+            $port,
             $errno,
             $errstr,
             intval(config('liman.server_connection_timeout')) / 1000
         );
         if (is_resource($status)) {
+            fclose($status);
             return response()->json([
                 'message' => 'Sunucuya başarıyla erişim sağlandı.',
             ]);

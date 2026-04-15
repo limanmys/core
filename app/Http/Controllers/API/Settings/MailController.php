@@ -36,12 +36,23 @@ class MailController extends Controller
     public function saveConfiguration(Request $request)
     {
         validate([
-            'host' => 'required|string',
-            'port' => 'required|integer',
-            'username' => 'required|string',
-            'password' => 'nullable|string',
-            'encryption' => 'required|string',
+            'host' => 'required|string|max:255',
+            'port' => 'required|integer|min:1|max:65535',
+            'username' => 'required|string|max:255',
+            'password' => 'nullable|string|max:255',
+            'encryption' => 'required|string|in:tls,ssl,null',
         ]);
+
+        $fields = ['host', 'username', 'password', 'encryption'];
+        foreach ($fields as $field) {
+            if ($request->has($field) && $request->$field !== null) {
+                if (preg_match('/[\n\r]/', $request->$field)) {
+                    return response()->json([
+                        'message' => 'Geçersiz karakter tespit edildi.',
+                    ], 422);
+                }
+            }
+        }
 
         setEnv([
             'MAIL_ENABLED' => (bool) $request->active,

@@ -721,6 +721,12 @@ if (! function_exists('setEnv')) {
 
         $editor = $editor->load(base_path('.env'));
         foreach ($values as $key => $value) {
+            if (is_string($key) && preg_match('/[\n\r]/', $key)) {
+                return false;
+            }
+            if (is_string($value) && preg_match('/[\n\r]/', $value)) {
+                return false;
+            }
             $editor->set($key, $value);
         }
         try {

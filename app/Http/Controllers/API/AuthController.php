@@ -142,9 +142,11 @@ class AuthController extends Controller
 
             if (auth('api')->user()->google2fa_secret == null) {
                 $secret = $tfa->generateSecretKey();
+                auth('api')->user()->update([
+                    'google2fa_secret' => $secret,
+                ]);
                 return response()->json([
                     'message' => 'İki faktörlü doğrulama için Google Authenticator uygulaması ile QR kodunu okutunuz.',
-                    'secret' => $secret,
                     'image' => $tfa->getQRCodeInline(
                         "Liman",
                         auth('api')->user()->email,
@@ -184,7 +186,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|string',
             'password' => 'required|string',
-            'secret' => 'required'
+            'token' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -200,17 +202,26 @@ class AuthController extends Controller
             return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
         }
 
-        $token = auth('api')->attempt([
+        $authToken = auth('api')->attempt([
             'email' => $user->email,
             'password' => $validator->validated()["password"],
         ]);
-        if (! $token) {
+        if (! $authToken) {
             return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
         }
 
-        User::find(auth('api')->user()->id)->update([
+        $authenticatedUser = auth('api')->user();
+        if (! $authenticatedUser->google2fa_secret) {
+            return response()->json(['message' => '2FA kurulum süreci başlatılmamış. Lütfen önce giriş yapınız.'], 422);
+        }
+
+        $tfa = app('pragmarx.google2fa');
+        if (! $tfa->verifyGoogle2FA($authenticatedUser->google2fa_secret, $request->token)) {
+            return response()->json(['message' => 'OTP doğrulama başarısız. QR kodunu tekrar okutup deneyiniz.'], 422);
+        }
+
+        $authenticatedUser->update([
             'otp_enabled' => true,
-            'google2fa_secret' => $request->secret
         ]);
 
         return response()->json(['message' => '2FA kurulumu başarıyla yapıldı.']);
