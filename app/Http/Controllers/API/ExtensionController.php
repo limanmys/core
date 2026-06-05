@@ -60,6 +60,21 @@ class ExtensionController extends Controller
      */
     public function assign(Request $request)
     {
+        if (! auth('api')->user()->isAdmin()) {
+            if (! Permission::can(auth('api')->user()->id, 'server', 'id', $request->server_id)) {
+                return response()->json([
+                    'message' => 'Bu işlemi yapmak için yetkiniz yok!',
+                ], Response::HTTP_FORBIDDEN);
+            }
+            foreach ($request->extensions as $extension_id) {
+                if (! Permission::can(auth('api')->user()->id, 'extension', 'id', $extension_id)) {
+                    return response()->json([
+                        'message' => 'Bu işlemi yapmak için yetkiniz yok!',
+                    ], Response::HTTP_FORBIDDEN);
+                }
+            }
+        }
+
         try {
             DB::table('server_extensions')->insert(
                 array_map(function ($extension) use ($request) {
@@ -104,6 +119,21 @@ class ExtensionController extends Controller
      */
     public function unassign(Request $request)
     {
+        if (! auth('api')->user()->isAdmin()) {
+            if (! Permission::can(auth('api')->user()->id, 'server', 'id', $request->server_id)) {
+                return response()->json([
+                    'message' => 'Bu işlemi yapmak için yetkiniz yok!',
+                ], Response::HTTP_FORBIDDEN);
+            }
+            foreach ($request->extensions as $extension_id) {
+                if (! Permission::can(auth('api')->user()->id, 'extension', 'id', $extension_id)) {
+                    return response()->json([
+                        'message' => 'Bu işlemi yapmak için yetkiniz yok!',
+                    ], Response::HTTP_FORBIDDEN);
+                }
+            }
+        }
+
         try {
             DB::table('server_extensions')
                 ->where('server_id', $request->server_id)

@@ -196,8 +196,8 @@ class OIDCAuthenticator implements AuthenticatorInterface
 
 
             $permissions = [];
-            if (isset($tokenResponse['permissions'])) {
-                $permissions = $tokenResponse['permissions'];
+            if (isset($tokenData['permissions'])) {
+                $permissions = $tokenData['permissions'];
             }
 
             // Assign user to roles based on matching permission names
@@ -265,7 +265,7 @@ class OIDCAuthenticator implements AuthenticatorInterface
     }
     
     /**
-     * ID token'ı decode et ve verify et
+     * ID token'ı decode et ve kriptografik olarak verify et
      */
     private static function decodeAndVerifyIdToken($idToken): ?array
     {
@@ -276,63 +276,205 @@ class OIDCAuthenticator implements AuthenticatorInterface
                 Log::error('Invalid JWT token format');
                 return null;
             }
-            
+
             // Header ve payload'ı decode et
             $header = json_decode(base64_decode(str_pad(strtr($parts[0], '-_', '+/'), strlen($parts[0]) % 4, '=', STR_PAD_RIGHT)), true);
             $payload = json_decode(base64_decode(str_pad(strtr($parts[1], '-_', '+/'), strlen($parts[1]) % 4, '=', STR_PAD_RIGHT)), true);
-            
-            Log::info('JWT payload decoded', [
-                'payload' => $payload
+
+            if (! $header || ! isset($header['alg'])) {
+                Log::error('OIDC ID token missing header algorithm');
+                return null;
+            }
+
+            // Sadece asimetrik RS256 algoritmasını kabul et
+            // HS256 gibi simetrik algoritmalar reddedilmeli (client secret ile imzalanmış gibi görünen sahte tokenlar)
+            if ($header['alg'] !== 'RS256') {
+                Log::error('OIDC ID token unsupported algorithm', ['alg' => $header['alg']]);
+                return null;
+            }
+
+            // JWKS URI'yi belirle ve public key set'ini çek
+            $jwksUri = self::getJwksUri();
+            if (! $jwksUri) {
+                Log::error('OIDC JWKS URI could not be determined');
+                return null;
+            }
+
+            $jwks = Cache::remember(
+                'oidc_jwks:'.md5($jwksUri),
+                3600,
+                function () use ($jwksUri) {
+                    $response = Http::get($jwksUri);
+                    if (! $response->successful()) {
+                        throw new \Exception('Failed to fetch JWKS: '.$response->body());
+                    }
+
+                    return $response->json();
+                }
+            );
+
+            // Header'daki kid ile eşleşen public key'i JWKS içinde bul
+            $kid = $header['kid'] ?? null;
+            $matchedKey = null;
+            foreach ($jwks['keys'] ?? [] as $jwk) {
+                if ($kid === null || (isset($jwk['kid']) && $jwk['kid'] === $kid)) {
+                    if (isset($jwk['n'], $jwk['e'])) {
+                        $matchedKey = $jwk;
+                        break;
+                    }
+                }
+            }
+
+            if (! $matchedKey) {
+                Log::error('OIDC ID token signing key not found in JWKS', ['kid' => $kid]);
+                return null;
+            }
+
+            // JWK'dan PEM formatında public key oluştur
+            $publicKey = self::createPemFromModulusAndExponent($matchedKey['n'], $matchedKey['e']);
+
+            // JWT imzasını kriptografik olarak doğrula
+            $signature = base64_decode(str_pad(strtr($parts[2], '-_', '+/'), strlen($parts[2]) % 4, '=', STR_PAD_RIGHT));
+            $signedData = $parts[0].'.'.$parts[1];
+            $verifyResult = openssl_verify($signedData, $signature, $publicKey, OPENSSL_ALGO_SHA256);
+
+            if ($verifyResult !== 1) {
+                Log::error('OIDC ID token signature verification failed', ['openssl_error' => openssl_error_string()]);
+                return null;
+            }
+
+            Log::info('JWT signature verified successfully', [
+                'kid' => $kid,
+                'sub' => $payload['sub'] ?? null,
             ]);
-            
+
             // Basic validation
-            if (!$payload || !isset($payload['sub']) || !isset($payload['email'])) {
+            if (! $payload || ! isset($payload['sub']) || ! isset($payload['email'])) {
                 Log::error('OIDC ID token missing required claims', [
                     'has_sub' => isset($payload['sub']),
                     'has_email' => isset($payload['email']),
-                    'payload' => $payload
+                    'payload' => $payload,
                 ]);
                 return null;
             }
-            
+
             // Issuer kontrolü (trailing slash normalize edilerek)
             $expectedIssuer = rtrim(env('OIDC_ISSUER_URL'), '/');
             $actualIssuer = rtrim($payload['iss'], '/');
-            
+
             if ($actualIssuer !== $expectedIssuer) {
                 Log::error('OIDC ID token issuer mismatch', [
                     'expected' => $expectedIssuer,
                     'actual' => $actualIssuer,
-                    'original_expected' => env('OIDC_ISSUER_URL'),
-                    'original_actual' => $payload['iss']
                 ]);
                 return null;
             }
-            
+
             // Audience kontrolü
             if ($payload['aud'] !== env('OIDC_CLIENT_ID')) {
                 Log::error('OIDC ID token audience mismatch', [
                     'expected' => env('OIDC_CLIENT_ID'),
-                    'actual' => $payload['aud']
+                    'actual' => $payload['aud'],
                 ]);
                 return null;
             }
-            
+
             // Expiration kontrolü
             if ($payload['exp'] < time()) {
                 Log::error('OIDC ID token expired', [
                     'exp' => $payload['exp'],
-                    'now' => time()
+                    'now' => time(),
                 ]);
                 return null;
             }
-            
+
+            // Issued-at kontrolü (gelecekte oluşturulmuş token'ları reddet)
+            if (isset($payload['iat']) && $payload['iat'] > time() + 60) {
+                Log::error('OIDC ID token issued in the future', [
+                    'iat' => $payload['iat'],
+                    'now' => time(),
+                ]);
+                return null;
+            }
+
             return $payload;
-            
         } catch (\Exception $e) {
-            Log::error('ID token decode failed: ' . $e->getMessage());
+            Log::error('ID token decode/verify failed: '.$e->getMessage());
             return null;
         }
+    }
+
+    /**
+     * OIDC Provider'ın JWKS endpoint URI'sini döndür
+     */
+    private static function getJwksUri(): ?string
+    {
+        // Doğrudan yapılandırılmış değer varsa kullan
+        $configuredUri = env('OIDC_JWKS_URI');
+        if ($configuredUri) {
+            return $configuredUri;
+        }
+
+        // Auto-discovery
+        $issuer = rtrim(env('OIDC_ISSUER_URL'), '/');
+        if (! $issuer) {
+            return null;
+        }
+
+        try {
+            $response = Http::get($issuer.'/.well-known/openid-configuration');
+            if (! $response->successful()) {
+                Log::error('OIDC discovery failed: '.$response->body());
+                return null;
+            }
+
+            return $response->json()['jwks_uri'] ?? null;
+        } catch (\Exception $e) {
+            Log::error('OIDC discovery exception: '.$e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * JWK (n, e) değerlerinden PEM formatında RSA public key oluştur
+     */
+    private static function createPemFromModulusAndExponent(string $n, string $e): string
+    {
+        $modulus = base64_decode(strtr($n, '-_', '+/'));
+        $publicExponent = base64_decode(strtr($e, '-_', '+/'));
+
+        $modulus = pack('Ca*a*', 2, self::encodeLength(strlen($modulus)), $modulus);
+        $publicExponent = pack('Ca*a*', 2, self::encodeLength(strlen($publicExponent)), $publicExponent);
+
+        $rsaPublicKey = pack(
+            'Ca*a*a*',
+            48,
+            self::encodeLength(strlen($modulus) + strlen($publicExponent)),
+            $modulus,
+            $publicExponent
+        );
+
+        $rsaPublicKey = pack('Ca*a*', 48, self::encodeLength(strlen($rsaPublicKey)), $rsaPublicKey);
+
+        $encoded = base64_encode($rsaPublicKey);
+        $pem = "-----BEGIN PUBLIC KEY-----\n";
+        $pem .= chunk_split($encoded, 64, "\n");
+        $pem .= "-----END PUBLIC KEY-----\n";
+
+        return $pem;
+    }
+
+    /**
+     * DER/ASN.1 length encoding helper
+     */
+    private static function encodeLength(int $length): string
+    {
+        if ($length <= 127) {
+            return chr($length);
+        }
+        $temp = ltrim(pack('N', $length), chr(0));
+
+        return chr(0x80 | strlen($temp)).$temp;
     }
      /**
      * User'ı bul veya oluştur

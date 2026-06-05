@@ -27,6 +27,7 @@ class OIDCConnectionController extends Controller
             'auth_endpoint' => env('OIDC_AUTH_ENDPOINT'),
             'userinfo_endpoint' => env('OIDC_USERINFO_ENDPOINT'),
             'token_endpoint' => env('OIDC_TOKEN_ENDPOINT'),
+            'jwks_uri' => env('OIDC_JWKS_URI'),
         ]);
     }
 
@@ -46,6 +47,7 @@ class OIDCConnectionController extends Controller
             'auth_endpoint' => 'required|string',
             'userinfo_endpoint' => 'required|string',
             'token_endpoint' => 'required|string',
+            'jwks_uri' => 'nullable|string',
         ]);
 
         setEnv([
@@ -56,6 +58,7 @@ class OIDCConnectionController extends Controller
             'OIDC_AUTH_ENDPOINT' => $request->auth_endpoint,
             'OIDC_USERINFO_ENDPOINT' => $request->userinfo_endpoint,
             'OIDC_TOKEN_ENDPOINT' => $request->token_endpoint,
+            'OIDC_JWKS_URI' => $request->jwks_uri ?? '',
         ]);
 
         if ($request->client_secret) {
