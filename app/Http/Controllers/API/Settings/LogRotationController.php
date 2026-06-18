@@ -55,7 +55,12 @@ class LogRotationController extends Controller
     {
         validate([
             'type' => 'required|in:tcp,udp',
-            'ip_address' => 'required|min:3',
+            'ip_address' => [
+                'required',
+                'string',
+                'max:253',
+                'regex:/^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?$|^(?:\d{1,3}\.){3}\d{1,3}$|^\[?[0-9a-fA-F:]+\]?$/',
+            ],
             'port' => 'required|numeric|between:1,65535'
         ]);
 
