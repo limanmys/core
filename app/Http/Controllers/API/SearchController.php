@@ -24,10 +24,20 @@ class SearchController extends Controller
      */
     public function search(Request $request)
     {
-        $searchable = [];
-        $searchQuery = strtolower($request->input('query'));
+        validate([
+            'query' => 'nullable|string|min:1|max:64',
+        ]);
 
-        $results = Cache::remember(auth('api')->user()->id . '_searchable_' . $searchQuery, now()->addHour(), function () use ($searchable, $searchQuery) {
+        $searchable = [];
+        $searchQuery = strtolower((string) $request->input('query', ''));
+
+        if (trim($searchQuery) === '') {
+            return response()->json('{}');
+        }
+
+        $cacheKey = 'search:' . auth('api')->user()->id . ':' . sha1($searchQuery);
+
+        $results = Cache::remember($cacheKey, now()->addHour(), function () use ($searchable, $searchQuery) {
             $configs = [
                 'user' => 'Kullanıcı',
                 'common' => 'Genel'
