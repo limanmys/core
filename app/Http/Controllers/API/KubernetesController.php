@@ -2,12 +2,25 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class KubernetesController extends Controller
 {
+    public function __construct()
+    {
+        $user = auth('api')->user();
+        if (! $user || ! Permission::can($user->id, 'liman', 'id', 'add_server')) {
+            throw new JsonResponseException([
+                'message' => 'Bu işlemi yapmak için yetkiniz yok!',
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+    }
+
     public function getNamespaces(Request $request)
     {
         return $this->makeRenderEngineRequest($request, 'namespaces');

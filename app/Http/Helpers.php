@@ -293,6 +293,46 @@ if (! function_exists('knownPorts')) {
     }
 }
 
+if (! function_exists('isIpSafeForFetch')) {
+    /**
+     * Check if a hostname/IP is safe for Liman-initiated outbound fetch.
+     *
+     * Only link-local addresses are blocked (RFC3927 169.254.0.0/16 for IPv4,
+     * RFC4291 fe80::/10 for IPv6). These cover AWS/Azure/GCP instance metadata
+     * services (169.254.169.254) and mDNS. Loopback and RFC1918 private
+     * addresses are allowed — Liman is regularly used to manage internal
+     * servers / local Kubernetes clusters.
+     */
+    function isIpSafeForFetch($host): bool
+    {
+        if (! is_string($host) || trim($host) === '') {
+            return false;
+        }
+        $host = trim($host);
+        $ip = filter_var($host, FILTER_VALIDATE_IP) ? $host : gethostbyname($host);
+        if (! filter_var($ip, FILTER_VALIDATE_IP)) {
+            return false;
+        }
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $parts = explode('.', $ip);
+            if (count($parts) === 4 && $parts[0] === '169' && $parts[1] === '254') {
+                return false;
+            }
+        }
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $packed = @inet_pton($ip);
+            if ($packed !== false && strlen($packed) === 16) {
+                $firstByte = ord($packed[0]);
+                $secondByte = ord($packed[1]);
+                if ($firstByte === 0xfe && ($secondByte & 0xc0) === 0x80) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
+
 if (! function_exists('retrieveCertificate')) {
     /**
      * Retrieve certificate content from remote end
@@ -302,6 +342,10 @@ if (! function_exists('retrieveCertificate')) {
      */
     function retrieveCertificate($hostname, $port)
     {
+        if (! isIpSafeForFetch($hostname)) {
+            return [false, __('Bu adrese erişim güvenlik nedeniyle engellendi.')];
+        }
+
         $get = stream_context_create([
             'ssl' => [
                 'capture_peer_cert' => true,

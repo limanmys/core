@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Server;
 
 use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Permission;
 use App\System\Command;
 use Illuminate\Http\Response;
@@ -13,6 +14,15 @@ use Illuminate\Http\Response;
  */
 class UserController extends Controller
 {
+    /**
+     * Bu listedeki gruplara kullanıcı ekleme admin yetkisi gerektirir.
+     * wheel/sudo/admin → root; docker/lxd → container escape; disk/shadow → dosya erişimi.
+     */
+    private const PRIVILEGED_GROUPS = [
+        'wheel', 'sudo', 'admin', 'docker', 'lxd',
+        'adm', 'shadow', 'disk', 'root', 'kvm',
+        'libvirt', 'polkitd', 'systemd-journal', 'kadmin', 'kmem',
+    ];
     public function __construct()
     {
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'server_details')) {
@@ -213,12 +223,33 @@ class UserController extends Controller
     {
         $group = request('group');
         $user = request('user');
+
+        if (! auth('api')->user()->isAdmin() && in_array(strtolower((string) $group), self::PRIVILEGED_GROUPS)) {
+            throw new JsonResponseException([
+                'message' => 'Kritik gruplara kullanıcı eklemek için yönetici yetkisi gerekir.',
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
         $output = Command::runSudo('usermod -a -G @{:group} @{:user} &> /dev/null && echo 1 || echo 0', [
             'group' => $group,
             'user' => $user,
         ]);
         if ($output != '1') {
             return response()->json('An error occured while adding user to group.', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        if (in_array(strtolower((string) $group), self::PRIVILEGED_GROUPS)) {
+            AuditLog::write(
+                'server_user',
+                'add_to_privileged_group',
+                [
+                    'server_id' => server()->id,
+                    'server_name' => server()->name,
+                    'group' => (string) $group,
+                    'user' => (string) $user,
+                ],
+                'PRIVILEGED_GROUP_USER_ADDED'
+            );
         }
 
         return response()->json('User added to group successfully.');
@@ -263,8 +294,17 @@ class UserController extends Controller
      */
     public function addSudoers()
     {
+        if (! auth('api')->user()->isAdmin()) {
+            throw new JsonResponseException([
+                'message' => 'Sudoer eklemek için yönetici yetkisi gerekir.',
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
+        validate([
+            'name' => ['required', 'string', 'regex:/^[a-zA-Z0-9._-]+$/'],
+        ]);
+
         $name = request('name');
-        $name = str_replace(' ', '\\x20', (string) $name);
         $checkFile = Command::runSudo("[ -f '/etc/sudoers.d/{:name}' ] && echo 1 || echo 0", [
             'name' => $name,
         ]);
@@ -281,6 +321,17 @@ class UserController extends Controller
             return response()->json(['message' => 'An error occured while creating sudoer'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+        AuditLog::write(
+            'server_user',
+            'add_sudoer',
+            [
+                'server_id' => server()->id,
+                'server_name' => server()->name,
+                'sudoer_name' => (string) $name,
+            ],
+            'SUDO_USER_ADDED'
+        );
+
         return response()->json('Sudoer created successfully.');
     }
 
@@ -293,10 +344,16 @@ class UserController extends Controller
      */
     public function deleteSudoers()
     {
+        if (! auth('api')->user()->isAdmin()) {
+            throw new JsonResponseException([
+                'message' => 'Sudoer silmek için yönetici yetkisi gerekir.',
+            ], '', Response::HTTP_FORBIDDEN);
+        }
+
         $names = request('names');
-        $names = array_map(function ($value) {
-            return str_replace(' ', '\\x20', (string) $value);
-        }, $names);
+        if (! is_array($names)) {
+            return response()->json(['names' => 'Geçersiz istek.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
         foreach ($names as $name) {
             $output = Command::runSudo(
@@ -309,6 +366,17 @@ class UserController extends Controller
                 return response()->json('An error occured while deleting sudoer.', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
+
+        AuditLog::write(
+            'server_user',
+            'delete_sudoers',
+            [
+                'server_id' => server()->id,
+                'server_name' => server()->name,
+                'sudoers' => implode(', ', $names),
+            ],
+            'SUDO_USERS_DELETED'
+        );
 
         return response()->json('Sudoer deleted successfully.');
     }
