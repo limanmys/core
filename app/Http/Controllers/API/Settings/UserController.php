@@ -9,6 +9,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RoleUser;
 use App\Models\User;
+use App\Rules\StrongPassword;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -48,7 +49,7 @@ class UserController extends Controller
                 'max:255',
                 'unique:users',
             ],
-            'password' => ['string', 'min:8'],
+            'password' => ['nullable', 'string', new StrongPassword],
         ]);
 
         $data = [
@@ -119,8 +120,10 @@ class UserController extends Controller
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
-            'password' => ['nullable', 'string', 'min:8'],
+            'password' => ['nullable', 'string', new StrongPassword],
             'session_time' => ['required', 'integer', 'min:15', 'max:999999'],
+            'roles' => ['required', 'array'],
+            'roles.*' => [Rule::exists('roles', 'id')],
         ]);
 
         $session_time = env('JWT_TTL', 120);
@@ -186,6 +189,12 @@ class UserController extends Controller
     public function delete(Request $request)
     {
         $user = User::where('id', $request->user_id)->first();
+
+        if (! $user) {
+            return response()->json([
+                'message' => 'Kullanıcı bulunamadı.'
+            ], 404);
+        }
 
         // If user type is not local, return error
         if ($user->auth_type !== 'local') {

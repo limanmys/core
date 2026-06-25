@@ -29,15 +29,19 @@ Route::group([
     Route::get('/gate', [AuthController::class, 'authGate']);
     Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:login');
-    Route::post('/setup_mfa', [AuthController::class, 'setupTwoFactorAuthentication']);
+    Route::post('/setup_mfa', [AuthController::class, 'setupTwoFactorAuthentication'])
+        ->middleware('throttle:mfa:5,1');
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'userProfile']);
-    Route::post('/change_password', [AuthController::class, 'forceChangePassword']);
+    Route::post('/change_password', [AuthController::class, 'forceChangePassword'])
+        ->middleware('throttle:password:5,1');
     Route::post('/forgot_password', [AuthController::class, 'sendPasswordResetLink'])
         ->middleware('throttle:forgot-password');
-    Route::post('/reset_password', [AuthController::class, 'resetPassword']);
+    Route::post('/reset_password', [AuthController::class, 'resetPassword'])
+        ->middleware('throttle:reset:5,1');
     Route::get('/oidc/callback', [AuthController::class, 'oidcCallback'])
-        ->name('oidcCallback');
+        ->name('oidcCallback')
+        ->middleware('throttle:oidc:30,1');
 });
 
 Route::post('/notifications/send', [ExternalNotificationController::class, 'accept']);
