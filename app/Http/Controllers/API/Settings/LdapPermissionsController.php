@@ -36,7 +36,7 @@ class LdapPermissionsController extends Controller
             $request->password
         );
 
-        $query = $request->search_query;
+        $query = ldap_escape($request->search_query, '', LDAP_ESCAPE_FILTER);
         $users = collect($ldap->search("(&(sAMAccountName=$query*)(sAMAccountType=805306368))", new LDAPSearchOptions(
             1,
             100,
@@ -81,7 +81,8 @@ class LdapPermissionsController extends Controller
 
         foreach ($users as $user) {
             $username = $user;
-            $ldapUser = $ldap->search('(&(objectClass=user)(sAMAccountName='.$user.'))', new LDAPSearchOptions(
+            $escapedUser = ldap_escape($user, '', LDAP_ESCAPE_FILTER);
+            $ldapUser = $ldap->search('(&(objectClass=user)(sAMAccountName='.$escapedUser.'))', new LDAPSearchOptions(
                 1,
                 1,
                 [
@@ -158,7 +159,7 @@ class LdapPermissionsController extends Controller
             $request->password
         );
 
-        $query = $request->search_query;
+        $query = ldap_escape($request->search_query, '', LDAP_ESCAPE_FILTER);
         $groups = $ldap->search("(&(sAMAccountName=$query*)(objectCategory=group))", new LDAPSearchOptions(
             1,
             100,
@@ -217,7 +218,7 @@ class LdapPermissionsController extends Controller
             $request->password
         );
 
-        $query = $request->search_query;
+        $query = ldap_escape($request->search_query, '', LDAP_ESCAPE_FILTER);
         $groups = $ldap->search("(&(sAMAccountName=$query*)(objectCategory=group))", new LDAPSearchOptions(
             1,
             100,

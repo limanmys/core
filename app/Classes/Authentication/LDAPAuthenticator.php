@@ -67,7 +67,8 @@ class LDAPAuthenticator implements AuthenticatorInterface
             'sn',
             'userprincipalname'
         ]);
-        $results = $ldap->search(sprintf('(|(sAMAccountName=%s)(%s=%s)(userPrincipalName=%s))', $request->email, $mailColumn, $request->email, $request->email), $options);
+        $escapedEmail = ldap_escape($request->email, '', LDAP_ESCAPE_FILTER);
+        $results = $ldap->search(sprintf('(|(sAMAccountName=%s)(%s=%s)(userPrincipalName=%s))', $escapedEmail, $mailColumn, $escapedEmail, $escapedEmail), $options);
 
         if (count($results) == 0) {
             Log::error('LDAP authentication failed. User not found.');
@@ -76,6 +77,19 @@ class LDAPAuthenticator implements AuthenticatorInterface
         }
 
         $ldapUser = $results[0];
+
+        $bindDn = $ldap->getDn();
+        $bindIdentityMatches = false;
+        if (isset($ldapUser['userprincipalname'])) {
+            $bindIdentityMatches = strtolower($ldapUser['userprincipalname']) === strtolower($bindDn);
+        } elseif (isset($ldapUser['samaccountname'])) {
+            $bindIdentityMatches = strtolower($ldapUser['samaccountname']) === $email;
+        }
+        if (! $bindIdentityMatches) {
+            Log::error('LDAP authentication failed. Bind identity does not match search result.');
+
+            return Authenticator::returnLoginError($request->email);
+        }
 
         if (! isset($ldapUser[$guidColumn])) {
             Log::error('LDAP authentication failed. User guid not found.');
