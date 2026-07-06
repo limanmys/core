@@ -174,6 +174,14 @@ class Ldap
     }
 
     /**
+     * Get the bind DN used for authentication
+     */
+    public function getDn(): string
+    {
+        return $this->dn;
+    }
+
+    /**
      * Check if the LDAP server is alive
      */
     private function isAlive(): bool
