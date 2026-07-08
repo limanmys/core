@@ -31,10 +31,6 @@ class SearchController extends Controller
         $searchable = [];
         $searchQuery = strtolower((string) $request->input('query', ''));
 
-        if (trim($searchQuery) === '') {
-            return response()->json('{}');
-        }
-
         $cacheKey = 'search:' . auth('api')->user()->id . ':' . sha1($searchQuery);
 
         $results = Cache::remember($cacheKey, now()->addHour(), function () use ($searchable, $searchQuery) {

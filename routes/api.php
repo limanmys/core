@@ -12,10 +12,9 @@ use App\Http\Controllers\API\SearchController;
 use App\Http\Controllers\API\Server;
 use App\Http\Controllers\API\ServerController;
 use App\Http\Controllers\API\Settings;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function (Request $request) {
+Route::get('/', function () {
     return response()->json([
         'version' => getVersion(),
     ]);
@@ -30,7 +29,7 @@ Route::group([
     Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:login');
     Route::post('/setup_mfa', [AuthController::class, 'setupTwoFactorAuthentication'])
-        ->middleware('throttle:mfa:5,1');
+        ->middleware('throttle:5,1');
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'userProfile']);
     Route::post('/change_password', [AuthController::class, 'forceChangePassword'])
@@ -38,10 +37,10 @@ Route::group([
     Route::post('/forgot_password', [AuthController::class, 'sendPasswordResetLink'])
         ->middleware('throttle:forgot-password');
     Route::post('/reset_password', [AuthController::class, 'resetPassword'])
-        ->middleware('throttle:reset:5,1');
+        ->middleware('throttle:5,1');
     Route::get('/oidc/callback', [AuthController::class, 'oidcCallback'])
         ->name('oidcCallback')
-        ->middleware('throttle:oidc:30,1');
+        ->middleware('throttle:30,1');
 });
 
 Route::post('/notifications/send', [ExternalNotificationController::class, 'accept']);
@@ -109,18 +108,9 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
 
         Route::group(['prefix' => '{server_id}', 'middleware' => ['server']], function () {
             Route::get('/', [Server\DetailsController::class, 'server']);
-            Route::get('/specs', [Server\DetailsController::class, 'specs']);
 
             // Kubernetes
             Route::get('/kubernetes_deployment_details', [KubernetesController::class, 'getDeploymentDetailsFromServer']);
-
-            // Stats
-            Route::group(['prefix' => 'stats'], function () {
-                Route::get('/', [Server\DetailsController::class, 'stats']);
-                Route::get('/cpu', [Server\DetailsController::class, 'topCpuProcesses']);
-                Route::get('/ram', [Server\DetailsController::class, 'topMemoryProcesses']);
-                Route::get('/disk', [Server\DetailsController::class, 'topDiskUsage']);
-            });
 
             // Extensions
             Route::group(['prefix' => 'extensions'], function () {
@@ -138,59 +128,11 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
                     ->middleware(['extension']);
             });
 
-            // Services
-            Route::group(['prefix' => 'services'], function () {
-                Route::get('/', [Server\ServiceController::class, 'index']);
-                Route::post('/status', [Server\ServiceController::class, 'status']);
-                Route::post('/start', [Server\ServiceController::class, 'start']);
-                Route::post('/stop', [Server\ServiceController::class, 'stop']);
-                Route::post('/restart', [Server\ServiceController::class, 'restart']);
-                Route::post('/enable', [Server\ServiceController::class, 'enable']);
-                Route::post('/disable', [Server\ServiceController::class, 'disable']);
-            });
-
-            // Packages
-            Route::group(['prefix' => 'packages'], function () {
-                Route::get('/', [Server\PackageController::class, 'index']);
-
-                // Queue
-                Route::group(['prefix' => 'queue'], function () {
-                    Route::get('/', [Server\QueueController::class, 'index']);
-                    Route::post('/', [Server\QueueController::class, 'create']);
-                });
-            });
-
-            // Updates
-            Route::group(['prefix' => 'updates'], function () {
-                Route::get('/', [Server\UpdateController::class, 'index']);
-            });
-
             // Access Logs
             Route::group(['prefix' => 'access_logs'], function () {
                 Route::get('/', [Server\AccessLogController::class, 'index']);
                 Route::get('/{log_id}', [Server\AccessLogController::class, 'details']);
             });
-
-            // Ports
-            Route::group(['prefix' => 'ports'], function () {
-                Route::get('/', [Server\PortController::class, 'index']);
-            });
-
-            // Users
-            Route::group(['prefix' => 'users'], function () {
-                Route::get('/local', [Server\UserController::class, 'getLocalUsers']);
-                Route::post('/local', [Server\UserController::class, 'addLocalUser']);
-
-                Route::get('/groups', [Server\UserController::class, 'getLocalGroups']);
-                Route::post('/groups', [Server\UserController::class, 'addLocalGroup']);
-                Route::get('/groups/users', [Server\UserController::class, 'getLocalGroupDetails']);
-                Route::post('/groups/users', [Server\UserController::class, 'addLocalGroupUser']);
-
-                Route::get('/sudoers', [Server\UserController::class, 'getSudoers']);
-                Route::post('/sudoers', [Server\UserController::class, 'addSudoers']);
-                Route::delete('/sudoers', [Server\UserController::class, 'deleteSudoers']);
-            });
-
         });
     });
 

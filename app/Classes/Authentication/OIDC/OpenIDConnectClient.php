@@ -167,6 +167,20 @@ class OpenIDConnectClient extends BaseOpenIDConnectClient
     }
 
     /**
+     * Jumbojett'in verifyJWTClaims metodu, aud claim string olduğunda ve
+     * clientID ile eşleşmediğinde in_array'e string haystack geçip TypeError
+     * fırlatıyor (PHP 8+). aud'yi normalize ederek bu bug'ı düzeltiriz.
+     */
+    protected function verifyJWTClaims($claims, string $accessToken = null): bool
+    {
+        if (isset($claims->aud) && !is_array($claims->aud)) {
+            $claims->aud = [$claims->aud];
+        }
+
+        return parent::verifyJWTClaims($claims, $accessToken);
+    }
+
+    /**
      * Authorization code'u token'a çevir, ID token'ı JWKS/client_secret ile
      * doğrula ve claim'leri döndür.
      *
