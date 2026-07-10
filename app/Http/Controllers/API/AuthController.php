@@ -9,6 +9,7 @@ use App\Classes\Authentication\OIDCAuthenticator;
 use App\Http\Controllers\Controller;
 use App\Models\SystemSettings;
 use App\Models\User;
+use App\Rules\StrongPassword;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -199,6 +200,12 @@ class AuthController extends Controller
             })->first();
 
         if (! $user) {
+            // Timing normalization: 'kullanıcı yok' ve 'parola yanlış' sürelerini eşitle.
+            // Hash::check, "parola yanlış" path'inde çalıştırılan süre (~50ms) kadar zaman alır.
+            Hash::check(
+                'invalid',
+                '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'
+            );
             return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
         }
 
@@ -288,12 +295,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|string',
             'password' => 'required|string',
-            'new_password' => [
-                'string',
-                'min:10',
-                'max:32',
-                'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\!\[\]\(\)\{\}\#\?\%\&\*\+\,\-\.\/\:\;\<\=\>\@\^\_\`\~]).{10,}$/',
-            ],
+            'new_password' => ['required', 'string', new StrongPassword],
         ], [
             'new_password.regex' => 'Yeni parolanız en az 10 karakter uzunluğunda olmalı ve en az 1 sayı, özel karakter ve büyük harf içermelidir.',
         ]);
@@ -309,6 +311,11 @@ class AuthController extends Controller
                   ->first();
 
         if (! $user) {
+            // Timing normalization: 'kullanıcı yok' ve 'parola yanlış' sürelerini eşitle.
+            Hash::check(
+                'invalid',
+                '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'
+            );
             return response()->json(['message' => 'Kullanıcı adı veya şifreniz yanlış.'], 401);
         }
 
@@ -363,11 +370,9 @@ class AuthController extends Controller
             'password' => [
                 'required',
                 'string',
-                'min:10',
-                'max:32',
-                'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\!\[\]\(\)\{\}\#\?\%\&\*\+\,\-\.\/\:\;\<\=\>\@\^\_\`\~]).{10,}$/',
-                'confirmed'
-            ]
+                new StrongPassword,
+                'confirmed',
+            ],
         ]);
      
         $status = Password::reset(

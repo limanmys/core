@@ -297,6 +297,29 @@ class ExtensionController extends Controller
             ], 500), null];
         }
 
+        // Zip Slip protection: validate every entry name before extraction.
+        // Reject entries that attempt path traversal outside the extraction directory.
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $stat = $zip->statIndex($i);
+            if ($stat === false) {
+                continue;
+            }
+            $name = $stat['name'];
+            if (
+                str_contains($name, '..') ||
+                str_starts_with($name, '/') ||
+                str_starts_with($name, '\\') ||
+                str_contains($name, '://')
+            ) {
+                return [
+                    response()->json([
+                        'message' => 'Geçersiz eklenti paketi (path traversal tespit edildi): ' . $name,
+                    ], Response::HTTP_UNPROCESSABLE_ENTITY),
+                    null,
+                ];
+            }
+        }
+
         // Determine a random tmp folder to extract files
         $path = '/tmp/'.Str::random();
         // Extract Zip to the Temp Folder.

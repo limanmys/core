@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\StrongPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -29,6 +30,14 @@ class ProfileController extends Controller
             ], 403);
         }
 
+        // Validation önce çalışsın; parola değişikliği ancak tüm validationlar geçerse uygulansın.
+        validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . auth('api')->user()->id,
+            'password' => ['nullable', 'string', new StrongPassword],
+            'old_password' => ['required_with:password', 'string'],
+        ]);
+
         $user = User::find(auth('api')->user()->id);
 
         if ($request->password) {
@@ -47,11 +56,6 @@ class ProfileController extends Controller
                 'password' => Hash::make($request->password),
             ]);
         }
-
-        validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . auth('api')->user()->id,
-        ]);
 
         $session_time = env('JWT_TTL', 120);
         if ($request->session_time == $session_time) {

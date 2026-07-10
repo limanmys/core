@@ -13,29 +13,21 @@ require_once app_path('Http/Controllers/HASync/_routes.php');
 require_once app_path('Http/Controllers/Extension/Sandbox/_routes.php');
 
 Route::any('/upload/{any?}', function () {
-    $server = app('tus-server');
-    $extension_id = request()->headers->get('extension-id');
-    $extension = \App\Models\Extension::find($extension_id);
-    if ($extension) {
-        $path = '/liman/extensions/'.strtolower((string) $extension->name);
-    } else {
-        $path = storage_path();
-    }
+    $extension = request()->attributes->get('extension');
+    $path = '/liman/extensions/'.strtolower((string) $extension->name);
 
     if (! file_exists($path.'/uploads')) {
         mkdir($path.'/uploads');
-        if ($extension) {
-            rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
-        } else {
-            rootSystem()->fixExtensionPermissions('liman', 'liman');
-        }
+        rootSystem()->fixExtensionPermissions($extension->id, $extension->name);
     }
+    $server = app('tus-server');
     $server->setUploadDir($path.'/uploads');
     $response = $server->serve();
 
     return $response->send();
 })
-    ->where('any', '.*');
+    ->where('any', '.*')
+    ->middleware(['extension.access', 'throttle:upload']);
 
 Route::post('/upload_info', function () {
     request()->validate([
@@ -44,20 +36,24 @@ Route::post('/upload_info', function () {
     $key = request('key');
     $server = app('tus-server');
     $info = $server->getCache()->get($key);
-    $extension_id = request('extension_id');
-    $extension = \App\Models\Extension::find($extension_id);
-    if ($extension_id) {
-        $extension_path = explode('/uploads/', (string) $info['file_path'], 2)[0];
-        $info['file_path'] = str_replace(
-            $extension_path,
-            '',
-            (string) $info['file_path']
-        );
-        rootSystem()->fixExtensionPermissions($extension_id, $extension->name);
+
+    if (! $info) {
+        return response()->json([
+            'message' => 'Dosya bulunamadı.',
+        ], 404);
     }
 
-    return $info;
-});
+    $extension = request()->attributes->get('extension');
+
+    rootSystem()->fixExtensionPermissions($extension->id, $extension->name);
+
+    return [
+        'name' => $info['name'] ?? basename((string) ($info['file_path'] ?? '')),
+        'size' => $info['size'] ?? 0,
+        'offset' => $info['offset'] ?? 0,
+        'file_path' => '/uploads/'.basename((string) ($info['file_path'] ?? '')),
+    ];
+})->middleware(['extension.access', 'throttle:upload']);
 
 Route::get(
     '/eklenti/{extension_id}/public/{any}',

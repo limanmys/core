@@ -17,8 +17,6 @@ use TusPhp\Response;
 class TusAuthenticated implements TusMiddleware
 {
     /**
-     * @param Request $request
-     * @param Response $response
      * @return void
      */
     public function handle(Request $request, Response $response)
@@ -26,6 +24,7 @@ class TusAuthenticated implements TusMiddleware
         // 1. Check if already authenticated via JWT Authorization header
         if (auth('api')->check()) {
             $this->checkExtensionPermission();
+
             return;
         }
 
@@ -33,23 +32,25 @@ class TusAuthenticated implements TusMiddleware
         if (auth('web')->check()) {
             auth('api')->login(auth('web')->user());
             $this->checkExtensionPermission();
+
             return;
         }
 
         // 3. Try Extension-Token (JWT from sandbox customRequestData['token'])
-        $token = "";
+        $token = '';
         if (request()->token) {
             $token = request()->token;
-        } else if (request()->headers->get('Extension-Token')) {
+        } elseif (request()->headers->get('Extension-Token')) {
             $token = request()->headers->get('Extension-Token');
         }
 
         if (! $token) {
             // 4. Try cookie-based JWT (web middleware group doesn't run CookieJWTAuthenticator)
             if (request()->hasCookie('token')) {
-                request()->headers->set('Authorization', 'Bearer ' . request()->cookie('token'));
+                request()->headers->set('Authorization', 'Bearer '.request()->cookie('token'));
                 if (auth('api')->check()) {
                     $this->checkExtensionPermission();
+
                     return;
                 }
             }
@@ -59,7 +60,7 @@ class TusAuthenticated implements TusMiddleware
 
         // Validate the JWT token
         try {
-            request()->headers->set('Authorization', 'Bearer ' . $token);
+            request()->headers->set('Authorization', 'Bearer '.$token);
             if (! auth('api')->check()) {
                 throw new UnauthorizedHttpException('', 'Invalid Extension-Token.');
             }
@@ -69,7 +70,8 @@ class TusAuthenticated implements TusMiddleware
 
         $this->checkExtensionPermission();
 
-        Log::info('Extension-Token validated for user ' . auth('api')->user()->id . '. IP: ' . request()->ip());
+        Log::info('Extension-Token validated for user '.auth('api')->user()->id.'. IP: '.request()->ip());
+
         return true;
     }
 
@@ -81,12 +83,12 @@ class TusAuthenticated implements TusMiddleware
         $extensionId = request()->headers->get('extension-id');
 
         if (! $extensionId) {
-            return;
+            throw new UnauthorizedHttpException('', 'Extension-Id header is missing.');
         }
 
         $user = auth('api')->user();
         if (! $user) {
-            return;
+            throw new UnauthorizedHttpException('', 'Authenticated user not found.');
         }
 
         if (! Permission::can($user->id, 'extension', 'id', $extensionId)) {

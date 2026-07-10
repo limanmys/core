@@ -173,6 +173,7 @@ return [
         App\Providers\TusServiceProvider::class,
         PHPOpenSourceSaver\JWTAuth\Providers\LaravelServiceProvider::class,
         App\Providers\BroadcastServiceProvider::class,
+        App\Providers\OIDCServiceProvider::class,
     ],
 
     /*
