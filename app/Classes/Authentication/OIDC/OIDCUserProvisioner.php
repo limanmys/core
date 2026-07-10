@@ -23,45 +23,61 @@ class OIDCUserProvisioner
         try {
             $user = User::where('oidc_sub', $userInfo['sub'])->first();
 
-            if (! $user) {
-                if (trim($userInfo['email']) === '') {
-                    throw new \Exception('User creation failed, email value is required');
-                }
-
-                $user = User::where('email', $userInfo['email'])->first();
-
-                if ($user) {
-                    $user->update([
-                        'oidc_sub' => $userInfo['sub'],
-                        'auth_type' => 'oidc',
-                        'name' => $userInfo['display_name'],
-                    ]);
-                } else {
-                    $user = $this->createUser($userInfo);
-                }
-            } else {
+            if ($user) {
                 $user->update([
                     'name' => $userInfo['display_name'],
                     'email' => $userInfo['email'],
-                    'auth_type' => 'oidc',
-                ]);
-            }
-
-            if (! $user->getJWTIdentifier()) {
-                Log::error('User JWT identifier is null', [
-                    'user_id' => $user->id,
-                    'user_exists' => $user->exists,
                 ]);
 
-                return null;
+                return $this->finalize($user);
             }
 
-            return $user;
+            if (trim($userInfo['email']) === '') {
+                throw new \Exception('User creation failed, email value is required');
+            }
+
+            $existing = User::where('email', $userInfo['email'])->first();
+
+            if ($existing) {
+                if ($existing->auth_type !== 'oidc') {
+                    Log::error('OIDC provisioning refused: email is already in use by a non-OIDC account', [
+                        'sub' => $userInfo['sub'],
+                        'email' => $userInfo['email'],
+                        'existing_user_id' => $existing->id,
+                        'existing_auth_type' => $existing->auth_type,
+                    ]);
+
+                    return null;
+                }
+
+                $existing->update([
+                    'oidc_sub' => $userInfo['sub'],
+                    'name' => $userInfo['display_name'],
+                ]);
+
+                return $this->finalize($existing);
+            }
+
+            return $this->finalize($this->createUser($userInfo));
         } catch (\Exception $e) {
             Log::error('User creation/update failed: '.$e->getMessage());
 
             return null;
         }
+    }
+
+    private function finalize(User $user): ?User
+    {
+        if (! $user->getJWTIdentifier()) {
+            Log::error('User JWT identifier is null', [
+                'user_id' => $user->id,
+                'user_exists' => $user->exists,
+            ]);
+
+            return null;
+        }
+
+        return $user;
     }
 
     /**
