@@ -33,7 +33,7 @@ Route::group([
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'userProfile']);
     Route::post('/change_password', [AuthController::class, 'forceChangePassword'])
-        ->middleware('throttle:password:5,1');
+        ->middleware('throttle:5,1');
     Route::post('/forgot_password', [AuthController::class, 'sendPasswordResetLink'])
         ->middleware('throttle:forgot-password');
     Route::post('/reset_password', [AuthController::class, 'resetPassword'])
