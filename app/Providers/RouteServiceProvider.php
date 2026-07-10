@@ -42,6 +42,10 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user('api')?->id ?: $request->ip());
         });
 
+        RateLimiter::for('external-notifications', function ($request) {
+            return Limit::perMinute(10)->by($request->ip());
+        });
+
         parent::boot();
 
         Route::middleware([])

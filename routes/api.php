@@ -43,7 +43,8 @@ Route::group([
         ->middleware('throttle:30,1');
 });
 
-Route::post('/notifications/send', [ExternalNotificationController::class, 'accept']);
+Route::post('/notifications/send', [ExternalNotificationController::class, 'accept'])
+    ->middleware('throttle:external-notifications');
 
 // Protected Routes
 Route::group(['middleware' => ['auth:api', 'permissions']], function () {
@@ -100,7 +101,7 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
         Route::patch('/{server_id}', [ServerController::class, 'update']);
         Route::delete('/{server_id}', [ServerController::class, 'delete']);
         Route::post('/{server_id}/favorites', [Server\DetailsController::class, 'favorite']);
-        
+
         // Server Creation Validations
         Route::post('/check_access', [ServerController::class, 'checkAccess']);
         Route::post('/check_connection', [ServerController::class, 'checkConnection']);
