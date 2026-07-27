@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use App\Models\Server;
 use App\Models\ServerKey;
 use App\Models\UserSettings;
@@ -75,6 +76,13 @@ class VaultController extends Controller
         $user_id = auth('api')->user()->id;
         if ($request->user_id != '' && auth('api')->user()->isAdmin()) {
             $user_id = $request->user_id;
+        }
+
+        // Yetki kontrolü: kullanıcı hedef sunucuya erişim iznine sahip olmalı.
+        if (! Permission::can(auth('api')->user()->id, 'server', 'id', $request->server_id)) {
+            return response()->json([
+                'message' => 'Bu sunucu üzerinde anahtar oluşturma yetkiniz bulunmamaktadır!'
+            ], Response::HTTP_FORBIDDEN);
         }
 
         $key = env('APP_KEY').$user_id.$request->server_id;
@@ -188,6 +196,13 @@ class VaultController extends Controller
         $user_id = auth('api')->user()->id;
         if ($request->user_id != '' && auth('api')->user()->isAdmin()) {
             $user_id = $request->user_id;
+        }
+
+        // Yetki kontrolü: kullanıcı hedef sunucuya erişim iznine sahip olmalı.
+        if (! Permission::can(auth('api')->user()->id, 'server', 'id', $request->server_id)) {
+            return response()->json([
+                'message' => 'Bu sunucu üzerinde anahtar oluşturma yetkiniz bulunmamaktadır!'
+            ], Response::HTTP_FORBIDDEN);
         }
 
         $encKey = env('APP_KEY').$user_id.$request->server_id;
