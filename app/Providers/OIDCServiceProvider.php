@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Classes\Authentication\Handoff\AuthenticationHandoffService;
+use App\Classes\Authentication\Handoff\TrustedClientRegistry;
 use App\Classes\Authentication\OIDC\OIDCFlowService;
 use App\Classes\Authentication\OIDC\OIDCRoleMapper;
 use App\Classes\Authentication\OIDC\OIDCTokenStore;
@@ -28,6 +30,8 @@ class OIDCServiceProvider extends ServiceProvider
         $this->app->singleton(OIDCUserProvisioner::class);
         $this->app->singleton(OIDCRoleMapper::class);
         $this->app->singleton(OIDCTokenStore::class);
+        $this->app->singleton(TrustedClientRegistry::class);
+        $this->app->singleton(AuthenticationHandoffService::class);
 
         $this->app->singleton(OIDCFlowService::class, function ($app) {
             return new OIDCFlowService(
@@ -35,6 +39,7 @@ class OIDCServiceProvider extends ServiceProvider
                 $app->make(OIDCUserProvisioner::class),
                 $app->make(OIDCRoleMapper::class),
                 $app->make(OIDCTokenStore::class),
+                $app->make(AuthenticationHandoffService::class),
             );
         });
     }

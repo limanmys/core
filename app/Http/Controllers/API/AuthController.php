@@ -99,6 +99,24 @@ class AuthController extends Controller
             $validator = Validator::make($request->all(), [
                 'type' => 'required|string',
                 'redirect_path' => 'nullable|string',
+                'handoff' => 'nullable|array',
+                'handoff.client_id' => [
+                    'required_with:handoff',
+                    'string',
+                    'regex:/\A[A-Za-z0-9_-]{1,64}\z/',
+                ],
+                'handoff.redirect_uri' => 'required_with:handoff|string|url|max:2048',
+                'handoff.state' => [
+                    'required_with:handoff',
+                    'string',
+                    'regex:/\A[A-Za-z0-9_-]{32,128}\z/',
+                ],
+                'handoff.code_challenge' => [
+                    'required_with:handoff',
+                    'string',
+                    'regex:/\A[A-Za-z0-9_-]{43}\z/',
+                ],
+                'handoff.code_challenge_method' => 'required_with:handoff|in:S256',
             ]);
         } else {
             $validator = Validator::make($request->all(), [

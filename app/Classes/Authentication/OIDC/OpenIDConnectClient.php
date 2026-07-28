@@ -39,6 +39,17 @@ class OpenIDConnectClient extends BaseOpenIDConnectClient
             $issuer ?: null,
         );
 
+        $verifySsl = filter_var(
+            env('OIDC_SSL_VERIFY', true),
+            FILTER_VALIDATE_BOOLEAN,
+        );
+        if (! $verifySsl) {
+            // Jumbojett performs its requests with cURL rather than Laravel's
+            // HTTP client. These are its equivalent of withoutVerifying().
+            $this->setVerifyPeer(false);
+            $this->setVerifyHost(false);
+        }
+
         $redirectUri = env('OIDC_REDIRECT_URI');
         if ($redirectUri) {
             $this->setRedirectURL($redirectUri);

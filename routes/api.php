@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\AuthHandoffController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\ExtensionController;
 use App\Http\Controllers\API\ExternalNotificationController;
@@ -41,6 +42,8 @@ Route::group([
     Route::get('/oidc/callback', [AuthController::class, 'oidcCallback'])
         ->name('oidcCallback')
         ->middleware('throttle:30,1');
+    Route::post('/handoff/exchange', [AuthHandoffController::class, 'exchange'])
+        ->middleware('throttle:auth-handoff-exchange');
 });
 
 Route::post('/notifications/send', [ExternalNotificationController::class, 'accept'])

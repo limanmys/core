@@ -3,6 +3,7 @@
 namespace App\Classes\Authentication\OIDC;
 
 use App\Classes\Authentication\Authenticator;
+use App\Classes\Authentication\Handoff\AuthenticationHandoffService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,6 +30,8 @@ class OIDCFlowService
 {
     private const STATE_CACHE_PREFIX = 'oidc_state:';
 
+    private const STATE_LOCK_PREFIX = 'oidc_state_lock:';
+
     private const STATE_TTL = 1800; // 30 dakika
 
     public function __construct(
@@ -36,11 +39,13 @@ class OIDCFlowService
         ?OIDCUserProvisioner $userProvisioner = null,
         ?OIDCRoleMapper $roleMapper = null,
         ?OIDCTokenStore $tokenStore = null,
+        ?AuthenticationHandoffService $handoffService = null,
     ) {
         $this->client = $client ?? new OpenIDConnectClient;
         $this->userProvisioner = $userProvisioner ?? new OIDCUserProvisioner;
         $this->roleMapper = $roleMapper ?? new OIDCRoleMapper;
         $this->tokenStore = $tokenStore ?? new OIDCTokenStore;
+        $this->handoffService = $handoffService ?? new AuthenticationHandoffService;
     }
 
     /** @var OpenIDConnectClient */
@@ -55,6 +60,8 @@ class OIDCFlowService
     /** @var OIDCTokenStore */
     private $tokenStore;
 
+    private AuthenticationHandoffService $handoffService;
+
     /**
      * OIDC flow'unu başlat - frontend'e redirect URL'i döndür.
      */
@@ -62,6 +69,17 @@ class OIDCFlowService
     {
         $state = Str::random(40);
         $nonce = Str::random(32);
+
+        $handoff = null;
+        if ($request->has('handoff')) {
+            $input = $request->input('handoff');
+            $handoff = is_array($input)
+                ? $this->handoffService->authorizeInitiation($input)
+                : null;
+            if ($handoff === null) {
+                return $this->error('Invalid authentication handoff request', 400);
+            }
+        }
 
         $redirectPath = null;
         if ($request->has('redirect_path')) {
@@ -73,21 +91,26 @@ class OIDCFlowService
             'ip' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'redirect_path' => $redirectPath,
+            'handoff' => $handoff,
             'created_at' => now()->toDateTimeString(),
         ], self::STATE_TTL);
 
         $authUrl = $this->client->buildAuthorizationUrl($state, $nonce);
 
         Log::info('OIDC flow initiated', [
-            'state' => $state,
             'ip' => $request->ip(),
             'user_agent' => $request->userAgent(),
+            'handoff_client_id' => $handoff['client_id'] ?? null,
         ]);
 
         return response()->json([
             'message' => 'OIDC provider\'a yönlendiriliyor...',
             'redirect_required' => true,
             'redirect_url' => $authUrl,
+        ])->withHeaders([
+            'Cache-Control' => 'no-store',
+            'Pragma' => 'no-cache',
+            'Referrer-Policy' => 'no-referrer',
         ]);
     }
 
@@ -96,25 +119,15 @@ class OIDCFlowService
      */
     public function handleCallback(Request $request): JsonResponse|RedirectResponse
     {
+        $stateData = null;
+
         try {
             Log::info('OIDC callback received', [
-                'state' => $request->state,
+                'has_state' => $request->has('state'),
                 'has_code' => $request->has('code'),
                 'has_error' => $request->has('error'),
                 'ip' => $request->ip(),
             ]);
-
-            if ($request->has('error')) {
-                Log::error('OIDC authentication error: '.$request->error.' - '.$request->error_description);
-
-                return $this->error('OIDC authentication failed: '.($request->error_description ?? $request->error), 401);
-            }
-
-            if (! $request->has('code')) {
-                Log::error('OIDC callback received without authorization code');
-
-                return $this->error('Authorization code not received', 400);
-            }
 
             if (! $request->has('state')) {
                 Log::error('OIDC callback received without state parameter');
@@ -122,14 +135,37 @@ class OIDCFlowService
                 return $this->error('State parameter not received', 400);
             }
 
-            $stateData = Cache::get(self::STATE_CACHE_PREFIX.$request->state);
+            $stateData = $this->consumeState((string) $request->state);
             if (! $stateData) {
                 Log::error('OIDC state not found in cache', [
-                    'state' => $request->state,
                     'ip' => $request->ip(),
                 ]);
 
                 return $this->error('Invalid or expired state parameter', 400);
+            }
+
+            if ($request->has('error')) {
+                Log::error('OIDC authentication error', [
+                    'error' => (string) $request->error,
+                ]);
+
+                return $this->callbackError(
+                    $stateData,
+                    'access_denied',
+                    'OIDC authentication failed',
+                    401,
+                );
+            }
+
+            if (! $request->has('code')) {
+                Log::error('OIDC callback received without authorization code');
+
+                return $this->callbackError(
+                    $stateData,
+                    'invalid_request',
+                    'Authorization code not received',
+                    400,
+                );
             }
 
             $result = $this->client->completeAuthorizationCodeFlow(
@@ -143,14 +179,24 @@ class OIDCFlowService
             // kontrolleri burada (spec: iat gelecekte olmamalı, azp multi-aud'de
             // client_id'ye eşit olmalı).
             if (! $this->validateExtraClaims($claims)) {
-                return $this->error('ID token claim validation failed', 400);
+                return $this->callbackError(
+                    $stateData,
+                    'invalid_token',
+                    'ID token claim validation failed',
+                    400,
+                );
             }
 
             $user = $this->userProvisioner->findOrCreate($claims);
             if (! $user) {
                 Log::error('OIDC user creation/update failed.');
 
-                return $this->error('User creation failed', 500);
+                return $this->callbackError(
+                    $stateData,
+                    'server_error',
+                    'User creation failed',
+                    500,
+                );
             }
 
             auth('api')->factory()->setTTL($user->session_time);
@@ -158,8 +204,10 @@ class OIDCFlowService
             $request->merge([
                 'ip' => $stateData['ip'],
                 'user_agent' => $stateData['user_agent'],
-                'callback_url' => $request->fullUrl(),
             ]);
+            if (empty($stateData['handoff'])) {
+                $request->merge(['callback_url' => $request->fullUrl()]);
+            }
 
             $permissions = $this->extractPermissions($tokenResponse, $claims);
             if (! empty($permissions)) {
@@ -174,28 +222,102 @@ class OIDCFlowService
                 'email' => $user->email,
             ]);
 
-            Cache::forget(self::STATE_CACHE_PREFIX.$request->state);
+            $limanToken = auth('api')->login($user);
+            if (! empty($stateData['handoff']) && is_array($stateData['handoff'])) {
+                $tokenPayload = Authenticator::createHandoffToken($limanToken, $request);
+                $code = $this->handoffService->issue($stateData['handoff'], $tokenPayload);
 
-            $limanTokenResponse = Authenticator::createNewToken(
-                auth('api')->login($user),
-                $request,
-            );
+                return redirect()->away(
+                    $this->handoffService->successRedirect($stateData['handoff'], $code),
+                )->withHeaders([
+                    'Cache-Control' => 'no-store',
+                    'Pragma' => 'no-cache',
+                    'Referrer-Policy' => 'no-referrer',
+                ]);
+            }
+
+            $limanTokenResponse = Authenticator::createNewToken($limanToken, $request);
 
             return redirect($stateData['redirect_path'] ?? '/')
                 ->withCookies($limanTokenResponse->headers->getCookies());
         } catch (OpenIDConnectClientException $e) {
-            Log::error('OIDC authentication failed: '.$e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
+            Log::error('OIDC authentication failed', [
+                'exception' => get_class($e),
             ]);
 
-            return $this->error('Authentication failed: '.$e->getMessage(), 400);
+            return $this->callbackError(
+                $stateData,
+                'invalid_grant',
+                'Authentication failed',
+                400,
+            );
         } catch (\Exception $e) {
-            Log::error('OIDC authentication exception: '.$e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
+            Log::error('OIDC authentication exception', [
+                'exception' => get_class($e),
             ]);
 
-            return $this->error('Authentication failed', 500);
+            return $this->callbackError(
+                $stateData,
+                'server_error',
+                'Authentication failed',
+                500,
+            );
         }
+    }
+
+    /**
+     * Consume OIDC state once while holding a distributed cache lock.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function consumeState(string $state): ?array
+    {
+        if (! preg_match('/\A[A-Za-z0-9]{40}\z/', $state)) {
+            return null;
+        }
+
+        $lock = Cache::lock(self::STATE_LOCK_PREFIX.hash('sha256', $state), 5);
+        if (! $lock->get()) {
+            return null;
+        }
+
+        try {
+            $value = Cache::pull(self::STATE_CACHE_PREFIX.$state);
+
+            return is_array($value) ? $value : null;
+        } finally {
+            try {
+                $lock->release();
+            } catch (\Throwable $e) {
+                Log::warning('OIDC state lock release failed');
+            }
+        }
+    }
+
+    /**
+     * Return browser handoff errors to the registered application without
+     * exposing provider details. Native Liman OIDC retains its JSON behavior.
+     *
+     * @param array<string, mixed>|null $stateData
+     */
+    private function callbackError(
+        ?array $stateData,
+        string $error,
+        string $message,
+        int $status,
+    ): JsonResponse|RedirectResponse {
+        $handoff = $stateData['handoff'] ?? null;
+        if (is_array($handoff)) {
+            return redirect()->away(
+                $this->handoffService->errorRedirect($handoff, $error),
+            )->withHeaders([
+                'Cache-Control' => 'no-store',
+                'Pragma' => 'no-cache',
+                'Referrer-Policy' => 'no-referrer',
+            ]);
+        }
+
+        return $this->error($message, $status);
     }
 
     /**

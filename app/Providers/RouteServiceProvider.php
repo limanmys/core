@@ -31,6 +31,13 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         RateLimiter::for('login', function ($request) {
+            if ($request->type === 'oidc' && $request->has('handoff')) {
+                // The BFF is the network caller, so all of its users share one
+                // source IP. Do not include the untrusted client_id in the key:
+                // attackers could rotate it to create unlimited rate buckets.
+                return Limit::perMinute(300)->by('handoff|'.$request->ip());
+            }
+
             return Limit::perMinute(3)->by($request->email.$request->ip());
         });
 
@@ -44,6 +51,10 @@ class RouteServiceProvider extends ServiceProvider
 
         RateLimiter::for('external-notifications', function ($request) {
             return Limit::perMinute(10)->by($request->ip());
+        });
+
+        RateLimiter::for('auth-handoff-exchange', function ($request) {
+            return Limit::perMinute(300)->by($request->ip());
         });
 
         parent::boot();

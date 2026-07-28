@@ -20,6 +20,99 @@ class Authenticator
      */
     public static function createNewToken($token, ?Request $request = null)
     {
+        $request ??= request();
+        [$user, $return, $tokenTimeout] = self::recordLogin($request);
+
+        // OIDC kullanıcıları için callback URL'den ana sayfaya redirect
+        if ($user->auth_type === 'oidc' && $request && $request->has('callback_url')) {
+            $callbackUrl = $request->input('callback_url');
+
+            // Callback URL'yi parse et ve ana sayfaya redirect URL'i oluştur
+            $parsedUrl = parse_url($callbackUrl);
+            $baseUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] .
+                      (isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '');
+
+            $redirectResponse = redirect($baseUrl . '/');
+
+            // Cookie'leri redirect response'a ekle
+            return $redirectResponse
+                ->withCookie(cookie(
+                    'token',
+                    $token,
+                    $tokenTimeout,
+                    null,
+                    $request->getHost(),
+                    true,
+                    true,
+                    false
+                ))
+                ->withCookie(cookie(
+                    'currentUser',
+                    json_encode($return),
+                    $tokenTimeout,
+                    null,
+                    $request->getHost(),
+                    true,
+                    false,
+                    false
+                ));
+        }
+
+        return response()->json($return)->withCookie(cookie(
+            'token',
+            $token,
+            $tokenTimeout,
+            null,
+            $request->getHost(),
+            true,
+            true,
+            false
+        ))->withCookie(cookie(
+            'currentUser',
+            json_encode($return),
+            $tokenTimeout,
+            null,
+            $request->getHost(),
+            true,
+            false,
+            false
+        ));
+    }
+
+    /**
+     * Build the confidential response stored behind a one-time handoff code.
+     * The JWT is returned only by the authenticated server-to-server exchange.
+     *
+     * @param string $token
+     * @return array<string, mixed>
+     */
+    public static function createHandoffToken($token, ?Request $request = null): array
+    {
+        $request ??= request();
+        [$user, $return] = self::recordLogin($request);
+
+        return [
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'expired_at' => $return['expired_at'],
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'status' => $user->status,
+                'auth_type' => $user->auth_type,
+            ],
+        ];
+    }
+
+    /**
+     * Persist login audit data and return the shared token response metadata.
+     *
+     * @return array{0: User, 1: array<string, mixed>, 2: int}
+     */
+    private static function recordLogin(?Request $request): array
+    {
+        $request ??= request();
         $id = auth('api')->user()->id;
         $user = User::find($id);
 
@@ -123,60 +216,7 @@ class Authenticator
             $tokenTimeout = auth('api')->factory()->getTTL() * 60;
         }
 
-        // OIDC kullanıcıları için callback URL'den ana sayfaya redirect
-        if ($user->auth_type === 'oidc' && $request && $request->has('callback_url')) {
-            $callbackUrl = $request->input('callback_url');
-            
-            // Callback URL'yi parse et ve ana sayfaya redirect URL'i oluştur
-            $parsedUrl = parse_url($callbackUrl);
-            $baseUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . 
-                      (isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '');
-            
-            $redirectResponse = redirect($baseUrl . '/');
-            
-            // Cookie'leri redirect response'a ekle
-            return $redirectResponse
-                ->withCookie(cookie(
-                    'token',
-                    $token,
-                    $tokenTimeout,
-                    null,
-                    $request->getHost(),
-                    true,
-                    true,
-                    false
-                ))
-                ->withCookie(cookie(
-                    'currentUser',
-                    json_encode($return),
-                    $tokenTimeout,
-                    null,
-                    $request->getHost(),
-                    true,
-                    false,
-                    false
-                ));
-        }
-
-        return response()->json($return)->withCookie(cookie(
-            'token',
-            $token,
-            $tokenTimeout,
-            null,
-            $request->getHost(),
-            true,
-            true,
-            false
-        ))->withCookie(cookie(
-            'currentUser',
-            json_encode($return),
-            $tokenTimeout,
-            null,
-            $request->getHost(),
-            true,
-            false,
-            false
-        ));
+        return [$user, $return, $tokenTimeout];
     }
 
     /**
