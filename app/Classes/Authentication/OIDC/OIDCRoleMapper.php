@@ -20,12 +20,12 @@ class OIDCRoleMapper
 {
     public function assignByPermissions(User $user, array $permissions): void
     {
-        if (empty($permissions)) {
-            return;
-        }
-
         try {
             $this->removeAutoRoles($user);
+
+            if (empty($permissions)) {
+                return;
+            }
 
             $matchingRoles = Role::whereIn('name', $permissions)->get();
 
@@ -53,6 +53,7 @@ class OIDCRoleMapper
                 RoleUser::create([
                     'user_id' => $user->id,
                     'role_id' => $role->id,
+                    'type' => 'oidc',
                     'auto' => true,
                 ]);
 

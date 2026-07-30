@@ -210,9 +210,7 @@ class OIDCFlowService
             }
 
             $permissions = $this->extractPermissions($tokenResponse, $claims);
-            if (! empty($permissions)) {
-                $this->roleMapper->assignByPermissions($user, $permissions);
-            }
+            $this->roleMapper->assignByPermissions($user, $permissions);
 
             $externalToken = $this->extractExternalToken($claims);
             $this->tokenStore->persist($user, $tokenResponse, $externalToken, $permissions);

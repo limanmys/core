@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AuthHandoffController;
+use App\Http\Controllers\API\CurrentUserDetailsController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\ExtensionController;
 use App\Http\Controllers\API\ExternalNotificationController;
@@ -33,6 +34,8 @@ Route::group([
         ->middleware('throttle:5,1');
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'userProfile']);
+    Route::get('/user/details', CurrentUserDetailsController::class)
+        ->middleware('auth:api');
     Route::post('/change_password', [AuthController::class, 'forceChangePassword'])
         ->middleware('throttle:5,1');
     Route::post('/forgot_password', [AuthController::class, 'sendPasswordResetLink'])
