@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\AuthHandoffController;
+use App\Http\Controllers\API\CurrentUserDetailsController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\ExtensionController;
 use App\Http\Controllers\API\ExternalNotificationController;
@@ -32,6 +34,8 @@ Route::group([
         ->middleware('throttle:5,1');
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'userProfile']);
+    Route::get('/user/details', CurrentUserDetailsController::class)
+        ->middleware('auth:api');
     Route::post('/change_password', [AuthController::class, 'forceChangePassword'])
         ->middleware('throttle:5,1');
     Route::post('/forgot_password', [AuthController::class, 'sendPasswordResetLink'])
@@ -41,6 +45,8 @@ Route::group([
     Route::get('/oidc/callback', [AuthController::class, 'oidcCallback'])
         ->name('oidcCallback')
         ->middleware('throttle:30,1');
+    Route::post('/handoff/exchange', [AuthHandoffController::class, 'exchange'])
+        ->middleware('throttle:auth-handoff-exchange');
 });
 
 Route::post('/notifications/send', [ExternalNotificationController::class, 'accept'])
