@@ -112,9 +112,11 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
         Route::post('/check_access', [ServerController::class, 'checkAccess']);
         Route::post('/check_connection', [ServerController::class, 'checkConnection']);
         Route::post('/check_name', [ServerController::class, 'checkName']);
+        Route::post('/ssh_host_key', [ServerController::class, 'sshHostKeyForEndpoint']);
 
         Route::group(['prefix' => '{server_id}', 'middleware' => ['server']], function () {
             Route::get('/', [Server\DetailsController::class, 'server']);
+            Route::post('/ssh_host_key', [ServerController::class, 'sshHostKey']);
 
             // Kubernetes
             Route::get('/kubernetes_deployment_details', [KubernetesController::class, 'getDeploymentDetailsFromServer']);

@@ -10,9 +10,15 @@ use App\Models\Certificate;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\ServerKey;
+use App\Models\SshHostKey;
+use App\Support\SshHostKeyDecision;
+use App\Support\SshHostKeyScanner;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use mervick\aesEverywhere\AES256;
+use Throwable;
 
 class ServerController extends Controller
 {
@@ -29,6 +35,16 @@ class ServerController extends Controller
             return response()->json([
                 'message' => 'Bu işlemi yapmak için izniniz yok.',
             ], 403);
+        }
+
+        if (
+            in_array($request->key_type, ['ssh', 'ssh_certificate'], true)
+            && ! SshHostKey::activeForEndpoint($request->ip_address, (int) $request->port)->exists()
+        ) {
+            return response()->json([
+                'code' => 'SSH_HOST_KEY_UNKNOWN',
+                'message' => 'SSH sunucu kimliği doğrulanmadan sunucu oluşturulamaz.',
+            ], 409);
         }
 
         $server = Server::create([
@@ -278,6 +294,7 @@ class ServerController extends Controller
         );
         if (is_resource($status)) {
             fclose($status);
+
             return response()->json([
                 'message' => 'Sunucuya başarıyla erişim sağlandı.',
             ]);
@@ -314,7 +331,38 @@ class ServerController extends Controller
      */
     public function checkConnection()
     {
-        $connector = new GenericConnector();
+        validate([
+            'ip_address' => 'required|string|max:255',
+            'username' => 'required|string|max:255',
+            'password' => 'required|string',
+            'port' => 'required|integer|min:1|max:65535',
+            'key_type' => 'required|in:ssh,ssh_certificate,winrm,winrm_insecure',
+            'approve_host_key' => 'sometimes|boolean',
+            'replace_host_key' => 'sometimes|boolean',
+            'host_key_fingerprint' => 'sometimes|string|max:128',
+        ]);
+
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server')) {
+            return response()->json([
+                'message' => 'Bu işlemi yapmak için izniniz yok.',
+            ], 403);
+        }
+
+        $connector = new GenericConnector;
+
+        if (in_array(request('key_type'), ['ssh', 'ssh_certificate'], true)) {
+            $hostKey = $this->reconcileSshHostKey(
+                request(),
+                request('ip_address'),
+                (int) request('port'),
+                true,
+            );
+
+            if ($hostKey instanceof JsonResponse) {
+                return $hostKey;
+            }
+        }
+
         $output = $connector->verify(
             request('ip_address'),
             request('username'),
@@ -333,5 +381,200 @@ class ServerController extends Controller
                 'password' => 'Kullanıcı adı ya da şifreniz yanlış olabilir.',
             ], 422);
         }
+    }
+
+    /**
+     * Discover and approve the current host key of an existing SSH server.
+     */
+    public function sshHostKey(Request $request): JsonResponse
+    {
+        validate([
+            'approve_host_key' => 'sometimes|boolean',
+            'replace_host_key' => 'sometimes|boolean',
+            'host_key_fingerprint' => 'sometimes|string|max:128',
+        ]);
+
+        $isApprovalRequest = $request->boolean('approve_host_key')
+            || $request->boolean('replace_host_key');
+        $canApprove = Permission::can(auth('api')->user()->id, 'liman', 'id', 'update_server');
+
+        if (
+            $isApprovalRequest
+            && ! $canApprove
+        ) {
+            return response()->json([
+                'message' => 'Bu işlemi yapmak için izniniz yok.',
+            ], 403);
+        }
+
+        $server = Server::find($request->route('server_id'));
+        if (! $server) {
+            return response()->json(['message' => 'Sunucu bulunamadı.'], 404);
+        }
+
+        if (! in_array($server->type, ['ssh', 'ssh_certificate'], true)) {
+            return response()->json([
+                'status' => 'not_applicable',
+            ]);
+        }
+
+        $hostKey = $this->reconcileSshHostKey(
+            $request,
+            $server->ip_address,
+            (int) $server->key_port,
+            true,
+        );
+
+        if ($hostKey instanceof JsonResponse) {
+            if ($hostKey->getStatusCode() === 409) {
+                $challenge = $hostKey->getData(true);
+                $challenge['can_approve'] = $canApprove;
+
+                return response()->json($challenge, 409);
+            }
+
+            return $hostKey;
+        }
+
+        return response()->json([
+            'status' => 'trusted',
+            'host' => $hostKey['host'],
+            'port' => $hostKey['port'],
+            'key_type' => $hostKey['key_type'],
+            'fingerprint' => $hostKey['fingerprint'],
+        ]);
+    }
+
+    /**
+     * Discover and approve an SSH endpoint used directly by an extension or tunnel.
+     */
+    public function sshHostKeyForEndpoint(Request $request): JsonResponse
+    {
+        validate([
+            'ip_address' => 'required|string|max:255',
+            'port' => 'required|integer|min:1|max:65535',
+            'approve_host_key' => 'sometimes|boolean',
+            'replace_host_key' => 'sometimes|boolean',
+            'host_key_fingerprint' => 'sometimes|string|max:128',
+        ]);
+
+        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server')) {
+            return response()->json([
+                'message' => 'Bu işlemi yapmak için izniniz yok.',
+            ], 403);
+        }
+
+        $hostKey = $this->reconcileSshHostKey(
+            $request,
+            $request->string('ip_address')->toString(),
+            $request->integer('port'),
+            true,
+        );
+
+        if ($hostKey instanceof JsonResponse) {
+            return $hostKey;
+        }
+
+        return response()->json([
+            'status' => 'trusted',
+            'host' => $hostKey['host'],
+            'port' => $hostKey['port'],
+            'key_type' => $hostKey['key_type'],
+            'fingerprint' => $hostKey['fingerprint'],
+        ]);
+    }
+
+    /**
+     * @return array{host: string, port: int, key_type: string, public_key: string, fingerprint: string}|JsonResponse
+     */
+    private function reconcileSshHostKey(
+        Request $request,
+        string $host,
+        int $port,
+        bool $replacementAllowed,
+    ): array|JsonResponse {
+        try {
+            $discovered = (new SshHostKeyScanner)->discover($host, $port);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return response()->json([
+                'code' => 'SSH_HOST_KEY_UNAVAILABLE',
+                'message' => 'SSH sunucu kimliği alınamadı.',
+            ], 422);
+        }
+        $normalizedHost = SshHostKey::normalizeHost($host);
+
+        $trustedKeys = SshHostKey::activeForEndpoint($normalizedHost, $port)->get();
+        $decision = SshHostKeyDecision::decide(
+            $trustedKeys->pluck('public_key')->all(),
+            $discovered['public_key'],
+            $discovered['fingerprint'],
+            $request->input('host_key_fingerprint'),
+            $request->boolean('approve_host_key'),
+            $replacementAllowed,
+            $request->boolean('replace_host_key'),
+        );
+
+        if ($decision === SshHostKeyDecision::TRUSTED) {
+            return $discovered;
+        }
+
+        $isMismatch = $trustedKeys->isNotEmpty();
+        $code = $isMismatch ? 'SSH_HOST_KEY_MISMATCH' : 'SSH_HOST_KEY_UNKNOWN';
+
+        if (in_array($decision, [
+            SshHostKeyDecision::CHALLENGE_UNKNOWN,
+            SshHostKeyDecision::CHALLENGE_MISMATCH,
+        ], true)) {
+            return response()->json([
+                'code' => $code,
+                'host' => $normalizedHost,
+                'port' => $port,
+                'key_type' => $discovered['key_type'],
+                'fingerprint' => $discovered['fingerprint'],
+                'trusted_fingerprints' => $trustedKeys->pluck('fingerprint')->values(),
+                'message' => $isMismatch
+                    ? 'SSH sunucusunun kimlik anahtarı değişmiş. Güvenilir bir kanaldan doğrulamadan değiştirmeyin.'
+                    : 'SSH sunucusunun kimlik anahtarı henüz onaylanmamış.',
+            ], 409);
+        }
+
+        DB::transaction(function () use ($normalizedHost, $port, $discovered, $decision): void {
+            if ($decision === SshHostKeyDecision::REPLACE) {
+                SshHostKey::activeForEndpoint($normalizedHost, $port)->update([
+                    'revoked_at' => now(),
+                    'revoked_by' => auth('api')->id(),
+                ]);
+            }
+
+            SshHostKey::updateOrCreate(
+                [
+                    'host' => $normalizedHost,
+                    'port' => $port,
+                    'fingerprint' => $discovered['fingerprint'],
+                ],
+                [
+                    'key_type' => $discovered['key_type'],
+                    'public_key' => $discovered['public_key'],
+                    'approved_by' => auth('api')->id(),
+                    'revoked_at' => null,
+                    'revoked_by' => null,
+                ],
+            );
+        });
+
+        AuditLog::write(
+            'ssh_host_key',
+            $decision === SshHostKeyDecision::REPLACE ? 'replace' : 'approve',
+            [
+                'host' => $normalizedHost,
+                'port' => $port,
+                'fingerprint' => $discovered['fingerprint'],
+            ],
+            $decision === SshHostKeyDecision::REPLACE ? 'SSH_HOST_KEY_REPLACED' : 'SSH_HOST_KEY_APPROVED',
+        );
+
+        return $discovered;
     }
 }
