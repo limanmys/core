@@ -193,16 +193,41 @@ class VaultController extends Controller
      */
     public function createKey(Request $request)
     {
-        $user_id = auth('api')->user()->id;
-        if ($request->user_id != '' && auth('api')->user()->isAdmin()) {
+        $user = auth('api')->user();
+        $user_id = $user->id;
+        if ($request->user_id != '' && $user->isAdmin()) {
             $user_id = $request->user_id;
         }
 
         // Yetki kontrolü: kullanıcı hedef sunucuya erişim iznine sahip olmalı.
-        if (! Permission::can(auth('api')->user()->id, 'server', 'id', $request->server_id)) {
+        if (! Permission::can($user->id, 'server', 'id', $request->server_id)) {
             return response()->json([
-                'message' => 'Bu sunucu üzerinde anahtar oluşturma yetkiniz bulunmamaktadır!'
+                'message' => 'Bu sunucu üzerinde anahtar oluşturma yetkiniz bulunmamaktadır!',
             ], Response::HTTP_FORBIDDEN);
+        }
+
+        $server = Server::find($request->server_id);
+        if (! $server) {
+            return response()->json([
+                'message' => 'Sunucu bulunamadı.',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $sharedKey = null;
+        if ($request->exists('shared')) {
+            $sharedKey = $request->shared == 'true' ? 1 : 0;
+
+            if (
+                (int) $server->shared_key !== $sharedKey
+                && (
+                    ! Permission::can($user->id, 'liman', 'id', 'update_server')
+                    || ! Permission::can($user->id, 'liman', 'id', 'server_details')
+                )
+            ) {
+                return response()->json([
+                    'message' => 'Bu sunucunun paylaşımlı anahtar ayarını değiştirme yetkiniz bulunmamaktadır!',
+                ], Response::HTTP_FORBIDDEN);
+            }
         }
 
         $encKey = env('APP_KEY').$user_id.$request->server_id;
@@ -228,9 +253,10 @@ class VaultController extends Controller
             ['type' => $request->type, 'data' => json_encode($data)]
         );
 
-        Server::where(['id' => $request->server_id])->update(
-            ['shared_key' => $request->shared == 'true' ? 1 : 0]
-        );
+        if ($sharedKey !== null && (int) $server->shared_key !== $sharedKey) {
+            $server->shared_key = $sharedKey;
+            $server->save();
+        }
 
         return respond('Başarıyla eklendi.');
     }
