@@ -8,7 +8,6 @@ use App\Models\AuditLog;
 use App\Models\Extension;
 use App\Models\Permission;
 use App\Models\Server;
-use App\Models\ServerKey;
 use App\Models\UserExtensionUsageStats;
 use App\Models\UserSettings;
 use GuzzleHttp\Client;
@@ -256,10 +255,7 @@ class ExtensionController extends Controller
      */
     private function checkForMissingSettings($extension)
     {
-        $key = ServerKey::where([
-            'server_id' => server()->id,
-            'user_id' => user()->id,
-        ])->first();
+        $key = server()->key(user()->id);
         $extra = [];
         if ($key) {
             $extra = ['clientUsername', 'clientPassword'];

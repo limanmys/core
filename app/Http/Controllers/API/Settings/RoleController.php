@@ -345,6 +345,10 @@ class RoleController extends Controller
                 'id' => 'update_server',
                 'name' => 'Sunucu Detaylarını Güncelleme',
             ],
+            [
+                'id' => 'share_server_key',
+                'name' => 'Sunucu Bağlantı Anahtarını Paylaşma',
+            ],
         ];
         $selected = getLimanPermissions($request->role_id);
 
