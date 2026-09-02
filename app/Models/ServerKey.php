@@ -14,5 +14,12 @@ class ServerKey extends Model
 {
     use UsesUuid, CacheQueryBuilder;
 
-    protected $fillable = ['type', 'data', 'server_id', 'user_id'];
+    protected $fillable = ['type', 'data', 'server_id', 'user_id', 'shared'];
+
+    protected function casts(): array
+    {
+        return [
+            'shared' => 'boolean',
+        ];
+    }
 }

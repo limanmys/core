@@ -159,6 +159,7 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
         Route::get('/', [Settings\VaultController::class, 'index']);
         Route::post('/', [Settings\VaultController::class, 'create']);
         Route::post('/key', [Settings\VaultController::class, 'createKey']);
+        Route::patch('/key/{key_id}/sharing', [Settings\VaultController::class, 'updateKeySharing']);
         Route::patch('/', [Settings\VaultController::class, 'update']);
         Route::delete('/', [Settings\VaultController::class, 'delete']);
     });

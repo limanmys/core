@@ -167,6 +167,7 @@ class Permission extends Model
                     'server_services' => __('Sunucu Servislerini Görüntüleme'),
                     'server_details' => __('Sunucu Detaylarını Görüntüleme'),
                     'update_server' => __('Sunucu Detaylarını Güncelleme'),
+                    'share_server_key' => __('Sunucu Bağlantı Anahtarını Paylaşma'),
                     default => '-',
                 };
                 break;

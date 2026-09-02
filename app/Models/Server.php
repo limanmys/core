@@ -92,16 +92,23 @@ class Server extends Model
      *
      * @return mixed
      */
-    public function key()
+    public function key(?string $userId = null)
     {
-        if ($this->shared_key == 1) {
-            return ServerKey::where('server_id', $this->id)->first();
+        $userId ??= user()->id;
+
+        $personalKey = ServerKey::where([
+            'server_id' => $this->id,
+            'user_id' => $userId,
+        ])->orderByDesc('updated_at')->orderBy('id')->first();
+
+        if ($personalKey) {
+            return $personalKey;
         }
 
         return ServerKey::where([
             'server_id' => $this->id,
-            'user_id' => user()->id,
-        ])->first();
+            'shared' => true,
+        ])->orderByDesc('updated_at')->orderBy('id')->first();
     }
 
     /**

@@ -31,10 +31,23 @@ class ServerController extends Controller
      */
     public function create(Request $request)
     {
-        if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server')) {
+        $user = auth('api')->user();
+        if (! Permission::can($user->id, 'liman', 'id', 'add_server')) {
             return response()->json([
                 'message' => 'Bu işlemi yapmak için izniniz yok.',
             ], 403);
+        }
+
+        $shared = $request->key_type !== 'no_key' && $request->boolean('shared');
+        if ($shared && $request->input('sharing_scope') !== 'key') {
+            throw new JsonResponseException([
+                'shared' => 'Anahtar paylaşımı için güncel istemcide açık onay verilmelidir.',
+            ], '', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        if ($shared && ! Permission::can($user->id, 'liman', 'id', 'share_server_key')) {
+            return response()->json([
+                'message' => 'Sunucu bağlantı anahtarını paylaşma yetkiniz bulunmamaktadır.',
+            ], Response::HTTP_FORBIDDEN);
         }
 
         if (
@@ -47,47 +60,54 @@ class ServerController extends Controller
             ], 409);
         }
 
-        $server = Server::create([
-            'name' => request('name'),
-            'ip_address' => request('ip_address'),
-            'type' => request('key_type') != 'no_key' ? request('key_type') : 'none',
-            'control_port' => request('port'),
-            'os' => request('os_type') ?? 'none',
-            'user_id' => auth('api')->user()->id,
-            'shared_key' => request('shared') == 'true' ? 1 : 0,
-            'key_port' => request('port'),
-        ]);
-
-        // Add Server to request object to use it later.
-        request()->request->add(['server' => $server]);
-
-        if ($request->os_type === 'kubernetes' && $request->has('kubeconfig')) {
-            $server->kubernetesInformation()->create([
-                'kubeconfig' => $request->kubeconfig,
-                'namespace' => $request->namespace,
-                'deployment' => $request->deployment,
+        $server = DB::transaction(function () use ($request, $shared, $user) {
+            $server = Server::create([
+                'name' => $request->name,
+                'ip_address' => $request->ip_address,
+                'type' => $request->key_type != 'no_key' ? $request->key_type : 'none',
+                'control_port' => $request->port,
+                'os' => $request->os_type ?? 'none',
+                'user_id' => $user->id,
+                'shared_key' => $shared ? 1 : 0,
+                'key_port' => $request->port,
             ]);
-        }
 
-        if ($request->key_type != 'no_key') {
-            $encKey = env('APP_KEY').auth('api')->user()->id.server()->id;
-            $data = [
-                'clientUsername' => AES256::encrypt(
-                    $request->username,
-                    $encKey
-                ),
-                'clientPassword' => AES256::encrypt(
-                    $request->password,
-                    $encKey
-                ),
-                'key_port' => request('port'),
-            ];
+            request()->request->add(['server' => $server]);
 
-            ServerKey::updateOrCreate(
-                ['server_id' => server()->id, 'user_id' => auth('api')->user()->id],
-                ['type' => $request->key_type, 'data' => json_encode($data)]
-            );
-        }
+            if ($request->os_type === 'kubernetes' && $request->has('kubeconfig')) {
+                $server->kubernetesInformation()->create([
+                    'kubeconfig' => $request->kubeconfig,
+                    'namespace' => $request->namespace,
+                    'deployment' => $request->deployment,
+                ]);
+            }
+
+            if ($request->key_type != 'no_key') {
+                $encKey = env('APP_KEY').$user->id.$server->id;
+                $data = [
+                    'clientUsername' => AES256::encrypt(
+                        $request->username,
+                        $encKey
+                    ),
+                    'clientPassword' => AES256::encrypt(
+                        $request->password,
+                        $encKey
+                    ),
+                    'key_port' => $request->port,
+                ];
+
+                ServerKey::updateOrCreate(
+                    ['server_id' => $server->id, 'user_id' => $user->id],
+                    [
+                        'type' => $request->key_type,
+                        'data' => json_encode($data),
+                        'shared' => $shared,
+                    ]
+                );
+            }
+
+            return $server;
+        });
 
         return $this->grantPermissions($server);
     }
@@ -118,6 +138,15 @@ class ServerController extends Controller
             ], '', Response::HTTP_FORBIDDEN);
         }
 
+        if (
+            $request->exists('shared_key')
+            && (int) $server->shared_key !== (int) $request->boolean('shared_key')
+        ) {
+            throw new JsonResponseException([
+                'shared_key' => 'Paylaşım ayarı anahtar üzerinden yönetilmelidir.',
+            ], '', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
         AuditLog::write(
             'server',
             'update',
@@ -128,14 +157,13 @@ class ServerController extends Controller
                 'shared_status' => $server->shared_key ? 'true' : 'false',
                 'new_server_name' => $request->name,
                 'new_server_ip' => $request->ip_address,
-                'new_shared_status' => $request->shared_key ? 'true' : 'false',
+                'new_shared_status' => $server->shared_key ? 'true' : 'false',
             ],
             'SERVER_UPDATE'
         );
 
         $server->name = $request->name;
         $server->ip_address = $request->ip_address;
-        $server->shared_key = (bool) $request->shared_key;
         $server->save();
 
         return response()->json([

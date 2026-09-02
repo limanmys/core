@@ -236,6 +236,7 @@ if (! function_exists('getLimanPermissions')) {
             'server_services' => 'Sunucu Servislerini Görüntüleme',
             'server_details' => 'Sunucu Detaylarını Görüntüleme',
             'update_server' => 'Sunucu Detaylarını Güncelleme',
+            'share_server_key' => 'Sunucu Bağlantı Anahtarını Paylaşma',
         ];
         $permissions = Permission::where([
             'morph_id' => $user_id ? $user_id : user()->id,
@@ -579,7 +580,7 @@ if (! function_exists('extensionDb')) {
                 return null;
             }
             $data = json_decode((string) $serverKey->data, true);
-            $encKey = env('APP_KEY') . auth()->user()->id . server()->id;
+            $encKey = env('APP_KEY') . $serverKey->user_id . server()->id;
 
             return AES256::decrypt($data[$key], $encKey);
         }
@@ -592,7 +593,6 @@ if (! function_exists('extensionDb')) {
         return null;
     }
 }
-
 if (! function_exists('sudo')) {
     /**
      * Get sudo query

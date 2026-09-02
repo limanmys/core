@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\ServerKey;
@@ -10,6 +11,7 @@ use App\Models\UserSettings;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use mervick\aesEverywhere\AES256;
 
 /**
@@ -27,6 +29,7 @@ class VaultController extends Controller
      */
     public function index(Request $request)
     {
+        $targetUserId = auth('api')->user()->id;
         if ($request->user_id != '') {
             if (! auth('api')->user()->isAdmin()) {
                 return response()->json([
@@ -34,10 +37,10 @@ class VaultController extends Controller
                 ], Response::HTTP_FORBIDDEN);
             }
 
-            $settings = UserSettings::where('user_id', $request->user_id)->get();
-        } else {
-            $settings = UserSettings::where('user_id', auth('api')->user()->id)->get();
+            $targetUserId = $request->user_id;
         }
+
+        $settings = UserSettings::where('user_id', $targetUserId)->get();
 
         // Retrieve User servers that has permission.
         $servers = auth('api')->user()->servers();
@@ -50,7 +53,7 @@ class VaultController extends Controller
             $setting->type = 'setting';
         }
 
-        $keys = auth('api')->user()->keys;
+        $keys = ServerKey::where('user_id', $targetUserId)->get();
 
         foreach ($keys as $key) {
             $server = $servers->find($key->server_id);
@@ -150,7 +153,8 @@ class VaultController extends Controller
      */
     public function delete(Request $request)
     {
-        if ($request->type == 'key') {
+        $isServerKey = $request->type == 'key';
+        if ($isServerKey) {
             $first = ServerKey::find($request->id);
         } else {
             $first = UserSettings::find($request->id);
@@ -179,7 +183,44 @@ class VaultController extends Controller
             }
         }
 
-        $flag = $first->delete();
+        if ($isServerKey) {
+            $flag = DB::transaction(function () use ($first) {
+                $server = DB::table('servers')->where('id', $first->server_id)->lockForUpdate()->first();
+                $key = DB::table('server_keys')
+                    ->where('id', $first->id)
+                    ->where('server_id', $first->server_id)
+                    ->lockForUpdate()
+                    ->first();
+                if (! $key) {
+                    return false;
+                }
+
+                $wasShared = (bool) $key->shared;
+                $flag = $first->delete();
+
+                if ($flag && $wasShared && $server) {
+                    DB::table('servers')->where('id', $server->id)->update(['shared_key' => 0]);
+                }
+
+                return $flag;
+            });
+
+            if ($flag) {
+                AuditLog::write(
+                    'server_key',
+                    'delete',
+                    [
+                        'server_id' => $first->server_id,
+                        'key_id' => $first->id,
+                        'key_owner_id' => $first->user_id,
+                        'was_shared' => (bool) $first->shared,
+                    ],
+                    'SERVER_KEY_DELETE'
+                );
+            }
+        } else {
+            $flag = $first->delete();
+        }
 
         return response()->json(['status' => $flag], $flag ? 200 : 500);
     }
@@ -193,6 +234,19 @@ class VaultController extends Controller
      */
     public function createKey(Request $request)
     {
+        if ($request->exists('shared')) {
+            $request->merge(['shared' => $request->boolean('shared')]);
+        }
+        validate([
+            'server_id' => 'required|uuid',
+            'user_id' => 'nullable|uuid',
+            'type' => 'required|in:ssh,ssh_certificate,winrm,winrm_insecure,no_key',
+            'username' => 'nullable|string|max:125',
+            'password' => 'nullable|string|max:2500',
+            'key_port' => 'required|integer|min:1|max:65535',
+            'shared' => 'sometimes|boolean',
+        ]);
+
         $user = auth('api')->user();
         $user_id = $user->id;
         if ($request->user_id != '' && $user->isAdmin()) {
@@ -213,51 +267,227 @@ class VaultController extends Controller
             ], Response::HTTP_NOT_FOUND);
         }
 
-        $sharedKey = null;
-        if ($request->exists('shared')) {
-            $sharedKey = $request->shared == 'true' ? 1 : 0;
-
-            if (
-                (int) $server->shared_key !== $sharedKey
-                && (
-                    ! Permission::can($user->id, 'liman', 'id', 'update_server')
-                    || ! Permission::can($user->id, 'liman', 'id', 'server_details')
-                )
-            ) {
-                return response()->json([
-                    'message' => 'Bu sunucunun paylaşımlı anahtar ayarını değiştirme yetkiniz bulunmamaktadır!',
-                ], Response::HTTP_FORBIDDEN);
-            }
+        $shared = $request->type !== 'no_key' && $request->boolean('shared');
+        if ($shared && $request->input('sharing_scope') !== 'key') {
+            return response()->json([
+                'message' => 'Anahtar paylaşımı için güncel istemcide açık onay verilmelidir.',
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        if (
+            $shared
+            && (
+                $user_id !== $user->id
+                || ! Permission::can($user->id, 'liman', 'id', 'share_server_key')
+            )
+        ) {
+            return response()->json([
+                'message' => 'Yalnızca kendi bağlantı anahtarınızı paylaşabilirsiniz ve paylaşma iznine sahip olmalısınız.',
+            ], Response::HTTP_FORBIDDEN);
         }
 
+        $wasShared = DB::table('server_keys')
+            ->where('server_id', $request->server_id)
+            ->where('user_id', $user_id)
+            ->where('shared', true)
+            ->exists();
         $encKey = env('APP_KEY').$user_id.$request->server_id;
-        UserSettings::where([
-            'server_id' => $request->server_id,
-            'user_id' => $user_id,
-            'name' => 'clientUsername',
-        ])->delete();
-        UserSettings::where([
-            'server_id' => $request->server_id,
-            'user_id' => $user_id,
-            'name' => 'clientPassword',
-        ])->delete();
-
         $data = [
             'clientUsername' => AES256::encrypt($request->username, $encKey),
             'clientPassword' => AES256::encrypt($request->password, $encKey),
             'key_port' => $request->key_port,
         ];
 
-        ServerKey::updateOrCreate(
-            ['server_id' => $request->server_id, 'user_id' => $user_id],
-            ['type' => $request->type, 'data' => json_encode($data)]
-        );
+        $result = DB::transaction(function () use ($request, $server, $shared, $user_id, $data) {
+            $lockedServer = DB::table('servers')->where('id', $server->id)->lockForUpdate()->first();
+            if (! $lockedServer) {
+                return 'missing';
+            }
 
-        if ($sharedKey !== null && (int) $server->shared_key !== $sharedKey) {
-            $server->shared_key = $sharedKey;
-            $server->save();
+            if (
+                $shared
+                && DB::table('server_keys')
+                    ->where('server_id', $lockedServer->id)
+                    ->where('shared', true)
+                    ->where('user_id', '!=', $user_id)
+                    ->exists()
+            ) {
+                return 'conflict';
+            }
+
+            UserSettings::where([
+                'server_id' => $request->server_id,
+                'user_id' => $user_id,
+                'name' => 'clientUsername',
+            ])->delete();
+            UserSettings::where([
+                'server_id' => $request->server_id,
+                'user_id' => $user_id,
+                'name' => 'clientPassword',
+            ])->delete();
+
+            ServerKey::where([
+                'server_id' => $request->server_id,
+                'user_id' => $user_id,
+            ])->update(['shared' => false]);
+
+            ServerKey::updateOrCreate(
+                ['server_id' => $request->server_id, 'user_id' => $user_id],
+                [
+                    'type' => $request->type,
+                    'data' => json_encode($data),
+                    'shared' => $shared,
+                ]
+            );
+
+            $sharedKeyExists = DB::table('server_keys')
+                ->where('server_id', $lockedServer->id)
+                ->where('shared', true)
+                ->exists();
+            DB::table('servers')->where('id', $lockedServer->id)->update([
+                'shared_key' => $sharedKeyExists ? 1 : 0,
+            ]);
+
+            return 'saved';
+        });
+
+        if ($result === 'conflict') {
+            return response()->json([
+                'message' => 'Bu sunucu için başka bir bağlantı anahtarı zaten paylaşılmış.',
+            ], Response::HTTP_CONFLICT);
+        }
+        if ($result === 'missing') {
+            return response()->json([
+                'message' => 'Sunucu bulunamadı.',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($wasShared !== $shared) {
+            $key = ServerKey::where([
+                'server_id' => $request->server_id,
+                'user_id' => $user_id,
+            ])->orderByDesc('updated_at')->first();
+            AuditLog::write(
+                'server_key',
+                $shared ? 'share' : 'unshare',
+                [
+                    'server_id' => $request->server_id,
+                    'key_id' => $key?->id,
+                    'key_owner_id' => $user_id,
+                    'shared' => $shared,
+                ],
+                $shared ? 'SERVER_KEY_SHARE' : 'SERVER_KEY_UNSHARE'
+            );
         }
 
         return respond('Başarıyla eklendi.');
+    }
+
+    public function updateKeySharing(Request $request, string $key_id)
+    {
+        if (! $request->exists('shared')) {
+            validate(['shared' => 'required|boolean']);
+        }
+        $request->merge(['shared' => $request->boolean('shared')]);
+        validate(['shared' => 'required|boolean']);
+
+        $user = auth('api')->user();
+        $shared = $request->boolean('shared');
+        $key = ServerKey::find($key_id);
+        if (! $key) {
+            return response()->json([
+                'message' => 'Anahtar bulunamadı.',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $isOwner = $key->user_id === $user->id;
+        if ($shared) {
+            if (
+                ! $isOwner
+                || ! Permission::can($user->id, 'server', 'id', $key->server_id)
+                || ! Permission::can($user->id, 'liman', 'id', 'share_server_key')
+            ) {
+                return response()->json([
+                    'message' => 'Bu bağlantı anahtarını paylaşma yetkiniz bulunmamaktadır.',
+                ], Response::HTTP_FORBIDDEN);
+            }
+        } elseif (
+            ! $isOwner
+            && (
+                ! Permission::can($user->id, 'server', 'id', $key->server_id)
+                || ! Permission::can($user->id, 'liman', 'id', 'update_server')
+                || ! Permission::can($user->id, 'liman', 'id', 'server_details')
+            )
+        ) {
+            return response()->json([
+                'message' => 'Bu bağlantı anahtarının paylaşımını kaldırma yetkiniz bulunmamaktadır.',
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $serverId = $key->server_id;
+        $result = DB::transaction(function () use ($key_id, $serverId, $shared) {
+            $server = DB::table('servers')->where('id', $serverId)->lockForUpdate()->first();
+            if (! $server) {
+                return 'missing';
+            }
+
+            $key = DB::table('server_keys')
+                ->where('id', $key_id)
+                ->where('server_id', $server->id)
+                ->lockForUpdate()
+                ->first();
+            if (! $key) {
+                return 'missing';
+            }
+
+            if (
+                $shared
+                && DB::table('server_keys')
+                    ->where('server_id', $key->server_id)
+                    ->where('shared', true)
+                    ->where('id', '!=', $key->id)
+                    ->exists()
+            ) {
+                return 'conflict';
+            }
+
+            DB::table('server_keys')->where('id', $key->id)->update([
+                'shared' => $shared,
+                'updated_at' => now(),
+            ]);
+            $sharedKeyExists = DB::table('server_keys')
+                ->where('server_id', $server->id)
+                ->where('shared', true)
+                ->exists();
+            DB::table('servers')->where('id', $server->id)->update([
+                'shared_key' => $sharedKeyExists ? 1 : 0,
+            ]);
+
+            return 'saved';
+        });
+
+        if ($result === 'conflict') {
+            return response()->json([
+                'message' => 'Bu sunucu için başka bir bağlantı anahtarı zaten paylaşılmış.',
+            ], Response::HTTP_CONFLICT);
+        }
+        if ($result === 'missing') {
+            return response()->json([
+                'message' => 'Anahtar veya sunucu bulunamadı.',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        AuditLog::write(
+            'server_key',
+            $shared ? 'share' : 'unshare',
+            [
+                'server_id' => $key->server_id,
+                'key_id' => $key->id,
+                'key_owner_id' => $key->user_id,
+                'shared' => $shared,
+            ],
+            $shared ? 'SERVER_KEY_SHARE' : 'SERVER_KEY_UNSHARE'
+        );
+
+        return respond($shared ? 'Anahtar paylaşıldı.' : 'Anahtar paylaşımı kaldırıldı.');
     }
 }

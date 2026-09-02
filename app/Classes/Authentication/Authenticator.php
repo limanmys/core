@@ -145,6 +145,7 @@ class Authenticator
                     'server_services' => Permission::can($id, 'liman', 'id', 'server_services'),
                     'add_server' => Permission::can($id, 'liman', 'id', 'add_server'),
                     'update_server' => Permission::can($id, 'liman', 'id', 'update_server'),
+                    'share_server_key' => Permission::can($id, 'liman', 'id', 'share_server_key'),
                     'view_logs' => Permission::can($id, 'liman', 'id', 'view_logs'),
                     'view' => (function () {
                         $defaultPermissions = config('liman.default_views');
