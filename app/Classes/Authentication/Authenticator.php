@@ -58,7 +58,12 @@ class Authenticator
                 ));
         }
 
-        return response()->json($return)->withCookie(cookie(
+        return response()->json([
+            ...$return,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
+        ])->withCookie(cookie(
             'token',
             $token,
             $tokenTimeout,
