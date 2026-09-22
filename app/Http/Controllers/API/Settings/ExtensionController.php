@@ -9,6 +9,7 @@ use App\Models\GolangLicense;
 use App\Models\License;
 use App\Models\Permission;
 use App\Models\Server;
+use App\Support\ExtensionPackagePath;
 use App\System\Command;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -331,12 +332,21 @@ class ExtensionController extends Controller
             ], 500), null];
         }
 
-        if (count(scandir($path)) == 3) {
-            $path = $path.'/'.scandir($path)[2];
+        $packagePaths = ExtensionPackagePath::resolve($path);
+        if ($packagePaths === null) {
+            return [response()->json([
+                'message' => 'Eklenti dosyası açılamıyor.',
+            ], Response::HTTP_UNPROCESSABLE_ENTITY), null];
         }
+        $path = $packagePaths['directory'];
 
         // Now that we have everything, let's extract database.
-        $file = file_get_contents($path.'/db.json');
+        $file = file_get_contents($packagePaths['database']);
+        if ($file === false) {
+            return [response()->json([
+                'message' => 'Eklenti dosyası açılamıyor.',
+            ], Response::HTTP_UNPROCESSABLE_ENTITY), null];
+        }
 
         $json = json_decode($file, true);
 
@@ -411,7 +421,7 @@ class ExtensionController extends Controller
             'extension_folder' => $extension_folder,
         ]);
 
-        Command::runLiman('cp -r {:path}/* {:extension_folder}/.', [
+        Command::runLiman('cp -r @{:path}/* {:extension_folder}/.', [
             'extension_folder' => $extension_folder,
             'path' => $path,
         ]);
