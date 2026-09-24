@@ -61,7 +61,10 @@ class ExternalNotificationController extends Controller
             'title' => 'required',
             'content' => 'required',
             'level' => 'required|in:critical,high,medium,low,trivial',
-            'send_to' => 'nullable|in:all,admins,non_admins',
+            'send_to' => is_array($request->input('send_to'))
+                ? 'array|list'
+                : 'nullable|in:all,admins,non_admins',
+            'send_to.*' => 'required|uuid',
             'mail' => 'nullable|boolean',
         ]);
 
