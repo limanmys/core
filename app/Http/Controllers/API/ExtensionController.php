@@ -10,6 +10,7 @@ use App\Models\Permission;
 use App\Models\Server;
 use App\Models\UserExtensionUsageStats;
 use App\Models\UserSettings;
+use App\Support\ServerConnectionStatus;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\MimeType;
@@ -174,9 +175,20 @@ class ExtensionController extends Controller
      */
     public function render(Request $request)
     {
-        $dbJson = getExtensionJson(extension()->name);
-
         $this->checkPermissions(extension());
+
+        if (in_array(server()->type, ['ssh', 'ssh_certificate'], true)) {
+            $connectionStatus = ServerConnectionStatus::forServer(server(), auth('api')->user()->id);
+            if ($connectionStatus['source'] === 'missing') {
+                return response()->json([
+                    'code' => 'SERVER_CONNECTION_KEY_REQUIRED',
+                    'message' => 'Bu SSH sunucusu için kullanılabilir bir bağlantı anahtarınız yok. Kendi SSH bağlantı anahtarınızı ekleyin veya yöneticinizden sunucunun bağlantı anahtarını paylaşmasını isteyin.',
+                    'connection_status' => $connectionStatus,
+                ], Response::HTTP_FORBIDDEN);
+            }
+        }
+
+        $dbJson = getExtensionJson(extension()->name);
         $this->checkForMissingSettings($dbJson);
 
         if (extension()->require_key == true && server()->key() == null) {

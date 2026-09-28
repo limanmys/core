@@ -113,10 +113,13 @@ Route::group(['middleware' => ['auth:api', 'permissions']], function () {
         Route::post('/check_connection', [ServerController::class, 'checkConnection']);
         Route::post('/check_name', [ServerController::class, 'checkName']);
         Route::post('/ssh_host_key', [ServerController::class, 'sshHostKeyForEndpoint']);
+        // Recovery must work even when the control port is unreachable.
+        // Object authorization remains in permissions and the controller.
+        Route::post('/{server_id}/ssh_host_key', [ServerController::class, 'sshHostKey']);
+        Route::get('/{server_id}/key_sharing', [ServerController::class, 'keySharing']);
 
         Route::group(['prefix' => '{server_id}', 'middleware' => ['server']], function () {
             Route::get('/', [Server\DetailsController::class, 'server']);
-            Route::post('/ssh_host_key', [ServerController::class, 'sshHostKey']);
 
             // Kubernetes
             Route::get('/kubernetes_deployment_details', [KubernetesController::class, 'getDeploymentDetailsFromServer']);

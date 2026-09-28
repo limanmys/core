@@ -11,6 +11,8 @@ use App\Models\Permission;
 use App\Models\Server;
 use App\Models\ServerKey;
 use App\Models\SshHostKey;
+use App\Support\ServerConnectionStatus;
+use App\Support\SshConnectionDiagnostic;
 use App\Support\SshHostKeyDecision;
 use App\Support\SshHostKeyScanner;
 use Illuminate\Http\JsonResponse;
@@ -404,6 +406,15 @@ class ServerController extends Controller
                 'message' => 'Anahtarınız doğrulandı.',
             ]);
         } else {
+            $diagnostic = json_decode($output, true);
+            if (is_array($diagnostic) && in_array($diagnostic['code'] ?? null, [
+                'SSH_HOST_KEY_UNKNOWN', 'SSH_HOST_KEY_MISMATCH', 'SSH_CONNECTION_TIMEOUT',
+                'SSH_DNS_FAILED', 'SSH_CONNECTION_REFUSED', 'SSH_ALGORITHM_UNSUPPORTED',
+                'SSH_HANDSHAKE_FAILED', 'SSH_AUTHENTICATION_FAILED', 'SSH_PRIVATE_KEY_INVALID',
+            ], true)) {
+                return response()->json(SshConnectionDiagnostic::forCode($diagnostic['code']), 422);
+            }
+
             return response()->json([
                 'username' => 'Kullanıcı adı ya da şifreniz yanlış olabilir.',
                 'password' => 'Kullanıcı adı ya da şifreniz yanlış olabilir.',
@@ -416,6 +427,9 @@ class ServerController extends Controller
      */
     public function sshHostKey(Request $request): JsonResponse
     {
+        if (! Permission::can(auth('api')->user()->id, 'server', 'id', $request->route('server_id'))) {
+            return response()->json(['message' => 'Bu sunucu üzerinde yetkiniz bulunmamaktadır.'], 403);
+        }
         validate([
             'approve_host_key' => 'sometimes|boolean',
             'replace_host_key' => 'sometimes|boolean',
@@ -473,6 +487,38 @@ class ServerController extends Controller
         ]);
     }
 
+    /** Return sharing metadata only; never return credential data. */
+    public function keySharing(Request $request): JsonResponse
+    {
+        $userId = auth('api')->user()->id;
+        $serverId = $request->route('server_id');
+        if (! Permission::can($userId, 'server', 'id', $serverId)) {
+            return response()->json(['message' => 'Bu sunucu üzerinde yetkiniz bulunmamaktadır.'], 403);
+        }
+        $server = Server::find($serverId);
+        if (! $server) {
+            return response()->json(['message' => 'Sunucu bulunamadı.'], 404);
+        }
+
+        $ownKey = ServerKey::where('server_id', $serverId)->where('user_id', $userId)
+            ->orderByDesc('updated_at')->orderBy('id')->first(['id', 'shared', 'type']);
+        $sharedKey = ServerKey::where('server_id', $serverId)->where('shared', true)
+            ->orderByDesc('updated_at')->orderBy('id')->first(['id', 'user_id', 'type']);
+
+        return response()->json([
+            'server' => ['id' => $server->id, 'name' => $server->name, 'type' => $server->type, 'key_port' => $server->key_port],
+            'connection_status' => ServerConnectionStatus::describe($server->type, $ownKey?->type, $sharedKey?->type),
+            'own_key' => $ownKey ? ['id' => $ownKey->id, 'shared' => $ownKey->shared] : null,
+            'shared_key' => $sharedKey ? ['id' => $sharedKey->id, 'is_owner' => $sharedKey->user_id === $userId] : null,
+            'can_share' => $ownKey && $ownKey->type !== 'no_key' && ! $sharedKey
+                && Permission::can($userId, 'liman', 'id', 'share_server_key'),
+            'can_unshare' => $sharedKey && ($sharedKey->user_id === $userId || (
+                Permission::can($userId, 'liman', 'id', 'update_server')
+                && Permission::can($userId, 'liman', 'id', 'server_details')
+            )),
+        ]);
+    }
+
     /**
      * Discover and approve an SSH endpoint used directly by an extension or tunnel.
      */
@@ -521,19 +567,20 @@ class ServerController extends Controller
         int $port,
         bool $replacementAllowed,
     ): array|JsonResponse {
+        $normalizedHost = SshHostKey::normalizeHost($host);
+        $trustedKeys = SshHostKey::activeForEndpoint($normalizedHost, $port)->get();
         try {
-            $discovered = (new SshHostKeyScanner)->discover($host, $port);
+            $discovered = (new SshHostKeyScanner)->discover($host, $port, $trustedKeys->pluck('key_type')->all());
         } catch (Throwable $exception) {
             report($exception);
 
             return response()->json([
-                'code' => 'SSH_HOST_KEY_UNAVAILABLE',
-                'message' => 'SSH sunucu kimliği alınamadı.',
+                ...SshConnectionDiagnostic::fromException($exception),
+                'host' => $normalizedHost,
+                'port' => $port,
+                'timeout_seconds' => max(1, (int) ceil(intval(config('liman.server_connection_timeout')) / 1000)),
             ], 422);
         }
-        $normalizedHost = SshHostKey::normalizeHost($host);
-
-        $trustedKeys = SshHostKey::activeForEndpoint($normalizedHost, $port)->get();
         $decision = SshHostKeyDecision::decide(
             $trustedKeys->pluck('public_key')->all(),
             $discovered['public_key'],

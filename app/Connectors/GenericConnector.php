@@ -15,9 +15,7 @@ class GenericConnector
     /**
      * Construct a new connector instance
      */
-    public function __construct(public $server = null, public $user = null)
-    {
-    }
+    public function __construct(public $server = null, public $user = null) {}
 
     /**
      * Execute command on remote server
@@ -67,8 +65,9 @@ class GenericConnector
                 ]
             );
 
+            $body = $response->getBody()->getContents();
             if ($response->getStatusCode() === 201) {
-                $json = json_decode($response->getBody()->getContents());
+                $json = json_decode($body);
                 if (isset($json->status) && $json->message === 'cannot connect to server') {
                     abort(
                         504,
@@ -77,7 +76,7 @@ class GenericConnector
                 }
             }
 
-            return $response->getBody()->getContents();
+            return $body;
         } catch (\Exception $exception) {
             $code = 504;
             try {
@@ -113,14 +112,13 @@ class GenericConnector
      * @return void
      */
     public function create(
-        \App\Models\Server $server,
+        Server $server,
         $username,
         $password,
         $user_id,
         $key,
         $port = null
-    ) {
-    }
+    ) {}
 
     /**
      * Send file to remote server
@@ -166,6 +164,7 @@ class GenericConnector
                 'password' => $password,
                 'port' => $port,
                 'key_type' => $type,
+                'detailed_errors' => '1',
             ])
         );
     }

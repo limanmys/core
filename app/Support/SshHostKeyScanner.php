@@ -13,18 +13,33 @@ final class SshHostKeyScanner
      *
      * @return array{host: string, port: int, key_type: string, public_key: string, fingerprint: string}
      */
-    public function discover(string $host, int $port): array
+    public function discover(string $host, int $port, array $trustedKeyTypes = []): array
     {
         $timeout = max(1, (int) ceil(intval(config('liman.server_connection_timeout')) / 1000));
         $normalizedHost = SshHostKey::normalizeHost($host);
         $ssh = new SSH2($normalizedHost, $port, $timeout);
-        $publicKey = $ssh->getServerPublicHostKey();
-
-        if (! is_string($publicKey) || trim($publicKey) === '') {
-            throw new RuntimeException('SSH sunucu anahtarı alınamadı.');
+        // Prefer approved algorithms, like the engine. Keep other algorithms as
+        // fallbacks so legitimate algorithm rotations can still be discovered.
+        if ($trustedKeyTypes !== []) {
+            $preferred = [];
+            foreach ($trustedKeyTypes as $type) {
+                array_push($preferred, ...($type === 'ssh-rsa' ? ['rsa-sha2-256', 'rsa-sha2-512', 'ssh-rsa'] : [$type]));
+            }
+            $ssh->setPreferredAlgorithms(['hostkey' => array_values(array_unique([
+                ...$preferred, ...SSH2::getSupportedHostKeyAlgorithms(),
+            ]))]);
         }
+        try {
+            $publicKey = $ssh->getServerPublicHostKey();
 
-        return self::fromOpenSshPublicKey($host, $port, $publicKey);
+            if (! is_string($publicKey) || trim($publicKey) === '') {
+                throw new RuntimeException($ssh->isTimeout() ? 'SSH handshake timed out.' : 'SSH sunucu anahtarı alınamadı.');
+            }
+
+            return self::fromOpenSshPublicKey($host, $port, $publicKey);
+        } finally {
+            $ssh->disconnect();
+        }
     }
 
     /**
