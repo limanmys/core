@@ -6,10 +6,12 @@ use App\Exceptions\JsonResponseException;
 use App\Http\Controllers\Controller;
 use App\Models\Extension;
 use App\Models\Permission;
-use App\System\Command;
 use App\Models\User;
+use App\System\Command;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
+use stdClass;
 
 /**
  * Access Log Controller
@@ -20,7 +22,7 @@ class AccessLogController extends Controller
     {
         if (! isset(auth('api')->user()->id)) {
             throw new JsonResponseException([
-                'message' => 'Tekrar giriş yapınız.'
+                'message' => 'Tekrar giriş yapınız.',
             ], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -46,12 +48,13 @@ class AccessLogController extends Controller
      */
     public function index()
     {
+        $serverId = $this->authorizedServerId();
         $data = Command::runLiman(
             'cat /liman/logs/liman_new.log | grep @{:user_id} | grep @{:server_id} | grep -v "recover middleware catch" | tail -{:page} | tac',
             [
                 'page' => 500,
                 'user_id' => strlen(request('log_user_id')) > 5 ? request('log_user_id') : '',
-                'server_id' => request('server_id'),
+                'server_id' => $serverId,
             ]
         );
         $clean = [];
@@ -63,13 +66,11 @@ class AccessLogController extends Controller
             return response()->json([]);
         }
 
-        foreach (explode("\n", (string) $data) as $row) {
-            $row = json_decode($row);
-
+        foreach ($this->parseLogs($data, $serverId) as $row) {
             try {
                 if (isset($row->request_details->extension_id)) {
                     if (! isset($knownExtensions[$row->request_details->extension_id])) {
-    
+
                         $extension = Extension::find($row->request_details->extension_id);
                         if ($extension) {
                             $knownExtensions[$row->request_details->extension_id] =
@@ -83,7 +84,7 @@ class AccessLogController extends Controller
                 } else {
                     $row->extension_id = __('Komut');
                 }
-    
+
                 if (! isset($knownUsers[$row->user_id])) {
                     $user = User::find($row->user_id);
                     if ($user) {
@@ -92,12 +93,12 @@ class AccessLogController extends Controller
                         $knownUsers[$row->user_id] = $row->user_id;
                     }
                 }
-    
+
                 $row->user_id = $knownUsers[$row->user_id];
-    
+
                 if (isset($row->request_details->lmntargetFunction)) {
                     $row->view = $row->request_details->lmntargetFunction;
-    
+
                     if (isset($row->request_details->lmntargetFunction) && $row->request_details->lmntargetFunction == '') {
                         if ($row->lmn_level == 'high_level' && isset($row->request_details->title)) {
                             $row->view = base64_decode($row->request_details->title);
@@ -106,7 +107,7 @@ class AccessLogController extends Controller
                 } else {
                     $row->view = __('Komut');
                 }
-    
+
                 $clean[] = $row;
             } catch (\Throwable $e) {
                 continue;
@@ -123,20 +124,21 @@ class AccessLogController extends Controller
      */
     public function details()
     {
-        $query = request('log_id');
-        $data = Command::runLiman('grep @{:query} /liman/logs/liman_new.log', [
-            'query' => $query,
-        ]);
-        if ($data == '') {
+        $serverId = $this->authorizedServerId();
+        $logId = request()->route('log_id');
+        $data = [];
+        if (Str::isUuid($logId)) {
+            $data = $this->parseLogs(Command::runLiman('grep -F -- @{:query} /liman/logs/liman_new.log', [
+                'query' => $logId,
+            ]), $serverId, $logId);
+        }
+        if ($data === []) {
             return response()->json([
-                'message' => 'Bu loga ait detay bulunamadı.'
+                'message' => 'Bu loga ait detay bulunamadı.',
             ], Response::HTTP_NOT_FOUND);
         }
-        $data = explode("\n", (string) $data);
         $logs = [];
         foreach ($data as $k_ => $row) {
-            $row = mb_convert_encoding($row, 'UTF-8', 'auto');
-            $row = json_decode($row);
             foreach ($row as $k => &$v) {
                 if ($k == 'level' || $k == 'log_id') {
                     continue;
@@ -188,5 +190,42 @@ class AccessLogController extends Controller
         }
 
         return response()->json($logs);
+    }
+
+    private function authorizedServerId(): string
+    {
+        $serverId = request()->route('server_id');
+        if (! is_string($serverId) || ! Permission::can(auth('api')->user()->id, 'server', 'id', $serverId)) {
+            throw new JsonResponseException(
+                ['message' => 'Bu işlem için yetkiniz bulunmamaktadır.'],
+                '',
+                Response::HTTP_FORBIDDEN
+            );
+        }
+
+        return $serverId;
+    }
+
+    /**
+     * @return list<stdClass>
+     */
+    private function parseLogs(string $data, string $serverId, ?string $logId = null): array
+    {
+        $rows = [];
+        foreach (explode("\n", $data) as $line) {
+            $row = json_decode(mb_convert_encoding($line, 'UTF-8', 'auto'));
+            if (! $row instanceof stdClass || ($row->request_details->server_id ?? null) !== $serverId) {
+                continue;
+            }
+
+            // Extension records can carry the originating request ID in request_details.
+            if ($logId !== null && ($row->log_id ?? null) !== $logId && ($row->request_details->log_id ?? null) !== $logId) {
+                continue;
+            }
+
+            $rows[] = $row;
+        }
+
+        return $rows;
     }
 }
