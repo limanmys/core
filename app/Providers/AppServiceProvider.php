@@ -2,12 +2,13 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\VerifyCsrfToken;
 use App\Models\Notification;
 use App\Models\Server;
+use App\Models\User;
 use App\Observers\NotificationObserver;
 use App\Observers\ServerObserver;
 use App\Observers\UserObserver;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Contracts\Http\Kernel;
@@ -31,8 +32,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(
         Router $router,
         Kernel $kernel
-    )
-    {
+    ) {
         Paginator::useBootstrap();
         Carbon::setLocale(app()->getLocale());
         Notification::observe(NotificationObserver::class);
@@ -47,16 +47,16 @@ class AppServiceProvider extends ServiceProvider
         if (! request()->headers->has('liman-token')) {
             $router->pushMiddlewareToGroup(
                 'web',
-                \App\Http\Middleware\VerifyCsrfToken::class
+                VerifyCsrfToken::class
             );
         }
 
         ResetPassword::createUrlUsing(function ($user, string $token) {
-            return sprintf(
-                '%s/auth/reset_password?token=%s&email=%s', 
-                request()->getSchemeAndHttpHost(), 
-                $token, 
-                $user->getEmailForPasswordReset()
+            return rtrim(config('app.url'), '/').'/auth/reset_password?'.http_build_query(
+                ['token' => $token, 'email' => $user->getEmailForPasswordReset()],
+                '',
+                '&',
+                PHP_QUERY_RFC3986
             );
         });
     }
@@ -66,7 +66,5 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
-    {
-    }
+    public function register() {}
 }
