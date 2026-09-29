@@ -4,6 +4,35 @@
     "keywords": ["liman", "linux", "havelsan"],
     "license": "MIT",
     "type": "project",
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "acsystems/keycloak-php-sdk",
+                "version": "4.4.0",
+                "type": "library",
+                "license": "MIT",
+                "dist": {
+                    "type": "zip",
+                    "url": "packages/keycloak-php-sdk-4.4.0.zip",
+                    "reference": "29545022aea3f317bdbb0539f160914c6afb2183",
+                    "shasum": "99f37c3357e9153e2d9b74de54b4393e075f6608"
+                },
+                "require": {
+                    "php": ">=7.4",
+                    "ext-json": "*",
+                    "guzzlehttp/guzzle": "^7.7",
+                    "league/oauth2-client": "^2.7"
+                },
+                "autoload": {
+                    "psr-4": {
+                        "Keycloak\\": "src/",
+                        "App\\Tests\\": "tests"
+                    }
+                }
+            }
+        }
+    ],
     "require": {
         "php": "^8.4",
         "acsystems/keycloak-php-sdk": "^4.4",

@@ -4,32 +4,22 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f3d1e864eb7812f0c20692ac85421a8a",
+    "content-hash": "58d38cce359e3b687bb1ca3dd8d4465f",
     "packages": [
         {
             "name": "acsystems/keycloak-php-sdk",
             "version": "4.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://bitbucket.org/acwebdev/keycloak-php-sdk.git",
-                "reference": "29545022aea3f317bdbb0539f160914c6afb2183"
-            },
             "dist": {
                 "type": "zip",
-                "url": "https://bitbucket.org/acwebdev/keycloak-php-sdk/get/29545022aea3f317bdbb0539f160914c6afb2183.zip",
+                "url": "packages/keycloak-php-sdk-4.4.0.zip",
                 "reference": "29545022aea3f317bdbb0539f160914c6afb2183",
-                "shasum": ""
+                "shasum": "99f37c3357e9153e2d9b74de54b4393e075f6608"
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^7.7",
                 "league/oauth2-client": "^2.7",
                 "php": ">=7.4"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^9.6",
-                "roave/security-advisories": "dev-latest",
-                "symfony/dotenv": "^v5.4"
             },
             "type": "library",
             "autoload": {
@@ -38,29 +28,9 @@
                     "App\\Tests\\": "tests"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "WebDev",
-                    "email": "web.support@ac-systems.com",
-                    "homepage": "https://ac-systems.be"
-                }
-            ],
-            "description": "PHP wrapper for the KeyCloak admin API",
-            "homepage": "https://bitbucket.org/acwebdev/keycloak-php-sdk",
-            "keywords": [
-                "admin",
-                "identity server",
-                "keycloak",
-                "sdk"
-            ],
-            "support": {
-                "source": "https://bitbucket.org/acwebdev/keycloak-php-sdk/src/29545022aea3f317bdbb0539f160914c6afb2183/?at=4.4.0"
-            },
-            "time": "2024-01-08T10:04:09+00:00"
+            ]
         },
         {
             "name": "ankitpokhrel/tus-php",
