@@ -14,10 +14,12 @@ use App\Models\SshHostKey;
 use App\Support\ServerConnectionStatus;
 use App\Support\SshConnectionDiagnostic;
 use App\Support\SshHostKeyDecision;
+use App\Support\SshHostKeyScanCache;
 use App\Support\SshHostKeyScanner;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use mervick\aesEverywhere\AES256;
 use Throwable;
@@ -434,6 +436,7 @@ class ServerController extends Controller
             'approve_host_key' => 'sometimes|boolean',
             'replace_host_key' => 'sometimes|boolean',
             'host_key_fingerprint' => 'sometimes|string|max:128',
+            'force_refresh' => 'sometimes|boolean',
         ]);
 
         $isApprovalRequest = $request->boolean('approve_host_key')
@@ -530,6 +533,7 @@ class ServerController extends Controller
             'approve_host_key' => 'sometimes|boolean',
             'replace_host_key' => 'sometimes|boolean',
             'host_key_fingerprint' => 'sometimes|string|max:128',
+            'force_refresh' => 'sometimes|boolean',
         ]);
 
         if (! Permission::can(auth('api')->user()->id, 'liman', 'id', 'add_server')) {
@@ -570,7 +574,19 @@ class ServerController extends Controller
         $normalizedHost = SshHostKey::normalizeHost($host);
         $trustedKeys = SshHostKey::activeForEndpoint($normalizedHost, $port)->get();
         try {
-            $discovered = (new SshHostKeyScanner)->discover($host, $port, $trustedKeys->pluck('key_type')->all());
+            $scanCache = new SshHostKeyScanCache(
+                Cache::store('redis'),
+                max(1, (int) ceil(intval(config('liman.server_connection_timeout')) / 1000)),
+            );
+            $discovered = $scanCache->discover(
+                $host,
+                $port,
+                $trustedKeys->pluck('public_key')->all(),
+                fn () => app(SshHostKeyScanner::class)->discover($host, $port, $trustedKeys->pluck('key_type')->all()),
+                $request->boolean('force_refresh')
+                    || $request->boolean('approve_host_key')
+                    || $request->boolean('replace_host_key'),
+            );
         } catch (Throwable $exception) {
             report($exception);
 
@@ -649,6 +665,8 @@ class ServerController extends Controller
             ],
             $decision === SshHostKeyDecision::REPLACE ? 'SSH_HOST_KEY_REPLACED' : 'SSH_HOST_KEY_APPROVED',
         );
+
+        $scanCache->rememberTrusted($discovered);
 
         return $discovered;
     }

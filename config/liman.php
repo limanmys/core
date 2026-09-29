@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'server_connection_timeout' => 5000, //ms
+    'server_connection_timeout' => 15000, //ms
     'default_views' => [
         'sidebar' => 'servers',
         'dashboard' => [
