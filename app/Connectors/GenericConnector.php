@@ -128,7 +128,8 @@ class GenericConnector
     public function sendFile($localPath, $remotePath, $permissions = 0644): string
     {
         return trim(
-            (string) self::request('putFile', [
+            (string) $this->request('putFile', [
+                'extension_id' => request('extension_id'),
                 'local_path' => $localPath,
                 'remote_path' => $remotePath,
             ])
@@ -143,7 +144,8 @@ class GenericConnector
     public function receiveFile($localPath, $remotePath): string
     {
         return trim(
-            (string) self::request('getFile', [
+            (string) $this->request('getFile', [
+                'extension_id' => request('extension_id'),
                 'local_path' => $localPath,
                 'remote_path' => $remotePath,
             ])
