@@ -95,8 +95,6 @@ class Ldap
      */
     public function search(string $filter, LDAPSearchOptions $options = new LDAPSearchOptions()): array
     {
-        $filter = html_entity_decode($filter);
-
         // Variables
         $cookie = '';
         $size = 0;
