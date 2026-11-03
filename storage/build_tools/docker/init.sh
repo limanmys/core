@@ -16,6 +16,8 @@ chmod -R 755 /liman/extensions
 chown liman:liman /liman/extensions
 chmod -R 755 /liman/keys
 chown -R liman:liman /liman/keys
+chown liman:liman /liman/keys/service.key
+chmod 600 /liman/keys/service.key
 chmod -R 700 /liman/logs
 chown -R liman:liman /liman/logs
 chmod -R 755 /liman/sandbox
