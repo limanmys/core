@@ -71,3 +71,15 @@ jobs:
           name: "Release ${{ env.RELEASE_VER }} - ${{ env.RELEASE_RUNNUMBER }}"
           tag_name: "release.${{ env.LIMAN_BRANCH }}.${{ env.RELEASE_RUNNUMBER }}"
           prerelease: ${{ env.PRERELEASE }}
+
+  docker:
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    uses: ./.github/workflows/docker-publish.yml
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
