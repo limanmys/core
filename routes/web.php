@@ -27,7 +27,7 @@ Route::any('/upload/{any?}', function () {
     return $response->send();
 })
     ->where('any', '.*')
-    ->middleware(['extension.access', 'throttle:upload']);
+    ->middleware(['extension.access']);
 
 Route::post('/upload_info', function () {
     request()->validate([
